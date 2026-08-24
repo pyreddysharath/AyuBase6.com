@@ -3,7 +3,7 @@
  *
  * Paste this into a Google Sheet's Apps Script editor (Extensions > Apps
  * Script), deploy it as a Web App, and point FEEDBACK_ENDPOINT in
- * HEALThee.html at the deployment URL. Every feedback submission on
+ * index.html at the deployment URL. Every feedback submission on
  * the site will then also be appended as a new row here, in real time,
  * from every visitor — not just stored in one person's browser.
  *
@@ -21,7 +21,7 @@
  *    the script — approve it (it's your own script, acting on your
  *    own sheet).
  * 6. Copy the "Web app URL" shown after deploying (it ends in /exec).
- * 7. In HEALThee.html, find:
+ * 7. In index.html, find:
  *        const FEEDBACK_ENDPOINT = ...;
  *    and set it to your deployed Web App URL.
  *
@@ -35,10 +35,10 @@
 function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var date = (e.parameter && e.parameter.date) || Utilities.formatDate(new Date().toISOString(), "Asia/Kolkata", "yyyy-MM-dd HH:mm:ss");
+    var date = (e.parameter && e.parameter.Date) || Utilities.formatDate(new Date(), "Asia/Kolkata", "yyyy-MM-dd HH:mm:ss");
     var website = (e.parameter && e.parameter.Website) || '';
-    var name = (e.parameter && e.parameter.name) || '';
-    var message = (e.parameter && e.parameter.message) || '';
+    var name = (e.parameter && e.parameter.Name) || '';
+    var message = (e.parameter && e.parameter.Message) || '';
     var status = (e.parameter && e.parameter.Status) || '';
 
     sheet.appendRow([date, website, name, message, status]);
