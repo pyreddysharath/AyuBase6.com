@@ -72,12 +72,12 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 #app-logo {
   font-size: clamp(2rem, 5vw, 2.8rem);
   font-weight: 900; letter-spacing: -2px;
-  display: flex; align-items: baseline; gap: 0;
+  display: flex; align-items: baseline; gap: 0.15em;
   line-height: 1;
   transition: all .3s;
 }
 #logo-heal {
-  color: #2563eb;            /* blue by default (Activity mode) */
+  color: #2563eb;            /* blue by default (Body/Activity mode) */
   font-style: normal;
   transition: color .3s;
 }
@@ -111,61 +111,26 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
   max-width: 100%; padding-bottom: 4px;
 }
 .tab-btn {
-  padding: 9px 30px; border-radius: 40px; border: 2px solid transparent;
-  font-size: .9rem; font-weight: 700; cursor: pointer;
-  transition: all .18s; letter-spacing: .3px; background: transparent;
-  display: inline-flex; align-items: center; gap: 6px;
-  flex: 0 0 auto; white-space: nowrap;
+  padding: 6px 12px; border: none; border-radius: 0;
+  font-size: .74rem; font-weight: 700; cursor: pointer;
+  transition: all .18s; letter-spacing: .2px; background: transparent;
+  display: inline-flex; flex-direction: column; align-items: center; gap: 4px;
+  flex: 0 0 auto; white-space: nowrap; box-shadow: none;
 }
-.tab-btn-icon{ width: 16px; height: 16px; flex: 0 0 auto; }
-.tab-btn.activity {
-  color: #2563eb; border-color: #3b82f6;
-  background: #eff6ff;
-}
-.tab-btn.activity.active {
-  background: #2563eb; color: #fff; border-color: #2563eb;
-  box-shadow: 0 3px 14px rgba(37,99,235,.35);
-}
-.tab-btn.nutrition {
-  color: #16a34a; border-color: #22c55e;
-  background: #f0fdf4;
-}
-.tab-btn.nutrition.active {
-  background: #16a34a; color: #fff; border-color: #16a34a;
-  box-shadow: 0 3px 14px rgba(22,163,74,.35);
-}
-.tab-btn.calculator {
-  color: var(--calc-2); border-color: var(--calc-3);
-  background: var(--calc-4);
-}
-.tab-btn.calculator.active {
-  background: var(--calc-2); color: #fff; border-color: var(--calc-2);
-  box-shadow: 0 3px 14px rgba(225,29,72,.35);
-}
-.tab-btn.alerts {
-  color: var(--alert-2); border-color: var(--alert-3);
-  background: var(--alert-4);
-}
-.tab-btn.alerts.active {
-  background: var(--alert-2); color: #fff; border-color: var(--alert-2);
-  box-shadow: 0 3px 14px rgba(13,148,136,.35);
-}
-.tab-btn.routines {
-  color: var(--rout-1); border-color: var(--rout-3);
-  background: var(--rout-4);
-}
-.tab-btn.routines.active {
-  background: var(--rout-2); color: #fff; border-color: var(--rout-2);
-  box-shadow: 0 3px 14px rgba(245,158,11,.35);
-}
-.tab-btn.mind {
-  color: var(--mind-2); border-color: var(--mind-3);
-  background: var(--mind-4);
-}
-.tab-btn.mind.active {
-  background: var(--mind-2); color: #fff; border-color: var(--mind-2);
-  box-shadow: 0 3px 14px rgba(99,102,241,.35);
-}
+.tab-btn-icon{ width: 30px; height: 30px; flex: 0 0 auto; opacity: .5; transition: opacity .18s, transform .18s; }
+.tab-btn.active .tab-btn-icon{ opacity: 1; transform: scale(1.12); }
+.tab-btn.activity { color: #93b8f5; }
+.tab-btn.activity.active { color: #2563eb; }
+.tab-btn.nutrition { color: #7cc99a; }
+.tab-btn.nutrition.active { color: #16a34a; }
+.tab-btn.calculator { color: var(--calc-3); }
+.tab-btn.calculator.active { color: var(--calc-2); }
+.tab-btn.alerts { color: var(--alert-3); }
+.tab-btn.alerts.active { color: var(--alert-2); }
+.tab-btn.routines { color: var(--rout-3); }
+.tab-btn.routines.active { color: var(--rout-2); }
+.tab-btn.mind { color: var(--mind-3); }
+.tab-btn.mind.active { color: var(--mind-2); }
 
 /* ── TAB PANELS ── */
 .tab-panel { display: none; }
@@ -1059,15 +1024,43 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   box-shadow:0 2px 18px rgba(146,64,14,.12);padding:20px;
   border:1px solid rgba(252,211,77,.5);margin-bottom:18px;
 }
-.rout-card h2{color:var(--rout-1);margin:0 0 14px}
+.rout-card h2{color:var(--rout-2);margin:0 0 14px;display:flex;align-items:center;gap:8px}
 .rout-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--rout-4)}
+.wake-control{
+  background:var(--rout-4);border-radius:12px;padding:14px 16px;margin-bottom:16px;
+}
+.wake-control-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:.92rem;font-weight:600;color:var(--rout-1);margin-bottom:10px;
+}
+.wake-slider{
+  -webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:4px;
+  background:linear-gradient(to right,
+    #ef4444 0%, #ef4444 25%,
+    #f59e0b 25%, #f59e0b 41.67%,
+    #22c55e 41.67%, #22c55e 58.33%,
+    #f59e0b 58.33%, #f59e0b 75%,
+    #ef4444 75%, #ef4444 100%);
+  outline:none;margin:4px 0;
+}
+.wake-range-ends{display:flex;justify-content:space-between;font-size:.72rem;color:var(--rout-1);opacity:.7;margin-top:2px}
+.wake-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;
+  background:#fff;border:3px solid var(--rout-1);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.wake-slider::-moz-range-thumb{
+  width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--rout-1);
+  cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.wake-zone-label{font-size:.8rem;font-weight:700;text-align:center;margin-top:6px}
 .rout-row:last-child{border-bottom:none}
 .rout-check{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.9rem;color:var(--rout-1);flex:1}
 .rout-check input[type=checkbox]{width:18px;height:18px;accent-color:var(--rout-2);flex-shrink:0}
 .rout-check input[type=checkbox]:checked ~ span{text-decoration:line-through;opacity:.55}
 .rout-time{font-size:.78rem;color:#a06a2e;font-weight:400}
-.rout-info-btn{color:var(--rout-2)}
-.rout-info-btn:hover,.rout-info-btn.active{background:var(--rout-2)}
+.calc-info-btn.rout-info-btn{color:var(--rout-2);border-color:var(--rout-3)}
+.calc-info-btn.rout-info-btn:hover,.calc-info-btn.rout-info-btn.active{background:var(--rout-2);border-color:var(--rout-2)}
+.calc-task.rout-info-panel{color:var(--rout-1);background:var(--rout-4)}
 .rout-info-panel{background:var(--rout-4);color:var(--rout-1);margin:0 0 10px}
 
 /* ─── MIND TAB ─────────────────────────────────── */
@@ -1094,6 +1087,17 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .mind-body{font-size:.88rem;line-height:1.55;color:#3f3f6b;margin:0 0 10px}
 .mind-why{font-size:.82rem;line-height:1.5;color:var(--mind-1);background:var(--mind-4);border-radius:10px;padding:10px 12px;margin:0}
 .mind-why strong{color:var(--mind-1)}
+.mind-topic-list{list-style:none;margin:0;padding:0}
+.mind-topic-list li{
+  font-size:.85rem;line-height:1.5;color:#3f3f6b;
+  padding:8px 0;border-bottom:1px solid var(--mind-4);
+}
+.mind-topic-list li:last-child{border-bottom:none}
+.mind-topic-list strong{color:var(--mind-1)}
+.mind-goal{
+  text-align:center;font-size:.92rem;font-weight:700;color:var(--mind-1);
+  background:var(--mind-4);border-radius:12px;padding:14px 16px;margin-top:6px;
+}
 .page-reset-row{display:flex;justify-content:flex-end;margin-bottom:10px}
 .reset-icon-btn{
   font-size:.76rem;font-weight:600;padding:6px 14px;border-radius:20px;
@@ -1104,6 +1108,24 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .reset-icon-btn.calc-reset{border-color:var(--calc-3);color:var(--calc-2)}
 .alert-page .reset-icon-btn{border-color:var(--alert-3);color:var(--alert-2)}
 .alert-page .reset-icon-btn:hover{background:var(--alert-2);color:#fff;border-color:var(--alert-2)}
+.nudge-intro{
+  font-size:.86rem;line-height:1.5;color:var(--alert-1);text-align:center;
+  background:var(--alert-4);border-radius:12px;padding:12px 16px;margin-bottom:18px;
+}
+.nudge-stats-row{display:flex;gap:10px;text-align:center}
+.nudge-stat{flex:1;background:var(--alert-4);border-radius:12px;padding:12px 8px}
+.nudge-stat-num{font-size:1.4rem;font-weight:800;color:var(--alert-2)}
+.nudge-stat-lbl{font-size:.72rem;color:var(--alert-1);margin-top:2px}
+.nudge-plan-note{font-size:.8rem;color:var(--alert-1);text-align:center;margin-top:14px}
+.nudge-plan-note strong{color:var(--alert-2)}
+.nudge-section-lbl{
+  font-size:.9rem;font-weight:800;color:var(--alert-1);margin:22px 0 12px;
+  display:flex;align-items:center;gap:8px;
+}
+.nudge-goal{
+  text-align:center;font-size:.92rem;font-weight:700;color:var(--alert-1);
+  background:var(--alert-4);border-radius:12px;padding:14px 16px;margin-top:18px;
+}
 .reminders-notif-banner{
   display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 14px;
   background:var(--alert-4);border:1px solid rgba(94,234,212,.5);border-radius:12px;
@@ -1961,12 +1983,34 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
     <span id="logo-heal">Ayu</span> <span id="logo-thee">Base6</span>
   </div>
   <div id="tab-btns">
-    <button class="tab-btn activity active" onclick="switchTab('activity')">🏃 Body</button>
-    <button class="tab-btn nutrition" onclick="switchTab('nutrition')">🥗 Food</button>
-    <button class="tab-btn routines" onclick="switchTab('routines')">☀️ Routines</button>
-    <button class="tab-btn alerts" onclick="switchTab('alerts')"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/></svg> Reminders</button>
-    <button class="tab-btn mind" onclick="switchTab('mind')">🧘 Mind</button>
-    <button class="tab-btn calculator" onclick="switchTab('calculator')">🔬 Vitals</button>
+    <button class="tab-btn activity active" onclick="switchTab('activity')"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="url(#gradBody)"><path d="M13.5 5.5a2 2 0 100-4 2 2 0 000 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg> 1. BODY</button>
+    <button class="tab-btn nutrition" onclick="switchTab('nutrition')"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="url(#gradFood)"><path d="M12 6.5c-.5-1.5-2-2.5-3.5-2S6 6 6.5 7.5c-2 .5-3.5 2.5-3.5 5C3 16.5 6.5 20 9 20c1 0 1.5-.5 3-.5s2 .5 3 .5c2.5 0 6-3.5 6-7.5 0-2.5-1.5-4.5-3.5-5 .3-1-.3-2.5-1.5-3S12.3 5 12 6.5z"/></svg> 2. FOOD</button>
+    <button class="tab-btn routines" onclick="switchTab('routines')"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="url(#gradRoutines)"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg> 3. ROUTINES</button>
+    <button class="tab-btn alerts" onclick="switchTab('alerts')"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="url(#gradNudges)"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/></svg> 4. NUDGES</button>
+    <button class="tab-btn mind" onclick="switchTab('mind')"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="url(#gradMind)"><path d="M12 3c-4.97 0-9 4.03-9 9 0 1.31.29 2.55.79 3.68.53-.79 1.28-1.58 2.32-2.25C7.36 11.02 9.5 9 12 9s4.64 2.02 5.89 4.43c1.04.67 1.79 1.46 2.32 2.25.5-1.13.79-2.37.79-3.68 0-4.97-4.03-9-9-9zm0 12c-2.67 0-5.15 1.15-6.88 3.06C6.68 19.48 9.19 21 12 21s5.32-1.52 6.88-3.94C17.15 16.15 14.67 15 12 15z"/></svg> 5. MIND</button>
+    <button class="tab-btn calculator" onclick="switchTab('calculator')"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="url(#gradVitals)"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> 6. VITALS</button>
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <linearGradient id="gradBody" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#38bdf8"/>
+        </linearGradient>
+        <linearGradient id="gradFood" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#16a34a"/><stop offset="100%" stop-color="#86efac"/>
+        </linearGradient>
+        <linearGradient id="gradRoutines" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fcd34d"/>
+        </linearGradient>
+        <linearGradient id="gradNudges" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#0d9488"/><stop offset="100%" stop-color="#5eead4"/>
+        </linearGradient>
+        <linearGradient id="gradMind" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a5b4fc"/>
+        </linearGradient>
+        <linearGradient id="gradVitals" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#e11d48"/><stop offset="100%" stop-color="#fda4af"/>
+        </linearGradient>
+      </defs>
+    </svg>
   </div>
 </nav>
 
@@ -2111,59 +2155,6 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
       <button type="button" class="reminders-notif-banner-btn" onclick="requestNotificationPermission()">Enable</button>
     </div>
 
-    <!-- DRINK — hydration reminder -->
-    <div class="alert-card" id="alert-card-drink">
-      <div class="alert-card-hdr">
-        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8 8 4 12.5 4 16a8 8 0 0016 0c0-3.5-4-8-8-14z"/></svg><span class="section-title-text">Water</span></h2>
-        <button type="button" class="alert-info-btn" id="alert-drink-info-btn" onclick="toggleAlertTask('drink')" title="Why it helps">i</button>
-      </div>
-
-      <div class="alert-task" id="alert-drink-task" style="display:none">
-        <p class="alert-card-sub">Stay on top of hydration through the day.</p>
-        <strong>How much to drink:</strong> aim for roughly 200–250ml (a glass) at each reminder — that works out
-        to about 2–3 litres across a day for most adults, adjusted for activity level and climate.
-        <ul>
-          <li>Supports concentration and energy — even mild dehydration affects focus</li>
-          <li>Helps digestion and keeps skin and joints healthier</li>
-          <li>Small, frequent sips are easier on the body than drinking a lot at once</li>
-        </ul>
-      </div>
-
-      <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Remind every <span class="alert-time-val" id="alert-drink-time-val">60 min</span></div>
-        <input type="range" id="alert-drink-time" class="bmi-slider alert-slider" min="5" max="120" step="5" value="60" oninput="onAlertTimeChange('drink')">
-      </div>
-
-      <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Sound</div>
-        <div class="alert-sound-row">
-          <select id="alert-drink-sound" class="alert-sound-select" onchange="onAlertSoundChange('drink')">
-            <option value="drop">Water Drop (default)</option>
-            <option value="bubble">Bubble</option>
-            <option value="splash">Splash</option>
-            <option value="bell">Soft Bell</option>
-          </select>
-          <button type="button" class="alert-icon-btn" id="alert-drink-play" title="Preview sound" onclick="previewAlertSound('drink')">▶</button>
-          <button type="button" class="alert-icon-btn" id="alert-drink-mute" title="Mute" onclick="toggleAlertMute('drink')">🔊</button>
-        </div>
-      </div>
-
-      <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
-        <input type="checkbox" id="alert-drink-notify" class="notify-cb" checked onchange="onAlertNotifyChange('drink')">
-        <label for="alert-drink-notify" class="notify-icon-label" title="Notify">
-          <span class="notify-icon-off"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/><path d="M2 2l20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></span><span class="notify-icon-on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/></svg></span>
-        </label>
-        <button type="button" class="alert-preview-btn" onclick="previewAlertNotification('drink')">Preview notification</button>
-      </div>
-      <div class="notif-blocked-hint" id="alert-drink-notif-hint" style="display:none">🚫 Notifications are blocked in your browser for this site. Enable them in your browser's site settings, then reload.</div>
-      <div class="notif-mock" id="alert-drink-notif-mock">
-        <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-drink-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
-        <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8 8 4 12.5 4 16a8 8 0 0016 0c0-3.5-4-8-8-14z"/></svg></span>
-        <div class="notif-mock-text"><strong>Water</strong><span>Drink a glass of water — about 200ml keeps you on track!</span></div>
-      </div>
-
-    </div>
-
     <!-- EYES: 20-20-20 — most frequent -->
     <div class="alert-card" id="alert-card-break">
       <div class="alert-card-hdr">
@@ -2269,6 +2260,59 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 
     </div>
 
+    <!-- DRINK — hydration reminder -->
+    <div class="alert-card" id="alert-card-drink">
+      <div class="alert-card-hdr">
+        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8 8 4 12.5 4 16a8 8 0 0016 0c0-3.5-4-8-8-14z"/></svg><span class="section-title-text">Water</span></h2>
+        <button type="button" class="alert-info-btn" id="alert-drink-info-btn" onclick="toggleAlertTask('drink')" title="Why it helps">i</button>
+      </div>
+
+      <div class="alert-task" id="alert-drink-task" style="display:none">
+        <p class="alert-card-sub">Stay on top of hydration through the day.</p>
+        <strong>How much to drink:</strong> aim for roughly 200–250ml (a glass) at each reminder — that works out
+        to about 2–3 litres across a day for most adults, adjusted for activity level and climate.
+        <ul>
+          <li>Supports concentration and energy — even mild dehydration affects focus</li>
+          <li>Helps digestion and keeps skin and joints healthier</li>
+          <li>Small, frequent sips are easier on the body than drinking a lot at once</li>
+        </ul>
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-row-lbl dotted-lbl">Remind every <span class="alert-time-val" id="alert-drink-time-val">60 min</span></div>
+        <input type="range" id="alert-drink-time" class="bmi-slider alert-slider" min="5" max="120" step="5" value="60" oninput="onAlertTimeChange('drink')">
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-row-lbl dotted-lbl">Sound</div>
+        <div class="alert-sound-row">
+          <select id="alert-drink-sound" class="alert-sound-select" onchange="onAlertSoundChange('drink')">
+            <option value="drop">Water Drop (default)</option>
+            <option value="bubble">Bubble</option>
+            <option value="splash">Splash</option>
+            <option value="bell">Soft Bell</option>
+          </select>
+          <button type="button" class="alert-icon-btn" id="alert-drink-play" title="Preview sound" onclick="previewAlertSound('drink')">▶</button>
+          <button type="button" class="alert-icon-btn" id="alert-drink-mute" title="Mute" onclick="toggleAlertMute('drink')">🔊</button>
+        </div>
+      </div>
+
+      <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
+        <input type="checkbox" id="alert-drink-notify" class="notify-cb" checked onchange="onAlertNotifyChange('drink')">
+        <label for="alert-drink-notify" class="notify-icon-label" title="Notify">
+          <span class="notify-icon-off"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/><path d="M2 2l20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></span><span class="notify-icon-on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/></svg></span>
+        </label>
+        <button type="button" class="alert-preview-btn" onclick="previewAlertNotification('drink')">Preview notification</button>
+      </div>
+      <div class="notif-blocked-hint" id="alert-drink-notif-hint" style="display:none">🚫 Notifications are blocked in your browser for this site. Enable them in your browser's site settings, then reload.</div>
+      <div class="notif-mock" id="alert-drink-notif-mock">
+        <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-drink-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
+        <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8 8 4 12.5 4 16a8 8 0 0016 0c0-3.5-4-8-8-14z"/></svg></span>
+        <div class="notif-mock-text"><strong>Water</strong><span>Drink a glass of water — about 200ml keeps you on track!</span></div>
+      </div>
+
+    </div>
+
     <!-- EYES: GUIDED EXERCISE — follow-the-dot animation -->
     <div class="alert-card" id="alert-card-break-ex">
       <div class="alert-card-hdr">
@@ -2353,7 +2397,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
     </div>
 
     <div class="page-reset-row" style="margin-top:10px">
-      <button type="button" class="reset-icon-btn" title="Reset Reminders to defaults" onclick="resetRemindersToDefault()">↺ Reset</button>
+      <button type="button" class="reset-icon-btn" title="Reset Nudges to defaults" onclick="resetRemindersToDefault()">↺ Reset</button>
     </div>
 
   </div>
@@ -2364,15 +2408,39 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   <div class="rout-page">
 
     <div class="rout-card">
+      <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg> Wake-Up Time</h2>
+      <div class="wake-control">
+        <div class="wake-control-hdr">
+          <span>Wake up at <strong id="wake-time-val">5:45 AM</strong></span>
+          <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('wake')" title="Why?">i</button>
+        </div>
+        <input type="range" id="wake-time-slider" min="180" max="540" step="15" value="345" class="wake-slider">
+        <div class="wake-range-ends"><span>3:00 AM</span><span>9:00 AM</span></div>
+        <div class="wake-zone-label" id="wake-zone-label">🟢 Great wake-up time</div>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-wake" style="display:none">
+        <strong>3:00 – 4:30 AM</strong> is far earlier than the body's natural rhythm and usually cuts sleep
+        short — red zone.<br>
+        <strong>4:30 – 5:30 AM</strong> works for early risers used to it, but can still shorten sleep for most
+        people — orange zone.<br>
+        <strong>5:30 – 6:30 AM</strong> lines up well with most people's natural cortisol rhythm and gives a calm
+        morning before the day's demands start — green zone, the sweet spot.<br>
+        <strong>6:30 – 7:30 AM</strong> is still a perfectly healthy, common wake time — orange-green.<br>
+        <strong>7:30 – 9:00 AM</strong> tends to compress the rest of the day's routine into a shorter window —
+        orange zone.<br>
+        Every activity below shifts automatically with whatever you pick here, and the Sleep time is always set
+        to give at least 8 hours before the next wake-up.
+      </div>
+    </div>
+
+    <div class="rout-card">
       <h2>☀️ Morning</h2>
+
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="wake"> <span>Wake up <span class="rout-time">(5:30 – 6:00 AM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="walkex"> <span>Walk or Exercise <span class="rout-time" id="rt-walkex">(6:00 – 6:45 AM)</span></span></label>
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="walkex"> <span>Walk or Exercise <span class="rout-time">(6:00 – 6:45 AM)</span></span></label>
-      </div>
-      <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="palms"> <span>Rub palms together and place over closed eyes <span class="rout-time">(6:45 AM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="palms"> <span>Rub palms together and place over closed eyes <span class="rout-time" id="rt-palms">(6:45 AM)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('palms')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-palms" style="display:none">
@@ -2380,7 +2448,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
         rest, easing the eyes into the day rather than opening straight into bright light or a screen.
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="water"> <span>Drink water <span class="rout-time">(6:50 AM, 1–2 glasses)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="water"> <span>Drink water <span class="rout-time" id="rt-water">(6:50 AM, 1–2 glasses)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('water')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-water" style="display:none">
@@ -2388,45 +2456,41 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
         your body loses water through breathing and sweat even while asleep.
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="bathroom"> <span>Wait a while, then go to the bathroom <span class="rout-time">(7:00 AM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="bathroom"> <span>Wait a while, then go to the bathroom <span class="rout-time" id="rt-bathroom">(7:00 AM)</span></span></label>
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="breakfast"> <span>Breakfast <span class="rout-time">(7:30 – 8:30 AM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="breakfast"> <span>Breakfast <span class="rout-time" id="rt-breakfast">(7:30 – 8:30 AM)</span></span></label>
       </div>
     </div>
 
     <div class="rout-card">
       <h2>🌤️ Afternoon</h2>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="fruits"> <span>Fruits <span class="rout-time">(11:00 AM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="fruits"> <span>Fruits <span class="rout-time" id="rt-fruits">(11:00 AM)</span></span></label>
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="lunch"> <span>Lunch <span class="rout-time">(12:30 – 1:30 PM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="lunch"> <span>Lunch <span class="rout-time" id="rt-lunch">(12:30 – 1:30 PM)</span></span></label>
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="snacks"> <span>Snacks <span class="rout-time">(4:00 – 5:00 PM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="snacks"> <span>Snacks <span class="rout-time" id="rt-snacks">(4:00 – 5:00 PM)</span></span></label>
       </div>
     </div>
 
     <div class="rout-card">
       <h2>🌙 Evening &amp; Night</h2>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="dinner"> <span>Dinner <span class="rout-time">(7:00 – 8:00 PM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="dinner"> <span>Dinner <span class="rout-time" id="rt-dinner">(7:00 – 8:00 PM)</span></span></label>
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="nomobile"> <span>Do not use mobile <span class="rout-time">(9:00 – 10:00 PM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="nomobile"> <span>Do not use mobile <span class="rout-time" id="rt-nomobile">(9:00 – 10:00 PM)</span></span></label>
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="sleep"> <span>Sleep <span class="rout-time">(10:00 – 11:00 PM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="sleep"> <span>Sleep <span class="rout-time" id="rt-sleep">(10:00 – 11:00 PM)</span></span></label>
       </div>
     </div>
 
     <div style="text-align:center;margin-top:6px">
       <button type="button" class="refresh-btn" onclick="remindMeNowAll()">🔔 Remind Me</button>
-    </div>
-
-    <div class="page-reset-row" style="margin-top:10px">
-      <button type="button" class="reset-icon-btn" title="Reset today's checklist" onclick="resetRoutinesChecklist()">↺ Reset</button>
     </div>
 
   </div>
@@ -2437,73 +2501,47 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 <div id="mind-panel" class="tab-panel" style="display:none">
   <div class="mind-page">
 
-    <div class="mind-intro">A calm mind is as much a daily practice as exercise or diet — a few small,
-    repeatable habits below, not one-time fixes.</div>
+    <div class="mind-intro">Mental wellbeing and stress management — a calm mind is as much a daily practice
+    as exercise or diet.</div>
 
     <div class="mind-card">
-      <div class="mind-card-hdr"><span class="mind-icon">😌</span><h2>Let Go of Stress</h2></div>
-      <div class="mind-pill">Try: 4 slow breaths — in for 4, hold 4, out for 4</div>
-      <p class="mind-body">Stress is the body's alarm system stuck in the "on" position — useful for a moment of
-      real danger, harmful when it runs all day. Take a few slow, deep breaths whenever you notice your shoulders
-      tightening or your mind racing; step away from the task for two minutes if you can.</p>
-      <p class="mind-why"><strong>Why it matters:</strong> chronic stress keeps cortisol elevated, which disturbs
-      sleep, digestion, and focus — a short pause to breathe costs far less time than the mistakes and fatigue
-      that unmanaged stress causes later in the day.</p>
+      <div class="mind-card-hdr"><span class="mind-icon">🧘</span><h2>Calm the Mind</h2></div>
+      <ul class="mind-topic-list">
+        <li><strong>Stress management</strong> — notice tension early and step away for two minutes before it builds up.</li>
+        <li><strong>Breathing exercises</strong> — 4 slow breaths (in 4, hold 4, out 4) resets a racing mind fast.</li>
+        <li><strong>Meditation</strong> — even 5 quiet minutes a day trains the mind to settle faster under pressure.</li>
+        <li><strong>Mindfulness</strong> — bring full attention to one task at a time instead of half-attention to many.</li>
+        <li><strong>Relaxation</strong> — deliberately unclench your jaw and shoulders a few times a day.</li>
+      </ul>
     </div>
 
     <div class="mind-card">
-      <div class="mind-card-hdr"><span class="mind-icon">🔥</span><h2>Cool Down Anger</h2></div>
-      <div class="mind-pill">Try: pause 10 seconds before responding</div>
-      <p class="mind-body">When anger rises, pause before reacting — even ten seconds of silence, or stepping out
-      of the room, is often enough for the first wave to pass. Respond once you can think clearly, not while the
-      emotion is still driving.</p>
-      <p class="mind-why"><strong>Why it matters:</strong> words and decisions made in anger are hard to take
-      back, and the physical toll — raised blood pressure, tense muscles — lingers long after the moment has
-      passed.</p>
+      <div class="mind-card-hdr"><span class="mind-icon">📵</span><h2>Digital Wellbeing</h2></div>
+      <ul class="mind-topic-list">
+        <li><strong>Screen breaks</strong> — look away from every screen for a few minutes each hour.</li>
+        <li><strong>Digital wellbeing</strong> — set a cut-off time for notifications and social media each night.</li>
+      </ul>
     </div>
 
     <div class="mind-card">
-      <div class="mind-card-hdr"><span class="mind-icon">🪞</span><h2>Quiet the Ego</h2></div>
-      <div class="mind-pill">Try: ask "does this really need defending?"</div>
-      <p class="mind-body">Much of anger, jealousy, and selfishness trace back to the same root — the need to be
-      right, to win, or to be seen as better than someone else. Notice when you're arguing to protect your pride
-      rather than to reach the truth, and let the small ones go.</p>
-      <p class="mind-why"><strong>Why it matters:</strong> a mind less busy defending itself has far more room
-      left for the people and things that actually matter — this is the one habit here that quietly makes all
-      the others easier.</p>
+      <div class="mind-card-hdr"><span class="mind-icon">🤝</span><h2>Connect &amp; Live</h2></div>
+      <ul class="mind-topic-list">
+        <li><strong>Social connection</strong> — a short real conversation does more for mood than a long scroll.</li>
+        <li><strong>Hobbies</strong> — protect time each week for something you do purely because you enjoy it.</li>
+        <li><strong>Time outdoors</strong> — daylight and fresh air lift mood and reset focus better than another coffee.</li>
+      </ul>
     </div>
 
     <div class="mind-card">
-      <div class="mind-card-hdr"><span class="mind-icon">🤝</span><h2>Let Go of Selfishness</h2></div>
-      <div class="mind-pill">Try: ask what's fair for both sides</div>
-      <p class="mind-body">Notice when a decision is being made purely for personal gain at someone else's
-      expense, and ask what a fairer version of that choice would look like. Small, genuine acts of consideration
-      for others build trust that self-interest alone never can.</p>
-      <p class="mind-why"><strong>Why it matters:</strong> relationships built on give-and-take are far more
-      resilient — and satisfying — than ones optimized only for what you can get, which tend to erode over
-      time.</p>
+      <div class="mind-card-hdr"><span class="mind-icon">📝</span><h2>Reflect &amp; Balance</h2></div>
+      <ul class="mind-topic-list">
+        <li><strong>Gratitude</strong> — name one good thing daily; it shifts attention away from what's going wrong.</li>
+        <li><strong>Mood check-ins</strong> — a quick "how am I actually doing today?" catches problems early.</li>
+        <li><strong>Work/rest balance</strong> — a defined stop time protects tomorrow's energy as much as today's output.</li>
+      </ul>
     </div>
 
-    <div class="mind-card">
-      <div class="mind-card-hdr"><span class="mind-icon">🌱</span><h2>Release Jealousy</h2></div>
-      <div class="mind-pill">Try: write one thing you're working toward</div>
-      <p class="mind-body">When you catch yourself comparing your situation to someone else's, redirect that
-      energy toward your own progress instead — write down one thing you're working toward, rather than one
-      thing someone else has.</p>
-      <p class="mind-why"><strong>Why it matters:</strong> jealousy keeps attention fixed on what you lack
-      relative to others, which quietly undermines gratitude for what you already have and rarely leads to any
-      real action.</p>
-    </div>
-
-    <div class="mind-card">
-      <div class="mind-card-hdr"><span class="mind-icon">🙏</span><h2>A Simple Daily Practice</h2></div>
-      <div class="mind-pill">Try: name one thing you're grateful for tonight</div>
-      <p class="mind-body">A few minutes of quiet reflection or gratitude each day — before sleep or right after
-      waking — gives the mind a chance to reset. Naming even one thing you're grateful for shifts attention away
-      from what's going wrong.</p>
-      <p class="mind-why"><strong>Why it matters:</strong> a calm, uncluttered mind makes every other habit in
-      this app — eating well, moving daily, sleeping on time — easier to actually follow through on.</p>
-    </div>
+    <div class="mind-goal">🎯 Goal: A healthy body needs a healthy mind.</div>
 
   </div>
 </div>
@@ -6602,8 +6640,133 @@ function toggleRoutineInfo(key){
 }
 initRoutinesChecklist();
 
+// ════════════════════════════════════════════════
+//  ROUTINES — wake-time slider drives every other
+//  activity's displayed time, via a fixed offset (in
+//  minutes) from whatever wake time is chosen.
+// ════════════════════════════════════════════════
+const WAKE_OFFSETS = {
+  walkex:    [15, 60],
+  palms:     [60],
+  water:     [65],
+  bathroom:  [75],
+  breakfast: [105, 165],
+  fruits:    [315],
+  lunch:     [405, 465],
+  snacks:    [615, 675],
+  dinner:    [795, 855],
+  nomobile:  [900, 960],
+  sleep:     [960, 1005],
+};
+function minutesToClock(totalMin){
+  let m=((totalMin%1440)+1440)%1440;
+  let h=Math.floor(m/60), mm=m%60;
+  const ampm = h>=12 ? 'PM' : 'AM';
+  let h12 = h%12; if(h12===0) h12=12;
+  return h12+':'+String(mm).padStart(2,'0')+' '+ampm;
+}
+function updateWakeSchedule(){
+  const slider=document.getElementById('wake-time-slider');
+  if(!slider) return;
+  const wake=+slider.value;
+  document.getElementById('wake-time-val').textContent=minutesToClock(wake);
+
+  // Colour-zone feedback, matching the slider track's own 5 bands —
+  // red / orange / green / orange / red across the 3:00-9:00 AM range.
+  const zoneLabel=document.getElementById('wake-zone-label');
+  let zoneText, zoneColor;
+  if(wake>=330 && wake<390){ zoneText='🟢 Great wake-up time'; zoneColor='#16a34a'; }
+  else if((wake>=270 && wake<330) || (wake>=390 && wake<450)){ zoneText='🟠 Okay — still a healthy wake-up time'; zoneColor='#d97706'; }
+  else { zoneText='🔴 Quite early or late — adjust if you can'; zoneColor='#dc2626'; }
+  if(zoneLabel){ zoneLabel.textContent=zoneText; zoneLabel.style.color=zoneColor; }
+
+  // Ripple the new wake time through every other activity.
+  Object.keys(WAKE_OFFSETS).forEach(key=>{
+    const el=document.getElementById('rt-'+key);
+    if(!el) return;
+    const offsets=WAKE_OFFSETS[key];
+    if(offsets.length===2){
+      el.textContent=`(${minutesToClock(wake+offsets[0])} – ${minutesToClock(wake+offsets[1])})`;
+    } else {
+      let extra='';
+      if(key==='water') extra=', 1–2 glasses';
+      el.textContent=`(${minutesToClock(wake+offsets[0])}${extra})`;
+    }
+  });
+}
+const wakeSliderEl=document.getElementById('wake-time-slider');
+if(wakeSliderEl){
+  wakeSliderEl.addEventListener('input', updateWakeSchedule);
+  updateWakeSchedule();
+}
+
+// ════════════════════════════════════════════════
+//  NUDGES TAB — the daily habit checklist, with a
+//  per-day history in localStorage so a streak and
+//  weekly/monthly completion % can be computed.
+// ════════════════════════════════════════════════
+const NUDGE_STORE_KEY='ayuBase6NudgeHistory';
+const NUDGE_KEYS=['morning','meal','exercise','sleep','hydration','hygiene','sunlight','sittingbreaks','screentime'];
+
+function loadNudgeHistory(){
+  let raw=null;
+  try{ raw=JSON.parse(localStorage.getItem(NUDGE_STORE_KEY)||'null'); }catch(e){}
+  return raw || {};
+}
+function saveNudgeHistory(hist){
+  try{ localStorage.setItem(NUDGE_STORE_KEY, JSON.stringify(hist)); }catch(e){}
+}
+function dayCompletionPct(dayObj){
+  if(!dayObj) return 0;
+  const checkedCount = NUDGE_KEYS.filter(k=>dayObj[k]).length;
+  return checkedCount / NUDGE_KEYS.length;
+}
+function updateNudgeStats(){
+  const hist=loadNudgeHistory();
+  let streak=0;
+  let d=new Date();
+  for(let i=0;i<365;i++){
+    const pct=dayCompletionPct(hist[d.toDateString()]);
+    if(pct>=1){ streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  function avgOverDays(n){
+    let sum=0, count=0, dd=new Date();
+    for(let i=0;i<n;i++){
+      const key=dd.toDateString();
+      if(hist[key]){ sum+=dayCompletionPct(hist[key]); count++; }
+      dd.setDate(dd.getDate()-1);
+    }
+    return count ? Math.round((sum/count)*100) : 0;
+  }
+  const streakEl=document.getElementById('nudge-streak');
+  const weeklyEl=document.getElementById('nudge-weekly');
+  const monthlyEl=document.getElementById('nudge-monthly');
+  if(streakEl) streakEl.textContent=streak;
+  if(weeklyEl) weeklyEl.textContent=avgOverDays(7)+'%';
+  if(monthlyEl) monthlyEl.textContent=avgOverDays(30)+'%';
+}
+function initNudgeChecklist(){
+  const today=new Date().toDateString();
+  const hist=loadNudgeHistory();
+  const todayChecked=hist[today] || {};
+  document.querySelectorAll('.nudge-cb').forEach(cb=>{
+    const key=cb.dataset.key;
+    cb.checked=!!todayChecked[key];
+    cb.addEventListener('change',()=>{
+      const h=loadNudgeHistory();
+      if(!h[today]) h[today]={};
+      h[today][key]=cb.checked;
+      saveNudgeHistory(h);
+      updateNudgeStats();
+    });
+  });
+  updateNudgeStats();
+}
+initNudgeChecklist();
+
 function resetRemindersToDefault(){
-  if(!confirm('Reset all Reminders back to their defaults?')) return;
+  if(!confirm('Reset all Nudges back to their defaults?')) return;
 
   const permGranted=(typeof Notification!=='undefined' && Notification.permission==='granted');
 
