@@ -7769,6 +7769,16 @@ function getFeedbackEntries(){
 function saveFeedbackEntries(list){
   localStorage.setItem(FEEDBACK_STORAGE_KEY, JSON.stringify(list));
 }
+// dd-MMM-yyyy for the date, then the locale time with seconds dropped —
+// no comma between the two (just a space), e.g. "18-Sep-2026 1:23 PM".
+function formatFeedbackTimestamp(d){
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mmm = MONTHS[d.getMonth()];
+  const yyyy = d.getFullYear();
+  const timeNoSeconds = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  return `${dd}-${mmm}-${yyyy} ${timeNoSeconds}`;
+}
 
 function submitFeedback(){
   const websiteEl = document.getElementById('fb-website');
@@ -7787,7 +7797,7 @@ function submitFeedback(){
   // capitalized to match the Google Sheet's column headers exactly —
   // e.parameter lookups in Apps Script are case-sensitive.
   const entry = {
-    Date: new Date().toLocaleString(),
+    Date: formatFeedbackTimestamp(new Date()),
     Website: websiteEl.value,
     Name: name,
     Message: message,
