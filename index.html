@@ -2005,6 +2005,9 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .workout-summary-total strong{color:#60a5fa;font-size:1.15rem}
 .workout-start-btn{margin-top:20px;width:100%;padding:13px;font-size:1rem;background:#2563eb}
 .workout-start-btn:hover{background:#1d4ed8}
+.workout-consent-text{font-size:.88rem;line-height:1.5;color:#c7d4ec;text-align:left;margin:0}
+.workout-skip-cam-btn{margin-top:10px;width:100%;padding:11px;font-size:.85rem;background:rgba(255,255,255,.12)}
+.workout-skip-cam-btn:hover{background:rgba(255,255,255,.22)}
 
 </style>
 
@@ -7875,6 +7878,9 @@ function saveCookieConsentObj(obj){
   renderCookieChoice();
   applyCookieConsent();
   hideCookieBanner();
+  // Collapse the Cookies footer section too, if that's where this choice
+  // was made from — the choice is saved, so there's nothing left to do here.
+  closeAllFooterSections();
 }
 function setCookieConsent(acceptAll){
   saveCookieConsentObj({ necessary:true, advertising: !!acceptAll, decidedAt: Date.now() });
@@ -7959,7 +7965,8 @@ if (footerYearEl) footerYearEl.textContent = new Date().getFullYear();
 //  and pauses automatically when an open palm is
 //  held up to the camera.
 // ════════════════════════════════════════════════
-const workoutState = { playlist:[], index:-1, phase:'idle', timeLeft:0, timerId:null, paused:false, camStream:null, camTimerId:null, palmHoldFrames:0 };
+const workoutState = { playlist:[], index:-1, phase:'idle', timeLeft:0, timerId:null, paused:false, camStream:null, camTimerId:null, palmHoldFrames:0, itemsSinceRest:0 };
+const WORKOUT_REST_EVERY = 3; // insert a rest gap only after every Nth exercise/pose
 
 function parseDurationSeconds(durStr){
   if(!durStr) return 30;
@@ -8005,9 +8012,13 @@ function startWorkoutFullscreen(){
   workoutState.playlist = playlist;
   workoutState.index = -1;
   workoutState.paused = false;
+  workoutState.itemsSinceRest = 0;
 
   const activeSeconds = playlist.reduce((sum,item)=>sum+item.seconds, 0);
-  const breakCount = Math.max(0, playlist.length - 1);
+  // a rest gap is only inserted after every WORKOUT_REST_EVERY-th item, and
+  // never after the very last item (the session just ends there instead)
+  let breakCount = 0;
+  for(let i=1; i<playlist.length; i++){ if(i % WORKOUT_REST_EVERY === 0) breakCount++; }
   const breakSeconds = breakCount * WORKOUT_REST_SECONDS;
   document.getElementById('wsum-count').textContent = playlist.length;
   document.getElementById('wsum-active').textContent = formatMinSec(activeSeconds);
@@ -8016,6 +8027,7 @@ function startWorkoutFullscreen(){
 
   document.getElementById('workout-overlay').style.display = 'flex';
   document.getElementById('workout-summary').style.display = 'block';
+  document.getElementById('workout-cam-consent').style.display = 'none';
   document.getElementById('workout-stage').style.display = 'none';
   document.getElementById('workout-controls').style.display = 'none';
   document.getElementById('workout-progress-bar').style.display = 'none';
@@ -8024,13 +8036,31 @@ function startWorkoutFullscreen(){
 // Called from the Start button inside the summary screen — this is where
 // camera access is actually requested, after telling the person why.
 function beginWorkoutPlayback(){
+  // Ask first — the camera is only ever touched once the person taps
+  // "Allow Camera" on this screen, never before.
   document.getElementById('workout-summary').style.display = 'none';
+  document.getElementById('workout-cam-consent').style.display = 'block';
+}
+
+// Person tapped "Allow Camera" — only now does getUserMedia() get called.
+function acceptWorkoutCamera(){
+  document.getElementById('workout-cam-consent').style.display = 'none';
   document.getElementById('workout-stage').style.display = 'block';
   document.getElementById('workout-controls').style.display = 'flex';
   document.getElementById('workout-progress-bar').style.display = 'block';
   document.getElementById('workout-pause-btn').textContent = '⏸ Pause';
-  alert('This session can use your camera so showing an open palm pauses it automatically. Allow camera access if prompted — or just use the Pause button if you\'d rather skip that.');
   startPalmDetectionCamera();
+  advanceWorkoutItem();
+}
+
+// Person tapped "Skip" — camera is never requested; workout runs on the
+// timer + manual Pause button only.
+function declineWorkoutCamera(){
+  document.getElementById('workout-cam-consent').style.display = 'none';
+  document.getElementById('workout-stage').style.display = 'block';
+  document.getElementById('workout-controls').style.display = 'flex';
+  document.getElementById('workout-progress-bar').style.display = 'block';
+  document.getElementById('workout-pause-btn').textContent = '⏸ Pause';
   advanceWorkoutItem();
 }
 
@@ -8092,17 +8122,26 @@ function runWorkoutTimer(){
     updateWorkoutTimerDisplay();
     if(workoutState.timeLeft <= 0){
       if(workoutState.phase === 'active'){
-        // move into a short rest gap before the next item
-        workoutState.phase = 'rest';
-        workoutState.timeLeft = WORKOUT_REST_SECONDS;
-        document.getElementById('workout-name').textContent = 'Rest';
-        document.getElementById('workout-meta').textContent = 'Get ready for the next one';
-        const videoEl = document.getElementById('workout-video');
-        videoEl.pause(); videoEl.style.display = 'none';
-        const figureEl = document.getElementById('workout-figure');
-        figureEl.style.display = 'flex';
-        figureEl.style.fontSize = '5rem';
-        figureEl.innerHTML = '💤';
+        workoutState.itemsSinceRest++;
+        const isLastItem = (workoutState.index + 1) >= workoutState.playlist.length;
+        const dueForRest = (workoutState.itemsSinceRest % WORKOUT_REST_EVERY === 0);
+        if(!isLastItem && dueForRest){
+          // move into a short rest gap before the next item — only after
+          // every WORKOUT_REST_EVERY-th exercise/pose, not every single one
+          workoutState.phase = 'rest';
+          workoutState.timeLeft = WORKOUT_REST_SECONDS;
+          document.getElementById('workout-name').textContent = 'Rest';
+          document.getElementById('workout-meta').textContent = 'Get ready for the next one';
+          const videoEl = document.getElementById('workout-video');
+          videoEl.pause(); videoEl.style.display = 'none';
+          const figureEl = document.getElementById('workout-figure');
+          figureEl.style.display = 'flex';
+          figureEl.style.fontSize = '5rem';
+          figureEl.innerHTML = '💤';
+        } else {
+          workoutState.phase = 'active';
+          advanceWorkoutItem();
+        }
       } else {
         advanceWorkoutItem();
       }
@@ -8139,16 +8178,34 @@ function skipWorkoutItem(){
 // just runs on the timer) if the camera is unavailable or denied.
 function startPalmDetectionCamera(){
   const video = document.getElementById('workout-cam');
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+  const statusEl = document.getElementById('workout-status');
+  // A file opened directly (file://...) is NOT a secure context, and
+  // browsers block camera access there even though `navigator.mediaDevices`
+  // itself can still exist (so checking only for its presence misses this
+  // case) — this is the #1 cause of the camera silently never appearing
+  // when someone opens the downloaded .html file straight from Downloads.
+  if(!window.isSecureContext){
     video.style.display = 'none';
+    if(statusEl) statusEl.textContent = 'Camera needs the page opened over https (not a downloaded file) — use the Pause button instead';
     return;
   }
-  navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user' }, audio:false }).then(stream=>{
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    video.style.display = 'none';
+    if(statusEl) statusEl.textContent = 'Camera not supported in this browser — use the Pause button instead';
+    return;
+  }
+  // Some cameras/browsers reject a facingMode constraint outright (desktop
+  // webcams especially, since they have no front/back notion) even though
+  // permission itself would be granted fine — falling back to a plain
+  // video:true request avoids that showing up as a false "denied".
+  navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user' }, audio:false })
+    .catch(()=> navigator.mediaDevices.getUserMedia({ video:true, audio:false }))
+    .then(stream=>{
     workoutState.camStream = stream;
     video.srcObject = stream;
     video.style.display = 'block';
     const canvas = document.getElementById('workout-cam-canvas');
-    canvas.width = 40; canvas.height = 30;
+    canvas.width = 64; canvas.height = 48;
     const ctx = canvas.getContext('2d');
     workoutState.palmHoldFrames = 0;
     workoutState.camTimerId = setInterval(()=>{
@@ -8156,23 +8213,31 @@ function startPalmDetectionCamera(){
       try{
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-        let brightSkinPixels = 0;
+        let skinPixels = 0;
         const totalPixels = canvas.width * canvas.height;
         for(let i=0; i<data.length; i+=4){
           const r=data[i], g=data[i+1], b=data[i+2];
-          const brightness = (r+g+b)/3;
-          // rough skin-tone + brightness check: red channel dominant, bright overall
-          if(brightness > 120 && r > g && r > b){ brightSkinPixels++; }
+          // YCbCr skin-tone test — far more robust across cameras/white-balance
+          // and lighting conditions than a plain "red channel bigger" check,
+          // which auto white-balance can easily wash out.
+          const y  =  0.299*r + 0.587*g + 0.114*b;
+          const cb = 128 - 0.168736*r - 0.331264*g + 0.5*b;
+          const cr = 128 + 0.5*r - 0.418688*g - 0.081312*b;
+          if(y > 60 && cb >= 77 && cb <= 135 && cr >= 133 && cr <= 180){ skinPixels++; }
         }
-        const coverage = brightSkinPixels / totalPixels;
-        if(coverage > 0.55){
+        const coverage = skinPixels / totalPixels;
+        // a palm held up close to the camera fills a large share of the
+        // frame; 0.35 gives enough margin for a hand that isn't perfectly
+        // centered while still avoiding false triggers from a face at
+        // normal distance (which fills much less of the frame)
+        if(coverage > 0.35){
           workoutState.palmHoldFrames++;
         } else {
           workoutState.palmHoldFrames = 0;
         }
-        // require ~0.6s of sustained coverage before pausing, to avoid
-        // false triggers from a single bright frame
-        if(workoutState.palmHoldFrames >= 4 && !workoutState.paused){
+        // require ~450ms of sustained coverage before pausing, to avoid
+        // false triggers from a single stray frame
+        if(workoutState.palmHoldFrames >= 3 && !workoutState.paused){
           workoutState.paused = true;
           document.getElementById('workout-pause-btn').textContent = '▶ Resume';
           document.getElementById('workout-status').textContent = 'Paused — palm detected';
@@ -8183,8 +8248,18 @@ function startPalmDetectionCamera(){
         }
       }catch(e){ /* not fatal — just skip this frame */ }
     }, 150);
-  }).catch(()=>{
-    video.style.display = 'none'; // camera denied/unavailable — timer-only mode
+  }).catch(err=>{
+    video.style.display = 'none'; // camera denied/unavailable/no-camera — timer-only mode
+    if(statusEl){
+      const name = err && err.name;
+      if(name === 'NotAllowedError'){
+        statusEl.textContent = 'Camera permission blocked — allow it in your browser\'s site settings, then try again';
+      } else if(name === 'NotFoundError' || name === 'OverconstrainedError'){
+        statusEl.textContent = 'No usable camera found on this device — use the Pause button instead';
+      } else {
+        statusEl.textContent = 'Camera error' + (name ? ' (' + name + ')' : '') + ' — use the Pause button instead';
+      }
+    }
   });
 }
 
@@ -8218,6 +8293,15 @@ function stopPalmDetectionCamera(){
     <div class="workout-summary-row"><span>💤 Breaks</span><strong id="wsum-breaks">0 (0:00)</strong></div>
     <div class="workout-summary-row workout-summary-total"><span>Total time</span><strong id="wsum-total">0:00</strong></div>
     <button type="button" class="workout-ctrl-btn workout-start-btn" onclick="beginWorkoutPlayback()">▶ Start</button>
+  </div>
+
+  <!-- Camera-access consent — shown after Start, before the camera is ever
+       touched. Access is only requested if the person taps "Allow Camera". -->
+  <div class="workout-summary" id="workout-cam-consent" style="display:none">
+    <div class="workout-summary-title">Use your camera?</div>
+    <p class="workout-consent-text">Showing an open palm to your camera can pause the workout automatically.</p>
+    <button type="button" class="workout-ctrl-btn workout-start-btn" onclick="acceptWorkoutCamera()">Allow Camera</button>
+    <button type="button" class="workout-ctrl-btn workout-skip-cam-btn" onclick="declineWorkoutCamera()">Skip</button>
   </div>
 
   <div class="workout-progress-bar" id="workout-progress-bar" style="display:none"><div class="workout-progress-fill" id="workout-progress-fill"></div></div>
