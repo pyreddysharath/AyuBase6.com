@@ -971,6 +971,14 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   transition:transform .12s,box-shadow .12s;
 }
 .refresh-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(45,106,79,.4)}
+/* Routines' own "Remind Me" button uses this shared button style too, but
+   should carry Routines' amber accent rather than Food's green. */
+#routines-panel .refresh-btn{
+  background:linear-gradient(135deg,var(--rout-3),var(--rout-2));
+  color:#000;
+  box-shadow:0 3px 12px rgba(146,64,14,.3);
+}
+#routines-panel .refresh-btn:hover{ box-shadow:0 6px 18px rgba(146,64,14,.4); }
 
 /* ─── AGE SECTION ─────────────────────────────── */
 .gender-block{margin-top:10px}
