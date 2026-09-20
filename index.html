@@ -18,6 +18,11 @@
 <link rel="alternate icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAACJklEQVRYhe2XzW8MYRzHP7/ZaatVsd1KqXbjJSsaiYq4OHN2ET26OJaIo0QiEeLW/hPi5iY4ciBOaBxwqAT10pUy+9Kyze7O16H7WtvpiLFz8T3tM88z+/nku88+mYGWSBqRdEPSC0nLii45SU8lXZDUR6dImpJUiBC6UV5LmugE97sAr2dJ0gEAkzQCzAPbOlbz7/ISOOYAF2OAA0wCZ03SHHAkBgGARyapCAzGJJAzSYoJDoATJxzALb9Z5sRMiawAM05Np5g5am2LFh/mOXm7TBkg4XLpapLpsbU5v+Bz/X6Vd3546OB+l9njRg8RNLDqiS9/AAcYS4Fb++wGrgyRfBnSw0arQ/a7WKntrJ5+Iz3QMmkwOWzUO/5rgV2ZBFcyzbGKPjfvVZmvCew7lODywSZwfSLfhOWc+Fyvw4x0cmM4/NaAeHwnz9SD9quVQpVqSIFFT5TqfAf2JoPXtwsIvGwFLySsUxY8UT9YbKsx3hu8PtqfwBfvczQE+pLGaFD/rG8gzDkQEJXEws/meDS19l8PSqQNVHPiU6N/GB+yTQGRCnz1xI+GgLFn++b3RCrw0VPjQHIGjPSWbgqofQO6SWN3iG+PTECr4sNKc7xzyOgPcd//5wEHyMfILzjAXIwCbx3gVowCd02SCzwHDncZngcyjplVgDPAty7CBZwzs6XmFWlC0qsuvBfmJJ3urCX1Sjov6YkkL0JoUdIzSdck7Whl/gJdW7CoRcjsKgAAAABJRU5ErkJggg==">
 
 
+<!-- Fonts for the "Our Other Sites" footer section — matching IntiGuttu.com's
+     own type pairing (IBM Plex Mono for labels/links, Newsreader for body text) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
 <!-- Activity styles -->
 <style>
 
@@ -1906,6 +1911,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 #tab-privacy{ animation: iconSwing 2.6s ease-in-out infinite; animation-delay: .4s; transform-origin: top center; }
 #tab-cookies{ animation: iconWobble 2.8s ease-in-out infinite; animation-delay: .6s; }
 #tab-notifications{ animation: iconRing 3.2s ease-in-out infinite; animation-delay: .8s; transform-origin: top center; }
+#tab-othersites{ animation: iconPulse 2.2s ease-in-out infinite; animation-delay: 1s; }
 .footer-tab-btn:hover, .footer-tab-btn.active{ animation-play-state: paused; }
 
 .footer-acc-body{ padding: 16px 4px 2px; font-size: .8rem; line-height: 1.6; color: #57543f; }
@@ -1957,8 +1963,40 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 }
 #cookie-banner-accept{ background: #2d6a4f; color: #fff; }
 #cookie-banner-necessary{ background: #f0efe9; color: #2d2b23; }
-.footer-copyright{ text-align: left; font-size: .72rem; color: #a09c8c; }
-.footer-copyright-strong{ color: #000; font-weight: 800; }
+.footer-copyright{ text-align: left; font-size: .72rem; color: var(--footer-accent, var(--act-2)); transition: color .2s; }
+.footer-copyright-strong{ color: var(--footer-accent, var(--act-2)); font-weight: 800; transition: color .2s; }
+
+/* Our Other Sites — type pairing borrowed from IntiGuttu.com itself:
+   IBM Plex Mono for the heading/links, Newsreader for the body copy. */
+.othersites-row{
+  display: flex; align-items: center; justify-content: flex-start; gap: 6px;
+  padding: 0;
+}
+#sec-othersites .footer-sec-title{
+  color: var(--footer-accent, var(--act-2)); transition: color .2s; text-transform: uppercase;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: .03em;
+}
+#sec-othersites .othersites-intro{
+  font-style: italic; font-family: 'Newsreader', Georgia, serif;
+}
+.othersites-link{
+  display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: .88rem;
+  color: var(--footer-accent-light, #60a5fa); text-decoration: none; transition: color .2s;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+.othersites-link:hover{ text-decoration: underline; }
+.othersites-ext-icon{ width: 14px; height: 14px; flex: 0 0 auto; }
+.othersites-info-btn{
+  background: none; border: none; padding: 2px; cursor: pointer;
+  color: var(--footer-accent-light, #60a5fa); transition: color .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.othersites-info-btn svg{ width: 19px; height: 19px; }
+.othersites-info-btn:hover{ opacity: .75; }
+.othersites-info-panel{
+  font-size: .82rem; color: #57543f; line-height: 1.5; padding: 2px 0 12px;
+  font-family: 'Newsreader', Georgia, serif;
+}
 
 /* ─── FULLSCREEN WORKOUT PLAYER ────────────────── */
 .workout-overlay{
@@ -6020,6 +6058,9 @@ const RECIPES_DATA = [
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/></svg>
         <span class="notif-status-dot" id="notif-status-dot"></span>
       </div>
+      <div class="footer-tab-btn" id="tab-othersites" title="Our Other Sites" onclick="showFooterSection('othersites')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+      </div>
     </div>
   </div>
 
@@ -6107,6 +6148,37 @@ const RECIPES_DATA = [
     </p>
   </div>
 
+  <div class="footer-acc-body" id="sec-othersites" style="display:none">
+    <div class="footer-sec-title">Our Other Sites</div>
+    <p class="othersites-intro">A couple of other things we've built — feel free to drop by if any of these sound useful to you.</p>
+
+    <div class="othersites-row">
+      <a class="othersites-link" href="https://bharatgaruda.com" target="_blank" rel="noopener noreferrer">
+        BharatGaruda.com
+        <svg class="othersites-ext-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+      </a>
+      <button type="button" class="othersites-info-btn" onclick="toggleSiteInfo('bharatgaruda')" title="About BharatGaruda.com" aria-label="About BharatGaruda.com">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+      </button>
+    </div>
+    <div class="othersites-info-panel" id="site-info-bharatgaruda" style="display:none">
+      India's government sites aggregator — brings together official government links across every state and union territory of India, in one place.
+    </div>
+
+    <div class="othersites-row">
+      <a class="othersites-link" href="https://intiguttu.com" target="_blank" rel="noopener noreferrer">
+        IntiGuttu.com
+        <svg class="othersites-ext-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+      </a>
+      <button type="button" class="othersites-info-btn" onclick="toggleSiteInfo('intiguttu')" title="About IntiGuttu.com" aria-label="About IntiGuttu.com">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+      </button>
+    </div>
+    <div class="othersites-info-panel" id="site-info-intiguttu" style="display:none">
+      A private, no-login home reference app — for household DIY fixes, everyday tips, and recipes from every state of India and country in the world.
+    </div>
+  </div>
+
   </div>
 
 </footer>
@@ -6181,6 +6253,10 @@ function switchTab(tab) {
   // Footer icons pick up the active tab's accent colour too.
   const FOOTER_ACCENTS = { activity:'#2563eb', nutrition:'#16a34a', calculator:'var(--calc-2)', alerts:'var(--alert-2)', routines:'var(--rout-2)', mind:'var(--mind-2)' };
   document.documentElement.style.setProperty('--footer-accent', FOOTER_ACCENTS[tab] || FOOTER_ACCENTS.activity);
+  // Lighter counterpart — mirrors the "Base6" half of the logo (per-tab),
+  // used for the Our Other Sites links.
+  const FOOTER_ACCENTS_LIGHT = { activity:'#60a5fa', nutrition:'#86efac', calculator:'var(--calc-3)', alerts:'var(--alert-3)', routines:'var(--rout-3)', mind:'var(--mind-3)' };
+  document.documentElement.style.setProperty('--footer-accent-light', FOOTER_ACCENTS_LIGHT[tab] || FOOTER_ACCENTS_LIGHT.activity);
 
   // Browser UI theme-color (disabled — meta tag commented out in <head>)
   // const THEME_COLORS = { activity:'#60a5fa', nutrition:'#86efac', calculator:'#fda4af', alerts:'#5eead4' };
@@ -7708,7 +7784,18 @@ function downloadBodyPDF(){
 const FEEDBACK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxPwZpVM9hxNnVcH_nPoFLH4pUhcsJhqQlo3IB9OwLLHgFqYvS_NLCN9aCxztz0fkK2/exec';
 const FEEDBACK_STORAGE_KEY = 'healtheeFeedbackEntries';
 const COOKIE_CONSENT_KEY = 'healtheeCookieConsent';
-const FOOTER_SECTIONS = ['disclaimer', 'feedback', 'privacy', 'cookies', 'notifications'];
+const FOOTER_SECTIONS = ['disclaimer', 'feedback', 'privacy', 'cookies', 'notifications', 'othersites'];
+
+// Toggles the short description under one of the "Our Other Sites" entries.
+// Only one is kept open at a time, matching the tidy accordion feel used
+// elsewhere in the footer.
+function toggleSiteInfo(id){
+  const panel = document.getElementById('site-info-' + id);
+  if(!panel) return;
+  const isOpen = panel.style.display === 'block';
+  document.querySelectorAll('.othersites-info-panel').forEach(p => { p.style.display = 'none'; });
+  panel.style.display = isOpen ? 'none' : 'block';
+}
 
 function closeAllFooterSections(){
   FOOTER_SECTIONS.forEach(s => {
