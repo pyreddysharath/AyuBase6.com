@@ -1,0 +1,15 @@
+{
+  "content": "A couple of other things we've built — feel free to drop by if any of these sound useful to you.",
+  "sites": [
+    {
+      "site": "BharatGaruda.com",
+      "url": "https://bharatgaruda.com",
+      "information": "India's government sites aggregator — brings together official government links across every state and union territory of India, in one place."
+    },
+    {
+      "site": "IntiGuttu.com",
+      "url": "https://intiguttu.com",
+      "information": "A private, no-login home reference app — for household DIY fixes, everyday tips, and recipes from every state of India and country in the world."
+    }
+  ]
+}
