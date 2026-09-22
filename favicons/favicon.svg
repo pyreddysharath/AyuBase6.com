@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="0" y="0" width="64" height="64" rx="14" fill="#ffffff"/><path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#60a5fa" transform="translate(32 34) rotate(-75)"/>
-<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#86efac" transform="translate(32 34) rotate(-45)"/>
-<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#fcd34d" transform="translate(32 34) rotate(-15)"/>
-<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#5eead4" transform="translate(32 34) rotate(15)"/>
-<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#a5b4fc" transform="translate(32 34) rotate(45)"/>
-<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#fda4af" transform="translate(32 34) rotate(75)"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="0" y="0" width="64" height="64" rx="14" fill="#ffffff"/><path d="M 0 -1.429 C -4.30 -7.15, -13.43 -15.00, 0.00 -30.01 C 13.43 -15.00, 4.30 -7.15, 0 -1.429 Z" fill="#2563eb" transform="translate(32 44.86) rotate(-75)"/>
+<path d="M 0 -1.429 C -4.30 -7.15, -13.43 -15.00, 0.00 -30.01 C 13.43 -15.00, 4.30 -7.15, 0 -1.429 Z" fill="#16a34a" transform="translate(32 44.86) rotate(-45)"/>
+<path d="M 0 -1.429 C -4.30 -7.15, -13.43 -15.00, 0.00 -30.01 C 13.43 -15.00, 4.30 -7.15, 0 -1.429 Z" fill="#f59e0b" transform="translate(32 44.86) rotate(-15)"/>
+<path d="M 0 -1.429 C -4.30 -7.15, -13.43 -15.00, 0.00 -30.01 C 13.43 -15.00, 4.30 -7.15, 0 -1.429 Z" fill="#0d9488" transform="translate(32 44.86) rotate(15)"/>
+<path d="M 0 -1.429 C -4.30 -7.15, -13.43 -15.00, 0.00 -30.01 C 13.43 -15.00, 4.30 -7.15, 0 -1.429 Z" fill="#6366f1" transform="translate(32 44.86) rotate(45)"/>
+<path d="M 0 -1.429 C -4.30 -7.15, -13.43 -15.00, 0.00 -30.01 C 13.43 -15.00, 4.30 -7.15, 0 -1.429 Z" fill="#e11d48" transform="translate(32 44.86) rotate(75)"/></svg>
