@@ -1945,14 +1945,15 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   border: 1px solid #ddd8c8; border-radius: 8px; resize: vertical;
 }
 .feedback-form-section input:focus, .feedback-form-section textarea:focus{
-  outline: none; border-color: #7c3aed;
+  outline: none; border-color: var(--footer-accent, var(--act-2));
 }
 .feedback-form-section button{
-  align-self: flex-start; background: #7c3aed; color: #fff; border: none;
+  align-self: flex-start; background: var(--footer-accent, var(--act-2)); color: #fff; border: none;
   font-weight: 700; font-size: .85rem; padding: 9px 20px; border-radius: 8px; cursor: pointer;
+  transition: background .2s, opacity .15s;
 }
 .feedback-form-section button:disabled{ opacity: .6; cursor: default; }
-.feedback-form-section button:hover:not(:disabled){ background: #6d28d9; }
+.feedback-form-section button:hover:not(:disabled){ opacity: .85; }
 .feedback-confirm{
   margin-top: 12px; background: #ecfdf3; border: 1px solid #bbf0d0; color: #15803d;
   font-size: .85rem; font-weight: 600; padding: 10px 14px; border-radius: 8px;
@@ -2027,18 +2028,6 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   font-size:2rem;line-height:1;cursor:pointer;opacity:.8;
 }
 .workout-close-btn:hover{opacity:1}
-.workout-cam-preview{
-  position:absolute;bottom:16px;right:16px;width:110px;height:82px;border-radius:10px;
-  object-fit:cover;border:2px solid rgba(255,255,255,.4);transform:scaleX(-1);
-}
-.workout-palm-mark{
-  position:absolute;bottom:16px;right:16px;width:110px;height:82px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;font-size:2.1rem;
-  background:rgba(37,99,235,.5);border:2px solid #60a5fa;pointer-events:none;
-}
-.workout-palm-mark.holding{ animation:palmMarkHold 1s ease-in-out infinite; }
-.workout-palm-mark.confirmed{ background:rgba(37,99,235,.75); border-color:#93c5fd; }
-@keyframes palmMarkHold{ 0%,100%{opacity:.55} 50%{opacity:1} }
 .workout-progress-bar{position:absolute;top:0;left:0;right:0;height:5px;background:rgba(255,255,255,.15)}
 .workout-progress-fill{height:100%;background:#2563eb;width:0%;transition:width .3s linear}
 .workout-stage{text-align:center;padding:0 20px;max-width:480px}
@@ -2069,9 +2058,6 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .workout-summary-total strong{color:#60a5fa;font-size:1.15rem}
 .workout-start-btn{margin-top:20px;width:100%;padding:13px;font-size:1rem;background:#2563eb}
 .workout-start-btn:hover{background:#1d4ed8}
-.workout-consent-text{font-size:.88rem;line-height:1.5;color:#c7d4ec;text-align:left;margin:0}
-.workout-skip-cam-btn{margin-top:10px;width:100%;padding:11px;font-size:.85rem;background:rgba(255,255,255,.12)}
-.workout-skip-cam-btn:hover{background:rgba(255,255,255,.22)}
 
 /* ─── WIDER DESKTOP LAYOUT ───────────────────────
    Vitals, Routines, Mind and Nudges used to be capped at 640px, leaving the
@@ -8363,11 +8349,9 @@ if (footerYearEl) footerYearEl.textContent = new Date().getFullYear();
 // ════════════════════════════════════════════════
 //  FULLSCREEN WORKOUT PLAYER — plays through the
 //  selected day's exercises + yoga poses one at a
-//  time in fullscreen, with a rest gap between each,
-//  and pauses automatically when an open palm is
-//  held up to the camera.
+//  time in fullscreen, with a rest gap between each.
 // ════════════════════════════════════════════════
-const workoutState = { playlist:[], index:-1, phase:'idle', timeLeft:0, timerId:null, paused:false, camStream:null, camTimerId:null, palmHoldFrames:0, itemsSinceRest:0 };
+const workoutState = { playlist:[], index:-1, phase:'idle', timeLeft:0, timerId:null, paused:false, itemsSinceRest:0 };
 const WORKOUT_REST_EVERY = 3; // insert a rest gap only after every Nth exercise/pose
 
 function parseDurationSeconds(durStr){
@@ -8429,36 +8413,14 @@ function startWorkoutFullscreen(){
 
   document.getElementById('workout-overlay').style.display = 'flex';
   document.getElementById('workout-summary').style.display = 'block';
-  document.getElementById('workout-cam-consent').style.display = 'none';
   document.getElementById('workout-stage').style.display = 'none';
   document.getElementById('workout-controls').style.display = 'none';
   document.getElementById('workout-progress-bar').style.display = 'none';
 }
 
-// Called from the Start button inside the summary screen — this is where
-// camera access is actually requested, after telling the person why.
+// Called from the Start button inside the summary screen.
 function beginWorkoutPlayback(){
-  // Ask first — the camera is only ever touched once the person taps
-  // "Allow Camera" on this screen, never before.
   document.getElementById('workout-summary').style.display = 'none';
-  document.getElementById('workout-cam-consent').style.display = 'block';
-}
-
-// Person tapped "Allow Camera" — only now does getUserMedia() get called.
-function acceptWorkoutCamera(){
-  document.getElementById('workout-cam-consent').style.display = 'none';
-  document.getElementById('workout-stage').style.display = 'block';
-  document.getElementById('workout-controls').style.display = 'flex';
-  document.getElementById('workout-progress-bar').style.display = 'block';
-  document.getElementById('workout-pause-btn').textContent = '⏸ Pause';
-  startPalmDetectionCamera();
-  advanceWorkoutItem();
-}
-
-// Person tapped "Skip" — camera is never requested; workout runs on the
-// timer + manual Pause button only.
-function declineWorkoutCamera(){
-  document.getElementById('workout-cam-consent').style.display = 'none';
   document.getElementById('workout-stage').style.display = 'block';
   document.getElementById('workout-controls').style.display = 'flex';
   document.getElementById('workout-progress-bar').style.display = 'block';
@@ -8469,7 +8431,6 @@ function declineWorkoutCamera(){
 function stopWorkoutFullscreen(){
   clearInterval(workoutState.timerId);
   workoutState.timerId = null;
-  stopPalmDetectionCamera();
   const video = document.getElementById('workout-video');
   video.pause(); video.removeAttribute('src'); video.style.display = 'none';
   document.getElementById('workout-overlay').style.display = 'none';
@@ -8560,13 +8521,6 @@ function updateWorkoutTimerDisplay(){
 
 function toggleWorkoutPause(){
   workoutState.paused = !workoutState.paused;
-  // Manual pause/resume via the button should reset the palm-gesture state
-  // machine too, so a hand that happens to be in frame right now doesn't
-  // immediately count toward an unwanted gesture-triggered change — the
-  // same 2s resume cooldown applies whether the pause came from the button
-  // or from the palm gesture.
-  workoutState.palmHoldFrames = 0;
-  workoutState.pausedAt = workoutState.paused ? Date.now() : 0;
   document.getElementById('workout-pause-btn').textContent = workoutState.paused ? '▶ Resume' : '⏸ Pause';
   document.getElementById('workout-status').textContent = workoutState.paused ? 'Paused' : '';
 }
@@ -8574,179 +8528,6 @@ function toggleWorkoutPause(){
 function skipWorkoutItem(){
   workoutState.phase = 'active'; // ensure the next advance starts a fresh exercise, not another rest
   advanceWorkoutItem();
-}
-
-// ── Palm-pause via camera ──
-// This is a lightweight brightness/coverage heuristic (no ML hand-tracking
-// library involved): holding an open palm close to the camera fills a
-// large share of the frame with a bright, fairly uniform skin-toned
-// blob, which this detects by sampling pixels on a small offscreen
-// canvas each frame. It's not precise gesture recognition, but it
-// reliably catches "palm held up close to the camera" without needing
-// a heavy external ML dependency, and it degrades gracefully (workout
-// just runs on the timer) if the camera is unavailable or denied.
-function startPalmDetectionCamera(){
-  const video = document.getElementById('workout-cam');
-  const statusEl = document.getElementById('workout-status');
-  // A file opened directly (file://...) is NOT a secure context, and
-  // browsers block camera access there even though `navigator.mediaDevices`
-  // itself can still exist (so checking only for its presence misses this
-  // case) — this is the #1 cause of the camera silently never appearing
-  // when someone opens the downloaded .html file straight from Downloads.
-  if(!window.isSecureContext){
-    video.style.display = 'none';
-    if(statusEl) statusEl.textContent = 'Camera needs the page opened over https (not a downloaded file) — use the Pause button instead';
-    return;
-  }
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    video.style.display = 'none';
-    if(statusEl) statusEl.textContent = 'Camera not supported in this browser — use the Pause button instead';
-    return;
-  }
-  // Some cameras/browsers reject a facingMode constraint outright (desktop
-  // webcams especially, since they have no front/back notion) even though
-  // permission itself would be granted fine — falling back to a plain
-  // video:true request avoids that showing up as a false "denied".
-  navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user' }, audio:false })
-    .catch(()=> navigator.mediaDevices.getUserMedia({ video:true, audio:false }))
-    .then(stream=>{
-    workoutState.camStream = stream;
-    video.srcObject = stream;
-    video.style.display = 'block';
-    const canvas = document.getElementById('workout-cam-canvas');
-    canvas.width = 64; canvas.height = 48;
-    const ctx = canvas.getContext('2d');
-    workoutState.palmHoldFrames = 0;
-    workoutState.pausedAt = 0;
-    workoutState.gestureReleasedSincePause = true;
-    const markEl = document.getElementById('workout-palm-mark');
-    const FRAME_MS = 150;
-    const PAUSE_HOLD_FRAMES = Math.round(500 / FRAME_MS);   // ~0.5s to pause
-    const RESUME_HOLD_FRAMES = Math.round(350 / FRAME_MS);  // shorter — showing it a 2nd time is a deliberate repeat, not a first guess
-    const RESUME_COOLDOWN_MS = 1000; // minimum time paused before a resume can even be considered
-    workoutState.camTimerId = setInterval(()=>{
-      if(video.readyState < 2) return;
-      try{
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-        const totalPixels = canvas.width * canvas.height;
-        let skinPixels = 0, brightnessSum = 0;
-        const brightnessVals = new Float32Array(totalPixels);
-        let idx = 0;
-        for(let i=0; i<data.length; i+=4){
-          const r=data[i], g=data[i+1], b=data[i+2];
-          const y  =  0.299*r + 0.587*g + 0.114*b;
-          // YCbCr skin-tone test — far more robust across cameras/white-balance
-          // and lighting conditions than a plain "red channel bigger" check.
-          const cb = 128 - 0.168736*r - 0.331264*g + 0.5*b;
-          const cr = 128 + 0.5*r - 0.418688*g - 0.081312*b;
-          if(y > 60 && cb >= 77 && cb <= 135 && cr >= 133 && cr <= 180){ skinPixels++; }
-          brightnessVals[idx++] = y;
-          brightnessSum += y;
-        }
-        const coverage = skinPixels / totalPixels;
-        const meanBrightness = brightnessSum / totalPixels;
-        let varSum = 0;
-        for(let i=0; i<totalPixels; i++){ const d = brightnessVals[i]-meanBrightness; varSum += d*d; }
-        const brightnessStdDev = Math.sqrt(varSum / totalPixels);
-
-        // Two ways to trigger, either is accepted:
-        //  (a) an open palm held close fills most of the frame with a fairly
-        //      uniform skin tone — high skin-tone coverage AND low pixel-to-pixel
-        //      variation (a face-and-background scene, by contrast, has much more
-        //      variation: edges, hair, walls, clothing — so this filters most of
-        //      those false triggers out even though a face is also "skin toned").
-        //  (b) the lens is bluntly covered/blocked by a hand — the frame goes
-        //      almost totally dark. This is the more foolproof gesture if (a)
-        //      ever mis-fires: fully cupping a hand over the camera.
-        const palmOpen = coverage > 0.55 && brightnessStdDev < 30;
-        const lensCovered = meanBrightness < 18;
-        const gestureActive = palmOpen || lensCovered;
-
-        if(!workoutState.paused){
-          // Pausing: needs a short sustained hold. While it's building up,
-          // show the hand mark over the camera preview so there's some
-          // visible confirmation the camera is actually seeing something,
-          // before the workout actually reacts to it.
-          if(gestureActive){ workoutState.palmHoldFrames++; } else { workoutState.palmHoldFrames = 0; }
-          if(markEl){
-            if(workoutState.palmHoldFrames > 0 && workoutState.palmHoldFrames < PAUSE_HOLD_FRAMES){
-              markEl.textContent = '✋'; markEl.className = 'workout-palm-mark holding'; markEl.style.display = 'flex';
-            } else if(workoutState.palmHoldFrames === 0){
-              markEl.style.display = 'none';
-            }
-          }
-          if(workoutState.palmHoldFrames >= PAUSE_HOLD_FRAMES){
-            workoutState.paused = true;
-            workoutState.palmHoldFrames = 0;
-            workoutState.pausedAt = Date.now();
-            // The palm that just triggered this pause is almost certainly
-            // still up in front of the camera — the resume check below
-            // requires it to actually be taken away and shown again, so
-            // this flag starts false until that release is actually seen.
-            workoutState.gestureReleasedSincePause = false;
-            document.getElementById('workout-pause-btn').textContent = '▶ Resume';
-            document.getElementById('workout-status').textContent = 'Paused — palm detected';
-            if(markEl){
-              markEl.textContent = '✅'; markEl.className = 'workout-palm-mark confirmed'; markEl.style.display = 'flex';
-              setTimeout(()=>{ if(workoutState.paused) markEl.style.display = 'none'; }, 900);
-            }
-          }
-        } else {
-          // Resuming needs the SAME palm gesture shown again — not just the
-          // original one still sitting there. Without this, holding a palm
-          // up (as you naturally would right after pausing) immediately
-          // satisfied both the pause condition and, once a cooldown timer
-          // elapsed, the resume condition too — pause and resume kept
-          // firing back to back in a loop. Requiring an actual release
-          // (gesture goes away) before a fresh gesture counts fixes that.
-          if(!gestureActive){
-            workoutState.gestureReleasedSincePause = true;
-            workoutState.palmHoldFrames = 0;
-            if(markEl) markEl.style.display = 'none';
-          } else if(workoutState.gestureReleasedSincePause && Date.now() - workoutState.pausedAt >= RESUME_COOLDOWN_MS){
-            workoutState.palmHoldFrames++;
-            if(markEl){
-              markEl.textContent = '✋'; markEl.className = 'workout-palm-mark holding'; markEl.style.display = 'flex';
-            }
-            if(workoutState.palmHoldFrames >= RESUME_HOLD_FRAMES){
-              workoutState.paused = false;
-              workoutState.palmHoldFrames = 0;
-              document.getElementById('workout-pause-btn').textContent = '⏸ Pause';
-              document.getElementById('workout-status').textContent = '';
-              if(markEl){
-                markEl.textContent = '✅'; markEl.className = 'workout-palm-mark confirmed'; markEl.style.display = 'flex';
-                setTimeout(()=>{ if(!workoutState.paused) markEl.style.display = 'none'; }, 900);
-              }
-            }
-          }
-        }
-      }catch(e){ /* not fatal — just skip this frame */ }
-    }, FRAME_MS);
-  }).catch(err=>{
-    video.style.display = 'none'; // camera denied/unavailable/no-camera — timer-only mode
-    if(statusEl){
-      const name = err && err.name;
-      if(name === 'NotAllowedError'){
-        statusEl.textContent = 'Camera permission blocked — allow it in your browser\'s site settings, then try again';
-      } else if(name === 'NotFoundError' || name === 'OverconstrainedError'){
-        statusEl.textContent = 'No usable camera found on this device — use the Pause button instead';
-      } else {
-        statusEl.textContent = 'Camera error' + (name ? ' (' + name + ')' : '') + ' — use the Pause button instead';
-      }
-    }
-  });
-}
-
-function stopPalmDetectionCamera(){
-  clearInterval(workoutState.camTimerId);
-  workoutState.camTimerId = null;
-  if(workoutState.camStream){
-    workoutState.camStream.getTracks().forEach(t=>t.stop());
-    workoutState.camStream = null;
-  }
-  const markEl = document.getElementById('workout-palm-mark');
-  if(markEl) markEl.style.display = 'none';
 }
 
 // Keep the header logo mark's width equal to the "Ayu Base6" wordmark's
@@ -8773,15 +8554,9 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(syncLogoWi
 <!-- ══ FULLSCREEN WORKOUT PLAYER ═══════════ -->
 <div id="workout-overlay" class="workout-overlay" style="display:none">
   <button type="button" class="workout-close-btn" onclick="stopWorkoutFullscreen()" title="Close">&times;</button>
-  <video id="workout-cam" class="workout-cam-preview" autoplay muted playsinline style="display:none"></video>
-  <canvas id="workout-cam-canvas" style="display:none"></canvas>
-  <!-- Visual confirmation that a palm was actually seen, laid over the
-       camera preview — a hand icon while it's still building up the hold,
-       then a checkmark the instant it actually triggers pause/resume. -->
-  <div id="workout-palm-mark" class="workout-palm-mark" style="display:none"></div>
 
-  <!-- Pre-play summary — shown first; camera + playback only start once
-       the person taps Start here. -->
+  <!-- Pre-play summary — shown first; playback starts once the person
+       taps Start here. -->
   <div class="workout-summary" id="workout-summary">
     <div class="workout-summary-title">Today's Session</div>
     <div class="workout-summary-row"><span>🏋️ Exercises &amp; poses</span><strong id="wsum-count">0</strong></div>
@@ -8789,15 +8564,6 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(syncLogoWi
     <div class="workout-summary-row"><span>💤 Breaks</span><strong id="wsum-breaks">0 (0:00)</strong></div>
     <div class="workout-summary-row workout-summary-total"><span>Total time</span><strong id="wsum-total">0:00</strong></div>
     <button type="button" class="workout-ctrl-btn workout-start-btn" onclick="beginWorkoutPlayback()">▶ Start</button>
-  </div>
-
-  <!-- Camera-access consent — shown after Start, before the camera is ever
-       touched. Access is only requested if the person taps "Allow Camera". -->
-  <div class="workout-summary" id="workout-cam-consent" style="display:none">
-    <div class="workout-summary-title">Use your camera?</div>
-    <p class="workout-consent-text">Showing an open palm to your camera can pause the workout automatically.</p>
-    <button type="button" class="workout-ctrl-btn workout-start-btn" onclick="acceptWorkoutCamera()">Allow Camera</button>
-    <button type="button" class="workout-ctrl-btn workout-skip-cam-btn" onclick="declineWorkoutCamera()">Skip</button>
   </div>
 
   <div class="workout-progress-bar" id="workout-progress-bar" style="display:none"><div class="workout-progress-fill" id="workout-progress-fill"></div></div>
