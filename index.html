@@ -7277,20 +7277,20 @@ function makeSVG(primary, secondary) {
 // ════════════════════════════════════════
 const EX_LIB = {
   // ── NECK MOBILITY ──
-  neck_tilt_h: { name:'Neck Tilt Horizontal', pri:['head','neck'], sec:['shoulder'], impact:'Neck (Lateral Flexion)', sets:'2 sets', dur:'30 sec each side', desc:'Standing or seated tall, gently tilt your ear toward your shoulder without lifting the shoulder. Feel the stretch along the side of the neck.' },
+  neck_tilt_h: { name:'Neck Tilt Horizontal', pri:['head','neck'], sec:['shoulder'], impact:'Neck (Lateral Flexion)', sets:'2 sets', dur:'10 reps each side', desc:'Standing or seated tall, gently tilt your ear toward your shoulder without lifting the shoulder. Feel the stretch along the side of the neck.' },
   neck_tilt_v: { name:'Neck Tilt Vertical', pri:['head','neck'], sec:['shoulder'], impact:'Neck (Flexion & Extension)', sets:'2 sets', dur:'10 reps', desc:'Slowly nod your chin down toward your chest, then gently tilt your head back to look up. Move slowly and stay within a comfortable range.' },
   neck_rotation: { name:'Neck Rotation', pri:['head','neck'], sec:['shoulder'], impact:'Neck Rotational Mobility', sets:'2 sets', dur:'10 reps each way', desc:'Turn your head slowly to look over one shoulder, return to center, then turn to the other side. Keep shoulders relaxed and still.' },
   // ── SHOULDER & ARM MOBILITY ──
   tricep_stretch: { name:'Tricep Stretch', pri:['larm','rarm'], sec:['shoulder'], impact:'Triceps & Shoulder', sets:'2 sets', dur:'30 sec each arm', desc:'Raise one arm overhead, bend the elbow to drop the hand behind your neck, and gently press with the opposite hand for a deeper stretch.' },
   shoulder_x: { name:'Shoulder Stretch', pri:['shoulder','larm'], sec:['upperback'], impact:'Shoulders & Upper Back', sets:'2 sets', dur:'30 sec each arm', desc:'Pull one arm straight across your chest with the opposite hand. Hold at the forearm, not the elbow joint, and keep shoulders down.' },
-  chest_open: { name:'Chest Expansion', pri:['chest'], sec:['shoulder','larm','rarm'], impact:'Chest & Pectorals', sets:'2 sets', dur:'30 sec', desc:'Clasp hands behind your back, straighten arms, and lift gently while squeezing shoulder blades together. Open the chest and breathe deeply.' },
-  arm_circles: { name:'Arm Circles', pri:['shoulder','larm','rarm'], sec:['chest'], impact:'Shoulder Mobility', sets:'2 sets', dur:'20 sec each direction', desc:'Extend arms out to the sides and draw small, controlled circles, gradually increasing size, then reverse direction.' },
+  chest_open: { name:'Chest Expansion', pri:['chest'], sec:['shoulder','larm','rarm'], impact:'Chest & Pectorals', sets:'2 sets', dur:'10 reps', desc:'Clasp hands behind your back, straighten arms, and lift gently while squeezing shoulder blades together. Open the chest and breathe deeply.' },
+  arm_circles: { name:'Arm Circles', pri:['shoulder','larm','rarm'], sec:['chest'], impact:'Shoulder Mobility', sets:'2 sets', dur:'10 reps each direction', desc:'Extend arms out to the sides and draw small, controlled circles, gradually increasing size, then reverse direction.' },
   // ── SPINE & TORSO MOBILITY ──
   standing_spiral: { name:'Standing Spiral Rotation', pri:['core','lowerback'], sec:['hip','shoulder'], impact:'Full Spine Rotation', sets:'2 sets', dur:'10 reps each side', desc:'Feet planted hip-width apart, rotate your torso and arms fully to one side in a smooth spiral, then reverse through center to the other side.' },
-  side_bend: { name:'Side Bend', pri:['core','lowerback'], sec:['shoulder'], impact:'Obliques & Lateral Spine', sets:'2 sets', dur:'30 sec each side', desc:'Stand tall, reach one arm overhead and lean sideways at the waist. Keep hips facing forward and feel the stretch along your side.' },
+  side_bend: { name:'Side Bend', pri:['core','lowerback'], sec:['shoulder'], impact:'Obliques & Lateral Spine', sets:'2 sets', dur:'10 reps each side', desc:'Stand tall, reach one arm overhead and lean sideways at the waist. Keep hips facing forward and feel the stretch along your side.' },
   mid_back_turn: { name:'Mid Back Turn', pri:['core','lowerback'], sec:['shoulder'], impact:'Thoracic (Mid-Back) Rotation', sets:'2 sets', dur:'10 reps each side', desc:'Seated or on all fours, place one hand behind your head and rotate your upper back to open toward the ceiling, then return and repeat.' },
   torso_rotation: { name:'Torso Rotation', pri:['core','lowerback'], sec:['hip'], impact:'Core & Rotational Strength', sets:'2 sets', dur:'20 reps', desc:'Standing with knees soft, rotate your torso and arms side to side in a controlled twisting motion, keeping hips relatively stable.' },
-  spine_twist: { name:'Seated Spine Twist', pri:['core','lowerback'], sec:['hip','shoulder'], impact:'Spine & Obliques', sets:'2 sets', dur:'20 sec each side', desc:'Sit upright, rotate your torso fully to each side, placing a hand behind you on the floor for support.' },
+  spine_twist: { name:'Seated Spine Twist', pri:['core','lowerback'], sec:['hip','shoulder'], impact:'Spine & Obliques', sets:'2 sets', dur:'10 reps each side', desc:'Sit upright, rotate your torso fully to each side, placing a hand behind you on the floor for support.' },
   cat_cow: { name:'Cat-Cow', pri:['lowerback','core'], sec:['neck','shoulder'], impact:'Spine Mobility', sets:'2 sets', dur:'10 slow reps', desc:'On all fours, arch your spine up (cat) then dip it down (cow), moving with your breath. Slow and fluid throughout.' },
   child_pose: { name:"Child's Pose", pri:['lowerback'], sec:['hip','shoulder','lthigh'], impact:'Lower Back & Hips', sets:'2 sets', dur:'40 sec', desc:'Kneel and sit back onto your heels, reaching your arms forward with your forehead resting on the mat. Breathe into your lower back.' },
   // ── JOINT CIRCLES ──
@@ -7418,6 +7418,18 @@ function adjustedSets(setsStr, ageId){
   let lo = Math.max(1, parseInt(m[1],10) + delta);
   let hi = Math.max(lo, (m[2] ? parseInt(m[2],10) : parseInt(m[1],10)) + delta);
   return lo === hi ? `${lo} set${lo>1?'s':''}` : `${lo}–${hi} sets`;
+}
+
+// Reps scale down a bit for children and seniors, same idea as
+// AGE_SET_DELTA above but sized for rep counts (which run higher than set
+// counts, so the swing is bigger) — never below a sensible floor of 6.
+const AGE_REP_DELTA = { child:-2, teen:0, adult:0, middleage:0, senior:-2 };
+function adjustedDur(durStr, ageId){
+  const m = durStr.match(/^(\d+)(\s*reps?\b.*)$/i);
+  if (!m) return durStr;
+  const delta = AGE_REP_DELTA[ageId] || 0;
+  const reps = Math.max(6, parseInt(m[1],10) + delta);
+  return `${reps}${m[2]}`;
 }
 
 // ════════════════════════════════════════
@@ -7729,7 +7741,7 @@ function buildWeekPlan(ag) {
           <div class="ex-impact">🎯 ${ex.impact}</div>
           <div class="ex-stats2">
             <span class="ex-stat2">🔄 ${adjustedSets(ex.sets, ag.id)}</span>
-            <span class="ex-stat2">⏱ ${ex.dur}</span>
+            <span class="ex-stat2">⏱ ${adjustedDur(ex.dur, ag.id)}</span>
           </div>
           <div class="ex-desc2">${ex.desc}</div>
         </div>
@@ -7955,7 +7967,7 @@ function downloadBodyPDF(){
       para('🏋️ Exercise',11,[20,20,20]);
       exerciseIds.forEach(id=>{
         const ex=EX_LIB[id];
-        para(`•  ${ex.name} — ${adjustedSets(ex.sets, selectedBodyAge.id)}, ${ex.dur}  (${ex.impact})`,9.5);
+        para(`•  ${ex.name} — ${adjustedSets(ex.sets, selectedBodyAge.id)}, ${adjustedDur(ex.dur, selectedBodyAge.id)}  (${ex.impact})`,9.5);
       });
       y+=3;
     }
@@ -8372,7 +8384,7 @@ function buildTodaysPlaylist(){
     const routineIds = dayPlan.routine.filter(id => EX_LIB[id]);
     exercisesForDay(currentDayIndex, routineIds).forEach(id=>{
       const ex = EX_LIB[id];
-      if(ex) list.push({ type:'exercise', icon:'🏋️', name:ex.name, meta:`${adjustedSets(ex.sets, selectedBodyAge.id)} · ${ex.dur}`, seconds:parseDurationSeconds(ex.dur), pri:ex.pri, sec:ex.sec });
+      if(ex) list.push({ type:'exercise', icon:'🏋️', name:ex.name, meta:`${adjustedSets(ex.sets, selectedBodyAge.id)} · ${adjustedDur(ex.dur, selectedBodyAge.id)}`, seconds:parseDurationSeconds(adjustedDur(ex.dur, selectedBodyAge.id)), pri:ex.pri, sec:ex.sec });
     });
   }
   if(yogaChecked){
