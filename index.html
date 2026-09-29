@@ -190,6 +190,8 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
   overflow-x: auto; background: #fff;
   border-bottom: 2px solid #e2eaff;
   scrollbar-width: none;
+  justify-content: center; /* fallback for older browsers */
+  justify-content: safe center; /* avoids clipping the first tab if the row ever overflows on a narrow screen */
 }
 .week-nav::-webkit-scrollbar { display: none; }
 .day-tab {
@@ -206,7 +208,7 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 .day-tab:hover:not(.active) { background: #dbeafe; color: var(--act-2); }
 
 /* Exercise container */
-.act-container { max-width: 960px; margin: 0 auto; padding: 20px 16px 40px; }
+.act-container { max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px; }
 
 .day-panel { display: none; }
 .day-panel.active { display: block; }
@@ -937,7 +939,7 @@ html,body{overflow-x:hidden;max-width:100%}
   user-select:none;line-height:1;
 }
 /* All cards and content above bg */
-.page-container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 16px 40px}
+.page-container{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 16px 40px}
 
 /* ─── LOGO ────────────────────────────────────── */
 .logo-wrap{
@@ -1077,10 +1079,10 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   font-family:var(--font);color:#2e1a4d;min-height:calc(100vh - 110px);
   background:linear-gradient(160deg,#ede4fc 0%,#f3edfc 35%,#f8f5fd 65%,#e9defb 100%);
 }
-.calc-page{max-width:640px;margin:0 auto;padding:26px 16px 40px}
+.calc-page{max-width:1200px;margin:0 auto;padding:26px 16px 40px}
 
 /* ─── ROUTINES TAB ─────────────────────────────── */
-.rout-page{max-width:640px;margin:0 auto;padding:26px 16px 40px}
+.rout-page{max-width:1200px;margin:0 auto;padding:26px 16px 40px}
 .rout-card{
   background:rgba(255,255,255,.92);border-radius:var(--r);
   box-shadow:0 2px 18px rgba(146,64,14,.12);padding:20px;
@@ -1126,7 +1128,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .rout-info-panel{background:var(--rout-4);color:var(--rout-1);margin:0 0 10px}
 
 /* ─── MIND TAB ─────────────────────────────────── */
-.mind-page{max-width:640px;margin:0 auto;padding:26px 16px 40px}
+.mind-page{max-width:1200px;margin:0 auto;padding:26px 16px 40px}
 .mind-intro{
   font-size:.86rem;line-height:1.5;color:var(--mind-1);text-align:center;
   background:var(--mind-4);border-radius:12px;padding:12px 16px;margin-bottom:20px;
@@ -1341,7 +1343,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   font-family:var(--font);color:#124b47;min-height:calc(100vh - 110px);
   background:linear-gradient(160deg,#d7f5f0 0%,#e3faf6 35%,#f0fdfa 65%,#c8f0ea 100%);
 }
-.alert-page{max-width:640px;margin:0 auto;padding:26px 16px 40px}
+.alert-page{max-width:1200px;margin:0 auto;padding:26px 16px 40px}
 .alert-card{
   background:rgba(255,255,255,.92);border-radius:var(--r);
   box-shadow:0 2px 18px rgba(19,78,74,.12);padding:20px;
@@ -2050,6 +2052,14 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .workout-skip-cam-btn{margin-top:10px;width:100%;padding:11px;font-size:.85rem;background:rgba(255,255,255,.12)}
 .workout-skip-cam-btn:hover{background:rgba(255,255,255,.22)}
 
+/* ─── WIDER DESKTOP LAYOUT ───────────────────────
+   Vitals, Routines, Mind and Nudges used to be capped at 640px, leaving the
+   page looking mostly blank on both sides of a real desktop window. Still
+   a single stacked column (no grid) — the cards themselves just stretch to
+   use the page's full width instead of sitting in a narrow strip. */
+.calc-card-spaced{margin-top:18px}
+.rout-remind-row{text-align:center;margin-top:6px}
+
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -2198,7 +2208,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
       </div>
     </div>
 
-    <div class="calc-card" style="margin-top:18px">
+    <div class="calc-card calc-card-spaced">
       <div class="calc-card-hdr">
         <h2>Lab Insights</h2>
         <span style="display:flex;align-items:center;gap:4px">
@@ -2250,7 +2260,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
       <div class="reminders-notif-banner-text">
         Turn on browser notifications so these reminders can reach you even when this tab isn't in focus.
       </div>
-      <button type="button" class="reminders-notif-banner-btn" onclick="requestNotificationPermission()">Enable</button>
+      <button type="button" class="reminders-notif-banner-btn" onclick="toggleMasterNotify()">Enable</button>
     </div>
 
     <!-- EYES: 20-20-20 — most frequent -->
@@ -2587,7 +2597,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
       </div>
     </div>
 
-    <div style="text-align:center;margin-top:6px">
+    <div class="rout-remind-row">
       <button type="button" class="refresh-btn" onclick="remindMeNowAll()">🔔 Remind Me</button>
     </div>
 
@@ -6158,7 +6168,7 @@ const RECIPES_DATA = [
     first.</p>
     <p id="notif-status-text" class="feedback-note-small">Checking permission status…</p>
     <div class="feedback-form-section" style="flex-direction:row; gap:10px;">
-      <button id="notif-enable-btn" onclick="requestNotificationPermission()">Enable Notifications</button>
+      <button id="notif-enable-btn" onclick="toggleMasterNotify()">Enable Notifications</button>
     </div>
     <p class="feedback-note-small" id="notif-denied-help" style="display:none;margin-top:8px">
       Notifications are blocked in your browser. To turn them on, open your browser's site settings for this
@@ -6359,15 +6369,20 @@ function onAlertNotifyChange(key){
     return;
   }
   if(Notification.permission==='granted'){
-    alertState[key].notify=true;
+    // Permission's already decided — never pop the browser dialog again,
+    // just follow whatever the master Enable/Disable switch currently says.
+    alertState[key].notify=isMasterNotifyOn();
   } else if(Notification.permission==='denied'){
     alertState[key].notify=false;
     showNotifBlockedHint('alert-'+key+'-notif-hint');
     // Still turned on — it'll fall back to the in-app preview when it fires.
   } else {
+    // Only 'default' (never decided yet) legitimately needs to ask.
     requestNotificationPermission().then(perm=>{
-      alertState[key].notify=(perm==='granted');
+      if(perm==='granted') setMasterNotifyFlag(true);
+      alertState[key].notify=(perm==='granted' && isMasterNotifyOn());
       if(perm==='denied') showNotifBlockedHint('alert-'+key+'-notif-hint');
+      refreshNotifStatusUI();
     });
   }
   scheduleAlertTimer(key);
@@ -6418,9 +6433,118 @@ function scheduleAlertTimer(key){
 
 // ── Notification permission (shared across all 3 alert types, and
 //    surfaced via the bell icon in the footer) ──
+// Wrapped defensively: most browsers return a Promise from
+// requestPermission(), but some older/embedded WebViews only support the
+// legacy callback form and return undefined instead — calling .then() on
+// that throws, and the UI (still reading "Enable") never gets the memo
+// that permission was actually granted. This handles both forms.
 function requestNotificationPermission(){
   if(typeof Notification==='undefined') return Promise.resolve('unsupported');
-  return Notification.requestPermission().then(perm=>{ refreshNotifStatusUI(); return perm; });
+  return new Promise(resolve=>{
+    let settled=false;
+    const done=perm=>{
+      if(settled) return;
+      settled=true;
+      resolve(perm);
+    };
+    let maybePromise;
+    try{ maybePromise=Notification.requestPermission(done); }catch(e){ done(Notification.permission); return; }
+    if(maybePromise && typeof maybePromise.then==='function'){
+      maybePromise.then(done).catch(()=>done(Notification.permission));
+    }
+    // Belt-and-braces for browsers that resolve permission without
+    // reliably firing either callback style or a focus/visibility event.
+    setTimeout(()=>{ if(!settled && Notification.permission!=='default') done(Notification.permission); }, 400);
+  });
+}
+// ── Master on/off switch for ALL reminder notifications at once ──
+// There is no browser API to *revoke* Notification permission from code —
+// once granted, it stays granted until the person changes it in their
+// browser's own site settings. So "Disable" here is our own app-level
+// switch: every reminder keeps running, it just falls back to its in-app
+// preview instead of firing a real OS notification. Because of that, once
+// permission has actually been decided (granted OR denied), turning this
+// switch on or off again NEVER re-asks the browser — only the very first
+// turn-on, while permission is still undecided ('default'), does.
+const NOTIF_MASTER_KEY='ayubase6-notif-master-on';
+function isMasterNotifyOn(){
+  if(typeof Notification==='undefined' || Notification.permission!=='granted') return false;
+  try{
+    const v=localStorage.getItem(NOTIF_MASTER_KEY);
+    // Never explicitly toggled by this person yet: default to "on" so
+    // anyone who already granted permission before this switch existed
+    // keeps getting real notifications, same as before.
+    if(v===null) return true;
+    return v==='1';
+  }catch(e){ return true; }
+}
+function setMasterNotifyFlag(on){
+  try{ localStorage.setItem(NOTIF_MASTER_KEY, on?'1':'0'); }catch(e){}
+}
+// Applies the master on/off state to every reminder's real-notification
+// flag, without touching whether that reminder itself is on or off.
+function syncAllReminderNotifyFlags(){
+  if(typeof Notification==='undefined') return;
+  const denied=Notification.permission==='denied';
+  const masterOn=isMasterNotifyOn();
+  ['break','walk','drink'].forEach(key=>{
+    const st=alertState[key];
+    if(!st || !st.enabled) return;
+    st.notify=masterOn;
+    if(denied) showNotifBlockedHint('alert-'+key+'-notif-hint');
+  });
+  if(typeof eyeExState!=='undefined' && eyeExState.enabled){
+    eyeExState.notify=masterOn;
+    if(denied) showNotifBlockedHint('eye-ex-notif-hint');
+  }
+}
+// The single handler behind both "Enable"/"Disable" buttons (the top
+// banner in the Alerts tab, and the footer's Notification Settings panel).
+function toggleMasterNotify(){
+  if(typeof Notification==='undefined') return;
+  if(isRestrictedFileOrigin() && Notification.permission!=='granted'){
+    // Asking the browser here would just show a dialog that can't reliably
+    // stick (see isRestrictedFileOrigin's note) — refreshNotifStatusUI()
+    // already explains why and hides the button in this state.
+    refreshNotifStatusUI();
+    return;
+  }
+  // Make sure the button is showing the true current state right before we
+  // act — and then act on exactly what it's showing, not on a separately
+  // recomputed flag. That guarantees "click what you see" always holds,
+  // even in the edge case where permission was granted by some other means
+  // (e.g. the browser's own site-settings) since the last render.
+  refreshNotifStatusUI();
+  const banner=document.getElementById('reminders-notif-banner');
+  const bannerBtn=banner ? banner.querySelector('.reminders-notif-banner-btn') : null;
+  const footerBtn=document.getElementById('notif-enable-btn');
+  const visibleBtn = (bannerBtn && bannerBtn.style.display!=='none') ? bannerBtn : footerBtn;
+  const currentlyOn = visibleBtn ? /disable/i.test(visibleBtn.textContent) : isMasterNotifyOn();
+  if(currentlyOn){
+    // Turning off is always purely in-code — no browser call, ever.
+    setMasterNotifyFlag(false);
+    syncAllReminderNotifyFlags();
+    refreshNotifStatusUI();
+    return;
+  }
+  if(Notification.permission==='denied'){
+    // Blocked at the browser level — nothing code can do; surface the hint.
+    refreshNotifStatusUI();
+    return;
+  }
+  if(Notification.permission==='granted'){
+    // Already decided by the browser — flip on directly, no popup.
+    setMasterNotifyFlag(true);
+    syncAllReminderNotifyFlags();
+    refreshNotifStatusUI();
+    return;
+  }
+  // 'default' is the ONLY state where asking the browser is actually needed.
+  requestNotificationPermission().then(perm=>{
+    if(perm==='granted') setMasterNotifyFlag(true);
+    syncAllReminderNotifyFlags();
+    refreshNotifStatusUI();
+  });
 }
 // Clicking the bell both opens the settings panel AND, if the person
 // hasn't been asked yet, triggers the actual permission prompt right away
@@ -6428,7 +6552,7 @@ function requestNotificationPermission(){
 function handleNotifBellClick(){
   showFooterSection('notifications');
   if(typeof Notification!=='undefined' && Notification.permission==='default'){
-    requestNotificationPermission();
+    toggleMasterNotify();
   }
 }
 // Inline "blocked" hint shown right next to a Notify checkbox — no
@@ -6439,6 +6563,18 @@ function showNotifBlockedHint(hintId){
   hint.style.display='block';
   clearTimeout(hint._hideTimer);
   hint._hideTimer=setTimeout(()=>{ hint.style.display='none'; }, 7000);
+}
+// Chrome (and most Chromium browsers) treat a page opened directly as a
+// local file — double-clicked, or dragged into the browser, i.e. a
+// file:// address — as a restricted, non-persistent origin for the
+// Notification permission: the "Allow" dialog can still appear, but the
+// grant doesn't reliably stick, so Notification.permission can stay
+// 'default' (or bounce back to it) even right after clicking Allow. That's
+// a platform limitation, not something this page's code can work around —
+// it goes away once the page is served from a real address (http/https,
+// including plain localhost) instead of opened as a local file.
+function isRestrictedFileOrigin(){
+  try{ return location.protocol==='file:'; }catch(e){ return false; }
 }
 function refreshNotifStatusUI(){
   const dot=document.getElementById('notif-status-dot');
@@ -6452,26 +6588,65 @@ function refreshNotifStatusUI(){
     updateRemindersNotifBanner();
     return;
   }
+  if(isRestrictedFileOrigin() && Notification.permission!=='granted'){
+    if(dot) dot.className='notif-status-dot';
+    if(statusText) statusText.textContent="⚠️ This page was opened as a local file, so the browser won't reliably keep notification permission on. Open it from a web address (e.g. host it, or visit it at a real URL) to use real notifications — the in-app reminders still work either way.";
+    if(enableBtn) enableBtn.style.display='none';
+    if(deniedHelp) deniedHelp.style.display='none';
+    updateRemindersNotifBanner();
+    return;
+  }
   const perm=Notification.permission;
-  if(dot) dot.className='notif-status-dot '+(perm==='granted'?'granted':'');
+  const masterOn=isMasterNotifyOn();
+  if(dot) dot.className='notif-status-dot '+(masterOn?'granted':'');
   if(statusText){
-    statusText.textContent = perm==='granted' ? '✅ Notifications are enabled.'
-      : perm==='denied' ? '🚫 Notifications are blocked for this site.'
+    statusText.textContent = perm==='denied' ? '🚫 Notifications are blocked for this site.'
+      : masterOn ? '✅ Notifications are enabled.'
+      : perm==='granted' ? '🔕 Notifications are currently turned off.'
       : 'Notifications are not yet enabled.';
   }
-  if(enableBtn) enableBtn.style.display = perm==='granted' ? 'none' : 'inline-block';
+  if(enableBtn){
+    enableBtn.style.display = perm==='denied' ? 'none' : 'inline-block';
+    enableBtn.textContent = masterOn ? 'Disable Notifications' : 'Enable Notifications';
+  }
   if(deniedHelp) deniedHelp.style.display = perm==='denied' ? 'block' : 'none';
   updateRemindersNotifBanner();
+  // Covers permission changes made outside our own buttons too (e.g. via
+  // the browser's address-bar site settings) — this function already runs
+  // on load, on tab focus and after visibilitychange.
+  if(typeof syncAllReminderNotifyFlags==='function') syncAllReminderNotifyFlags();
 }
-// Inline prompt shown at the top of the Reminders tab itself — only when
-// permission hasn't been decided yet (nothing useful to say once it's
-// already granted, and if it's denied the browser needs a settings
-// change, not another prompt).
+// Inline banner at the top of the Reminders tab — doubles as the master
+// Enable/Disable control, always visible (except when notifications aren't
+// supported at all) so the label always reflects the real current state.
 function updateRemindersNotifBanner(){
   const banner=document.getElementById('reminders-notif-banner');
   if(!banner) return;
   if(typeof Notification==='undefined'){ banner.style.display='none'; return; }
-  banner.style.display = (Notification.permission==='default') ? 'flex' : 'none';
+  const textEl=banner.querySelector('.reminders-notif-banner-text');
+  const btn=banner.querySelector('.reminders-notif-banner-btn');
+  const perm=Notification.permission;
+  const masterOn=isMasterNotifyOn();
+  banner.style.display='flex';
+  if(isRestrictedFileOrigin() && perm!=='granted'){
+    if(textEl) textEl.textContent="This page is open as a local file, so the browser can't reliably remember notification permission here — open it from a real web address to use real notifications. Reminders still work inside the app either way.";
+    if(btn) btn.style.display='none';
+    return;
+  }
+  if(perm==='denied'){
+    if(textEl) textEl.textContent="Notifications are blocked in your browser. Open this site's browser settings to allow them, then reload the page.";
+    if(btn) btn.style.display='none';
+    return;
+  }
+  if(btn){
+    btn.style.display='inline-block';
+    btn.textContent = masterOn ? 'Disable' : 'Enable';
+  }
+  if(textEl){
+    textEl.textContent = masterOn
+      ? "Browser notifications are on — these reminders will reach you even when this tab isn't in focus."
+      : "Turn on browser notifications so these reminders can reach you even when this tab isn't in focus.";
+  }
 }
 
 // Start each reminder's timer and paint its slider fill on load. The
@@ -6486,7 +6661,11 @@ function updateRemindersNotifBanner(){
   alertState[key].notify=(typeof Notification!=='undefined' && Notification.permission==='granted');
   scheduleAlertTimer(key);
 });
-refreshNotifStatusUI();
+// NOTE: the initial refreshNotifStatusUI() call is deferred to just after
+// eyeExState is declared and initialized further down this script (it
+// calls syncAllReminderNotifyFlags(), which reads eyeExState — calling it
+// here, before that `const` runs, would throw a temporal-dead-zone
+// ReferenceError and abort the rest of this script's initial execution).
 // Covers the case where permission was changed via the browser's own
 // site-settings UI (address-bar icon) rather than our in-app prompt —
 // our JS has no event for that, so re-check whenever the tab regains
@@ -6566,14 +6745,19 @@ function onEyeExNotifyChange(){
   eyeExState.enabled=true;
   if(typeof Notification==='undefined'){ eyeExState.notify=false; return; }
   if(Notification.permission==='granted'){
-    eyeExState.notify=true;
+    // Permission's already decided — never pop the browser dialog again,
+    // just follow whatever the master Enable/Disable switch currently says.
+    eyeExState.notify=isMasterNotifyOn();
   } else if(Notification.permission==='denied'){
     eyeExState.notify=false;
     showNotifBlockedHint('eye-ex-notif-hint');
   } else {
+    // Only 'default' (never decided yet) legitimately needs to ask.
     requestNotificationPermission().then(perm=>{
-      eyeExState.notify=(perm==='granted');
+      if(perm==='granted') setMasterNotifyFlag(true);
+      eyeExState.notify=(perm==='granted' && isMasterNotifyOn());
       if(perm==='denied') showNotifBlockedHint('eye-ex-notif-hint');
+      refreshNotifStatusUI();
     });
   }
 }
@@ -6615,6 +6799,28 @@ eyeExState.enabled=true;
 eyeExState.notify=(typeof Notification!=='undefined' && Notification.permission==='granted');
 renderEyeExTimes();
 renderEyeExDaysSub();
+// Now that both alertState and eyeExState exist, it's safe to run the
+// initial notification-status refresh (see the note above, near the
+// alertState init loop) — this paints the banner/footer status correctly
+// on load and syncs every enabled reminder's notify flag to the browser's
+// actual current permission.
+refreshNotifStatusUI();
+// Safety net: some browsers don't reliably resolve requestPermission()'s
+// promise or invoke its legacy callback, and permission can also change
+// through means our own buttons never see (the browser's address-bar site
+// settings, an OS-level prompt on mobile, etc). Rather than depend on any
+// one signal, just poll the real permission value at a light interval and
+// re-paint the moment it's different from what we last saw — this is what
+// guarantees the button never stays stuck reading the wrong label.
+if(typeof Notification!=='undefined'){
+  let _lastSeenNotifPerm=Notification.permission;
+  setInterval(()=>{
+    if(Notification.permission!==_lastSeenNotifPerm){
+      _lastSeenNotifPerm=Notification.permission;
+      refreshNotifStatusUI();
+    }
+  }, 700);
+}
 
 // ── The guided exercise itself — a pre-recorded 2-minute video that
 // cycles through zigzag, figure-8, circle+loop, vertical zigzag, star,
