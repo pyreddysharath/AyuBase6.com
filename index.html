@@ -251,24 +251,24 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 }
 /* SVG figures */
 .body-svg { width: 120px; height: 150px; }
-.muscle-highlight { fill: #ef4444; opacity: .75; }
-.muscle-secondary { fill: #f97316; opacity: .55; }
+.muscle-highlight { fill: var(--act-2); opacity: .8; }
+.muscle-secondary { fill: var(--act-3); opacity: .65; }
 .body-base { fill: #93c5fd; }
 .body-outline { fill: none; stroke: #1e40af; stroke-width: 1.5; stroke-linejoin: round; }
 .joint { fill: #3b82f6; }
-.muscle-glow { fill: #ef4444; opacity: .3; filter: blur(4px); }
+.muscle-glow { fill: var(--act-2); opacity: .3; filter: blur(4px); }
 
 .ex-body { padding: 14px 16px; }
 .ex-name { font-size: 1rem; font-weight: 800; color: #1e3a6e; margin-bottom: 4px; }
 .ex-muscle-tag {
   display: inline-flex; align-items: center; gap: 4px;
-  background: #fee2e2; color: #b91c1c;
+  background: #dbeafe; color: #1d4ed8;
   padding: 2px 9px; border-radius: 20px; font-size: .68rem; font-weight: 700;
   margin-bottom: 8px;
 }
 .ex-secondary-tag {
   display: inline-flex; align-items: center; gap: 4px;
-  background: #ffedd5; color: #c2410c;
+  background: #eff6ff; color: var(--act-2);
   padding: 2px 9px; border-radius: 20px; font-size: .68rem; font-weight: 700;
   margin-left: 4px; margin-bottom: 8px;
 }
@@ -338,8 +338,8 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 }
 /* Body SVG styles */
 .bh-base    { fill: #bfdbfe; }
-.bh-primary { fill: #ef4444; opacity: .85; }
-.bh-secondary { fill: #f97316; opacity: .65; }
+.bh-primary { fill: var(--act-2); opacity: .85; }
+.bh-secondary { fill: var(--act-3); opacity: .7; }
 
 /* Animation box */
 .ex-anim-wrap { flex: 1; min-width: 120px; }
@@ -402,7 +402,7 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
   50%      { opacity:.7; }
 }
 .plank-pulse {
-  width: 50px; height: 3px; background: #ef4444;
+  width: 50px; height: 3px; background: var(--act-2);
   border-radius: 2px; margin: 4px auto 0;
   animation: pulse-line 2s ease-in-out infinite;
 }
@@ -615,8 +615,8 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 .ex-info { padding: 12px 14px; }
 .ex-name2 { font-size: .95rem; font-weight: 800; color: #1e3a6e; margin-bottom: 4px; }
 .ex-impact {
-  font-size: .73rem; font-weight: 700; color: #dc2626;
-  background: #fef2f2; border-radius: 20px;
+  font-size: .73rem; font-weight: 700; color: #1d4ed8;
+  background: #dbeafe; border-radius: 20px;
   display: inline-block; padding: 2px 8px; margin-bottom: 7px;
 }
 .ex-stats2 { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:7px; }
@@ -642,9 +642,13 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 }
 .gender-btn.selected{background:var(--g2);color:#fff;border-color:var(--g2)}
 .radio-row{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--g2);margin-bottom:8px;cursor:pointer}
+/* Contained like Food's cards — a boxed card that sits inside the page's
+   normal width, instead of a banner stretching edge to edge. */
+.body-age-wrap { max-width: 1200px; margin: 0 auto; padding: 20px 16px 0; }
 .body-age-section {
   background: #60a5fa;
   padding: 24px 20px 20px; text-align: center;
+  border-radius: 14px; box-shadow: 0 2px 18px rgba(37,99,235,.18);
 }
 .body-age-title {
   font-size: 1.1rem; font-weight: 800; color: #1e3a6e; margin-bottom: 10px;
@@ -724,8 +728,8 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 ════════════════════════════════════════ */
 .cardio-section-label {
   font-size: .82rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .8px; color: #b45309;
-  background: #fef3c7; border-radius: 8px;
+  letter-spacing: .8px; color: #fff;
+  background: var(--act-2); border-radius: 8px;
   padding: 7px 14px; margin: 16px 0 10px;
   display: inline-block;
 }
@@ -763,8 +767,8 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
   border-radius: 20px !important; font-size: .68rem !important;
 }
 .type-tag.warmup-tag {
-  background: #d1fae5 !important; color: #047857 !important;
-  border-color: #6ee7b7 !important;
+  background: var(--act-4) !important; color: var(--act-1) !important;
+  border-color: var(--act-3) !important;
 }
 .type-tag.main-tag {
   background: #dbeafe !important; color: #1d4ed8 !important;
@@ -777,7 +781,7 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 .yoga-outer { margin: 8px 0 30px; }
 .yoga-section-label {
   font-size: .74rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .6px; color: #7c3aed;
+  letter-spacing: .6px; color: var(--act-2);
   margin: 14px 0 10px; display: flex; align-items: center; gap: 6px;
 }
 .yoga-grid {
@@ -787,12 +791,12 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 }
 .yoga-card {
   background: #fff;
-  border: 1.5px solid #ddd6fe; border-radius: 14px;
+  border: 1.5px solid #bfdbfe; border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 2px 14px rgba(124,58,237,.1);
+  box-shadow: 0 2px 14px rgba(37,99,235,.1);
 }
 .yoga-top-row {
-  background: linear-gradient(160deg,#faf5ff 0%,#f3e8ff 60%,#ede9fe 100%);
+  background: linear-gradient(160deg,#eff6ff 0%,#dbeafe 60%,#bfdbfe 100%);
   display: flex; justify-content: center; align-items: center;
   padding: 14px; min-height: 120px;
   overflow: hidden;
@@ -801,43 +805,43 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 .yoga-fig-svg { width: 84px; height: 84px; display: block; }
 .yoga-fig-video { width: 100%; height: 140px; object-fit: cover; display: block; cursor: pointer; }
 .yoga-info { padding: 12px 14px; }
-.yoga-name { font-size: .92rem; font-weight: 800; color: #5b21b6; }
-.yoga-sanskrit { font-size: .74rem; font-style: italic; color: #7c3aed; margin: 2px 0 8px; }
+.yoga-name { font-size: .92rem; font-weight: 800; color: #1e3a6e; }
+.yoga-sanskrit { font-size: .74rem; font-style: italic; color: var(--act-2); margin: 2px 0 8px; }
 .yoga-stats { display: flex; gap: 6px; flex-wrap: wrap; }
 .yoga-stat {
-  background: #f3e8ff; border: 1px solid #ddd6fe;
+  background: #eff6ff; border: 1px solid #bfdbfe;
   border-radius: 8px; padding: 4px 9px;
-  font-size: .73rem; color: #6d28d9; font-weight: 600;
+  font-size: .73rem; color: #1e40af; font-weight: 600;
 }
 .cardio-wrap { margin-bottom: 20px; }
 .cardio-card {
-  background: linear-gradient(135deg,#fffbeb,#fef3c7);
-  border-radius: 14px; border: 2px solid #fbbf24;
-  overflow: hidden; box-shadow: 0 2px 14px rgba(251,191,36,.2);
+  background: linear-gradient(135deg,#eff6ff,#dbeafe);
+  border-radius: 14px; border: 2px solid var(--act-3);
+  overflow: hidden; box-shadow: 0 2px 14px rgba(37,99,235,.2);
 }
 .cardio-header {
-  background: linear-gradient(135deg,#d97706,#b45309);
+  background: linear-gradient(135deg, var(--act-2), #1d4ed8);
   color: #fff; font-weight: 800; font-size: .95rem;
   padding: 10px 16px; letter-spacing: .3px;
 }
 .cardio-tag {
-  background: #fef3c7 !important; color: #b45309 !important;
-  border-color: #fbbf24 !important;
+  background: #dbeafe !important; color: #1d4ed8 !important;
+  border-color: var(--act-3) !important;
 }
 .cardio-alt-card {
-  background: linear-gradient(135deg,#ecfdf5,#d1fae5);
-  border-radius: 14px; border: 2px dashed #10b981;
-  overflow: hidden; box-shadow: 0 2px 14px rgba(16,185,129,.15);
+  background: linear-gradient(135deg,#eff6ff,#dbeafe);
+  border-radius: 14px; border: 2px dashed var(--act-2);
+  overflow: hidden; box-shadow: 0 2px 14px rgba(37,99,235,.15);
   margin-top: 12px;
 }
 .cardio-alt-hdr {
-  background: linear-gradient(135deg,#059669,#047857);
+  background: linear-gradient(135deg, var(--act-3), var(--act-2));
   color: #fff; font-weight: 800; font-size: .88rem;
   padding: 8px 16px; letter-spacing: .3px;
 }
 .alt-tag {
   font-size: .62rem; font-weight: 700; text-transform: uppercase;
-  background: #d1fae5; color: #047857; border-radius: 20px;
+  background: #dbeafe; color: #1d4ed8; border-radius: 20px;
   padding: 2px 8px; margin-left: 6px; vertical-align: middle;
 }
 
@@ -851,7 +855,7 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
   overflow: visible;
 }
 .anim-box {
-  background: linear-gradient(160deg,#f8faff 0%,#e8f4ff 50%,#f0f9f4 100%);
+  background: linear-gradient(160deg,#f8faff 0%,#e8f4ff 50%,#dbeafe 100%);
   border-radius: 12px;
   padding: 6px 4px 2px;
   width: 100%;
@@ -882,7 +886,7 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 }
 .ex-top-row {
   min-height: 148px !important;
-  background: linear-gradient(160deg,#e8f0ff 0%,#f0f8ff 60%,#e8f5f0 100%) !important;
+  background: linear-gradient(160deg,#e8f0ff 0%,#f0f8ff 60%,#dbeafe 100%) !important;
   padding: 12px !important;
 }
 
@@ -898,7 +902,7 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 ════════════════════════════════════════ */
 .ex-top-row {
   min-height: auto !important;
-  background: linear-gradient(160deg,#e8f0ff 0%,#f0f8ff 60%,#e8f5f0 100%) !important;
+  background: linear-gradient(160deg,#e8f0ff 0%,#f0f8ff 60%,#dbeafe 100%) !important;
   padding: 16px !important;
   display: flex; justify-content: center; align-items: center;
 }
@@ -991,6 +995,15 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   box-shadow:0 3px 12px rgba(146,64,14,.3);
 }
 #routines-panel .refresh-btn:hover{ box-shadow:0 6px 18px rgba(146,64,14,.4); }
+/* Body's "Start Today's Exercises" / "Download Body Plan" buttons use this
+   same shared style too, but should carry Body's blue accent rather than
+   Food's green. */
+#activity-panel .refresh-btn{
+  background:linear-gradient(135deg,var(--act-3),var(--act-2));
+  color:#fff;
+  box-shadow:0 3px 12px rgba(37,99,235,.3);
+}
+#activity-panel .refresh-btn:hover{ box-shadow:0 6px 18px rgba(37,99,235,.4); }
 
 /* ─── AGE SECTION ─────────────────────────────── */
 .gender-block{margin-top:10px}
@@ -2018,6 +2031,14 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   position:absolute;bottom:16px;right:16px;width:110px;height:82px;border-radius:10px;
   object-fit:cover;border:2px solid rgba(255,255,255,.4);transform:scaleX(-1);
 }
+.workout-palm-mark{
+  position:absolute;bottom:16px;right:16px;width:110px;height:82px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:2.1rem;
+  background:rgba(37,99,235,.5);border:2px solid #60a5fa;pointer-events:none;
+}
+.workout-palm-mark.holding{ animation:palmMarkHold 1s ease-in-out infinite; }
+.workout-palm-mark.confirmed{ background:rgba(37,99,235,.75); border-color:#93c5fd; }
+@keyframes palmMarkHold{ 0%,100%{opacity:.55} 50%{opacity:1} }
 .workout-progress-bar{position:absolute;top:0;left:0;right:0;height:5px;background:rgba(255,255,255,.15)}
 .workout-progress-fill{height:100%;background:#2563eb;width:0%;transition:width .3s linear}
 .workout-stage{text-align:center;padding:0 20px;max-width:480px}
@@ -2027,7 +2048,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .workout-name{font-size:1.5rem;font-weight:800;margin-bottom:6px}
 .workout-meta{font-size:.95rem;color:#9fb3d8;margin-bottom:18px}
 .workout-timer{font-size:3rem;font-weight:800;color:#60a5fa;margin-bottom:10px}
-.workout-status{font-size:.85rem;color:#fbbf24;min-height:1.2em}
+.workout-status{font-size:.85rem;color:#93c5fd;min-height:1.2em}
 .workout-controls{position:absolute;bottom:20px;left:16px;display:flex;gap:10px}
 .workout-ctrl-btn{
   padding:10px 18px;border-radius:24px;border:none;background:rgba(255,255,255,.15);
@@ -2658,10 +2679,12 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 <div id="activity-panel" class="tab-panel" style="display:block">
 
   <!-- Age selector -->
-  <div class="body-age-section">
-    <div class="body-age-title">Age?</div>
-    <input type="range" id="body-age-slider" min="5" max="100" step="1" value="5" class="body-age-slider">
-    <div id="body-age-val" class="body-age-val"></div>
+  <div class="body-age-wrap">
+    <div class="body-age-section">
+      <div class="body-age-title">Age?</div>
+      <input type="range" id="body-age-slider" min="5" max="100" step="1" value="5" class="body-age-slider">
+      <div id="body-age-val" class="body-age-val"></div>
+    </div>
   </div>
 
   <!-- Activity type selector -->
@@ -8155,6 +8178,17 @@ function submitFeedback(){
     return;
   }
 
+  // Show "Sending..." and disable the button immediately so it's obvious
+  // the click registered, and so a slow connection can't be double-submitted
+  // by an impatient second click. Restored in onFeedbackSent() below, once
+  // the request has actually finished (success or failure).
+  const submitBtn = document.getElementById('fb-submit-btn');
+  if (submitBtn) {
+    submitBtn.dataset.origText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+  }
+
   // Object key order determines the order fields are sent in below (via
   // URLSearchParams): Date, Website, Name, Message, Status. Keys are
   // capitalized to match the Google Sheet's column headers exactly —
@@ -8216,6 +8250,14 @@ function onFeedbackSent(){
   formSec.style.display = 'none';
   document.getElementById('fb-name').value = '';
   document.getElementById('fb-message').value = '';
+
+  // Restore the button now that the request has actually finished, so the
+  // next time the form is opened it's back to a normal, clickable "Submit".
+  const submitBtn = document.getElementById('fb-submit-btn');
+  if (submitBtn) {
+    submitBtn.textContent = submitBtn.dataset.origText || 'Submit';
+    submitBtn.disabled = false;
+  }
 
   const confirmEl = document.getElementById('feedback-confirm');
   confirmEl.style.display = 'block';
@@ -8576,9 +8618,12 @@ function startPalmDetectionCamera(){
     const ctx = canvas.getContext('2d');
     workoutState.palmHoldFrames = 0;
     workoutState.pausedAt = 0;
+    workoutState.gestureReleasedSincePause = true;
+    const markEl = document.getElementById('workout-palm-mark');
     const FRAME_MS = 150;
     const PAUSE_HOLD_FRAMES = Math.round(500 / FRAME_MS);   // ~0.5s to pause
-    const RESUME_COOLDOWN_MS = 2000; // ignore the resume gesture for 2s right after pausing
+    const RESUME_HOLD_FRAMES = Math.round(350 / FRAME_MS);  // shorter — showing it a 2nd time is a deliberate repeat, not a first guess
+    const RESUME_COOLDOWN_MS = 1000; // minimum time paused before a resume can even be considered
     workoutState.camTimerId = setInterval(()=>{
       if(video.readyState < 2) return;
       try{
@@ -8619,27 +8664,61 @@ function startPalmDetectionCamera(){
         const gestureActive = palmOpen || lensCovered;
 
         if(!workoutState.paused){
-          // Pausing: needs a short sustained hold, same as before.
+          // Pausing: needs a short sustained hold. While it's building up,
+          // show the hand mark over the camera preview so there's some
+          // visible confirmation the camera is actually seeing something,
+          // before the workout actually reacts to it.
           if(gestureActive){ workoutState.palmHoldFrames++; } else { workoutState.palmHoldFrames = 0; }
+          if(markEl){
+            if(workoutState.palmHoldFrames > 0 && workoutState.palmHoldFrames < PAUSE_HOLD_FRAMES){
+              markEl.textContent = '✋'; markEl.className = 'workout-palm-mark holding'; markEl.style.display = 'flex';
+            } else if(workoutState.palmHoldFrames === 0){
+              markEl.style.display = 'none';
+            }
+          }
           if(workoutState.palmHoldFrames >= PAUSE_HOLD_FRAMES){
             workoutState.paused = true;
             workoutState.palmHoldFrames = 0;
             workoutState.pausedAt = Date.now();
+            // The palm that just triggered this pause is almost certainly
+            // still up in front of the camera — the resume check below
+            // requires it to actually be taken away and shown again, so
+            // this flag starts false until that release is actually seen.
+            workoutState.gestureReleasedSincePause = false;
             document.getElementById('workout-pause-btn').textContent = '▶ Resume';
             document.getElementById('workout-status').textContent = 'Paused — palm detected';
+            if(markEl){
+              markEl.textContent = '✅'; markEl.className = 'workout-palm-mark confirmed'; markEl.style.display = 'flex';
+              setTimeout(()=>{ if(workoutState.paused) markEl.style.display = 'none'; }, 900);
+            }
           }
         } else {
-          // Resuming: the gesture is ignored entirely for the first 2s after
-          // pausing — this is what stops the very palm-hold that just caused
-          // the pause from also being read as the "show it again" resume
-          // signal. Once those 2s have passed, a single fresh detection
-          // (no extra hold needed) resumes it — whether that's the same
-          // hand still up, or lowered-then-raised again, either is fine.
-          if(Date.now() - workoutState.pausedAt >= RESUME_COOLDOWN_MS && gestureActive){
-            workoutState.paused = false;
+          // Resuming needs the SAME palm gesture shown again — not just the
+          // original one still sitting there. Without this, holding a palm
+          // up (as you naturally would right after pausing) immediately
+          // satisfied both the pause condition and, once a cooldown timer
+          // elapsed, the resume condition too — pause and resume kept
+          // firing back to back in a loop. Requiring an actual release
+          // (gesture goes away) before a fresh gesture counts fixes that.
+          if(!gestureActive){
+            workoutState.gestureReleasedSincePause = true;
             workoutState.palmHoldFrames = 0;
-            document.getElementById('workout-pause-btn').textContent = '⏸ Pause';
-            document.getElementById('workout-status').textContent = '';
+            if(markEl) markEl.style.display = 'none';
+          } else if(workoutState.gestureReleasedSincePause && Date.now() - workoutState.pausedAt >= RESUME_COOLDOWN_MS){
+            workoutState.palmHoldFrames++;
+            if(markEl){
+              markEl.textContent = '✋'; markEl.className = 'workout-palm-mark holding'; markEl.style.display = 'flex';
+            }
+            if(workoutState.palmHoldFrames >= RESUME_HOLD_FRAMES){
+              workoutState.paused = false;
+              workoutState.palmHoldFrames = 0;
+              document.getElementById('workout-pause-btn').textContent = '⏸ Pause';
+              document.getElementById('workout-status').textContent = '';
+              if(markEl){
+                markEl.textContent = '✅'; markEl.className = 'workout-palm-mark confirmed'; markEl.style.display = 'flex';
+                setTimeout(()=>{ if(!workoutState.paused) markEl.style.display = 'none'; }, 900);
+              }
+            }
           }
         }
       }catch(e){ /* not fatal — just skip this frame */ }
@@ -8666,6 +8745,8 @@ function stopPalmDetectionCamera(){
     workoutState.camStream.getTracks().forEach(t=>t.stop());
     workoutState.camStream = null;
   }
+  const markEl = document.getElementById('workout-palm-mark');
+  if(markEl) markEl.style.display = 'none';
 }
 
 // Keep the header logo mark's width equal to the "Ayu Base6" wordmark's
@@ -8694,6 +8775,10 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(syncLogoWi
   <button type="button" class="workout-close-btn" onclick="stopWorkoutFullscreen()" title="Close">&times;</button>
   <video id="workout-cam" class="workout-cam-preview" autoplay muted playsinline style="display:none"></video>
   <canvas id="workout-cam-canvas" style="display:none"></canvas>
+  <!-- Visual confirmation that a palm was actually seen, laid over the
+       camera preview — a hand icon while it's still building up the hold,
+       then a checkmark the instant it actually triggers pause/resume. -->
+  <div id="workout-palm-mark" class="workout-palm-mark" style="display:none"></div>
 
   <!-- Pre-play summary — shown first; camera + playback only start once
        the person taps Start here. -->
