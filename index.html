@@ -75,11 +75,19 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 
 /* Logo mark + wordmark, stacked — mark width is kept at half the
    wordmark's own rendered width by syncLogoWidth() in JS, so the two stay
-   proportional regardless of viewport or font size. */
+   proportional regardless of viewport or font size. The var() fallback
+   below (used only until that JS runs) tracks the same clamp() curve as
+   the wordmark's own font-size, scaled to match its real measured width —
+   not an arbitrary guess — so the very first paint is already close to
+   the final size instead of starting oversized and visibly shrinking
+   down once the script catches up (the "zoom in, then settle" flash on
+   load/refresh that a flat 220px fallback used to cause, especially on
+   this file's large page weight where that script can run noticeably
+   late). */
 #app-logo-wrap{
   display: flex; flex-direction: column; align-items: center; gap: 0;
 }
-#app-logo-mark{ width: var(--logo-w, 220px); height: auto; flex: 0 0 auto; display: block; }
+#app-logo-mark{ width: var(--logo-w, clamp(73px, 12.5vw, 119px)); height: auto; flex: 0 0 auto; display: block; }
 /* Each petal is one section's own "Base6" wordmark colour — Body, Food,
    Routines, Nudges, Mind, Vitals, left to right in the same order as the
    tab row below — so the mark stays fixed rather than swapping with the
