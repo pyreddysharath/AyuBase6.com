@@ -2148,6 +2148,157 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 <!-- AdSense is intentionally NOT loaded here. It only sets ad/tracking
      cookies once the user has actually consented to "Advertising" —
      see applyCookieConsent()/loadAdSenseScript() further down. -->
+<style id="ayu-presentation">
+/* Ayu Base6 — shared presentation system, with a distinct accent per tab. */
+:root {
+ --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+ --heading-font: 'Trebuchet MS', 'Segoe UI', sans-serif;
+ --ink: #243448; --muted: #586779; --r: 18px;
+ --sh: 0 4px 20px rgba(28,48,73,.055);
+ --act-2: #255cc0; --nut-2: #25704f; --calc-2: #be345d;
+ --alert-2: #087e75; --rout-2: #a75b12; --mind-2: #6250b3;
+}
+body { color:var(--ink); font-size:16px; line-height:1.55; background:#f6f8fb; -webkit-font-smoothing:antialiased; }
+button,input,select,textarea { font-family:var(--font); }
+button { line-height:1.35; }
+h1,h2,h3,.body-age-title,.activity-type-title,.ex-name2,.yoga-name,.sec-ttl,.wp-title { font-family:var(--heading-font); letter-spacing:-.025em; }
+#app-nav { padding:14px 20px 10px; gap:14px; border-bottom:1px solid #e4e9f0; box-shadow:0 3px 18px #24344808; }
+#app-logo { font-family:Georgia,serif; font-size:clamp(2rem,4vw,2.65rem); letter-spacing:-1.5px; }
+#tab-btns { gap:8px; padding:4px 4px 7px; }
+.tab-btn { min-width:85px; padding:9px 16px; border-radius:12px; font-size:.75rem; letter-spacing:.07em; gap:5px; }
+.tab-btn-icon { width:29px; height:29px; }
+.tab-btn.activity { --tab-accent:#255cc0; --tab-tint:#edf3ff; }
+.tab-btn.nutrition { --tab-accent:#25704f; --tab-tint:#edf7f0; }
+.tab-btn.routines { --tab-accent:#96500d; --tab-tint:#fff5e5; }
+.tab-btn.alerts { --tab-accent:#08766e; --tab-tint:#eaf8f5; }
+.tab-btn.mind { --tab-accent:#6250b3; --tab-tint:#f1edfc; }
+.tab-btn.calculator { --tab-accent:#b52e55; --tab-tint:#fdf0f4; }
+#tab-btns .tab-btn { color:var(--tab-accent); }
+.tab-btn.active,.tab-btn:hover { background:var(--tab-tint); }
+#tab-btns .tab-btn.active .tab-btn-icon { filter:none; transform:scale(1.06); }
+#activity-panel { --accent:#255cc0; --deep:#1d3f79; --tint:#edf3ff; --line:#dce6f6; background:linear-gradient(145deg,#edf3ff,#f7f9fd 70%); }
+#nutrition-panel { --accent:#25704f; --deep:#204b38; --tint:#eff8f1; --line:#dcebdd; }
+#nutrition-panel #page-bg { background:linear-gradient(145deg,#edf7f0,#f8faf7 70%); }
+#routines-panel { --accent:#96500d; --deep:#724116; --tint:#fff6e8; --line:#efe2ce; background:linear-gradient(145deg,#fff5e7,#fcfaf6 70%); }
+#alerts-panel { --accent:#08766e; --deep:#155c56; --tint:#eaf8f5; --line:#d2eae4; background:linear-gradient(145deg,#eaf7f4,#f6faf9 70%); }
+#mind-panel { --accent:#6250b3; --deep:#493b7f; --tint:#f3effb; --line:#e4dff1; background:linear-gradient(145deg,#f1edfa,#faf9fc 70%); }
+#calculator-panel { --accent:#b52e55; --deep:#872b47; --tint:#fdf0f4; --line:#efdde4; background:linear-gradient(145deg,#fceef3,#fcf9fa 70%); }
+.tab-panel { color:var(--ink); min-height:calc(100vh - 180px); }
+.page-container,.calc-page,.alert-page,.rout-page,.mind-page { padding:28px 24px 48px; }
+.body-age-wrap { padding:28px 24px 0; }
+.activity-type-wrap { padding:18px 24px 20px; }
+.act-container { padding:20px 24px 48px; }
+.card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section {
+ background:#fff; border:1px solid var(--line,#e0e7ee); border-radius:18px;
+ box-shadow:var(--sh); padding:26px; backdrop-filter:none;
+}
+.card,.alert-card,.rout-card,.mind-card { margin-bottom:20px; }
+.tab-panel h2,.body-age-title,.activity-type-title { color:var(--deep); font-size:1.25rem; font-weight:700; line-height:1.35; }
+.tab-panel h2 { margin-bottom:18px; }
+.calc-card-hdr h2,.mind-card h2,.alert-card-hdr h2 { margin-bottom:0; }
+.section-title-icon { width:23px; height:23px; color:var(--accent); }
+.ex-desc,.ex-desc2,.yoga-desc,.calc-sub,.calc-task,.alert-task,.alert-card-sub,.reminders-notif-banner-text,.lab-disclaimer,.lab-card-remedies,.lab-card-note,.lab-normal-list,.gwhy,.groc-note,.advisory-text,.rmethod {
+ font-family:var(--font); font-style:normal; font-size:.93rem; line-height:1.7;
+}
+.ex-desc,.ex-desc2,.calc-sub,.alert-card-sub,.gwhy,.rmethod { color:var(--muted); }
+.tab-panel .refresh-btn { background:var(--accent); color:#fff; border-radius:12px; min-height:44px; box-shadow:0 3px 9px #24344812; font-size:.9rem; padding:12px 22px; }
+.gender-btn,.dpill,.activity-check { min-height:46px; border-radius:12px; font-size:.95rem; padding:12px 16px; }
+.tab-panel .gender-btn.selected,.activity-check.on,.dpill.on { background:var(--tint); border-color:var(--accent); color:var(--deep); }
+input[type=checkbox],input[type=radio] { accent-color:var(--accent,#255cc0); }
+select,input[type=text],input[type=number],input[type=time],textarea { font-size:1rem; line-height:1.45; }
+.alert-sound-select,.lab-select,.lab-value-input,.lab-row-val-input,.modal-search { min-height:44px; border-radius:10px; }
+:where(button,input,select,textarea,a,[tabindex]):focus-visible { outline:3px solid var(--accent,#255cc0); outline-offset:4px; }
+.body-age-val,.slider-val { color:var(--accent); font-size:1rem; font-variant-numeric:tabular-nums; }
+.age-val-num { font-size:1.6rem; font-weight:750; letter-spacing:-.03em; }
+.age-val-group { font-size:.88rem; color:var(--muted); opacity:1; }
+.ex-name2,.ex-name,.yoga-name { font-size:1.08rem; line-height:1.4; }
+.ex-info,.ex-body,.yoga-info { padding:18px; }
+.ex-stat2,.ex-stat,.ex-muscle-tag,.ex-secondary-tag { font-size:.76rem; }
+.anim-label,.ws-lbl { font-size:.72rem; }
+.ws-lbl { color:#cedbf0; }
+.week-nav { background:transparent; border-bottom:1px solid var(--line); padding-bottom:8px; gap:7px; }
+.day-tab,.rec-day-tab { min-height:42px; border-radius:10px; font-size:.85rem; }
+.day-header { background:var(--accent); padding:20px 22px; }
+.rout-row { padding:15px 0; border-bottom-color:var(--line); }
+.rout-check { font-size:1rem; color:#453b2c; align-items:flex-start; }
+.rout-check input[type=checkbox] { margin-top:4px; }
+.rout-time { font-size:.86rem; color:#775a36; display:inline-block; }
+.wake-control { background:var(--tint); padding:20px; }
+.wake-control-hdr { font-size:1rem; }
+#wake-time-val { font-size:1.25rem; font-variant-numeric:tabular-nums; }
+.mind-card-hdr { padding-bottom:17px; border-bottom:1px solid var(--line); margin-bottom:8px; }
+.mind-icon { width:44px; height:44px; border-radius:13px; background:var(--tint); }
+.mind-topic-list { gap:12px; }
+.mind-topic-list li { font-family:Georgia,'Times New Roman',serif; font-size:1.13rem; font-style:normal; line-height:1.8; color:#4b4460; background:var(--tint); border:1px solid var(--line); border-radius:12px; padding:16px 18px; box-shadow:0 2px 6px rgba(73,59,127,.035); }
+.mind-topic-list li:last-child { padding-bottom:16px; }
+.mind-topic-list li::marker { color:var(--accent); }
+.alert-row-lbl { font-size:.94rem; font-weight:600; }
+.alert-time-val { color:var(--deep); font-variant-numeric:tabular-nums; }
+.alert-preview-btn,.lab-upload-btn,.reset-icon-btn { min-height:40px; font-size:.86rem; border-radius:10px; }
+.alert-icon-btn { min-width:40px; min-height:40px; border-radius:10px; }
+.alert-task,.calc-task { background:var(--tint); color:var(--deep); }
+.calc-info-btn,.alert-info-btn { width:30px; height:30px; }
+.bmi-box { padding:18px 14px; border-radius:14px; }
+.bmi-lbl,.nt-n { font-size:.75rem; letter-spacing:.06em; }
+.bmi-cat { font-size:.86rem; }
+#calc-bmi-wrap .bmi-num { font-size:2rem; font-variant-numeric:tabular-nums; }
+.nt-u { color:#526b5d; font-size:.74rem; }
+.nt-v { font-size:1.12rem; }
+.nt-pill { padding:14px 12px; border-radius:12px; }
+.nt-checkall-lbl { font-size:.82rem; }
+.sec-ttl,.wp-title { font-size:1.08rem; }
+.iname,.gname,.rname { font-size:1rem; line-height:1.4; }
+.ihindi,.ghindi,.rmeta,.gqty { font-size:.82rem; }
+.icard,.gcard,.rcard { border-radius:13px; }
+.cov-table { font-size:.88rem; }
+.cov-table th,.cov-table td { padding:12px 10px; }
+#bg-icons span,#body-bg-icons span { opacity:.055; }
+.app-footer { border-top:1px solid #e3e8ef; }
+.footer-acc-body p,.cookie-banner-text { font-size:.88rem; line-height:1.65; }
+@media(max-width:640px) {
+ #app-nav { padding:10px 8px 7px; gap:9px; }
+ #app-logo { font-size:1.9rem; }
+ #tab-btns { width:100%; gap:3px; padding-left:0; padding-right:0; }
+ .tab-btn { min-width:0; flex:1 0 0; padding:8px 3px; font-size:.62rem; letter-spacing:.025em; }
+ .tab-btn-icon { width:25px; height:25px; }
+ .page-container,.calc-page,.alert-page,.rout-page,.mind-page { padding:18px 12px 32px; }
+ .body-age-wrap { padding:18px 12px 0; }
+ .activity-type-wrap { padding:16px 12px; }
+ .act-container { padding:16px 12px 32px; }
+ .card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section { padding:20px 17px; border-radius:15px; }
+ .tab-panel h2,.body-age-title,.activity-type-title { font-size:1.15rem; }
+ .mind-topic-list li { font-size:1.06rem; line-height:1.75; }
+ .rout-check { font-size:.94rem; }
+ .alert-sound-row { flex-wrap:wrap; }
+ .alert-sound-select { min-width:0; max-width:100%; }
+ .lab-manual-row { flex-wrap:wrap; }
+ .lab-select { min-width:0; max-width:100%; }
+ .ex-grid2 { grid-template-columns:minmax(0,1fr); }
+ .calc-row { flex-wrap:wrap; }
+}
+@media(prefers-reduced-motion:reduce) {
+ .tab-btn,.tab-btn-icon,#tab-underline,.ex-card,.ex-card2 { transition:none; }
+ .tab-btn.just-selected .tab-btn-icon,#bg-icons span,#body-bg-icons span,.food-emoji,.food-shine { animation:none; }
+}
+
+
+/* Food age control aligned with the Body age control. */
+#nutrition-panel #sec-age, #food-age-val { text-align:left; }
+#food-age-val { margin-left:0; }
+#food-age-slider { height:8px; border-radius:4px; margin-top:14px; }
+#food-age-slider::-webkit-slider-thumb {
+ width:22px; height:22px; border:3px solid var(--g2);
+ margin-top:-7px; box-shadow:0 1px 4px rgba(0,0,0,.35); transition:none;
+}
+#food-age-slider::-moz-range-thumb {
+ width:22px; height:22px; border:3px solid var(--g2);
+ box-shadow:0 1px 4px rgba(0,0,0,.35); transition:none;
+}
+#food-age-slider::-webkit-slider-thumb:hover,
+#food-age-slider::-webkit-slider-thumb:active { transform:none; }
+#food-age-slider::-moz-range-thumb:hover,
+#food-age-slider::-moz-range-thumb:active { transform:none; }
+</style>
 </head>
 <body>
 
