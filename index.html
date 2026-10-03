@@ -57,7 +57,7 @@
   --mind-3: #a5b4fc;  /* light indigo */
   --mind-4: #e0e7ff;  /* pale indigo */
   --white: #fff;
-  --font: 'Segoe UI', system-ui, sans-serif;
+  --font: 'Sabon Roman', 'Sabon', Georgia, 'Times New Roman', serif;
 }
 
 body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflow-anchor: none; }
@@ -189,7 +189,31 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
    ACTIVITY TAB STYLES
 ══════════════════════════════════════════ */
 #activity-panel {
-  background: linear-gradient(160deg, #e8f0ff 0%, #f0f7ff 40%, #e8f4ff 100%);
+  /* Base6-blue tinted, same pastel-gradient approach as Food's own
+     background, so the panel reads as clearly "Base6 blue" rather than
+     a near-white wash — and tall enough to fill the viewport like the
+     other tab panels, so the footer doesn't sit above a stray plain
+     strip when there isn't much content selected yet. */
+  background: linear-gradient(160deg, #dbe9ff 0%, #eaf3ff 35%, #f3f8ff 65%, #d6e6ff 100%);
+  min-height: calc(100vh - 110px);
+  position: relative; overflow-x: hidden;
+}
+/* Scattered exercise/yoga icons behind the Body tab's content — same
+   treatment as Food's #bg-icons, populated in the same script pattern. */
+#body-bg-icons {
+  position: absolute; inset: 0; pointer-events: none;
+  overflow: hidden; z-index: 0;
+}
+#body-bg-icons span {
+  position: absolute; font-size: 2rem; opacity: .12;
+  user-select: none; line-height: 1;
+  animation: bgIconFloat 9s ease-in-out infinite;
+  transform: rotate(var(--r, 0deg));
+}
+.body-content-wrap { position: relative; z-index: 1; }
+@keyframes bgIconFloat {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50% { transform: translateY(-14px) rotate(var(--r, 0deg)); }
 }
 
 /* Week day tabs */
@@ -289,7 +313,7 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
   font-size: .75rem; color: #1e40af; font-weight: 600;
   display: flex; align-items: center; gap: 4px;
 }
-.ex-desc { font-family:'Newsreader',Georgia,serif; font-style:italic; font-size: .85rem; color: #475569; margin-top: 8px; line-height: 1.55; }
+.ex-desc { font-family:'Sabon Roman','Sabon',Georgia,serif; font-style:italic; font-size: .85rem; color: #475569; margin-top: 8px; line-height: 1.55; }
 
 /* Weekly summary bar */
 .week-summary {
@@ -627,13 +651,13 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
   background: #dbeafe; border-radius: 20px;
   display: inline-block; padding: 2px 8px; margin-bottom: 7px;
 }
-.ex-stats2 { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:7px; }
+.ex-stats2 { display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
 .ex-stat2 {
   background: #eff6ff; border: 1px solid #bfdbfe;
   border-radius: 8px; padding: 4px 9px;
   font-size: .73rem; color: #1e40af; font-weight: 600;
 }
-.ex-desc2 { font-family:'Newsreader',Georgia,serif; font-style:italic; font-size: .85rem; color: #475569; line-height: 1.55; }
+.ex-desc2 { font-family:'Sabon Roman','Sabon',Georgia,serif; font-style:italic; font-size: .85rem; color: #475569; line-height: 1.55; }
 
 @media(max-width:600px){
   .ex-grid2 { grid-template-columns: 1fr; }
@@ -654,17 +678,22 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
    normal width, instead of a banner stretching edge to edge. */
 .body-age-wrap { max-width: 1200px; margin: 0 auto; padding: 20px 16px 0; }
 .body-age-section {
-  background: #60a5fa;
-  padding: 24px 20px 20px; text-align: center;
-  border-radius: 14px; box-shadow: 0 2px 18px rgba(37,99,235,.18);
+  background: rgba(255,255,255,.88);
+  backdrop-filter: blur(6px);
+  padding: 22px; text-align: left;
+  border-radius: var(--r); box-shadow: var(--sh);
+  border: 1px solid rgba(191,219,254,.6);
 }
 .body-age-title {
-  font-size: 1.1rem; font-weight: 800; color: #1e3a6e; margin-bottom: 10px;
+  font-size: 1.18rem; font-weight: 700; color: #1e3a6e; margin-bottom: 14px;
+  text-align: left;
 }
-.body-age-val { font-weight: 700; color: #1e3a6e; font-size: 1rem; margin-top: 10px; min-height: 1.3em; }
+.body-age-val { font-weight: 700; color: #60a5fa; font-size: .85rem; margin-top: 8px; min-height: 1.3em; }
+.age-val-num { display: block; }
+.age-val-group { display: block; font-size: .85rem; font-weight: 600; margin-top: 7px; opacity: .75; }
 .body-age-slider {
   -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 4px;
-  background: rgba(255,255,255,.25); outline: none; margin: 4px 0;
+  background: rgba(37,99,235,.25); outline: none; margin: 14px 0 0;
 }
 .body-age-slider::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%;
@@ -675,20 +704,20 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
   background: #fff; border: 3px solid #1e40af; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,.35);
 }
 .body-age-subtitle {
-  font-size: .82rem; color: rgba(255,255,255,.7); margin-bottom: 16px;
+  font-size: .82rem; color: rgba(30,58,110,.7); margin-bottom: 16px;
 }
 .body-age-grid {
   display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
 }
 .body-age-pill {
   display: flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.25);
+  background: #fff; border: 2px solid rgba(37,99,235,.3);
   border-radius: 40px; padding: 10px 20px; cursor: pointer;
-  transition: all .18s; color: #fff;
+  transition: all .18s; color: #1e3a6e;
 }
-.body-age-pill:hover { background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.5); }
+.body-age-pill:hover { background: #eff6ff; border-color: rgba(37,99,235,.55); }
 .body-age-pill.selected {
-  background: #fff; border-color: #fff; color: #1e3a6e;
+  background: var(--act-2); border-color: var(--act-2); color: #fff;
 }
 .bap-icon { font-size: 1.2rem; }
 .bap-lbl  { font-size: .88rem; font-weight: 700; }
@@ -696,40 +725,34 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 /* ════════════════════════════════════════
    ACTIVITY TYPE SELECTOR (Exercise / Yoga)
 ════════════════════════════════════════ */
+.activity-type-wrap { max-width: 1200px; margin: 0 auto; padding: 16px 16px 20px; }
 .activity-type-section {
-  background: #fff; padding: 18px 20px 16px; text-align: center;
-  border-bottom: 2px solid #e2eaff;
+  background: rgba(255,255,255,.88);
+  backdrop-filter: blur(6px);
+  padding: 22px; text-align: center;
+  border-radius: var(--r); box-shadow: var(--sh);
+  border: 1px solid rgba(191,219,254,.6);
 }
 .activity-type-title {
-  font-size: 1rem; font-weight: 800; color: #1e3a6e; margin-bottom: 4px;
+  font-size: 1.18rem; font-weight: 700; color: #1e3a6e; margin-bottom: 14px;
+  text-align: left;
 }
 .activity-type-subtitle {
   font-size: .8rem; color: #5b7ab3; margin-bottom: 14px;
 }
+/* Same pattern as Food's Dietary Preference? pills (.diet-row/.dpill) —
+   one full-width option per row, not side-by-side. */
 .activity-type-options {
-  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+  display: flex; flex-direction: column; gap: 8px; margin-top: 4px;
 }
 .activity-check {
-  display: flex; align-items: center; gap: 9px; cursor: pointer;
-  background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 40px;
-  padding: 9px 20px; transition: all .18s;
+  display: flex; align-items: center; gap: 10px; padding: 12px 20px;
+  border-radius: 10px; border: 2px solid #bfdbfe; background: rgba(255,255,255,.7);
+  cursor: pointer; font-size: .95rem; font-weight: 600; color: #60a5fa;
+  transition: all .12s; width: 100%;
 }
-.activity-check:hover { background: #dbeafe; border-color: #93c5fd; }
-.activity-check input[type="checkbox"] { display: none; }
-.activity-check-box {
-  width: 18px; height: 18px; border-radius: 5px; flex-shrink: 0;
-  border: 2px solid #93c5fd; background: #fff; position: relative;
-  transition: all .15s;
-}
-.activity-check input:checked ~ .activity-check-box {
-  background: #2563eb; border-color: #2563eb;
-}
-.activity-check input:checked ~ .activity-check-box::after {
-  content: '✓'; position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: .72rem; font-weight: 800;
-}
-.activity-check-label { font-size: .88rem; font-weight: 700; color: #1e3a6e; }
+.activity-check input[type="checkbox"] { accent-color: #2563eb; width: 15px; height: 15px; }
+.activity-check.on { background: var(--act-3); border-color: var(--act-2); color: #fff; }
 
 /* ════════════════════════════════════════
    ROUTINE + CARDIO LABELS
@@ -754,16 +777,29 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
   padding: 2px 10px; letter-spacing: .3px;
 }
 .warmup-wrap { margin-bottom: 22px; }
+/* The box around each Exercise/Yoga subsection — gives the header pill
+   and its card grid a shared background so they read as one section. */
+.warmup-subsection {
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 14px; padding: 14px; margin: 14px 0;
+}
 .warmup-subsection-label {
-  font-size: .74rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .6px; color: #334155;
-  margin: 14px 0 10px; display: flex; align-items: center; gap: 6px;
+  font-size: .92rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .6px; color: #fff;
+  background: linear-gradient(135deg, var(--act-3), var(--act-2));
+  border-radius: 10px; padding: 10px 16px;
+  margin: 0 0 12px; display: flex; align-items: center; gap: 8px;
 }
 .warmup-empty-msg {
   font-size: .85rem; color: #64748b; background: #f8fafc;
   border: 1.5px dashed #cbd5e1; border-radius: 10px;
   padding: 14px 16px; margin-bottom: 4px;
 }
+/* Collapsible Exercise / Yoga subsections within the Warm-Up — expanded
+   by default; clicking the header toggles the card grid below it. */
+.warmup-collapse-hdr { cursor: pointer; user-select: none; }
+.warmup-collapse-arrow { margin-left: auto; font-size: 1.3rem; line-height: 1; transition: transform .15s; }
+.warmup-collapse-hdr.collapsed .warmup-collapse-arrow { transform: rotate(-90deg); }
 .routine-label {
   font-size: .82rem; font-weight: 700; text-transform: uppercase;
   letter-spacing: .8px; color: #1e40af;
@@ -788,9 +824,11 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 ════════════════════════════════════════ */
 .yoga-outer { margin: 8px 0 30px; }
 .yoga-section-label {
-  font-size: .74rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .6px; color: var(--act-2);
-  margin: 14px 0 10px; display: flex; align-items: center; gap: 6px;
+  font-size: .92rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .6px; color: #fff;
+  background: linear-gradient(135deg, var(--act-3), var(--act-2));
+  border-radius: 10px; padding: 10px 16px;
+  margin: 0 0 12px; display: flex; align-items: center; gap: 8px;
 }
 .yoga-grid {
   display: grid;
@@ -903,6 +941,20 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
   .body-age-pill { padding:8px 14px; }
   .bap-lbl { font-size:.78rem; }
 }
+/* Match Food's card breakpoint exactly (its h2/.card/.dpill all shift at
+   640px, not 600px) so Body's cards resize at the same width Food's do. */
+@media(max-width:640px){
+  .body-age-title, .activity-type-title { font-size: 1rem; }
+  /* Food's .page-container also drops its top padding to 16px at this
+     breakpoint — match it so the Age? card starts at the same point. */
+  .body-age-wrap { padding: 16px 10px 0; }
+  .activity-type-wrap { padding-left: 10px; padding-right: 10px; }
+  .body-age-section, .activity-type-section { padding: 16px; }
+  .activity-check { padding: 8px 12px; font-size: .83rem; }
+}
+@media(max-width:380px){
+  .activity-check { padding: 7px 10px; font-size: .78rem; }
+}
 
 
 /* ════════════════════════════════════════
@@ -929,7 +981,7 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
   --blue:#1a5276;--blue-lt:#ebf5fb;
   --pink:#7b2d5e;--pink-lt:#fdf0f7;
   --r:14px;--sh:0 2px 18px rgba(0,0,0,.08);
-  --font:'Segoe UI',system-ui,sans-serif;
+  --font:'Sabon Roman','Sabon',Georgia,'Times New Roman',serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{overflow-x:hidden;max-width:100%}
@@ -949,9 +1001,11 @@ html,body{overflow-x:hidden;max-width:100%}
 #bg-icons span{
   position:absolute;font-size:2rem;opacity:.12;
   user-select:none;line-height:1;
+  animation: bgIconFloat 9s ease-in-out infinite;
+  transform: rotate(var(--r, 0deg));
 }
 /* All cards and content above bg */
-.page-container{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 16px 40px}
+.page-container{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:20px 16px 40px}
 
 /* ─── LOGO ────────────────────────────────────── */
 .logo-wrap{
@@ -1174,7 +1228,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .mind-why strong{color:var(--mind-1)}
 .mind-topic-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .mind-topic-list li{
-  font-family:'Newsreader',Georgia,serif;font-style:italic;
+  font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;
   font-size:.95rem;line-height:1.65;color:#3f3f6b;
   background:var(--mind-4);border-radius:10px;padding:14px 16px;
 }
@@ -1215,14 +1269,14 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   background:var(--alert-4);border:1px solid rgba(94,234,212,.5);border-radius:12px;
 }
 .reminders-notif-banner-icon{font-size:1.3rem;flex:0 0 auto}
-.reminders-notif-banner-text{flex:1;font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:.85rem;line-height:1.5;color:var(--alert-1)}
+.reminders-notif-banner-text{flex:1;font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;font-size:.85rem;line-height:1.5;color:var(--alert-1)}
 .reminders-notif-banner-btn{
   flex:0 0 auto;padding:8px 16px;border-radius:20px;border:none;
   background:var(--alert-2);color:#fff;font-size:.8rem;font-weight:700;cursor:pointer;
 }
 .reminders-notif-banner-btn:hover{background:var(--alert-1)}
 .notif-blocked-hint{
-  font-family:'Newsreader',Georgia,serif;font-style:italic;
+  font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;
   font-size:.8rem;line-height:1.5;color:var(--alert-1);background:var(--alert-4);
   border:1px solid rgba(94,234,212,.6);border-radius:8px;padding:8px 10px;margin-top:6px;
 }
@@ -1240,7 +1294,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 }
 .calc-info-btn:hover,.calc-info-btn.active{background:var(--calc-2);color:#fff;border-color:var(--calc-2)}
 .calc-task{
-  font-family:'Newsreader',Georgia,serif;font-style:italic;
+  font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;
   font-size:.85rem;line-height:1.6;color:var(--calc-1);background:var(--calc-4);
   border-radius:10px;padding:12px 14px;margin:10px 0;
 }
@@ -1253,9 +1307,13 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
   color:var(--calc-2);margin:18px 0 12px;
 }
-.calc-sub{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:.88rem;line-height:1.5;color:#9d6470;margin:2px 0 18px}
+.calc-sub{font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;font-size:.88rem;line-height:1.5;color:#9d6470;margin:2px 0 18px}
 .calc-row{display:flex;align-items:center;gap:8px;margin-bottom:18px}
 .calc-row-stacked{margin-bottom:20px}
+/* The Age? card has just this one row — no sibling below it inside the
+   card — so its bottom margin is only ever dead space before the card's
+   own padding. */
+#sec-age .calc-row-stacked{margin-bottom:0}
 .calc-row-top{
   font-size:.85rem;font-weight:600;color:var(--calc-1);
   display:flex;justify-content:flex-start;align-items:baseline;flex-wrap:nowrap;
@@ -1353,14 +1411,14 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .lab-badge.high{background:#ffedd5;color:#c2410c}
 .lab-card-range{font-size:.78rem;color:#7c6a99;margin-top:4px}
 .lab-card-system{font-size:.78rem;color:var(--calc-2);font-weight:600;margin-top:8px}
-.lab-card-remedies{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:.84rem;line-height:1.5;color:#3a2a52;margin-top:6px;padding-left:18px}
+.lab-card-remedies{font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;font-size:.84rem;line-height:1.5;color:#3a2a52;margin-top:6px;padding-left:18px}
 .lab-card-remedies li{margin-bottom:2px}
 .lab-card-note{
-  font-family:'Newsreader',Georgia,serif;font-style:italic;
+  font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;
   font-size:.8rem;color:#7a3b0c;background:#fff4e5;border-radius:8px;
   padding:8px 10px;margin-top:8px;line-height:1.5;
 }
-.lab-normal-list{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:.84rem;color:#4a6151;line-height:1.65}
+.lab-normal-list{font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;font-size:.84rem;color:#4a6151;line-height:1.65}
 
 /* ─── ALERTS TAB ───────────────────────────────── */
 #alerts-panel{
@@ -1380,7 +1438,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .section-title-icon{width:26px;height:26px;flex:0 0 auto}
 .inline-teal-icon{width:19px;height:19px;vertical-align:-4px;flex:0 0 auto}
 .alert-card-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.alert-card-sub{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:.86rem;line-height:1.5;color:#3a7a72;margin:0 0 10px}
+.alert-card-sub{font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;font-size:.86rem;line-height:1.5;color:#3a7a72;margin:0 0 10px}
 .alert-time-range{font-size:.78rem;font-weight:700;color:var(--alert-2)}
 .alert-row{margin-top:14px}
 .alert-row-lbl{font-size:.78rem;font-weight:700;font-style:italic;letter-spacing:.5px;color:var(--alert-1);margin-bottom:6px}
@@ -1470,7 +1528,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 
 /* Task info blurb — opened via the "i" icon in the section header */
 .alert-task{
-  font-family:'Newsreader',Georgia,serif;font-style:italic;
+  font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;
   font-size:.85rem;line-height:1.6;color:#155e56;background:var(--alert-4);
   border-radius:10px;padding:12px 14px;margin-top:6px;
 }
@@ -1702,8 +1760,8 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .ghindi{font-size:.7rem;color:#4a6151}
 .gqty{font-size:.85rem;font-weight:700;color:var(--g3);background:var(--g6);
       display:inline-block;padding:3px 10px;border-radius:20px;margin-top:3px}
-.gwhy{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:.72rem;color:#4a6151;margin-top:2px;line-height:1.45}
-.groc-note{margin-top:12px;font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:.82rem;color:#4a6151;
+.gwhy{font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;font-size:.72rem;color:#4a6151;margin-top:2px;line-height:1.45}
+.groc-note{margin-top:12px;font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;font-size:.82rem;color:#4a6151;
            background:var(--g6);border-radius:8px;padding:9px 13px;line-height:1.65}
 .groc-note strong{font-style:normal}
 
@@ -1722,7 +1780,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .advisory-icon{font-size:1.4rem;flex-shrink:0;line-height:1;color:var(--g2);display:inline-flex;align-items:center}
 .advisory-hdr-label{display:inline-flex;align-items:center;gap:6px}
 .advisory-icon svg{width:20px;height:20px;display:block}
-.advisory-text{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:.88rem;color:var(--g1);line-height:1.6}
+.advisory-text{font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;font-size:.88rem;color:var(--g1);line-height:1.6}
 .advisory-text strong{font-style:normal;color:var(--g1);font-size:.9rem}
 .rec-section{background:rgba(255,255,255,.88);border-radius:var(--r);box-shadow:var(--sh);
              padding:22px;margin-bottom:24px;border:1px solid rgba(183,228,199,.5)}
@@ -1759,7 +1817,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .rmeta{font-size:.72rem;color:#4a6151;margin-left:auto;text-align:right}
 .rtags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}
 .rtag{font-size:.67rem;padding:2px 7px;border-radius:20px;background:var(--g6);color:var(--g2);font-weight:600}
-.rmethod{font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:.85rem;color:#4a6151;line-height:1.6}
+.rmethod{font-family:'Sabon Roman','Sabon',Georgia,serif;font-style:italic;font-size:.85rem;color:#4a6151;line-height:1.6}
 .ring-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:7px}
 .ringtag{font-size:.62rem;background:var(--g6);border-radius:20px;padding:2px 7px}
 
@@ -1813,7 +1871,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 @media(max-width:640px){
   .logo-wrap{padding:28px 12px 20px}
   .heal-title{font-size:2.6rem;letter-spacing:-2px}
-  .page-container{padding:0 10px 32px}
+  .page-container{padding:16px 10px 32px}
   .card{padding:16px}
   h2{font-size:1rem}
   .dpill{padding:8px 12px;font-size:.83rem}
@@ -2046,11 +2104,14 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .workout-stage{text-align:center;padding:0 20px;max-width:480px}
 .workout-figure{width:220px;height:220px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center}
 .workout-figure svg{width:100%;height:100%}
-.workout-pose-video{width:280px;max-width:80vw;border-radius:16px;margin:0 auto 10px;display:block}
-.workout-name{font-size:1.5rem;font-weight:800;margin-bottom:6px}
-.workout-meta{font-size:.95rem;color:#9fb3d8;margin-bottom:18px}
-.workout-timer{font-size:3rem;font-weight:800;color:#60a5fa;margin-bottom:10px}
-.workout-status{font-size:.85rem;color:#93c5fd;min-height:1.2em}
+.workout-pose-video{
+  position:fixed;inset:0;width:100%;height:100%;
+  object-fit:cover;border-radius:0;margin:0;z-index:-1;display:block;
+}
+.workout-name{font-size:1.5rem;font-weight:800;margin-bottom:6px;text-shadow:0 2px 10px rgba(0,0,0,.85)}
+.workout-meta{font-size:.95rem;color:#9fb3d8;margin-bottom:18px;text-shadow:0 2px 10px rgba(0,0,0,.85)}
+.workout-timer{font-size:3rem;font-weight:800;color:#60a5fa;margin-bottom:10px;text-shadow:0 2px 10px rgba(0,0,0,.85)}
+.workout-status{font-size:.85rem;color:#93c5fd;min-height:1.2em;text-shadow:0 2px 10px rgba(0,0,0,.85)}
 .workout-controls{position:absolute;bottom:20px;left:16px;display:flex;gap:10px}
 .workout-ctrl-btn{
   padding:10px 18px;border-radius:24px;border:none;background:rgba(255,255,255,.15);
@@ -2652,14 +2713,13 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
       <ul class="mind-topic-list">
         <li>Morning mood is a teaser of the day. The decision is yours as to how the main picture should be.</li>
         <li>Have a bath — wash off yesterday's dirt and let its thoughts rinse away.</li>
-        <li>Leave yesterday in yesterday.</li>
-        <li>Today should not be a copy &amp; paste of yesterday.</li>
+        <li>Leave yesterday in yesterday — don't copy-paste it into today.</li>
         <li>0 expectations = ∞ happiness.</li>
       </ul>
     </div>
 
     <div class="mind-card">
-      <div class="mind-card-hdr"><span class="mind-icon">🚦</span><h2>Traffic — Introduces a New You</h2></div>
+      <div class="mind-card-hdr"><span class="mind-icon">🚦</span><h2>Traffic Therapy</h2></div>
       <ul class="mind-topic-list">
         <li>Just think whether your reaction is worth it.</li>
         <li>You are more valuable than your vehicle. So are others.</li>
@@ -2671,25 +2731,9 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
       <div class="mind-card-hdr"><span class="mind-icon">💪</span><h2>Work on Yourself</h2></div>
       <ul class="mind-topic-list">
         <li>Learning something new for a few minutes a day brings returns with compound interest.</li>
-        <li>Mistakes aren't charity. Don't donate yours to others. They're your children. Accept them.</li>
-        <li>Take criticism. It's the best thing for improving yourself.</li>
+        <li>Mistakes aren't charity. Don't donate yours to others. Accept them.</li>
+        <li>Take criticism like a vaccine — brief sting, lasting immunity.</li>
         <li>Jealousy makes you less. Put up a "No Entry" sign.</li>
-      </ul>
-    </div>
-
-    <div class="mind-card">
-      <div class="mind-card-hdr"><span class="mind-icon">🏠</span><h2>Home</h2></div>
-      <ul class="mind-topic-list">
-        <li>No trespassing from work into home.</li>
-        <li>If you work from home, shut down your work avatar along with your laptop. Practise split personality.</li>
-      </ul>
-    </div>
-
-    <div class="mind-card">
-      <div class="mind-card-hdr"><span class="mind-icon">🤝</span><h2>Company &amp; Me-Time</h2></div>
-      <ul class="mind-topic-list">
-        <li>Meet up with friends.</li>
-        <li>No friends? Then meet yourself.</li>
       </ul>
     </div>
 
@@ -2707,6 +2751,10 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 
 <!-- ══ BODY PANEL ══════════════════════════ -->
 <div id="activity-panel" class="tab-panel" style="display:block">
+  <!-- Scattered exercise/yoga icons in background, mirroring Food's bg-icons -->
+  <div id="body-bg-icons" aria-hidden="true"></div>
+
+  <div class="body-content-wrap">
 
   <!-- Age selector -->
   <div class="body-age-wrap">
@@ -2718,20 +2766,17 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   </div>
 
   <!-- Activity type selector -->
-  <div class="activity-type-section">
-    <div class="activity-type-title">🎯 Activity Type?</div>
-    <div class="activity-type-subtitle">Choose what to include in your Warm-Up</div>
-    <div class="activity-type-options">
-      <label class="activity-check">
-        <input type="checkbox" id="chk-exercise" onchange="onActivityTypeChange()">
-        <span class="activity-check-box"></span>
-        <span class="activity-check-label">🏋️ Exercise</span>
-      </label>
-      <label class="activity-check">
-        <input type="checkbox" id="chk-yoga" onchange="onActivityTypeChange()">
-        <span class="activity-check-box"></span>
-        <span class="activity-check-label">🧘 Yoga</span>
-      </label>
+  <div class="activity-type-wrap">
+    <div class="activity-type-section">
+      <div class="activity-type-title">Activity Type?</div>
+      <div class="activity-type-options">
+        <label class="activity-check" id="act-exercise-pill">
+          <input type="checkbox" id="chk-exercise" onchange="onActivityTypeChange()"> Exercise
+        </label>
+        <label class="activity-check" id="act-yoga-pill">
+          <input type="checkbox" id="chk-yoga" onchange="onActivityTypeChange()"> Yoga
+        </label>
+      </div>
     </div>
   </div>
 
@@ -2742,13 +2787,15 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   <div class="act-container">
     <div id="body-week-section" style="display:none">
       <div style="text-align:center;margin-bottom:14px">
-        <button id="body-start-btn" class="refresh-btn" onclick="startWorkoutFullscreen()" style="display:none">▶ Start Today's Exercises</button>
+        <button id="body-start-btn" class="refresh-btn" onclick="startWorkoutFullscreen()" style="display:none">▶ Let's Start</button>
       </div>
       <div id="day-panels"></div>
       <div id="body-download-wrap" style="margin-top:16px;text-align:center">
         <button id="body-download-btn" class="refresh-btn" onclick="downloadBodyPDF()">📄 Download Body Plan (PDF)</button>
       </div>
     </div>
+  </div>
+
   </div>
 </div>
 
@@ -2921,7 +2968,29 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
     s.style.top=Math.random()*98+'%';
     s.style.fontSize=(1.4+Math.random()*1.6)+'rem';
     s.style.opacity=(.07+Math.random()*.1).toFixed(2);
-    s.style.transform=`rotate(${Math.round(Math.random()*60-30)}deg)`;
+    s.style.setProperty('--r', Math.round(Math.random()*60-30)+'deg');
+    s.style.animationDuration=(7+Math.random()*7).toFixed(2)+'s';
+    s.style.animationDelay=(-Math.random()*8).toFixed(2)+'s';
+    wrap.appendChild(s);
+  }
+})();
+
+// Same treatment for the Body tab — exercise/yoga icons instead of food.
+(function(){
+  const icons=['🏋️','🧘','🤸','🏃','💪','🤾','🚴','🏊','🤺','🥋',
+               '⛹️','🧘‍♀️','🤸‍♂️','🏃‍♀️','🚶','🦵','🧘‍♂️','🥇','🤼','🏃‍♂️'];
+  const wrap = document.getElementById('body-bg-icons');
+  if(!wrap) return;
+  for(let i=0;i<45;i++){
+    const s=document.createElement('span');
+    s.textContent=icons[i%icons.length];
+    s.style.left=Math.random()*98+'%';
+    s.style.top=Math.random()*98+'%';
+    s.style.fontSize=(1.4+Math.random()*1.6)+'rem';
+    s.style.opacity=(.07+Math.random()*.1).toFixed(2);
+    s.style.setProperty('--r', Math.round(Math.random()*60-30)+'deg');
+    s.style.animationDuration=(7+Math.random()*7).toFixed(2)+'s';
+    s.style.animationDelay=(-Math.random()*8).toFixed(2)+'s';
     wrap.appendChild(s);
   }
 })();
@@ -3036,7 +3105,7 @@ function onFoodAgeChange(){
   const slider=document.getElementById('food-age-slider');
   const age=+slider.value;
   foodAgeBracket=foodAgeBracketForAge(age);
-  document.getElementById('food-age-val').textContent=age+' yrs — '+foodAgeBracket.icon+' '+foodAgeBracket.label;
+  document.getElementById('food-age-val').innerHTML=`<span class="age-val-num">${age} yrs</span><span class="age-val-group">${foodAgeBracket.label}</span>`;
   updateSliderFill(slider,'var(--g3)');
   resolveFoodAgeGroup();
 }
@@ -6324,6 +6393,12 @@ function switchTab(tab) {
 
   currentActiveTab = tab;
   window.scrollTo(0, tabScrollPositions[tab] || 0);
+
+  // Re-check the underline's position a frame later too — the panel we
+  // just revealed can still be settling (scrollbar appearing/disappearing,
+  // late image/video sizing), which can nudge the centered nav row after
+  // the synchronous position above was already computed.
+  requestAnimationFrame(() => positionTabUnderline(activeBtn));
 }
 
 // ════════════════════════════════════════
@@ -7257,7 +7332,7 @@ function buildBodyAgeUI() {
   const update = () => {
     const age = +slider.value;
     const ag = bodyAgeGroupForAge(age);
-    document.getElementById('body-age-val').textContent = age + ' yrs — ' + ag.icon + ' ' + ag.label;
+    document.getElementById('body-age-val').innerHTML = `<span class="age-val-num">${age} yrs</span><span class="age-val-group">${ag.label}</span>`;
     selectBodyAge(ag);
   };
   slider.addEventListener('input', update);
@@ -7713,6 +7788,9 @@ const POSE_SVGS = {
 
 // Re-render the current age group's plan when Exercise/Yoga checkboxes change
 function onActivityTypeChange(){
+  document.querySelectorAll('.activity-check').forEach(p=>{
+    p.classList.toggle('on', p.querySelector('input').checked);
+  });
   if (selectedBodyAge) buildWeekPlan(selectedBodyAge);
   updateStartButtonVisibility();
 }
@@ -7722,6 +7800,15 @@ function updateStartButtonVisibility(){
   const exerciseChecked = document.getElementById('chk-exercise')?.checked ?? false;
   const yogaChecked = document.getElementById('chk-yoga')?.checked ?? false;
   btn.style.display = (exerciseChecked || yogaChecked) ? 'inline-block' : 'none';
+}
+
+// Exercise/Yoga subsections inside the Warm-Up are expanded by default;
+// clicking the header collapses/expands its card grid.
+function toggleWarmupCollapse(hdr){
+  const body = hdr.nextElementSibling;
+  if (!body) return;
+  const collapsed = hdr.classList.toggle('collapsed');
+  body.style.display = collapsed ? 'none' : '';
 }
 
 function buildPlanForAge(ageId){
@@ -7751,6 +7838,19 @@ function buildWeekPlan(ag) {
   const weekNav = document.getElementById('week-nav');
   const dayPanels = document.getElementById('day-panels');
 
+  const exerciseChecked = document.getElementById('chk-exercise')?.checked ?? false;
+  const yogaChecked = document.getElementById('chk-yoga')?.checked ?? false;
+
+  // Nothing below the Activity Type selector shows until Exercise and/or
+  // Yoga is actually picked — no placeholder message, no Cardio Add-On.
+  if (!exerciseChecked && !yogaChecked) {
+    weekNav.style.display = 'none';
+    weekNav.innerHTML = '';
+    dayPanels.innerHTML = '';
+    document.getElementById('body-week-section').style.display = 'none';
+    return;
+  }
+
   // Rebuild day tabs
   weekNav.innerHTML = DAY_SHORT.map((d,i) =>
     `<div class="day-tab${i===0?' active':''}" onclick="switchDay(${i})">${d}</div>`
@@ -7766,10 +7866,6 @@ function buildWeekPlan(ag) {
     const cardioEx = EX_LIB[dayPlan.cardioId];
     const routineIds = dayPlan.routine.filter(id => EX_LIB[id]);
 
-    // ── Warm-Up section: driven by the Exercise / Yoga checkboxes ──
-    const exerciseChecked = document.getElementById('chk-exercise')?.checked ?? false;
-    const yogaChecked = document.getElementById('chk-yoga')?.checked ?? false;
-
     // Exercise sub-list: exactly 10 per day — the day's 5 fixed thematic
     // exercises plus 5 rotating picks from the shared pool
     const exerciseIds = exercisesForDay(di, routineIds);
@@ -7782,12 +7878,10 @@ function buildWeekPlan(ag) {
         </div>
         <div class="ex-info">
           <div class="ex-name2">${ex.name}</div>
-          <div class="ex-impact">🎯 ${ex.impact}</div>
           <div class="ex-stats2">
             <span class="ex-stat2">🔄 ${adjustedSets(ex.sets, ag.id)}</span>
             <span class="ex-stat2">⏱ ${adjustedDur(ex.dur, ag.id)}</span>
           </div>
-          <div class="ex-desc2">${ex.desc}</div>
         </div>
       </div>`;
     }).join('');
@@ -7808,20 +7902,22 @@ function buildWeekPlan(ag) {
         </div>
       </div>`).join('');
 
-    // Assemble Warm-Up section content based on which checkboxes are checked
+    // Assemble Warm-Up section content based on which checkboxes are checked.
+    // Exercise and Yoga are each a collapsible subsection, expanded by default.
     let warmupContent = '';
     if (exerciseChecked) {
       warmupContent += `
-      <div class="warmup-subsection-label">🏋️ Exercise</div>
-      <div class="ex-grid2">${exerciseCards}</div>`;
+      <div class="warmup-subsection">
+        <div class="warmup-subsection-label warmup-collapse-hdr" onclick="toggleWarmupCollapse(this)">🏋️ Exercise <span class="warmup-collapse-arrow">▾</span></div>
+        <div class="ex-grid2 warmup-collapse-body">${exerciseCards}</div>
+      </div>`;
     }
     if (yogaChecked) {
       warmupContent += `
-      <div class="yoga-section-label">🧘 Yoga</div>
-      <div class="yoga-grid">${yogaCards}</div>`;
-    }
-    if (!exerciseChecked && !yogaChecked) {
-      warmupContent = `<div class="warmup-empty-msg">Select Exercise and/or Yoga above to see your Warm-Up.</div>`;
+      <div class="warmup-subsection">
+        <div class="yoga-section-label warmup-collapse-hdr" onclick="toggleWarmupCollapse(this)">🧘 Yoga <span class="warmup-collapse-arrow">▾</span></div>
+        <div class="yoga-grid warmup-collapse-body">${yogaCards}</div>
+      </div>`;
     }
 
     // Build a low-impact alternative mini-card (used for both walk & swim)
@@ -7835,12 +7931,10 @@ function buildWeekPlan(ag) {
         </div>
         <div class="ex-info">
           <div class="ex-name2">${altEx.name} <span class="alt-tag">Alternative</span></div>
-          <div class="ex-impact">🎯 ${altEx.impact}</div>
           <div class="ex-stats2">
             <span class="ex-stat2">⏱ ${altEx.dur}</span>
             <span class="ex-stat2 cardio-tag">✅ Joint-friendly swap</span>
           </div>
-          <div class="ex-desc2">${note}</div>
         </div>
       </div>`;
     }
@@ -7856,32 +7950,20 @@ function buildWeekPlan(ag) {
     // Cardio card
     const cardioCard = `
       <div class="cardio-card">
-        <div class="cardio-header">🏃 ${ag.label.split(' ')[0]} Cardio — ${cardioEx.name}</div>
         <div class="ex-top-row">
           <div class="ex-body-fig">${makeSVG(cardioEx.pri, cardioEx.sec)}</div>
         </div>
         <div class="ex-info">
           <div class="ex-name2">${cardioEx.name}</div>
-          <div class="ex-impact">🎯 ${cardioEx.impact}</div>
           <div class="ex-stats2">
             <span class="ex-stat2">⏱ ${cardioEx.dur}</span>
             <span class="ex-stat2 cardio-tag">🔥 Cardio Boost</span>
           </div>
-          <div class="ex-desc2">${cardioEx.desc}</div>
         </div>
       </div>
       ${altCard}`;
 
     panel.innerHTML = `
-      <div class="day-header">
-        <div>
-          <h3>${DAYS[di]} — ${dayPlan.label}</h3>
-          <div class="day-meta">🔥 Warm-Up + Exercise/Yoga · ${exerciseIds.length} exercises + cardio</div>
-        </div>
-        <span class="day-focus">${dayPlan.focus}</span>
-      </div>
-
-      <div class="warmup-section-label">🔥 Warm-Up</div>
       <div class="warmup-wrap">${warmupContent}</div>
 
       <div class="cardio-section-label">⚡ Cardio Add-On</div>
@@ -8599,6 +8681,20 @@ function skipWorkoutItem(){
 // hooks just keep it re-synced afterwards.
 window.addEventListener('resize', syncLogoWidth);
 if(document.fonts && document.fonts.ready){ document.fonts.ready.then(syncLogoWidth); }
+
+// Keep the sliding tab underline glued to whichever tab is actually
+// active, even if something shifts the nav's layout after the fact — a
+// window resize, a late web-font swap, or (notably on Body/Food, which
+// inject a lot of content once an age/plan is picked) a vertical
+// scrollbar appearing/disappearing and nudging the centered nav row
+// sideways. Without this, the bar could stay at its last computed pixel
+// position instead of the now-shifted button underneath it.
+function resyncTabUnderline(){
+  const activeBtn = document.querySelector('.tab-btn.active');
+  if(activeBtn) positionTabUnderline(activeBtn);
+}
+window.addEventListener('resize', resyncTabUnderline);
+if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabUnderline); }
 
 
 
