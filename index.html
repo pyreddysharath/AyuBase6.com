@@ -2098,6 +2098,24 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
       <span id="logo-heal">Ayu</span> <span id="logo-thee">Base6</span>
     </div>
   </div>
+  <script>
+  // Runs the instant the logo markup above exists, rather than waiting
+  // for the page's single large script block near the end of the body —
+  // on a page this size that block can execute late enough for the CSS
+  // fallback width to flash and then visibly snap to the real size right
+  // after first paint. Measuring here, immediately, avoids that. (The
+  // resize/web-font-load re-sync hooks for this same function live in
+  // the main script block further down.)
+  function syncLogoWidth(){
+    const text = document.getElementById('app-logo');
+    const mark = document.getElementById('app-logo-mark');
+    if(!text || !mark) return;
+    const w = text.getBoundingClientRect().width;
+    // Mark is sized at half the wordmark's own width.
+    if(w > 0){ document.documentElement.style.setProperty('--logo-w', (w / 2) + 'px'); }
+  }
+  syncLogoWidth();
+  </script>
   <div id="tab-btns" role="tablist">
     <button class="tab-btn activity active" onclick="switchTab('activity')" role="tab" aria-selected="true"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="url(#gradBody)"><g fill="none" stroke="url(#gradBody)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.3,8.3 L10.5,14"/><path d="M10.5,14 L14,15.3 L16.3,19"/><path d="M10.5,14 L6.3,17.8"/><path d="M13.5,9 L17.8,10.3"/></g><circle cx="14.2" cy="5.2" r="2.5"/></svg></span><span>BODY</span></button>
     <button class="tab-btn nutrition" onclick="switchTab('nutrition')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="url(#gradFood)"><path d="M12,21 C6.5,19 3.3,14 4.3,8.5 C5,4.8 8,2.3 10.3,3 C10.9,4.8 11,7.5 10.5,10.5 C9.8,14.8 10.5,18 12,21 Z"/><path d="M12,21 C18,19 21.2,13.5 20,7.5 C19.2,3.5 15.5,0.8 12.7,1.8 C11.9,4 11.7,7.3 12.3,10.5 C13.2,15 12.8,18 12,21 Z" fill="url(#gradFoodLight)"/><path d="M12,20 C12.8,15.5 11.8,11 15.8,5.3" fill="none" stroke="#fff" stroke-width="0.9" stroke-linecap="round"/></svg></span><span>FOOD</span></button>
@@ -8552,19 +8570,12 @@ function skipWorkoutItem(){
   advanceWorkoutItem();
 }
 
-// Keep the header logo mark's width equal to the "Ayu Base6" wordmark's
-// own rendered width, so the two always span the same length — reruns on
-// resize and once web fonts finish loading, since either can change the
-// wordmark's measured width.
-function syncLogoWidth(){
-  const text = document.getElementById('app-logo');
-  const mark = document.getElementById('app-logo-mark');
-  if(!text || !mark) return;
-  const w = text.getBoundingClientRect().width;
-  // Mark is sized at half the wordmark's own width.
-  if(w > 0){ document.documentElement.style.setProperty('--logo-w', (w / 2) + 'px'); }
-}
-syncLogoWidth();
+// syncLogoWidth() itself is defined right after the logo markup near the
+// top of the page (not here) so it can run the instant those elements
+// exist, rather than waiting for this whole script block — which, on a
+// page this size, could otherwise run late enough for the CSS fallback
+// width to be visibly replaced a moment after first paint. These two
+// hooks just keep it re-synced afterwards.
 window.addEventListener('resize', syncLogoWidth);
 if(document.fonts && document.fonts.ready){ document.fonts.ready.then(syncLogoWidth); }
 
