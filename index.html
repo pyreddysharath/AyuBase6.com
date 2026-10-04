@@ -2378,8 +2378,16 @@ h2, .tab-panel h2,
      long names (ROUTINES, NUDGES) sitting side by side don't touch. */
   .tab-btn{ font-size: .625rem; letter-spacing: .02em; flex: 1 1 auto; padding-left: 4px; padding-right: 4px; }
 }
-</style>
 
+/* Nudges top row: just the Enable / Disable button. Any problem shows
+   only after a click, right under the control that was clicked. */
+.reminders-notif-banner.nudges-actions{ flex-direction:column; justify-content:center; align-items:center; gap:12px;
+  background:none; border:none; padding:0; margin:10px 0 0; }
+.reminders-notif-banner.nudges-actions .reminders-notif-banner-btn{ min-height:40px; border-radius:10px; }
+.reminders-notif-error{ margin:12px auto 0; max-width:520px; }
+.rout-remind-msg{ margin:12px auto 0; max-width:520px; text-align:left;
+  color:var(--rout-1); background:var(--rout-4); border-color:rgba(252,211,77,.7); }
+</style>
 </head>
 <body>
 
@@ -2586,13 +2594,6 @@ h2, .tab-panel h2,
 <!-- ══ ALERTS PANEL ═════════════════════════ -->
 <div id="alerts-panel" class="tab-panel" style="display:none">
   <div class="alert-page">
-    <div class="reminders-notif-banner" id="reminders-notif-banner" style="display:none">
-      <span class="reminders-notif-banner-icon">🔔</span>
-      <div class="reminders-notif-banner-text">
-        Turn on browser notifications so these reminders can reach you even when this tab isn't in focus.
-      </div>
-      <button type="button" class="reminders-notif-banner-btn" onclick="toggleMasterNotify()">Enable</button>
-    </div>
 
     <!-- EYES: 20-20-20 — most frequent -->
     <div class="alert-card" id="alert-card-break">
@@ -2638,7 +2639,7 @@ h2, .tab-panel h2,
         </label>
         <button type="button" class="alert-preview-btn" onclick="previewAlertNotification('break')">Preview notification</button>
       </div>
-      <div class="notif-blocked-hint" id="alert-break-notif-hint" style="display:none">🚫 Notifications are blocked in your browser for this site. Enable them in your browser's site settings, then reload.</div>
+      <div class="notif-blocked-hint" id="alert-break-notif-hint" style="display:none"></div>
       <div class="notif-mock" id="alert-break-notif-mock">
         <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-break-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/></svg></span>
@@ -2690,7 +2691,7 @@ h2, .tab-panel h2,
         </label>
         <button type="button" class="alert-preview-btn" onclick="previewAlertNotification('walk')">Preview notification</button>
       </div>
-      <div class="notif-blocked-hint" id="alert-walk-notif-hint" style="display:none">🚫 Notifications are blocked in your browser for this site. Enable them in your browser's site settings, then reload.</div>
+      <div class="notif-blocked-hint" id="alert-walk-notif-hint" style="display:none"></div>
       <div class="notif-mock" id="alert-walk-notif-mock">
         <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-walk-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.5a2 2 0 100-4 2 2 0 000 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg></span>
@@ -2743,7 +2744,7 @@ h2, .tab-panel h2,
         </label>
         <button type="button" class="alert-preview-btn" onclick="previewAlertNotification('drink')">Preview notification</button>
       </div>
-      <div class="notif-blocked-hint" id="alert-drink-notif-hint" style="display:none">🚫 Notifications are blocked in your browser for this site. Enable them in your browser's site settings, then reload.</div>
+      <div class="notif-blocked-hint" id="alert-drink-notif-hint" style="display:none"></div>
       <div class="notif-mock" id="alert-drink-notif-mock">
         <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-drink-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8 8 4 12.5 4 16a8 8 0 0016 0c0-3.5-4-8-8-14z"/></svg></span>
@@ -2826,7 +2827,7 @@ h2, .tab-panel h2,
           </label>
           <button type="button" class="alert-preview-btn" onclick="previewEyeExNotification()">Preview notification</button>
         </div>
-        <div class="notif-blocked-hint" id="eye-ex-notif-hint" style="display:none">🚫 Notifications are blocked in your browser for this site. Enable them in your browser's site settings, then reload.</div>
+        <div class="notif-blocked-hint" id="eye-ex-notif-hint" style="display:none"></div>
         <div class="notif-mock" id="eye-ex-notif-mock">
         <button type="button" class="notif-mock-close" onclick="document.getElementById('eye-ex-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
           <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0-6a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z"/></svg></span>
@@ -2835,9 +2836,12 @@ h2, .tab-panel h2,
       </div>
     </div>
 
-    <div class="page-reset-row" style="margin-top:10px">
+    <!-- Reset, then (on the next line) the Enable / Disable All Notifications switch, centred. -->
+    <div class="reminders-notif-banner nudges-actions" id="reminders-notif-banner">
       <button type="button" class="reset-icon-btn" title="Reset Nudges to defaults" onclick="resetRemindersToDefault()">↺ Reset</button>
+      <button type="button" class="reminders-notif-banner-btn" onclick="toggleMasterNotify('reminders-notif-error')">Enable All Notifications</button>
     </div>
+    <div class="notif-blocked-hint reminders-notif-error" id="reminders-notif-error" style="display:none"></div>
 
   </div>
 </div>
@@ -2930,6 +2934,7 @@ h2, .tab-panel h2,
 
     <div class="rout-remind-row">
       <button type="button" class="refresh-btn" onclick="remindMeNowAll()">🔔 Remind Me</button>
+      <div class="notif-blocked-hint rout-remind-msg" id="rout-remind-msg" style="display:none"></div>
     </div>
 
   </div>
@@ -6712,51 +6717,95 @@ function toggleAlertTask(key){
   body.style.display=isOpen?'none':'block';
   if(btn) btn.classList.toggle('active', !isOpen);
 }
+// ── Why a notification couldn't be turned on, in plain words. Returns
+//    null when nothing is wrong (permission granted). Used only right after
+//    the person clicks something, and shown only next to what they clicked.
+function notifProblemMessage(perm){
+  if(typeof Notification==='undefined') return "This browser doesn't support notifications.";
+  if(perm===undefined) perm=Notification.permission;
+  if(perm==='granted') return null;
+  if(isRestrictedFileOrigin()) return "This page is open as a local file, so the browser can't keep notification permission. Open it from a web address to use notifications.";
+  if(perm==='denied') return "Notifications are blocked for this site. Allow them in your browser's site settings, then reload the page.";
+  return "Notification permission wasn't granted. Click again to allow it.";
+}
+// Shows a message in one section only, then hides it again.
+function showNotifBlockedHint(hintId, msg){
+  const hint=document.getElementById(hintId);
+  if(!hint) return;
+  if(msg) hint.textContent='🚫 '+msg;
+  hint.style.display='block';
+  clearTimeout(hint._hideTimer);
+  hint._hideTimer=setTimeout(()=>{ hint.style.display='none'; }, 7000);
+}
+function hideNotifHint(hintId){
+  const hint=document.getElementById(hintId);
+  if(hint){ clearTimeout(hint._hideTimer); hint.style.display='none'; }
+}
 function onAlertNotifyChange(key){
   const cb=document.getElementById('alert-'+key+'-notify');
+  const hintId='alert-'+key+'-notif-hint';
+  hideNotifHint(hintId);
   if(!cb.checked){
-    // Unchecking the bell now turns the whole reminder off — there's no
-    // separate enable toggle any more.
+    // Unchecking the bell turns this reminder off.
     alertState[key].enabled=false;
     alertState[key].notify=false;
     scheduleAlertTimer(key);
     return;
   }
   alertState[key].enabled=true;
-  if(typeof Notification==='undefined'){
+  scheduleAlertTimer(key);
+  if(typeof Notification==='undefined' || (isRestrictedFileOrigin() && Notification.permission!=='granted') || Notification.permission==='denied'){
+    // Still on — it falls back to the in-app preview when it fires.
     alertState[key].notify=false;
-    scheduleAlertTimer(key);
+    showNotifBlockedHint(hintId, notifProblemMessage());
     return;
   }
   if(Notification.permission==='granted'){
-    // Permission's already decided — never pop the browser dialog again,
-    // just follow whatever the master Enable/Disable switch currently says.
     alertState[key].notify=isMasterNotifyOn();
-  } else if(Notification.permission==='denied'){
-    alertState[key].notify=false;
-    showNotifBlockedHint('alert-'+key+'-notif-hint');
-    // Still turned on — it'll fall back to the in-app preview when it fires.
-  } else {
-    // Only 'default' (never decided yet) legitimately needs to ask.
-    requestNotificationPermission().then(perm=>{
-      if(perm==='granted') setMasterNotifyFlag(true);
-      alertState[key].notify=(perm==='granted' && isMasterNotifyOn());
-      if(perm==='denied') showNotifBlockedHint('alert-'+key+'-notif-hint');
-      refreshNotifStatusUI();
-    });
+    return;
   }
-  scheduleAlertTimer(key);
+  // Only 'default' (never decided yet) needs to ask.
+  requestNotificationPermission().then(perm=>{
+    if(perm==='granted') setMasterNotifyFlag(true);
+    alertState[key].notify=(perm==='granted' && isMasterNotifyOn());
+    const msg=notifProblemMessage(perm);
+    if(msg) showNotifBlockedHint(hintId, msg);
+    refreshNotifStatusUI();
+  });
 }
-// Fires a preview for every reminder one after another (staggered so
-// they don't all land at once and get lost/overlapped as OS notifications).
+// Routines' "Remind Me": sends each reminder as a real browser
+// notification, one after another. It never adds anything to the Nudges
+// tab; if notifications can't be sent, the reason is shown under the
+// Remind Me button itself.
 function remindMeNowAll(){
-  const steps = [
-    ()=>previewAlertNotification('drink'),
-    ()=>previewAlertNotification('break'),
-    ()=>previewAlertNotification('walk'),
-    ()=>previewEyeExNotification(),
-  ];
-  steps.forEach((fn, i)=> setTimeout(fn, i*1200));
+  const hintId='rout-remind-msg';
+  hideNotifHint(hintId);
+  const send=()=>{
+    if(!isMasterNotifyOn()){
+      showNotifBlockedHint(hintId, "Notifications are turned off. Turn them on with Enable in the Nudges tab.");
+      return;
+    }
+    const items=[
+      {title:ALERT_LABELS.drink.title, body:ALERT_LABELS.drink.msg, st:alertState.drink},
+      {title:ALERT_LABELS.break.title, body:ALERT_LABELS.break.msg, st:alertState.break},
+      {title:ALERT_LABELS.walk.title,  body:ALERT_LABELS.walk.msg,  st:alertState.walk},
+      {title:'Eye Exercise', body:'Time for your guided eye exercise — follow the dot for 30 seconds.', st:eyeExState},
+    ];
+    items.forEach((it,i)=>setTimeout(()=>{
+      if(!it.st.muted) playAlertPreset(it.st.sound);
+      try{ new Notification(it.title, { body: it.body }); }catch(e){}
+    }, i*1200));
+  };
+  const problem=notifProblemMessage();
+  if(!problem){ send(); return; }
+  if(typeof Notification!=='undefined' && Notification.permission==='default' && !isRestrictedFileOrigin()){
+    requestNotificationPermission().then(perm=>{
+      if(perm==='granted'){ setMasterNotifyFlag(true); refreshNotifStatusUI(); send(); }
+      else showNotifBlockedHint(hintId, notifProblemMessage(perm));
+    });
+    return;
+  }
+  showNotifBlockedHint(hintId, problem);
 }
 function previewAlertNotification(key){
   // Preview should always show a real OS/taskbar notification when
@@ -6845,35 +6894,23 @@ function setMasterNotifyFlag(on){
 // flag, without touching whether that reminder itself is on or off.
 function syncAllReminderNotifyFlags(){
   if(typeof Notification==='undefined') return;
-  const denied=Notification.permission==='denied';
   const masterOn=isMasterNotifyOn();
   ['break','walk','drink'].forEach(key=>{
     const st=alertState[key];
     if(!st || !st.enabled) return;
     st.notify=masterOn;
-    if(denied) showNotifBlockedHint('alert-'+key+'-notif-hint');
   });
   if(typeof eyeExState!=='undefined' && eyeExState.enabled){
     eyeExState.notify=masterOn;
-    if(denied) showNotifBlockedHint('eye-ex-notif-hint');
   }
 }
 // The single handler behind both "Enable"/"Disable" buttons (the top
 // banner in the Alerts tab, and the footer's Notification Settings panel).
-function toggleMasterNotify(){
-  if(typeof Notification==='undefined') return;
-  if(isRestrictedFileOrigin() && Notification.permission!=='granted'){
-    // Asking the browser here would just show a dialog that can't reliably
-    // stick (see isRestrictedFileOrigin's note) — refreshNotifStatusUI()
-    // already explains why and hides the button in this state.
-    refreshNotifStatusUI();
-    return;
-  }
-  // Make sure the button is showing the true current state right before we
-  // act — and then act on exactly what it's showing, not on a separately
-  // recomputed flag. That guarantees "click what you see" always holds,
-  // even in the edge case where permission was granted by some other means
-  // (e.g. the browser's own site-settings) since the last render.
+function toggleMasterNotify(errorHintId){
+  if(errorHintId) hideNotifHint(errorHintId);
+  const fail=msg=>{ if(errorHintId) showNotifBlockedHint(errorHintId, msg); refreshNotifStatusUI(); };
+  if(typeof Notification==='undefined'){ fail(notifProblemMessage()); return; }
+  // Act on exactly what the button shows ("click what you see").
   refreshNotifStatusUI();
   const banner=document.getElementById('reminders-notif-banner');
   const bannerBtn=banner ? banner.querySelector('.reminders-notif-banner-btn') : null;
@@ -6881,29 +6918,25 @@ function toggleMasterNotify(){
   const visibleBtn = (bannerBtn && bannerBtn.style.display!=='none') ? bannerBtn : footerBtn;
   const currentlyOn = visibleBtn ? /disable/i.test(visibleBtn.textContent) : isMasterNotifyOn();
   if(currentlyOn){
-    // Turning off is always purely in-code — no browser call, ever.
+    // Turning off is purely in-app — no browser call.
     setMasterNotifyFlag(false);
     syncAllReminderNotifyFlags();
     refreshNotifStatusUI();
     return;
   }
-  if(Notification.permission==='denied'){
-    // Blocked at the browser level — nothing code can do; surface the hint.
-    refreshNotifStatusUI();
-    return;
-  }
   if(Notification.permission==='granted'){
-    // Already decided by the browser — flip on directly, no popup.
     setMasterNotifyFlag(true);
     syncAllReminderNotifyFlags();
     refreshNotifStatusUI();
     return;
   }
-  // 'default' is the ONLY state where asking the browser is actually needed.
+  if(Notification.permission==='denied' || isRestrictedFileOrigin()){ fail(notifProblemMessage()); return; }
+  // 'default' is the only state where asking the browser is needed.
   requestNotificationPermission().then(perm=>{
     if(perm==='granted') setMasterNotifyFlag(true);
     syncAllReminderNotifyFlags();
-    refreshNotifStatusUI();
+    const msg=notifProblemMessage(perm);
+    if(msg) fail(msg); else refreshNotifStatusUI();
   });
 }
 // Clicking the bell both opens the settings panel AND, if the person
@@ -6914,15 +6947,6 @@ function handleNotifBellClick(){
   if(typeof Notification!=='undefined' && Notification.permission==='default'){
     toggleMasterNotify();
   }
-}
-// Inline "blocked" hint shown right next to a Notify checkbox — no
-// scrolling to the footer required to see why it didn't turn on.
-function showNotifBlockedHint(hintId){
-  const hint=document.getElementById(hintId);
-  if(!hint) return;
-  hint.style.display='block';
-  clearTimeout(hint._hideTimer);
-  hint._hideTimer=setTimeout(()=>{ hint.style.display='none'; }, 7000);
 }
 // Chrome (and most Chromium browsers) treat a page opened directly as a
 // local file — double-clicked, or dragged into the browser, i.e. a
@@ -6982,30 +7006,11 @@ function refreshNotifStatusUI(){
 function updateRemindersNotifBanner(){
   const banner=document.getElementById('reminders-notif-banner');
   if(!banner) return;
-  if(typeof Notification==='undefined'){ banner.style.display='none'; return; }
-  const textEl=banner.querySelector('.reminders-notif-banner-text');
   const btn=banner.querySelector('.reminders-notif-banner-btn');
-  const perm=Notification.permission;
-  const masterOn=isMasterNotifyOn();
   banner.style.display='flex';
-  if(isRestrictedFileOrigin() && perm!=='granted'){
-    if(textEl) textEl.textContent="This page is open as a local file, so the browser can't reliably remember notification permission here — open it from a real web address to use real notifications. Reminders still work inside the app either way.";
-    if(btn) btn.style.display='none';
-    return;
-  }
-  if(perm==='denied'){
-    if(textEl) textEl.textContent="Notifications are blocked in your browser. Open this site's browser settings to allow them, then reload the page.";
-    if(btn) btn.style.display='none';
-    return;
-  }
   if(btn){
     btn.style.display='inline-block';
-    btn.textContent = masterOn ? 'Disable' : 'Enable';
-  }
-  if(textEl){
-    textEl.textContent = masterOn
-      ? "Browser notifications are on — these reminders will reach you even when this tab isn't in focus."
-      : "Turn on browser notifications so these reminders can reach you even when this tab isn't in focus.";
+    btn.textContent = isMasterNotifyOn() ? 'Disable All Notifications' : 'Enable All Notifications';
   }
 }
 
@@ -7097,29 +7102,30 @@ function toggleEyeExMute(){
 }
 function onEyeExNotifyChange(){
   const cb=document.getElementById('eye-ex-notify');
+  const hintId='eye-ex-notif-hint';
+  hideNotifHint(hintId);
   if(!cb.checked){
     eyeExState.enabled=false;
     eyeExState.notify=false;
     return;
   }
   eyeExState.enabled=true;
-  if(typeof Notification==='undefined'){ eyeExState.notify=false; return; }
-  if(Notification.permission==='granted'){
-    // Permission's already decided — never pop the browser dialog again,
-    // just follow whatever the master Enable/Disable switch currently says.
-    eyeExState.notify=isMasterNotifyOn();
-  } else if(Notification.permission==='denied'){
+  if(typeof Notification==='undefined' || (isRestrictedFileOrigin() && Notification.permission!=='granted') || Notification.permission==='denied'){
     eyeExState.notify=false;
-    showNotifBlockedHint('eye-ex-notif-hint');
-  } else {
-    // Only 'default' (never decided yet) legitimately needs to ask.
-    requestNotificationPermission().then(perm=>{
-      if(perm==='granted') setMasterNotifyFlag(true);
-      eyeExState.notify=(perm==='granted' && isMasterNotifyOn());
-      if(perm==='denied') showNotifBlockedHint('eye-ex-notif-hint');
-      refreshNotifStatusUI();
-    });
+    showNotifBlockedHint(hintId, notifProblemMessage());
+    return;
   }
+  if(Notification.permission==='granted'){
+    eyeExState.notify=isMasterNotifyOn();
+    return;
+  }
+  requestNotificationPermission().then(perm=>{
+    if(perm==='granted') setMasterNotifyFlag(true);
+    eyeExState.notify=(perm==='granted' && isMasterNotifyOn());
+    const msg=notifProblemMessage(perm);
+    if(msg) showNotifBlockedHint(hintId, msg);
+    refreshNotifStatusUI();
+  });
 }
 function previewEyeExNotification(){
   if(!eyeExState.muted) playAlertPreset(eyeExState.sound);
