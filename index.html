@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-petal-card="a">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2388,6 +2388,85 @@ h2, .tab-panel h2,
 .rout-remind-msg{ margin:12px auto 0; max-width:520px; text-align:left;
   color:var(--rout-1); background:var(--rout-4); border-color:rgba(252,211,77,.7); }
 </style>
+
+<!-- ══ LOTUS PETALS ════════════════════════════════════════════════════
+     The logo's own petal shape, in each tab's "Base6" colour:
+     falling petals, a large lotus behind each tab, and an accent inside
+     every section box. -->
+<style id="lotus-petals">
+:root{ --lotus-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='9.5 11.5 45 27'%3E%3Cpath d='M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z' transform='translate(32 34) rotate(-75)'/%3E%3Cpath d='M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z' transform='translate(32 34) rotate(-45)'/%3E%3Cpath d='M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z' transform='translate(32 34) rotate(-15)'/%3E%3Cpath d='M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z' transform='translate(32 34) rotate(15)'/%3E%3Cpath d='M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z' transform='translate(32 34) rotate(45)'/%3E%3Cpath d='M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z' transform='translate(32 34) rotate(75)'/%3E%3C/svg%3E"); --petal-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-10 -22 20 22'%3E%3Cpath d='M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z'/%3E%3C/svg%3E"); }
+#activity-panel  { --petal:#60a5fa; }
+#nutrition-panel { --petal:#86efac; }
+#routines-panel  { --petal:#fcd34d; }
+#alerts-panel    { --petal:#5eead4; }
+#mind-panel      { --petal:#a5b4fc; }
+#calculator-panel{ --petal:#fda4af; }
+
+/* ── Big lotus behind each tab's content, all petals in the tab colour ── */
+#activity-panel, #nutrition-panel #page-bg, #routines-panel, #alerts-panel,
+#mind-panel, #calculator-panel{ isolation:isolate; }
+#nutrition-panel #page-bg{ position:relative; }
+#activity-panel::before, #nutrition-panel #page-bg::before, #routines-panel::before,
+#alerts-panel::before, #mind-panel::before, #calculator-panel::before{
+  content:""; position:fixed; z-index:-1; pointer-events:none;
+  right:-4vw; bottom:-3vh; width:min(62vw,620px); aspect-ratio:45/27;
+  background:var(--petal); opacity:.22;
+  -webkit-mask:var(--lotus-mask) center/contain no-repeat; mask:var(--lotus-mask) center/contain no-repeat;
+}
+
+/* Section boxes slightly see-through so the big lotus behind shows softly. */
+.tab-panel :is(.card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card){ background:rgba(255,255,255,.84); }
+#activity-panel::before, #nutrition-panel #page-bg::before, #routines-panel::before,
+#alerts-panel::before, #mind-panel::before, #calculator-panel::before{ opacity:.3; }
+
+/* ── Falling petals, coloured by whichever tab is open ── */
+/* Above the header (z 500) so petals start from the very top, over the logo;
+   below pop-ups, the cookie banner and the workout player. */
+#petal-fall{ position:fixed; inset:0; z-index:600; pointer-events:none; overflow:hidden; }
+#petal-fall i{
+  position:absolute; top:-40px; display:block; width:var(--s,18px); aspect-ratio:20/22;
+  background:var(--footer-accent-light,#60a5fa); transition:background-color .6s;
+  -webkit-mask:var(--petal-mask) center/contain no-repeat; mask:var(--petal-mask) center/contain no-repeat;
+  opacity:var(--o,.6); animation:petalFall var(--d,14s) linear var(--delay,0s) infinite;
+}
+@keyframes petalFall{
+  0%  { transform:translate3d(0,0,0) rotate(var(--r0,0deg)); }
+  25% { transform:translate3d(var(--x1,30px),27vh,0) rotate(calc(var(--r0,0deg) + 90deg)); }
+  50% { transform:translate3d(var(--x2,-20px),55vh,0) rotate(calc(var(--r0,0deg) + 180deg)); }
+  75% { transform:translate3d(var(--x1,30px),82vh,0) rotate(calc(var(--r0,0deg) + 270deg)); }
+  100%{ transform:translate3d(var(--x2,-20px),110vh,0) rotate(calc(var(--r0,0deg) + 360deg)); }
+}
+@media (prefers-reduced-motion:reduce){ #petal-fall{ display:none; } }
+
+/* ── Petal accents inside the section boxes (samples A–D) ── */
+.card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card{
+  position:relative; isolation:isolate;
+}
+:is(.card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card)::after{
+  content:none; position:absolute; z-index:-1; pointer-events:none; background:var(--petal);
+}
+/* A — small lotus tucked in the top-right corner */
+html[data-petal-card="a"] :is(.card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card)::after{
+  content:""; top:14px; right:16px; width:84px; aspect-ratio:45/27; opacity:.6;
+  -webkit-mask:var(--lotus-mask) center/contain no-repeat; mask:var(--lotus-mask) center/contain no-repeat;
+}
+/* B — one petal, tilted, in the top-right corner */
+html[data-petal-card="b"] :is(.card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card)::after{
+  content:""; top:12px; right:22px; width:34px; aspect-ratio:20/22; opacity:.9; transform:rotate(35deg);
+  -webkit-mask:var(--petal-mask) center/contain no-repeat; mask:var(--petal-mask) center/contain no-repeat;
+}
+/* C — large faint lotus rising from the bottom-right */
+html[data-petal-card="c"] :is(.card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card)::after{
+  content:""; bottom:10px; right:16px; width:min(40%,240px); aspect-ratio:45/27; opacity:.28;
+  -webkit-mask:var(--lotus-mask) bottom right/contain no-repeat; mask:var(--lotus-mask) bottom right/contain no-repeat;
+}
+/* D — a few loose petals drifting across the top-right */
+html[data-petal-card="d"] :is(.card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card)::after{
+  content:""; top:8px; right:16px; width:140px; height:52px; opacity:.8;
+  -webkit-mask:var(--petal-mask) 0 22px/18px auto no-repeat, var(--petal-mask) 50px 2px/28px auto no-repeat, var(--petal-mask) 108px 16px/22px auto no-repeat;
+          mask:var(--petal-mask) 0 22px/18px auto no-repeat, var(--petal-mask) 50px 2px/28px auto no-repeat, var(--petal-mask) 108px 16px/22px auto no-repeat;
+}
+</style>
 </head>
 <body>
 
@@ -2989,7 +3068,7 @@ h2, .tab-panel h2,
 <!-- ══ BODY PANEL ══════════════════════════ -->
 <div id="activity-panel" class="tab-panel" style="display:block">
   <!-- Scattered exercise/yoga icons in background, mirroring Food's bg-icons -->
-  <div id="body-bg-icons" aria-hidden="true"></div>
+  <!-- <div id="body-bg-icons" aria-hidden="true"></div>  switched off: lotus petals replace the gym icons -->
 
   <div class="body-content-wrap">
 
@@ -3043,7 +3122,7 @@ h2, .tab-panel h2,
 <!-- ══ PAGE TOP: seamless hero + cards ══════════ -->
 <div id="page-bg">
   <!-- Scattered nature icons in background -->
-  <div id="bg-icons" aria-hidden="true"></div>
+  <!-- <div id="bg-icons" aria-hidden="true"></div>  switched off: lotus petals replace the vegetable icons -->
 
   <div class="page-container">
 
@@ -3193,6 +3272,7 @@ h2, .tab-panel h2,
 // ════════════════════════════════════════════════
 //  BACKGROUND SCATTERED ICONS
 // ════════════════════════════════════════════════
+/* Emoji backgrounds (food / gym icons) — switched off; the lotus petals replace them.
 (function(){
   const icons=['🥦','🥕','🍅','🌿','🥬','🍋','🍎','🥭','🍇','🌾','🫛','🧅','🍆','🥒','🌱',
                '🍗','🥚','🐟','🦐','🍖','🫘','🌰','🥥','🍌','🍊','🍉','🫑','🥝'];
@@ -3231,6 +3311,7 @@ h2, .tab-panel h2,
     wrap.appendChild(s);
   }
 })();
+*/
 
 // ════════════════════════════════════════════════
 //  AGE DATA
@@ -8969,5 +9050,28 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   </div>
 </div>
 
+
+<div id="petal-fall" aria-hidden="true"></div>
+<script>
+// Falling petals — a handful, slow and light, so they never get in the way.
+(function(){
+  const box=document.getElementById('petal-fall');
+  if(!box) return;
+  const n = window.innerWidth < 640 ? 11 : 20;
+  for(let i=0;i<n;i++){
+    const p=document.createElement('i');
+    const r=(a,b)=>a+Math.random()*(b-a);
+    p.style.left=r(0,98)+'%';
+    p.style.setProperty('--s', r(18,34).toFixed(1)+'px');
+    p.style.setProperty('--o', r(.45,.85).toFixed(2));
+    p.style.setProperty('--d', r(11,20).toFixed(1)+'s');
+    p.style.setProperty('--delay', (-r(0,20)).toFixed(1)+'s');
+    p.style.setProperty('--r0', Math.round(r(0,360))+'deg');
+    p.style.setProperty('--x1', Math.round(r(-60,60))+'px');
+    p.style.setProperty('--x2', Math.round(r(-60,60))+'px');
+    box.appendChild(p);
+  }
+})();
+</script>
 </body>
 </html>
