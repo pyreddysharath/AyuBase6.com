@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-petal-card="a">
+<html lang="en" data-petal-card="e">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2425,9 +2425,9 @@ h2, .tab-panel h2,
 #petal-fall{ position:fixed; inset:0; z-index:600; pointer-events:none; overflow:hidden; }
 #petal-fall i{
   position:absolute; top:-40px; display:block; width:var(--s,18px); aspect-ratio:20/22;
-  background:var(--footer-accent-light,#60a5fa); transition:background-color .6s;
+  background:var(--petal-base6,#60a5fa); transition:background-color .6s;
   -webkit-mask:var(--petal-mask) center/contain no-repeat; mask:var(--petal-mask) center/contain no-repeat;
-  opacity:var(--o,.6); animation:petalFall var(--d,14s) linear var(--delay,0s) infinite;
+  opacity:var(--o,.6); animation:petalFall var(--d,4.5s) cubic-bezier(.45,.05,.55,.95) var(--delay,0s) 1 both;
 }
 @keyframes petalFall{
   0%  { transform:translate3d(0,0,0) rotate(var(--r0,0deg)); }
@@ -2436,7 +2436,33 @@ h2, .tab-panel h2,
   75% { transform:translate3d(var(--x1,30px),82vh,0) rotate(calc(var(--r0,0deg) + 270deg)); }
   100%{ transform:translate3d(var(--x2,-20px),110vh,0) rotate(calc(var(--r0,0deg) + 360deg)); }
 }
+/* Two colours, taken from the title: every other petal in the 'Ayu' colour. */
+#petal-fall i.ayu{ background:var(--petal-ayu,#2563eb); }
 @media (prefers-reduced-motion:reduce){ #petal-fall{ display:none; } }
+
+/* Smaller "i" (and ⚠) buttons everywhere. */
+.calc-info-btn, .alert-info-btn{ width:22px; height:22px; font-size:.72rem; border-width:1.2px; }
+.calc-info-btn svg{ width:12px; height:12px; }
+/* Nudges / Vitals: header buttons pushed to the box's far right edge, and
+   the corner lotus moved just left of them so the two never overlap. */
+.alert-card-hdr > .alert-info-btn, .calc-card-hdr > span{ margin-right:-12px; }
+html[data-petal-card="a"] .alert-card:has(> .alert-card-hdr .alert-info-btn)::after{ right:44px; }
+html[data-petal-card="a"] .calc-card:has(#lab-info-btn)::after{ right:70px; }
+@media(max-width:640px){
+  .alert-card-hdr > .alert-info-btn, .calc-card-hdr > span{ margin-right:-8px; }
+}
+
+/* Wake-Up Time: the "i" sits at the top right, in the title row, at the
+   box's far right edge like Nudges / Vitals. */
+.rout-card-hdr{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
+.rout-card-hdr h2{ margin:0; }
+.rout-card-hdr > .rout-info-btn{ margin-right:-12px; }
+@media(max-width:640px){ .rout-card-hdr > .rout-info-btn{ margin-right:-8px; } }
+/* Wake-Up Time: no tinted inner box, so the lotus behind shows through. */
+#routines-panel .wake-control{ background:none; padding:0; border-radius:0; margin-bottom:0; }
+
+/* Food's Age? title sits the same distance above its slider as Body's. */
+#nutrition-panel #sec-age h2{ margin-bottom:14px; }
 
 /* ── Petal accents inside the section boxes (samples A–D) ── */
 .card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card{
@@ -2445,9 +2471,18 @@ h2, .tab-panel h2,
 :is(.card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card)::after{
   content:none; position:absolute; z-index:-1; pointer-events:none; background:var(--petal);
 }
+/* E (in use) — the lotus as the box's own background: centred, soft, sized
+   to the box (never taller than 280px), behind everything in it. */
+html[data-petal-card="e"] :is(.card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card)::after{
+  content:""; left:50%; top:50%; transform:translate(-50%,-50%); opacity:.16;
+  /* A box no bigger than the card (minus a margin) and never taller than
+     280px; the lotus is fitted inside it whole, so it's never cropped. */
+  width:min(calc(100% - 24px), 467px); height:min(calc(100% - 24px), 280px);
+  -webkit-mask:var(--lotus-mask) center/contain no-repeat; mask:var(--lotus-mask) center/contain no-repeat;
+}
 /* A — small lotus tucked in the top-right corner */
 html[data-petal-card="a"] :is(.card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card)::after{
-  content:""; top:14px; right:16px; width:84px; aspect-ratio:45/27; opacity:.6;
+  content:""; top:6px; right:16px; width:84px; aspect-ratio:45/27; opacity:.6;
   -webkit-mask:var(--lotus-mask) center/contain no-repeat; mask:var(--lotus-mask) center/contain no-repeat;
 }
 /* B — one petal, tilted, in the top-right corner */
@@ -2930,15 +2965,9 @@ html[data-petal-card="d"] :is(.card, .body-age-section, .activity-type-section, 
   <div class="rout-page">
 
     <div class="rout-card">
-      <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg> Wake-Up Time</h2>
-      <div class="wake-control">
-        <div class="wake-control-hdr">
-          <span>Wake up at <strong id="wake-time-val">5:45 AM</strong></span>
-          <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('wake')" title="Why?">i</button>
-        </div>
-        <input type="range" id="wake-time-slider" min="180" max="540" step="15" value="345" class="wake-slider">
-        <div class="wake-range-ends"><span>3:00 AM</span><span>9:00 AM</span></div>
-        <div class="wake-zone-label" id="wake-zone-label">🟢 Great wake-up time</div>
+      <div class="rout-card-hdr">
+        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg> Wake-Up Time</h2>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('wake')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-wake" style="display:none">
         <strong>3:00 – 4:30 AM</strong> is far earlier than the body's natural rhythm and usually cuts sleep
@@ -2952,6 +2981,14 @@ html[data-petal-card="d"] :is(.card, .body-age-section, .activity-type-section, 
         orange zone.<br>
         Every activity below shifts automatically with whatever you pick here, and the Sleep time is always set
         to give at least 8 hours before the next wake-up.
+      </div>
+      <div class="wake-control">
+        <div class="wake-control-hdr">
+          <strong id="wake-time-val">5:45 AM</strong>
+        </div>
+        <input type="range" id="wake-time-slider" min="180" max="540" step="15" value="345" class="wake-slider">
+        <div class="wake-range-ends"><span>3:00 AM</span><span>9:00 AM</span></div>
+        <div class="wake-zone-label" id="wake-zone-label">🟢 Great wake-up time</div>
       </div>
     </div>
 
@@ -9051,27 +9088,6 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
 </div>
 
 
-<div id="petal-fall" aria-hidden="true"></div>
-<script>
-// Falling petals — a handful, slow and light, so they never get in the way.
-(function(){
-  const box=document.getElementById('petal-fall');
-  if(!box) return;
-  const n = window.innerWidth < 640 ? 11 : 20;
-  for(let i=0;i<n;i++){
-    const p=document.createElement('i');
-    const r=(a,b)=>a+Math.random()*(b-a);
-    p.style.left=r(0,98)+'%';
-    p.style.setProperty('--s', r(18,34).toFixed(1)+'px');
-    p.style.setProperty('--o', r(.45,.85).toFixed(2));
-    p.style.setProperty('--d', r(11,20).toFixed(1)+'s');
-    p.style.setProperty('--delay', (-r(0,20)).toFixed(1)+'s');
-    p.style.setProperty('--r0', Math.round(r(0,360))+'deg');
-    p.style.setProperty('--x1', Math.round(r(-60,60))+'px');
-    p.style.setProperty('--x2', Math.round(r(-60,60))+'px');
-    box.appendChild(p);
-  }
-})();
-</script>
+<!-- Falling petals removed at Sharath's request (styles for #petal-fall left in place, unused). -->
 </body>
 </html>
