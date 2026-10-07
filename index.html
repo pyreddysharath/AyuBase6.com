@@ -2457,8 +2457,35 @@ html[data-petal-card="a"] .calc-card:has(#lab-info-btn)::after{ right:70px; }
 .activity-check{ justify-content:space-between; cursor:default; }
 .activity-choice{ display:flex; align-items:center; gap:10px; flex:1; cursor:pointer; }
 .activity-check input[type="radio"]{ accent-color:#2563eb; width:16px; height:16px; margin:0; }
-.activity-all{ display:flex; align-items:center; gap:6px; font-size:var(--fs-xs,.8125rem); font-weight:600; cursor:pointer; flex:0 0 auto; padding-left:12px; }
-.activity-all input{ accent-color:#2563eb; width:15px; height:15px; margin:0; }
+/* Short / Standard / Long — a small segmented switch at the row's right end. */
+.activity-len{ display:inline-flex; flex:0 0 auto; margin-left:12px; border:1.5px solid #bfdbfe; border-radius:999px; overflow:hidden; background:#fff; }
+.activity-len label{ position:relative; cursor:pointer; }
+.activity-len input{ position:absolute; opacity:0; width:1px; height:1px; pointer-events:none; }
+.activity-len span{ display:block; padding:5px 11px; font-size:.75rem; font-weight:600; color:#1d4ed8; line-height:1.2; }
+.activity-len label + label span{ border-left:1px solid #dbeafe; }
+.activity-len input:checked + span{ background:#2563eb; color:#fff; }
+.activity-len input:focus-visible + span{ outline:2px solid #2563eb; outline-offset:-2px; }
+@media(max-width:400px){ .activity-len span{ padding:5px 8px; font-size:.6875rem; } }
+/* If the row is too narrow, the switch drops to its own line instead of
+   running past the box edge. */
+.activity-check{ flex-wrap:wrap; row-gap:10px; column-gap:10px; justify-content:flex-start; }
+/* Line 1: the option. Line 2: Short / Standard / Long with the count beside it,
+   indented to line up under the option name. */
+.activity-choice{ display:flex; align-items:center; gap:10px; flex:1 0 100%; text-align:left; }
+.activity-len{ margin-left:26px; }
+.activity-count{ font-size:.78rem; font-weight:500; opacity:.8; white-space:nowrap; align-self:center; }
+@media(max-width:360px){ .activity-len span{ padding:5px 6px; font-size:.68rem; } .activity-len{ margin-left:22px; } .activity-check{ column-gap:8px; padding-left:12px; padding-right:10px; } .activity-count{ font-size:.72rem; } }
+.warmup-count{ font-weight:600; opacity:.9; }
+/* Order number on each exercise / yoga card (the order Let's Start plays them). */
+.ex-card2, .yoga-card{ position:relative; }
+.seq-badge{ position:absolute; top:10px; left:10px; z-index:2; min-width:26px; height:26px; padding:0 7px;
+  border-radius:999px; background:#2563eb; color:#fff; font-size:.8125rem; font-weight:700; line-height:26px; text-align:center;
+  box-shadow:0 1px 4px rgba(37,99,235,.35); pointer-events:none; font-variant-numeric:tabular-nums; }
+/* Day tabs: on phones all seven share the width, so Sunday isn't cut off. */
+@media(max-width:640px){
+  .week-nav{ gap:4px; padding-left:10px; padding-right:10px; justify-content:stretch; }
+  .day-tab{ flex:1 1 0; min-width:0; padding:8px 0; text-align:center; font-size:.75rem; }
+}
 
 /* Wake-Up Time: the "i" sits at the top right, in the title row, at the
    box's far right edge like Nudges / Vitals. */
@@ -3133,11 +3160,13 @@ html[data-petal-card="d"] :is(.card, .body-age-section, .activity-type-section, 
       <div class="activity-type-options">
         <div class="activity-check" id="act-exercise-pill">
           <label class="activity-choice"><input type="radio" name="activity-type" id="chk-exercise" value="exercise" onchange="onActivityTypeChange()"> Exercise</label>
-          <label class="activity-all" title="Show every exercise, not just the day's"><input type="checkbox" id="all-exercise" onchange="onActivityAllChange('exercise')"> All</label>
+          <span class="activity-len" role="radiogroup" aria-label="Session length"><label title="5 exercises a day"><input type="radio" name="len-exercise" value="short" onchange="onActivityLengthChange('exercise')"><span>Short</span></label><label title="10 exercises a day"><input type="radio" name="len-exercise" value="standard" checked onchange="onActivityLengthChange('exercise')"><span>Standard</span></label><label title="15 exercises a day"><input type="radio" name="len-exercise" value="long" onchange="onActivityLengthChange('exercise')"><span>Long</span></label></span>
+          <span class="activity-count" id="count-exercise">10 a day</span>
         </div>
         <div class="activity-check" id="act-yoga-pill">
           <label class="activity-choice"><input type="radio" name="activity-type" id="chk-yoga" value="yoga" onchange="onActivityTypeChange()"> Yoga</label>
-          <label class="activity-all" title="Show every yoga pose, not just the day's"><input type="checkbox" id="all-yoga" onchange="onActivityAllChange('yoga')"> All</label>
+          <span class="activity-len" role="radiogroup" aria-label="Session length"><label title="3 poses a day"><input type="radio" name="len-yoga" value="short" onchange="onActivityLengthChange('yoga')"><span>Short</span></label><label title="5 poses a day"><input type="radio" name="len-yoga" value="standard" checked onchange="onActivityLengthChange('yoga')"><span>Standard</span></label><label title="8 poses a day"><input type="radio" name="len-yoga" value="long" onchange="onActivityLengthChange('yoga')"><span>Long</span></label></span>
+          <span class="activity-count" id="count-yoga">5 a day</span>
         </div>
       </div>
     </div>
@@ -7879,12 +7908,15 @@ function warmupForDay(ageId, dayIndex, count){
 // Exactly 10 exercises for the day: the day's 5 fixed thematic exercises
 // (routineIds) always included, topped up with non-overlapping picks from
 // the shared rotating pool until there are exactly 10 total.
-function exercisesForDay(dayIndex, routineIds){
+function exercisesForDay(dayIndex, routineIds, count){
+  const total = count || 10;
+  // Fewer than the day's fixed exercises: keep the first ones (Short).
+  if (total <= routineIds.length) return routineIds.slice(0, total);
   const seen = new Set(routineIds);
   const extra = [];
   const n = WARMUP_POOL.length;
   const start = (dayIndex * 2) % n;
-  for (let i = 0; extra.length < 10 - routineIds.length && i < n * 2; i++){
+  for (let i = 0; extra.length < total - routineIds.length && i < n * 2; i++){
     const id = WARMUP_POOL[(start + i) % n];
     if (!seen.has(id) && EX_LIB[id]) { seen.add(id); extra.push(id); }
   }
@@ -7978,11 +8010,12 @@ function yogaForAge(ageId){
 // Exactly 5 poses for the day, rotating through the full 19-pose set
 // (so the full library is reached across the week) — dosage still comes
 // from the age bracket, only the day's selection changes.
-function yogaForDay(dayIndex, ageId){
+function yogaForDay(dayIndex, ageId, count){
   const n = YOGA_POSES.length;
+  const c = Math.min(count || 5, n);
   const start = (dayIndex * 5) % n;
   const picked = [];
-  for (let i = 0; i < 5; i++){
+  for (let i = 0; i < c; i++){
     picked.push(YOGA_POSES[(start + i) % n]);
   }
   return picked.map(p => {
@@ -8152,33 +8185,36 @@ const POSE_SVGS = {
 };
 
 
-// "All" switch beside Exercise / Yoga: when on, every exercise (or every
-// yoga pose) is listed instead of just that day's selection. Off by default.
-function isActivityAllOn(type){ return document.getElementById('all-'+type)?.checked ?? false; }
-// Ticking "All" also picks that option, since All only means something for
+// Session length beside Exercise / Yoga: Short / Standard / Long sets how
+// many items each day gets. Standard (the default) is the original plan.
+const ACTIVITY_LEN_COUNTS={ exercise:{short:5, standard:10, long:15}, yoga:{short:3, standard:5, long:8} };
+function activityLength(type){
+  return document.querySelector(`input[name="len-${type}"]:checked`)?.value || 'standard';
+}
+function activityCount(type){ return ACTIVITY_LEN_COUNTS[type][activityLength(type)]; }
+// Picking a length also picks that option, since length only applies to
 // the option that's selected.
-function onActivityAllChange(type){
-  const all=document.getElementById('all-'+type), radio=document.getElementById('chk-'+type);
-  if(all && all.checked && radio && !radio.checked) radio.checked=true;
+function onActivityLengthChange(type){
+  const radio=document.getElementById('chk-'+type);
+  if(radio && !radio.checked) radio.checked=true;
   onActivityTypeChange();
 }
-// Every exercise across the week for this age group (no repeats, in plan order).
-function allExerciseIds(ageId){
-  const plan=PLANS[ageId]||[], seen=new Set(), out=[];
-  plan.forEach((d,i)=>exercisesForDay(i, d.routine.filter(id=>EX_LIB[id])).forEach(id=>{ if(!seen.has(id)){ seen.add(id); out.push(id); } }));
-  return out;
-}
 function exerciseIdsFor(dayIndex, ageId){
-  if(isActivityAllOn('exercise')) return allExerciseIds(ageId);
   const d=(PLANS[ageId]||[])[dayIndex]; if(!d) return [];
-  return exercisesForDay(dayIndex, d.routine.filter(id=>EX_LIB[id]));
+  return exercisesForDay(dayIndex, d.routine.filter(id=>EX_LIB[id]), activityCount('exercise'));
 }
 function yogaListFor(dayIndex, ageId){
-  return isActivityAllOn('yoga') ? yogaForAge(ageId) : yogaForDay(dayIndex, ageId);
+  return yogaForDay(dayIndex, ageId, activityCount('yoga'));
 }
+// "10 a day" next to each option, following its Short / Standard / Long.
+function updateActivityCounts(){
+  ['exercise','yoga'].forEach(t=>{ const el=document.getElementById('count-'+t); if(el) el.textContent=activityCount(t)+' a day'; });
+}
+updateActivityCounts();
 
 // Re-render the current age group's plan when Exercise / Yoga changes
 function onActivityTypeChange(){
+  updateActivityCounts();
   document.querySelectorAll('.activity-check').forEach(p=>{
     p.classList.toggle('on', p.querySelector('input').checked);
   });
@@ -8260,10 +8296,11 @@ function buildWeekPlan(ag) {
     // Exercise sub-list: exactly 10 per day — the day's 5 fixed thematic
     // exercises plus 5 rotating picks from the shared pool
     const exerciseIds = exerciseIdsFor(di, ag.id);
-    const exerciseCards = exerciseIds.map(id => {
+    const exerciseCards = exerciseIds.map((id, i) => {
       const ex = EX_LIB[id];
       return `
       <div class="ex-card2">
+        <span class="seq-badge" aria-label="Exercise ${i+1}">${i+1}</span>
         <div class="ex-top-row">
           <div class="ex-body-fig">${makeSVG(ex.pri, ex.sec)}</div>
         </div>
@@ -8280,8 +8317,9 @@ function buildWeekPlan(ag) {
     // Yoga sub-list: exactly 5 poses for the day, rotating through the
     // full 19-pose set across the week — dosage differs only by age
     const yogaList = yogaListFor(di, ag.id);
-    const yogaCards = yogaList.map(y => `
+    const yogaCards = yogaList.map((y, i) => `
       <div class="yoga-card">
+        <span class="seq-badge" aria-label="Pose ${i+1}">${i+1}</span>
         <div class="yoga-top-row">${POSE_VIDEOS[y.name] ? `<video class="yoga-fig-video" src="${POSE_VIDEOS[y.name]}" muted loop playsinline onclick="handleYogaVideoClick(this)"></video>` : (POSE_SVGS[y.name] || '')}</div>
         <div class="yoga-info">
           <div class="yoga-name">🧘 ${y.name}</div>
@@ -8466,7 +8504,7 @@ function downloadBodyPDF(){
   para(`Age Group: ${selectedBodyAge.label}`,11,[20,20,20]);
   const exOn=document.getElementById('chk-exercise')?.checked;
   const yogaOn=document.getElementById('chk-yoga')?.checked;
-  para(`Warm-Up Includes: ${[exOn?('Exercise'+(isActivityAllOn('exercise')?' (all)':'')):null,yogaOn?('Yoga'+(isActivityAllOn('yoga')?' (all poses)':'')):null].filter(Boolean).join(' + ')||'None selected — pick Exercise or Yoga in the app to include it'}`,10,[74,97,81]);
+  para(`Warm-Up Includes: ${[exOn?`Exercise (${activityLength('exercise')}, ${activityCount('exercise')} a day)`:null,yogaOn?`Yoga (${activityLength('yoga')}, ${activityCount('yoga')} poses a day)`:null].filter(Boolean).join(' + ')||'None selected — pick Exercise or Yoga in the app to include it'}`,10,[74,97,81]);
   y+=6; rule();
 
   const plan=PLANS[selectedBodyAge.id]||[];
