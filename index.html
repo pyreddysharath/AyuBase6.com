@@ -2452,6 +2452,14 @@ html[data-petal-card="a"] .calc-card:has(#lab-info-btn)::after{ right:70px; }
   .alert-card-hdr > .alert-info-btn, .calc-card-hdr > span{ margin-right:-8px; }
 }
 
+/* Body > Activity Type?: one choice (radio) per row, with its own "All"
+   switch at the right end of the row. */
+.activity-check{ justify-content:space-between; cursor:default; }
+.activity-choice{ display:flex; align-items:center; gap:10px; flex:1; cursor:pointer; }
+.activity-check input[type="radio"]{ accent-color:#2563eb; width:16px; height:16px; margin:0; }
+.activity-all{ display:flex; align-items:center; gap:6px; font-size:var(--fs-xs,.8125rem); font-weight:600; cursor:pointer; flex:0 0 auto; padding-left:12px; }
+.activity-all input{ accent-color:#2563eb; width:15px; height:15px; margin:0; }
+
 /* Wake-Up Time: the "i" sits at the top right, in the title row, at the
    box's far right edge like Nudges / Vitals. */
 .rout-card-hdr{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
@@ -3123,12 +3131,14 @@ html[data-petal-card="d"] :is(.card, .body-age-section, .activity-type-section, 
     <div class="activity-type-section">
       <div class="activity-type-title">Activity Type?</div>
       <div class="activity-type-options">
-        <label class="activity-check" id="act-exercise-pill">
-          <input type="checkbox" id="chk-exercise" onchange="onActivityTypeChange()"> Exercise
-        </label>
-        <label class="activity-check" id="act-yoga-pill">
-          <input type="checkbox" id="chk-yoga" onchange="onActivityTypeChange()"> Yoga
-        </label>
+        <div class="activity-check" id="act-exercise-pill">
+          <label class="activity-choice"><input type="radio" name="activity-type" id="chk-exercise" value="exercise" onchange="onActivityTypeChange()"> Exercise</label>
+          <label class="activity-all" title="Show every exercise, not just the day's"><input type="checkbox" id="all-exercise" onchange="onActivityAllChange('exercise')"> All</label>
+        </div>
+        <div class="activity-check" id="act-yoga-pill">
+          <label class="activity-choice"><input type="radio" name="activity-type" id="chk-yoga" value="yoga" onchange="onActivityTypeChange()"> Yoga</label>
+          <label class="activity-all" title="Show every yoga pose, not just the day's"><input type="checkbox" id="all-yoga" onchange="onActivityAllChange('yoga')"> All</label>
+        </div>
       </div>
     </div>
   </div>
@@ -8142,7 +8152,32 @@ const POSE_SVGS = {
 };
 
 
-// Re-render the current age group's plan when Exercise/Yoga checkboxes change
+// "All" switch beside Exercise / Yoga: when on, every exercise (or every
+// yoga pose) is listed instead of just that day's selection. Off by default.
+function isActivityAllOn(type){ return document.getElementById('all-'+type)?.checked ?? false; }
+// Ticking "All" also picks that option, since All only means something for
+// the option that's selected.
+function onActivityAllChange(type){
+  const all=document.getElementById('all-'+type), radio=document.getElementById('chk-'+type);
+  if(all && all.checked && radio && !radio.checked) radio.checked=true;
+  onActivityTypeChange();
+}
+// Every exercise across the week for this age group (no repeats, in plan order).
+function allExerciseIds(ageId){
+  const plan=PLANS[ageId]||[], seen=new Set(), out=[];
+  plan.forEach((d,i)=>exercisesForDay(i, d.routine.filter(id=>EX_LIB[id])).forEach(id=>{ if(!seen.has(id)){ seen.add(id); out.push(id); } }));
+  return out;
+}
+function exerciseIdsFor(dayIndex, ageId){
+  if(isActivityAllOn('exercise')) return allExerciseIds(ageId);
+  const d=(PLANS[ageId]||[])[dayIndex]; if(!d) return [];
+  return exercisesForDay(dayIndex, d.routine.filter(id=>EX_LIB[id]));
+}
+function yogaListFor(dayIndex, ageId){
+  return isActivityAllOn('yoga') ? yogaForAge(ageId) : yogaForDay(dayIndex, ageId);
+}
+
+// Re-render the current age group's plan when Exercise / Yoga changes
 function onActivityTypeChange(){
   document.querySelectorAll('.activity-check').forEach(p=>{
     p.classList.toggle('on', p.querySelector('input').checked);
@@ -8224,7 +8259,7 @@ function buildWeekPlan(ag) {
 
     // Exercise sub-list: exactly 10 per day — the day's 5 fixed thematic
     // exercises plus 5 rotating picks from the shared pool
-    const exerciseIds = exercisesForDay(di, routineIds);
+    const exerciseIds = exerciseIdsFor(di, ag.id);
     const exerciseCards = exerciseIds.map(id => {
       const ex = EX_LIB[id];
       return `
@@ -8244,7 +8279,7 @@ function buildWeekPlan(ag) {
 
     // Yoga sub-list: exactly 5 poses for the day, rotating through the
     // full 19-pose set across the week — dosage differs only by age
-    const yogaList = yogaForDay(di, ag.id);
+    const yogaList = yogaListFor(di, ag.id);
     const yogaCards = yogaList.map(y => `
       <div class="yoga-card">
         <div class="yoga-top-row">${POSE_VIDEOS[y.name] ? `<video class="yoga-fig-video" src="${POSE_VIDEOS[y.name]}" muted loop playsinline onclick="handleYogaVideoClick(this)"></video>` : (POSE_SVGS[y.name] || '')}</div>
@@ -8431,7 +8466,7 @@ function downloadBodyPDF(){
   para(`Age Group: ${selectedBodyAge.label}`,11,[20,20,20]);
   const exOn=document.getElementById('chk-exercise')?.checked;
   const yogaOn=document.getElementById('chk-yoga')?.checked;
-  para(`Warm-Up Includes: ${[exOn?'Exercise':null,yogaOn?'Yoga':null].filter(Boolean).join(' + ')||'None selected — tick Exercise and/or Yoga in the app to include it'}`,10,[74,97,81]);
+  para(`Warm-Up Includes: ${[exOn?('Exercise'+(isActivityAllOn('exercise')?' (all)':'')):null,yogaOn?('Yoga'+(isActivityAllOn('yoga')?' (all poses)':'')):null].filter(Boolean).join(' + ')||'None selected — pick Exercise or Yoga in the app to include it'}`,10,[74,97,81]);
   y+=6; rule();
 
   const plan=PLANS[selectedBodyAge.id]||[];
@@ -8443,7 +8478,7 @@ function downloadBodyPDF(){
 
     const cardioEx=EX_LIB[dayPlan.cardioId];
     const routineIds=dayPlan.routine.filter(id=>EX_LIB[id]);
-    const exerciseIds=exercisesForDay(di, routineIds);
+    const exerciseIds=exerciseIdsFor(di, selectedBodyAge.id);
 
     if(exOn){
       para('🏋️ Exercise',11,[20,20,20]);
@@ -8454,7 +8489,7 @@ function downloadBodyPDF(){
       y+=3;
     }
     if(yogaOn){
-      const yogaList=yogaForDay(di, selectedBodyAge.id);
+      const yogaList=yogaListFor(di, selectedBodyAge.id);
       para('🧘 Yoga',11,[20,20,20]);
       yogaList.forEach(yg=>{
         para(`•  ${yg.name} (${yg.sanskrit}) — ${yg.sets}, ${yg.dur}`,9.5);
@@ -8868,14 +8903,13 @@ function buildTodaysPlaylist(){
   const exerciseChecked = document.getElementById('chk-exercise')?.checked ?? false;
   const yogaChecked = document.getElementById('chk-yoga')?.checked ?? false;
   if(exerciseChecked){
-    const routineIds = dayPlan.routine.filter(id => EX_LIB[id]);
-    exercisesForDay(currentDayIndex, routineIds).forEach(id=>{
+    exerciseIdsFor(currentDayIndex, selectedBodyAge.id).forEach(id=>{
       const ex = EX_LIB[id];
       if(ex) list.push({ type:'exercise', icon:'🏋️', name:ex.name, meta:`${adjustedSets(ex.sets, selectedBodyAge.id)} · ${adjustedDur(ex.dur, selectedBodyAge.id)}`, seconds:parseDurationSeconds(adjustedDur(ex.dur, selectedBodyAge.id)), pri:ex.pri, sec:ex.sec });
     });
   }
   if(yogaChecked){
-    yogaForDay(currentDayIndex, selectedBodyAge.id).forEach(y=>{
+    yogaListFor(currentDayIndex, selectedBodyAge.id).forEach(y=>{
       list.push({ type:'yoga', icon:'🧘', name:y.name, meta:`${y.sets} · ${y.dur}`, seconds:parseDurationSeconds(y.dur), video:POSE_VIDEOS[y.name] || null });
     });
   }
