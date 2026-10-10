@@ -2475,6 +2475,8 @@ html[data-petal-card="a"] .calc-card:has(#lab-info-btn)::after{ right:70px; }
 .activity-len{ margin-left:26px; }
 .activity-count{ font-size:.78rem; font-weight:500; opacity:.8; white-space:nowrap; align-self:center; }
 @media(max-width:360px){ .activity-len span{ padding:5px 6px; font-size:.68rem; } .activity-len{ margin-left:22px; } .activity-check{ column-gap:8px; padding-left:12px; padding-right:10px; } .activity-count{ font-size:.72rem; } }
+/* Short / Standard / Long and the count only appear for the option that's picked. */
+.activity-check:not(.on) .activity-len, .activity-check:not(.on) .activity-count{ display:none; }
 .warmup-count{ font-weight:600; opacity:.9; }
 /* Order number on each exercise / yoga card (the order Let's Start plays them). */
 .ex-card2, .yoga-card{ position:relative; }
