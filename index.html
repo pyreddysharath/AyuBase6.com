@@ -1389,6 +1389,12 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 }
 .lab-add-icon-btn:hover{background:var(--calc-1);transform:scale(1.06)}
 .lab-upload-status{font-size:.76rem;color:#9d6470}
+.lab-file-link{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;
+  color:var(--calc-2);background:#fff;border:1.5px solid var(--calc-3);transition:all .15s}
+.lab-file-link svg{width:24px;height:24px}
+.lab-file-link:hover{background:var(--calc-4);border-color:var(--calc-2)}
+/* Line between the uploaded report's results and the Manual section. */
+.lab-section-divider{height:0;border-top:1.5px dashed rgba(225,29,72,.35);margin:22px 0 18px}
 .lab-manual-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 .lab-select{
   flex:1;min-width:160px;padding:8px 10px;border-radius:8px;border:1.5px solid var(--calc-3);
@@ -2720,11 +2726,14 @@ html[data-petal-card="d"] :is(.card, .body-age-section, .activity-type-section, 
       <div class="lab-upload-row">
         <label class="refresh-btn lab-upload-btn" for="lab-pdf-input">📄 Upload Report (PDF)</label>
         <input type="file" id="lab-pdf-input" accept="application/pdf" style="display:none">
+        <a id="lab-file-link" class="lab-file-link" href="#" target="_blank" rel="noopener" style="display:none" title="Open report" aria-label="Open uploaded report in a new tab"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/><text x="12" y="18.2" text-anchor="middle" font-size="5.6" font-weight="700" fill="#fff" font-family="Arial, sans-serif">PDF</text></svg></a>
         <span id="lab-upload-status" class="lab-upload-status"></span>
       </div>
 
       <div id="lab-rows" class="lab-rows"></div>
       <div id="lab-results" class="lab-results"></div>
+
+      <div class="lab-section-divider" role="separator"></div>
 
       <h3 class="calc-subhdr">• Manual</h3>
 
@@ -3862,11 +3871,31 @@ document.getElementById('lab-add-btn')?.addEventListener('click',()=>{
   valInp.value='';
 });
 
+// The uploaded report, shown as a PDF icon beside the Upload button that
+// opens the file itself in a new tab. Kept only in this browser tab.
+let labFileUrl=null;
+function showLabFileLink(file){
+  const a=document.getElementById('lab-file-link');
+  if(!a) return;
+  if(labFileUrl) URL.revokeObjectURL(labFileUrl);
+  labFileUrl=URL.createObjectURL(file);
+  a.href=labFileUrl;
+  a.title='Open '+file.name;
+  a.setAttribute('aria-label','Open '+file.name+' in a new tab');
+  a.style.display='inline-flex';
+}
+function hideLabFileLink(){
+  const a=document.getElementById('lab-file-link');
+  if(labFileUrl){ URL.revokeObjectURL(labFileUrl); labFileUrl=null; }
+  if(a){ a.style.display='none'; a.href='#'; }
+}
+
 // ── PDF upload: best-effort auto-extraction of test values ──
 document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>{
   const file=e.target.files[0];
   const statusEl=document.getElementById('lab-upload-status');
   if(!file) return;
+  showLabFileLink(file);
   statusEl.textContent='Reading PDF…';
   try{
     if(typeof pdfjsLib==='undefined'){
@@ -3935,6 +3964,7 @@ function resetCheckToDefault(){
   renderLabRows();
   const fileInput=document.getElementById('lab-pdf-input');
   if(fileInput) fileInput.value='';
+  hideLabFileLink();
   const statusEl2=document.getElementById('lab-upload-status');
   if(statusEl2) statusEl2.textContent='';
 }
