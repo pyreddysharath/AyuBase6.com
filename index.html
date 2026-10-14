@@ -1376,7 +1376,9 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   font-size:.76rem;line-height:1.4;color:#7a3b0c;background:#fff4e5;
   border:1px solid #f5c68a;border-radius:10px;padding:10px 12px;margin:6px 0 16px;
 }
-.lab-upload-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.lab-upload-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:0}
+.lab-rows:not(:empty){margin-top:24px}
+.lab-rows:empty,.lab-results:empty{display:none}
 .lab-upload-btn{
   display:inline-block;cursor:pointer;padding:9px 16px;font-size:.82rem;
   background:linear-gradient(135deg,var(--calc-3),var(--calc-2));
@@ -1394,7 +1396,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .lab-file-link svg{width:24px;height:24px}
 .lab-file-link:hover{background:var(--calc-4);border-color:var(--calc-2)}
 /* Line between the uploaded report's results and the Manual section. */
-.lab-section-divider{height:0;border-top:1.5px dashed rgba(8,145,178,.35);margin:22px 0 18px}
+.lab-section-divider{height:0;border-top:1.5px dashed rgba(8,145,178,.35);margin:18px 0}
 .lab-manual-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 .lab-select{
   flex:1;min-width:160px;padding:8px 10px;border-radius:8px;border:1.5px solid var(--calc-3);
@@ -1416,7 +1418,8 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   border:none;background:transparent;color:var(--calc-2);font-size:1rem;cursor:pointer;
   line-height:1;padding:2px 4px;
 }
-.lab-results{margin-top:18px}
+.lab-results{margin-top:24px}
+.lab-results-hdr.lab-normal-hdr{margin-top:30px}
 .lab-results-hdr{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--calc-1);margin-bottom:8px}
 .lab-card{
   border:1px solid rgba(103,232,249,.55);border-radius:12px;padding:14px;margin-bottom:12px;
@@ -1431,6 +1434,8 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .lab-card-system{font-size:.78rem;color:var(--calc-2);font-weight:600;margin-top:8px}
 .lab-card-remedies{font-family:var(--font);font-style:italic;font-size:.84rem;line-height:1.5;color:#234b57;margin-top:6px;padding-left:18px}
 .lab-card-remedies li{margin-bottom:2px}
+.lab-card-subhdr{font-size:.8125rem;font-weight:700;color:var(--calc-1);margin-top:12px;padding-top:10px;border-top:1px dashed var(--calc-3)}
+.lab-card-subhdr + .lab-card-remedies{margin-top:4px}
 .lab-card-note{
   font-family:var(--font);font-style:italic;
   font-size:.8rem;color:#7a3b0c;background:#fff4e5;border-radius:8px;
@@ -3853,13 +3858,14 @@ function renderLabResults(){
         </div>
         <div class="lab-card-range">Normal range: ${ref.low}–${ref.high} ${ref.unit}</div>
         <div class="lab-card-system">🩻 Related to: ${ref.system}</div>
+        <div class="lab-card-subhdr">🌿 Precautions &amp; what can help</div>
         <ul class="lab-card-remedies">${ref.remedies.map(x=>`<li>${x}</li>`).join('')}</ul>
         <div class="lab-card-note">${ref.note}</div>
       </div>`;
     });
   }
   if(normal.length){
-    html+=`<div class="lab-results-hdr" style="margin-top:${outOfRange.length?18:0}px">✅ Within Normal Range</div>
+    html+=`<div class="lab-results-hdr${outOfRange.length?' lab-normal-hdr':''}">✅ Within Normal Range</div>
       <div class="lab-normal-list">${normal.join(' · ')}</div>`;
   }
   wrap.innerHTML=html;
