@@ -1376,6 +1376,15 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   font-size:.76rem;line-height:1.4;color:#7a3b0c;background:#fff4e5;
   border:1px solid #f5c68a;border-radius:10px;padding:10px 12px;margin:6px 0 16px;
 }
+.lab-sex-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin:12px 0 16px}
+.lab-sex-lbl{font-size:.8125rem;font-weight:600;color:var(--calc-1)}
+.lab-sex{display:inline-flex;border:1.5px solid var(--calc-3);border-radius:999px;overflow:hidden;background:#fff}
+.lab-sex label{position:relative;cursor:pointer}
+.lab-sex input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.lab-sex span{display:block;padding:5px 14px;font-size:.75rem;font-weight:600;color:var(--calc-1);line-height:1.2}
+.lab-sex label + label span{border-left:1px solid var(--calc-3)}
+.lab-sex input:checked + span{background:var(--calc-2);color:#fff}
+.lab-sex input:focus-visible + span{outline:2px solid var(--calc-2);outline-offset:-2px}
 .lab-upload-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:0}
 .lab-rows:not(:empty){margin-top:24px}
 .lab-rows:empty,.lab-results:empty{display:none}
@@ -2713,7 +2722,7 @@ html[data-petal-card="d"] :is(.card, .body-age-section, .activity-type-section, 
       </div>
     </div>
 
-    <div class="calc-card calc-card-spaced">
+    <div class="calc-card calc-card-spaced" id="lab-insights-card">
       <div class="calc-card-hdr">
         <h2>Lab Insights</h2>
         <span style="display:flex;align-items:center;gap:4px">
@@ -2728,6 +2737,11 @@ html[data-petal-card="d"] :is(.card, .body-age-section, .activity-type-section, 
       </div>
       <div class="calc-task" id="lab-info-panel" style="display:none">
         <p class="calc-sub" style="margin:0">Upload a lab report (text-based PDF) or add values yourself — we'll flag anything outside the normal range, what it relates to, and food-based remedies.</p>
+      </div>
+
+      <div class="lab-sex-row">
+        <span class="lab-sex-lbl">Normal ranges for</span>
+        <span class="lab-sex" role="radiogroup" aria-label="Normal ranges for"><label><input type="radio" name="lab-sex" value="male" checked onchange="renderLabResults()"><span>Men</span></label><label><input type="radio" name="lab-sex" value="female" onchange="renderLabResults()"><span>Women</span></label></span>
       </div>
 
       <h3 class="calc-subhdr">• Upload</h3>
@@ -3708,127 +3722,136 @@ updateCalcFigure();
 //  medicines or doses; that's a doctor's call.
 // ════════════════════════════════════════════════
 const LAB_REF=[
-  {id:'hb',name:'Hemoglobin',aliases:['hemoglobin','hgb'],unit:'g/dL',low:13.0,high:17.0,
+  {id:'hb',name:'Hemoglobin',aliases:['hemoglobin','hgb'],unit:'g/dL',low:13.0,high:17.0,female:{low:12.0,high:15.5},
     system:'Blood / oxygen transport',
-    remediesLow:["Eat iron-rich foods daily — spinach, methi, lentils, rajma, lean meat", "Add beetroot, pomegranate, dates & jaggery to meals", "Pair iron-rich foods with citrus or amla (vitamin C) to absorb better", "Avoid tea/coffee for an hour before and after meals", "Include B12 & folate sources — dairy, eggs, leafy greens", "Rest well and avoid heavy exertion if you feel breathless or dizzy"],
-    remediesHigh:["Drink plenty of water through the day — dehydration can raise readings", "Avoid smoking and second-hand smoke", "Do not take iron supplements unless a doctor advises", "Limit alcohol", "Get a repeat test to confirm the value", "See a doctor if you have headaches, dizziness or a flushed face"],
+    remediesLow:["Eat iron-rich foods daily — spinach, methi, lentils, rajma, lean meat", "Add beetroot, pomegranate, dates & jaggery to meals", "Pair iron-rich foods with citrus or amla (vitamin C) to absorb better", "Avoid tea/coffee for an hour before and after meals", "Include B12 & folate sources — dairy, eggs, leafy greens", "Rest well and avoid heavy exertion if you feel breathless or dizzy", "Add sprouted moong, chana and ragi to breakfasts", "Cook in cast-iron kadai or tawa", "Get a doctor to check the cause — iron, B12 or folate", "Watch for tiredness, pale skin or shortness of breath"],
+    remediesHigh:["Drink plenty of water through the day — dehydration can raise readings", "Avoid smoking and second-hand smoke", "Do not take iron supplements unless a doctor advises", "Limit alcohol", "Get a repeat test to confirm the value", "See a doctor if you have headaches, dizziness or a flushed face", "Avoid iron-fortified tonics and multivitamins with iron", "Tell your doctor about testosterone or other hormone medicines", "Tell your doctor if you live at high altitude — it naturally raises haemoglobin", "Ask your doctor about sleep apnoea if you snore heavily"],
     noteHigh:"High haemoglobin can come from dehydration, smoking or other causes — a doctor can tell which with further tests.",
     note:'Low haemoglobin is often treated with iron (and sometimes B12/folate) supplements — the right one and dose depends on further tests your doctor may order.'},
   {id:'vitd',name:'Vitamin D (25-OH)',aliases:['vitamin d','vit d','25-oh vitamin d','25(oh)d'],unit:'ng/mL',low:30,high:100,
     system:'Bones, immunity, mood',
-    remediesLow:["Get 15–20 minutes of morning or late-afternoon sunlight on arms and face most days", "Eat fatty fish (salmon, mackerel, sardines) 2–3 times a week", "Include egg yolks, fortified milk and curd", "Add sun-dried mushrooms to meals", "Keep up weight-bearing exercise like walking for bone strength", "Recheck levels after about three months of changes"],
-    remediesHigh:["Stop any vitamin D supplements until you speak to a doctor", "Avoid extra calcium supplements for now", "Drink enough water through the day", "Watch for nausea, thirst or frequent urination", "Do not take high-dose \"weekly\" vitamin D shots without supervision", "Get calcium and kidney tests checked with your doctor"],
+    remediesLow:["Get 15–20 minutes of morning or late-afternoon sunlight on arms and face most days", "Eat fatty fish (salmon, mackerel, sardines) 2–3 times a week", "Include egg yolks, fortified milk and curd", "Add mushrooms dried in sunlight to meals", "Keep up weight-bearing exercise like walking for bone strength", "Recheck levels after about three months of changes", "Choose vitamin D-fortified oil, milk or cereals", "Spend time outdoors on weekends and holidays", "Ask your doctor to check calcium and magnesium too", "Keep a healthy weight — excess body fat can lower vitamin D levels"],
+    remediesHigh:["Stop any vitamin D supplements until you speak to a doctor", "Avoid extra calcium supplements for now", "Drink enough water through the day", "Watch for nausea, thirst or frequent urination", "Do not take high-dose \"weekly\" vitamin D shots without supervision", "Get calcium and kidney tests checked with your doctor", "Check every supplement and tonic label for added vitamin D", "Avoid fortified foods with extra vitamin D for now", "Do not stop prescribed medicine without asking your doctor", "Recheck levels after a few weeks off supplements"],
     noteHigh:"High vitamin D is almost always from supplements — a doctor should review your dose.",
     note:'Vitamin D3 supplements are commonly used for low levels — the dose depends on how low you are, so check with your doctor.'},
   {id:'b12',name:'Vitamin B12',aliases:['vitamin b12','vit b12','b-12','cobalamin'],unit:'pg/mL',low:200,high:900,
     system:'Nerves, energy, red blood cells',
-    remediesLow:["Include dairy — milk, curd, paneer — every day", "Eat eggs, fish or lean meat if your diet allows", "Vegetarians/vegans: use fortified cereals, plant milks or nutritional yeast", "Limit alcohol, which reduces B12 absorption", "If you take metformin or antacids long term, ask your doctor to monitor B12", "Watch for tingling in hands/feet, tiredness or memory issues"],
-    remediesHigh:["Pause B12 supplements or injections until a doctor reviews them", "Avoid energy drinks and multivitamins with high B12", "Stay well hydrated", "Get liver and kidney tests if your doctor suggests", "Repeat the test to confirm the value"],
+    remediesLow:["Include dairy — milk, curd, paneer — every day", "Eat eggs, fish or lean meat if your diet allows", "Vegetarians/vegans: use fortified cereals, plant milks or fortified nutritional yeast", "Limit alcohol, which reduces B12 absorption", "If you take metformin or acid-reducing medicines (like omeprazole) long term, ask your doctor to monitor B12", "Watch for tingling in hands/feet, tiredness or memory issues", "Plant foods have almost no natural B12 — vegetarians need dairy, eggs or fortified foods", "Ask your doctor about B12 if you are over 50 or vegetarian", "Get a doctor to check anaemia with a full blood count", "Recheck levels after about three months"],
+    remediesHigh:["Pause B12 supplements or injections until a doctor reviews them", "Avoid energy drinks and multivitamins with high B12", "Get liver and kidney tests if your doctor suggests", "Repeat the test to confirm the value", "Tell your doctor if you have liver or kidney problems", "Limit alcohol", "Keep a balanced, varied diet", "Tell your doctor about all supplements you take"],
     noteHigh:"High B12 is usually from supplements, but sometimes points to liver or blood conditions — worth a doctor's review.",
     note:'Very low B12 sometimes needs tablets or injections — a doctor should decide which, based on severity.'},
   {id:'ferritin',name:'Ferritin (iron stores)',aliases:['ferritin'],unit:'ng/mL',low:20,high:250,
     system:'Iron stores / energy',
-    remediesLow:["Eat red meat, poultry or fish if your diet allows", "Include lentils, beans, chana, tofu and leafy greens", "Have vitamin C (citrus, amla, guava) with iron-rich meals", "Avoid tea, coffee and calcium supplements around iron-rich meals", "Cook in cast-iron pans", "Watch for fatigue, hair fall or brittle nails"],
-    remediesHigh:["Do not take iron supplements or iron-fortified tonics", "Limit red meat and organ meats", "Avoid vitamin C supplements with meals", "Limit alcohol", "Ask your doctor about tests for inflammation or iron overload"],
+    remediesLow:["Eat red meat, poultry or fish if your diet allows", "Include lentils, beans, chana, tofu and leafy greens", "Have vitamin C (citrus, amla, guava) with iron-rich meals", "Avoid tea, coffee and calcium supplements around iron-rich meals", "Cook in cast-iron pans", "Watch for fatigue, hair fall or brittle nails", "Add ragi, bajra and sprouted grains", "Include dates, raisins and jaggery as snacks", "Ask a doctor to check for blood loss (including heavy periods) if levels stay low", "Recheck levels after about three months"],
+    remediesHigh:["Do not take iron supplements or iron-fortified tonics", "Limit red meat and organ meats", "Avoid vitamin C supplements with meals", "Limit alcohol", "Ask your doctor about tests for inflammation or iron overload", "Avoid cooking in cast-iron vessels", "Avoid iron-fortified cereals and atta", "Keep a healthy weight and stay active", "Recheck levels as your doctor advises", "Consider donating blood only if a doctor approves"],
     noteHigh:"High ferritin can reflect inflammation, liver issues or iron overload — a doctor should look into the cause.",
     note:'Low ferritin often calls for an iron supplement — dose and duration are best set by a doctor.'},
   {id:'calcium',name:'Calcium',aliases:['calcium','serum calcium'],unit:'mg/dL',low:8.6,high:10.3,
     system:'Bones, teeth, muscle & nerve function',
-    remediesLow:["Have milk, curd, buttermilk or paneer daily", "Add sesame seeds (til), ragi and almonds", "Eat green leafy vegetables like drumstick leaves and methi", "Get sunlight or vitamin D — it helps absorb calcium", "Limit fizzy drinks and excess salt", "Do weight-bearing exercise like walking"],
-    remediesHigh:["Stop calcium and vitamin D supplements until a doctor advises", "Drink plenty of water", "Avoid antacids that contain calcium", "Limit very high-dairy intake for now", "Watch for excess thirst, constipation or confusion", "See a doctor to find the cause"],
+    remediesLow:["Have milk, curd, buttermilk or paneer daily", "Add sesame seeds (til), ragi and almonds", "Eat green leafy vegetables like drumstick leaves and methi", "Get sunlight or vitamin D — it helps absorb calcium", "Limit fizzy drinks and excess salt", "See a doctor if you get tingling around the mouth, cramps or muscle spasms", "Include small fish eaten with bones, like sardines", "Choose calcium-set tofu or fortified foods", "Low readings can be due to low albumin — ask your doctor about \"corrected\" calcium", "Ask your doctor to check vitamin D and magnesium"],
+    remediesHigh:["Stop calcium and vitamin D supplements until a doctor advises", "Drink plenty of water", "Avoid antacids that contain calcium", "Avoid extra dairy beyond normal amounts for now", "Watch for excess thirst, constipation or confusion", "See a doctor to find the cause", "Ask your doctor whether any medicine (e.g. some water pills, lithium) could be the cause", "Stay active — long bed rest can raise calcium", "Avoid vitamin A supplements in high doses", "Recheck levels as your doctor advises"],
     noteHigh:"High calcium needs a doctor's evaluation — it can come from supplements or gland issues.",
     note:'Calcium supplements are common but should be paired with the right vitamin D dose — check with a doctor.'},
   {id:'magnesium',name:'Magnesium',aliases:['magnesium'],unit:'mg/dL',low:1.7,high:2.2,
     system:'Muscles, nerves, energy production',
-    remediesLow:["Snack on nuts & seeds — almonds, pumpkin seeds, cashews", "Choose whole grains like millets, brown rice and oats", "Eat leafy greens and bananas", "Add beans, chana and rajma", "Limit alcohol and very high caffeine", "Watch for muscle cramps or twitching"],
-    remediesHigh:["Stop magnesium supplements and laxatives or antacids containing magnesium", "Drink enough water", "Avoid Epsom-salt drinks", "Get kidney function checked", "See a doctor if you feel weak, drowsy or have a slow heartbeat"],
+    remediesLow:["Snack on nuts & seeds — almonds, pumpkin seeds, cashews", "Choose whole grains like millets, brown rice and oats", "Eat leafy greens, bananas and avocado", "Add beans, chana and rajma", "Limit alcohol and very high caffeine", "Watch for muscle cramps or twitching", "Have dark chocolate (70%+) in small amounts", "Add tofu and soy", "Ask your doctor if acid-reducing medicines (like omeprazole) or water pills are a cause", "Recheck levels after a few weeks"],
+    remediesHigh:["Stop magnesium supplements and laxatives or antacids containing magnesium (e.g. milk of magnesia)", "Drink enough water", "Avoid Epsom-salt drinks", "Get kidney function checked", "See a doctor if you feel weak, drowsy or have a slow heartbeat", "Avoid protein powders and tonics with added minerals", "Tell your doctor about all medicines you take", "Recheck levels as your doctor advises"],
     noteHigh:"High magnesium is uncommon and often linked to kidney function or supplements — check with a doctor.",
     note:'Magnesium supplements are widely available OTC — check with a doctor first if you have kidney issues.'},
   {id:'zinc',name:'Zinc',aliases:['zinc'],unit:'µg/dL',low:60,high:120,
     system:'Immunity, wound healing, taste/smell',
-    remediesLow:["Eat pumpkin seeds, cashews and sesame", "Include chickpeas, lentils and whole grains", "Have eggs, dairy, meat or shellfish if your diet allows", "Soak or sprout legumes and grains to improve absorption", "Watch for slow wound healing or frequent infections"],
-    remediesHigh:["Stop zinc supplements and lozenges", "Avoid multivitamins with added zinc", "Do not take zinc with copper-lowering medicines unless advised", "Drink enough water", "Ask a doctor to check copper levels"],
+    remediesLow:["Eat pumpkin seeds, cashews and sesame", "Include chickpeas, lentils and whole grains", "Have eggs, dairy, meat or shellfish if your diet allows", "Soak or sprout legumes and grains to improve absorption", "Watch for slow wound healing or frequent infections", "Include oats, curd and paneer", "Limit alcohol, which lowers zinc", "Ask your doctor about zinc if you have frequent diarrhoea", "Watch for hair fall, poor appetite or loss of taste", "Recheck levels after about three months"],
+    remediesHigh:["Stop zinc supplements and lozenges", "Avoid multivitamins with added zinc", "Ask a doctor to check copper levels", "Avoid denture creams with zinc for long periods", "Keep a balanced, varied diet", "Watch for nausea or stomach upset", "Recheck levels after a few weeks off supplements"],
     noteHigh:"Long-term high zinc can lower copper — a doctor or pharmacist can advise.",
     note:'Zinc supplements exist OTC, but high doses can affect copper levels — ask a doctor/pharmacist about dosage.'},
   {id:'folate',name:'Folate (Vitamin B9)',aliases:['folate','folic acid'],unit:'ng/mL',low:3.0,high:20.0,
     system:'Cell growth, red blood cells',
-    remediesLow:["Eat leafy greens — spinach, methi, palak — most days", "Include citrus fruits and papaya", "Add beans, lentils and chickpeas", "Choose fortified cereals or atta", "Cook vegetables lightly — folate is lost with overcooking", "Limit alcohol"],
-    remediesHigh:["Pause folic acid supplements until a doctor reviews", "Avoid fortified tonics with added folic acid", "Ask your doctor to check B12 as well", "Repeat the test to confirm the value", "Keep a balanced, varied diet"],
+    remediesLow:["Eat leafy greens — spinach, methi, palak — most days", "Include citrus fruits and papaya", "Add beans, lentils and chickpeas", "Choose fortified cereals or atta", "Cook vegetables lightly — folate is lost with overcooking", "Limit alcohol", "Have sprouted moong and chana", "Eat beetroot, broccoli and asparagus", "If planning pregnancy, ask your doctor about folic acid", "Recheck levels after about three months"],
+    remediesHigh:["Pause folic acid supplements until a doctor reviews", "Avoid fortified tonics with added folic acid", "Ask your doctor to check B12 as well", "Repeat the test to confirm the value", "Keep a balanced, varied diet", "Tell your doctor about all supplements you take", "Limit fortified energy bars and drinks", "Do not stop prescribed folic acid in pregnancy without asking your doctor", "Recheck levels as your doctor advises"],
     noteHigh:"High folate is usually from supplements — a doctor can check it isn't hiding a B12 deficiency.",
     note:'Folic acid tablets are commonly used — especially important to confirm the right dose if pregnant or planning pregnancy.'},
   {id:'tsh',name:'TSH (thyroid)',aliases:['tsh'],unit:'µIU/mL',low:0.4,high:4.0,
     system:'Thyroid / metabolism',
-    remediesLow:["A low TSH can mean an overactive thyroid — see a doctor for T3/T4 tests", "Avoid iodine supplements or kelp tablets", "Limit caffeine if you feel palpitations or anxiety", "Eat regular, balanced meals to maintain weight", "Get enough sleep and manage stress"],
-    remediesHigh:["A high TSH can mean an underactive thyroid — see a doctor for T3/T4 tests", "Use iodised salt (not extra iodine supplements)", "Include selenium sources — eggs, Brazil nuts, fish", "Take thyroid medicine on an empty stomach, apart from calcium/iron, if prescribed", "Stay active to support energy and weight", "Recheck levels as your doctor advises"],
+    remediesLow:["A low TSH can mean an overactive thyroid — see a doctor for T3/T4 tests", "Avoid iodine supplements or kelp tablets", "Limit caffeine if you feel palpitations or anxiety", "Eat regular, balanced meals to maintain weight", "Stop biotin supplements 2–3 days before thyroid tests — they can distort results", "Avoid smoking", "Do not change thyroid medicine dose on your own, if you take it", "Watch for weight loss, tremor or fast heartbeat", "Recheck TSH as your doctor advises", "Keep bones strong with calcium and vitamin D foods"],
+    remediesHigh:["A high TSH can mean an underactive thyroid — see a doctor for T3/T4 tests", "Use iodised salt (not extra iodine supplements)", "Include selenium sources — eggs, Brazil nuts, fish", "If prescribed thyroid medicine, take it on an empty stomach, 4 hours apart from calcium/iron", "Stop biotin supplements 2–3 days before thyroid tests — they can distort results", "Recheck levels as your doctor advises", "Avoid very large amounts of raw cabbage and cauliflower; keep soy away from thyroid medicine", "Watch for tiredness, weight gain, dry skin or feeling cold", "Get enough sleep and manage stress", "Avoid smoking"],
     note:'Thyroid medicine (like levothyroxine) must be prescribed and monitored by a doctor — please don\'t self-medicate for thyroid results.'},
   {id:'glucose',name:'Fasting Glucose',aliases:['fasting glucose','fasting blood sugar','fbs'],unit:'mg/dL',low:70,high:99,
     system:'Blood sugar / metabolism',
-    remediesLow:["Eat or drink something with sugar right away if you feel shaky or sweaty", "Don't skip meals — eat at regular intervals", "Carry a small snack like fruit or biscuits", "Limit alcohol, especially on an empty stomach", "If you take diabetes medicine, ask your doctor to review the dose", "Seek help if you faint or feel confused"],
-    remediesHigh:["Cut down refined sugar, sweets, white rice and maida", "Fill half the plate with vegetables and add fibre", "Walk 10–15 minutes after meals", "Choose smaller, balanced meals with protein", "Keep a healthy weight and sleep 7–8 hours", "Get HbA1c tested with your doctor"],
+    remediesLow:["Eat or drink something with sugar right away if you feel shaky or sweaty", "Don't skip meals — eat at regular intervals", "Carry a small snack like fruit or biscuits", "Limit alcohol, especially on an empty stomach", "If you take diabetes medicine, ask your doctor to review the dose", "Seek help if you faint or feel confused", "Include protein and fibre with every meal", "Avoid intense exercise on an empty stomach", "Tell family or friends how to help if your sugar drops", "Recheck fasting sugar as your doctor advises"],
+    remediesHigh:["Cut down refined sugar, sweets, white rice and maida", "Fill half the plate with vegetables and add fibre", "Walk 10–15 minutes after meals", "Choose smaller, balanced meals with protein", "Keep a healthy weight and sleep 7–8 hours", "Get HbA1c tested with your doctor", "Avoid sugary drinks and fruit juices", "Limit alcohol", "Manage stress — it can raise blood sugar", "Recheck fasting sugar as your doctor advises"],
+    noteLow:"Low fasting sugar can happen with diabetes medicines, long fasting or alcohol — if it keeps happening, see a doctor.",
     note:'If elevated, medicines such as metformin are sometimes prescribed — but this needs a doctor\'s review alongside tests like HbA1c.'},
   {id:'hba1c',name:'HbA1c',aliases:['hba1c','glycated hemoglobin'],unit:'%',low:4.0,high:5.6,
     system:'Average blood sugar (past ~3 months)',
-    remediesLow:["Eat regular, balanced meals", "Avoid long gaps between meals", "If you take diabetes medicine, ask your doctor to review it", "Discuss low readings with a doctor — some blood conditions affect HbA1c", "Repeat the test to confirm"],
-    remediesHigh:["Cut down sugar, sweets and sugary drinks", "Choose whole grains and millets over white rice and maida", "Exercise at least 150 minutes a week", "Eat more vegetables, salads and fibre", "Keep a healthy weight", "Monitor fasting sugar and recheck HbA1c in three months"],
+    remediesLow:["Eat regular, balanced meals", "Avoid long gaps between meals", "If you take diabetes medicine, ask your doctor to review it", "Discuss low readings with a doctor — some blood conditions affect HbA1c", "Repeat the test to confirm", "Recheck fasting sugar too", "Ask your doctor to check for anaemia", "Keep a balanced, varied diet", "Stay active with regular exercise"],
+    remediesHigh:["Cut down sugar, sweets and sugary drinks", "Choose whole grains and millets over white rice and maida", "Exercise at least 150 minutes a week", "Eat more vegetables, salads and fibre", "Keep a healthy weight", "Monitor fasting sugar and recheck HbA1c in three months", "Sleep 7–8 hours a night", "Manage stress with yoga or breathing exercises", "Avoid smoking"],
+    noteLow:"A low HbA1c is uncommon — it can reflect anaemia or other blood conditions, so discuss it with a doctor.",
     note:'An elevated HbA1c usually needs a doctor\'s evaluation for possible medication.'},
   {id:'cholesterol',name:'Total Cholesterol',aliases:['total cholesterol','cholesterol total','cholesterol'],unit:'mg/dL',low:0,high:200,
     system:'Heart / blood vessels',
-    remediesLow:["Eat a balanced diet with enough healthy fats (nuts, seeds)", "Discuss very low values with a doctor", "Repeat the test to confirm", "Keep regular meals", "Get thyroid and liver checks if advised"],
-    remediesHigh:["Have oats, whole grains and beans for soluble fibre", "Snack on walnuts & almonds", "Cut down fried, processed and bakery foods", "Add omega-3 sources — fish, flaxseed, chia", "Exercise 30 minutes most days", "Avoid smoking and limit alcohol"],
+    remediesLow:["Eat a balanced diet with enough healthy fats (nuts, seeds)", "Discuss very low values with a doctor", "Repeat the test to confirm", "Keep regular meals", "Get thyroid and liver checks if advised", "Include eggs and dairy if your diet allows", "Avoid crash diets", "Ask your doctor about nutrition and absorption issues", "Stay active with regular exercise"],
+    remediesHigh:["Have oats, whole grains and beans for soluble fibre", "Snack on walnuts & almonds", "Cut down fried, processed and bakery foods", "Add omega-3 sources — fish, flaxseed, chia", "Exercise 30 minutes most days", "Avoid smoking and limit alcohol", "Keep a healthy weight", "Use less ghee, butter and coconut oil", "Eat more fruits and vegetables", "Recheck lipid profile as your doctor advises"],
+    noteLow:"Very low values are uncommon — a doctor can check whether diet, thyroid or liver factors are involved.",
     note:'Cholesterol-lowering medicine (like statins) should only be started on a doctor\'s advice.'},
   {id:'ldl',name:'LDL Cholesterol',aliases:['ldl','ldl cholesterol'],unit:'mg/dL',low:0,high:100,
     system:'Heart / blood vessels',
-    remediesLow:["Discuss very low values with a doctor", "Keep a balanced diet with healthy fats", "Repeat the test to confirm", "Keep regular meals", "Get thyroid and liver checks if advised"],
-    remediesHigh:["Eat soluble fibre — oats, beans, apples", "Cut down saturated and trans fats (ghee, vanaspati, fried snacks)", "Add plant sterols — nuts and seeds", "Exercise 30 minutes most days", "Keep a healthy weight", "Avoid smoking"],
+    remediesLow:["Discuss very low values with a doctor", "Keep a balanced diet with healthy fats", "Repeat the test to confirm", "Keep regular meals", "Get thyroid and liver checks if advised", "Include eggs and dairy if your diet allows", "Avoid crash diets", "Ask your doctor about nutrition and absorption issues", "Stay active with regular exercise"],
+    remediesHigh:["Eat soluble fibre — oats, beans, apples", "Cut down saturated and trans fats (ghee, vanaspati, fried snacks)", "Add plant sterols — nuts and seeds", "Exercise 30 minutes most days", "Keep a healthy weight", "Avoid smoking", "Eat more fruits and vegetables", "Limit red and processed meat", "Limit alcohol", "Recheck lipid profile as your doctor advises"],
+    noteLow:"Very low values are uncommon — a doctor can check whether diet, thyroid or liver factors are involved.",
     note:'Ask a doctor whether medication is needed alongside diet changes.'},
-  {id:'hdl',name:'HDL Cholesterol',aliases:['hdl','hdl cholesterol'],unit:'mg/dL',low:40,high:90,
+  {id:'hdl',name:'HDL Cholesterol',aliases:['hdl','hdl cholesterol'],unit:'mg/dL',low:40,high:90,female:{low:50,high:90},
     system:'Heart / blood vessels (protective)',
-    remediesLow:["Do regular aerobic exercise — brisk walking, cycling, swimming", "Use healthy fats like olive or mustard oil, nuts and fatty fish", "Avoid smoking", "Lose excess weight, especially around the waist", "Cut down sugar and refined carbs"],
-    remediesHigh:["High HDL is usually protective — no action is typically needed", "Keep up your current healthy habits", "Limit alcohol", "Repeat the test to confirm", "Discuss very high values with a doctor"],
+    remediesLow:["Do regular aerobic exercise — brisk walking, cycling, swimming", "Use healthy fats like olive or mustard oil, nuts and fatty fish", "Avoid smoking", "Lose excess weight, especially around the waist", "Cut down sugar and refined carbs", "Limit trans fats — vanaspati, bakery and fried snacks", "Add omega-3 sources — fish, flaxseed, walnuts", "Keep blood sugar under control", "Sleep 7–8 hours a night", "Recheck lipid profile as your doctor advises"],
+    remediesHigh:["Very high HDL isn't always protective — discuss it with a doctor", "Limit or avoid alcohol — heavy drinking raises HDL", "Ask your doctor about thyroid and liver tests", "Tell your doctor about medicines you take, such as hormone therapy", "Mention any family history of very high HDL or early heart disease", "Don't take supplements meant to raise HDL (like niacin) unless a doctor advises", "Keep LDL and triglycerides in check too", "Repeat the test to confirm the value", "Keep a balanced, varied diet"],
+    noteHigh:"HDL above about 80–90 mg/dL is not extra protective — studies link very high levels to higher risk, so it's worth a doctor's review.",
     note:'Low HDL is usually managed with lifestyle changes — talk to a doctor if it stays low.'},
   {id:'triglycerides',name:'Triglycerides',aliases:['triglycerides'],unit:'mg/dL',low:0,high:150,
     system:'Heart / metabolism',
-    remediesLow:["Low triglycerides are generally not a concern", "Keep a balanced diet with enough calories", "Repeat the test to confirm", "Keep regular meals", "Discuss with a doctor if very low"],
-    remediesHigh:["Cut down sugar, sweets and sugary drinks", "Limit or avoid alcohol", "Eat omega-3 rich fish or flaxseed", "Exercise 30 minutes most days", "Reduce white rice, maida and fried foods", "Keep a healthy weight"],
+    remediesLow:["Low triglycerides are generally not a concern", "Keep a balanced diet with enough calories", "Repeat the test to confirm", "Keep regular meals", "Discuss with a doctor if very low", "Stay active with regular exercise", "Keep a balanced, varied diet", "Ask your doctor about thyroid checks", "Avoid crash diets"],
+    remediesHigh:["Cut down sugar, sweets and sugary drinks", "Limit or avoid alcohol", "Eat omega-3 rich fish or flaxseed", "Exercise 30 minutes most days", "Reduce white rice, maida and fried foods", "Keep a healthy weight", "Avoid fruit juices and sweetened drinks", "Have dinner early and keep it light", "Keep blood sugar under control", "Recheck lipid profile as your doctor advises"],
+    noteLow:"Very low values are uncommon — a doctor can check whether diet, thyroid or liver factors are involved.",
     note:'Very high triglycerides sometimes need medication — a doctor should decide.'},
   {id:'sodium',name:'Sodium',aliases:['sodium'],unit:'mmol/L',low:135,high:145,
     system:'Fluid balance / nerves',
-    remediesLow:["Don't overdrink water beyond thirst", "Use oral rehydration salts (ORS) after vomiting, diarrhoea or heavy sweating", "Ask your doctor if any medicines (e.g. water pills) could be the cause", "Avoid strict salt-free diets unless prescribed", "See a doctor promptly if you feel confused, weak or nauseous"],
-    remediesHigh:["Drink enough water through the day", "Cut down salty snacks, pickles and papad", "Limit processed and packaged foods", "Ask your doctor if any medicines could be the cause", "See a doctor promptly if you feel very thirsty or confused"],
+    remediesLow:["Don't overdrink water beyond thirst", "Use oral rehydration salts (ORS) after vomiting, diarrhoea or heavy sweating", "Ask your doctor if any medicines (e.g. water pills) could be the cause", "Avoid strict salt-free diets unless prescribed", "See a doctor promptly if you feel confused, weak or nauseous", "Limit beer and very low-salt crash diets", "Drink electrolyte fluids during long exercise in heat", "Recheck sodium as your doctor advises", "Tell your doctor about all medicines you take"],
+    remediesHigh:["Drink water regularly — high sodium usually means the body is short of water", "Drink more in hot weather, during illness or after exercise", "Older adults: drink on a schedule, as thirst can be weak", "Avoid very salty foods until it's rechecked", "Ask your doctor if any medicines could be the cause", "Tell your doctor if you pass unusually large amounts of urine", "See a doctor promptly if you feel extremely thirsty, confused or drowsy", "Recheck sodium as your doctor advises"],
     note:'Abnormal sodium needs medical evaluation — please see a doctor rather than self-treating.'},
   {id:'potassium',name:'Potassium',aliases:['potassium'],unit:'mmol/L',low:3.5,high:5.1,
     system:'Heart rhythm / muscles',
-    remediesLow:["Eat bananas, oranges, coconut water and potatoes", "Include tomatoes, spinach and beans", "Rehydrate with ORS after vomiting or diarrhoea", "Ask your doctor if water pills or laxatives could be the cause", "See a doctor if you have muscle weakness, cramps or palpitations"],
-    remediesHigh:["Avoid potassium-rich foods for now — bananas, coconut water, potatoes, tomatoes", "Do not use \"low-sodium\" salt substitutes (they contain potassium)", "Avoid potassium supplements", "Ask your doctor to review blood-pressure or kidney medicines", "See a doctor promptly — high potassium can affect the heart"],
+    remediesLow:["Eat bananas, oranges, coconut water and potatoes", "Include tomatoes, spinach and beans", "Rehydrate with ORS after vomiting or diarrhoea", "Ask your doctor if water pills or laxatives could be the cause", "See a doctor if you have muscle weakness, cramps or palpitations", "Add dals, rajma and leafy greens", "Limit alcohol", "Recheck potassium as your doctor advises", "Tell your doctor about all medicines you take", "Ask your doctor to check magnesium too — low magnesium makes potassium hard to correct"],
+    remediesHigh:["Avoid potassium-rich foods for now — bananas, coconut water, potatoes, tomatoes", "Do not use \"low-sodium\" salt substitutes (they contain potassium)", "Avoid potassium supplements", "Ask your doctor to review blood-pressure or kidney medicines", "See a doctor promptly — high potassium can affect the heart", "Leach vegetables (soak and boil) to reduce potassium", "Limit dry fruits, fruit juices and coconut water", "Avoid painkillers like ibuprofen unless a doctor approves", "Recheck potassium as your doctor advises", "A damaged blood sample can falsely raise potassium — a repeat test may be needed"],
     note:'Abnormal potassium can affect the heart — please get this checked by a doctor promptly rather than self-treating.'},
-  {id:'creatinine',name:'Creatinine',aliases:['creatinine'],unit:'mg/dL',low:0.6,high:1.3,
+  {id:'creatinine',name:'Creatinine',aliases:['creatinine'],unit:'mg/dL',low:0.7,high:1.3,female:{low:0.6,high:1.1},
     system:'Kidney function',
-    remediesLow:["Low creatinine is often linked to low muscle mass — include strength exercise", "Eat adequate protein — dal, eggs, dairy, paneer", "Stay well hydrated", "Repeat the test to confirm", "Discuss with a doctor if very low"],
-    remediesHigh:["Drink enough water through the day", "Avoid painkillers like ibuprofen unless a doctor approves", "Limit salt and processed foods", "Ask a doctor before high-protein diets or creatine supplements", "Keep blood pressure and blood sugar under control", "Get urine and kidney tests as advised"],
+    remediesLow:["Low creatinine is often linked to low muscle mass — include strength exercise", "Eat adequate protein — dal, eggs, dairy, paneer", "Repeat the test to confirm", "Discuss with a doctor if very low", "Keep a balanced, varied diet", "Stay active to maintain muscle", "Tell your doctor if you have lost weight recently", "Get liver function checked if advised"],
+    remediesHigh:["Drink enough water through the day", "Avoid painkillers like ibuprofen unless a doctor approves", "Limit salt and processed foods", "Ask a doctor before high-protein diets or creatine supplements", "Keep blood pressure and blood sugar under control", "Get urine and kidney tests as advised", "Limit red meat for a few days before tests", "Avoid herbal supplements unless a doctor approves", "Recheck creatinine as your doctor advises", "Avoid smoking"],
     note:'Kidney-related results should always be reviewed with a doctor.'},
   {id:'albumin',name:'Albumin',aliases:['albumin'],unit:'g/dL',low:3.4,high:5.4,
     system:'Liver / nutrition status',
-    remediesLow:["Eat adequate protein — eggs, dairy, dal, paneer, fish or meat", "Have small, frequent meals if appetite is low", "Limit alcohol", "Ask your doctor to check liver and kidney function", "Watch for swelling in feet or ankles"],
-    remediesHigh:["Drink enough water — high albumin is often from dehydration", "Repeat the test after hydrating well", "Avoid very high-protein supplements", "Keep a balanced diet", "Discuss with a doctor if it stays high"],
+    remediesLow:["Eat adequate protein — eggs, dairy, dal, paneer, fish or meat", "Have small, frequent meals if appetite is low", "Limit alcohol", "Ask your doctor to check liver and kidney function", "Watch for swelling in feet or ankles", "Add protein to every meal", "Take a protein-rich snack like sprouts, curd or nuts", "Treat infections and diarrhoea promptly", "Recheck levels as your doctor advises"],
+    remediesHigh:["Drink enough water — high albumin is often from dehydration", "Repeat the test after hydrating well", "Keep a balanced diet", "Discuss with a doctor if it stays high", "Drink extra fluids in hot weather", "Recheck levels as your doctor advises"],
     note:'Low albumin can have several causes — best discussed with a doctor.'},
   {id:'wbc',name:'WBC Count',aliases:['wbc','white blood cell','total leukocyte count','tlc'],unit:'thousand/µL',low:4.0,high:11.0,
     system:'Immune system',
-    remediesLow:["Wash hands often and keep good hygiene", "Eat well-cooked food and avoid raw or street food", "Stay away from people with infections", "Get enough sleep and eat a balanced diet", "See a doctor if you get a fever"],
-    remediesHigh:["See a doctor to check for infection or inflammation", "Rest well and drink plenty of fluids", "Avoid smoking", "Manage stress and sleep 7–8 hours", "Repeat the test as your doctor advises"],
+    remediesLow:["Wash hands often and keep good hygiene", "Eat well-cooked food and avoid raw or street food", "Stay away from people with infections", "Get enough sleep and eat a balanced diet", "See a doctor if you get a fever", "Get vaccinations as your doctor advises", "Include protein, fruits and vegetables daily", "Avoid crowded places when possible", "Tell your doctor about all medicines you take", "Recheck the count as your doctor advises"],
+    remediesHigh:["See a doctor to check for infection or inflammation", "Rest well and drink plenty of fluids", "Avoid smoking", "Manage stress and sleep 7–8 hours", "Repeat the test as your doctor advises", "Keep good hygiene and wash hands often", "Eat a balanced diet with fruits and vegetables", "Tell your doctor about all medicines you take", "Watch for fever, pain or swelling"],
     note:'Abnormal WBC counts need a doctor\'s evaluation — they can indicate infection or other conditions.'},
   {id:'platelet',name:'Platelet Count',aliases:['platelet','platelet count'],unit:'lakh/µL',low:1.5,high:4.5,
     system:'Blood clotting',
-    remediesLow:["Avoid painkillers like aspirin and ibuprofen unless a doctor approves", "Avoid contact sports and activities that risk injury", "Use a soft toothbrush", "Watch for unusual bruising, nosebleeds or bleeding gums", "Papaya leaf extract is a popular home remedy, but evidence is limited — confirm with a doctor", "Seek urgent care if bleeding doesn't stop"],
-    remediesHigh:["Drink enough water", "Stay active and avoid long periods of sitting", "Avoid smoking", "Do not start aspirin on your own", "See a doctor to find the cause"],
+    remediesLow:["Avoid painkillers like aspirin and ibuprofen unless a doctor approves", "Avoid contact sports and activities that risk injury", "Use a soft toothbrush", "Watch for unusual bruising, nosebleeds or bleeding gums", "Papaya leaf extract is a popular home remedy, but evidence is limited — confirm with a doctor", "Seek urgent care if bleeding doesn't stop", "Limit alcohol", "Avoid shaving with blades — use an electric razor", "If you have fever with low platelets, get tested for dengue promptly", "Recheck the count as your doctor advises"],
+    remediesHigh:["Drink enough water", "Stay active and avoid long periods of sitting", "Avoid smoking", "Do not start aspirin on your own", "See a doctor to find the cause", "Avoid dehydration, especially in hot weather", "Ask your doctor to check iron — low iron can raise platelets", "Watch for headaches, chest pain or a swollen leg", "Recheck the count as your doctor advises"],
     note:'Very low or high platelet counts need prompt medical attention.'},
   {id:'vitc',name:'Vitamin C',aliases:['vitamin c'],unit:'mg/dL',low:0.4,high:2.0,
     system:'Immunity, skin, wound healing',
-    remediesLow:["Eat citrus fruits — orange, lemon, sweet lime — and amla", "Add guava, papaya and bell peppers", "Eat fresh vegetables lightly cooked or raw in salads", "Avoid smoking, which uses up vitamin C", "Watch for bleeding gums or slow-healing wounds"],
-    remediesHigh:["Stop vitamin C supplements and effervescent tablets", "Drink plenty of water", "Avoid very high doses if you have a history of kidney stones", "Keep to food sources only", "Discuss with a doctor if it stays high"],
+    remediesLow:["Eat citrus fruits — orange, lemon, sweet lime — and amla", "Add guava, papaya and bell peppers", "Eat fresh vegetables lightly cooked or raw in salads", "Avoid smoking, which uses up vitamin C", "Watch for bleeding gums or slow-healing wounds", "Eat fruit whole rather than only as juice", "Store cut fruit briefly — vitamin C fades with time", "Add tomatoes and leafy greens", "Recheck levels after a few weeks"],
+    remediesHigh:["Stop vitamin C supplements and effervescent tablets", "Drink plenty of water", "Avoid very high doses if you have a history of kidney stones", "Keep to food sources only", "Discuss with a doctor if it stays high", "Avoid fortified drinks with added vitamin C", "Keep a balanced, varied diet", "Watch for stomach upset or diarrhoea", "Recheck levels after a few weeks off supplements"],
     noteHigh:"High vitamin C is almost always from supplements — cutting back usually fixes it.",
     note:'Vitamin C supplements are widely available OTC; check dose with a pharmacist/doctor if you take other medication.'},
 ];
 let labRows=[]; // {refId, value}
+// Some normal ranges differ for men and women (Hemoglobin, HDL, Creatinine).
+function labSex(){ return document.querySelector('input[name="lab-sex"]:checked')?.value || 'male'; }
+function labRange(ref){ return (labSex()==='female' && ref.female) ? ref.female : {low:ref.low, high:ref.high}; }
 
 (function initLabSelect(){
   const sel=document.getElementById('lab-test-select');
@@ -3876,7 +3899,8 @@ function renderLabResults(){
   const outOfRange=[], normal=[];
   labRows.forEach(r=>{
     const ref=LAB_REF.find(x=>x.id===r.refId); if(!ref) return;
-    if(r.value<ref.low || r.value>ref.high){ outOfRange.push({ref,val:r.value,status:r.value<ref.low?'low':'high'}); }
+    const rg=labRange(ref);
+    if(r.value<rg.low || r.value>rg.high){ outOfRange.push({ref,val:r.value,status:r.value<rg.low?'low':'high'}); }
     else { normal.push(ref.name); }
   });
   let html='';
@@ -3888,11 +3912,11 @@ function renderLabResults(){
           <span class="lab-card-name">${ref.name}</span>
           <span class="lab-badge ${status}">${status==='low'?'Low':'High'} — your value ${val} ${ref.unit}</span>
         </div>
-        <div class="lab-card-range">Normal range: ${ref.low}–${ref.high} ${ref.unit}</div>
+        <div class="lab-card-range">Normal range: ${labRange(ref).low}–${labRange(ref).high} ${ref.unit}${ref.female?` (${labSex()==='female'?'women':'men'})`:''}</div>
         <div class="lab-card-system">🩻 Related to: ${ref.system}</div>
         <div class="lab-card-subhdr">🌿 Precautions &amp; what can help</div>
         <ol class="lab-card-remedies">${((status==='low'?ref.remediesLow:ref.remediesHigh)||ref.remedies||[]).map(x=>`<li>${x}</li>`).join('')}</ol>
-        <div class="lab-card-note">${(status==='high'&&ref.noteHigh)||ref.note}</div>
+        <div class="lab-card-note">${(status==='high'&&ref.noteHigh)||(status==='low'&&ref.noteLow)||ref.note}</div>
       </div>`;
     });
   }
@@ -3932,15 +3956,43 @@ function hideLabFileLink(){
 }
 
 // ── PDF upload: best-effort auto-extraction of test values ──
+// After a report is picked, bring the Lab Insights card to the top of the
+// screen (just under the sticky nav) so the results are what you see —
+// on phones the card otherwise starts below the BMI calculator.
+function scrollLabInsightsToTop(){
+  requestAnimationFrame(()=>{
+    try{
+      const card=document.getElementById('lab-insights-card');
+      if(!card) return;
+      // The top nav only overlaps content if it is actually pinned while
+      // scrolled; otherwise it scrolls away and needs no offset.
+      const nav=document.getElementById('app-nav');
+      const navPinned=nav && window.scrollY>nav.offsetHeight && nav.getBoundingClientRect().top>=0;
+      const navH=navPinned?nav.offsetHeight:0;
+      const targetY=()=>window.scrollY+card.getBoundingClientRect().top-navH-10;
+      // A short page can't scroll the card that far up (results aren't in
+      // yet) — stretch the Vitals panel just enough to allow it.
+      const panel=document.getElementById('calculator-panel');
+      for(let i=0;i<4 && panel;i++){
+        const deficit=targetY()-(document.documentElement.scrollHeight-window.innerHeight);
+        if(deficit<=1) break;
+        panel.style.minHeight=(panel.offsetHeight+Math.ceil(deficit))+'px';
+      }
+      window.scrollTo({top:Math.max(0,targetY()),behavior:'smooth'});
+    }catch(err){}
+  });
+}
 document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>{
   const file=e.target.files[0];
   const statusEl=document.getElementById('lab-upload-status');
   if(!file) return;
   showLabFileLink(file);
   statusEl.textContent='Reading PDF…';
+  scrollLabInsightsToTop();
   try{
     if(typeof pdfjsLib==='undefined'){
       statusEl.textContent='Couldn\'t load the PDF reader — please add values manually below.';
+      scrollLabInsightsToTop();
       return;
     }
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -3971,6 +4023,7 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
   }catch(err){
     statusEl.textContent='Couldn\'t read that PDF — please add values manually below.';
   }
+  scrollLabInsightsToTop();
 });
 
 // ── Reset the whole Vitals tab (BMI calculator + Lab Insights) ──
@@ -4003,6 +4056,8 @@ function resetCheckToDefault(){
 
   labRows=[];
   renderLabRows();
+  const calcPanel=document.getElementById('calculator-panel'); if(calcPanel) calcPanel.style.minHeight='';
+  const sexMale=document.querySelector('input[name="lab-sex"][value="male"]'); if(sexMale) sexMale.checked=true;
   const fileInput=document.getElementById('lab-pdf-input');
   if(fileInput) fileInput.value='';
   hideLabFileLink();
