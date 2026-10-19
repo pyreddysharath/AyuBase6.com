@@ -3949,6 +3949,7 @@ document.getElementById('lab-add-btn')?.addEventListener('click',()=>{
 // The uploaded report, shown as a PDF icon beside the Upload button that
 // opens the file itself in a new tab. Kept only in this browser tab.
 let labFileUrl=null;
+let labUploadGeneration=0; // Only the latest upload may publish results.
 function showLabFileLink(file){
   const a=document.getElementById('lab-file-link');
   if(!a) return;
@@ -3996,6 +3997,10 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
   const file=e.target.files[0];
   const statusEl=document.getElementById('lab-upload-status');
   if(!file) return;
+  const generation=++labUploadGeneration;
+  e.target.value=''; // Allow selecting the same file again.
+  labRows=[];
+  renderLabRows();
   showLabFileLink(file);
   statusEl.textContent='Reading PDF…';
   scrollLabInsightsToTop();
@@ -4007,11 +4012,14 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
     }
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     const buf=await file.arrayBuffer();
+    if(generation!==labUploadGeneration) return;
     const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    if(generation!==labUploadGeneration) return;
     let text='';
     for(let i=1;i<=pdf.numPages;i++){
       const page=await pdf.getPage(i);
       const content=await page.getTextContent();
+      if(generation!==labUploadGeneration) return;
       text+=content.items.map(it=>it.str).join(' ')+'\n';
     }
     let found=0;
@@ -4031,6 +4039,7 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
       ? `Found ${found} value${found===1?'':'s'} — review below and add anything we missed.`
       : 'Couldn\'t auto-read values from this PDF (scanned reports without a text layer aren\'t supported yet) — please add values manually below.';
   }catch(err){
+    if(generation!==labUploadGeneration) return;
     statusEl.textContent='Couldn\'t read that PDF — please add values manually below.';
   }
   scrollLabInsightsToTop();
@@ -4064,6 +4073,7 @@ function resetCheckToDefault(){
   updateCalcFigure();
   document.getElementById('calc-bmi-wrap').style.display='none';
 
+  ++labUploadGeneration; // Ignore any report still being read.
   labRows=[];
   renderLabRows();
   const calcPanel=document.getElementById('calculator-panel'); if(calcPanel) calcPanel.style.minHeight='';
