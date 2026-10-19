@@ -1434,7 +1434,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   border:1px solid rgba(103,232,249,.55);border-radius:12px;padding:14px;margin-bottom:12px;
   background:#fff;
 }
-.lab-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.lab-card-top{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
 .lab-card-name{font-weight:700;color:var(--calc-1);font-size:.9rem}
 .lab-badge{font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase}
 .lab-badge.low{background:#fee2e2;color:#dc2626}
@@ -1444,7 +1444,13 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .lab-card-remedies{font-family:var(--font);font-style:italic;font-size:.84rem;line-height:1.5;color:#234b57;margin-top:6px;padding-left:18px}
 .lab-card-remedies li{margin-bottom:2px}
 .lab-card-remedies li::marker{font-style:normal;font-weight:700;color:var(--calc-2)}
-.lab-card-subhdr{font-size:.8125rem;font-weight:700;color:var(--calc-1);margin-top:12px;padding-top:10px;border-top:1px dashed var(--calc-3)}
+.lab-card-subhdr{font-family:var(--font);font-size:.875rem;font-weight:700;letter-spacing:.01em;color:#2E6B45;margin-top:12px;padding:6px 0}
+.lab-card-precautions > summary{cursor:pointer;display:flex;align-items:center;gap:10px;list-style:none}
+.lab-card-precautions > summary::-webkit-details-marker{display:none}
+.lab-card-precautions-icon{width:20px;height:20px;flex:none;color:inherit}
+.lab-card-precautions-arrow{width:24px;height:24px;flex:none;transition:transform .15s ease}
+.lab-card-precautions[open] .lab-card-precautions-arrow{transform:rotate(90deg)}
+.lab-card-precautions > summary:focus-visible{outline:2px solid var(--calc-1);outline-offset:4px}
 .lab-card-subhdr + .lab-card-remedies{margin-top:4px}
 .lab-card-note{
   font-family:var(--font);font-style:italic;
@@ -3914,9 +3920,11 @@ function renderLabResults(){
         </div>
         <div class="lab-card-range">Normal range: ${labRange(ref).low}–${labRange(ref).high} ${ref.unit}${ref.female?` (${labSex()==='female'?'women':'men'})`:''}</div>
         <div class="lab-card-system">🩻 Related to: ${ref.system}</div>
-        <div class="lab-card-subhdr">🌿 Precautions &amp; what can help</div>
+        <details class="lab-card-precautions">
+        <summary class="lab-card-subhdr"><svg class="lab-card-precautions-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 8 9 8 9s8-4.5 8-9V6l-8-3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg><span>Precautions</span> <svg class="lab-card-precautions-arrow" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></summary>
         <ol class="lab-card-remedies">${((status==='low'?ref.remediesLow:ref.remediesHigh)||ref.remedies||[]).map(x=>`<li>${x}</li>`).join('')}</ol>
         <div class="lab-card-note">${(status==='high'&&ref.noteHigh)||(status==='low'&&ref.noteLow)||ref.note}</div>
+        </details>
       </div>`;
     });
   }
