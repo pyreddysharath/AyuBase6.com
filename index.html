@@ -1444,11 +1444,13 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .lab-card-remedies{font-family:var(--font);font-style:italic;font-size:.84rem;line-height:1.5;color:#234b57;margin-top:6px;padding-left:18px}
 .lab-card-remedies li{margin-bottom:2px}
 .lab-card-remedies li::marker{font-style:normal;font-weight:700;color:var(--calc-2)}
-.lab-card-subhdr{font-family:var(--font);font-size:.875rem;font-weight:700;letter-spacing:.01em;color:#2E6B45;margin-top:12px;padding:6px 0}
-.lab-card-precautions > summary{cursor:pointer;display:flex;align-items:center;gap:10px;list-style:none}
+.lab-card-subhdr{font-family:var(--font);font-size:.875rem;font-weight:600;letter-spacing:.01em;color:#2E6B45;margin-top:12px;padding:6px 0}
+.lab-card-precautions > summary{cursor:pointer;display:flex;align-items:center;gap:6px;list-style:none}
 .lab-card-precautions > summary::-webkit-details-marker{display:none}
+.lab-card-precautions:not([open]) > summary{padding-bottom:0;margin-bottom:0}
+.lab-card:has(> .lab-card-precautions:not([open])){padding-bottom:8px}
 .lab-card-precautions-icon{width:20px;height:20px;flex:none;color:inherit}
-.lab-card-precautions-arrow{width:24px;height:24px;flex:none;transition:transform .15s ease}
+.lab-card-precautions-arrow{width:18px;height:18px;flex:none;transition:transform .15s ease}
 .lab-card-precautions[open] .lab-card-precautions-arrow{transform:rotate(90deg)}
 .lab-card-precautions > summary:focus-visible{outline:2px solid var(--calc-1);outline-offset:4px}
 .lab-card-subhdr + .lab-card-remedies{margin-top:4px}
