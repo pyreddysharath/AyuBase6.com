@@ -2571,6 +2571,11 @@ html[data-petal-card="d"] :is(.card, .body-age-section, .activity-type-section, 
           mask:var(--petal-mask) 0 22px/18px auto no-repeat, var(--petal-mask) 50px 2px/28px auto no-repeat, var(--petal-mask) 108px 16px/22px auto no-repeat;
 }
 </style>
+<style id="nudge-notif-timer">
+.notif-mock-timer-btn{display:inline-block;margin-top:8px;padding:6px 12px;border:0;border-radius:999px;background:var(--alert-2);color:#fff;font:700 .76rem var(--font,inherit);cursor:pointer}
+.notif-mock-timer-btn:hover{background:var(--alert-1)}
+.notif-mock-timer-btn.running,.notif-mock-timer-btn.done{background:var(--alert-4);color:var(--alert-1);cursor:default}
+</style>
 </head>
 <body>
 
@@ -7078,6 +7083,180 @@ function onAlertNotifyChange(key){
     refreshNotifStatusUI();
   });
 }
+
+// ════════════════════════════════════════════════
+//  NUDGE NOTIFICATIONS — lotus artwork, stay-until-closed, and the
+//  20-20-20 countdown that runs inside the notification itself.
+// ════════════════════════════════════════════════
+const NUDGE_LOTUS_PETAL='M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z';
+function drawNudgeLotus(ctx, cx, cy, scale, fill, alpha){
+  // Same six-petal lotus as the Nudges tab; (cx,cy) is the point where the petals meet.
+  const petal=new Path2D(NUDGE_LOTUS_PETAL);
+  ctx.save(); ctx.globalAlpha=alpha; ctx.fillStyle=fill;
+  [-75,-45,-15,15,45,75].forEach(a=>{
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(a*Math.PI/180); ctx.scale(scale,scale); ctx.fill(petal); ctx.restore();
+  });
+  ctx.restore();
+}
+const _nudgeArt={};
+function nudgeArt(kind){
+  if(_nudgeArt[kind]!==undefined) return _nudgeArt[kind];
+  let url;
+  try{
+    const c=document.createElement('canvas'), x=c.getContext('2d');
+    if(kind==='banner'){            // wide picture shown in the notification
+      c.width=720; c.height=360;
+      const g=x.createLinearGradient(0,0,720,360);
+      g.addColorStop(0,'#f0fdfa'); g.addColorStop(1,'#ccfbf1');
+      x.fillStyle=g; x.fillRect(0,0,720,360);
+      drawNudgeLotus(x, 470, 335, 14.5, '#5eead4', .55);   // big lotus, tab colour
+      drawNudgeLotus(x, 150, 360, 6.5,  '#0d9488', .22);   // smaller deeper-teal one
+    }else if(kind==='badge'){       // small monochrome mark (Android status bar)
+      c.width=96; c.height=96;
+      drawNudgeLotus(x, 48, 76, 2.0, '#000', 1);
+    }else{                          // icon
+      c.width=192; c.height=192;
+      x.fillStyle='#ccfbf1'; x.beginPath(); x.arc(96,96,96,0,Math.PI*2); x.fill();
+      drawNudgeLotus(x, 96, 138, 3.4, '#0d9488', 1);
+    }
+    url=c.toDataURL('image/png');
+  }catch(e){ url=undefined; }
+  return (_nudgeArt[kind]=url);
+}
+
+// Service worker (optional, needs sw.js next to this page and http/https):
+// lets the notification carry real buttons ("Start 20s timer" / "Cancel").
+// Without it everything still works — clicking the notification starts the timer.
+let nudgeSwReg=null;
+function initNudgeSW(){
+  try{
+    if(!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
+    navigator.serviceWorker.addEventListener('message', ev=>{
+      const d=ev.data||{};
+      if(d.type==='nudge-click') handleNudgeClick(d.key, d.action);
+    });
+    // sw.js lives in the config/ folder, so its scope is config/ (not the whole
+    // site). That's fine: it's only used to show notifications with buttons and
+    // to hear their clicks, so we use the registration directly instead of
+    // waiting on navigator.serviceWorker.ready (which only resolves for pages
+    // inside the worker's scope).
+    navigator.serviceWorker.register('config/sw.js').then(reg=>{
+      if(reg.active){ nudgeSwReg=reg; return; }
+      const w=reg.installing||reg.waiting; if(!w) return;
+      w.addEventListener('statechange', ()=>{ if(w.state==='activated') nudgeSwReg=reg; });
+    }).catch(()=>{});
+  }catch(e){}
+}
+function handleNudgeClick(key, action){
+  if(key!=='break') return;
+  if(action==='cancel') cancelEyeTimer();
+  else startEyeTimer();
+}
+// Shows one nudge as a real notification. Returns true if one was shown.
+// - lotus icon / banner / badge, and it stays on screen until closed
+// - same tag per nudge, so an update replaces the old one instead of stacking
+function showNudgeNotification(title, body, o){
+  o=o||{};
+  if(typeof Notification==='undefined' || Notification.permission!=='granted') return false;
+  const key=o.key||'nudge';
+  const opts={ body:body, tag:'nudge-'+key, requireInteraction:true, silent:!!o.silent, data:{key:key} };
+  const icon=nudgeArt('icon'), image=nudgeArt('banner'), badge=nudgeArt('badge');
+  if(icon) opts.icon=icon; if(image) opts.image=image; if(badge) opts.badge=badge;
+  try{
+    if(nudgeSwReg){
+      if(o.actions) opts.actions=o.actions;
+      nudgeSwReg.showNotification(title, opts).catch(()=>{ try{ delete opts.actions; new Notification(title, opts); }catch(e){} });
+      return true;
+    }
+    const n=new Notification(title, opts);   // (buttons aren't allowed on plain notifications)
+    if(o.onclick) n.onclick=()=>{ try{ n.close(); }catch(e){} o.onclick(); };
+    return true;
+  }catch(e){
+    try{ new Notification(title,{body:body}); return true; }catch(e2){ return false; }
+  }
+}
+
+// ── 20-20-20 countdown ──
+// The page keeps time (a tiny Web Worker, so a hidden tab can't slow it down)
+// and repaints the notification every second.
+const EYE_TIMER_SECS=20;
+const eyeTimer={ running:false, endAt:0, worker:null, iv:null };
+function eyeTimerNotifyOpts(extra){
+  return Object.assign({ key:'break', silent:true }, extra||{});
+}
+function eyeStartPrompt(){
+  // Body text of the reminder notification, with the way to start the timer.
+  return ALERT_LABELS.break.msg + (nudgeSwReg ? '\n\u00A0\n⏱ Press “Start 20s timer” below.' : '\n\u00A0\n⏱ Click here to start a 20s timer.');
+}
+function showEyeReminderNotification(){
+  return showNudgeNotification(ALERT_LABELS.break.title, eyeStartPrompt(), {
+    key:'break',
+    actions:[{action:'start', title:'▶ Start 20s timer'}],
+    onclick:()=>startEyeTimer()
+  });
+}
+function startEyeTimer(){
+  if(eyeTimer.running) return;
+  eyeTimer.running=true;
+  eyeTimer.endAt=Date.now()+EYE_TIMER_SECS*1000;
+  eyeTimerTick();
+  const tick=()=>eyeTimerTick();
+  try{
+    const src='var i=setInterval(function(){postMessage(1)},1000);onmessage=function(e){if(e.data==="stop"){clearInterval(i);close();}}';
+    const url=URL.createObjectURL(new Blob([src],{type:'text/javascript'}));
+    const w=new Worker(url); w.onmessage=tick; eyeTimer.worker=w; eyeTimer.workerUrl=url;
+  }catch(e){ eyeTimer.iv=setInterval(tick,1000); }
+}
+function stopEyeTimerLoop(){
+  if(eyeTimer.worker){ try{ eyeTimer.worker.postMessage('stop'); eyeTimer.worker.terminate(); }catch(e){} eyeTimer.worker=null; }
+  if(eyeTimer.workerUrl){ try{ URL.revokeObjectURL(eyeTimer.workerUrl); }catch(e){} eyeTimer.workerUrl=null; }
+  if(eyeTimer.iv){ clearInterval(eyeTimer.iv); eyeTimer.iv=null; }
+  eyeTimer.running=false;
+}
+function eyeTimerTick(){
+  if(!eyeTimer.running) return;
+  const left=Math.max(0, Math.ceil((eyeTimer.endAt-Date.now())/1000));
+  if(left<=0){ finishEyeTimer(); return; }
+  paintEyeTimer(left);
+}
+function paintEyeTimer(left){
+  showNudgeNotification('Eyes · '+left+'s left', '⏱ Look at something 20 feet away…\n\u00A0\n'+left+' seconds to go', eyeTimerNotifyOpts({
+    actions:[{action:'cancel', title:'Cancel'}], onclick:()=>{}
+  }));
+  setEyeMockTimer('⏱ '+left+'s left', 'running');
+}
+function finishEyeTimer(){
+  stopEyeTimerLoop();
+  if(!alertState.break.muted) playAlertPreset(alertState.break.sound);   // the “done” sound
+  showNudgeNotification('Eyes · Done ✅', 'Great job — you can look back at your screen now.', eyeTimerNotifyOpts());
+  setEyeMockTimer('✅ Done — look back at the screen', 'done');
+}
+function cancelEyeTimer(){
+  if(!eyeTimer.running) return;
+  stopEyeTimerLoop();
+  showNudgeNotification('Eyes', 'Timer cancelled. Click here to try again.', eyeTimerNotifyOpts({ onclick:()=>startEyeTimer() }));
+  setEyeMockTimer('▶ Start 20s timer', '');
+}
+// In-app version of the same thing (used when real notifications aren't allowed).
+function setEyeMockTimer(text, cls){
+  const btn=document.getElementById('alert-break-mock-timer');
+  if(!btn) return;
+  btn.textContent=text; btn.className='notif-mock-timer-btn'+(cls?' '+cls:'');
+}
+function attachMockEyeTimer(){
+  const mock=document.getElementById('alert-break-notif-mock');
+  if(!mock) return;
+  let btn=document.getElementById('alert-break-mock-timer');
+  if(!btn){
+    btn=document.createElement('button');
+    btn.type='button'; btn.id='alert-break-mock-timer';
+    btn.onclick=()=>startEyeTimer();
+    const holder=mock.querySelector('.notif-mock-text'); if(holder) holder.appendChild(btn);
+  }
+  if(!eyeTimer.running) setEyeMockTimer('▶ Start 20s timer','');
+}
+initNudgeSW();
+
 // Routines' "Remind Me": sends each reminder as a real browser
 // notification, one after another. It never adds anything to the Nudges
 // tab; if notifications can't be sent, the reason is shown under the
@@ -7091,14 +7270,15 @@ function remindMeNowAll(){
       return;
     }
     const items=[
-      {title:ALERT_LABELS.drink.title, body:ALERT_LABELS.drink.msg, st:alertState.drink},
-      {title:ALERT_LABELS.break.title, body:ALERT_LABELS.break.msg, st:alertState.break},
-      {title:ALERT_LABELS.walk.title,  body:ALERT_LABELS.walk.msg,  st:alertState.walk},
-      {title:'Eye Exercise', body:'Time for your guided eye exercise — follow the dot for 30 seconds.', st:eyeExState},
+      {title:ALERT_LABELS.drink.title, body:ALERT_LABELS.drink.msg, st:alertState.drink, key:'drink'},
+      {title:ALERT_LABELS.break.title, body:ALERT_LABELS.break.msg, st:alertState.break, key:'break'},
+      {title:ALERT_LABELS.walk.title,  body:ALERT_LABELS.walk.msg,  st:alertState.walk, key:'walk'},
+      {title:'Eye Exercise', body:'Time for your guided eye exercise — follow the dot for 30 seconds.', st:eyeExState, key:'eyeex'},
     ];
     items.forEach((it,i)=>setTimeout(()=>{
       if(!it.st.muted) playAlertPreset(it.st.sound);
-      try{ new Notification(it.title, { body: it.body }); }catch(e){}
+      if(it.key==='break') showEyeReminderNotification();
+      else showNudgeNotification(it.title, it.body, {key:it.key});
     }, i*1200));
   };
   const problem=notifProblemMessage();
@@ -7120,21 +7300,27 @@ function previewAlertNotification(key){
   if(!alertState[key].muted) playAlertPreset(alertState[key].sound);
   if(typeof Notification!=='undefined' && Notification.permission==='granted'){
     const info=ALERT_LABELS[key];
-    try{ new Notification(info.title, { body: info.msg }); return; }catch(e){}
+    if(key==='break'){ if(showEyeReminderNotification()) return; }
+    else if(showNudgeNotification(info.title, info.msg, {key:key})) return;
   }
   const mock=document.getElementById('alert-'+key+'-notif-mock');
-  if(mock) mock.classList.add('show');
+  if(mock){ mock.classList.add('show'); if(key==='break') attachMockEyeTimer(); }
 }
 function fireAlert(key){
   const info=ALERT_LABELS[key];
   if(!alertState[key].muted) playAlertPreset(alertState[key].sound);
   let shown=false;
   if(alertState[key].notify && typeof Notification!=='undefined' && Notification.permission==='granted'){
-    try{ new Notification(info.title, { body: info.msg }); shown=true; }catch(e){}
+    shown = (key==='break') ? showEyeReminderNotification() : showNudgeNotification(info.title, info.msg, {key:key});
   }
   if(!shown){
     const mock=document.getElementById('alert-'+key+'-notif-mock');
-    if(mock){ mock.classList.add('show'); setTimeout(()=>mock.classList.remove('show'), 4000); }
+    if(mock){
+      mock.classList.add('show');
+      // Eyes keeps its in-app card up (with the timer button) until it's closed.
+      if(key==='break') attachMockEyeTimer();
+      else setTimeout(()=>mock.classList.remove('show'), 4000);
+    }
   }
 }
 function scheduleAlertTimer(key){
@@ -7435,7 +7621,7 @@ function onEyeExNotifyChange(){
 function previewEyeExNotification(){
   if(!eyeExState.muted) playAlertPreset(eyeExState.sound);
   if(typeof Notification!=='undefined' && Notification.permission==='granted'){
-    try{ new Notification('Eye Exercise', { body: 'Time for your guided eye exercise — follow the dot for 30 seconds.' }); return; }catch(e){}
+    if(showNudgeNotification('Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {key:'eyeex'})) return;
   }
   const mock=document.getElementById('eye-ex-notif-mock');
   if(mock) mock.classList.add('show');
@@ -7444,7 +7630,7 @@ function fireEyeExAlert(){
   if(!eyeExState.muted) playAlertPreset(eyeExState.sound);
   let shown=false;
   if(eyeExState.notify && typeof Notification!=='undefined' && Notification.permission==='granted'){
-    try{ new Notification('Eye Exercise', { body: 'Time for your guided eye exercise — follow the dot for 30 seconds.' }); shown=true; }catch(e){}
+    shown=showNudgeNotification('Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {key:'eyeex'});
   }
   if(!shown){
     const mock=document.getElementById('eye-ex-notif-mock');
