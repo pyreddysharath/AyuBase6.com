@@ -7116,8 +7116,10 @@ function nudgeArt(kind){
       drawNudgeLotus(x, 48, 76, 2.0, '#000', 1);
     }else{                          // icon
       c.width=192; c.height=192;
-      x.fillStyle='#ccfbf1'; x.beginPath(); x.arc(96,96,96,0,Math.PI*2); x.fill();
-      drawNudgeLotus(x, 96, 138, 3.4, '#0d9488', 1);
+      const g=x.createLinearGradient(0,0,192,192);
+      g.addColorStop(0,'#f0fdfa'); g.addColorStop(1,'#99f6e4');
+      x.fillStyle=g; x.fillRect(0,0,192,192);
+      drawNudgeLotus(x, 96, 142, 3.7, '#0d9488', .95);   // lotus fills the icon
     }
     url=c.toDataURL('image/png');
   }catch(e){ url=undefined; }
@@ -7128,6 +7130,7 @@ function nudgeArt(kind){
 // lets the notification carry real buttons ("Start 20s timer" / "Cancel").
 // Without it everything still works — clicking the notification starts the timer.
 let nudgeSwReg=null;
+const nudgeLast={};   // last plain (non-service-worker) notification per nudge
 function initNudgeSW(){
   try{
     if(!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
@@ -7159,16 +7162,24 @@ function showNudgeNotification(title, body, o){
   o=o||{};
   if(typeof Notification==='undefined' || Notification.permission!=='granted') return false;
   const key=o.key||'nudge';
-  const opts={ body:body, tag:'nudge-'+key, requireInteraction:true, silent:!!o.silent, data:{key:key} };
-  const icon=nudgeArt('icon'), image=nudgeArt('banner'), badge=nudgeArt('badge');
-  if(icon) opts.icon=icon; if(image) opts.image=image; if(badge) opts.badge=badge;
+  // A "fresh" notification (a reminder or a preview) must pop up again even if an
+  // earlier one with the same tag is still on screen; silent updates (the
+  // countdown) just replace the text in place.
+  const fresh=!o.silent;
+  const opts={ body:body, tag:'nudge-'+key, requireInteraction:true, silent:!!o.silent, renotify:fresh, data:{key:key} };
+  const icon=nudgeArt('icon'), badge=nudgeArt('badge');
+  if(icon) opts.icon=icon; if(badge) opts.badge=badge;
   try{
     if(nudgeSwReg){
       if(o.actions) opts.actions=o.actions;
-      nudgeSwReg.showNotification(title, opts).catch(()=>{ try{ delete opts.actions; new Notification(title, opts); }catch(e){} });
+      const show=()=>nudgeSwReg.showNotification(title, opts);
+      const done=fresh ? nudgeSwReg.getNotifications({tag:opts.tag}).then(l=>{ l.forEach(n=>n.close()); return show(); }) : show();
+      done.catch(()=>{ try{ delete opts.actions; new Notification(title, opts); }catch(e){} });
       return true;
     }
+    if(fresh && nudgeLast[key]){ try{ nudgeLast[key].close(); }catch(e){} }
     const n=new Notification(title, opts);   // (buttons aren't allowed on plain notifications)
+    nudgeLast[key]=n;
     if(o.onclick) n.onclick=()=>{ try{ n.close(); }catch(e){} o.onclick(); };
     return true;
   }catch(e){
