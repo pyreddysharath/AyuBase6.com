@@ -2431,22 +2431,31 @@ h2, .tab-panel h2,
 #mind-panel      { --petal:#a5b4fc; }
 #calculator-panel{ --petal:#67e8f9; }
 
-/* ── Big lotus behind each tab's content, all petals in the tab colour ── */
-#activity-panel, #nutrition-panel #page-bg, #routines-panel, #alerts-panel,
-#mind-panel, #calculator-panel{ isolation:isolate; }
-#nutrition-panel #page-bg{ position:relative; }
-#activity-panel::before, #nutrition-panel #page-bg::before, #routines-panel::before,
-#alerts-panel::before, #mind-panel::before, #calculator-panel::before{
-  content:""; position:fixed; z-index:-1; pointer-events:none;
-  right:-4vw; bottom:-3vh; width:min(62vw,620px); aspect-ratio:45/27;
-  background:var(--petal); opacity:.22;
-  -webkit-mask:var(--lotus-mask) center/contain no-repeat; mask:var(--lotus-mask) center/contain no-repeat;
-}
+/* Slightly deeper lotus shades, matched to each tab's palette. */
+#activity-panel   { --petal:#3b82f6; }
+#nutrition-panel  { --petal:#4ade80; }
+#routines-panel   { --petal:#fbbf24; }
+#alerts-panel     { --petal:#2dd4bf; }
+#mind-panel       { --petal:#818cf8; }
+#calculator-panel { --petal:#22d3ee; }
 
-/* Section boxes slightly see-through so the big lotus behind shows softly. */
-.tab-panel :is(.card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card){ background:rgba(255,255,255,.84); }
-#activity-panel::before, #nutrition-panel #page-bg::before, #routines-panel::before,
-#alerts-panel::before, #mind-panel::before, #calculator-panel::before{ opacity:.3; }
+/* Keep existing lotus artwork on individual section cards. Remove the
+   extra large translucent lotus overlays that looked like shadows. */
+html[data-petal-card="e"] :is(.card,.body-age-section,.activity-type-section,.rout-card,.mind-card,.alert-card,.calc-card)::after { opacity:.23; }
+
+/* A lotus watermark across the actual title/navigation header, in the
+   colour of the selected tab, without obscuring the logo or controls. */
+#app-nav { position:relative; isolation:isolate; overflow:hidden; --header-lotus:#3b82f6; }
+#app-nav::before { content:""; position:absolute; z-index:-1; pointer-events:none;
+  width:clamp(200px,38vw,470px); height:100%; top:0; left:50%;
+  transform:translateX(-50%); background:var(--header-lotus); opacity:.18;
+  -webkit-mask:var(--lotus-mask) center/contain no-repeat;
+  mask:var(--lotus-mask) center/contain no-repeat; }
+body:has(#nutrition-panel[style*="block"]) #app-nav { --header-lotus:#4ade80; }
+body:has(#routines-panel[style*="block"]) #app-nav { --header-lotus:#fbbf24; }
+body:has(#alerts-panel[style*="block"]) #app-nav { --header-lotus:#2dd4bf; }
+body:has(#mind-panel[style*="block"]) #app-nav { --header-lotus:#818cf8; }
+body:has(#calculator-panel[style*="block"]) #app-nav { --header-lotus:#22d3ee; }
 
 /* ── Falling petals, coloured by whichever tab is open ── */
 /* Above the header (z 500) so petals start from the very top, over the logo;
@@ -2543,7 +2552,7 @@ html[data-petal-card="a"] .calc-card:has(#lab-info-btn)::after{ right:70px; }
 /* E (in use) — the lotus as the box's own background: centred, soft, sized
    to the box (never taller than 280px), behind everything in it. */
 html[data-petal-card="e"] :is(.card, .body-age-section, .activity-type-section, .rout-card, .mind-card, .alert-card, .calc-card)::after{
-  content:""; left:50%; top:50%; transform:translate(-50%,-50%); opacity:.16;
+  content:""; left:50%; top:50%; transform:translate(-50%,-50%); opacity:.23;
   /* A box no bigger than the card (minus a margin) and never taller than
      280px; the lotus is fitted inside it whole, so it's never cropped. */
   width:min(calc(100% - 24px), 467px); height:min(calc(100% - 24px), 280px);
@@ -2571,10 +2580,62 @@ html[data-petal-card="d"] :is(.card, .body-age-section, .activity-type-section, 
           mask:var(--petal-mask) 0 22px/18px auto no-repeat, var(--petal-mask) 50px 2px/28px auto no-repeat, var(--petal-mask) 108px 16px/22px auto no-repeat;
 }
 </style>
+<style id="lotus-varied-positions">
+/* Varied, stable lotus placements and sizes across all section cards. */
+html[data-petal-card="e"] :is(.card,.body-age-section,.activity-type-section,.rout-card,.mind-card,.alert-card,.calc-card)::after {
+  left:var(--lotus-x,50%); top:var(--lotus-y,50%);
+  width:min(calc(100% - 16px),var(--lotus-w,260px));
+  height:min(calc(100% - 16px),var(--lotus-h,210px));
+  transform:translate(-50%,-50%);
+  opacity:.23;
+}
+#app-nav::before {
+  left:var(--header-lotus-x,50%); top:var(--header-lotus-y,50%);
+  height:var(--header-lotus-h,90%); width:var(--header-lotus-w,320px);
+  transform:translate(-50%,-50%);
+}
+
+/* Additional upright lotus motifs, arranged in mixed-size pairs on selected rows. */
+html[data-petal-card="e"] .lotus-extra-motif{
+  position:absolute; z-index:0; pointer-events:none;
+  background:var(--petal); opacity:.23;
+  width:var(--motif-width,90px); aspect-ratio:45/27;
+  left:var(--motif-left,15%); top:var(--motif-top,30%);
+  transform:translate(-50%,-50%);
+  -webkit-mask:var(--lotus-mask) center/contain no-repeat;
+  mask:var(--lotus-mask) center/contain no-repeat;
+}
+html[data-petal-card="e"] :is(.card,.body-age-section,.activity-type-section,.rout-card,.mind-card,.alert-card,.calc-card) > :not(.lotus-extra-motif){position:relative;z-index:1}
+</style>
 <style id="nudge-notif-timer">
 .notif-mock-timer-btn{display:inline-block;margin-top:8px;padding:6px 12px;border:0;border-radius:999px;background:var(--alert-2);color:#fff;font:700 .76rem var(--font,inherit);cursor:pointer}
 .notif-mock-timer-btn:hover{background:var(--alert-1)}
 .notif-mock-timer-btn.running,.notif-mock-timer-btn.done{background:var(--alert-4);color:var(--alert-1);cursor:default}
+</style>
+<style id="lotus-final-layout-fixes">
+/* Center the single lotus in the header and prevent extra motifs. */
+#app-nav::before {left:50% !important; transform:translate(-50%,-50%) !important;}
+.lotus-extra-motif {display:none !important;}
+/* Reduce whitespace below Activity Type on the initial Body screen. */
+#activity-panel .activity-type-wrap {padding-bottom:4px !important; margin-bottom:0 !important;}
+#activity-panel .act-container {padding-bottom:8px !important;}
+#activity-panel {padding-bottom:0 !important;}
+
+/* Body: remove viewport-filling empty area beneath Activity Type. */
+#activity-panel, #activity-panel.tab-panel { min-height:0 !important; height:auto !important; }
+#activity-panel .body-content-wrap { min-height:0 !important; padding-bottom:0 !important; margin-bottom:0 !important; }
+#activity-panel .activity-type-wrap { padding-bottom:10px !important; margin-bottom:0 !important; }
+#activity-panel .activity-type-section { margin-bottom:0 !important; }
+</style>
+
+<style id="lotus-final-adjustments">
+/* No lotus artwork in the tab/header title bar. */
+#app-nav::before, #app-nav::after { content:none !important; display:none !important; }
+/* Slightly larger single upright flower in each content section. */
+html[data-petal-card="e"] :is(.card,.body-age-section,.activity-type-section,.rout-card,.mind-card,.alert-card,.calc-card)::after {
+  width:min(calc(100% - 16px),calc(var(--lotus-w,260px) * 1.12)) !important;
+  height:min(calc(100% - 16px),calc(var(--lotus-h,210px) * 1.12)) !important;
+}
 </style>
 </head>
 <body>
@@ -9580,5 +9641,50 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
 
 
 <!-- Falling petals removed at Sharath's request (styles for #petal-fall left in place, unused). -->
+
+<script id="lotus-varied-layout">
+(function(){
+  // Seeded placements: different between cards, consistent across reloads.
+  const cards=document.querySelectorAll('#activity-panel .card,#activity-panel .body-age-section,#activity-panel .activity-type-section,#nutrition-panel .card,#routines-panel .rout-card,#mind-panel .mind-card,#alerts-panel .alert-card,#calculator-panel .calc-card');
+  function rand(seed){let x=Math.sin(seed*127.1+78.233)*43758.5453;return x-Math.floor(x)}
+  function arrangeLotus(el,i){
+    const seed=i+17;
+    el.querySelectorAll(':scope > .lotus-extra-motif').forEach(n=>n.remove());
+    const available=Math.max(100,el.clientWidth-32);
+    const paired=false; // One upright lotus per row
+    const gap=24;
+    const mainWidth=paired ? Math.min(230,available*.56) : Math.min(280,available*.75);
+    const smallWidth=paired ? Math.min(120,available-mainWidth-gap) : 0;
+    const total=mainWidth+(paired?gap+smallWidth:0);
+    const left=Math.max(16,(el.clientWidth-total)/2);
+    const reverse=rand(seed+7)>.5;
+    const mainCenter=left+(reverse&&paired?smallWidth+gap:0)+mainWidth/2;
+    el.style.setProperty('--lotus-x',mainCenter+'px');
+    el.style.setProperty('--lotus-y',(38+rand(seed+91)*24)+'%');
+    el.style.setProperty('--lotus-w',mainWidth+'px');
+    el.style.setProperty('--lotus-h',Math.min(180,mainWidth*.6)+'px');
+    el.style.setProperty('--lotus-rot','0deg');
+    if(paired&&smallWidth>=45){
+      const flower=document.createElement('span');
+      flower.className='lotus-extra-motif';flower.setAttribute('aria-hidden','true');
+      const smallCenter=left+(reverse?smallWidth/2:mainWidth+gap+smallWidth/2);
+      flower.style.setProperty('--motif-left',smallCenter+'px');
+      flower.style.setProperty('--motif-top',(38+rand(seed+91)*24)+'%');
+      flower.style.setProperty('--motif-width',smallWidth+'px');
+      el.appendChild(flower);
+    }
+  }
+  cards.forEach(arrangeLotus);
+  if(typeof ResizeObserver!=='undefined'){
+    const observer=new ResizeObserver(entries=>entries.forEach(entry=>{
+      const i=Array.prototype.indexOf.call(cards,entry.target);
+      if(i>=0)arrangeLotus(entry.target,i);
+    }));
+    cards.forEach(el=>observer.observe(el));
+  }
+  const nav=document.getElementById('app-nav');
+  if(nav){nav.style.setProperty('--header-lotus-x','50%');nav.style.setProperty('--header-lotus-w','min(285px, 70vw)');nav.style.setProperty('--header-lotus-rot','0deg')}
+})();
+</script>
 </body>
 </html>
