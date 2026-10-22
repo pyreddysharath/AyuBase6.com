@@ -7268,49 +7268,72 @@ function attachMockEyeTimer(){
 }
 // ── Pop-up notification window ──
 // A small window the page draws itself, so the lotus can sit behind the text and
-// the 20s countdown can tick live inside it. It stays open until it's closed.
-// (A scheduled reminder has no click to "allow" it, so if the browser blocks the
-// window this returns false and the normal system notification is used instead.)
+// the 20s countdown can tick live inside it. Title (bold) + text, and for Eyes an
+// empty gap and then a clickable timer. It stays open until it's closed.
+// Where the browser supports it (Chrome / Edge on desktop) it opens as a
+// Picture-in-Picture style window, which has no address bar; otherwise as a
+// small browser pop-up. If neither is allowed the normal system notification is used.
 function nudgeEsc(t){ return String(t).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-function nudgePopupHTML(title, msg, withTimer){
+function nudgePopupContent(win, title, msg, withTimer){
+  const doc=win.document;
   const lotus=[-75,-45,-15,15,45,75].map(a=>'<path d="'+NUDGE_LOTUS_PETAL+'" transform="translate(32 34) rotate('+a+')"/>').join('');
-  const preset=withTimer ? JSON.stringify((typeof ALERT_SOUNDS!=='undefined' && ALERT_SOUNDS[alertState.break.sound])||null) : 'null';
-  const muted=withTimer ? !!alertState.break.muted : true;
   const css='html,body{margin:0;height:100%}'
     +'body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#134e4a;background:linear-gradient(135deg,#f0fdfa,#ccfbf1);position:relative;overflow:hidden}'
-    +'svg.bg{position:absolute;right:-10px;bottom:-16px;width:80%;height:auto;opacity:.6;fill:#5eead4}'
-    +'.c{position:relative;box-sizing:border-box;height:100%;padding:14px 16px;display:flex;flex-direction:column}'
-    +'h1{margin:0 24px 6px 0;font-size:16px}p{margin:0;font-size:13px;line-height:1.45}'
-    +'.row{margin-top:auto;display:flex;align-items:center;gap:10px}'
-    +'.btn{border:0;border-radius:999px;padding:8px 14px;font:700 13px system-ui,sans-serif;background:#0d9488;color:#fff;cursor:pointer}'
-    +'.btn.ghost{background:rgba(255,255,255,.75);color:#134e4a}'
-    +'#n{display:none;font-size:30px;font-weight:800;color:#0d9488;line-height:1}'
-    +'.x{position:absolute;top:6px;right:10px;border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:#134e4a}';
-  const js='var P='+preset+',MUTED='+muted+',SECS='+EYE_TIMER_SECS+',ctx=null,end=0,iv=null;'
-    +'var btn=document.getElementById("t"),num=document.getElementById("n"),msg=document.getElementById("m");'
-    +'function chime(){if(MUTED||!P||!ctx)return;try{var t=ctx.currentTime;P.notes.forEach(function(n){if(n.f>0){var o=ctx.createOscillator(),g=ctx.createGain();o.type=P.wave;o.frequency.value=n.f;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.25,t+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+n.d);o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+n.d+0.02);}t+=n.d+0.03;});}catch(e){}}'
-    +'function tick(){var left=Math.max(0,Math.ceil((end-Date.now())/1000));num.textContent=left+"s";if(left<=0){clearInterval(iv);num.textContent="\\u2705 Done";msg.textContent="Great job \\u2014 you can look back at your screen now.";chime();}}'
-    +'if(btn)btn.onclick=function(){if(iv)return;try{ctx=new(window.AudioContext||window.webkitAudioContext)();ctx.resume&&ctx.resume();}catch(e){}end=Date.now()+SECS*1000;btn.style.display="none";num.style.display="block";tick();iv=setInterval(tick,250);};';
-  return '<!doctype html><html><head><meta charset="utf-8"><title>'+nudgeEsc(title)+'</title><style>'+css+'</style></head><body>'
-    +'<svg class="bg" viewBox="9.5 11.5 45 27" aria-hidden="true">'+lotus+'</svg>'
-    +'<div class="c"><button class="x" title="Close" onclick="window.close()">&times;</button>'
-    +'<h1>'+nudgeEsc(title)+'</h1><p id="m">'+nudgeEsc(msg)+'</p>'
-    +'<div class="row">'+(withTimer?'<button id="t" class="btn">\u25B6 Start '+EYE_TIMER_SECS+'s timer</button><div id="n"></div>':'')
-    +'<button class="btn ghost" onclick="window.close()">Close</button></div></div>'
-    +'<scr'+'ipt>'+js+'</scr'+'ipt></body></html>';
+    +'svg.bg{position:absolute;right:-8px;bottom:-14px;width:75%;height:auto;opacity:.6;fill:#5eead4}'
+    +'.c{position:relative;box-sizing:border-box;padding:12px 14px}'
+    +'h1{margin:0 0 4px;font-size:15px;font-weight:800}'
+    +'p{margin:0;font-size:13px;line-height:1.4}'
+    +'.t{margin-top:16px;font-size:28px;font-weight:800;color:#0d9488;line-height:1;cursor:pointer;user-select:none}'
+    +'.t.run,.t.done{cursor:default}';
+  doc.title=title;
+  doc.head.innerHTML='<meta charset="utf-8"><style>'+css+'</style>';
+  doc.body.innerHTML='<svg class="bg" viewBox="9.5 11.5 45 27" aria-hidden="true">'+lotus+'</svg>'
+    +'<div class="c"><h1>'+nudgeEsc(title)+'</h1><p>'+nudgeEsc(msg)+'</p>'
+    +(withTimer?'<div class="t" id="n" title="Click to start the timer">\u25B6 '+EYE_TIMER_SECS+'s</div>':'')+'</div>';
+  if(!withTimer) return;
+  const num=doc.getElementById('n'); let iv=null, end=0;
+  const tick=()=>{
+    const left=Math.max(0, Math.ceil((end-Date.now())/1000));
+    if(left>0){ num.textContent=left+'s'; return; }
+    win.clearInterval(iv); num.className='t done'; num.textContent='\u2705 Done';
+    if(!alertState.break.muted) playAlertPreset(alertState.break.sound);   // sound when the timer ends
+  };
+  num.onclick=()=>{
+    if(iv) return;
+    num.className='t run'; end=Date.now()+EYE_TIMER_SECS*1000; tick(); iv=win.setInterval(tick,250);
+  };
 }
-function openNudgePopup(key, title, msg, o){
-  o=o||{};
-  let w=null;
+function nudgeNativeFallback(key, title, msg){
+  const ok = key==='break' ? showEyeReminderNotification() : showNudgeNotification(title, msg, {key:key});
+  if(ok) return;
+  const mock=document.getElementById(key==='eyeex' ? 'eye-ex-notif-mock' : 'alert-'+key+'-notif-mock');
+  if(mock){ mock.classList.add('show'); if(key==='break') attachMockEyeTimer(); }
+}
+function openNudgeBrowserPopup(key, title, msg, timer, W, H){
   try{
-    const W=380, H=200;
-    const left=Math.max(0,(screen.availWidth||1024)-W-20), top=Math.max(0,(screen.availHeight||768)-H-60);
-    w=window.open('', 'nudge-'+key, 'popup=yes,width='+W+',height='+H+',left='+left+',top='+top);
+    const left=Math.max(0,(screen.availWidth||1024)-W-20), top=Math.max(0,(screen.availHeight||768)-H-100);
+    const w=window.open('', 'nudge-'+key, 'popup=yes,width='+W+',height='+H+',left='+left+',top='+top);
     if(!w || w.closed) return false;
-    w.document.open(); w.document.write(nudgePopupHTML(title, msg, !!o.timer)); w.document.close();
+    nudgePopupContent(w, title, msg, timer);
     try{ w.focus(); }catch(e){}
     return true;
   }catch(e){ return false; }
+}
+function openNudgePopup(key, title, msg, o){
+  o=o||{};
+  const timer=!!o.timer, W=320, H=timer?150:92;
+  const onFail=o.onFail||(()=>nudgeNativeFallback(key,title,msg));
+  try{
+    // Picture-in-Picture style window: no address bar, but the browser only allows
+    // it straight after a click (e.g. Preview), so scheduled reminders skip to the pop-up.
+    if(window.documentPictureInPicture && navigator.userActivation && navigator.userActivation.isActive){
+      window.documentPictureInPicture.requestWindow({width:W, height:H})
+        .then(w=>nudgePopupContent(w, title, msg, timer))
+        .catch(()=>{ if(!openNudgeBrowserPopup(key,title,msg,timer,W,H)) onFail(); });
+      return true;
+    }
+  }catch(e){}
+  return openNudgeBrowserPopup(key, title, msg, timer, W, H);
 }
 
 initNudgeSW();
