@@ -2637,6 +2637,166 @@ html[data-petal-card="e"] :is(.card,.body-age-section,.activity-type-section,.ro
   height:min(calc(100% - 16px),calc(var(--lotus-h,210px) * 1.12)) !important;
 }
 </style>
+
+<style id="ayubase6-desktop-polish-2026">
+/* Option A: calm tab-aware gradient header, without lotus imagery. */
+body { --header-rgb:37,92,192; }
+body:has(#tab-btns .tab-btn.nutrition.active) { --header-rgb:37,112,79; }
+body:has(#tab-btns .tab-btn.routines.active) { --header-rgb:150,80,13; }
+body:has(#tab-btns .tab-btn.alerts.active) { --header-rgb:8,118,110; }
+body:has(#tab-btns .tab-btn.mind.active) { --header-rgb:98,80,179; }
+body:has(#tab-btns .tab-btn.calculator.active) { --header-rgb:14,116,144; }
+#app-nav {
+  background:radial-gradient(ellipse 390px 190px at 12% 0%,rgba(var(--header-rgb),.115),transparent 80%),
+             radial-gradient(ellipse 440px 210px at 90% 110%,rgba(var(--header-rgb),.10),transparent 82%),
+             linear-gradient(115deg,#fff 0%,#f8fbff 50%,#f3f7ff 100%);
+  border-bottom:1px solid rgba(var(--header-rgb),.16);
+  box-shadow:0 5px 22px rgba(26,48,76,.075);
+  transition:background-color .25s ease,border-color .25s ease;
+}
+#app-nav::before,#app-nav::after {content:none !important;display:none !important;}
+#tab-btns .tab-btn { transition:background-color .2s ease,box-shadow .2s ease,transform .2s ease; }
+#tab-btns .tab-btn.active { background:var(--tab-tint); box-shadow:inset 0 -2px 0 var(--tab-accent),0 2px 9px rgba(35,52,72,.06); }
+#tab-btns .tab-btn:hover:not(.active) { background:var(--tab-tint); }
+.tab-panel h2,.body-age-title,.activity-type-title { letter-spacing:-.025em; line-height:1.35; }
+.card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section {
+  border-color:var(--line,#e0e7ee);
+  box-shadow:0 3px 14px rgba(30,52,80,.045),0 1px 3px rgba(30,52,80,.025);
+}
+@media (min-width:900px) {
+  #app-nav { padding:18px 28px 14px; gap:13px; }
+  #tab-btns { gap:12px; }
+  #tab-btns .tab-btn { min-width:102px; padding:10px 20px; }
+  /* Constrain content, not the full-width pastel panel backgrounds. */
+  .tab-panel :is(.page-container,.calc-page,.alert-page,.rout-page,.mind-page,.body-age-wrap,.activity-type-wrap,.act-container) {
+    max-width:1160px; margin-left:auto; margin-right:auto;
+  }
+  .tab-panel :is(.page-container,.calc-page,.alert-page,.rout-page,.mind-page) { padding-left:30px; padding-right:30px; }
+  .tab-panel :is(.body-age-wrap,.activity-type-wrap,.act-container) { padding-left:30px; padding-right:30px; }
+  .tab-panel :is(.card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section) { border-radius:20px; }
+}
+@media (max-width:599px) {
+  #app-nav { padding:12px 12px 9px; }
+  #tab-btns .tab-btn { min-width:0; }
+}
+@media (prefers-reduced-motion:reduce) {
+  #app-nav,#tab-btns .tab-btn { transition:none !important; }
+}
+</style>
+
+<style id="ayubase6-unified-header-logo-alignment">
+/* Keep the brand anchored at exactly the same coordinates on all six tabs. */
+#app-nav { align-items:center !important; }
+#app-logo-wrap {
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  margin-inline:auto;
+  flex-shrink:0;
+  transform:none !important;
+}
+#app-logo-mark { margin-inline:auto; }
+#app-logo { justify-content:center; text-align:center; margin-inline:auto; }
+@media(min-width:900px) { #app-logo-wrap { max-width:1160px; } }
+</style>
+
+<style id="ayubase6-stable-header-center">
+/* Keep the viewport's layout width constant when switching between the
+   short Body tab and longer tabs (which otherwise add a scrollbar). */
+html { overflow-y: scroll; scrollbar-gutter: stable; }
+/* Center the shared logo within the same stable header coordinate system. */
+#app-nav { box-sizing: border-box; width: 100%; }
+#app-logo-wrap { position: relative; left: 0; right: 0; }
+</style>
+
+<style id="ayubase6-tab-gradient-and-lotus-colour">
+/* Tab-matched pastel header; retain the shared logo's fixed alignment. */
+body { --ayu-header-base:#edf4ff; --ayu-header-ink:37,92,192; }
+body:has(#tab-btns .tab-btn.nutrition.active) { --ayu-header-base:#eaf9ef; --ayu-header-ink:37,112,79; }
+body:has(#tab-btns .tab-btn.routines.active) { --ayu-header-base:#fff7e5; --ayu-header-ink:150,80,13; }
+body:has(#tab-btns .tab-btn.alerts.active) { --ayu-header-base:#e8f9f5; --ayu-header-ink:8,118,110; }
+body:has(#tab-btns .tab-btn.mind.active) { --ayu-header-base:#f1efff; --ayu-header-ink:98,80,179; }
+body:has(#tab-btns .tab-btn.calculator.active) { --ayu-header-base:#e8f8fc; --ayu-header-ink:14,116,144; }
+#app-nav {
+  background-image:
+    radial-gradient(ellipse 420px 190px at 12% 0%,rgba(var(--ayu-header-ink),.10),transparent 80%),
+    radial-gradient(ellipse 440px 210px at 90% 110%,rgba(var(--ayu-header-ink),.09),transparent 82%),
+    linear-gradient(115deg,rgba(255,255,255,.78),rgba(255,255,255,.25));
+  background-color:var(--ayu-header-base);
+  border-bottom-color:rgba(var(--ayu-header-ink),.18);
+  transition:background-color .25s ease,border-bottom-color .25s ease;
+}
+/* Slightly richer lotus watermarks without altering their dimensions or positions. */
+html[data-petal-card="e"] :is(.card,.body-age-section,.activity-type-section,.rout-card,.mind-card,.alert-card,.calc-card)::after { opacity:.29 !important; }
+html[data-petal-card="e"] .lotus-extra-motif { opacity:.29; }
+@media (prefers-reduced-motion:reduce) { #app-nav { transition:none; } }
+</style>
+
+<style id="ayubase6-centered-lotus-all-cards">
+/* One upright, centered watermark per content section, including Mind. */
+html[data-petal-card="e"] :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel) :is(.card,.body-age-section,.activity-type-section,.rout-card,.mind-card,.alert-card,.calc-card) {
+  position:relative;
+  isolation:isolate;
+}
+html[data-petal-card="e"] :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel) :is(.card,.body-age-section,.activity-type-section,.rout-card,.mind-card,.alert-card,.calc-card)::after {
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  right:auto !important;
+  bottom:auto !important;
+  transform:translate(-50%,-50%) !important;
+  background:var(--petal) !important;
+  opacity:.29 !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  border:0 !important;
+  border-radius:0 !important;
+  -webkit-mask:var(--lotus-mask) center/contain no-repeat !important;
+  mask:var(--lotus-mask) center/contain no-repeat !important;
+}
+/* Mind's inner content stays in front of the lotus rather than masking it. */
+html[data-petal-card="e"] #mind-panel .mind-card > * {position:relative;z-index:1;}
+/* Do not place decorative lotus images in the title/header. */
+#app-nav::before,#app-nav::after {content:none !important;display:none !important;}
+</style>
+<style id="mind-lotus-visible-through-text-cards">
+/* Keep Mind text readable while allowing the centered lotus to show through. */
+html[data-petal-card="e"] #mind-panel .mind-topic-list li {
+  background:rgba(245,243,255,.32) !important;
+  border-color:rgba(165,180,252,.28) !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+html[data-petal-card="e"] #mind-panel .mind-card {
+  background:rgba(255,255,255,.72) !important;
+}
+</style>
+
+<style id="ayubase6-coordinated-header-section-palette">
+/* A slightly richer version of each tab's existing section palette.
+   The common header geometry and logo alignment are deliberately untouched. */
+body { --ayu-header-base:#dcecff; --ayu-header-ink:37,92,192; }
+body:has(#tab-btns .tab-btn.nutrition.active) { --ayu-header-base:#d7f2df; --ayu-header-ink:37,112,79; }
+body:has(#tab-btns .tab-btn.routines.active) { --ayu-header-base:#ffedc9; --ayu-header-ink:150,80,13; }
+body:has(#tab-btns .tab-btn.alerts.active) { --ayu-header-base:#d0f1e9; --ayu-header-ink:8,118,110; }
+body:has(#tab-btns .tab-btn.mind.active) { --ayu-header-base:#e5dfff; --ayu-header-ink:98,80,179; }
+body:has(#tab-btns .tab-btn.calculator.active) { --ayu-header-base:#d2f0f8; --ayu-header-ink:14,116,144; }
+#app-nav {
+  background-color:var(--ayu-header-base) !important;
+  background-image:
+    radial-gradient(ellipse 420px 190px at 12% 0%,rgba(var(--ayu-header-ink),.095),transparent 80%),
+    radial-gradient(ellipse 440px 210px at 90% 110%,rgba(var(--ayu-header-ink),.075),transparent 82%),
+    linear-gradient(115deg,rgba(255,255,255,.58),rgba(255,255,255,.18)) !important;
+  border-bottom-color:rgba(var(--ayu-header-ink),.20) !important;
+  transition:background-color .25s ease,border-bottom-color .25s ease;
+}
+@media (prefers-reduced-motion:reduce) { #app-nav { transition:none !important; } }
+</style>
 </head>
 <body>
 
@@ -9660,7 +9820,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     const reverse=rand(seed+7)>.5;
     const mainCenter=left+(reverse&&paired?smallWidth+gap:0)+mainWidth/2;
     el.style.setProperty('--lotus-x',mainCenter+'px');
-    el.style.setProperty('--lotus-y',(38+rand(seed+91)*24)+'%');
+    el.style.setProperty('--lotus-y','50%');
     el.style.setProperty('--lotus-w',mainWidth+'px');
     el.style.setProperty('--lotus-h',Math.min(180,mainWidth*.6)+'px');
     el.style.setProperty('--lotus-rot','0deg');
