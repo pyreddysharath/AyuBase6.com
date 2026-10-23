@@ -2797,6 +2797,43 @@ body:has(#tab-btns .tab-btn.calculator.active) { --ayu-header-base:#d2f0f8; --ay
 }
 @media (prefers-reduced-motion:reduce) { #app-nav { transition:none !important; } }
 </style>
+<style id="lotus-through-fields">
+/* The big lotus behind each tab stays fully visible: option rows, buttons, inputs and selects have no
+   solid fill of their own. Selected / hovered / active states keep their colour. */
+.tab-panel :is(.activity-check,.dpill,.gender-btn,.alert-icon-btn,.alert-sound-select,.alert-info-btn,.alert-preview-btn,
+  .eye-ex-time-item,.eye-ex-stage-play-btn,.reset-icon-btn,.calc-info-btn,.rout-info-btn,.lab-upload-btn,.lab-sex,
+  .lab-select,.lab-value-input,.mind-icon,
+  input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=color]),select,textarea):not(.on):not(.selected):not(.active):not(.muted):not(:hover){
+  background:transparent !important; background-color:transparent !important; backdrop-filter:none !important;
+}
+</style>
+<style id="header-band">
+/* OPTION 5 — pale tinted header (as originally) with a 6px band in that tab's "Base6" colour underneath. */
+body { --hdr-band:#60a5fa; }
+body:has(#tab-btns .tab-btn.nutrition.active)  { --hdr-band:#86efac; }
+body:has(#tab-btns .tab-btn.routines.active)   { --hdr-band:var(--rout-3); }
+body:has(#tab-btns .tab-btn.alerts.active)     { --hdr-band:var(--alert-3); }
+body:has(#tab-btns .tab-btn.mind.active)       { --hdr-band:var(--mind-3); }
+body:has(#tab-btns .tab-btn.calculator.active) { --hdr-band:var(--calc-3); }
+body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
+#app-logo #logo-thee { color:#3b82f6; }
+#app-logo.nutrition-mode #logo-thee   { color:#4ade80; }
+#app-logo.routines-mode #logo-thee    { color:#f59e0b; }
+#app-logo.alerts-mode #logo-thee      { color:#2dd4bf; }
+#app-logo.mind-mode #logo-thee        { color:#818cf8; }
+#app-logo.calculator-mode #logo-thee  { color:#22d3ee; }
+</style>
+<style id="fields-in-front">
+/* The lotus sits behind the fields, so their outlines and labels must stay clearly visible on top of it:
+   outlines take a mid tone of that tab's own accent colour, darker than the lotus, so they never blend into it. */
+.tab-panel :is(.activity-check,.dpill,.gender-btn,.alert-icon-btn,.alert-sound-select,.alert-info-btn,.alert-preview-btn,
+  .eye-ex-time-item,.eye-ex-stage-play-btn,.reset-icon-btn,.calc-info-btn,.rout-info-btn,.lab-upload-btn,.lab-sex,
+  .lab-select,.lab-value-input,
+  input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=color]),select,textarea):not(.on):not(.selected):not(.active):not(.muted):not(:hover){
+  border-color:color-mix(in srgb,var(--accent,#2563eb) 55%,#fff) !important;
+}
+#activity-panel .activity-check:not(.on){ color:#3b82f6; }
+</style>
 </head>
 <body>
 
