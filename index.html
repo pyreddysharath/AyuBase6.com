@@ -2834,6 +2834,12 @@ body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
 }
 #activity-panel .activity-check:not(.on){ color:#3b82f6; }
 </style>
+<style id="footer-viewport-fix">
+/* Footer viewport spacing: applied to the main page, not notification popup scripts. */
+html { min-height: 100%; }
+body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+body > .app-footer { margin-top: auto; flex-shrink: 0; }
+</style>
 </head>
 <body>
 
