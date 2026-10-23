@@ -9610,7 +9610,10 @@ function showFooterSection(id){
         const nav = document.getElementById('app-nav');
         const navHeight = nav ? nav.offsetHeight : 0;
         const iconRow = document.getElementById('footer-tabs-row');
-        const targetY = window.scrollY + iconRow.getBoundingClientRect().top - navHeight - 12;
+        const isSidebar = window.matchMedia('(min-width:900px)').matches && iconRow.parentElement === nav;
+        const scrollTarget = isSidebar ? sec : iconRow;
+        const offset = isSidebar ? 24 : navHeight + 12;
+        const targetY = window.scrollY + scrollTarget.getBoundingClientRect().top - offset;
         window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
       }
       catch (err) { /* not fatal if unsupported */ }
@@ -9626,7 +9629,7 @@ function showFooterSection(id){
 // clears the feedback inputs — the fields are just hidden, not reset —
 // so a draft name/message is still there when Feedback is reopened.
 document.addEventListener('click', function(e){
-  if (!e.target.closest('.app-footer')) {
+  if (!e.target.closest('.app-footer') && !e.target.closest('#footer-tabs-row')) {
     closeAllFooterSections();
   }
 });
