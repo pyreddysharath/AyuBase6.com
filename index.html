@@ -3083,6 +3083,47 @@ body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
 #tab-btns .tab-btn.nutrition.active .tab-btn-icon { color:#A9E6BE !important; fill:currentColor !important; }
 #tab-btns .tab-btn.routines.active .tab-btn-icon { color:#F8D59C !important; fill:currentColor !important; }
 </style>
+<style id="ayu-mobile-desktop-selected-tab-parity-20261024">
+/* Mobile selected tabs use the same solid background and contrasting icons as desktop. */
+@media (max-width:899px) {
+ #tab-btns .tab-btn.activity.active {background:#2563eb !important;color:#eaf4ff !important;}
+ #tab-btns .tab-btn.nutrition.active {background:#22c55e !important;color:color-mix(in srgb,#dcfce7 90%,white) !important;}
+ #tab-btns .tab-btn.routines.active {background:var(--rout-2) !important;color:color-mix(in srgb,#fff4d0 90%,white) !important;}
+ #tab-btns .tab-btn.alerts.active {background:var(--alert-2) !important;color:color-mix(in srgb,#ccfbf1 90%,white) !important;}
+ #tab-btns .tab-btn.mind.active {background:var(--mind-2) !important;color:color-mix(in srgb,#e0e7ff 90%,white) !important;}
+ #tab-btns .tab-btn.calculator.active {background:var(--calc-2) !important;color:color-mix(in srgb,#ecfeff 90%,white) !important;}
+ #tab-btns .tab-btn.active {box-shadow:inset 4px 0 0 rgba(255,255,255,.55),0 2px 9px rgba(35,52,72,.12) !important;}
+ #tab-btns .tab-btn.active span {color:inherit !important;}
+ #tab-btns .tab-btn:not(.active) .tab-btn-icon {color:var(--tab-accent) !important;fill:currentColor !important;}
+ #tab-btns .tab-btn.active .tab-btn-icon {color:inherit !important;fill:currentColor !important;}
+ #tab-btns .tab-btn.nutrition.active .tab-btn-icon {color:#A9E6BE !important;fill:currentColor !important;}
+ #tab-btns .tab-btn.routines.active .tab-btn-icon {color:#F8D59C !important;fill:currentColor !important;}
+}
+</style>
+
+<style id="ayu-mobile-section-underline-20261024">
+/* Mobile: selected underline follows each section's desktop accent colour. */
+@media (max-width:899px) {
+  #tab-btns:has(.tab-btn.activity.active) #tab-underline { background-color:#2563eb !important; }
+  #tab-btns:has(.tab-btn.nutrition.active) #tab-underline { background-color:#22c55e !important; }
+  #tab-btns:has(.tab-btn.routines.active) #tab-underline { background-color:var(--rout-2) !important; }
+  #tab-btns:has(.tab-btn.alerts.active) #tab-underline { background-color:var(--alert-2) !important; }
+  #tab-btns:has(.tab-btn.mind.active) #tab-underline { background-color:var(--mind-2) !important; }
+  #tab-btns:has(.tab-btn.calculator.active) #tab-underline { background-color:var(--calc-2) !important; }
+}
+</style>
+<style id="ayu-remove-side-tab-shadow-20261024">
+/* Keep selected tab backgrounds, icon colours and mobile underline.
+   Remove the left-side inset highlight; retain only subtle neutral depth. */
+#tab-btns .tab-btn.active {
+  box-shadow: 0 2px 9px rgba(35,52,72,.10) !important;
+}
+@media (min-width:900px) {
+  #tab-btns .tab-btn:not(.active):hover {
+    box-shadow:none !important;
+  }
+}
+</style>
 </head>
 <body>
 
