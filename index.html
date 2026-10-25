@@ -3149,6 +3149,41 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
   background:var(--alert-1) !important; color:#fff !important;
 }
 </style>
+<style id="vitals-tracker-css">
+.page-reset-row .reset-icon-btn.calc-reset{margin-left:auto}
+.reset-icon-btn.icon-only{width:34px;height:34px;min-height:34px;padding:0;border-radius:50%;border-width:2px;
+  display:inline-flex;align-items:center;justify-content:center}
+.reset-icon-btn.icon-only svg{width:16px;height:16px}
+#tracker-card .calc-card-hdr{margin-bottom:16px}
+.trk-green{color:#15803d} .trk-red{color:#b91c1c} .trk-orange{color:#ea580c} .trk-grey{color:#64748b}
+.trk-entry{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+.trk-entry .lab-value-input{width:auto;flex:1 1 84px;min-width:0}
+.trk-entry .trk-date{flex:1 1 128px}
+.trk-hint{font-size:.76rem;color:#4b7a87;margin:0 0 6px}
+.trk-hint:empty,.trk-msg:empty{display:none}
+.trk-msg{font-size:.78rem;font-weight:600;margin:0 0 8px}
+#tracker-list{margin-top:10px}
+.trk-sec{border:1px solid rgba(103,232,249,.55);border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}
+.trk-hdr{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;border:0;background:transparent;
+  cursor:pointer;text-align:left;font:inherit;color:var(--calc-1)}
+.trk-name-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.trk-name{font-weight:700;font-size:.9rem}
+.trk-tag{font-size:.7rem;font-weight:700;color:#ea580c}
+.trk-latest{font-weight:800;font-size:.95rem;white-space:nowrap}
+.trk-latest small{font-weight:600;font-size:.68rem;opacity:.85}
+.trk-chev{flex:0 0 auto;font-size:.9rem;transition:transform .15s;color:var(--calc-2)}
+.trk-sec.open .trk-chev{transform:rotate(180deg)}
+.trk-body{padding:2px 14px 12px;font-size:.8rem;color:#0c3d4d;display:flex;flex-direction:column;gap:6px}
+.trk-body[hidden]{display:none}
+.trk-line{line-height:1.45}
+.trk-line.strong{font-weight:700}
+.trk-list{list-style:none;margin:4px 0 0;padding:0;max-height:240px;overflow-y:auto;border-top:1px dashed rgba(8,145,178,.35)}
+.trk-list li{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(8,145,178,.12)}
+.trk-d{flex:1;color:#4b7a87}
+.trk-v{font-weight:700}
+.trk-del{border:none;background:transparent;color:var(--calc-2);font-size:1.1rem;line-height:1;cursor:pointer;padding:2px 6px}
+.trk-actions{display:flex;justify-content:center;margin-top:6px}
+</style>
 </head>
 <body>
 
@@ -3307,6 +3342,9 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
           <div class="bmi-box"><div class="bmi-lbl">Healthy weight range</div><div class="bmi-num" id="calc-bmi-range">–</div></div>
         </div>
       </div>
+      <div class="page-reset-row" style="margin:14px 0 0">
+        <button type="button" class="reset-icon-btn calc-reset icon-only" title="Reset BMI" aria-label="Reset BMI" onclick="resetBmiToDefault()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+      </div>
     </div>
 
     <div class="calc-card calc-card-spaced" id="lab-insights-card">
@@ -3352,11 +3390,67 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
         <input type="number" id="lab-test-value" class="lab-value-input" placeholder="Value" step="any">
         <button type="button" id="lab-add-btn" class="lab-add-icon-btn" title="Add">+</button>
       </div>
+      <div class="page-reset-row" style="margin:14px 0 0">
+        <button type="button" class="reset-icon-btn calc-reset icon-only" title="Reset Lab Insights" aria-label="Reset Lab Insights" onclick="resetLabToDefault()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+      </div>
     </div>
 
-    <div class="page-reset-row" style="margin-top:10px">
-      <button type="button" class="reset-icon-btn calc-reset" title="Reset Vitals to defaults" onclick="resetCheckToDefault()">↺ Reset</button>
+    <!-- TRACKER — log readings over time; one collapsed section per reading type -->
+    <div class="calc-card calc-card-spaced" id="tracker-card">
+      <div class="calc-card-hdr">
+        <h2>📈 Tracker</h2>
+        <span style="display:flex;align-items:center;gap:4px">
+          <button type="button" class="calc-info-btn" id="tracker-info-btn" onclick="toggleTrackerInfo()" title="About this tool">i</button>
+        </span>
+      </div>
+      <div class="calc-task" id="tracker-info-panel" style="display:none">
+        <p class="calc-sub" style="margin:0 0 6px">Pick a reading, add a value, and it gets its own section below. Colours show how your latest reading compares:</p>
+        <ul style="margin:6px 0 0 18px;padding:0">
+          <li><span class="trk-green"><b>Green</b></span> — the latest reading is within the acceptable range</li>
+          <li><span class="trk-orange"><b>Orange</b></span> — outside the range, but closer to it than the previous reading (improved)</li>
+          <li><span class="trk-red"><b>Red</b></span> — outside the range, and further from it than the previous reading, or no previous reading to compare with</li>
+          <li><span class="trk-grey"><b>Grey</b></span> — no range to compare against</li>
+        </ul>
+        <p class="calc-sub" style="margin:8px 0 0"><b>Weight</b> is saved with your height, and judged against the healthy BMI range (18.5–24.9) for that height. <b>Height</b> shows green when it is higher than the previous reading. <b>Blood Pressure</b> judges systolic and diastolic together. Each reading in a list is coloured the same way against the one before it.</p>
+        <p class="calc-sub" style="margin:8px 0 0">Educational only — ranges are general adult references, not a diagnosis. Readings stay on this device.</p>
+      </div>
+
+      <div class="lab-manual-row" style="margin-bottom:8px">
+        <select id="tracker-select" class="lab-select" onchange="onTrackerSelect()" aria-label="Reading to add">
+          <option value="">Select a reading…</option>
+        </select>
+      </div>
+
+      <div id="tracker-sliders" style="display:none">
+        <div class="calc-row-stacked" style="margin-bottom:14px">
+          <div class="calc-row-top"><span id="trk-main-lbl">Weight?</span> <span id="trk-main-val" class="slider-val"></span></div>
+          <input type="range" id="tracker-slider-main" class="bmi-slider calc-slider" style="width:100%">
+        </div>
+        <div class="calc-row-stacked" id="trk-h-row" style="display:none;margin-bottom:14px">
+          <div class="calc-row-top">Height? <span id="trk-h-val" class="slider-val"></span></div>
+          <input type="range" id="tracker-slider-h" class="bmi-slider calc-slider" style="width:100%">
+        </div>
+      </div>
+
+      <div class="trk-entry" id="tracker-entry" style="display:none">
+        <input type="number" inputmode="decimal" step="any" id="tracker-v1" class="lab-value-input" placeholder="Value">
+        <input type="number" inputmode="decimal" step="any" id="tracker-v2" class="lab-value-input" placeholder="Diastolic" style="display:none">
+        <input type="date" id="tracker-date" class="lab-value-input trk-date" aria-label="Date of reading">
+        <button type="button" id="tracker-add-btn" class="lab-add-icon-btn" title="Add reading" onclick="addTrackerReading()">+</button>
+      </div>
+      <p class="trk-hint" id="tracker-hint"></p>
+      <p class="trk-msg" id="tracker-msg" role="status" aria-live="polite"></p>
+
+      <div id="tracker-list"></div>
+
+      <div class="trk-actions" id="tracker-actions" style="display:none">
+        <button type="button" class="refresh-btn lab-upload-btn" onclick="downloadTrackerPDF()">⬇ Download PDF</button>
+      </div>
+      <div class="page-reset-row" style="margin:14px 0 0">
+        <button type="button" class="reset-icon-btn calc-reset icon-only" title="Reset Tracker" aria-label="Reset Tracker" onclick="resetTracker()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+      </div>
     </div>
+
 
   </div>
 </div>
@@ -4647,7 +4741,7 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
   scrollLabInsightsToTop();
 });
 
-// ── Reset the whole Vitals tab (BMI calculator + Lab Insights) ──
+// ── Per-section resets for the Vitals tab (BMI, Lab Insights) ──
 function toggleLabInfo(){
   const body=document.getElementById('lab-info-panel');
   const btn=document.getElementById('lab-info-btn');
@@ -4662,9 +4756,8 @@ function toggleLabDisclaimer(){
   body.style.display=isOpen?'none':'block';
   if(btn) btn.classList.toggle('active', !isOpen);
 }
-function resetCheckToDefault(){
-  if(!confirm('Reset the Vitals tab back to its defaults? This clears your height/weight and any lab values you\'ve added.')) return;
-
+function resetBmiToDefault(){
+  if(!confirm('Reset BMI back to its defaults? This clears your height and weight.')) return;
   const hEl=document.getElementById('calc-height-slider'), wEl=document.getElementById('calc-weight-slider');
   hEl.value=hEl.min; wEl.value=wEl.min;
   calcHeightTouched=false; calcWeightTouched=false;
@@ -4674,7 +4767,10 @@ function resetCheckToDefault(){
   updateSliderFill(wEl,'var(--calc-2)');
   updateCalcFigure();
   document.getElementById('calc-bmi-wrap').style.display='none';
-
+  if(window.ayuTrackerRender) window.ayuTrackerRender();
+}
+function resetLabToDefault(){
+  if(!confirm('Reset Lab Insights back to its defaults? This clears any lab values you\'ve added.')) return;
   ++labUploadGeneration; // Ignore any report still being read.
   labRows=[];
   renderLabRows();
@@ -10258,6 +10354,321 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     document.addEventListener('DOMContentLoaded', placeFooterControls);
   } else { placeFooterControls(); }
   window.addEventListener('resize', placeFooterControls, {passive:true});
+})();
+</script>
+<script id="vitals-tracker">
+(function(){
+  'use strict';
+  var KEY='ayu_vitals_tracker_v1';
+  // parts: one entry per number in a reading (BP has two). lo/hi null = open-ended. Ranges are general adult references.
+  // slider: metrics entered with a slider like the BMI section.
+  var GROUPS=[
+    {name:'Heart & Blood', ids:['bp','hr','spo2','rr']},
+    {name:'Body',          ids:['weight','height','temp']},
+    {name:'Blood Sugar',   ids:['sugarf','sugarp','hba1c']},
+    {name:'Cholesterol',   ids:['chol','ldl','hdl','trig']},
+    {name:'Lifestyle',     ids:['sleep','steps']}
+  ];
+  function ftIn(cm){ var t=Math.round(cm/2.54), f=Math.floor(t/12); return f+"'"+(t-f*12)+'"'; }
+  var METRICS=[
+    {id:'bp', name:'Blood Pressure', unit:'mmHg', note:' (systolic / diastolic)',
+      parts:[{lbl:'Systolic',lo:90,hi:120,min:50,max:260},{lbl:'Diastolic',lo:60,hi:80,min:30,max:160}]},
+    {id:'hr', name:'Resting Heart Rate', unit:'bpm', parts:[{lbl:'Heart rate',lo:60,hi:100,min:20,max:250}]},
+    {id:'spo2', name:'Oxygen (SpO2)', unit:'%', parts:[{lbl:'SpO2',lo:95,hi:100,min:50,max:100}]},
+    {id:'rr', name:'Respiratory Rate', unit:'breaths/min', parts:[{lbl:'Respiratory rate',lo:12,hi:20,min:4,max:60}]},
+    {id:'weight', name:'Weight', unit:'kg', needsHeight:true,
+      slider:{min:10,max:200,step:0.5,label:'Weight?',fmt:function(v){ return nf(v)+' kg ('+Math.round(v*2.20462)+' lbs)'; }},
+      parts:[{lbl:'Weight',dyn:true,min:10,max:200}]},
+    {id:'height', name:'Height', unit:'cm',
+      slider:{min:80,max:220,step:1,label:'Height?',fmt:function(v){ return ftIn(v)+' ('+nf(v)+' cm)'; }},
+      parts:[{lbl:'Height',noRange:true,min:80,max:220}]},
+    {id:'temp', name:'Body Temperature', unit:'\u00B0F', parts:[{lbl:'Temperature',lo:97,hi:99,min:90,max:110}]},
+    {id:'sugarf', name:'Blood Sugar (Fasting)', unit:'mg/dL', parts:[{lbl:'Fasting sugar',lo:70,hi:99,min:20,max:800}]},
+    {id:'sugarp', name:'Blood Sugar (After Meal)', unit:'mg/dL', parts:[{lbl:'After-meal sugar',lo:70,hi:140,min:20,max:800}]},
+    {id:'hba1c', name:'HbA1c', unit:'%', parts:[{lbl:'HbA1c',lo:null,hi:5.6,min:3,max:20}]},
+    {id:'chol', name:'Total Cholesterol', unit:'mg/dL', parts:[{lbl:'Total cholesterol',lo:null,hi:200,min:50,max:600}]},
+    {id:'ldl', name:'LDL Cholesterol', unit:'mg/dL', parts:[{lbl:'LDL',lo:null,hi:100,min:10,max:400}]},
+    {id:'hdl', name:'HDL Cholesterol', unit:'mg/dL', parts:[{lbl:'HDL',lo:40,hi:null,min:10,max:150}]},
+    {id:'trig', name:'Triglycerides', unit:'mg/dL', parts:[{lbl:'Triglycerides',lo:null,hi:150,min:20,max:2000}]},
+    {id:'sleep', name:'Sleep', unit:'hrs', parts:[{lbl:'Sleep',lo:7,hi:9,min:0,max:24}]},
+    {id:'steps', name:'Steps', unit:'steps', parts:[{lbl:'Steps',lo:7000,hi:null,min:0,max:100000}]}
+  ];
+  var byId={}; METRICS.forEach(function(m){ byId[m.id]=m; });
+  var open={};
+  var data=load();
+
+  function $(id){ return document.getElementById(id); }
+  function load(){
+    try{ var o=JSON.parse(localStorage.getItem(KEY)||'null'); return (o&&typeof o==='object')?o:{}; }
+    catch(e){ return {}; }
+  }
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} }
+  function pad(n){ return (n<10?'0':'')+n; }
+  function ymd(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function fmtDate(s){
+    var p=s.split('-').map(Number);
+    return new Date(p[0],p[1]-1,p[2]).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  }
+  function nf(x){ return String(Math.round(x*10)/10); }
+  function valText(m,rd){ return rd.v.map(nf).join('/'); }
+  // Weight readings carry the height they were entered with.
+  function valFull(m,rd){ return valText(m,rd)+' '+m.unit+((m.id==='weight'&&rd.h)?' ('+nf(rd.h)+' cm)':''); }
+
+  // Best-known height: latest Height reading, else the height saved with the latest weight, else the BMI sliders.
+  function heightCm(){
+    var h=data.height; if(h&&h.length) return h[h.length-1].v[0];
+    var w=data.weight; if(w&&w.length&&w[w.length-1].h) return w[w.length-1].h;
+    var el=$('calc-height-slider');
+    if(el && typeof calcHeightTouched!=='undefined' && calcHeightTouched) return +el.value;
+    return null;
+  }
+  function rangeOf(m,i,rd){
+    var p=m.parts[i];
+    if(p.noRange) return null;
+    if(p.dyn){ var h=(rd&&rd.h)||heightCm(); if(!h) return null; var mt=h/100; return {lo:18.5*mt*mt, hi:24.9*mt*mt}; }
+    return {lo:p.lo==null?-Infinity:p.lo, hi:p.hi==null?Infinity:p.hi};
+  }
+  function fmtR(r){
+    if(r.lo===-Infinity) return 'up to '+nf(r.hi);
+    if(r.hi===Infinity) return nf(r.lo)+' or more';
+    return nf(r.lo)+'-'+nf(r.hi);
+  }
+  function evalR(m,rd){
+    var dist=0;
+    for(var i=0;i<m.parts.length;i++){
+      var r=rangeOf(m,i,rd); if(!r) return {state:'none',dist:null};
+      var v=rd.v[i];
+      if(v<r.lo) dist+=r.lo-v; else if(v>r.hi) dist+=v-r.hi;
+    }
+    return {state:dist===0?'ok':'bad', dist:dist};
+  }
+  function rangeText(m,rd){
+    var parts=[], any=false;
+    for(var i=0;i<m.parts.length;i++){ var r=rangeOf(m,i,rd); if(r){ any=true; parts.push(fmtR(r)); } }
+    if(!any) return m.parts[0].dyn ? 'Add your height to see a healthy range' : 'Not applicable';
+    var t=parts.join(' / ')+' '+m.unit+(m.note||'');
+    if(m.parts[0].dyn){ var h=(rd&&rd.h)||heightCm(); t+=' (BMI 18.5-24.9 at '+nf(h)+' cm)'; }
+    return t;
+  }
+  // Colour of reading i:
+  //  green  - within the range (Height: taller than the previous reading)
+  //  orange - outside the range but closer to it than the previous reading
+  //  red    - outside the range and no closer (or nothing to compare with)
+  //  grey   - no range to compare against
+  function statusAt(m,arr,i){
+    if(m.id==='height') return (i>0 && arr[i].v[0]>arr[i-1].v[0]) ? 'ok' : 'none';
+    var e=evalR(m,arr[i]);
+    if(e.state==='none') return 'none';
+    if(e.state==='ok') return 'ok';
+    if(i>0){ var p=evalR(m,arr[i-1]); if(p.state!=='none' && e.dist<p.dist-1e-9) return 'better'; }
+    return 'bad';
+  }
+  function stateCls(st){ return st==='ok'?'trk-green':st==='better'?'trk-orange':st==='bad'?'trk-red':'trk-grey'; }
+
+  function render(){
+    var list=$('tracker-list'); if(!list) return;
+    var html='', count=0;
+    METRICS.forEach(function(m){
+      var arr=data[m.id]; if(!arr||!arr.length) return; count++;
+      var last=arr[arr.length-1], cls=stateCls(statusAt(m,arr,arr.length-1));
+      var isOpen=!!open[m.id];
+      var rows=arr.map(function(r,i){ return {r:r,i:i}; }).reverse().map(function(o){
+        var c=stateCls(statusAt(m,arr,o.i));
+        return '<li><span class="trk-d">'+fmtDate(o.r.d)+'</span><span class="trk-v '+c+'">'+valText(m,o.r)+' <small>'+m.unit
+          +((m.id==='weight'&&o.r.h)?' \u00B7 '+nf(o.r.h)+' cm':'')+'</small></span>'
+          +'<button type="button" class="trk-del" data-act="del" data-rid="'+o.r.id+'" aria-label="Delete this reading" title="Delete">\u00D7</button></li>';
+      }).join('');
+      html+='<div class="trk-sec'+(isOpen?' open':'')+'" data-id="'+m.id+'">'
+        +'<button type="button" class="trk-hdr" data-act="toggle" aria-expanded="'+isOpen+'">'
+          +'<span class="trk-name-wrap"><span class="trk-name">'+m.name+'</span></span>'
+          +'<span class="trk-latest '+cls+'">'+valText(m,last)+' <small>'+m.unit+'</small></span>'
+          +'<span class="trk-chev" aria-hidden="true">\u25BE</span></button>'
+        +'<div class="trk-body"'+(isOpen?'':' hidden')+'>'
+          +'<div class="trk-line">Acceptable range: <b>'+rangeText(m,last)+'</b></div>'
+          +'<ul class="trk-list">'+rows+'</ul>'
+        +'</div></div>';
+    });
+    list.innerHTML=html;
+    var act=$('tracker-actions'); if(act) act.style.display=count?'':'none';
+    refreshHint();
+  }
+  window.ayuTrackerRender=render;
+
+  // ---- the dropdown (grouped) ----
+  (function buildSelect(){
+    var sel=$('tracker-select'); if(!sel) return;
+    GROUPS.forEach(function(g){
+      var og=document.createElement('optgroup'); og.label=g.name;
+      g.ids.forEach(function(id){ var o=document.createElement('option'); o.value=id; o.textContent=byId[id].name; og.appendChild(o); });
+      sel.appendChild(og);
+    });
+  })();
+
+  var listEl=$('tracker-list');
+  if(listEl) listEl.addEventListener('click',function(e){
+    var b=e.target.closest('[data-act]'); if(!b) return;
+    var sec=b.closest('.trk-sec'); if(!sec) return;
+    var id=sec.getAttribute('data-id');
+    if(b.getAttribute('data-act')==='toggle'){
+      var body=sec.querySelector('.trk-body'), willOpen=body.hasAttribute('hidden');
+      if(willOpen) body.removeAttribute('hidden'); else body.setAttribute('hidden','');
+      b.setAttribute('aria-expanded',String(willOpen)); sec.classList.toggle('open',willOpen); open[id]=willOpen;
+    } else if(b.getAttribute('data-act')==='del'){
+      if(!confirm('Delete this reading?')) return;
+      var rid=b.getAttribute('data-rid');
+      data[id]=(data[id]||[]).filter(function(r){ return r.id!==rid; });
+      if(!data[id].length){ delete data[id]; delete open[id]; }
+      save(); render();
+    }
+  });
+
+  window.toggleTrackerInfo=function(){
+    var body=$('tracker-info-panel'), btn=$('tracker-info-btn');
+    var isOpen=body.style.display!=='none';
+    body.style.display=isOpen?'none':'block';
+    if(btn) btn.classList.toggle('active',!isOpen);
+  };
+
+  // ---- entry sliders (Weight, Height) ----
+  function paintSlider(el,valEl,cfg){
+    var v=parseFloat(el.value);
+    if(valEl) valEl.textContent=cfg.fmt(v);
+    if(typeof updateSliderFill==='function') updateSliderFill(el,'var(--calc-2)');
+  }
+  var HCFG=byId.height.slider;
+  function setupSlider(el,cfg,start){
+    el.min=cfg.min; el.max=cfg.max; el.step=cfg.step;
+    el.value=Math.min(cfg.max,Math.max(cfg.min,start));
+  }
+  function currentHint(m){
+    var rd=null;
+    if(m.needsHeight){ rd={h:parseFloat($('tracker-slider-h').value)}; }
+    return 'Acceptable range: '+rangeText(m,rd);
+  }
+  function refreshHint(){
+    var sel=$('tracker-select'), hint=$('tracker-hint');
+    if(hint && sel && byId[sel.value]) hint.textContent=currentHint(byId[sel.value]);
+  }
+  var mainEl=$('tracker-slider-main'), hEl=$('tracker-slider-h');
+  if(mainEl) mainEl.addEventListener('input',function(){ var m=byId[$('tracker-select').value]; if(m&&m.slider) paintSlider(mainEl,$('trk-main-val'),m.slider); });
+  if(hEl) hEl.addEventListener('input',function(){ paintSlider(hEl,$('trk-h-val'),HCFG); refreshHint(); });
+
+  window.onTrackerSelect=function(){
+    var m=byId[$('tracker-select').value], box=$('tracker-entry'), sl=$('tracker-sliders');
+    $('tracker-msg').textContent='';
+    if(!m){ box.style.display='none'; sl.style.display='none'; $('tracker-hint').textContent=''; return; }
+    box.style.display='flex';
+    var v1=$('tracker-v1'), v2=$('tracker-v2'), two=m.parts.length>1;
+    if(m.slider){
+      v1.style.display='none'; v2.style.display='none'; sl.style.display='block';
+      var prev=data[m.id]&&data[m.id].length?data[m.id][data[m.id].length-1].v[0]:null;
+      var bmiEl=$(m.id==='height'?'calc-height-slider':'calc-weight-slider');
+      var bmiTouched=(m.id==='height')?(typeof calcHeightTouched!=='undefined'&&calcHeightTouched):(typeof calcWeightTouched!=='undefined'&&calcWeightTouched);
+      var start=prev!=null?prev:(bmiTouched&&bmiEl?+bmiEl.value:(m.id==='height'?165:60));
+      $('trk-main-lbl').textContent=m.slider.label;
+      setupSlider(mainEl,m.slider,start); paintSlider(mainEl,$('trk-main-val'),m.slider);
+      var hrow=$('trk-h-row');
+      if(m.needsHeight){
+        hrow.style.display='block';
+        setupSlider(hEl,HCFG,heightCm()||165); paintSlider(hEl,$('trk-h-val'),HCFG);
+      } else hrow.style.display='none';
+    } else {
+      sl.style.display='none'; v1.style.display=''; v1.value=''; v2.value='';
+      v1.placeholder=two?m.parts[0].lbl:'Value ('+m.unit+')';
+      v2.placeholder=two?m.parts[1].lbl:''; v2.style.display=two?'':'none';
+    }
+    var dt=$('tracker-date'); dt.max=ymd(new Date()); dt.value=ymd(new Date());
+    refreshHint();
+  };
+
+  function fail(msg,el){
+    var o=$('tracker-msg'); o.textContent=msg; o.className='trk-msg trk-red'; if(el) el.focus();
+  }
+  window.addTrackerReading=function(){
+    var m=byId[$('tracker-select').value]; if(!m) return;
+    var vals=[], extra={};
+    if(m.slider){
+      vals.push(parseFloat(mainEl.value));
+      if(m.needsHeight) extra.h=parseFloat(hEl.value);
+    } else {
+      var inputs=[$('tracker-v1'),$('tracker-v2')];
+      for(var i=0;i<m.parts.length;i++){
+        var p=m.parts[i], raw=inputs[i].value, v=parseFloat(raw);
+        if(raw===''||isNaN(v)||v<p.min||v>p.max){
+          return fail('Please enter a valid '+p.lbl.toLowerCase()+' ('+p.min+'-'+p.max+' '+m.unit+').',inputs[i]);
+        }
+        vals.push(v);
+      }
+      if(m.id==='bp' && vals[0]<=vals[1]) return fail('Systolic should be higher than diastolic.',inputs[0]);
+    }
+    var today=ymd(new Date()), d=$('tracker-date').value||today;
+    if(d>today) return fail('The date can\u2019t be in the future.',$('tracker-date'));
+    var arr=data[m.id]||(data[m.id]=[]);
+    var rd={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6), d:d, ts:Date.now(), v:vals};
+    if(extra.h) rd.h=extra.h;
+    arr.push(rd);
+    arr.sort(function(a,b){ return a.d<b.d?-1:a.d>b.d?1:a.ts-b.ts; });
+    save();
+    if(!m.slider){ $('tracker-v1').value=''; $('tracker-v2').value=''; }
+    var o=$('tracker-msg'); o.textContent='Saved \u2014 see \u201C'+m.name+'\u201D below.'; o.className='trk-msg trk-green';
+    render();
+  };
+
+  window.resetTracker=function(){
+    if(!confirm('Reset the Tracker? This deletes all saved readings on this device.')) return;
+    data={}; open={}; save();
+    var sel=$('tracker-select'); if(sel) sel.value='';
+    $('tracker-entry').style.display='none'; $('tracker-sliders').style.display='none';
+    $('tracker-hint').textContent=''; $('tracker-msg').textContent='';
+    render();
+  };
+
+  window.downloadTrackerPDF=function(){
+    var keys=METRICS.filter(function(m){ return data[m.id]&&data[m.id].length; });
+    if(!keys.length){ alert('Add at least one reading first.'); return; }
+    if(!window.jspdf){ alert('The PDF tool could not be loaded. Please check your internet connection and try again.'); return; }
+    var doc=new window.jspdf.jsPDF({unit:'pt',format:'a4'});
+    var W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=40, y=M;
+    var INK=[30,41,59], GREEN=[21,128,61], RED=[185,28,28], ORANGE=[234,88,12], GREY=[100,116,139], TEAL=[14,116,144];
+    function write(txt,size,style,color,gap){
+      doc.setFont('helvetica',style||'normal'); doc.setFontSize(size); doc.setTextColor(color[0],color[1],color[2]);
+      var lines=doc.splitTextToSize(txt,W-2*M), h=lines.length*size*1.3;
+      if(y+h>H-M){ doc.addPage(); y=M; }
+      doc.text(lines,M,y+size); y+=h+(gap||0);
+    }
+    write('Vitals Tracker',20,'bold',TEAL,2);
+    write('Generated on '+fmtDate(ymd(new Date())),9,'normal',GREY,2);
+    write('Educational information only - not a diagnosis or medical advice. Ranges are general adult reference ranges; please review your readings with a doctor.',8,'normal',GREY,12);
+    var COL={ok:GREEN,better:ORANGE,bad:RED,none:GREY};
+    var TXT={ok:'In range',better:'Outside range (improved)',bad:'Outside range',none:'-'};
+    keys.forEach(function(m){
+      var arr=data[m.id], li=arr.length-1, last=arr[li], st=statusAt(m,arr,li);
+      if(y+90>H-M){ doc.addPage(); y=M; }
+      doc.setDrawColor(190,220,228); doc.line(M,y,W-M,y); y+=8;
+      write(m.name+' ('+m.unit+')',13,'bold',TEAL,3);
+      write('Acceptable range: '+rangeText(m,last),10,'normal',INK,2);
+      var stTxt=m.id==='height'?(st==='ok'?'Taller than previous reading':'-'):(st==='none'?'No range to compare':TXT[st]);
+      write('Latest: '+valFull(m,last)+' on '+fmtDate(last.d)+' - '+stTxt,10,'bold',COL[st],4);
+      write('Readings (newest first)',9,'bold',INK,2);
+      for(var i=li;i>=0;i--){
+        var r=arr[i], rs=statusAt(m,arr,i), c=COL[rs];
+        if(y+16>H-M){ doc.addPage(); y=M; }
+        doc.setFont('helvetica','normal'); doc.setFontSize(10);
+        doc.setTextColor(INK[0],INK[1],INK[2]); doc.text(fmtDate(r.d),M+8,y+10);
+        doc.setTextColor(c[0],c[1],c[2]);       doc.text(valFull(m,r),M+150,y+10);
+        doc.text(m.id==='height'?(rs==='ok'?'Increased':'-'):TXT[rs],M+330,y+10);
+        y+=15;
+      }
+      y+=10;
+    });
+    var n=doc.internal.getNumberOfPages();
+    for(var i=1;i<=n;i++){ doc.setPage(i); doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(GREY[0],GREY[1],GREY[2]); doc.text('Page '+i+' of '+n,W-M,H-18,{align:'right'}); }
+    doc.save('vitals-tracker-'+ymd(new Date())+'.pdf');
+  };
+
+  var hs=$('calc-height-slider');
+  if(hs) hs.addEventListener('input',function(){ render(); });
+  render();
 })();
 </script>
 </body>
