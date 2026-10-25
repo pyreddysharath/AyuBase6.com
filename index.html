@@ -3245,6 +3245,16 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
   border-radius: 50%;
 }
 </style>
+<style id="ayu-vitals-reset-bottom-spacing">
+/* Leave only the tap-target clearance below the final reset row. */
+#calculator-panel .calc-card:has(> .page-reset-row:last-child) {
+  padding-bottom: 8px;
+}
+#calculator-panel .calc-card > .page-reset-row:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+</style>
 </head>
 <body>
 
