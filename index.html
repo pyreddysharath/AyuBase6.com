@@ -3290,6 +3290,51 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 .lab-edit-act{width:28px;height:28px;padding:0;border:none;border-radius:50%;background:#e2e8f0;color:#475569;font-size:.9rem;line-height:1;cursor:pointer}
 .lab-edit-act.save{background:#16a34a;color:#fff}
 </style>
+<style id="section-title-line">
+.tab-panel :is(.calc-card-hdr,.alert-card-hdr,.rout-card-hdr,.mind-card-hdr,.calc-card > h2,.rout-card > h2,.card > h2,.body-age-title,.activity-type-title){
+  background-image:linear-gradient(90deg,var(--accent),transparent);
+  background-repeat:no-repeat;
+  background-position:left bottom;
+  background-size:100% 2px;
+  padding-bottom:12px !important;
+  margin-bottom:16px !important;
+  border-bottom:0 !important;
+}
+</style>
+<style id="sound-row-css">
+.alert-sound-row{flex-wrap:nowrap !important}
+.alert-sound-row .alert-sound-select{flex:1 1 0 !important;min-width:0 !important;width:auto;max-width:100% !important}
+.alert-sound-row .alert-icon-btn{flex:0 0 auto}
+/* The chosen value stays on one line (cut with "…" if it can't fit). */
+.tab-panel .alert-sound-select{box-sizing:border-box;white-space:nowrap;text-overflow:ellipsis;font-size:.8rem !important}
+.tab-panel .alert-sound-select option{white-space:nowrap}
+/* Every dropdown: the value is centred vertically. */
+.tab-panel select{box-sizing:border-box;height:44px;min-height:44px;line-height:normal !important;padding-top:0 !important;padding-bottom:0 !important}
+/* Customizable (base-select) dropdowns lay their value out from the top; centre it. */
+.tab-panel select{align-items:center !important}
+.tab-panel select option{align-items:center}
+</style>
+<style id="time-picker-css">
+.schedule-time-btn{cursor:pointer;font:inherit;font-weight:600;text-align:center;flex:1 1 0;min-width:0}
+.tp-overlay{position:fixed;inset:0;z-index:100000;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:20px}
+.tp-dialog{width:100%;max-width:320px;background:#fff;border-radius:18px;padding:20px 18px 14px;box-shadow:0 20px 50px rgba(15,23,42,.35)}
+.tp-title{font-size:1rem;font-weight:700;color:#134e4a;margin-bottom:14px}
+.tp-row{display:flex;align-items:center;justify-content:center;gap:8px}
+.tp-colon{font-size:1.4rem;font-weight:700;color:#134e4a}
+.tp-sel{font:inherit;font-size:1.25rem;padding:10px 6px;border:1.5px solid #94a3b8;border-radius:12px;background:#fff;color:#0f172a;min-width:64px;text-align:center}
+.tp-sel:focus-visible{outline:2px solid #0d9488;outline-offset:1px}
+.tp-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.tp-btn{font:inherit;font-weight:700;font-size:.95rem;padding:10px 18px;border:none;border-radius:12px;background:transparent;color:#0d9488;cursor:pointer}
+.tp-ok{background:#0d9488;color:#fff}
+.tp-display{display:flex;align-items:center;justify-content:center;gap:4px}
+.tp-seg{font:inherit;font-size:2.6rem;font-weight:600;line-height:1.1;padding:2px 12px;border:none;border-radius:12px;background:#e3f4f1;color:#134e4a;cursor:pointer}
+.tp-seg.on{background:#0d9488;color:#fff}
+.tp-ampm{display:flex;flex-direction:column;gap:4px;margin-left:8px}
+.tp-ampm button{font:inherit;font-size:.8rem;font-weight:700;padding:5px 10px;border:1.5px solid #0d9488;border-radius:8px;background:#fff;color:#0d9488;cursor:pointer}
+.tp-ampm button.on{background:#0d9488;color:#fff}
+.tp-dial{display:block;width:240px;height:240px;max-width:100%;margin:14px auto 0;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
+.tp-dial:focus-visible{outline:2px solid #0d9488;outline-offset:2px;border-radius:50%}
+</style>
 </head>
 <body>
 
@@ -3817,10 +3862,12 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 
       <div class="alert-row">
         <div class="eye-ex-time-list schedule-times">
-          <label class="schedule-lbl" for="schedule-start">From</label>
-          <input type="time" class="eye-ex-time-item" id="schedule-start" value="08:00" onchange="onScheduleChange()">
-          <label class="schedule-lbl" for="schedule-end">to</label>
-          <input type="time" class="eye-ex-time-item" id="schedule-end" value="19:00" onchange="onScheduleChange()">
+          <span class="schedule-lbl">From</span>
+          <button type="button" class="eye-ex-time-item schedule-time-btn" id="schedule-start-btn" onclick="openTimePicker('start')" aria-label="Start time"></button>
+          <input type="hidden" id="schedule-start" value="08:00">
+          <span class="schedule-lbl">to</span>
+          <button type="button" class="eye-ex-time-item schedule-time-btn" id="schedule-end-btn" onclick="openTimePicker('end')" aria-label="End time"></button>
+          <input type="hidden" id="schedule-end" value="19:00">
         </div>
       </div>
     </div>
@@ -4814,15 +4861,11 @@ let labEditing=null;        // id of the test whose value is being edited
   const sel=document.getElementById('lab-test-select');
   if(!sel) return;
   sel.innerHTML=[...LAB_REF].sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:'base'})).map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
-  // "Select a test" is the closed-state label only: it is removed while the list is open so the list shows just the tests.
-  const ph=document.createElement('option'); ph.value=''; ph.textContent='Select a test'; ph.disabled=true;
-  const showPlaceholder=()=>{ if(!ph.parentNode) sel.insertBefore(ph,sel.firstChild); sel.selectedIndex=0; };
-  const hidePlaceholder=()=>{ if(ph.parentNode && sel.value===''){ ph.remove(); sel.selectedIndex=-1; } };
-  ['focus','mousedown'].forEach(ev=>sel.addEventListener(ev,hidePlaceholder));
-  sel.addEventListener('touchstart',hidePlaceholder,{passive:true});
-  sel.addEventListener('blur',()=>{ if(sel.selectedIndex===-1) showPlaceholder(); });
-  window.labSelectShowPlaceholder=()=>{ showPlaceholder(); updateRange(); };
-  showPlaceholder();
+  // "Select a test" is a hidden, disabled first option: the closed box shows it, the open menu doesn't list it.
+  const ph=document.createElement('option'); ph.value=''; ph.textContent='Select a test'; ph.disabled=true; ph.hidden=true;
+  sel.insertBefore(ph,sel.firstChild);
+  sel.selectedIndex=0;
+  window.labSelectShowPlaceholder=()=>{ sel.selectedIndex=0; updateRange(); };
   const updateRange=()=>{
     const ref=LAB_REF.find(r=>r.id===sel.value);
     const out=document.getElementById('lab-selected-range');
@@ -8099,7 +8142,11 @@ function toggleAlertTask(key){
 //    null when nothing is wrong (permission granted). Used only right after
 //    the person clicks something, and shown only next to what they clicked.
 function notifProblemMessage(perm){
-  if(typeof Notification==='undefined') return "This browser doesn't support notifications.";
+  if(typeof Notification==='undefined'){
+    return /iPhone|iPad|iPod/i.test(navigator.userAgent||'')
+      ? "On iPhone, notifications only work once this page is added to your Home Screen (Share → Add to Home Screen) and opened from there."
+      : "This browser doesn't support notifications.";
+  }
   if(perm===undefined) perm=Notification.permission;
   if(perm==='granted') return null;
   if(isRestrictedFileOrigin()) return "This page is open as a local file, so the browser can't keep notification permission. Open it from a web address to use notifications.";
@@ -8211,11 +8258,13 @@ function initNudgeSW(){
     // to hear their clicks, so we use the registration directly instead of
     // waiting on navigator.serviceWorker.ready (which only resolves for pages
     // inside the worker's scope).
-    navigator.serviceWorker.register('config/sw.js').then(reg=>{
+    const adopt=reg=>{
       if(reg.active){ nudgeSwReg=reg; return; }
       const w=reg.installing||reg.waiting; if(!w) return;
       w.addEventListener('statechange', ()=>{ if(w.state==='activated') nudgeSwReg=reg; });
-    }).catch(()=>{});
+    };
+    navigator.serviceWorker.register('config/sw.js').then(adopt)
+      .catch(()=>navigator.serviceWorker.register('sw.js').then(adopt).catch(()=>{}));
   }catch(e){}
 }
 function handleNudgeClick(key, action){
@@ -8223,9 +8272,28 @@ function handleNudgeClick(key, action){
   if(action==='cancel') cancelEyeTimer();
   else startEyeTimer();
 }
-// Shows one nudge as a real notification. Returns true if one was shown.
+// Phones can't build Notification objects directly (Chrome on Android throws) — they must go
+// through a service worker, which is also what lets a reminder appear on the lock screen.
+const NUDGE_IS_PHONE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'')
+  || (window.matchMedia && matchMedia('(pointer:coarse)').matches && !matchMedia('(hover:hover)').matches);
+function getNudgeReg(){
+  if(nudgeSwReg) return Promise.resolve(nudgeSwReg);
+  if(!('serviceWorker' in navigator)) return Promise.resolve(null);
+  return navigator.serviceWorker.getRegistrations()
+    .then(list=>{ const r=list.find(x=>x.active)||null; if(r) nudgeSwReg=r; return r; })
+    .catch(()=>null);
+}
+// Last resort when no system notification can be made: the in-app card for that nudge.
+function nudgeInPageFallback(key){
+  const mock=document.getElementById(key==='eyeex'?'eye-ex-notif-mock':'alert-'+key+'-notif-mock');
+  if(!mock) return;
+  mock.classList.add('show');
+  if(key!=='break') setTimeout(()=>mock.classList.remove('show'),4000);
+}
+// Shows one nudge as a real notification. Returns true if one was shown (or is on its way).
 // - lotus icon / banner / badge, and it stays on screen until closed
 // - same tag per nudge, so an update replaces the old one instead of stacking
+// - vibrates, so it gets noticed on the lock screen as well as while the phone is in use
 function showNudgeNotification(title, body, o){
   o=o||{};
   if(typeof Notification==='undefined' || Notification.permission!=='granted') return false;
@@ -8234,15 +8302,22 @@ function showNudgeNotification(title, body, o){
   // earlier one with the same tag is still on screen; silent updates (the
   // countdown) just replace the text in place.
   const fresh=!o.silent;
-  const opts={ body:body, tag:'nudge-'+key, requireInteraction:true, silent:!!o.silent, renotify:fresh, data:{key:key} };
+  const opts={ body:body, tag:'nudge-'+key, requireInteraction:true, silent:!!o.silent, renotify:fresh, data:{key:key}, timestamp:Date.now() };
+  if(fresh) opts.vibrate=[200,100,200,100,200];
   const icon=nudgeArt('icon'), badge=nudgeArt('badge');
   if(icon) opts.icon=icon; if(badge) opts.badge=badge;
+  const viaReg=reg=>{
+    if(o.actions) opts.actions=o.actions;
+    const show=()=>reg.showNotification(title, opts);
+    return fresh ? reg.getNotifications({tag:opts.tag}).then(l=>{ l.forEach(n=>n.close()); return show(); }) : show();
+  };
   try{
     if(nudgeSwReg){
-      if(o.actions) opts.actions=o.actions;
-      const show=()=>nudgeSwReg.showNotification(title, opts);
-      const done=fresh ? nudgeSwReg.getNotifications({tag:opts.tag}).then(l=>{ l.forEach(n=>n.close()); return show(); }) : show();
-      done.catch(()=>{ try{ delete opts.actions; new Notification(title, opts); }catch(e){} });
+      viaReg(nudgeSwReg).catch(()=>{ try{ delete opts.actions; new Notification(title, opts); }catch(e){} });
+      return true;
+    }
+    if(NUDGE_IS_PHONE && 'serviceWorker' in navigator){
+      getNudgeReg().then(reg=>{ if(reg) return viaReg(reg); nudgeInPageFallback(key); }).catch(()=>nudgeInPageFallback(key));
       return true;
     }
     if(fresh && nudgeLast[key]){ try{ nudgeLast[key].close(); }catch(e){} }
@@ -8461,7 +8536,7 @@ function fireAlert(key){
   if(!alertState[key].muted) playAlertPreset(alertState[key].sound);
   let shown=false;
   if(alertState[key].notify && typeof Notification!=='undefined' && Notification.permission==='granted'){
-    shown = openNudgePopup(key, info.title, info.msg, {timer:key==='break'})
+    shown = (!NUDGE_IS_PHONE && openNudgePopup(key, info.title, info.msg, {timer:key==='break'}))
       || ((key==='break') ? showEyeReminderNotification() : showNudgeNotification(info.title, info.msg, {key:key}));
   }
   if(!shown){
@@ -8713,11 +8788,104 @@ function onScheduleChange(){
   if(b) scheduleState.end=b;
   eyeExState.times=computeEyeExTimes();
   eyeExState.lastFiredKey=null;
+  renderScheduleBtns();
+}
+// ── Time picker with OK / Cancel (the browser's own time popup can't be changed) ──
+function fmt12(hhmm){
+  const p=String(hhmm||'').split(':').map(Number); if(p.length<2||p.some(isNaN)) return '';
+  return (p[0]%12||12)+':'+String(p[1]).padStart(2,'0')+' '+(p[0]>=12?'PM':'AM');
+}
+function renderScheduleBtns(){
+  const a=document.getElementById('schedule-start-btn'), b=document.getElementById('schedule-end-btn');
+  if(a) a.textContent=fmt12(scheduleState.start);
+  if(b) b.textContent=fmt12(scheduleState.end);
+}
+function openTimePicker(which){
+  const hid=document.getElementById('schedule-'+which); if(!hid) return;
+  const opener=document.getElementById('schedule-'+which+'-btn');
+  const cur=String(hid.value||'08:00').split(':').map(Number);
+  let h=(cur[0]%12)||12, m=cur[1]||0, pm=cur[0]>=12, mode='h', dragging=false;
+  const C=120, NUM_R=90, HAND_R=72, pad=n=>String(n).padStart(2,'0');
+  const ov=document.createElement('div');
+  ov.className='tp-overlay';
+  ov.innerHTML=`<div class="tp-dialog" role="dialog" aria-modal="true" aria-label="${which==='start'?'Start':'End'} time">
+    <div class="tp-title">${which==='start'?'Start time':'End time'}</div>
+    <div class="tp-display">
+      <button type="button" class="tp-seg" id="tp-hbtn" aria-label="Set hour"></button>
+      <span class="tp-colon">:</span>
+      <button type="button" class="tp-seg" id="tp-mbtn" aria-label="Set minutes"></button>
+      <div class="tp-ampm">
+        <button type="button" id="tp-am">AM</button>
+        <button type="button" id="tp-pm">PM</button>
+      </div>
+    </div>
+    <svg class="tp-dial" id="tp-dial" viewBox="0 0 240 240" tabindex="0" role="slider" aria-label="Clock. Use the arrow keys to change the value."></svg>
+    <div class="tp-actions">
+      <button type="button" class="tp-btn" id="tp-cancel">Cancel</button>
+      <button type="button" class="tp-btn tp-ok" id="tp-ok">OK</button>
+    </div></div>`;
+  document.body.appendChild(ov);
+  const $q=id=>ov.querySelector('#'+id), dial=$q('tp-dial');
+  const xy=(deg,r)=>[C+r*Math.sin(deg*Math.PI/180), C-r*Math.cos(deg*Math.PI/180)];
+  function paint(){
+    $q('tp-hbtn').textContent=pad(h); $q('tp-mbtn').textContent=pad(m);
+    $q('tp-hbtn').classList.toggle('on',mode==='h'); $q('tp-mbtn').classList.toggle('on',mode==='m');
+    $q('tp-am').classList.toggle('on',!pm); $q('tp-pm').classList.toggle('on',pm);
+    const val=mode==='h'?h:m, deg=mode==='h'?(h%12)*30:m*6;
+    const [hx,hy]=xy(deg,HAND_R), [bx,by]=xy(deg,NUM_R);
+    const onFace=mode==='h'||m%5===0;
+    let svg=`<circle cx="${C}" cy="${C}" r="112" fill="#e3f4f1"/>
+      <line x1="${C}" y1="${C}" x2="${hx}" y2="${hy}" stroke="#0d9488" stroke-width="2"/>
+      <circle cx="${C}" cy="${C}" r="4" fill="#0d9488"/>
+      <circle cx="${bx}" cy="${by}" r="19" fill="#0d9488"/>`;
+    if(!onFace) svg+=`<circle cx="${bx}" cy="${by}" r="3" fill="#fff"/>`;
+    for(let i=0;i<12;i++){
+      const label=mode==='h'?(i===0?12:i):i*5, sel=(mode==='h'?label===h:label===m);
+      const [x,y]=xy(i*30,NUM_R);
+      svg+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="600" fill="${sel?'#fff':'#134e4a'}" style="pointer-events:none">${mode==='h'?label:pad(label)}</text>`;
+    }
+    dial.innerHTML=svg;
+    dial.setAttribute('aria-valuenow',String(val));
+  }
+  function setFromPoint(e){
+    const r=dial.getBoundingClientRect(); if(!r.width) return;
+    const x=(e.clientX-r.left)/r.width*240-C, y=(e.clientY-r.top)/r.height*240-C;
+    let ang=Math.atan2(y,x)*180/Math.PI+90; if(ang<0) ang+=360;
+    if(mode==='h'){ h=Math.round(ang/30)%12||12; } else { m=Math.round(ang/6)%60; }
+    paint();
+  }
+  dial.addEventListener('pointerdown',e=>{ dragging=true; try{ dial.setPointerCapture(e.pointerId); }catch(_){} setFromPoint(e); });
+  dial.addEventListener('pointermove',e=>{ if(dragging) setFromPoint(e); });
+  const endDrag=()=>{ if(!dragging) return; dragging=false; if(mode==='h'){ mode='m'; paint(); } };
+  dial.addEventListener('pointerup',endDrag);
+  dial.addEventListener('pointercancel',()=>{ dragging=false; });
+  dial.addEventListener('keydown',e=>{
+    const d=(e.key==='ArrowUp'||e.key==='ArrowRight')?1:(e.key==='ArrowDown'||e.key==='ArrowLeft')?-1:0;
+    if(d){ e.preventDefault(); if(mode==='h') h=((h-1+d+12)%12)+1; else m=(m+d+60)%60; paint(); }
+    else if(e.key==='Enter'){ e.preventDefault(); $q('tp-ok').click(); }
+  });
+  $q('tp-hbtn').addEventListener('click',()=>{ mode='h'; paint(); });
+  $q('tp-mbtn').addEventListener('click',()=>{ mode='m'; paint(); });
+  $q('tp-am').addEventListener('click',()=>{ pm=false; paint(); });
+  $q('tp-pm').addEventListener('click',()=>{ pm=true; paint(); });
+  const close=()=>{ document.removeEventListener('keydown',onKey,true); ov.remove(); if(opener) opener.focus(); };
+  const onKey=e=>{ if(e.key==='Escape'){ e.preventDefault(); close(); } };
+  document.addEventListener('keydown',onKey,true);
+  ov.addEventListener('click',e=>{ if(e.target===ov) close(); });
+  $q('tp-cancel').addEventListener('click',close);
+  $q('tp-ok').addEventListener('click',()=>{
+    hid.value=pad((h%12)+(pm?12:0))+':'+pad(m);
+    onScheduleChange();
+    close();
+  });
+  paint();
+  dial.focus();
 }
 function resetScheduleToDefault(){
   Object.assign(scheduleState, SCHEDULE_DEFAULTS);
   document.getElementById('schedule-start').value=scheduleState.start;
   document.getElementById('schedule-end').value=scheduleState.end;
+  renderScheduleBtns();
   eyeExState.times=computeEyeExTimes();
 }
 function onEyeExCountChange(){
@@ -8782,7 +8950,7 @@ function fireEyeExAlert(){
   if(!eyeExState.muted) playAlertPreset(eyeExState.sound);
   let shown=false;
   if(eyeExState.notify && typeof Notification!=='undefined' && Notification.permission==='granted'){
-    shown=openNudgePopup('eyeex', 'Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.')
+    shown=(!NUDGE_IS_PHONE && openNudgePopup('eyeex', 'Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.'))
       || showNudgeNotification('Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {key:'eyeex'});
   }
   if(!shown){
@@ -8797,14 +8965,20 @@ function checkEyeExTimes(){
   if(!eyeExState.enabled) return;
   const now=new Date();
   if(!eyeExState.weekdays.includes(now.getDay())) return; // rest day — skip
-  const hh=String(now.getHours()).padStart(2,'0'), mm=String(now.getMinutes()).padStart(2,'0');
-  const nowKey=hh+':'+mm;
-  if(eyeExState.times.includes(nowKey) && eyeExState.lastFiredKey!==nowKey){
-    eyeExState.lastFiredKey=nowKey;
+  const nowMin=now.getHours()*60+now.getMinutes();
+  // A phone that was locked (page paused) can wake up a few minutes late, so a time counts as
+  // due for 10 minutes after it passes. The key includes the date, so it fires once per day.
+  const due=eyeExState.times.find(t=>{ const p=t.split(':').map(Number); const d=nowMin-(p[0]*60+p[1]); return d>=0 && d<=10; });
+  if(!due) return;
+  const dayKey=now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate()+' '+due;
+  if(eyeExState.lastFiredKey!==dayKey){
+    eyeExState.lastFiredKey=dayKey;
     fireEyeExAlert();
   }
 }
 eyeExState.checkTimerId=setInterval(checkEyeExTimes, 20000);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) checkEyeExTimes(); });   // catch up right after unlocking
+renderScheduleBtns();
 eyeExState.enabled=true;
 eyeExState.notify=(typeof Notification!=='undefined' && Notification.permission==='granted');
 // Now that both alertState and eyeExState exist, it's safe to run the
