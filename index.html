@@ -3225,6 +3225,26 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
   }
 }
 </style>
+<style id="ayu-smaller-vitals-reset-icons">
+#calculator-panel .reset-icon-btn.icon-only {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  border-width: 1.5px;
+}
+#calculator-panel .reset-icon-btn.icon-only svg {
+  width: 13px;
+  height: 13px;
+}
+/* Keep an easy-to-tap target around the smaller visible control. */
+#calculator-panel .reset-icon-btn.icon-only::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+}
+</style>
 </head>
 <body>
 
