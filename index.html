@@ -1657,6 +1657,9 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 }
 .eye-ex-status.eye-ex-status-hidden{opacity:0}
 .eye-ex-time-list{display:flex;flex-wrap:wrap;gap:8px}
+.schedule-times{align-items:center;flex-wrap:nowrap;gap:6px}
+.schedule-times .eye-ex-time-item{flex:1 1 0;min-width:0;width:100%;box-sizing:border-box}
+.schedule-lbl{font-size:.8rem;font-weight:600;color:var(--alert-1)}
 .eye-ex-time-item{
   padding:6px 8px;border-radius:8px;border:1.5px solid var(--alert-3);
   background:#fff;font-size:.8rem;color:#134e4a;
@@ -2424,7 +2427,7 @@ h2, .tab-panel h2,
 
 /* Nudges top row: just the Enable / Disable button. Any problem shows
    only after a click, right under the control that was clicked. */
-.reminders-notif-banner.nudges-actions{ flex-direction:column; justify-content:center; align-items:center; gap:12px;
+.reminders-notif-banner.nudges-actions{ flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center; gap:12px;
   background:none; border:none; padding:0; margin:10px 0 0; }
 .reminders-notif-banner.nudges-actions .reminders-notif-banner-btn{ min-height:40px; border-radius:10px; }
 .reminders-notif-error{ margin:12px auto 0; max-width:520px; }
@@ -3124,6 +3127,28 @@ body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
   }
 }
 </style>
+<style id="schedule-card-inverse">
+/* Schedule: inverted look — the flower's teal becomes the card background and the flower turns white,
+   so it reads as a settings block rather than another exercise card. */
+html[data-petal-card="e"] #alerts-panel #alert-card-schedule{
+  background-color:#2dd4bf !important; border-color:#14b8a6 !important;
+  backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
+}
+html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:#fff !important; opacity:.4 !important; }
+#alerts-panel #alert-card-schedule h2,
+#alerts-panel #alert-card-schedule .section-title-icon,
+#alerts-panel #alert-card-schedule .schedule-lbl{ color:var(--alert-1) !important; }
+#alerts-panel #alert-card-schedule .eye-ex-time-item{
+  background:#fff !important; background-color:#fff !important; border-color:var(--alert-1) !important; color:var(--alert-1) !important;
+}
+#alerts-panel #alert-card-schedule .alert-info-btn{
+  background:#fff !important; border-color:var(--alert-1) !important; color:var(--alert-1) !important;
+}
+#alerts-panel #alert-card-schedule .alert-info-btn:hover,
+#alerts-panel #alert-card-schedule .alert-info-btn.active{
+  background:var(--alert-1) !important; color:#fff !important;
+}
+</style>
 </head>
 <body>
 
@@ -3365,7 +3390,7 @@ body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
       </div>
 
       <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Sound</div>
+        <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
         <div class="alert-sound-row">
           <select id="alert-break-sound" class="alert-sound-select" onchange="onAlertSoundChange('break')">
             <option value="chime">Gentle Chime (default)</option>
@@ -3417,7 +3442,7 @@ body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
       </div>
 
       <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Sound</div>
+        <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
         <div class="alert-sound-row">
           <select id="alert-walk-sound" class="alert-sound-select" onchange="onAlertSoundChange('walk')">
             <option value="drum">Drum Beat (default)</option>
@@ -3470,7 +3495,7 @@ body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
       </div>
 
       <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Sound</div>
+        <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
         <div class="alert-sound-row">
           <select id="alert-drink-sound" class="alert-sound-select" onchange="onAlertSoundChange('drink')">
             <option value="drop">Water Drop (default)</option>
@@ -3529,31 +3554,24 @@ body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
         </div>
 
         <div class="alert-row">
-          <div class="alert-row-lbl dotted-lbl">Do this <span class="alert-time-val" id="eye-ex-count-lbl">2</span> times a day</div>
+          <div class="alert-row-lbl dotted-lbl">Sessions per day</div>
           <select id="eye-ex-count" class="alert-sound-select" onchange="onEyeExCountChange()">
             <option value="1">1 time a day</option>
             <option value="2" selected>2 times a day (recommended)</option>
           </select>
-          <div class="alert-card-sub" style="margin:6px 0 0">One in the morning, one in the evening after screen work. Not back-to-back.</div>
         </div>
 
         <div class="alert-row">
-          <div class="alert-row-lbl dotted-lbl">On <span class="alert-time-val" id="eye-ex-days-lbl">4</span> days a week</div>
+          <div class="alert-row-lbl dotted-lbl">Days per week</div>
           <select id="eye-ex-days" class="alert-sound-select" onchange="onEyeExDaysChange()">
-            <option value="3">3 days a week</option>
-            <option value="4" selected>4 days a week (recommended)</option>
-            <option value="5">5 days a week</option>
+            <option value="3">3 days: Mon, Wed, Fri</option>
+            <option value="4" selected>4 days: Mon, Tue, Thu, Fri (recommended)</option>
+            <option value="5">5 days: Mon–Fri</option>
           </select>
-          <div class="alert-card-sub" style="margin:6px 0 0" id="eye-ex-days-sub"></div>
         </div>
 
         <div class="alert-row">
-          <div class="alert-row-lbl dotted-lbl">At these times</div>
-          <div class="eye-ex-time-list" id="eye-ex-time-list"></div>
-        </div>
-
-        <div class="alert-row">
-          <div class="alert-row-lbl dotted-lbl">Sound</div>
+          <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
           <div class="alert-sound-row">
             <select id="eye-ex-sound" class="alert-sound-select" onchange="onEyeExSoundChange()">
               <option value="xylophone">Xylophone (default)</option>
@@ -3582,7 +3600,32 @@ body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
       </div>
     </div>
 
-    <!-- Reset, then (on the next line) the Enable / Disable All Notifications switch, centred. -->
+    <!-- SCHEDULE — common to every nudge above; sits at the bottom, above the action buttons. -->
+    <div class="alert-card" id="alert-card-schedule">
+      <div class="alert-card-hdr">
+        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg><span class="section-title-text">Schedule</span></h2>
+        <button type="button" class="alert-info-btn" id="alert-schedule-info-btn" onclick="toggleAlertTask('schedule')" title="About the schedule">i</button>
+      </div>
+
+      <div class="alert-task" id="alert-schedule-task" style="display:none">
+        <p class="alert-card-sub">Applies to every nudge above — Eyes, Walk, Water and Eyes (Exercise) only remind you inside this window.</p>
+        <ul>
+          <li>Eyes, Walk and Water keep their own “Remind every” interval, but stay quiet outside the window</li>
+          <li>Eyes (Exercise) reminds you at the start of the window (1 time a day) or at the start and end (2 times a day), on the days set in its own section</li>
+        </ul>
+      </div>
+
+      <div class="alert-row">
+        <div class="eye-ex-time-list schedule-times">
+          <label class="schedule-lbl" for="schedule-start">From</label>
+          <input type="time" class="eye-ex-time-item" id="schedule-start" value="08:00" onchange="onScheduleChange()">
+          <label class="schedule-lbl" for="schedule-end">to</label>
+          <input type="time" class="eye-ex-time-item" id="schedule-end" value="19:00" onchange="onScheduleChange()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Reset and Enable / Disable All Notifications, side by side and centred. -->
     <div class="reminders-notif-banner nudges-actions" id="reminders-notif-banner">
       <button type="button" class="reset-icon-btn" title="Reset Nudges to defaults" onclick="resetRemindersToDefault()">↺ Reset</button>
       <button type="button" class="reminders-notif-banner-btn" onclick="toggleMasterNotify('reminders-notif-error')">Enable All Notifications</button>
@@ -7547,6 +7590,17 @@ function playAlertPreset(name){
   }catch(e){ /* Web Audio unavailable — sound just won't play */ }
 }
 
+// ── Common Schedule: one daily window shared by every nudge ──
+const SCHEDULE_DEFAULTS={ start:'08:00', end:'19:00' };
+const scheduleState={ ...SCHEDULE_DEFAULTS };
+function hhmmToMin(t){ const m=/^(\d{1,2}):(\d{2})$/.exec(t||''); return m ? (+m[1])*60+(+m[2]) : null; }
+function inScheduleWindow(d){
+  const now=d||new Date();
+  const cur=now.getHours()*60+now.getMinutes();
+  const a=hhmmToMin(scheduleState.start), b=hhmmToMin(scheduleState.end);
+  if(a===null || b===null || a===b) return true;      // incomplete / identical → no restriction
+  return a<b ? (cur>=a && cur<=b) : (cur>=a || cur<=b); // overnight windows supported
+}
 const ALERT_DEFAULTS={ break:{minutes:20,sound:'chime'}, walk:{minutes:45,sound:'drum'}, drink:{minutes:60,sound:'drop'} };
 const ALERT_LABELS={
   break:{title:'Eyes', icon:'👁️', msg:'Look 20 feet away for 20 seconds — 20-20-20 time!'},
@@ -7968,7 +8022,7 @@ function scheduleAlertTimer(key){
   const st=alertState[key];
   if(st.timerId){ clearInterval(st.timerId); st.timerId=null; }
   if(st.enabled && st.minutes>0){
-    st.timerId=setInterval(()=>fireAlert(key), st.minutes*60000);
+    st.timerId=setInterval(()=>{ if(inScheduleWindow()) fireAlert(key); }, st.minutes*60000);
   }
 }
 
@@ -8189,36 +8243,36 @@ const EYE_EX_DAYS_PRESETS={
 const EYE_EX_DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const eyeExState={ enabled:true, count:2, times:[...EYE_EX_TIME_DEFAULTS[2]], days:4, weekdays:[...EYE_EX_DAYS_PRESETS[4]], sound:'xylophone', muted:false, notify:false, checkTimerId:null, lastFiredKey:null };
 
-function renderEyeExTimes(){
-  const wrap=document.getElementById('eye-ex-time-list');
-  if(!wrap) return;
-  wrap.innerHTML=eyeExState.times.map((t,i)=>
-    `<input type="time" class="eye-ex-time-item" value="${t}" data-idx="${i}">`
-  ).join('');
-  wrap.querySelectorAll('.eye-ex-time-item').forEach(inp=>{
-    inp.addEventListener('change',()=>{
-      eyeExState.times[+inp.dataset.idx]=inp.value;
-    });
-  });
+// The exercise fires as many times a day as its own "times a day" setting
+// says (1 = at the start of the Schedule, 2 = start and end), and only on
+// the days its own "days a week" setting picks.
+function computeEyeExTimes(){
+  const list=eyeExState.count===1 ? [scheduleState.start] : [scheduleState.start, scheduleState.end];
+  return [...new Set(list.filter(Boolean))];
 }
-function renderEyeExDaysSub(){
-  const sub=document.getElementById('eye-ex-days-sub');
-  if(!sub) return;
-  sub.textContent=eyeExState.weekdays.map(d=>EYE_EX_DAY_NAMES[d]).join(', ')+' — the rest of the week is a break.';
+function onScheduleChange(){
+  const a=document.getElementById('schedule-start').value;
+  const b=document.getElementById('schedule-end').value;
+  if(a) scheduleState.start=a;
+  if(b) scheduleState.end=b;
+  eyeExState.times=computeEyeExTimes();
+  eyeExState.lastFiredKey=null;
+}
+function resetScheduleToDefault(){
+  Object.assign(scheduleState, SCHEDULE_DEFAULTS);
+  document.getElementById('schedule-start').value=scheduleState.start;
+  document.getElementById('schedule-end').value=scheduleState.end;
+  eyeExState.times=computeEyeExTimes();
 }
 function onEyeExCountChange(){
   const count=+document.getElementById('eye-ex-count').value;
   eyeExState.count=count;
-  eyeExState.times=[...EYE_EX_TIME_DEFAULTS[count]];
-  document.getElementById('eye-ex-count-lbl').textContent=count;
-  renderEyeExTimes();
+  eyeExState.times=computeEyeExTimes();
 }
 function onEyeExDaysChange(){
   const days=+document.getElementById('eye-ex-days').value;
   eyeExState.days=days;
   eyeExState.weekdays=[...EYE_EX_DAYS_PRESETS[days]];
-  document.getElementById('eye-ex-days-lbl').textContent=days;
-  renderEyeExDaysSub();
 }
 function onEyeExSoundChange(){
   eyeExState.sound=document.getElementById('eye-ex-sound').value;
@@ -8297,8 +8351,6 @@ function checkEyeExTimes(){
 eyeExState.checkTimerId=setInterval(checkEyeExTimes, 20000);
 eyeExState.enabled=true;
 eyeExState.notify=(typeof Notification!=='undefined' && Notification.permission==='granted');
-renderEyeExTimes();
-renderEyeExDaysSub();
 // Now that both alertState and eyeExState exist, it's safe to run the
 // initial notification-status refresh (see the note above, near the
 // alertState init loop) — this paints the banner/footer status correctly
@@ -8642,6 +8694,11 @@ function resetRemindersToDefault(){
     scheduleAlertTimer(key);
   });
 
+  const schTaskBody=document.getElementById('alert-schedule-task');
+  if(schTaskBody) schTaskBody.style.display='none';
+  const schInfoBtn=document.getElementById('alert-schedule-info-btn');
+  if(schInfoBtn) schInfoBtn.classList.remove('active');
+
   const exTaskBody=document.getElementById('alert-break-ex-task');
   if(exTaskBody) exTaskBody.style.display='none';
   const exInfoBtn=document.getElementById('alert-break-ex-info-btn');
@@ -8649,10 +8706,7 @@ function resetRemindersToDefault(){
 
   Object.assign(eyeExState, { enabled:true, count:2, times:[...EYE_EX_TIME_DEFAULTS[2]], days:4, weekdays:[...EYE_EX_DAYS_PRESETS[4]], sound:'xylophone', muted:false, notify:permGranted, lastFiredKey:null });
   document.getElementById('eye-ex-count').value='2';
-  document.getElementById('eye-ex-count-lbl').textContent='2';
   document.getElementById('eye-ex-days').value='4';
-  document.getElementById('eye-ex-days-lbl').textContent='4';
-  renderEyeExDaysSub();
   document.getElementById('eye-ex-sound').value='xylophone';
   const eyeMuteBtn=document.getElementById('eye-ex-mute');
   eyeMuteBtn.textContent='🔊'; eyeMuteBtn.classList.remove('muted');
@@ -8670,7 +8724,7 @@ function resetRemindersToDefault(){
   updateEyeExBtn();
   const exStage=document.getElementById('eye-ex-stage');
   if(exStage && exStage.classList.contains('maximized')) toggleEyeExMaximize();
-  renderEyeExTimes();
+  resetScheduleToDefault();
 }
 
 let currentDayIndex = 0;
