@@ -3458,7 +3458,7 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 
       <div class="lab-manual-row" style="margin-bottom:8px">
         <select id="tracker-select" class="lab-select" onchange="onTrackerSelect()" aria-label="Reading to add">
-          <option value="">Select a reading…</option>
+          <option value="" selected disabled hidden style="display:none">Select a reading…</option>
         </select>
       </div>
 
@@ -10543,6 +10543,8 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       g.ids.forEach(function(id){ var o=document.createElement('option'); o.value=id; o.textContent=byId[id].name; og.appendChild(o); });
       sel.appendChild(og);
     });
+    // Keep the hidden placeholder selected after adding the reading groups.
+    sel.value='';
   })();
 
   var listEl=$('tracker-list');
