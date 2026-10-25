@@ -3307,7 +3307,6 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 .alert-sound-row .alert-icon-btn{flex:0 0 auto}
 /* The chosen value stays on one line (cut with "…" if it can't fit). */
 .tab-panel .alert-sound-select{box-sizing:border-box;white-space:nowrap;text-overflow:ellipsis;font-size:.8rem !important}
-.tab-panel .alert-sound-select option{white-space:nowrap}
 /* Every dropdown: the value is centred vertically. */
 .tab-panel select{box-sizing:border-box;height:44px;min-height:44px;line-height:normal !important;padding-top:0 !important;padding-bottom:0 !important}
 /* Customizable (base-select) dropdowns lay their value out from the top; centre it. */
@@ -3334,6 +3333,20 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 .tp-ampm button.on{background:#0d9488;color:#fff}
 .tp-dial{display:block;width:240px;height:240px;max-width:100%;margin:14px auto 0;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
 .tp-dial:focus-visible{outline:2px solid #0d9488;outline-offset:2px;border-radius:50%}
+</style>
+<style id="ayu-dropdown-fixes">
+/* "i" info icons: clearly inclined */
+.calc-info-btn,.alert-info-btn,.rout-info-btn{font-family:Georgia,'Times New Roman',serif !important;font-style:italic !important;font-weight:700}
+/* "Value" placeholders look like the "Test name" dropdown text */
+.tab-panel .lab-value-input::placeholder{color:var(--accent,#0e7490);font-size:.82rem;opacity:1}
+@supports (appearance: base-select){
+  /* Closed box: the chosen value shrinks with "…" instead of spilling out past the arrow. */
+  .tab-panel select > button{display:flex;align-items:center;flex:1 1 auto;min-width:0;width:100%;padding:0;border:0;background:none;font:inherit;color:inherit;text-align:left;cursor:pointer}
+  .tab-panel select selectedcontent{display:block;flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  /* Open list: stays inside the screen, wraps long values, and keeps its scrolling to itself. */
+  .tab-panel select::picker(select){box-sizing:border-box;width:max(anchor-size(width),240px);min-width:anchor-size(width);max-width:calc(100vw - 24px);max-height:var(--picker-max,min(60vh,420px));overscroll-behavior:contain}
+  .tab-panel select option{white-space:normal;overflow-wrap:anywhere}
+}
 </style>
 </head>
 <body>
@@ -3568,7 +3581,7 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 
       <div class="lab-manual-row" style="margin-bottom:8px">
         <select id="tracker-select" class="lab-select" onchange="onTrackerSelect()" aria-label="Reading to add">
-          <option value="" selected disabled hidden style="display:none">Select a reading…</option>
+          <option value="" selected disabled hidden style="display:none">Reading type</option>
         </select>
       </div>
 
@@ -4862,7 +4875,7 @@ let labEditing=null;        // id of the test whose value is being edited
   if(!sel) return;
   sel.innerHTML=[...LAB_REF].sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:'base'})).map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
   // "Select a test" is a hidden, disabled first option: the closed box shows it, the open menu doesn't list it.
-  const ph=document.createElement('option'); ph.value=''; ph.textContent='Select a test'; ph.disabled=true; ph.hidden=true;
+  const ph=document.createElement('option'); ph.value=''; ph.textContent='Test name'; ph.disabled=true; ph.hidden=true;
   sel.insertBefore(ph,sel.firstChild);
   sel.selectedIndex=0;
   window.labSelectShowPlaceholder=()=>{ sel.selectedIndex=0; updateRange(); };
@@ -11031,9 +11044,11 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   // ---- the dropdown (grouped) ----
   (function buildSelect(){
     var sel=$('tracker-select'); if(!sel) return;
-    GROUPS.forEach(function(g){
+    // Categories A-Z, and the readings inside each category A-Z.
+    var byName=function(a,b){ return a.localeCompare(b,undefined,{sensitivity:'base'}); };
+    GROUPS.slice().sort(function(a,b){ return byName(a.name,b.name); }).forEach(function(g){
       var og=document.createElement('optgroup'); og.label=g.name;
-      g.ids.forEach(function(id){ var o=document.createElement('option'); o.value=id; o.textContent=byId[id].name; og.appendChild(o); });
+      g.ids.slice().sort(function(x,y){ return byName(byId[x].name,byId[y].name); }).forEach(function(id){ var o=document.createElement('option'); o.value=id; o.textContent=byId[id].name; og.appendChild(o); });
       sel.appendChild(og);
     });
     // Keep the hidden placeholder selected after adding the reading groups.
@@ -11205,6 +11220,29 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   var hs=$('calc-height-slider');
   if(hs) hs.addEventListener('input',function(){ render(); });
   render();
+})();
+</script>
+<script id="ayu-dropdown-fixes-js">
+(function(){
+  if(!(window.CSS && CSS.supports && CSS.supports('appearance','base-select'))) return;
+  const prep=root=>{
+    (root.matches&&root.matches('.tab-panel select')?[root]:[]).concat([...(root.querySelectorAll?root.querySelectorAll('.tab-panel select'):[])]).forEach(sel=>{
+      if(sel.querySelector(':scope > button')) return;
+      const b=document.createElement('button'); b.type='button'; b.appendChild(document.createElement('selectedcontent'));
+      sel.insertBefore(b,sel.firstChild);
+    });
+  };
+  prep(document);
+  new MutationObserver(m=>m.forEach(r=>r.addedNodes.forEach(n=>{ if(n.nodeType===1) prep(n); }))).observe(document.body,{childList:true,subtree:true});
+  // Give the open list only as much height as the screen has room for (above or below the box).
+  const size=sel=>{
+    const r=sel.getBoundingClientRect(), vh=(window.visualViewport?visualViewport.height:innerHeight);
+    sel.style.setProperty('--picker-max',Math.max(160,Math.min(420,Math.max(vh-r.bottom,r.top)-16))+'px');
+  };
+  const onTouch=e=>{ const s=e.target.closest&&e.target.closest('.tab-panel select'); if(s) size(s); };
+  document.addEventListener('pointerdown',onTouch,true);
+  document.addEventListener('touchstart',onTouch,true);
+  document.addEventListener('keydown',e=>{ if(e.target.matches&&e.target.matches('.tab-panel select')) size(e.target); },true);
 })();
 </script>
 </body>
