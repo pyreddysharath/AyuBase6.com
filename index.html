@@ -3256,6 +3256,40 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
+<style id="lab-sections-css">
+.sec-logo{flex:0 0 auto;width:30px;height:30px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--calc-2),var(--calc-1));color:#fff;box-shadow:0 2px 6px rgba(8,145,178,.3)}
+.sec-logo svg{width:18px;height:18px}
+.lab-sec{border:1px solid;border-left-width:5px;border-radius:12px;margin-bottom:10px;overflow:hidden}
+.lab-sec-ok{background:#ecfdf5;border-color:#86efac;border-left-color:#16a34a}
+.lab-sec-bad{background:#fef2f2;border-color:#fca5a5;border-left-color:#dc2626}
+.lab-sec-na{background:#f1f5f9;border-color:#cbd5e1;border-left-color:#94a3b8}
+.lab-sec-sum{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;cursor:pointer;list-style:none}
+.lab-sec-sum::-webkit-details-marker{display:none}
+.lab-sec-sum:focus-visible{outline:2px solid var(--calc-1);outline-offset:-2px}
+.lab-sec-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.lab-sec-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lab-sec-name{font-weight:700;font-size:.9rem;min-width:0}
+.lab-sec-ok .lab-sec-name{color:#166534}.lab-sec-bad .lab-sec-name{color:#991b1b}.lab-sec-na .lab-sec-name{color:#475569}
+.lab-sec-vals{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:.74rem;color:#4b5563}
+.lab-sec-vals b{font-weight:700;color:#1f2937}
+.lab-sec-badge{flex:0 0 auto;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.2px}
+.lab-sec-badge.ok{background:#dcfce7;color:#166534}
+.lab-sec-badge.low{background:#fee2e2;color:#b91c1c}
+.lab-sec-badge.high{background:#ffedd5;color:#c2410c}
+.lab-sec-badge.na{background:#e2e8f0;color:#475569}
+.lab-sec-chev{flex:0 0 auto;font-size:.9rem;line-height:1.5;color:#64748b;transition:transform .15s}
+.lab-sec[open] .lab-sec-chev{transform:rotate(180deg)}
+.lab-sec-body{padding:0 14px 12px}
+.lab-sec-subhdr{font-size:.82rem;font-weight:700;color:#2E6B45;margin-top:10px}
+.lab-edit-btn{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin-left:4px;padding:5px;border:none;border-radius:8px;background:transparent;color:#475569;cursor:pointer}
+.lab-edit-btn:hover,.lab-edit-btn:focus-visible{background:rgba(71,85,105,.14)}
+.lab-edit-ui{display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px}
+.lab-edit-input{width:86px;padding:4px 8px;border:1.5px solid #94a3b8;border-radius:8px;background:#fff;font:inherit;font-size:.82rem;color:#1f2937}
+.lab-edit-input.bad{border-color:#dc2626}
+.lab-edit-act{width:28px;height:28px;padding:0;border:none;border-radius:50%;background:#e2e8f0;color:#475569;font-size:.9rem;line-height:1;cursor:pointer}
+.lab-edit-act.save{background:#16a34a;color:#fff}
+</style>
 </head>
 <body>
 
@@ -3336,7 +3370,7 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
   <h1 class="ayu-content-page-title" style="--ayu-page-accent:#0e7490">Vitals</h1>
   <div class="calc-page">
     <div class="calc-card">
-      <h2>🧮 BMI</h2>
+      <h2><span class="sec-logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M8 10a4.5 4.5 0 0 1 8 0"/><path d="M12 10l1.9 2.3"/></svg></span><span>BMI</span></h2>
 
       <div class="calc-row-stacked">
         <div class="calc-row-top">Height? <span id="calc-height-val" class="slider-val"></span></div>
@@ -3421,7 +3455,7 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 
     <div class="calc-card calc-card-spaced" id="lab-insights-card">
       <div class="calc-card-hdr">
-        <h2>Lab Insights</h2>
+        <h2><span class="sec-logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.5L4.5 19a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3L14 9.5V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg></span><span>Lab Insights</span></h2>
         <span style="display:flex;align-items:center;gap:4px">
           <button type="button" class="calc-info-btn" id="lab-disclaimer-btn" onclick="toggleLabDisclaimer()" title="Disclaimer"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 2L1 21h22L12 2zm0 3.83L19.53 19H4.47L12 5.83zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg></button>
           <button type="button" class="calc-info-btn" id="lab-info-btn" onclick="toggleLabInfo()" title="About this tool">i</button>
@@ -3450,7 +3484,6 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
         <span id="lab-upload-status" class="lab-upload-status"></span>
       </div>
 
-      <div id="lab-rows" class="lab-rows"></div>
       <div id="lab-results" class="lab-results"></div>
 
       <div class="lab-section-divider" role="separator"></div>
@@ -3471,7 +3504,7 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
     <!-- TRACKER — log readings over time; one collapsed section per reading type -->
     <div class="calc-card calc-card-spaced" id="tracker-card">
       <div class="calc-card-hdr">
-        <h2>📈 Tracker</h2>
+        <h2><span class="sec-logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span><span>Tracker</span></h2>
         <span style="display:flex;align-items:center;gap:4px">
           <button type="button" class="calc-info-btn" id="tracker-info-btn" onclick="toggleTrackerInfo()" title="About this tool">i</button>
         </span>
@@ -4655,14 +4688,146 @@ let labRows=[]; // {refId, value}
 function labSex(){ return document.querySelector('input[name="lab-sex"]:checked')?.value || 'male'; }
 function labRange(ref){ return (labSex()==='female' && ref.female) ? ref.female : {low:ref.low, high:ref.high}; }
 
+// ── Lab report row detection helpers ──
+// Group PDF.js text items into visual lines: items within ~3pt vertically share a line,
+// so a value sitting a hair above/below its test name (as in the Lp(a) row) stays on that row.
+function labClusterLines(items){
+  const rows=[];
+  items.slice().sort((a,b)=>b.y-a.y).forEach(it=>{
+    const row=rows.find(r=>Math.abs(r.y-it.y)<=3);
+    if(row) row.items.push(it); else rows.push({y:it.y,items:[it]});
+  });
+  return rows.map(r=>r.items.sort((a,b)=>a.x-b.x).map(i=>i.str).join(' '));
+}
+const labNormKey=v=>String(v||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const labNormUnit=u=>String(u||'').toLowerCase().replace(/[µμ]/g,'u').replace(/\s+/g,'');
+// Match a test name from a report row to a known test: exact alias first, else the longest alias it contains.
+function labMatchRef(name){
+  const key=labNormKey(name); if(!key) return null;
+  let best=null, bestLen=0;
+  for(const ref of LAB_REF){
+    for(const alias of [ref.name,...(ref.aliases||[])]){
+      const ak=labNormKey(alias); if(!ak) continue;
+      if(key===ak) return ref;
+      if(ak.length>=5 && key.includes(ak) && ak.length>bestLen){ best=ref; bestLen=ak.length; }
+    }
+  }
+  return best;
+}
+// Find result rows of the shape  "TEST NAME  [TECHNOLOGY]  VALUE  UNIT  [REFERENCE RANGE]".
+const LAB_UNIT_RE='(?:%|[A-Za-zµμ]{1,8}\\s?/\\s?[A-Za-zµμ0-9.^]{1,10}(?:/[A-Za-z0-9.^]{1,8})?|ratio|fL|pg|sec(?:onds)?)';
+const LAB_TECH=['SPECTROPHOTOMETRY','ELECTROCHEMILUMINESCENCE','IMMUNOTURBIDIMETRY','CHEMILUMINESCENCE','POTENTIOMETRY','TURBIDIMETRY','FLOW CYTOMETRY','IMMUNOASSAY','NEPHELOMETRY','COLORIMETRIC','PHOTOMETRIC','PHOTOMETRY','FLUORESCENCE','MICROSCOPY','ELECTRODE','ENZYMATIC','CALCULATED','IMPEDANCE','COLORIMETRY','ICP-MS','LC-MS','ECLIA','CLIA','ELISA','HPLC'];
+const LAB_NAME_STOP=/\b(page|date|sample|collected|received|released|barcode|address|phone|tel|report|precision|assay|method|referred|patient|processed|reference|range|interval|age|sex|gender|years?)\b/i;
+function labGenericRows(lines){
+  const out=[];
+  const re=new RegExp('^(.{3,80}?)\\s+([<>≤≥]?\\s*\\d{1,6}(?:\\.\\d+)?)\\s*('+LAB_UNIT_RE+')(?![A-Za-z0-9])\\s*(.*)$','i');
+  lines.forEach(raw=>{
+    const line=String(raw).replace(/[\u2010-\u2015\u2212]/g,'-').replace(/\s+/g,' ').trim();
+    const m=re.exec(line); if(!m) return;
+    let name=m[1].trim();
+    for(let guard=0;guard<3;guard++){
+      const up=name.toUpperCase();
+      const t=LAB_TECH.find(x=>up.endsWith(' '+x));
+      if(!t) break;
+      name=name.slice(0,name.length-t.length).trim();
+    }
+    if(!/^[A-Za-z]/.test(name) || (name.match(/[A-Za-z]/g)||[]).length<3) return;
+    if(name.length>60 || name.split(' ').length>9 || /[:;]/.test(name) || LAB_NAME_STOP.test(name)) return;
+    const valueText=m[2].replace(/\s+/g,'');
+    const value=parseFloat(valueText.replace(/[<>≤≥]/g,''));
+    if(!Number.isFinite(value)) return;
+    const rr=/([<>≤≥]\s*\d+(?:\.\d+)?|\d+(?:\.\d+)?\s*-\s*\d+(?:\.\d+)?)/.exec(m[4]||'');
+    out.push({name, value, valueText, unit:m[3].replace(/\s+/g,''), refRange:rr?rr[1].replace(/\s+/g,' ').trim():''});
+  });
+  return out;
+}
+// "40–60 mg/dL", "up to 200 mg/dL", "0.4 or more"
+function fmtLabRange(rg,unit){
+  const n=x=>String(Math.round(x*100)/100);
+  let t;
+  if(rg.high>=9999) t=n(rg.low)+' or more';
+  else if(rg.low<=0) t='up to '+n(rg.high);
+  else t=n(rg.low)+'\u2013'+n(rg.high);
+  return t+' '+unit;
+}
+const labEsc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Pull every test out of the report text: tests we can analyse (rows) and tests we can't (other).
+function labExtractFromText(text){
+  const rows=[], other=[], detected=new Set(), blocked=new Set();
+  const escapeRegExp=value=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  // 1) Row by row: "TEST NAME  TECHNOLOGY  VALUE  UNIT  REFERENCE".
+  labGenericRows(String(text).split('\n')).forEach(row=>{
+    const ref=labMatchRef(row.name);
+    if(ref){
+      if(detected.has(ref.id)||blocked.has(ref.id)) return;
+      if(labNormUnit(row.unit)===labNormUnit(ref.unit)){
+        rows.push({refId:ref.id,value:row.value}); detected.add(ref.id); return;
+      }
+      blocked.add(ref.id);
+      other.push({name:ref.name,valueText:row.valueText,unit:row.unit,refRange:row.refRange,reason:'unit',expectedUnit:ref.unit});
+      return;
+    }
+    if(!other.some(o=>labNormKey(o.name)===labNormKey(row.name))){
+      other.push({name:row.name,valueText:row.valueText,unit:row.unit,refRange:row.refRange,reason:'unknown'});
+    }
+  });
+  // 2) Fallback for layouts that don't give clean rows: look for each known test's name in the text.
+  const normalized=String(text).replace(/[\u2010-\u2015\u2212]/g,'-').replace(/\s+/g,' ').trim();
+  LAB_REF.forEach(ref=>{
+    if(detected.has(ref.id)||blocked.has(ref.id)) return;
+    const aliases=[...new Set([...(ref.aliases||[]),ref.name])].sort((a,b)=>b.length-a.length);
+    let best=null;
+    for(const alias of aliases){
+      const words=alias.trim().split(/[^a-z0-9]+/i).filter(Boolean);
+      if(!words.length) continue;
+      // Brackets/parentheses may sit between the words, e.g. "Lipoprotein (a)".
+      const flexible=words.map(escapeRegExp).join('[\\s\\-_/()\\[\\]]*');
+      const re=new RegExp(flexible,'ig');
+      let m;
+      while((m=re.exec(normalized))!==null){
+        const after=normalized.slice(m.index+m[0].length, Math.min(normalized.length,m.index+m[0].length+180));
+        const before=normalized.slice(Math.max(0,m.index-100),m.index);
+        const unit=ref.unit.split('/').map(escapeRegExp).join('\\s*/\\s*');
+        const afterValue=new RegExp('(?:^|\\s)([<>≤≥]?\\s*\\d{1,4}(?:\\.\\d+)?)\\s*'+unit+'\\b','i').exec(after);
+        if(afterValue){
+          const value=parseFloat(afterValue[1].replace(/[<>≤≥\s]/g,''));
+          if(Number.isFinite(value)){ best={value,score:100}; break; }
+        }
+        const beforeValue=new RegExp('([<>≤≥]?\\s*\\d{1,4}(?:\\.\\d+)?)\\s*'+unit+'\\s*$','i').exec(before);
+        if(beforeValue){
+          const value=parseFloat(beforeValue[1].replace(/[<>≤≥\s]/g,''));
+          if(Number.isFinite(value) && !best) best={value,score:80};
+        }
+      }
+      if(best?.score===100) break;
+    }
+    if(best && Number.isFinite(best.value)){ rows.push({refId:ref.id,value:best.value}); detected.add(ref.id); }
+  });
+  return {rows,other};
+}
+
+let labOther=[];            // tests found in a report that Lab Insights can't analyse (shown in grey)
+const labOpen=new Set();    // which result sections are expanded — all start collapsed
+let labEditing=null;        // id of the test whose value is being edited
+
 (function initLabSelect(){
   const sel=document.getElementById('lab-test-select');
   if(!sel) return;
   sel.innerHTML=[...LAB_REF].sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:'base'})).map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  // "Select a test" is the closed-state label only: it is removed while the list is open so the list shows just the tests.
+  const ph=document.createElement('option'); ph.value=''; ph.textContent='Select a test'; ph.disabled=true;
+  const showPlaceholder=()=>{ if(!ph.parentNode) sel.insertBefore(ph,sel.firstChild); sel.selectedIndex=0; };
+  const hidePlaceholder=()=>{ if(ph.parentNode && sel.value===''){ ph.remove(); sel.selectedIndex=-1; } };
+  ['focus','mousedown'].forEach(ev=>sel.addEventListener(ev,hidePlaceholder));
+  sel.addEventListener('touchstart',hidePlaceholder,{passive:true});
+  sel.addEventListener('blur',()=>{ if(sel.selectedIndex===-1) showPlaceholder(); });
+  window.labSelectShowPlaceholder=()=>{ showPlaceholder(); updateRange(); };
+  showPlaceholder();
   const updateRange=()=>{
     const ref=LAB_REF.find(r=>r.id===sel.value);
     const out=document.getElementById('lab-selected-range');
-    if(!out||!ref) return;
+    if(!out) return;
+    if(!ref){ out.textContent=''; return; }
     const rg=labRange(ref);
     out.textContent=`Typical range: ${rg.low}–${rg.high} ${ref.unit}${ref.female?` (women: ${ref.female.low}–${ref.female.high})`:''}`;
   };
@@ -4681,71 +4846,106 @@ function removeLabRow(refId){
   labRows=labRows.filter(r=>r.refId!==refId);
   renderLabRows();
 }
-function renderLabRows(){
-  const wrap=document.getElementById('lab-rows');
-  if(!wrap) return;
-  wrap.innerHTML=labRows.map(r=>{
-    const ref=LAB_REF.find(x=>x.id===r.refId); if(!ref) return '';
-    return `<div class="lab-row" data-id="${ref.id}">
-      <span class="lab-row-name">${ref.name}</span>
-      <input type="number" step="any" class="lab-row-val-input" value="${r.value}" data-id="${ref.id}">
-      <span class="lab-row-unit">${ref.unit}</span>
-      <button type="button" class="lab-row-remove" data-id="${ref.id}" title="Remove">✕</button>
-    </div>`;
-  }).join('');
-  wrap.querySelectorAll('.lab-row-val-input').forEach(inp=>{
-    inp.addEventListener('input',()=>{
-      const row=labRows.find(r=>r.refId===inp.dataset.id);
-      if(row){ row.value=parseFloat(inp.value); renderLabResults(); }
-    });
-  });
-  wrap.querySelectorAll('.lab-row-remove').forEach(btn=>{
-    btn.addEventListener('click',()=>removeLabRow(btn.dataset.id));
-  });
-  renderLabResults();
+function renderLabRows(){ renderLabResults(); }   // the per-test sections are the list now
+function labSectionHtml(it){
+  const open=labOpen.has(it.key)?' open':'';
+  const chev='<span class="lab-sec-chev" aria-hidden="true">▾</span>';
+  if(it.kind==='na'){
+    const o=it.o, valTxt=labEsc(o.valueText+' '+o.unit);
+    const why=o.reason==='unit'
+      ? `This test is reported in ${labEsc(o.unit)}, but Lab Insights compares it in ${labEsc(o.expectedUnit)}, so it can’t be analysed automatically.`
+      : 'Lab Insights doesn’t cover this test yet, so it can’t be analysed here.';
+    return `<details class="lab-sec lab-sec-na" data-key="${labEsc(it.key)}"${open}>
+      <summary class="lab-sec-sum"><span class="lab-sec-main"><span class="lab-sec-top"><span class="lab-sec-name">${labEsc(o.name)}</span><span class="lab-sec-badge na">Not analysed</span></span>
+        <span class="lab-sec-vals"><span>Your value: <b>${valTxt}</b></span><span>Normal: <b>${o.refRange?labEsc(o.refRange+' '+o.unit):'see your report'}</b></span></span></span>
+        ${chev}</summary>
+      <div class="lab-sec-body">
+        <div class="lab-card-range">Your value: ${valTxt}${o.refRange?` · Range on your report: ${labEsc(o.refRange)} ${labEsc(o.unit)}`:''}</div>
+        <div class="lab-card-note">${why} Compare it with the range printed on your report and check with your doctor.</div>
+      </div></details>`;
+  }
+  const ref=it.ref, rg=it.rg, val=it.val;
+  const rangeTxt=fmtLabRange(rg,ref.unit)+(ref.female?` (${labSex()==='female'?'women':'men'})`:'');
+  const label=it.st==='low'?'Low':it.st==='high'?'High':'Normal';
+  const valueHtml=(labEditing===ref.id)
+    ? `<span class="lab-edit-ui">Your value: <input type="number" step="any" inputmode="decimal" class="lab-edit-input" value="${labEsc(val)}" data-lab-input="${labEsc(ref.id)}" aria-label="Edit ${labEsc(ref.name)} value"> ${labEsc(ref.unit)}
+        <button type="button" class="lab-edit-act save" data-lab-save="${labEsc(ref.id)}" aria-label="Save value" title="Save">✓</button>
+        <button type="button" class="lab-edit-act" data-lab-cancel="1" aria-label="Cancel" title="Cancel">✕</button></span>`
+    : `<span>Your value: <b>${labEsc(val)} ${labEsc(ref.unit)}</b><button type="button" class="lab-edit-btn" data-lab-edit="${labEsc(ref.id)}" aria-label="Edit ${labEsc(ref.name)} value" title="Edit value"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></span>`;
+  const kind=it.st==='ok'?'ok':'bad';
+  let precautions;
+  if(it.st==='ok'){
+    precautions=`<div class="lab-card-note">Within the normal range — nothing to do except keep up your healthy habits. ${labEsc(ref.note||'')}</div>`;
+  }else{
+    const list=((it.st==='low'?ref.remediesLow:ref.remediesHigh)||ref.remedies||[]);
+    const note=(it.st==='high'&&ref.noteHigh)||(it.st==='low'&&ref.noteLow)||ref.note||'';
+    precautions=(list.length?`<div class="lab-sec-subhdr">Precautions</div><ol class="lab-card-remedies">${list.map(x=>`<li>${x}</li>`).join('')}</ol>`:'')
+      +(note?`<div class="lab-card-note">${note}</div>`:'');
+  }
+  return `<details class="lab-sec lab-sec-${kind}" data-key="${labEsc(ref.id)}"${open}>
+    <summary class="lab-sec-sum"><span class="lab-sec-main"><span class="lab-sec-top"><span class="lab-sec-name">${labEsc(ref.name)}</span><span class="lab-sec-badge ${it.st}">${label}</span></span>
+      <span class="lab-sec-vals">${valueHtml}<span>Normal: <b>${labEsc(rangeTxt)}</b></span></span></span>
+      ${chev}</summary>
+    <div class="lab-sec-body">
+      <div class="lab-card-range">${label==='Normal'?'Normal':label} — your value ${labEsc(val)} ${labEsc(ref.unit)} · Normal range: ${labEsc(rangeTxt)}</div>
+      <div class="lab-card-system">🩻 Related to: ${ref.system}</div>
+      ${precautions}
+    </div></details>`;
 }
 function renderLabResults(){
   const wrap=document.getElementById('lab-results');
   if(!wrap) return;
-  if(!labRows.length){ wrap.innerHTML=''; return; }
-  const outOfRange=[], normal=[];
+  const items=[];
   labRows.forEach(r=>{
     const ref=LAB_REF.find(x=>x.id===r.refId); if(!ref) return;
     const rg=labRange(ref);
-    if(r.value<rg.low || r.value>rg.high){ outOfRange.push({ref,val:r.value,status:r.value<rg.low?'low':'high'}); }
-    else { normal.push(ref.name); }
+    const st=r.value<rg.low?'low':r.value>rg.high?'high':'ok';
+    items.push({key:ref.id,kind:st==='ok'?'ok':'bad',ref,rg,val:r.value,st});
   });
-  let html='';
-  if(outOfRange.length){
-    html+='<div class="lab-results-hdr">⚠️ Outside Normal Range</div>';
-    outOfRange.forEach(({ref,val,status})=>{
-      html+=`<div class="lab-card">
-        <div class="lab-card-top">
-          <span class="lab-card-name">${ref.name}</span>
-          <span class="lab-badge ${status}">${status==='low'?'Low':'High'} — your value ${val} ${ref.unit}</span>
-        </div>
-        <div class="lab-card-range">Normal range: ${labRange(ref).low}–${labRange(ref).high} ${ref.unit}${ref.female?` (${labSex()==='female'?'women':'men'})`:''}</div>
-        <div class="lab-card-system">🩻 Related to: ${ref.system}</div>
-        <details class="lab-card-precautions">
-        <summary class="lab-card-subhdr"><svg class="lab-card-precautions-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 8 9 8 9s8-4.5 8-9V6l-8-3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg><span>Precautions</span> <svg class="lab-card-precautions-arrow" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></summary>
-        <ol class="lab-card-remedies">${((status==='low'?ref.remediesLow:ref.remediesHigh)||ref.remedies||[]).map(x=>`<li>${x}</li>`).join('')}</ol>
-        <div class="lab-card-note">${(status==='high'&&ref.noteHigh)||(status==='low'&&ref.noteLow)||ref.note}</div>
-        </details>
-      </div>`;
-    });
-  }
-  if(normal.length){
-    html+=`<div class="lab-results-hdr${outOfRange.length?' lab-normal-hdr':''}">✅ Within Normal Range</div>
-      <div class="lab-normal-list">${normal.join(' · ')}</div>`;
-  }
-  wrap.innerHTML=html;
+  labOther.forEach((o,i)=>items.push({key:'other:'+i,kind:'na',o}));
+  if(!items.length){ wrap.innerHTML=''; return; }
+  const order={bad:0,ok:1,na:2};                 // out of range first, then in range, then not analysed
+  items.sort((a,b)=>order[a.kind]-order[b.kind]);
+  wrap.innerHTML=items.map(labSectionHtml).join('');
 }
+function saveLabEdit(id){
+  const inp=document.querySelector('#lab-results .lab-edit-input');
+  const v=parseFloat(inp&&inp.value);
+  if(!Number.isFinite(v) || v<0){ if(inp){ inp.classList.add('bad'); inp.focus(); } return; }
+  const row=labRows.find(r=>r.refId===id); if(row) row.value=v;
+  labEditing=null; renderLabResults();
+}
+document.getElementById('lab-results')?.addEventListener('click',e=>{
+  const t=e.target;
+  if(t.closest('.lab-edit-ui, .lab-edit-btn')) e.preventDefault();   // editing shouldn't expand/collapse the section
+  const eb=t.closest('[data-lab-edit]');
+  if(eb){
+    labEditing=eb.getAttribute('data-lab-edit'); renderLabResults();
+    const inp=document.querySelector('#lab-results .lab-edit-input'); if(inp){ inp.focus(); inp.select(); }
+    return;
+  }
+  const sb=t.closest('[data-lab-save]');
+  if(sb){ saveLabEdit(sb.getAttribute('data-lab-save')); return; }
+  if(t.closest('[data-lab-cancel]')){ labEditing=null; renderLabResults(); }
+});
+document.getElementById('lab-results')?.addEventListener('keydown',e=>{
+  const inp=e.target.closest&&e.target.closest('.lab-edit-input'); if(!inp) return;
+  if(e.key==='Enter'){ e.preventDefault(); saveLabEdit(inp.getAttribute('data-lab-input')); }
+  else if(e.key==='Escape'){ labEditing=null; renderLabResults(); }
+  else if(e.key===' '){ e.preventDefault(); }
+});
+// Remember which sections are expanded (they re-render when a value is edited).
+document.getElementById('lab-results')?.addEventListener('toggle',e=>{
+  const d=e.target; if(!d||!d.classList||!d.classList.contains('lab-sec')) return;
+  const k=d.getAttribute('data-key');
+  if(d.open) labOpen.add(k); else labOpen.delete(k);
+},true);
 
 document.getElementById('lab-add-btn')?.addEventListener('click',()=>{
   const sel=document.getElementById('lab-test-select');
   const valInp=document.getElementById('lab-test-value');
   const val=parseFloat(valInp.value);
-  if(isNaN(val)) return;
+  if(isNaN(val) || !sel.value) return;     // needs a test to be chosen first
   addLabRow(sel.value, val);
   valInp.value='';
 });
@@ -4803,7 +5003,7 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
   if(!file) return;
   const generation=++labUploadGeneration;
   e.target.value=''; // Allow selecting the same file again.
-  labRows=[];
+  labRows=[]; labOther=[]; labOpen.clear(); labEditing=null;
   renderLabRows();
   showLabFileLink(file);
   statusEl.textContent='Reading PDF…';
@@ -4855,18 +5055,13 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
         continue;
       }
       // Reassemble text items into visual lines, left to right.
-      const lineMap=new Map();
+      const textItems=[];
       for(const item of content.items||[]){
         const str=(item.str||'').trim();
         if(!str) continue;
-        const y=Math.round((item.transform&&item.transform[5])||0);
-        if(!lineMap.has(y)) lineMap.set(y,[]);
-        lineMap.get(y).push({x:(item.transform&&item.transform[4])||0,str});
+        textItems.push({x:(item.transform&&item.transform[4])||0, y:(item.transform&&item.transform[5])||0, str});
       }
-      const pageText=[...lineMap.entries()]
-        .sort((a,b)=>b[0]-a[0])
-        .map(([,items])=>items.sort((a,b)=>a.x-b.x).map(it=>it.str).join(' '))
-        .join('\n');
+      const pageText=labClusterLines(textItems).join('\n');
       // OCR a page with no usable text layer, even if other pages have text.
       if(pageText.replace(/\s/g,'').length<12){
         const pageOCR=await ocrPdfPage(page);
@@ -4889,52 +5084,13 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
         if(generation!==labUploadGeneration) return;
       }
     }
-    const normalized=text
-      .replace(/[\u2010-\u2015\u2212]/g,'-')
-      .replace(/\s+/g,' ')
-      .trim();
-    let found=0;
-    const detected=new Set();
-    const escapeRegExp=value=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    const normKey=value=>value.toLowerCase().replace(/[^a-z0-9]/g,'');
-    // Match each test name/alias, then prefer a value and unit on the same
-    // result-row text immediately after the name. Fall back to a tightly
-    // bounded neighbourhood only when the row layout puts value before name.
-    LAB_REF.forEach(ref=>{
-      const aliases=[...new Set([...(ref.aliases||[]),ref.name])]
-        .sort((a,b)=>b.length-a.length);
-      let best=null;
-      for(const alias of aliases){
-        const words=alias.trim().split(/[^a-z0-9]+/i).filter(Boolean);
-        if(!words.length) continue;
-        const flexible=words.map(escapeRegExp).join('[\\s\\-_/]*');
-        const re=new RegExp(flexible,'ig');
-        let m;
-        while((m=re.exec(normalized))!==null){
-          const after=normalized.slice(m.index+m[0].length, Math.min(normalized.length,m.index+m[0].length+180));
-          const before=normalized.slice(Math.max(0,m.index-100),m.index);
-          const unit=ref.unit.split('/').map(escapeRegExp).join('\\s*/\\s*');
-          // The result value should be followed by this test's own unit.
-          const afterValue=new RegExp('(?:^|\\s)([<>≤≥]?\\s*\\d{1,4}(?:\\.\\d+)?)\\s*'+unit+'\\b','i').exec(after);
-          if(afterValue){
-            const value=parseFloat(afterValue[1].replace(/[<>≤≥\s]/g,''));
-            if(Number.isFinite(value)){ best={value,score:100}; break; }
-          }
-          // Some PDFs put the value/unit before the test name in text order.
-          const beforeValue=new RegExp('([<>≤≥]?\\s*\\d{1,4}(?:\\.\\d+)?)\\s*'+unit+'\\s*$','i').exec(before);
-          if(beforeValue){
-            const value=parseFloat(beforeValue[1].replace(/[<>≤≥\s]/g,''));
-            if(Number.isFinite(value) && !best) best={value,score:80};
-          }
-        }
-        if(best?.score===100) break;
-      }
-      if(best && Number.isFinite(best.value) && !detected.has(ref.id)){
-        addLabRow(ref.id,best.value); detected.add(ref.id); found++;
-      }
-    });
-    statusEl.textContent=found
-      ? `Found ${found} test value${found===1?'s':''} — review the detected values and confirm them against the report.`
+    const extracted=labExtractFromText(text);
+    extracted.rows.forEach(r=>addLabRow(r.refId,r.value));
+    labOther=extracted.other;
+    renderLabResults();
+    const totalTests=extracted.rows.length+extracted.other.length;
+    statusEl.textContent=totalTests
+      ? `${totalTests} test${totalTests===1?'':'s'} found`
       : 'Couldn’t identify test values automatically. Scanned PDFs are supported when OCR is available; otherwise enter values manually.';
   }catch(err){
     if(generation!==labUploadGeneration) return;
@@ -4975,10 +5131,11 @@ function resetBmiToDefault(){
 function resetLabToDefault(){
   if(!confirm('Reset Lab Insights back to its defaults? This clears any lab values you\'ve added.')) return;
   ++labUploadGeneration; // Ignore any report still being read.
-  labRows=[];
+  labRows=[]; labOther=[]; labOpen.clear(); labEditing=null;
   renderLabRows();
   const calcPanel=document.getElementById('calculator-panel'); if(calcPanel) calcPanel.style.minHeight='';
   const sexMale=document.querySelector('input[name="lab-sex"][value="male"]'); if(sexMale) sexMale.checked=true;
+  if(window.labSelectShowPlaceholder) window.labSelectShowPlaceholder();
   const fileInput=document.getElementById('lab-pdf-input');
   if(fileInput) fileInput.value='';
   hideLabFileLink();
