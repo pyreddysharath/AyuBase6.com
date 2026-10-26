@@ -1,0 +1,26 @@
+{
+  "id": "./",
+  "name": "AyuBase6 \u2013 Wellbeing",
+  "short_name": "AyuBase6",
+  "description": "AyuBase6 wellbeing routines, reminders and health tracking.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5fbf8",
+  "theme_color": "#0f9488",
+  "icons": [
+    {
+      "src": "icon/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
