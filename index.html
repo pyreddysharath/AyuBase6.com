@@ -3412,6 +3412,19 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 }
 </style>
 
+
+<style id="tracker-save-button-style">
+/* Tracker Save action: use the Vitals/Tracker teal accent and a readable button shape. */
+#tracker-card #tracker-add-btn.tracker-save-btn {
+  width:auto !important; min-width:72px; height:38px; flex:0 0 auto;
+  padding:0 16px; border-radius:9px; font-size:.82rem; font-weight:700;
+  line-height:1; background:var(--calc-1) !important; color:#fff !important;
+  box-shadow:none; transform:none;
+}
+#tracker-card #tracker-add-btn.tracker-save-btn:hover {
+  background:var(--calc-2) !important; transform:none;
+}
+</style>
 </head>
 <body>
 
@@ -3664,7 +3677,7 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
         <input type="number" inputmode="decimal" step="any" id="tracker-v1" class="lab-value-input" placeholder="Value">
         <input type="number" inputmode="decimal" step="any" id="tracker-v2" class="lab-value-input" placeholder="Diastolic" style="display:none">
         <input type="date" id="tracker-date" class="lab-value-input trk-date" aria-label="Date of reading">
-        <button type="button" id="tracker-add-btn" class="lab-add-icon-btn" title="Add reading" onclick="addTrackerReading()">+</button>
+        <button type="button" id="tracker-add-btn" class="lab-add-icon-btn tracker-save-btn" title="Save reading" onclick="addTrackerReading()">Save</button>
       </div>
       <p class="trk-hint" id="tracker-hint"></p>
       <p class="trk-msg" id="tracker-msg" role="status" aria-live="polite"></p>
