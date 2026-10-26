@@ -8436,9 +8436,8 @@ function initNudgeSW(){
       const d=ev.data||{};
       if(d.type==='nudge-click') handleNudgeClick(d.key, d.action);
     });
-    // sw.js is stored in config/. It shows notifications (with buttons), hears
-    // their taps, and makes the app installable. If it can't be found we fall back
-    // 
+    // sw.js is stored at the site root so it can control the whole GitHub Pages site.
+    // It shows notifications (with buttons) and handles their taps. If unavailable, we fall back.
     const adopt=reg=>{
       if(reg.active){ nudgeSwReg=reg; return; }
       const w=reg.installing||reg.waiting; if(!w) return;
