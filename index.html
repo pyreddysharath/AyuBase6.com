@@ -3175,8 +3175,8 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 .trk-tag{font-size:.7rem;font-weight:700;color:#ea580c}
 .trk-latest{font-weight:800;font-size:.95rem;white-space:nowrap}
 .trk-latest small{font-weight:600;font-size:.68rem;opacity:.85}
-.trk-chev{flex:0 0 auto;font-size:.9rem;transition:transform .15s;color:var(--calc-2)}
-.trk-sec.open .trk-chev{transform:rotate(180deg)}
+.trk-chev{flex:0 0 auto;font-size:1.45rem;line-height:1;transition:transform .15s ease;color:var(--calc-2);transform:rotate(0deg)}
+.trk-sec.open .trk-chev{transform:rotate(90deg)}
 .trk-body{padding:2px 14px 12px;font-size:.8rem;color:#0c3d4d;display:flex;flex-direction:column;gap:6px}
 .trk-body[hidden]{display:none}
 .trk-line{line-height:1.45}
@@ -3424,6 +3424,11 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 #tracker-card #tracker-add-btn.tracker-save-btn:hover {
   background:var(--calc-2) !important; transform:none;
 }
+</style>
+<style id="tracker-chevron-direction-fix">
+/* Larger Tracker disclosure arrow: points right while collapsed and down while expanded. */
+#tracker-card .trk-chev{font-size:1.45rem !important;line-height:1 !important;transform:rotate(0deg) !important;transition:transform .15s ease !important}
+#tracker-card .trk-sec.open .trk-chev{transform:rotate(90deg) !important}
 </style>
 </head>
 <body>
@@ -11128,7 +11133,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
         +'<button type="button" class="trk-hdr" data-act="toggle" aria-expanded="'+isOpen+'">'
           +'<span class="trk-name-wrap"><span class="trk-name">'+m.name+'</span></span>'
           +'<span class="trk-latest '+cls+'">'+valText(m,last)+' <small>'+m.unit+'</small></span>'
-          +'<span class="trk-chev" aria-hidden="true">\u25BE</span></button>'
+          +'<span class="trk-chev" aria-hidden="true">\u25B8</span></button>'
         +'<div class="trk-body"'+(isOpen?'':' hidden')+'>'
           +'<div class="trk-line">Acceptable range: <b>'+rangeText(m,last)+'</b></div>'
           +'<ul class="trk-list">'+rows+'</ul>'
