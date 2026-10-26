@@ -3460,10 +3460,10 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
 .alert-interval-select {
   appearance: auto !important;
   -webkit-appearance: menulist !important;
-  width: 100%;
-  max-width: 220px;
-  min-height: 42px;
-  padding: 9px 12px;
+  width: auto;
+  max-width: 132px;
+  min-height: 34px;
+  padding: 5px 8px;
   border: 1px solid #99d9ce;
   border-radius: 10px;
   background: #e8f8f4;
@@ -3475,7 +3475,7 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
   touch-action: manipulation;
 }
 .alert-interval-select:focus-visible { outline: 2px solid var(--alert-3, #0d9488); outline-offset: 2px; }
-@media (max-width: 600px) { .alert-interval-select { max-width: 100%; } }
+@media (max-width: 600px) { .alert-interval-select { max-width: 132px; min-height: 32px; padding: 4px 7px; } }
 </style>
 
 <style id="reminder-clock-picker-style">
