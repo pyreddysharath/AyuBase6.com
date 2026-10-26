@@ -3430,6 +3430,30 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 #tracker-card .trk-chev{font-size:1.45rem !important;line-height:1 !important;transform:rotate(0deg) !important;transition:transform .15s ease !important}
 #tracker-card .trk-sec.open .trk-chev{transform:rotate(90deg) !important}
 </style>
+
+<style id="my-reminders-form-line-and-colour-fix">
+/* Remove the divider immediately above Reminder name and soften the My Reminders card colour. */
+#alerts-panel #custom-reminders-card .custom-reminder-form { border-top: 0 !important; padding-top: 8px !important; }
+html[data-petal-card="e"] #alerts-panel #custom-reminders-card { background-color: #99f6e4 !important; border-color: #5eead4 !important; }
+html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { background: #fff !important; opacity: .22 !important; }
+</style>
+
+<style id="my-reminders-field-background-colour-fix">
+/* Give My Reminders inputs a soft section-matched mint background instead of white. */
+#alerts-panel #custom-reminders-card .custom-reminder-form input,
+#alerts-panel #custom-reminders-card .custom-reminder-form select,
+#alerts-panel #custom-reminders-card .custom-reminder-form textarea {
+  background-color: #ccfbf1 !important;
+  border-color: #5eead4 !important;
+  color: #134e4a !important;
+}
+#alerts-panel #custom-reminders-card .custom-reminder-form input:focus,
+#alerts-panel #custom-reminders-card .custom-reminder-form select:focus,
+#alerts-panel #custom-reminders-card .custom-reminder-form textarea:focus {
+  background-color: #d9fdf5 !important;
+  outline-color: #0d9488 !important;
+}
+</style>
 </head>
 <body>
 
