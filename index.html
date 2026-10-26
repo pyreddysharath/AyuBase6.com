@@ -8444,7 +8444,7 @@ function initNudgeSW(){
       const w=reg.installing||reg.waiting; if(!w) return;
       w.addEventListener('statechange', ()=>{ if(w.state==='activated') nudgeSwReg=reg; });
     };
-    navigator.serviceWorker.register('config/sw.js', {scope: '../'}).then(adopt).catch(()=>{});
+    navigator.serviceWorker.register('./sw.js', {scope: './'}).then(adopt).catch(()=>{});
   }catch(e){}
 }
 function handleNudgeClick(key, action){
