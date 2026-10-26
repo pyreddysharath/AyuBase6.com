@@ -3361,8 +3361,9 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 .notif-info ul{margin:6px 0 0 18px;padding:0}
 .notif-info li{margin:3px 0}
 .install-row{display:flex;justify-content:center;margin-top:12px}
-.install-btn{font:inherit;font-weight:700;font-size:.85rem;padding:10px 18px;min-height:44px;border-radius:12px;border:2px solid var(--accent,#08766e);background:transparent;color:var(--accent,#08766e);cursor:pointer}
-.install-btn:hover,.install-btn:focus-visible{background:rgba(8,118,110,.1)}
+.install-btn{font:inherit;font-weight:700;font-size:.85rem;padding:10px 18px;min-height:44px;border-radius:12px;border:2px solid #0F9488;background:#0F9488;color:#FFFFFF;cursor:pointer;transition:background-color .18s ease,border-color .18s ease,transform .18s ease}
+.install-btn:hover,.install-btn:focus-visible{background:#0B7F75;border-color:#0B7F75}
+.install-btn:active{background:#096D65;border-color:#096D65;transform:translateY(1px)}
 </style>
 
 <style id="reminders-section-tint-refinements">
@@ -4155,8 +4156,15 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
     </div>
 
     <div class="rout-remind-row">
-      <button type="button" class="refresh-btn" onclick="remindMeNowAll()">🔔 Remind Me</button>
+      <div class="rout-notify-actions">
+        <button type="button" class="refresh-btn" id="rout-notify-btn" onclick="enableRoutineNotifications()">🔔 Enable Notifications</button>
+      </div>
       <div class="notif-blocked-hint rout-remind-msg" id="rout-remind-msg" style="display:none"></div>
+      <div class="notif-info" id="routines-install-help" style="display:none"></div>
+      <div class="install-row reminder-install-row routines-install-row" id="routines-install-row">
+        <button type="button" class="install-btn" id="routines-install-app-btn" onclick="installApp()">Add to Home Screen</button>
+        <button type="button" class="alert-info-btn small-info install-info-overlay" onclick="toggleNotifInfo(this,'routines-install-help')" title="About adding a shortcut" aria-label="About adding a shortcut" aria-expanded="false">i</button>
+      </div>
     </div>
 
   </div>
@@ -8660,41 +8668,97 @@ function openNudgePopup(key, title, msg, o){
 
 initNudgeSW();
 
-// Routines' "Remind Me": sends each reminder as a real browser
-// notification, one after another. It never adds anything to the Nudges
-// tab; if notifications can't be sent, the reason is shown under the
-// Remind Me button itself.
-function remindMeNowAll(){
-  const hintId='rout-remind-msg';
-  hideNotifHint(hintId);
-  const send=()=>{
-    if(!isMasterNotifyOn()){
-      showNotifBlockedHint(hintId, "Notifications are turned off. Turn them on with Enable in the Nudges tab.");
-      return;
-    }
-    const items=[
-      {title:ALERT_LABELS.drink.title, body:ALERT_LABELS.drink.msg, st:alertState.drink, key:'drink'},
-      {title:ALERT_LABELS.break.title, body:ALERT_LABELS.break.msg, st:alertState.break, key:'break'},
-      {title:ALERT_LABELS.walk.title,  body:ALERT_LABELS.walk.msg,  st:alertState.walk, key:'walk'},
-      {title:'Eye Exercise', body:'Time for your guided eye exercise — follow the dot for 30 seconds.', st:eyeExState, key:'eyeex'},
-    ];
-    items.forEach((it,i)=>setTimeout(()=>{
-      if(!it.st.muted) playAlertPreset(it.st.sound);
-      if(it.key==='break') showEyeReminderNotification();
-      else showNudgeNotification(it.title, it.body, {key:it.key});
-    }, i*1200));
-  };
-  const problem=notifProblemMessage();
-  if(!problem){ send(); return; }
-  if(typeof Notification!=='undefined' && Notification.permission==='default' && !isRestrictedFileOrigin()){
-    requestNotificationPermission().then(perm=>{
-      if(perm==='granted'){ setMasterNotifyFlag(true); refreshNotifStatusUI(); send(); }
-      else showNotifBlockedHint(hintId, notifProblemMessage(perm));
-    });
+// Routines notifications are independent of the Nudges master switch.
+// Schedules follow each routine's displayed time and are checked while the
+// page/app is open. The browser cannot reliably run page timers after it closes.
+const ROUTINE_NOTIFY_KEY='ayuBase6-routine-notifications-enabled';
+const ROUTINE_SENT_KEY='ayuBase6-routine-notifications-sent';
+let routineNotifyTimer=null;
+const ROUTINE_NOTIFY_ITEMS={
+  walkex:{title:'Walk or Exercise',body:'It’s time for your walk or exercise.'},
+  palms:{title:'Relax Your Eyes',body:'Rub your palms together and gently place them over your closed eyes.'},
+  water:{title:'Drink Water',body:'Have 1–2 glasses of water.'},
+  bathroom:{title:'Bathroom Break',body:'Take a moment to go to the bathroom.'},
+  breakfast:{title:'Breakfast',body:'It’s time for breakfast.'},
+  fruits:{title:'Fruits',body:'Have some fruit.'},
+  lunch:{title:'Lunch',body:'It’s time for lunch.'},
+  snacks:{title:'Snacks',body:'It’s time for your snack.'},
+  dinner:{title:'Dinner',body:'It’s time for dinner.'},
+  nomobile:{title:'Screen Break',body:'Put your mobile away for the evening.'},
+  sleep:{title:'Sleep',body:'It’s time to prepare for sleep.'}
+};
+function routineNotificationsEnabled(){
+  try{return localStorage.getItem(ROUTINE_NOTIFY_KEY)==='1';}catch(e){return false;}
+}
+function updateRoutineNotifyButtons(){
+  const enabled=routineNotificationsEnabled();
+  const notify=document.getElementById('rout-notify-btn');
+  if(notify){notify.textContent=enabled?'🔔 Disable Notifications':'🔔 Enable Notifications';notify.setAttribute('aria-pressed',String(enabled));}
+}
+function enableRoutineNotifications(){
+  const hintId='rout-remind-msg'; hideNotifHint(hintId);
+  if(routineNotificationsEnabled()){
+    try{localStorage.setItem(ROUTINE_NOTIFY_KEY,'0');}catch(e){}
+    if(routineNotifyTimer){clearInterval(routineNotifyTimer);routineNotifyTimer=null;}
+    updateRoutineNotifyButtons();
+    hideNotifHint(hintId);
     return;
   }
-  showNotifBlockedHint(hintId, problem);
+  const activate=()=>{
+    try{localStorage.setItem(ROUTINE_NOTIFY_KEY,'1');localStorage.removeItem(ROUTINE_SENT_KEY);}catch(e){}
+    updateRoutineNotifyButtons();
+    checkRoutineNotificationSchedule();
+    if(routineNotifyTimer) clearInterval(routineNotifyTimer);
+    routineNotifyTimer=setInterval(checkRoutineNotificationSchedule,15000);
+    showNotifBlockedHint(hintId,'Routine notifications are enabled for the times shown beside each item. Keep AyuBase6 open for scheduled reminders.');
+  };
+  if(typeof Notification==='undefined'){
+    showNotifBlockedHint(hintId,"This browser doesn't support notifications.");return;
+  }
+  if(Notification.permission==='granted'){activate();return;}
+  if(Notification.permission==='default'&&!isRestrictedFileOrigin()){
+    requestNotificationPermission().then(perm=>{
+      if(perm==='granted') activate();
+      else showNotifBlockedHint(hintId,notifProblemMessage(perm)||'Notifications could not be enabled.');
+    });return;
+  }
+  showNotifBlockedHint(hintId,notifProblemMessage());
 }
+function routineItemMinute(key){
+  const el=document.getElementById('rt-'+key);
+  const text=el?el.textContent:'';
+  const m=text.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if(!m)return null;
+  let h=Number(m[1])%12;if(m[3].toUpperCase()==='PM')h+=12;
+  return h*60+Number(m[2]);
+}
+function checkRoutineNotificationSchedule(){
+  if(!routineNotificationsEnabled()||typeof Notification==='undefined'||Notification.permission!=='granted')return;
+  const now=new Date(), minute=now.getHours()*60+now.getMinutes();
+  let sent={};try{sent=JSON.parse(localStorage.getItem(ROUTINE_SENT_KEY)||'{}')||{};}catch(e){}
+  const day=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  Object.keys(ROUTINE_NOTIFY_ITEMS).forEach(key=>{
+    const scheduled=routineItemMinute(key);
+    if(scheduled===null||scheduled!==minute)return;
+    const sentKey=day+':'+key;
+    if(sent[sentKey])return;
+    const item=ROUTINE_NOTIFY_ITEMS[key];
+    showNudgeNotification(item.title,item.body,{key:'routine-'+key});
+    sent[sentKey]=true;
+  });
+  try{
+    const keys=Object.keys(sent);if(keys.length>150)keys.slice(0,keys.length-100).forEach(k=>delete sent[k]);
+    localStorage.setItem(ROUTINE_SENT_KEY,JSON.stringify(sent));
+  }catch(e){}
+}
+function initRoutineNotifications(){
+  updateRoutineNotifyButtons();
+  if(routineNotificationsEnabled()){
+    checkRoutineNotificationSchedule();
+    routineNotifyTimer=setInterval(checkRoutineNotificationSchedule,15000);
+  }
+}
+initRoutineNotifications();
 function previewAlertNotification(key){
   // Preview should always show a real OS/taskbar notification when
   // permission allows it — regardless of whether the Notify toggle for
@@ -11430,14 +11494,30 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
 
   // Install app: use the browser's own install prompt when it offers one, otherwise show how to do it by hand.
   var deferred=null;
+  var installRequested=false;
   var installed=function(){ return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone===true; };
   var refresh=function(){
-    var row=document.getElementById('install-row'); if(row) row.style.display=installed()?'none':'flex';
-    var help=document.getElementById('install-help'); if(help && installed()) help.style.display='none';
+    var isInstalled=installed() || installRequested;
+    var row=document.getElementById('install-row'); if(row) row.style.display='flex';
+    var routinesRow=document.getElementById('routines-install-row'); if(routinesRow) routinesRow.style.display='flex';
+    var btn=document.getElementById('install-app-btn');
+    var routinesBtn=document.getElementById('routines-install-app-btn');
+    var ua=navigator.userAgent||'';
+    var mobile=/Android|iPhone|iPad|iPod|Mobile/i.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+    var addLabel=mobile?'Add to Home Screen':'Add to Desktop';
+    var addedLabel=mobile?'Added to Home Screen':'Added to Desktop';
+    if(btn){btn.textContent=isInstalled?addedLabel:addLabel;btn.disabled=isInstalled;btn.setAttribute('aria-label',btn.textContent);}
+    if(routinesBtn){routinesBtn.textContent=isInstalled?addedLabel:addLabel;routinesBtn.disabled=isInstalled;routinesBtn.setAttribute('aria-label',routinesBtn.textContent);}
+    var help=document.getElementById('install-help'); if(help && isInstalled) help.style.display='none';
+    var routinesHelp=document.getElementById('routines-install-help'); if(routinesHelp && isInstalled) routinesHelp.style.display='none';
   };
   window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; refresh(); });
   window.addEventListener('appinstalled',function(){ deferred=null; refresh(); });
   window.installApp=function(){
+    // Keep both install buttons in sync as soon as either section's install action is chosen.
+    // A fresh page load resets this temporary state unless the app is actually installed.
+    installRequested=true;
+    refresh();
     if(deferred){
       var p=deferred; deferred=null; p.prompt();
       Promise.resolve(p.userChoice).catch(function(){}).then(refresh);
@@ -11763,6 +11843,32 @@ document.querySelectorAll('.alert-interval-select').forEach(sel=>{sel.addEventLi
 document.getElementById('clock-picker-close').onclick=close;document.getElementById('clock-picker-cancel').onclick=close;overlay.addEventListener('click',e=>{if(e.target===overlay)close();});document.getElementById('clock-picker-done').onclick=()=>{if(target){target.value=String(chosen);target.dispatchEvent(new Event('change',{bubbles:true}));}close();};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))close();});})();
 </script>
 
+
+<style id="my-reminders-plus-smaller-no-circle">
+/* Keep the My Reminders add control compact: smaller bold plus, no enclosing circle. */
+#alerts-panel #custom-reminder-add {
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:auto !important;
+  min-width:0 !important;
+  height:auto !important;
+  min-height:0 !important;
+  padding:0 2px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  font-family:Arial,sans-serif !important;
+  font-size:16px !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+  color:var(--alert-1) !important;
+  vertical-align:middle !important;
+}
+#alerts-panel #custom-reminder-add:focus-visible { outline:2px solid var(--alert-1); outline-offset:3px; }
+</style>
+
 </body>
 </html>
 <style id="reminders-final-layout-fixes">
@@ -11912,4 +12018,75 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   padding:6px 10px!important;
   box-sizing:border-box!important;
 }
+</style>
+
+<style id="reminders-title-matched-icon-colours">
+/* Match reminder info/add icons to the reminder section title colour. */
+#alerts-panel .reminder-install-row .install-info-overlay,
+#alerts-panel #reminders-notif-banner .master-notif-info-btn {
+  color: var(--alert-1) !important;
+  border-color: var(--alert-1) !important;
+}
+#alerts-panel #custom-reminder-add {
+  color: var(--alert-1) !important;
+  border-color: var(--alert-1) !important;
+  font-weight: 800 !important;
+}
+</style>
+
+
+<style id="reminder-icon-colour-and-plus-alignment-fix">
+/* Keep the My Reminders plus centered and visibly bold inside its circle. */
+#alerts-panel #custom-reminder-add {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  color: var(--alert-1) !important;
+  border-color: var(--alert-1) !important;
+  box-sizing: border-box !important;
+}
+/* The info icons on the teal install and notification buttons match their white text. */
+#alerts-panel #reminders-notif-banner .master-notif-info-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+}
+#alerts-panel .reminder-install-row .install-info-overlay {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+}
+</style>
+
+<style id="ayu-routines-notify-install-update">
+#routines-panel .rout-notify-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:8px 0 12px}
+#routines-panel .rout-notify-actions .refresh-btn{min-height:42px}
+#routines-panel .rout-notify-disable{background:#fff7ed!important;color:#9a3412!important;border:1px solid #fdba74!important;box-shadow:none!important}
+#routines-panel .rout-notify-disable:disabled{opacity:.65;cursor:default}
+#routines-panel .routines-install-row{position:relative;display:flex;align-items:center;justify-content:stretch;width:100%;gap:0;margin-top:12px}
+#routines-panel #routines-install-app-btn{display:block;width:100%;flex:1 1 100%;box-sizing:border-box;padding-right:42px}
+#routines-panel .routines-install-row .install-info-overlay{position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:2}
+#routines-panel #routines-install-help{margin-top:8px}
+</style>
+
+<style id="ayu-routines-install-accent-and-notify-toggle">
+#routines-panel #routines-install-app-btn{background:#96500d!important;border-color:#96500d!important;color:#fff!important}
+#routines-panel #routines-install-app-btn:hover,#routines-panel #routines-install-app-btn:focus-visible{background:#724116!important;border-color:#724116!important}
+#routines-panel #routines-install-app-btn:active{background:#5d3510!important;border-color:#5d3510!important}
+#routines-panel .routines-install-row .install-info-overlay{color:#fff!important;border-color:#fff!important}
+#routines-panel #routines-install-app-btn:disabled{opacity:1;cursor:default}
 </style>
