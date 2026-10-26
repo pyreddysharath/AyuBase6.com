@@ -3454,6 +3454,27 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
   outline-color: #0d9488 !important;
 }
 </style>
+<style id="alert-interval-select-fix">
+/* Safer interval control: a tap-to-select menu instead of a touch-sensitive slider. */
+.alert-interval-select {
+  appearance: auto !important;
+  -webkit-appearance: menulist !important;
+  width: 100%;
+  max-width: 220px;
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px solid #99d9ce;
+  border-radius: 10px;
+  background: #e8f8f4;
+  color: #164e48;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.alert-interval-select:focus-visible { outline: 2px solid var(--alert-3, #0d9488); outline-offset: 2px; }
+@media (max-width: 600px) { .alert-interval-select { max-width: 100%; } }
+</style>
 </head>
 <body>
 
@@ -3749,8 +3770,8 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
       </div>
 
       <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Remind every <span class="alert-time-val" id="alert-drink-time-val">60 min</span></div>
-        <input type="range" id="alert-drink-time" class="bmi-slider alert-slider" min="5" max="120" step="5" value="60" oninput="onAlertTimeChange('drink')">
+        <div class="alert-row-lbl dotted-lbl">Remind every </div>
+        <select id="alert-drink-time" class="alert-interval-select" aria-label="Water reminder interval" onchange="onAlertTimeChange('drink')"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60" selected>60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
       </div>
 
       <div class="alert-row">
@@ -3803,8 +3824,8 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
       </div>
 
       <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Remind every <span class="alert-time-val" id="alert-walk-time-val">45 min</span></div>
-        <input type="range" id="alert-walk-time" class="bmi-slider alert-slider" min="5" max="120" step="5" value="45" oninput="onAlertTimeChange('walk')">
+        <div class="alert-row-lbl dotted-lbl">Remind every </div>
+        <select id="alert-walk-time" class="alert-interval-select" aria-label="Walk reminder interval" onchange="onAlertTimeChange('walk')"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45" selected>45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60">60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
       </div>
 
       <div class="alert-row">
@@ -3857,8 +3878,8 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
       </div>
 
       <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Remind every <span class="alert-time-val" id="alert-break-time-val">20 min</span></div>
-        <input type="range" id="alert-break-time" class="bmi-slider alert-slider" min="5" max="120" step="5" value="20" oninput="onAlertTimeChange('break')">
+        <div class="alert-row-lbl dotted-lbl">Remind every </div>
+        <select id="alert-break-time" class="alert-interval-select" aria-label="Eyes (20-20-20) reminder interval" onchange="onAlertTimeChange('break')"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20" selected>20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60">60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
       </div>
 
       <div class="alert-row">
@@ -4020,7 +4041,7 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
       <button type="button" class="install-btn" id="install-app-btn" onclick="installApp()">Add AyuBase6 Shortcut</button>
       <button type="button" class="alert-info-btn small-info install-info-overlay" onclick="toggleNotifInfo(this,'install-help')" title="About adding a shortcut" aria-label="About adding a shortcut" aria-expanded="false">i</button>
     </div>
-    <div class="notif-info" id="install-help" style="display:none">Add a shortcut to AyuBase6 on your phone’s Home Screen or your computer’s desktop for quicker access. On supported browsers, use the browser menu and choose <b>Install app</b> or <b>Add to Home Screen</b>. The wording varies by browser and device.</div>
+    <div class="notif-info" id="install-help" style="display:none">Add AyuBase6 to your Home Screen, Dock, or desktop using your browser’s install/share menu. The browser uses the site’s app icon (the AyuBase6 lotus logo). Shortcut creation is controlled by the operating system and browser, so the steps differ by device and some browsers do not support automatic installation.</div>
 
   </div>
 </div>
@@ -8259,7 +8280,7 @@ function onAlertTimeChange(key){
   const val=+slider.value;
   alertState[key].minutes=val;
   document.getElementById('alert-'+key+'-time-val').textContent=val+' min';
-  updateSliderFill(slider,'var(--alert-2)');
+  if (slider && slider.tagName === 'INPUT' && slider.type === 'range') updateSliderFill(slider,'var(--alert-2)');
   scheduleAlertTimer(key);
 }
 function onAlertSoundChange(key){
@@ -11405,11 +11426,20 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       Promise.resolve(p.userChoice).catch(function(){}).then(refresh);
       return;
     }
-    var ios=/iPhone|iPad|iPod/.test(navigator.userAgent||'') || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+    var ua=navigator.userAgent||'';
+    var ios=/iPhone|iPad|iPod/.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+    var android=/Android/i.test(ua);
+    var safari=/Safari/i.test(ua) && !/Chrome|CriOS|Edg|OPR|Firefox/i.test(ua);
     var help=document.getElementById('install-help'); if(!help) return;
-    help.innerHTML=ios
-      ? 'To install: tap <b>Share</b>, then <b>Add to Home Screen</b>.'
-      : 'To install: open your browser menu and choose <b>Install app</b> or <b>Add to Home Screen</b>. If you don’t see either, your browser may not support installing — you can keep this page open in a tab instead.';
+    if(ios){
+      help.innerHTML='<b>iPhone/iPad:</b> open this page in Safari, tap <b>Share</b>, then choose <b>Add to Home Screen</b> and tap <b>Add</b>.';
+    } else if(android){
+      help.innerHTML='<b>Android:</b> open the browser menu (⋮) and choose <b>Install app</b> or <b>Add to Home screen</b>. If the option is missing, try opening this site in Chrome. The browser must support installing websites.';
+    } else if(safari){
+      help.innerHTML='<b>Mac Safari:</b> use <b>File → Add to Dock</b> on supported macOS versions. Other browsers may offer <b>Install app</b> from their menu.';
+    } else {
+      help.innerHTML='<b>Desktop:</b> use the browser menu or address-bar install icon and choose <b>Install AyuBase6</b> / <b>Install app</b>. If no install option appears, this browser or this page context does not support automatic shortcut creation; try opening the HTTPS website in Chrome or Edge. A webpage cannot create a desktop or Home Screen shortcut directly in every browser.';
+    }
     help.style.display='block';
   };
   refresh();
