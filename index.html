@@ -3320,21 +3320,21 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 <style id="time-picker-css">
 .schedule-time-btn{cursor:pointer;font:inherit;font-weight:600;text-align:center;flex:1 1 0;min-width:0}
 .tp-overlay{position:fixed;inset:0;z-index:100000;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:20px}
-.tp-dialog{width:100%;max-width:320px;background:#fff;border-radius:18px;padding:20px 18px 14px;box-shadow:0 20px 50px rgba(15,23,42,.35)}
-.tp-title{font-size:1rem;font-weight:700;color:#134e4a;margin-bottom:14px}
+.tp-dialog{--tp-accent:var(--alert-2,#0891b2);--tp-tint:color-mix(in srgb,var(--tp-accent) 14%,white);width:100%;max-width:320px;background:var(--tp-tint);border-radius:18px;padding:20px 18px 14px;box-shadow:0 20px 50px rgba(15,23,42,.35)}
+.tp-title{font-size:1rem;font-weight:700;color:var(--tp-accent);margin-bottom:14px}
 .tp-row{display:flex;align-items:center;justify-content:center;gap:8px}
-.tp-colon{font-size:1.4rem;font-weight:700;color:#134e4a}
+.tp-colon{font-size:1.4rem;font-weight:700;color:var(--tp-accent)}
 .tp-sel{font:inherit;font-size:1.25rem;padding:10px 6px;border:1.5px solid #94a3b8;border-radius:12px;background:#fff;color:#0f172a;min-width:64px;text-align:center}
-.tp-sel:focus-visible{outline:2px solid #0d9488;outline-offset:1px}
+.tp-sel:focus-visible{outline:2px solid var(--tp-accent);outline-offset:1px}
 .tp-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
 .tp-btn{font:inherit;font-weight:700;font-size:.95rem;padding:10px 18px;border:none;border-radius:12px;background:transparent;color:#0d9488;cursor:pointer}
-.tp-ok{background:#0d9488;color:#fff}
+.tp-ok{background:var(--alert-2,#0891b2);color:#fff}
 .tp-display{display:flex;align-items:center;justify-content:center;gap:4px}
 .tp-seg{font:inherit;font-size:2.6rem;font-weight:600;line-height:1.1;padding:2px 12px;border:none;border-radius:12px;background:#e3f4f1;color:#134e4a;cursor:pointer}
-.tp-seg.on{background:#0d9488;color:#fff}
+.tp-seg.on{background:var(--alert-2,#0891b2);color:#fff}
 .tp-ampm{display:flex;flex-direction:column;gap:4px;margin-left:8px}
 .tp-ampm button{font:inherit;font-size:.8rem;font-weight:700;padding:5px 10px;border:1.5px solid #0d9488;border-radius:8px;background:#fff;color:#0d9488;cursor:pointer}
-.tp-ampm button.on{background:#0d9488;color:#fff}
+.tp-ampm button.on{background:var(--alert-2,#0891b2);color:#fff}
 .tp-dial{display:block;width:240px;height:240px;max-width:100%;margin:14px auto 0;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
 /* no box around the clock; keyboard users still get a ring around the dial circle itself */
 .tp-dial,.tp-dial:focus,.tp-dial:focus-visible{outline:none !important}
@@ -3363,6 +3363,55 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 .install-btn{font:inherit;font-weight:700;font-size:.85rem;padding:10px 18px;min-height:44px;border-radius:12px;border:2px solid var(--accent,#08766e);background:transparent;color:var(--accent,#08766e);cursor:pointer}
 .install-btn:hover,.install-btn:focus-visible{background:rgba(8,118,110,.1)}
 </style>
+
+<style id="reminders-section-tint-refinements">
+/* Hours/Minutes controls keep the section's lighter tint both idle and focused. */
+.duration-clock-dialog .duration-clock-fields select,
+.duration-clock-dialog .duration-clock-fields select:hover,
+.duration-clock-dialog .duration-clock-fields select:focus,
+.duration-clock-dialog .duration-clock-fields select:focus-visible {
+  background:color-mix(in srgb,var(--alert-2,#0891b2) 16%,white) !important;
+  color:var(--alert-1,#134e4a) !important;
+  border-color:var(--alert-2,#0891b2) !important;
+  outline-color:var(--alert-2,#0891b2) !important;
+}
+.duration-clock-dialog .duration-clock-fields select option{background:#fff!important;color:#1e293b!important;}
+/* Schedule From/to fields use a lighter tint of the Schedule section colour. */
+#alerts-panel #alert-card-schedule .schedule-time-btn,
+#alerts-panel #alert-card-schedule .schedule-time-btn:hover,
+#alerts-panel #alert-card-schedule .schedule-time-btn:focus,
+#alerts-panel #alert-card-schedule .schedule-time-btn:focus-visible {
+  background:color-mix(in srgb,#2dd4bf 22%,white) !important;
+  background-color:color-mix(in srgb,#2dd4bf 22%,white) !important;
+  border-color:#14b8a6 !important;
+  color:var(--alert-1,#134e4a) !important;
+  outline-color:#14b8a6 !important;
+}
+/* Info icon is visually inside the Enable/Disable All Notifications button. */
+#reminders-notif-banner .reminders-notif-banner-btn{display:flex!important;align-items:center;justify-content:center;gap:8px;position:relative;}
+#reminders-notif-banner .master-notif-info-btn{display:inline-flex;align-items:center;justify-content:center;flex:0 0 18px!important;width:18px!important;height:18px!important;min-width:18px!important;min-height:18px!important;margin:0!important;border:1px solid rgba(255,255,255,.9)!important;background:transparent!important;color:#fff!important;line-height:16px!important;font-size:10px!important;border-radius:50%!important;padding:0!important;cursor:pointer;}
+#reminders-notif-banner .master-notif-info-btn.active{background:rgba(255,255,255,.22)!important;color:#fff!important;}
+</style>
+
+
+<style id="reminders-reset-button-height-fix">
+/* Match Reset button height to Enable All Notifications on desktop and mobile. */
+#reminders-notif-banner .master-notif-row .reminders-notif-banner-btn,
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn {
+  min-height: 40px !important;
+  height: 40px !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1.2 !important;
+}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+</style>
+
 </head>
 <body>
 
@@ -3401,7 +3450,7 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
     <button class="tab-btn activity active" onclick="switchTab('activity')" role="tab" aria-selected="true"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="3"/><path d="M8 9h8l2 5-3 1-2-3v4l4 6h-4l-3-5-3 5H3l5-8v-3l-2 4-3-1 3-6Z"/></svg></span><span>BODY</span></button>
     <button class="tab-btn nutrition" onclick="switchTab('nutrition')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 3C9 3 4 8 4 15c0 4 3 6 7 6 7 0 12-7 9-18Z"/><path d="M5 21c3-6 7-10 12-13" fill="none" stroke="white" stroke-width="1.7"/></svg></span><span>FOOD</span></button>
     <button class="tab-btn routines" onclick="switchTab('routines')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="2" width="18" height="20" rx="3"/><path d="m7 8 1.5 1.5L11 7M13 8h4M7 15l1.5 1.5L11 14M13 15h4" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>ROUTINES</span></button>
-    <button class="tab-btn alerts" onclick="switchTab('alerts')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a2 2 0 0 1 2 2c4 1 5 4 5 9 0 2 1 3 2 5H3c1-2 2-3 2-5 0-5 1-8 5-9a2 2 0 0 1 2-2ZM9 20h6a3 3 0 0 1-6 0Z"/><path d="M2 5 1 9M22 5l1 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>NUDGES</span></button>
+    <button class="tab-btn alerts" onclick="switchTab('alerts')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a2 2 0 0 1 2 2c4 1 5 4 5 9 0 2 1 3 2 5H3c1-2 2-3 2-5 0-5 1-8 5-9a2 2 0 0 1 2-2ZM9 20h6a3 3 0 0 1-6 0Z"/><path d="M2 5 1 9M22 5l1 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>REMINDERS</span></button>
     <button class="tab-btn mind" onclick="switchTab('mind')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 5C10 1 5 2 5 6c-4 1-4 6-2 8-2 4 1 7 5 7 2 2 4 0 4-3V5Zm0 0c2-4 7-3 7 1 4 1 4 6 2 8 2 4-1 7-5 7-2 2-4 0-4-3V5Z"/><path d="M12 6v12M6 10l3 2M18 10l-3 2" stroke="white" fill="none" stroke-width="1.3"/></svg></span><span>MIND</span></button>
     <button class="tab-btn calculator" onclick="switchTab('calculator')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.3 3.6 13.4C-1 8.9 5.2 2.2 10.2 6.6L12 8.3l1.8-1.7c5-4.4 11.2 2.3 6.6 6.8L12 21.3Z"/><path d="M3 15.3c1.8-.8 3.5-.7 5.2.5l3.4 2.6c.9.7 2.1.5 2.8-.3l4.1-4.3c.7-.7 1.8-.7 2.4-.1.7.7.7 1.7.1 2.4l-5.7 6.1c-1.4 1.5-3.6 1.7-5.3.6L3 18.4Z"/></svg></span><span>VITALS</span></button>
     <div id="tab-underline"></div>
@@ -3636,119 +3685,10 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 
 <!-- ══ ALERTS PANEL ═════════════════════════ -->
 <div id="alerts-panel" class="tab-panel" style="display:none">
-  <h1 class="ayu-content-page-title" style="--ayu-page-accent:#0891b2">Nudges</h1>
+  <h1 class="ayu-content-page-title" style="--ayu-page-accent:#0891b2">Reminders</h1>
   <div class="alert-page">
 
     <!-- EYES: 20-20-20 — most frequent -->
-    <div class="alert-card" id="alert-card-break">
-      <div class="alert-card-hdr">
-        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/></svg><span class="section-title-text">Eyes (20-20-20)</span></h2>
-        <button type="button" class="alert-info-btn" id="alert-break-info-btn" onclick="toggleAlertTask('break')" title="Why it helps">i</button>
-      </div>
-
-      <div class="alert-task" id="alert-break-task" style="display:none">
-        <p class="alert-card-sub">Regular eye breaks while looking at screens.</p>
-        <strong>The 20-20-20 rule:</strong> every 20 minutes, look at something about 20 feet (6 metres) away for
-        at least 20 seconds. It gives your eye's focusing muscles a rest from close-up screen work.
-        <ul>
-          <li>Reduces digital eye strain, dryness and blurry vision</li>
-          <li>Cuts down on headaches from prolonged screen focus</li>
-          <li>Encourages a natural blink reset, which re-moistens the eyes</li>
-        </ul>
-      </div>
-
-      <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Remind every <span class="alert-time-val" id="alert-break-time-val">20 min</span></div>
-        <input type="range" id="alert-break-time" class="bmi-slider alert-slider" min="5" max="120" step="5" value="20" oninput="onAlertTimeChange('break')">
-      </div>
-
-      <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
-        <div class="alert-sound-row">
-          <select id="alert-break-sound" class="alert-sound-select" onchange="onAlertSoundChange('break')">
-            <option value="chime">Gentle Chime (default)</option>
-            <option value="bell">Soft Bell</option>
-            <option value="ping">Ping</option>
-            <option value="marimba">Marimba Pop</option>
-          </select>
-          <button type="button" class="alert-icon-btn" id="alert-break-play" title="Preview sound" onclick="previewAlertSound('break')">▶</button>
-          <button type="button" class="alert-icon-btn" id="alert-break-mute" title="Mute" onclick="toggleAlertMute('break')">🔊</button>
-        </div>
-      </div>
-
-      <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
-        <input type="checkbox" id="alert-break-notify" class="notify-cb" checked onchange="onAlertNotifyChange('break')">
-        <label for="alert-break-notify" class="notify-icon-label" title="Notify — also turns this reminder on/off">
-          <span class="notify-icon-off"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/><path d="M2 2l20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></span><span class="notify-icon-on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/></svg></span>
-        </label>
-        <button type="button" class="alert-preview-btn" onclick="previewAlertNotification('break')">Preview notification</button>
-        <button type="button" class="alert-info-btn notif-info-btn" onclick="toggleNotifInfo(this,'alert-break-notif-info')" title="About notifications" aria-label="About notifications" aria-expanded="false">i</button>
-      </div>
-      <div class="notif-blocked-hint" id="alert-break-notif-hint" style="display:none"></div>
-      <div class="notif-info" id="alert-break-notif-info" style="display:none"></div>
-      <div class="notif-mock" id="alert-break-notif-mock">
-        <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-break-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
-        <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/></svg></span>
-        <div class="notif-mock-text"><strong>Eyes</strong><span>Look 20 feet away for 20 seconds — 20-20-20 time!</span></div>
-      </div>
-    </div>
-
-    <!-- WALK — short movement break -->
-    <div class="alert-card" id="alert-card-walk">
-      <div class="alert-card-hdr">
-        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.5a2 2 0 100-4 2 2 0 000 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg><span class="section-title-text">Walk</span></h2>
-        <button type="button" class="alert-info-btn" id="alert-walk-info-btn" onclick="toggleAlertTask('walk')" title="Why it helps">i</button>
-      </div>
-
-      <div class="alert-task" id="alert-walk-task" style="display:none">
-        <p class="alert-card-sub">Short movement breaks to counter prolonged sitting.</p>
-        <strong>2–5 minute movement breaks:</strong> stand up, stretch, or take a short walk every so often —
-        even a lap around the room counts.
-        <ul>
-          <li>Improves blood circulation and reduces stiffness</li>
-          <li>Counters the posture strain of prolonged sitting</li>
-          <li>Gives a small energy and focus boost for the next stretch of work</li>
-        </ul>
-      </div>
-
-      <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Remind every <span class="alert-time-val" id="alert-walk-time-val">45 min</span></div>
-        <input type="range" id="alert-walk-time" class="bmi-slider alert-slider" min="5" max="120" step="5" value="45" oninput="onAlertTimeChange('walk')">
-      </div>
-
-      <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
-        <div class="alert-sound-row">
-          <select id="alert-walk-sound" class="alert-sound-select" onchange="onAlertSoundChange('walk')">
-            <option value="drum">Drum Beat (default)</option>
-            <option value="footsteps">Footsteps</option>
-            <option value="xylophone">Xylophone</option>
-            <option value="ping">Ping</option>
-          </select>
-          <button type="button" class="alert-icon-btn" id="alert-walk-play" title="Preview sound" onclick="previewAlertSound('walk')">▶</button>
-          <button type="button" class="alert-icon-btn" id="alert-walk-mute" title="Mute" onclick="toggleAlertMute('walk')">🔊</button>
-        </div>
-      </div>
-
-      <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
-        <input type="checkbox" id="alert-walk-notify" class="notify-cb" checked onchange="onAlertNotifyChange('walk')">
-        <label for="alert-walk-notify" class="notify-icon-label" title="Notify">
-          <span class="notify-icon-off"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/><path d="M2 2l20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></span><span class="notify-icon-on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/></svg></span>
-        </label>
-        <button type="button" class="alert-preview-btn" onclick="previewAlertNotification('walk')">Preview notification</button>
-        <button type="button" class="alert-info-btn notif-info-btn" onclick="toggleNotifInfo(this,'alert-walk-notif-info')" title="About notifications" aria-label="About notifications" aria-expanded="false">i</button>
-      </div>
-      <div class="notif-blocked-hint" id="alert-walk-notif-hint" style="display:none"></div>
-      <div class="notif-info" id="alert-walk-notif-info" style="display:none"></div>
-      <div class="notif-mock" id="alert-walk-notif-mock">
-        <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-walk-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
-        <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.5a2 2 0 100-4 2 2 0 000 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg></span>
-        <div class="notif-mock-text"><strong>Walk</strong><span>Time for a 2–5 minute walk or stretch!</span></div>
-      </div>
-
-    </div>
-
-    <!-- DRINK — hydration reminder -->
     <div class="alert-card" id="alert-card-drink">
       <div class="alert-card-hdr">
         <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8 8 4 12.5 4 16a8 8 0 0016 0c0-3.5-4-8-8-14z"/></svg><span class="section-title-text">Water</span></h2>
@@ -3803,8 +3743,114 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 
     </div>
 
-    <!-- EYES: GUIDED EXERCISE — follow-the-dot animation -->
-    <div class="alert-card" id="alert-card-break-ex">
+<div class="alert-card" id="alert-card-walk">
+      <div class="alert-card-hdr">
+        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.5a2 2 0 100-4 2 2 0 000 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg><span class="section-title-text">Walk</span></h2>
+        <button type="button" class="alert-info-btn" id="alert-walk-info-btn" onclick="toggleAlertTask('walk')" title="Why it helps">i</button>
+      </div>
+
+      <div class="alert-task" id="alert-walk-task" style="display:none">
+        <p class="alert-card-sub">Short movement breaks to counter prolonged sitting.</p>
+        <strong>2–5 minute movement breaks:</strong> stand up, stretch, or take a short walk every so often —
+        even a lap around the room counts.
+        <ul>
+          <li>Improves blood circulation and reduces stiffness</li>
+          <li>Counters the posture strain of prolonged sitting</li>
+          <li>Gives a small energy and focus boost for the next stretch of work</li>
+        </ul>
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-row-lbl dotted-lbl">Remind every <span class="alert-time-val" id="alert-walk-time-val">45 min</span></div>
+        <input type="range" id="alert-walk-time" class="bmi-slider alert-slider" min="5" max="120" step="5" value="45" oninput="onAlertTimeChange('walk')">
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
+        <div class="alert-sound-row">
+          <select id="alert-walk-sound" class="alert-sound-select" onchange="onAlertSoundChange('walk')">
+            <option value="drum">Drum Beat (default)</option>
+            <option value="footsteps">Footsteps</option>
+            <option value="xylophone">Xylophone</option>
+            <option value="ping">Ping</option>
+          </select>
+          <button type="button" class="alert-icon-btn" id="alert-walk-play" title="Preview sound" onclick="previewAlertSound('walk')">▶</button>
+          <button type="button" class="alert-icon-btn" id="alert-walk-mute" title="Mute" onclick="toggleAlertMute('walk')">🔊</button>
+        </div>
+      </div>
+
+      <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
+        <input type="checkbox" id="alert-walk-notify" class="notify-cb" checked onchange="onAlertNotifyChange('walk')">
+        <label for="alert-walk-notify" class="notify-icon-label" title="Notify">
+          <span class="notify-icon-off"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/><path d="M2 2l20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></span><span class="notify-icon-on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/></svg></span>
+        </label>
+        <button type="button" class="alert-preview-btn" onclick="previewAlertNotification('walk')">Preview notification</button>
+        <button type="button" class="alert-info-btn notif-info-btn" onclick="toggleNotifInfo(this,'alert-walk-notif-info')" title="About notifications" aria-label="About notifications" aria-expanded="false">i</button>
+      </div>
+      <div class="notif-blocked-hint" id="alert-walk-notif-hint" style="display:none"></div>
+      <div class="notif-info" id="alert-walk-notif-info" style="display:none"></div>
+      <div class="notif-mock" id="alert-walk-notif-mock">
+        <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-walk-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
+        <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.5a2 2 0 100-4 2 2 0 000 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg></span>
+        <div class="notif-mock-text"><strong>Walk</strong><span>Time for a 2–5 minute walk or stretch!</span></div>
+      </div>
+
+    </div>
+
+<div class="alert-card" id="alert-card-break">
+      <div class="alert-card-hdr">
+        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/></svg><span class="section-title-text">Eyes (20-20-20)</span></h2>
+        <button type="button" class="alert-info-btn" id="alert-break-info-btn" onclick="toggleAlertTask('break')" title="Why it helps">i</button>
+      </div>
+
+      <div class="alert-task" id="alert-break-task" style="display:none">
+        <p class="alert-card-sub">Regular eye breaks while looking at screens.</p>
+        <strong>The 20-20-20 rule:</strong> every 20 minutes, look at something about 20 feet (6 metres) away for
+        at least 20 seconds. It gives your eye's focusing muscles a rest from close-up screen work.
+        <ul>
+          <li>Reduces digital eye strain, dryness and blurry vision</li>
+          <li>Cuts down on headaches from prolonged screen focus</li>
+          <li>Encourages a natural blink reset, which re-moistens the eyes</li>
+        </ul>
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-row-lbl dotted-lbl">Remind every <span class="alert-time-val" id="alert-break-time-val">20 min</span></div>
+        <input type="range" id="alert-break-time" class="bmi-slider alert-slider" min="5" max="120" step="5" value="20" oninput="onAlertTimeChange('break')">
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
+        <div class="alert-sound-row">
+          <select id="alert-break-sound" class="alert-sound-select" onchange="onAlertSoundChange('break')">
+            <option value="chime">Gentle Chime (default)</option>
+            <option value="bell">Soft Bell</option>
+            <option value="ping">Ping</option>
+            <option value="marimba">Marimba Pop</option>
+          </select>
+          <button type="button" class="alert-icon-btn" id="alert-break-play" title="Preview sound" onclick="previewAlertSound('break')">▶</button>
+          <button type="button" class="alert-icon-btn" id="alert-break-mute" title="Mute" onclick="toggleAlertMute('break')">🔊</button>
+        </div>
+      </div>
+
+      <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
+        <input type="checkbox" id="alert-break-notify" class="notify-cb" checked onchange="onAlertNotifyChange('break')">
+        <label for="alert-break-notify" class="notify-icon-label" title="Notify — also turns this reminder on/off">
+          <span class="notify-icon-off"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/><path d="M2 2l20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></span><span class="notify-icon-on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/></svg></span>
+        </label>
+        <button type="button" class="alert-preview-btn" onclick="previewAlertNotification('break')">Preview notification</button>
+        <button type="button" class="alert-info-btn notif-info-btn" onclick="toggleNotifInfo(this,'alert-break-notif-info')" title="About notifications" aria-label="About notifications" aria-expanded="false">i</button>
+      </div>
+      <div class="notif-blocked-hint" id="alert-break-notif-hint" style="display:none"></div>
+      <div class="notif-info" id="alert-break-notif-info" style="display:none"></div>
+      <div class="notif-mock" id="alert-break-notif-mock">
+        <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-break-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
+        <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/></svg></span>
+        <div class="notif-mock-text"><strong>Eyes</strong><span>Look 20 feet away for 20 seconds — 20-20-20 time!</span></div>
+      </div>
+    </div>
+
+<div class="alert-card" id="alert-card-break-ex">
       <div class="alert-card-hdr">
         <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/></svg><span class="section-title-text">Eyes (Exercise)</span></h2>
         <button type="button" class="alert-info-btn" id="alert-break-ex-info-btn" onclick="toggleAlertTask('break-ex')" title="Why it helps">i</button>
@@ -3908,18 +3954,31 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
       </div>
     </div>
 
-    <!-- Reset and Enable / Disable All Notifications, side by side and centred. -->
+    <!-- User-defined reminders -->
+    <div class="alert-card custom-reminders-card" id="custom-reminders-card">
+      <div class="alert-card-hdr">
+        <h2><span class="section-title-text">My Reminders</span></h2>
+        <button type="button" class="alert-info-btn small-info" id="custom-reminder-add" onclick="addCustomReminderForm()" title="Add a reminder" aria-label="Add a reminder">+</button>
+      </div>
+      <p class="alert-card-sub"></p>
+      <div id="custom-reminders-list"></div>
+    </div>
+
     <div class="reminders-notif-banner nudges-actions" id="reminders-notif-banner">
-      <button type="button" class="reset-icon-btn" title="Reset Nudges to defaults" onclick="resetRemindersToDefault()">↺ Reset</button>
-      <button type="button" class="reminders-notif-banner-btn" onclick="toggleMasterNotify('reminders-notif-error')">Enable All Notifications</button>
-      <button type="button" class="alert-info-btn notif-info-btn" onclick="toggleNotifInfo(this,'master-notif-info')" title="About notifications" aria-label="About notifications" aria-expanded="false">i</button>
+      <div class="master-notif-row">
+        <div class="master-notif-group">
+          <button type="button" class="reminders-notif-banner-btn" onclick="toggleMasterNotify('reminders-notif-error')"><span class="master-notif-label">Enable All Notifications</span><span role="button" tabindex="0" class="alert-info-btn notif-info-btn master-notif-info-btn" onclick="event.stopPropagation();toggleNotifInfo(this,'master-notif-info')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();toggleNotifInfo(this,'master-notif-info')}" title="About notifications" aria-label="About notifications" aria-expanded="false">i</span></button>
+        </div>
+        <div class="reminders-reset-row"><button type="button" class="reset-icon-btn" title="Reset Reminders to defaults" onclick="resetRemindersToDefault()">↺ Reset</button></div>
+      </div>
     </div>
     <div class="notif-blocked-hint reminders-notif-error" id="reminders-notif-error" style="display:none"></div>
     <div class="notif-info" id="master-notif-info" style="display:none"></div>
-    <div class="install-row" id="install-row">
-      <button type="button" class="install-btn" id="install-app-btn" onclick="installApp()">⬇ Install app</button>
+    <div class="install-row reminder-install-row" id="install-row">
+      <button type="button" class="install-btn" id="install-app-btn" onclick="installApp()">Add AyuBase6 Shortcut</button>
+      <button type="button" class="alert-info-btn small-info install-info-overlay" onclick="toggleNotifInfo(this,'install-help')" title="About adding a shortcut" aria-label="About adding a shortcut" aria-expanded="false">i</button>
     </div>
-    <div class="notif-info" id="install-help" style="display:none"></div>
+    <div class="notif-info" id="install-help" style="display:none">Add a shortcut to AyuBase6 on your phone’s Home Screen or your computer’s desktop for quicker access. On supported browsers, use the browser menu and choose <b>Install app</b> or <b>Add to Home Screen</b>. The wording varies by browser and device.</div>
 
   </div>
 </div>
@@ -8767,7 +8826,7 @@ function updateRemindersNotifBanner(){
   banner.style.display='flex';
   if(btn){
     btn.style.display='inline-block';
-    btn.textContent = isMasterNotifyOn() ? 'Disable All Notifications' : 'Enable All Notifications';
+    const label=btn.querySelector('.master-notif-label'); if(label) label.textContent = isMasterNotifyOn() ? 'Disable All Notifications' : 'Enable All Notifications'; else btn.textContent = isMasterNotifyOn() ? 'Disable All Notifications' : 'Enable All Notifications';
   }
 }
 
@@ -8840,16 +8899,17 @@ function renderScheduleBtns(){
   if(a) a.textContent=fmt12(scheduleState.start);
   if(b) b.textContent=fmt12(scheduleState.end);
 }
-function openTimePicker(which){
-  const hid=document.getElementById('schedule-'+which); if(!hid) return;
-  const opener=document.getElementById('schedule-'+which+'-btn');
-  const cur=String(hid.value||'08:00').split(':').map(Number);
+function openTimePicker(which, initialValue, onSelect, customTitle){
+  const custom=typeof onSelect==='function';
+  const hid=custom?null:document.getElementById('schedule-'+which); if(!custom&&!hid) return;
+  const opener=custom?(document.activeElement):document.getElementById('schedule-'+which+'-btn');
+  const cur=String(custom?(initialValue||'09:00'):(hid.value||'08:00')).split(':').map(Number);
   let h=(cur[0]%12)||12, m=cur[1]||0, pm=cur[0]>=12, mode='h', dragging=false;
   const C=120, NUM_R=90, HAND_R=72, pad=n=>String(n).padStart(2,'0');
   const ov=document.createElement('div');
   ov.className='tp-overlay';
-  ov.innerHTML=`<div class="tp-dialog" role="dialog" aria-modal="true" aria-label="${which==='start'?'Start':'End'} time">
-    <div class="tp-title">${which==='start'?'Start time':'End time'}</div>
+  ov.innerHTML=`<div class="tp-dialog" role="dialog" aria-modal="true" aria-label="${custom?(customTitle||'Select time'):(which==='start'?'Start':'End')+' time'}">
+    <div class="tp-title">${custom?(customTitle||'Select time'):(which==='start'?'Start time':'End time')}</div>
     <div class="tp-display">
       <button type="button" class="tp-seg" id="tp-hbtn" aria-label="Set hour"></button>
       <span class="tp-colon">:</span>
@@ -8875,9 +8935,9 @@ function openTimePicker(which){
     const [hx,hy]=xy(deg,HAND_R), [bx,by]=xy(deg,NUM_R);
     const onFace=mode==='h'||m%5===0;
     let svg=`<circle cx="${C}" cy="${C}" r="112" fill="#e3f4f1"/>
-      <line x1="${C}" y1="${C}" x2="${hx}" y2="${hy}" stroke="#0d9488" stroke-width="2"/>
-      <circle cx="${C}" cy="${C}" r="4" fill="#0d9488"/>
-      <circle cx="${bx}" cy="${by}" r="19" fill="#0d9488"/>`;
+      <line x1="${C}" y1="${C}" x2="${hx}" y2="${hy}" stroke="var(--alert-2,#0891b2)" stroke-width="2"/>
+      <circle cx="${C}" cy="${C}" r="4" fill="var(--alert-2,#0891b2)"/>
+      <circle cx="${bx}" cy="${by}" r="19" fill="var(--alert-2,#0891b2)"/>`;
     if(!onFace) svg+=`<circle cx="${bx}" cy="${by}" r="3" fill="#fff"/>`;
     for(let i=0;i<12;i++){
       const label=mode==='h'?(i===0?12:i):i*5, sel=(mode==='h'?label===h:label===m);
@@ -8914,8 +8974,8 @@ function openTimePicker(which){
   ov.addEventListener('click',e=>{ if(e.target===ov) close(); });
   $q('tp-cancel').addEventListener('click',close);
   $q('tp-ok').addEventListener('click',()=>{
-    hid.value=pad((h%12)+(pm?12:0))+':'+pad(m);
-    onScheduleChange();
+    const value=pad((h%12)+(pm?12:0))+':'+pad(m);
+    if(custom) onSelect(value); else { hid.value=value; onScheduleChange(); }
     close();
   });
   paint();
@@ -11321,5 +11381,433 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   },1200);
 })();
 </script>
+
+<style>
+.alert-info-btn,.calc-info-btn,.notif-info-btn{width:22px!important;height:22px!important;min-width:22px!important;min-height:22px!important;font-size:12px!important;line-height:20px!important}
+.alert-card-hdr{gap:10px}
+.master-notif-info-btn{width:18px!important;height:18px!important;min-width:18px!important;min-height:18px!important;font-size:10px!important;line-height:16px!important;padding:0!important}
+.alert-enabled-toggle{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:12px;color:var(--text-muted,#64748b);white-space:nowrap}
+.alert-enabled-toggle input{appearance:none;width:34px;height:19px;border-radius:20px;background:#cbd5e1;position:relative;cursor:pointer;transition:background .2s;margin:0}
+.alert-enabled-toggle input:before{content:"";position:absolute;width:15px;height:15px;left:2px;top:2px;border-radius:50%;background:white;transition:transform .2s}
+.alert-enabled-toggle input:checked{background:var(--alert-2,#0891b2)}
+.alert-enabled-toggle input:checked:before{transform:translateX(15px)}
+.reminder-install-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.nudges-actions{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.custom-reminder-form{border-top:1px solid rgba(100,116,139,.2);padding:14px 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.custom-reminder-form label{display:flex;flex-direction:column;gap:5px;font-size:13px}
+.custom-reminder-form input,.custom-reminder-form select{width:100%;box-sizing:border-box;min-height:40px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:9px;background:rgba(255,255,255,.8);color:#1e293b}
+.custom-reminder-form .wide{grid-column:1/-1}
+.custom-reminder-form .save-reminder{justify-self:start;padding:9px 18px;border:0;border-radius:9px;background:var(--alert-2,#0891b2);color:white;font-weight:600}
+.custom-reminder-item{padding:10px 0;border-bottom:1px solid rgba(100,116,139,.18);display:flex;justify-content:space-between;gap:10px;align-items:center}
+.custom-reminder-item{position:relative;padding:12px 62px 10px 0;align-items:flex-start}.custom-reminder-edit{position:absolute;right:30px;top:5px;border:1px solid var(--alert-2,#0891b2);background:transparent;color:var(--alert-2,#0891b2);border-radius:7px;padding:3px 8px;cursor:pointer;font-size:12px}.custom-reminder-delete{position:absolute;top:5px;right:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;padding:0!important;background:rgba(100,116,139,.14);font-size:20px;line-height:1;cursor:pointer;color:inherit}
+@media(max-width:520px){.custom-reminder-form{grid-template-columns:1fr}.custom-reminder-form .wide{grid-column:auto}.nudges-actions>*{flex:1 1 auto}.alert-card-hdr{flex-wrap:wrap}}
+.master-notif-row{flex:0 0 100%;display:flex;align-items:center;justify-content:center;gap:7px;order:2;width:100%}
+.nudges-actions{row-gap:10px;display:flex;flex-direction:column;align-items:stretch;width:100%}.reminders-reset-row{display:flex;justify-content:flex-end;width:100%}.master-notif-row{justify-content:flex-start!important;padding-left:2px}.reminder-install-row{justify-content:flex-start!important}
+.alert-enabled-toggle input:checked{background:var(--alert-2,#0891b2)!important}
+.alert-info-btn:not(.active):hover{background:#fff!important;color:var(--alert-2)!important;border-color:var(--alert-2)!important}
+.custom-reminder-form .save-reminder{background:var(--alert-2,#0891b2)!important}
+.reminder-frequency-fields{display:block}
+.reminder-frequency-fields>label{display:flex;flex-direction:column;gap:7px;font-size:13px}
+.duration-clock-trigger{display:block;text-align:left;min-height:40px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:9px;background:rgba(255,255,255,.8);color:#1e293b;cursor:pointer}
+.duration-picker{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;margin-top:8px;border:1px solid rgba(100,116,139,.3);border-radius:10px;background:rgba(255,255,255,.94)}
+.duration-picker[hidden]{display:none}.duration-clock-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.duration-clock-fields label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--alert-2,#0891b2)}.duration-clock-fields select{min-height:42px;border:1px solid var(--alert-2,#0891b2);border-radius:9px;padding:8px;background:white;color:#1e293b}.duration-clock-preview{margin-top:12px;text-align:center;font-weight:700;color:var(--alert-2,#0891b2)}.selected-times-list{display:grid;gap:7px}.selected-time-row{display:flex;gap:8px;align-items:center}.selected-time-btn{flex:1}.remove-selected-time,.add-selected-time{border:1px solid var(--alert-2,#0891b2);border-radius:9px;padding:8px 12px;background:transparent;color:var(--alert-2,#0891b2);cursor:pointer}.remove-selected-time{font-size:18px;min-width:38px}.add-selected-time{margin-top:8px}.reminder-form-actions{display:flex;gap:8px;align-items:center}.custom-reminder-form .cancel-reminder{border:1px solid var(--alert-2,#0891b2);border-radius:9px;padding:9px 18px;background:transparent;color:var(--alert-2,#0891b2);cursor:pointer}
+.duration-picker label{display:flex;flex-direction:column;gap:5px;font-size:12px}
+.duration-picker select{min-height:38px;padding:6px;border:1px solid #cbd5e1;border-radius:8px;background:white}
+.duration-total{grid-column:1/-1;margin:0;font-size:12px}
+.duration-done{grid-column:1/-1;justify-self:start;border:0;border-radius:8px;padding:8px 16px;background:var(--alert-2,#0891b2);color:white;cursor:pointer}
+</style>
+<script>
+(function(){
+  function addSwitches(){
+    const cards=[...document.querySelectorAll('#alerts-panel .alert-card')].filter(c=>c.id!=='alert-card-schedule'&&c.id!=='custom-reminders-card');
+    cards.forEach(card=>{
+      const title=(card.querySelector('h2')?.innerText||'').trim();
+      if(!/Eyes \(20-20-20\)|^Walk$|^Water$|Eyes \(Exercise\)/i.test(title)) return;
+      const key=card.id.replace('alert-card-','');
+      if(card.querySelector('.alert-enabled-toggle')) return;
+      const hdr=card.querySelector('.alert-card-hdr'); if(!hdr)return;
+      const label=document.createElement('label');label.className='alert-enabled-toggle';
+      label.innerHTML='<input type="checkbox" aria-label="Enable '+title.replace(/"/g,'')+'" />';
+      const input=label.querySelector('input'); input.checked=false;
+      input.addEventListener('change',()=>{
+        if(window.alertState && window.alertState[key]) window.alertState[key].enabled=input.checked;
+        card.classList.toggle('alert-disabled',!input.checked);
+        if(typeof window.scheduleAlertTimer==='function'){try{window.scheduleAlertTimer(key)}catch(e){}}
+      });
+      const infoBtn=hdr.querySelector('.alert-info-btn'); if(infoBtn) hdr.insertBefore(label,infoBtn.nextSibling); else hdr.appendChild(label);
+      if(window.alertState && window.alertState[key]) window.alertState[key].enabled=false;
+    });
+    // Deterministically arrange the whole Reminders panel, not just the four cards.
+    // The action buttons share .alert-page with the cards, so explicitly place them last.
+    const page=document.querySelector('#alerts-panel .alert-page');
+    if(page){
+      const directCards=[...page.querySelectorAll(':scope > .alert-card')];
+      const find=(re)=>directCards.find(c=>re.test((c.querySelector('h2')?.innerText||'').trim()));
+      const ordered=[find(/^Water$/i),find(/^Walk$/i),find(/Eyes \(20-20-20\)/i),find(/Eyes \(Exercise\)/i)].filter(Boolean);
+      const custom=document.getElementById('custom-reminders-card');
+      const bottomIds=['reminders-notif-banner','reminders-notif-error','master-notif-info','install-row','install-help'];
+      const bottom=bottomIds.map(id=>document.getElementById(id)).filter(el=>el && el.parentElement===page);
+      const reserved=new Set([...ordered,custom,...bottom].filter(Boolean));
+      const remaining=[...page.children].filter(el=>!reserved.has(el));
+      // Re-append in explicit order so repeated calls cannot reverse cards or lift actions.
+      [...ordered, ...(custom && custom.parentElement===page ? [custom] : []), ...remaining, ...bottom]
+        .filter(Boolean).forEach(el=>page.appendChild(el));
+    }
+  }
+  let customReminderCounter=0;
+  function stopReminderTimers(item){if(item._reminderTimer)clearInterval(item._reminderTimer);if(item._reminderTimeout)clearTimeout(item._reminderTimeout);(item._reminderTimeouts||[]).forEach(clearTimeout);(item._reminderTimers||[]).forEach(clearInterval)}
+  function formatClock(v){const [hh,mm]=v.split(':').map(Number);return (hh%12||12)+':'+String(mm).padStart(2,'0')+' '+(hh>=12?'PM':'AM')}
+  window.addCustomReminderForm=function(editItem){
+    const list=document.getElementById('custom-reminders-list'); if(!list)return;
+    const oldForm=list.querySelector('.custom-reminder-form'); if(oldForm)oldForm.remove();
+    const existing=editItem||null; if(existing)stopReminderTimers(existing);
+    const saved=existing?JSON.parse(existing.dataset.reminder||'{}'):{};
+    const form=document.createElement('form');form.className='custom-reminder-form';
+    form.innerHTML='<label class="wide">Reminder name<input name="name" required maxlength="80" placeholder="e.g. Take a stretch break"></label>'+ 
+      '<label class="wide">Frequency<select name="frequency-mode"><option value="regular">At regular times</option><option value="selected">At selected times</option></select></label>'+ 
+      '<div class="wide reminder-frequency-fields"></div>'+ 
+      '<label>Notification sound<select name="sound"><option value="chime">Chime</option><option value="drop">Water drop</option><option value="drum">Drum</option><option value="none">Silent</option></select></label>'+ 
+      '<div class="wide reminder-form-actions"><button class="save-reminder" type="submit">Save reminder</button><button class="cancel-reminder" type="button">Cancel</button></div>';
+    const mode=form.querySelector('[name="frequency-mode"]'), fields=form.querySelector('.reminder-frequency-fields');
+    form.elements.name.value=saved.name||''; form.elements.sound.value=saved.sound||'chime'; mode.value=saved.mode||'regular';
+    let chosenTimes=(saved.times||[]).slice(); if(!chosenTimes.length)chosenTimes=['09:00'];
+    let duration=Number(saved.duration)||15;
+    function renderFrequency(){
+      if(mode.value==='regular'){
+        fields.innerHTML='<label>Minutes <button type="button" class="duration-clock-trigger" aria-haspopup="dialog"></button></label>';
+        const btn=fields.querySelector('.duration-clock-trigger');
+        function showDuration(){btn.textContent=durationLabel(duration)} showDuration();
+        btn.addEventListener('click',()=>openDurationPicker(duration,v=>{duration=v;showDuration()}));
+      } else {
+        fields.innerHTML='<div class="selected-times-wrap"><div class="selected-times-list"></div><button type="button" class="add-selected-time">＋ Add time</button></div>';
+        const timesList=fields.querySelector('.selected-times-list');
+        function drawTimes(){timesList.innerHTML='';chosenTimes.forEach((t,i)=>{const row=document.createElement('div');row.className='selected-time-row';const b=document.createElement('button');b.type='button';b.className='duration-clock-trigger selected-time-btn';b.textContent=formatClock(t);b.addEventListener('click',()=>openTimePicker('custom',t,v=>{chosenTimes[i]=v;drawTimes()},'Select time'));const rm=document.createElement('button');rm.type='button';rm.className='remove-selected-time';rm.textContent='×';rm.setAttribute('aria-label','Remove time');rm.disabled=chosenTimes.length===1;rm.addEventListener('click',()=>{chosenTimes.splice(i,1);drawTimes()});row.append(b,rm);timesList.append(row)})}
+        drawTimes();fields.querySelector('.add-selected-time').addEventListener('click',()=>{chosenTimes.push('09:00');drawTimes();const b=timesList.lastElementChild?.querySelector('button');if(b)b.click()});
+      }
+    }
+    mode.addEventListener('change',renderFrequency);renderFrequency();
+    form.querySelector('.cancel-reminder').addEventListener('click',()=>{form.remove();if(existing)startReminder(existing)});
+    form.addEventListener('submit',function(e){
+      e.preventDefault();const d=new FormData(form);const item=existing||document.createElement('div');if(!existing){item.className='custom-reminder-item';item.dataset.reminderId=String(++customReminderCounter)}
+      stopReminderTimers(item);
+      const data={name:String(d.get('name')).trim(),mode:mode.value,duration:duration,times:mode.value==='selected'?[...new Set(chosenTimes)].sort():[],sound:d.get('sound')};
+      item.dataset.reminder=JSON.stringify(data);
+      item.innerHTML='';const info=document.createElement('div');const strong=document.createElement('strong');strong.textContent=data.name;const detail=document.createElement('div');detail.style.fontSize='12px';detail.style.opacity='.8';detail.textContent=(data.mode==='regular'?'Every '+durationLabel(data.duration):'At '+data.times.map(formatClock).join(', '))+' · Sound: '+data.sound;info.append(strong,detail);
+      const edit=document.createElement('button');edit.type='button';edit.className='custom-reminder-edit';edit.textContent='Edit';edit.addEventListener('click',()=>window.addCustomReminderForm(item));
+      const del=document.createElement('button');del.type='button';del.className='custom-reminder-delete';del.textContent='×';del.setAttribute('aria-label','Delete reminder');del.title='Delete reminder';del.addEventListener('click',()=>{stopReminderTimers(item);item.remove()});item.append(info,edit,del);
+      if(!existing)list.append(item);form.remove();startReminder(item);
+      if('Notification' in window && Notification.permission==='default') Notification.requestPermission().catch(()=>{});
+    });
+    if(existing) existing.before(form); else list.append(form);form.querySelector('input[name="name"]').focus();
+  };
+  function durationLabel(total){total=Math.max(1,Math.min(1440,Number(total)||1));const h=Math.floor(total/60),m=total%60;return (h?h+' hour'+(h===1?'':'s'):'')+(h&&m?' ':'')+(m?m+' minute'+(m===1?'':'s'):'')}
+  function openDurationPicker(current,onSelect){
+    const ov=document.createElement('div');ov.className='tp-overlay';
+    ov.innerHTML='<div class="tp-dialog duration-clock-dialog" role="dialog" aria-modal="true" aria-label="Choose reminder interval"><div class="tp-title">Repeat every</div><div class="duration-dials"><section class="duration-dial-section"><div class="duration-dial-heading">Hours</div><div class="duration-dial duration-hour-dial" role="group" aria-label="Choose hours"><div class="duration-dial-hand"></div><div class="duration-dial-center"></div></div><div class="duration-dial-value duration-hour-value"></div></section><section class="duration-dial-section"><div class="duration-dial-heading">Minutes</div><div class="duration-dial duration-minute-dial" role="slider" aria-label="Choose minutes" aria-valuemin="0" aria-valuemax="59" tabindex="0"><div class="duration-dial-hand"></div><div class="duration-dial-center"></div></div><div class="duration-dial-value duration-minute-value"></div></section></div><div class="duration-clock-preview"></div><div class="tp-actions"><button type="button" class="tp-btn dur-cancel">Cancel</button><button type="button" class="tp-btn tp-ok dur-ok">OK</button></div></div>';document.body.append(ov);
+    const hourDial=ov.querySelector('.duration-hour-dial'),minuteDial=ov.querySelector('.duration-minute-dial');
+    let hours=Math.floor(current/60),minutes=current%60;
+    function addDialButton(dial,value,label,ring,count){
+      const b=document.createElement('button');b.type='button';b.className='duration-dial-number'+(ring?' inner':'');b.textContent=label;b.dataset.value=value;b.setAttribute('aria-label',label+(dial===hourDial?' hours':' minutes'));
+      const positionIndex=dial===minuteDial?value/5:(value%count);const angle=positionIndex*Math.PI*2/count-Math.PI/2;const radius=ring?23:44;
+      b.style.left=(50+Math.cos(angle)*radius)+'%';b.style.top=(50+Math.sin(angle)*radius)+'%';
+      b.addEventListener('click',()=>{if(dial===hourDial)hours=value;else minutes=value;draw()});dial.append(b);
+    }
+    // Hours: all 24 values on two clear 12-position rings (00–11 outside, 12–23 inside).
+    for(let i=0;i<24;i++)addDialButton(hourDial,i,String(i).padStart(2,'0'),i>=12,12);
+    // Minutes: 12 clock positions, in five-minute increments from 00 through 55.
+    for(let i=0;i<60;i+=5)addDialButton(minuteDial,i,String(i).padStart(2,'0'),false,12);
+    function chooseMinuteFromPointer(e){const r=minuteDial.getBoundingClientRect(),x=e.clientX-(r.left+r.width/2),y=e.clientY-(r.top+r.height/2);if(Math.hypot(x,y)<14)return;let a=Math.atan2(y,x)+Math.PI/2;if(a<0)a+=Math.PI*2;minutes=Math.round(a/(Math.PI*2)*60)%60;draw()}
+    minuteDial.addEventListener('click',e=>{if(e.target.closest('.duration-dial-number'))return;chooseMinuteFromPointer(e)});
+    minuteDial.addEventListener('keydown',e=>{if(e.key==='ArrowUp'||e.key==='ArrowRight'){e.preventDefault();minutes=(minutes+1)%60;draw()}else if(e.key==='ArrowDown'||e.key==='ArrowLeft'){e.preventDefault();minutes=(minutes+59)%60;draw()}});
+    function draw(){
+      hourDial.querySelectorAll('.duration-dial-number').forEach(b=>{const v=Number(b.dataset.value);b.classList.toggle('selected',v===hours);b.setAttribute('aria-pressed',String(v===hours));});
+      minuteDial.querySelectorAll('.duration-dial-number').forEach(b=>{const v=Number(b.dataset.value);b.classList.toggle('selected',v===Math.floor(minutes/5)*5);b.setAttribute('aria-pressed',String(v===Math.floor(minutes/5)*5));});
+      hourDial.querySelector('.duration-dial-hand').style.transform='translate(-50%,-100%) rotate('+(hours%12*30)+'deg)';
+      minuteDial.querySelector('.duration-dial-hand').style.transform='translate(-50%,-100%) rotate('+(minutes*6)+'deg)';
+      ov.querySelector('.duration-hour-value').textContent=hours+' hour'+(hours===1?'':'s');
+      ov.querySelector('.duration-minute-value').textContent=String(minutes).padStart(2,'0')+' minute'+(minutes===1?'':'s');
+      minuteDial.setAttribute('aria-valuenow',minutes);
+      const n=Math.min(1440,Math.max(1,hours*60+minutes));ov.querySelector('.duration-clock-preview').textContent='Every '+durationLabel(n);
+    }
+    const close=()=>ov.remove();ov.querySelector('.dur-cancel').onclick=close;ov.addEventListener('click',e=>{if(e.target===ov)close()});ov.querySelector('.dur-ok').onclick=()=>{let n=hours*60+minutes;if(n>1440)n=1440;if(!n)n=1;onSelect(n);close()};draw();
+  }
+  function startReminder(item){
+    const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name)return;
+    const notify=()=>{try{if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()})}catch(_){}};
+    if(data.mode==='regular')item._reminderTimer=setInterval(notify,Math.max(1,Number(data.duration)||1)*60000);
+    else {item._reminderTimeouts=[];item._reminderTimers=[];data.times.forEach(t=>{const [hh,mm]=t.split(':').map(Number),now=new Date(),next=new Date();next.setHours(hh,mm,0,0);if(next<=now)next.setDate(next.getDate()+1);const delay=next-now;item._reminderTimeouts.push(setTimeout(()=>{notify();item._reminderTimers.push(setInterval(notify,24*60*60*1000))},delay))})}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addSwitches);else addSwitches();
+  setTimeout(addSwitches,700);
+})();
+</script>
+
+<style id="per-reminder-schedule-styles">
+/* Each reminder has its own schedule row; My Reminders uses the former Schedule card treatment. */
+#alerts-panel #alert-card-schedule{display:none!important}
+html[data-petal-card="e"] #alerts-panel #custom-reminders-card{background-color:#2dd4bf!important;border-color:#14b8a6!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after{background:#fff!important;opacity:.4!important}
+#alerts-panel #custom-reminders-card h2,#alerts-panel #custom-reminders-card .section-title-icon{color:var(--alert-1)!important}
+#alerts-panel .per-reminder-schedule{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0 12px;padding:10px 0;border-bottom:0!important}
+#alerts-panel .per-reminder-schedule .schedule-lbl{font-size:13px;font-weight:600;color:var(--alert-2,#0891b2)}
+#alerts-panel .per-reminder-schedule .eye-ex-time-item{min-width:92px;padding:8px 10px;border:1px solid var(--alert-2,#0891b2);border-radius:9px;background:rgba(255,255,255,.78);color:var(--alert-1,#134e4a);font:inherit;cursor:pointer}
+html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item{background:#fff!important;border-color:var(--alert-1)!important;color:var(--alert-1)!important}
+@media(max-width:420px){#alerts-panel .per-reminder-schedule{gap:6px}#alerts-panel .per-reminder-schedule .eye-ex-time-item{min-width:78px}}
+</style>
+<script id="per-reminder-schedule-logic">
+(function(){
+  const defaults={start:'09:00',end:'18:00'};
+  const specs=[
+    {id:'alert-card-drink',key:'drink',title:'Water'},
+    {id:'alert-card-walk',key:'walk',title:'Walk'},
+    {id:'alert-card-break',key:'break',title:'Eyes (20-20-20)'},
+    {id:'alert-card-break-ex',key:'break-ex',title:'Eyes (Exercise)'}
+  ];
+  const cards={};
+  function inWindow(start,end,date){
+    const now=date||new Date(),cur=now.getHours()*60+now.getMinutes();
+    const val=t=>{const m=/^(\d{1,2}):(\d{2})$/.exec(t||'');return m?+m[1]*60+(+m[2]):null};
+    const a=val(start),b=val(end);if(a===null||b===null||a===b)return true;
+    return a<b?cur>=a&&cur<=b:cur>=a||cur<=b;
+  }
+  function drawButton(btn,value){btn.textContent=typeof window.fmt12==='function'?window.fmt12(value):value;}
+  function updateExerciseTimes(){
+    const c=cards['break-ex'];
+    if(!c||typeof eyeExState==='undefined')return;
+    const count=Number(document.getElementById('eye-ex-count')?.value||eyeExState.count||2);
+    eyeExState.times=count===1?[c.start]:[c.start,c.end];
+    eyeExState.lastFiredKey=null;
+  }
+  function addSchedule(spec){
+    const card=document.getElementById(spec.id);if(!card)return;
+    const state={start:defaults.start,end:defaults.end};cards[spec.key]=state;
+    const row=document.createElement('div');row.className='per-reminder-schedule';row.setAttribute('aria-label',spec.title+' schedule');
+    row.innerHTML='<div class="alert-row-lbl dotted-lbl per-reminder-schedule-label">Schedule</div><div class="per-reminder-schedule-times"><span>From</span><button type="button" class="eye-ex-time-item" data-time="start" aria-label="'+spec.title+' start time"></button><span>to</span><button type="button" class="eye-ex-time-item" data-time="end" aria-label="'+spec.title+' end time"></button></div>';
+    const task=card.querySelector('.alert-task');
+    if(spec.key==='break-ex'){
+      // Keep the guided exercise video before its Schedule field.
+      const video=card.querySelector('.eye-ex-wrap');
+      if(video)video.after(row);
+      else if(task)card.insertBefore(row,task);
+      else {const hdr=card.querySelector('.alert-card-hdr');hdr?hdr.after(row):card.prepend(row)}
+    } else if(task)card.insertBefore(row,task);
+    else {const hdr=card.querySelector('.alert-card-hdr');hdr?hdr.after(row):card.prepend(row)}
+    ['start','end'].forEach(which=>{
+      const btn=row.querySelector('[data-time="'+which+'"]');drawButton(btn,state[which]);
+      btn.addEventListener('click',()=>{
+        const picker=window.openTimePicker;
+        if(typeof picker!=='function')return;
+        picker('custom',state[which],value=>{
+          state[which]=value;drawButton(btn,value);
+          if(spec.key==='break-ex')updateExerciseTimes();
+          if(spec.key!=='break-ex'&&typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(spec.key);
+        },spec.title+' — '+(which==='start'?'From':'To'));
+      });
+    });
+    // Keep selected window on the card so timer checks use this section's own values.
+    card.dataset.scheduleKey=spec.key;
+  }
+  function reorder(){
+    const page=document.querySelector('#alerts-panel .alert-page');if(!page)return;
+    specs.forEach(spec=>{const c=document.getElementById(spec.id);if(c)page.appendChild(c)});
+    const custom=document.getElementById('custom-reminders-card');if(custom)page.appendChild(custom);
+  }
+  function install(){
+    specs.forEach(addSchedule);reorder();
+    // Retain the legacy hidden schedule controls for reset compatibility, but remove its card from the UI.
+    const oldStart=document.getElementById('schedule-start'),oldEnd=document.getElementById('schedule-end');
+    if(oldStart)oldStart.value=defaults.start;if(oldEnd)oldEnd.value=defaults.end;
+    if(typeof scheduleState!=='undefined'){scheduleState.start=defaults.start;scheduleState.end=defaults.end}
+    if(typeof alertState!=='undefined'){['break','walk','drink'].forEach(k=>{if(alertState[k]&&typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)})}
+    updateExerciseTimes();
+  }
+  // Override the shared-window gate: each timer now checks the From/To values in its own card.
+  const oldScheduleAlertTimer=window.scheduleAlertTimer;
+  window.scheduleAlertTimer=function(key){
+    const st=(typeof alertState!=='undefined'&&alertState[key])||null;if(!st)return;
+    if(st.timerId){clearInterval(st.timerId);st.timerId=null}
+    if(st.enabled&&st.minutes>0){st.timerId=setInterval(()=>{const w=cards[key];if(w&&inWindow(w.start,w.end)&&typeof window.fireAlert==='function')window.fireAlert(key)},st.minutes*60000)}
+    else if(typeof oldScheduleAlertTimer==='function'&&key==='__fallback')oldScheduleAlertTimer(key);
+  };
+  // Keep the exercise's one/two daily sessions inside its own schedule window.
+  const oldCheck=window.checkEyeExTimes;
+  window.checkEyeExTimes=function(){
+    const w=cards['break-ex'];if(!w||!inWindow(w.start,w.end))return;
+    if(typeof oldCheck==='function')oldCheck();
+  };
+  const oldEyeCountChange=window.onEyeExCountChange;
+  window.onEyeExCountChange=function(){if(typeof oldEyeCountChange==='function')oldEyeCountChange();updateExerciseTimes()};
+  const oldReset=window.resetRemindersToDefault;
+  window.resetRemindersToDefault=function(){if(typeof oldReset==='function')oldReset();Object.values(cards).forEach(w=>{w.start=defaults.start;w.end=defaults.end});document.querySelectorAll('#alerts-panel .per-reminder-schedule').forEach(row=>{const spec=specs.find(x=>row.closest('#'+x.id));if(!spec)return;row.querySelector('[data-time="start"]').textContent='9:00 AM';row.querySelector('[data-time="end"]').textContent='6:00 PM'});['break','walk','drink'].forEach(k=>window.scheduleAlertTimer(k));updateExerciseTimes()};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+})();
+</script>
+
+
+<style id="eyes-exercise-video-schedule-gap">
+/* Keep a clear visual gap between the guided exercise video and its Schedule field. */
+#alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedule {
+  margin-top: 16px !important;
+}
+#alerts-panel #alert-card-break-ex .eye-ex-wrap > .eye-ex-stage + .per-reminder-schedule {
+  margin-top: 16px !important;
+}
+</style>
+
+<style id="reminders-bottom-controls-spacing-fix">
+/* Add one extra blank-line-sized gap before the bottom reminder action buttons. */
+#alerts-panel .reminders-notif-banner.nudges-actions{margin-top:28px!important;}
+#alerts-panel .reminders-notif-error,
+#alerts-panel #master-notif-info{margin-top:8px;}
+#alerts-panel .install-row.reminder-install-row{margin-top:16px!important;}
+</style>
 </body>
 </html>
+<style id="reminders-final-layout-fixes">
+/* Reminders actions: notification and reset share one row; shortcut spans the same full width below. */
+#reminders-notif-banner.nudges-actions{display:block!important;width:100%;}
+#reminders-notif-banner .master-notif-row{display:flex!important;align-items:stretch!important;justify-content:space-between!important;gap:10px!important;width:100%!important;padding:0!important;}
+#reminders-notif-banner .master-notif-group{display:flex;align-items:center;gap:6px;flex:1 1 0;min-width:0;}
+#reminders-notif-banner .master-notif-group .reminders-notif-banner-btn{flex:1 1 auto;min-width:0;width:100%;}
+#reminders-notif-banner .reminders-reset-row{display:flex;flex:1 1 0;min-width:0;width:auto!important;justify-content:stretch!important;}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn{width:100%;min-width:0;}
+#install-row.reminder-install-row{position:relative;display:flex!important;width:100%;margin-top:10px;justify-content:stretch!important;gap:0!important;padding-right:0!important;}
+#install-row #install-app-btn{display:block;width:100%;flex:1 1 100%;box-sizing:border-box;padding-right:38px;}
+#install-row .install-info-overlay{position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:2;}
+/* Make all information circles consistently compact. */
+.alert-info-btn,.calc-info-btn,.notif-info-btn{width:18px!important;height:18px!important;min-width:18px!important;min-height:18px!important;font-size:10px!important;line-height:16px!important;padding:0!important;border-radius:50%!important;}
+/* Keep Hours and Minutes controls tinted with the active section colour in every state. */
+.duration-clock-dialog .duration-clock-fields label{color:var(--alert-2,#0891b2)!important;}
+.duration-clock-dialog .duration-clock-fields select,
+.duration-clock-dialog .duration-clock-fields select:hover,
+.duration-clock-dialog .duration-clock-fields select:active,
+.duration-clock-dialog .duration-clock-fields select:focus,
+.duration-clock-dialog .duration-clock-fields select:focus-visible{
+  background:color-mix(in srgb,var(--alert-2,#0891b2) 16%,white)!important;
+  background-color:color-mix(in srgb,var(--alert-2,#0891b2) 16%,white)!important;
+  color:var(--alert-1,#134e4a)!important;
+  border-color:var(--alert-2,#0891b2)!important;
+  outline-color:var(--alert-2,#0891b2)!important;
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--alert-2,#0891b2) 14%,transparent)!important;
+}
+/* Tint the opened Hours/Minutes option lists with a pale version of the Reminders section colour. */
+.duration-clock-dialog .duration-clock-fields select option,
+.duration-clock-dialog .duration-clock-fields select option:checked{
+  background-color:#ccfbf1!important;
+  color:#134e4a!important;
+}
+@media(max-width:520px){#reminders-notif-banner .master-notif-row{gap:8px!important;}#reminders-notif-banner .master-notif-group,#reminders-notif-banner .reminders-reset-row{flex:1 1 0;}#install-row #install-app-btn{width:100%;}}
+</style>
+
+
+<style id="reminder-clock-dial-picker">
+.duration-clock-dialog{width:min(620px,calc(100vw - 28px))!important;max-width:620px!important}
+.duration-dials{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
+.duration-dial-section{min-width:0;text-align:center}
+.duration-dial-heading{font-weight:700;color:var(--alert-2,#0891b2);margin-bottom:8px}
+.duration-dial{position:relative;width:min(100%,230px);aspect-ratio:1;margin:0 auto;border-radius:50%;border:2px solid color-mix(in srgb,var(--alert-2,#0891b2) 45%,white);background:color-mix(in srgb,var(--alert-2,#0891b2) 10%,white);touch-action:manipulation;overflow:hidden}
+.duration-dial-number{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;width:28px;height:28px;border:0;border-radius:50%;padding:0;background:transparent;color:#134e4a;font-size:11px;line-height:1;cursor:pointer;z-index:2}
+.duration-hour-dial .duration-dial-number{width:27px;height:27px;font-size:10px}
+.duration-dial-number.inner{width:24px;height:24px;font-size:9px;background:color-mix(in srgb,var(--alert-2,#0891b2) 8%,white)}
+.duration-dial-number.selected{background:var(--alert-2,#0891b2)!important;color:white!important;font-weight:700;box-shadow:0 0 0 2px white}
+.duration-dial-hand{position:absolute;z-index:1;left:50%;top:50%;width:2px;height:34%;background:var(--alert-2,#0891b2);transform-origin:50% 100%;border-radius:2px;pointer-events:none}
+.duration-dial-center{position:absolute;z-index:1;left:50%;top:50%;width:8px;height:8px;transform:translate(-50%,-50%);border-radius:50%;background:var(--alert-2,#0891b2);pointer-events:none}
+.duration-dial-value{margin-top:8px;font-size:13px;font-weight:700;color:var(--alert-2,#0891b2)}
+@media(max-width:520px){.duration-clock-dialog{padding:14px!important}.duration-dials{gap:8px}.duration-dial-number{width:25px;height:25px;font-size:10px}.duration-hour-dial .duration-dial-number{width:24px;height:24px;font-size:9px}.duration-dial-number.inner{width:21px;height:21px;font-size:8px}}
+</style>
+
+<style id="reminder-clock-24-hour-and-5-minute-layout">
+/* Keep the 24-hour dial readable: 00–11 on the outer ring, 12–23 on the inner ring, with extra separation between rings. */
+.duration-hour-dial .duration-dial-number{width:25px;height:25px;font-size:10px;font-variant-numeric:tabular-nums}
+.duration-hour-dial .duration-dial-number.inner{width:24px;height:24px;font-size:9px}
+.duration-minute-dial .duration-dial-number{width:29px;height:29px;font-size:10px;font-variant-numeric:tabular-nums}
+@media(max-width:520px){.duration-hour-dial .duration-dial-number{width:23px;height:23px;font-size:9px}.duration-hour-dial .duration-dial-number.inner{width:21px;height:21px;font-size:8px}.duration-minute-dial .duration-dial-number{width:25px;height:25px;font-size:9px}}
+</style>
+
+<style id="per-reminder-schedule-layout-refinement">
+#alerts-panel .per-reminder-schedule{display:block!important;margin:4px 0 12px!important;padding:10px 0!important;border-bottom:1px solid rgba(100,116,139,.2)!important}
+#alerts-panel .per-reminder-schedule .per-reminder-schedule-label{font-size:.8rem!important;font-weight:700!important;font-style:italic!important;letter-spacing:.5px!important;color:var(--alert-1)!important;margin:0 0 8px!important}
+#alerts-panel .per-reminder-schedule .per-reminder-schedule-label:before{color:var(--alert-2)!important;margin-right:6px!important}
+#alerts-panel .per-reminder-schedule-times{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#alerts-panel .per-reminder-schedule-times>span{font-size:.82rem!important;font-weight:400!important;color:#134e4a!important}
+#alerts-panel .per-reminder-schedule .eye-ex-time-item{font-size:.82rem!important;font-weight:400!important;color:#134e4a!important;min-width:84px;padding:8px 10px}
+html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item{background:#fff!important;border-color:var(--alert-1)!important;color:#134e4a!important}
+@media(max-width:420px){#alerts-panel .per-reminder-schedule-times{gap:6px}#alerts-panel .per-reminder-schedule .eye-ex-time-item{min-width:74px}}
+</style>
+
+<style id="per-reminder-schedule-spacing-typography-fix">
+/* Tighten the space above each Schedule field and match the normal field-label typography. */
+#alerts-panel .per-reminder-schedule{margin-top:0!important;padding-top:2px!important;}
+#alerts-panel .per-reminder-schedule .per-reminder-schedule-label{font-style:normal!important;font-weight:600!important;letter-spacing:0!important;font-size:.78rem!important;color:var(--alert-1)!important;}
+</style>
+
+<style id="reminders-requested-final-corrections">
+/* Remove the horizontal separator from each Schedule row, including earlier overrides. */
+#alerts-panel .per-reminder-schedule,
+#alerts-panel .per-reminder-schedule::before,
+#alerts-panel .per-reminder-schedule::after {
+  border-bottom: 0 !important;
+  border-top: 0 !important;
+  box-shadow: none !important;
+}
+#alerts-panel .per-reminder-schedule .per-reminder-schedule-label { border: 0 !important; }
+</style>
+<script id="reminders-requested-final-order-and-exercise-placement">
+(function(){
+  function applyRequestedReminderLayout(){
+    const page=document.querySelector('#alerts-panel .alert-page');
+    if(!page)return;
+    const ids=['alert-card-drink','alert-card-walk','alert-card-break','alert-card-break-ex'];
+    ids.forEach(id=>{const card=document.getElementById(id);if(card)page.appendChild(card)});
+    const custom=document.getElementById('custom-reminders-card');if(custom)page.appendChild(custom);
+    const ex=document.getElementById('alert-card-break-ex');
+    if(ex){
+      const wrap=ex.querySelector('.eye-ex-wrap');
+      const schedule=ex.querySelector('.per-reminder-schedule');
+      const stage=wrap&&wrap.querySelector('.eye-ex-stage');
+      const sessions=wrap&&[...wrap.querySelectorAll('.alert-row')].find(row=>/Sessions per day/i.test(row.textContent||''));
+      if(wrap&&schedule&&stage){
+        // Keep the video/stage first, then Schedule, then Sessions per day and remaining controls.
+        stage.after(schedule);
+      } else if(wrap&&schedule&&sessions){
+        sessions.before(schedule);
+      }
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applyRequestedReminderLayout,{once:true});
+  else applyRequestedReminderLayout();
+})();
+</script>
+
+<style id="reminders-extra-blank-line-before-actions">
+/* Add one more line of breathing room before the bottom reminder action buttons. */
+#alerts-panel #reminders-notif-banner {
+  margin-top: 32px !important;
+}
+</style>
+
+
+<style id="reminders-reset-button-fit-content">
+/* Size Reset button to its icon and label rather than stretching in the action row. */
+#alerts-panel .reminders-reset-row{
+  display:flex!important;
+  justify-content:flex-end!important;
+  align-items:center!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  min-width:0!important;
+}
+#alerts-panel .reminders-reset-row .reset-icon-btn{
+  display:inline-flex!important;
+  flex:0 0 auto!important;
+  width:max-content!important;
+  min-width:max-content!important;
+  max-width:100%!important;
+  align-items:center!important;
+  justify-content:center!important;
+  white-space:nowrap!important;
+  gap:4px!important;
+  padding:6px 10px!important;
+  box-sizing:border-box!important;
+}
+</style>
