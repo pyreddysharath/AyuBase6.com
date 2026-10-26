@@ -2436,8 +2436,6 @@ h2, .tab-panel h2,
   background:none; border:none; padding:0; margin:10px 0 0; }
 .reminders-notif-banner.nudges-actions .reminders-notif-banner-btn{ min-height:40px; border-radius:10px; }
 .reminders-notif-error{ margin:12px auto 0; max-width:520px; }
-.rout-remind-msg{ margin:12px auto 0; max-width:520px; text-align:left;
-  color:var(--rout-1); background:var(--rout-4); border-color:rgba(252,211,77,.7); }
 </style>
 
 <!-- ══ LOTUS PETALS ════════════════════════════════════════════════════
@@ -4159,7 +4157,7 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
       <div class="rout-notify-actions">
         <button type="button" class="refresh-btn" id="rout-notify-btn" onclick="enableRoutineNotifications()">🔔 Enable Notifications</button>
       </div>
-      <div class="notif-blocked-hint rout-remind-msg" id="rout-remind-msg" style="display:none"></div>
+      <div class="notif-blocked-hint" id="rout-notif-hint" style="display:none"></div>
       <div class="notif-info" id="routines-install-help" style="display:none"></div>
       <div class="install-row reminder-install-row routines-install-row" id="routines-install-row">
         <button type="button" class="install-btn" id="routines-install-app-btn" onclick="installApp()">Add to Home Screen</button>
@@ -8696,12 +8694,12 @@ function updateRoutineNotifyButtons(){
   if(notify){notify.textContent=enabled?'🔔 Disable Notifications':'🔔 Enable Notifications';notify.setAttribute('aria-pressed',String(enabled));}
 }
 function enableRoutineNotifications(){
-  const hintId='rout-remind-msg'; hideNotifHint(hintId);
+  const hintId='rout-notif-hint';
+  hideNotifHint(hintId);
   if(routineNotificationsEnabled()){
     try{localStorage.setItem(ROUTINE_NOTIFY_KEY,'0');}catch(e){}
     if(routineNotifyTimer){clearInterval(routineNotifyTimer);routineNotifyTimer=null;}
     updateRoutineNotifyButtons();
-    hideNotifHint(hintId);
     return;
   }
   const activate=()=>{
@@ -8710,20 +8708,26 @@ function enableRoutineNotifications(){
     checkRoutineNotificationSchedule();
     if(routineNotifyTimer) clearInterval(routineNotifyTimer);
     routineNotifyTimer=setInterval(checkRoutineNotificationSchedule,15000);
-    showNotifBlockedHint(hintId,'Routine notifications are enabled for the times shown beside each item. Keep AyuBase6 open for scheduled reminders.');
   };
   if(typeof Notification==='undefined'){
-    showNotifBlockedHint(hintId,"This browser doesn't support notifications.");return;
+    showNotifBlockedHint(hintId, notifProblemMessage());
+    return;
   }
   if(Notification.permission==='granted'){activate();return;}
-  if(Notification.permission==='default'&&!isRestrictedFileOrigin()){
-    requestNotificationPermission().then(perm=>{
-      if(perm==='granted') activate();
-      else showNotifBlockedHint(hintId,notifProblemMessage(perm)||'Notifications could not be enabled.');
-    });return;
+  if(Notification.permission==='denied'){
+    showNotifBlockedHint(hintId, "Notifications are blocked for this site. Allow them in your browser's site settings, then reload the page.");
+    return;
   }
-  showNotifBlockedHint(hintId,notifProblemMessage());
+  if(isRestrictedFileOrigin()){
+    showNotifBlockedHint(hintId, notifProblemMessage());
+    return;
+  }
+  requestNotificationPermission().then(perm=>{
+    if(perm==='granted') activate();
+    else showNotifBlockedHint(hintId, notifProblemMessage(perm));
+  });
 }
+
 function routineItemMinute(key){
   const el=document.getElementById('rt-'+key);
   const text=el?el.textContent:'';
@@ -8753,6 +8757,8 @@ function checkRoutineNotificationSchedule(){
 }
 function initRoutineNotifications(){
   updateRoutineNotifyButtons();
+  // Keep the blocked-permission hint hidden until the user clicks Enable Notifications.
+  hideNotifHint('rout-notif-hint');
   if(routineNotificationsEnabled()){
     checkRoutineNotificationSchedule();
     routineNotifyTimer=setInterval(checkRoutineNotificationSchedule,15000);
@@ -12089,4 +12095,8 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
 #routines-panel #routines-install-app-btn:active{background:#5d3510!important;border-color:#5d3510!important}
 #routines-panel .routines-install-row .install-info-overlay{color:#fff!important;border-color:#fff!important}
 #routines-panel #routines-install-app-btn:disabled{opacity:1;cursor:default}
+</style>
+
+<style id="ayu-routines-notification-hint-theme">
+#routines-panel #rout-notif-hint{background:#fff4d6!important;color:#704214!important;border:1px solid #e7c779!important;border-radius:8px;padding:8px 10px;margin-top:6px}
 </style>
