@@ -3204,6 +3204,12 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
   background-color: var(--tint, #ecfeff);
   font-weight: 750;
 }
+/* Give the saved-reading group a soft green highlight. */
+.tab-panel select optgroup.tracker-my-readings {
+  color: #166534;
+  background-color: #dcfce7;
+  font-weight: 800;
+}
 /* Customizable native pickers retain keyboard/accessibility behaviour and
    allow section colours on browsers that otherwise use an OS-owned menu. */
 @supports (appearance: base-select) {
@@ -8949,9 +8955,8 @@ function refreshNotifStatusUI(){
   if(deniedHelp) deniedHelp.style.display = perm==='denied' ? 'block' : 'none';
   updateRemindersNotifBanner();
   // Covers permission changes made outside our own buttons too (e.g. via
-  // the browser's address-bar site settings) — this function already runs
-  // on load, on tab focus and after visibilitychange.
-  if(typeof syncAllReminderNotifyFlags==='function') syncAllReminderNotifyFlags();
+  // the browser's address-bar site settings). Individual section switches
+  // are kept independent; only the master button updates all of them.
 }
 // Inline banner at the top of the Reminders tab — doubles as the master
 // Enable/Disable control, always visible (except when notifications aren't
@@ -8970,6 +8975,19 @@ function updateRemindersNotifBanner(){
     btn.setAttribute('aria-pressed',String(on));
   }
 }
+
+// Keep the master button in sync with individual section switches. The
+// master is considered enabled only when every reminder section is enabled;
+// toggling the master itself still turns every section on or off together.
+document.addEventListener('change', function(e){
+  const target=e.target;
+  if(!target || !['alert-break-notify','alert-walk-notify','alert-drink-notify','eye-ex-notify'].includes(target.id)) return;
+  const ids=['alert-break-notify','alert-walk-notify','alert-drink-notify','eye-ex-notify'];
+  const allEnabled=ids.every(id=>{const cb=document.getElementById(id); return !!(cb && cb.checked);});
+  setMasterNotifyFlag(allEnabled);
+  updateRemindersNotifBanner();
+  refreshNotifStatusUI();
+});
 
 // Start each reminder's timer and paint its slider fill on load. The
 // Notify checkbox is checked by default in the HTML (reminder "on"), and
@@ -11268,19 +11286,28 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   }
   window.ayuTrackerRender=render;
 
-  // ---- the dropdown (grouped) ----
-  (function buildSelect(){
+  // ---- the dropdown (saved readings first, then alphabetical categories) ----
+  function buildTrackerSelect(){
     var sel=$('tracker-select'); if(!sel) return;
-    // Categories A-Z, and the readings inside each category A-Z.
+    var selected=sel.value;
+    while(sel.options.length>1) sel.remove(1);
     var byName=function(a,b){ return a.localeCompare(b,undefined,{sensitivity:'base'}); };
+    var saved=METRICS.filter(function(m){ return data[m.id]&&data[m.id].length; })
+      .sort(function(a,b){ return byName(a.name,b.name); });
+    if(saved.length){
+      var yours=document.createElement('optgroup'); yours.label='My readings'; yours.className='tracker-my-readings';
+      saved.forEach(function(m){ var o=document.createElement('option'); o.value=m.id; o.textContent=m.name; yours.appendChild(o); });
+      sel.appendChild(yours);
+    }
+    // Categories A-Z, and the readings inside each category A-Z.
     GROUPS.slice().sort(function(a,b){ return byName(a.name,b.name); }).forEach(function(g){
       var og=document.createElement('optgroup'); og.label=g.name;
       g.ids.slice().sort(function(x,y){ return byName(byId[x].name,byId[y].name); }).forEach(function(id){ var o=document.createElement('option'); o.value=id; o.textContent=byId[id].name; og.appendChild(o); });
       sel.appendChild(og);
     });
-    // Keep the hidden placeholder selected after adding the reading groups.
-    sel.value='';
-  })();
+    sel.value=byId[selected]?selected:'';
+  }
+  buildTrackerSelect();
 
   var listEl=$('tracker-list');
   if(listEl) listEl.addEventListener('click',function(e){
@@ -11386,7 +11413,10 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     if(extra.h) rd.h=extra.h;
     arr.push(rd);
     arr.sort(function(a,b){ return a.d<b.d?-1:a.d>b.d?1:a.ts-b.ts; });
+    // Automatically expand the metric section that received the new reading.
+    open[m.id]=true;
     save();
+    buildTrackerSelect();
     if(!m.slider){ $('tracker-v1').value=''; $('tracker-v2').value=''; }
     var o=$('tracker-msg'); o.textContent='Saved \u2014 see \u201C'+m.name+'\u201D below.'; o.className='trk-msg trk-green';
     render();
@@ -11395,6 +11425,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   window.resetTracker=function(){
     if(!confirm('Reset the Tracker? This deletes all saved readings on this device.')) return;
     data={}; open={}; save();
+    buildTrackerSelect();
     var sel=$('tracker-select'); if(sel) sel.value='';
     $('tracker-entry').style.display='none'; $('tracker-sliders').style.display='none';
     $('tracker-hint').textContent=''; $('tracker-msg').textContent='';
