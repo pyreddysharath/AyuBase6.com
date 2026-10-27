@@ -4041,7 +4041,7 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
     <div class="notif-blocked-hint reminders-notif-error" id="reminders-notif-error" style="display:none"></div>
     <div class="notif-info" id="master-notif-info" style="display:none"></div>
     <div class="install-row reminder-install-row" id="install-row">
-      <button type="button" class="install-btn" id="install-app-btn" onclick="installApp()">Add AyuBase6 Shortcut</button>
+      <button type="button" class="install-btn" id="install-app-btn" onclick="installApp('reminders')">Add AyuBase6 Shortcut</button>
       <button type="button" class="alert-info-btn small-info install-info-overlay" onclick="toggleNotifInfo(this,'install-help')" title="About adding a shortcut" aria-label="About adding a shortcut" aria-expanded="false">i</button>
     </div>
     <div class="notif-info" id="install-help" style="display:none">Add AyuBase6 to your Home Screen, Dock, or desktop using your browser’s install/share menu. The browser uses the site’s app icon (the AyuBase6 lotus logo). Shortcut creation is controlled by the operating system and browser, so the steps differ by device and some browsers do not support automatic installation.</div>
@@ -4143,11 +4143,11 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
         <button type="button" class="refresh-btn" id="rout-notify-btn" onclick="enableRoutineNotifications()">🔔 Enable Notifications</button>
       </div>
       <div class="notif-blocked-hint" id="rout-notif-hint" style="display:none"></div>
-      <div class="notif-info" id="routines-install-help" style="display:none"></div>
       <div class="install-row reminder-install-row routines-install-row" id="routines-install-row">
-        <button type="button" class="install-btn" id="routines-install-app-btn" onclick="installApp()">Add to Home Screen</button>
+        <button type="button" class="install-btn" id="routines-install-app-btn" onclick="installApp('routines')">Add AyuBase6 Shortcut</button>
         <button type="button" class="alert-info-btn small-info install-info-overlay" onclick="toggleNotifInfo(this,'routines-install-help')" title="About adding a shortcut" aria-label="About adding a shortcut" aria-expanded="false">i</button>
       </div>
+      <div class="notif-info" id="routines-install-help" style="display:none"></div>
     </div>
 
   </div>
@@ -8598,7 +8598,7 @@ function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc){
     +'p{margin:0;font-size:13px;line-height:1.4}'
     +'.t{margin-top:16px;font-size:28px;font-weight:800;color:#0d9488;line-height:1;cursor:pointer;user-select:none}'
     +'.t.run,.t.done{cursor:default}'
-    +'.ex-toggle{display:inline-flex;align-items:center;gap:6px;margin-top:10px;border:1px solid #5eead4;border-radius:9px;padding:6px 9px;background:#fff;color:#0f766e;font-weight:700;cursor:pointer;font-size:12px}'
+    +'.ex-toggle{display:inline-flex;align-items:center;gap:6px;margin-top:10px;border:1px solid #0d9488;border-radius:9px;padding:6px 9px;background:#fff;color:#0d9488;font-weight:700;cursor:pointer;font-size:12px}'+'.ex-toggle svg{width:15px;height:15px;display:block;fill:currentColor;flex:none}'
     +'.ex-video{display:none;width:100%;max-height:58vh;margin-top:8px;border-radius:10px;background:#001410}'
     +'.c.expanded{max-height:90vh;overflow:auto}'
     +'.c.expanded .ex-video{display:block}';
@@ -8607,8 +8607,8 @@ function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc){
   doc.body.innerHTML='<svg class="bg" viewBox="9.5 11.5 45 27" aria-hidden="true">'+lotus+'</svg>'
     +'<div class="c"><h1>'+nudgeEsc(title)+'</h1><p>'+nudgeEsc(msg)+'</p>'
     +(withTimer?'<div class="t" id="n" title="Click to start the timer">\u25B6 '+EYE_TIMER_SECS+'s</div>':'')
-    +(title==='Eye Exercise' && exerciseVideoSrc?'<button type="button" class="ex-toggle" id="ex-toggle" aria-expanded="false" title="Expand guided eye exercise video">▶️ Exercise video</button><video class="ex-video" id="ex-video" controls playsinline muted preload="metadata" src="'+exerciseVideoSrc.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></video>':'')+'</div>';
-  if(title==='Eye Exercise'){const toggle=doc.getElementById('ex-toggle'), card=doc.querySelector('.c'), video=doc.getElementById('ex-video');if(toggle&&card&&video)toggle.onclick=()=>{const expanded=card.classList.toggle('expanded');toggle.setAttribute('aria-expanded',String(expanded));toggle.textContent=expanded?'✕ Hide exercise video':'▶️ Exercise video';if(expanded){try{win.resizeTo(420,520)}catch(e){};video.play().catch(()=>{});}else{video.pause();try{win.resizeTo(320,150)}catch(e){}}};}
+    +(title==='Eye Exercise' && exerciseVideoSrc?'<button type="button" class="ex-toggle" id="ex-toggle" aria-expanded="false" title="Expand guided eye exercise video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span></button><video class="ex-video" id="ex-video" controls playsinline muted preload="metadata" src="'+exerciseVideoSrc.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></video>':'')+'</div>';
+  if(title==='Eye Exercise'){const toggle=doc.getElementById('ex-toggle'), card=doc.querySelector('.c'), video=doc.getElementById('ex-video');if(toggle&&card&&video)toggle.onclick=()=>{const expanded=card.classList.toggle('expanded');toggle.setAttribute('aria-expanded',String(expanded));toggle.innerHTML=expanded?'✕ <span>Hide exercise video</span>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span>';if(expanded){try{win.resizeTo(420,520)}catch(e){};video.play().catch(()=>{});}else{video.pause();try{win.resizeTo(320,150)}catch(e){}}};}
   if(!withTimer) return;
   const num=doc.getElementById('n'); let iv=null, end=0;
   const tick=()=>{
@@ -8871,13 +8871,26 @@ function syncAllReminderNotifyFlags(forceState){
 }
 // The single handler behind both "Enable"/"Disable" buttons (the top
 // banner in the Alerts tab, and the footer's Notification Settings panel).
+function syncAllAppNotifications(forceState){
+  const on=!!forceState;
+  syncAllReminderNotifyFlags(on);
+  // The Routines section has its own schedule switch, so include it in the
+  // master action as well as the four Reminders switches.
+  try{ localStorage.setItem(ROUTINE_NOTIFY_KEY,on?'1':'0'); if(!on) localStorage.removeItem(ROUTINE_SENT_KEY); }catch(e){}
+  if(!on && routineNotifyTimer){ clearInterval(routineNotifyTimer); routineNotifyTimer=null; }
+  if(on && typeof Notification!=='undefined' && Notification.permission==='granted'){
+    checkRoutineNotificationSchedule();
+    if(routineNotifyTimer) clearInterval(routineNotifyTimer);
+    routineNotifyTimer=setInterval(checkRoutineNotificationSchedule,15000);
+  }
+  if(typeof updateRoutineNotifyButtons==='function') updateRoutineNotifyButtons();
+}
 function toggleMasterNotify(errorHintId){
   const installHelp=document.getElementById('install-help'); if(installHelp) installHelp.style.display='none';
   const routinesInstallHelp=document.getElementById('routines-install-help'); if(routinesInstallHelp) routinesInstallHelp.style.display='none';
   if(errorHintId) hideNotifHint(errorHintId);
   const fail=msg=>{ if(errorHintId) showNotifBlockedHint(errorHintId, msg); refreshNotifStatusUI(); };
   if(typeof Notification==='undefined'){ fail(notifProblemMessage()); return; }
-  // Act on exactly what the button shows ("click what you see").
   refreshNotifStatusUI();
   const banner=document.getElementById('reminders-notif-banner');
   const bannerBtn=banner ? banner.querySelector('.reminders-notif-banner-btn') : null;
@@ -8885,25 +8898,27 @@ function toggleMasterNotify(errorHintId){
   const visibleBtn = (bannerBtn && bannerBtn.style.display!=='none') ? bannerBtn : footerBtn;
   const currentlyOn = visibleBtn ? /disable/i.test(visibleBtn.textContent) : isMasterNotifyOn();
   if(currentlyOn){
-    // Turning off is purely in-app — no browser call.
     setMasterNotifyFlag(false);
-    syncAllReminderNotifyFlags(false);
+    syncAllAppNotifications(false);
     refreshNotifStatusUI();
     return;
   }
   if(Notification.permission==='granted'){
     setMasterNotifyFlag(true);
-    syncAllReminderNotifyFlags(true);
+    syncAllAppNotifications(true);
     refreshNotifStatusUI();
     return;
   }
   if(Notification.permission==='denied' || isRestrictedFileOrigin()){ fail(notifProblemMessage()); return; }
-  // 'default' is the only state where asking the browser is needed.
   requestNotificationPermission().then(perm=>{
-    if(perm==='granted') setMasterNotifyFlag(true);
-    syncAllReminderNotifyFlags(true);
-    const msg=notifProblemMessage(perm);
-    if(msg) fail(msg); else refreshNotifStatusUI();
+    if(perm==='granted'){
+      setMasterNotifyFlag(true);
+      syncAllAppNotifications(true);
+      refreshNotifStatusUI();
+    } else {
+      const msg=notifProblemMessage(perm);
+      if(msg) fail(msg); else refreshNotifStatusUI();
+    }
   });
 }
 // Clicking the bell both opens the settings panel AND, if the person
@@ -11549,20 +11564,18 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   };
   window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; refresh(); });
   window.addEventListener('appinstalled',function(){ deferred=null; refresh(); });
-  window.installApp=function(){
-    // Only show manual install instructions after an install-button click, and never if already installed.
-    if(installed()){ refresh(); return; }
-    var help=document.getElementById('install-help');
-    var routinesHelp=document.getElementById('routines-install-help');
+  window.installApp=function(section){
+    // Keep fallback instructions confined to the section whose button was clicked.
+    section = section === 'routines' ? 'routines' : 'reminders';
+    var help=document.getElementById(section==='routines'?'routines-install-help':'install-help');
+    var otherHelp=document.getElementById(section==='routines'?'install-help':'routines-install-help');
+    if(otherHelp) otherHelp.style.display='none';
     if(help) help.style.display='none';
-    if(routinesHelp) routinesHelp.style.display='none';
+    if(installed()){ refresh(); return; }
     if(deferred){
       var p=deferred; deferred=null; p.prompt();
       Promise.resolve(p.userChoice).then(function(choice){
-        if(choice && choice.outcome==='accepted'){
-          if(help) help.style.display='none';
-          if(routinesHelp) routinesHelp.style.display='none';
-        }
+        if(choice && choice.outcome==='accepted' && help) help.style.display='none';
       }).catch(function(){}).then(refresh);
       return;
     }
@@ -11570,8 +11583,6 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     var ios=/iPhone|iPad|iPod/.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
     var android=/Android/i.test(ua);
     var safari=/Safari/i.test(ua) && !/Chrome|CriOS|Edg|OPR|Firefox/i.test(ua);
-    if(installed()) return;
-    if(!help) return;
     if(ios){
       help.innerHTML='<b>iPhone/iPad:</b> open this page in Safari, tap <b>Share</b>, then choose <b>Add to Home Screen</b> and tap <b>Add</b>.';
     } else if(android){
@@ -11579,9 +11590,9 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     } else if(safari){
       help.innerHTML='<b>Mac Safari:</b> use <b>File → Add to Dock</b> on supported macOS versions. Other browsers may offer <b>Install app</b> from their menu.';
     } else {
-      help.innerHTML='<b>Desktop:</b> use the browser menu or address-bar install icon and choose <b>Install AyuBase6</b> / <b>Install app</b>. If no install option appears, this browser or this page context does not support automatic shortcut creation; try opening the HTTPS website in Chrome or Edge. A webpage cannot create a desktop or Home Screen shortcut directly in every browser.';
+      help.innerHTML='<b>Desktop:</b> in Chrome or Edge, use the browser menu or address-bar install icon and choose <b>Install AyuBase6</b> / <b>Install app</b>. If unavailable, this browser may not support installation here.';
     }
-    help.style.display='block';
+    if(help) help.style.display='block';
   };
   refresh();
 
