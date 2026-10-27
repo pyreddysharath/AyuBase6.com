@@ -11652,7 +11652,17 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   // Install app: use the browser prompt when available; otherwise show instructions inline (never a modal).
   var deferred=null;
   var installed=function(){ return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone===true; };
-  var androidHelp='<b>Add AyuBase6</b><br>Android: open the browser menu (⋮) and choose Install app or Add to Home screen. If the option is missing, try opening this site in Chrome. The browser must support installing websites.';
+  var installedMessage=function(){
+    var ua=navigator.userAgent||'';
+    var ios=/iPhone|iPad|iPod/.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+    var android=/Android/i.test(ua);
+    var desktop=/Windows|Macintosh|Linux/i.test(ua) && !android && !ios;
+    if(ios) return '<b>AyuBase6 is already added to your Home Screen.</b>';
+    if(android) return '<b>AyuBase6 is already installed on your home screen.</b>';
+    if(desktop) return '<b>AyuBase6 is already installed on your desktop.</b>';
+    return '<b>AyuBase6 is already installed.</b>';
+  };
+  var androidHelp='<b>Add AyuBase6</b><br>Open the browser menu (⋮) and choose Install app or Add to Home screen. If unavailable, try Chrome.';
   var refresh=function(){
     var isInstalled=installed();
     var row=document.getElementById('install-row'); if(row) row.style.display='flex';
@@ -11672,7 +11682,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     if(otherHelp) otherHelp.style.display='none';
     if(!help) return;
     if(installed()){
-      help.innerHTML=androidHelp;
+      help.innerHTML=installedMessage();
       help.style.display='block';
       return;
     }
