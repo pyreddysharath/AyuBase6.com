@@ -8916,6 +8916,16 @@ function syncAllReminderNotifyFlags(forceState){
       scheduleAlertTimer(key);
     }
   });
+  // Keep the extra per-card switches in sync with the main switches too.
+  document.querySelectorAll('#alerts-panel .alert-enabled-toggle input').forEach(input=>{
+    const card=input.closest('.alert-card');
+    if(!card) return;
+    const title=(card.querySelector('h2')?.innerText||'').trim();
+    const mainId=/^Water$/i.test(title)?'alert-drink-notify':/^Walk$/i.test(title)?'alert-walk-notify':/Eyes \(20-20-20\)/i.test(title)?'alert-break-notify':/Eyes \(Exercise\)/i.test(title)?'eye-ex-notify':null;
+    const main=mainId?document.getElementById(mainId):null;
+    if(main) input.checked=main.checked;
+    card.classList.toggle('alert-disabled',!input.checked);
+  });
 
   // Eyes (Exercise) has a separate state object and switch.
   const eyeCb=document.getElementById('eye-ex-notify');
@@ -11737,14 +11747,22 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       const hdr=card.querySelector('.alert-card-hdr'); if(!hdr)return;
       const label=document.createElement('label');label.className='alert-enabled-toggle';
       label.innerHTML='<input type="checkbox" aria-label="Enable '+title.replace(/"/g,'')+'" />';
-      const input=label.querySelector('input'); input.checked=false;
+      const input=label.querySelector('input');
+      const mainSwitchId=({drink:'alert-drink-notify',walk:'alert-walk-notify',break:'alert-break-notify','eye-ex':'eye-ex-notify'})[key];
+      const mainSwitch=mainSwitchId ? document.getElementById(mainSwitchId) : null;
+      input.checked=mainSwitch ? mainSwitch.checked : !!(window.alertState && window.alertState[key] && window.alertState[key].enabled);
+      card.classList.toggle('alert-disabled',!input.checked);
       input.addEventListener('change',()=>{
-        if(window.alertState && window.alertState[key]) window.alertState[key].enabled=input.checked;
-        card.classList.toggle('alert-disabled',!input.checked);
-        if(typeof window.scheduleAlertTimer==='function'){try{window.scheduleAlertTimer(key)}catch(e){}}
+        if(mainSwitch && mainSwitch.checked!==input.checked){
+          mainSwitch.checked=input.checked;
+          mainSwitch.dispatchEvent(new Event('change',{bubbles:true}));
+        } else {
+          if(window.alertState && window.alertState[key]) window.alertState[key].enabled=input.checked;
+          card.classList.toggle('alert-disabled',!input.checked);
+          if(typeof window.scheduleAlertTimer==='function'){try{window.scheduleAlertTimer(key)}catch(e){}}
+        }
       });
       const infoBtn=hdr.querySelector('.alert-info-btn'); if(infoBtn) hdr.insertBefore(label,infoBtn.nextSibling); else hdr.appendChild(label);
-      if(window.alertState && window.alertState[key]) window.alertState[key].enabled=false;
     });
     // Deterministically arrange the whole Reminders panel, not just the four cards.
     // The action buttons share .alert-page with the cards, so explicitly place them last.
