@@ -3864,7 +3864,7 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
 
       <div class="alert-row alert-preview-row"><button type="button" class="alert-preview-btn" onclick="previewAlertNotification('drink')">Preview notification</button><button type="button" class="alert-info-btn notif-info-btn" onclick="toggleNotifInfo(this,'alert-drink-notif-info')" title="About notifications" aria-label="About notifications" aria-expanded="false">i</button></div>
       <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
-        <input type="checkbox" id="alert-drink-notify" class="notify-cb" checked onchange="onAlertNotifyChange('drink')"><label for="alert-drink-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
+        <input type="checkbox" id="alert-drink-notify" class="notify-cb" onchange="onAlertNotifyChange('drink')"><label for="alert-drink-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
       <div class="notif-blocked-hint" id="alert-drink-notif-hint" style="display:none"></div>
       <div class="notif-info" id="alert-drink-notif-info" style="display:none"></div>
       <div class="notif-mock" id="alert-drink-notif-mock">
@@ -3912,7 +3912,7 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
 
       <div class="alert-row alert-preview-row"><button type="button" class="alert-preview-btn" onclick="previewAlertNotification('walk')">Preview notification</button><button type="button" class="alert-info-btn notif-info-btn" onclick="toggleNotifInfo(this,'alert-walk-notif-info')" title="About notifications" aria-label="About notifications" aria-expanded="false">i</button></div>
       <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
-        <input type="checkbox" id="alert-walk-notify" class="notify-cb" checked onchange="onAlertNotifyChange('walk')"><label for="alert-walk-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
+        <input type="checkbox" id="alert-walk-notify" class="notify-cb" onchange="onAlertNotifyChange('walk')"><label for="alert-walk-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
       <div class="notif-blocked-hint" id="alert-walk-notif-hint" style="display:none"></div>
       <div class="notif-info" id="alert-walk-notif-info" style="display:none"></div>
       <div class="notif-mock" id="alert-walk-notif-mock">
@@ -3960,7 +3960,7 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
 
       <div class="alert-row alert-preview-row"><button type="button" class="alert-preview-btn" onclick="previewAlertNotification('break')">Preview notification</button><button type="button" class="alert-info-btn notif-info-btn" onclick="toggleNotifInfo(this,'alert-break-notif-info')" title="About notifications" aria-label="About notifications" aria-expanded="false">i</button></div>
       <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
-        <input type="checkbox" id="alert-break-notify" class="notify-cb" checked onchange="onAlertNotifyChange('break')"><label for="alert-break-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
+        <input type="checkbox" id="alert-break-notify" class="notify-cb" onchange="onAlertNotifyChange('break')"><label for="alert-break-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
       <div class="notif-blocked-hint" id="alert-break-notif-hint" style="display:none"></div>
       <div class="notif-info" id="alert-break-notif-info" style="display:none"></div>
       <div class="notif-mock" id="alert-break-notif-mock">
@@ -9088,17 +9088,15 @@ function updateRemindersNotifBanner(){
   }
 }
 
-// Keep the master button in sync with individual section switches. The
-// master is considered enabled only when every reminder section is enabled;
-// toggling the master itself still turns every section on or off together.
+// Individual reminder section switches are independent of the master
+// Enable All / Disable All button. Changing one section must not change the
+// master button's label, visual state, or saved master preference. The master
+// button itself remains responsible for turning all sections on or off.
 document.addEventListener('change', function(e){
   const target=e.target;
   if(!target || !['alert-break-notify','alert-walk-notify','alert-drink-notify','eye-ex-notify'].includes(target.id)) return;
-  const ids=['alert-break-notify','alert-walk-notify','alert-drink-notify','eye-ex-notify'];
-  const allEnabled=ids.every(id=>{const cb=document.getElementById(id); return !!(cb && cb.checked);});
-  setMasterNotifyFlag(allEnabled);
-  updateRemindersNotifBanner();
-  refreshNotifStatusUI();
+  // Deliberately do not call setMasterNotifyFlag(), updateRemindersNotifBanner(),
+  // or refreshNotifStatusUI() here: individual toggles must not affect the master.
 });
 
 // Start each reminder's timer and paint its slider fill on load. The
@@ -9109,8 +9107,11 @@ document.addEventListener('change', function(e){
 ['break','walk','drink'].forEach(key=>{
   const slider=document.getElementById('alert-'+key+'-time');
   if(slider) updateSliderFill(slider,'var(--alert-2)');
-  alertState[key].enabled=true;
-  alertState[key].notify=(typeof Notification!=='undefined' && Notification.permission==='granted');
+  // These reminders are opt-in on a fresh page load.
+  const cb=document.getElementById('alert-'+key+'-notify');
+  if(cb){ cb.checked=false; cb.setAttribute('aria-checked','false'); }
+  alertState[key].enabled=false;
+  alertState[key].notify=false;
   scheduleAlertTimer(key);
 });
 // NOTE: the initial refreshNotifStatusUI() call is deferred to just after
@@ -12064,6 +12065,28 @@ document.getElementById('clock-picker-close').onclick=close;document.getElementB
 
 </style>
 
+
+<script id="reminders-default-off-fix">
+(function(){
+  function setDefaultsOff(){
+    const items=[['drink','alert-card-drink'],['walk','alert-card-walk'],['break','alert-card-break']];
+    items.forEach(([key,cardId])=>{
+      const cb=document.getElementById('alert-'+key+'-notify');
+      const card=document.getElementById(cardId);
+      if(cb){cb.checked=false;cb.setAttribute('aria-checked','false');}
+      if(card){
+        const extra=card.querySelector('.alert-enabled-toggle input');
+        if(extra)extra.checked=false;
+        card.classList.add('alert-disabled');
+      }
+      if(typeof alertState!=='undefined'&&alertState[key]){alertState[key].enabled=false;alertState[key].notify=false;}
+    });
+    if(typeof updateRemindersNotifBanner==='function')updateRemindersNotifBanner();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setDefaultsOff,{once:true});else setDefaultsOff();
+  window.addEventListener('load',setDefaultsOff,{once:true});
+})();
+</script>
 </body>
 </html>
 <style id="reminders-final-layout-fixes">
