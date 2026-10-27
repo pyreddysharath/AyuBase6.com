@@ -11630,9 +11630,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   document.addEventListener('keydown',e=>{ if(e.target.matches&&e.target.matches('.tab-panel select')) size(e.target); },true);
 })();
 </script>
-<style id="ayu-install-modal-style">
-.ayu-install-modal-backdrop{position:fixed;inset:0;z-index:20000;background:rgba(15,23,42,.48);display:flex;align-items:center;justify-content:center;padding:20px}.ayu-install-modal{width:min(440px,100%);background:var(--card-bg,#fff);color:var(--text,#1f2937);border-radius:18px;padding:22px;box-shadow:0 18px 60px rgba(0,0,0,.25);border:1px solid rgba(100,116,139,.25)}.ayu-install-modal h3{margin:0 0 12px;font-size:1.12rem}.ayu-install-modal p{line-height:1.55;margin:0 0 18px}.ayu-install-modal-actions{display:flex;justify-content:flex-end;gap:10px}.ayu-install-modal-actions button{border-radius:10px;padding:9px 16px;cursor:pointer;font:inherit}.ayu-install-modal-close{border:1px solid #94a3b8;background:transparent;color:inherit}
-</style>
+
 <script id="ayu-install-js">
 (function(){
   // One shared note, used by every notification "i" button.
@@ -11651,72 +11649,52 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     if(btn){ btn.classList.toggle('active',open); btn.setAttribute('aria-expanded',String(open)); }
   };
 
-  // Install app: use the browser's own install prompt when it offers one, otherwise show how to do it by hand.
+  // Install app: use the browser prompt when available; otherwise show instructions inline (never a modal).
   var deferred=null;
   var installed=function(){ return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone===true; };
+  var androidHelp='<b>Add AyuBase6</b><br>Android: open the browser menu (⋮) and choose Install app or Add to Home screen. If the option is missing, try opening this site in Chrome. The browser must support installing websites.';
   var refresh=function(){
     var isInstalled=installed();
     var row=document.getElementById('install-row'); if(row) row.style.display='flex';
     var routinesRow=document.getElementById('routines-install-row'); if(routinesRow) routinesRow.style.display='flex';
     var btn=document.getElementById('install-app-btn');
     var routinesBtn=document.getElementById('routines-install-app-btn');
-    var ua=navigator.userAgent||'';
-    var mobile=/Android|iPhone|iPad|iPod|Mobile/i.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
     var addLabel='Add AyuBase6 Shortcut';
-    var addedLabel='Added';
-    if(btn){btn.textContent=isInstalled?addedLabel:addLabel;btn.disabled=isInstalled;btn.setAttribute('aria-label',btn.textContent);}
-    if(routinesBtn){routinesBtn.textContent=isInstalled?addedLabel:addLabel;routinesBtn.disabled=isInstalled;routinesBtn.setAttribute('aria-label',routinesBtn.textContent);}
-    var help=document.getElementById('install-help'); if(help && isInstalled) help.style.display='none';
-    var routinesHelp=document.getElementById('routines-install-help'); if(routinesHelp && isInstalled) routinesHelp.style.display='none';
+    if(btn){btn.textContent=addLabel;btn.disabled=false;btn.setAttribute('aria-label',addLabel);}
+    if(routinesBtn){routinesBtn.textContent=addLabel;routinesBtn.disabled=false;routinesBtn.setAttribute('aria-label',addLabel);}
   };
   window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; refresh(); });
   window.addEventListener('appinstalled',function(){ deferred=null; refresh(); });
   window.installApp=function(section){
-    // Keep fallback instructions confined to the section whose button was clicked.
     section = section === 'routines' ? 'routines' : 'reminders';
     var help=document.getElementById(section==='routines'?'routines-install-help':'install-help');
     var otherHelp=document.getElementById(section==='routines'?'install-help':'routines-install-help');
     if(otherHelp) otherHelp.style.display='none';
-    if(help) help.style.display='none';
-    if(installed()){ refresh(); return; }
+    if(!help) return;
+    if(installed()){
+      help.innerHTML=androidHelp;
+      help.style.display='block';
+      return;
+    }
     if(deferred){
       var p=deferred; deferred=null; p.prompt();
-      Promise.resolve(p.userChoice).then(function(choice){
-        if(choice && choice.outcome==='accepted' && help) help.style.display='none';
-      }).catch(function(){}).then(refresh);
+      Promise.resolve(p.userChoice).catch(function(){}).then(refresh);
       return;
     }
     var ua=navigator.userAgent||'';
     var ios=/iPhone|iPad|iPod/.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
     var android=/Android/i.test(ua);
     var safari=/Safari/i.test(ua) && !/Chrome|CriOS|Edg|OPR|Firefox/i.test(ua);
-    if(ios){
-      help.innerHTML='<b>iPhone/iPad:</b> open this page in Safari, tap <b>Share</b>, then choose <b>Add to Home Screen</b> and tap <b>Add</b>.';
-    } else if(android){
-      help.innerHTML='<b>Android:</b> open the browser menu (⋮) and choose <b>Install app</b> or <b>Add to Home screen</b>. If the option is missing, try opening this site in Chrome. The browser must support installing websites.';
+    if(android){
+      help.innerHTML=androidHelp;
+    } else if(ios){
+      help.innerHTML='<b>Add AyuBase6</b><br>iPhone/iPad: open this page in Safari, tap Share, then choose Add to Home Screen and tap Add.';
     } else if(safari){
-      help.innerHTML='<b>Mac Safari:</b> use <b>File → Add to Dock</b> on supported macOS versions. Other browsers may offer <b>Install app</b> from their menu.';
+      help.innerHTML='<b>Add AyuBase6</b><br>Mac Safari: use File → Add to Dock on supported macOS versions. Other browsers may offer Install app from their menu.';
     } else {
-      help.innerHTML='<b>Desktop:</b> in Chrome or Edge, use the browser menu or address-bar install icon and choose <b>Install AyuBase6</b> / <b>Install app</b>. If unavailable, this browser may not support installation here.';
+      help.innerHTML='<b>Add AyuBase6</b><br>Desktop: in Chrome or Edge, use the browser menu or address-bar install icon and choose Install AyuBase6 / Install app. If unavailable, this browser may not support installation here.';
     }
-    // If the browser has no native install prompt, show a focused help popup.
-    if(help){
-      var message=help.innerHTML;
-      if(section==='routines' && !message.trim()) message=ios
-        ? '<b>iPhone/iPad:</b> open this page in Safari, tap <b>Share</b>, then choose <b>Add to Home Screen</b> and tap <b>Add</b>.'
-        : android
-          ? '<b>Android:</b> open the browser menu (⋮) and choose <b>Install app</b> or <b>Add to Home screen</b>. If unavailable, try Chrome.'
-          : '<b>Desktop:</b> in Chrome or Edge, use the browser menu or address-bar install icon and choose <b>Install AyuBase6</b> / <b>Install app</b>. If unavailable, this browser may not support installation here.';
-      var backdrop=document.createElement('div'); backdrop.className='ayu-install-modal-backdrop';
-      var modal=document.createElement('div'); modal.className='ayu-install-modal'; modal.setAttribute('role','dialog'); modal.setAttribute('aria-modal','true'); modal.setAttribute('aria-label','Add AyuBase6');
-      modal.innerHTML='<h3>Add AyuBase6</h3><p>'+message+'</p><div class="ayu-install-modal-actions"><button type="button" class="ayu-install-modal-close">Close</button></div>';
-      backdrop.appendChild(modal); document.body.appendChild(backdrop);
-      function closeInstallModal(){backdrop.remove();document.removeEventListener('keydown',onEsc);}
-      function onEsc(e){if(e.key==='Escape')closeInstallModal();}
-      modal.querySelector('button').addEventListener('click',closeInstallModal);
-      backdrop.addEventListener('click',function(e){if(e.target===backdrop)closeInstallModal();});
-      document.addEventListener('keydown',onEsc);
-    }
+    help.style.display='block';
   };
   refresh();
 
