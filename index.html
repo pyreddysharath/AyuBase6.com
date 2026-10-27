@@ -3550,6 +3550,23 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
 }
 #activity-panel .activity-check.on .activity-choice { color: var(--act-2, #2563eb) !important; }
 </style>
+
+<style id="schedule-header-cleanup">
+#alert-card-schedule > .alert-card-hdr { display: none !important; }
+#alert-card-schedule .schedule-times > .schedule-lbl:first-child::before { content: "• "; }
+</style>
+<style id="schedule-from-dot">
+/* The "Schedule" label is gone; the row now starts with a dot before "From", like the other fields. */
+#alerts-panel .per-reminder-schedule-times > .per-reminder-from::before{content:'•';color:var(--alert-2);margin-right:6px}
+/* "From" / "to" text and the two time boxes look like the 'Remind every' label and its box. */
+#alerts-panel .per-reminder-schedule .per-reminder-schedule-times > span{font-size:13px !important;font-weight:600 !important;color:#134e4a !important}
+html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > .eye-ex-time-item,
+#alerts-panel .per-reminder-schedule .per-reminder-schedule-times > .eye-ex-time-item{
+  box-sizing:border-box;height:44px;min-height:44px;min-width:89px !important;padding:0 7px !important;line-height:normal;
+  font-size:13px !important;font-weight:600 !important;color:var(--accent,#08766e) !important;
+  background:transparent !important;border:1px solid rgb(119,180,175) !important;border-radius:10px !important;
+}
+</style>
 </head>
 <body>
 
@@ -11921,7 +11938,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     const card=document.getElementById(spec.id);if(!card)return;
     const state={start:defaults.start,end:defaults.end};cards[spec.key]=state;
     const row=document.createElement('div');row.className='per-reminder-schedule';row.setAttribute('aria-label',spec.title+' schedule');
-    row.innerHTML='<div class="alert-row-lbl dotted-lbl per-reminder-schedule-label">Schedule</div><div class="per-reminder-schedule-times"><span>From</span><button type="button" class="eye-ex-time-item" data-time="start" aria-label="'+spec.title+' start time"></button><span>to</span><button type="button" class="eye-ex-time-item" data-time="end" aria-label="'+spec.title+' end time"></button></div>';
+    row.innerHTML='<div class="per-reminder-schedule-times"><span class="per-reminder-from">From</span><button type="button" class="eye-ex-time-item" data-time="start" aria-label="'+spec.title+' start time"></button><span>to</span><button type="button" class="eye-ex-time-item" data-time="end" aria-label="'+spec.title+' end time"></button></div>';
     const task=card.querySelector('.alert-task');
     if(spec.key==='break-ex'){
       // Keep the guided exercise video before its Schedule field.
