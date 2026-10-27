@@ -3506,6 +3506,44 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
 #reminder-interval-picker .clock-actions .clock-done{background:var(--alert-2,#0d9488);color:white}
 </style>
 
+
+<style id="body-activity-radio-only">
+/* Match Food's minimalist radio-only choices in Body > Activity Type? */
+#activity-panel .activity-type-options { gap: 10px !important; }
+#activity-panel .activity-type-options > .activity-check {
+  padding: 3px 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--act-2, #2563eb) !important;
+  min-height: 0 !important;
+}
+#activity-panel .activity-type-options > .activity-check.on {
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--act-2, #2563eb) !important;
+}
+#activity-panel .activity-choice {
+  flex: 1 0 100% !important;
+  padding: 3px 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--act-2, #2563eb) !important;
+  font-weight: 500 !important;
+}
+#activity-panel .activity-choice input[type="radio"] {
+  appearance: auto !important;
+  -webkit-appearance: radio !important;
+  accent-color: var(--act-2, #2563eb) !important;
+  width: 17px !important;
+  height: 17px !important;
+  margin: 0 !important;
+  flex: 0 0 auto !important;
+}
+#activity-panel .activity-check.on .activity-choice { color: var(--act-2, #2563eb) !important; }
+</style>
 </head>
 <body>
 
@@ -4288,9 +4326,9 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
     <!-- ── SECTION 1b: GENDER ────────────────── -->
     <div class="card" id="sec-gender">
       <h2>Gender?</h2>
-      <div class="gender-btn-row">
-        <button type="button" class="gender-btn" id="gender-male-btn" onclick="selectFoodGender('male')">♂ Male</button>
-        <button type="button" class="gender-btn" id="gender-female-btn" onclick="selectFoodGender('female')">♀ Female</button>
+      <div class="gender-btn-row food-choice-row">
+        <label class="gender-btn food-choice" id="gender-male-btn"><input type="radio" name="food-gender" id="gender-male-radio" value="male" onchange="selectFoodGender('male')"> <span>♂ Male</span></label>
+        <label class="gender-btn food-choice" id="gender-female-btn"><input type="radio" name="food-gender" id="gender-female-radio" value="female" onchange="selectFoodGender('female')"> <span>♀ Female</span></label>
       </div>
       <div id="female-extra" style="display:none;margin-top:14px">
         <div class="calc-row-top" style="color:var(--g2);margin-bottom:8px">Optional</div>
@@ -4580,6 +4618,8 @@ function selectFoodGender(g){
   foodGender=g;
   document.getElementById('gender-male-btn').classList.toggle('selected', g==='male');
   document.getElementById('gender-female-btn').classList.toggle('selected', g==='female');
+  document.getElementById('gender-male-radio').checked = g==='male';
+  document.getElementById('gender-female-radio').checked = g==='female';
   document.getElementById('female-extra').style.display = g==='female' ? 'block' : 'none';
   if(g!=='female') foodFemState='none';
   resolveFoodAgeGroup();
@@ -12241,4 +12281,25 @@ html[data-petal-card="e"] #activity-panel .activity-type-section > * {
   position: relative !important;
   z-index: auto !important;
 }
+
+/* Food tab: simplify Gender and Dietary Preference choices; keep section cards intact. */
+#sec-gender .gender-btn-row,
+#sec-diet .diet-row { display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
+#sec-gender .gender-btn.food-choice,
+#sec-diet .dpill {
+  display:flex; align-items:center; justify-content:flex-start; gap:9px;
+  width:auto; min-height:0; padding:3px 0; margin:0;
+  border:0; border-radius:0; background:transparent; box-shadow:none;
+  color:var(--g2); font-size:.95rem; font-weight:500; cursor:pointer;
+}
+#sec-gender .gender-btn.food-choice { flex:0 0 auto; }
+#sec-gender .food-choice input[type="radio"],
+#sec-diet .dpill input[type="checkbox"] {
+  appearance:auto; -webkit-appearance:auto; width:17px; height:17px;
+  margin:0; accent-color:var(--g2); flex:0 0 auto;
+}
+#sec-gender .gender-btn.food-choice.selected,
+#sec-diet .dpill.on { background:transparent; border:0; color:var(--g2); }
+#sec-diet .dpill { padding:3px 0; }
+
 </style>
