@@ -51,6 +51,7 @@
   #tab-underline { display:none !important; }
   body > footer, body > .footer, body > #app-footer { margin-top:auto; }
 }
+.alert-interval-row{display:block;margin:10px 0 14px}.alert-interval-row .alert-row-lbl{margin-bottom:8px}.alert-interval-row input[type="range"]{width:100%;display:block}
 </style>
 
 <!-- Activity styles -->
@@ -3837,10 +3838,9 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
           <li>Small, frequent sips are easier on the body than drinking a lot at once</li>
         </ul>
       </div>
-
-      <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Remind every </div>
-        <select id="alert-drink-time" class="alert-interval-select" aria-label="Water reminder interval" onchange="onAlertTimeChange('drink')"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60" selected>60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
+<div class="alert-row alert-interval-row">
+        <div class="alert-row-lbl">• Remind every</div>
+        <select id="alert-drink-time" class="alert-interval-select" aria-label="Water reminder interval" onchange="onAlertTimeChange('drink')"><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60" selected>60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
       </div>
 
       <div class="alert-row">
@@ -3886,10 +3886,9 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
           <li>Gives a small energy and focus boost for the next stretch of work</li>
         </ul>
       </div>
-
-      <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Remind every </div>
-        <select id="alert-walk-time" class="alert-interval-select" aria-label="Walk reminder interval" onchange="onAlertTimeChange('walk')"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45" selected>45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60">60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
+<div class="alert-row alert-interval-row">
+        <div class="alert-row-lbl">• Remind every</div>
+        <select id="alert-walk-time" class="alert-interval-select" aria-label="Walk reminder interval" onchange="onAlertTimeChange('walk')"><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60" selected>60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
       </div>
 
       <div class="alert-row">
@@ -3935,10 +3934,9 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
           <li>Encourages a natural blink reset, which re-moistens the eyes</li>
         </ul>
       </div>
-
-      <div class="alert-row">
-        <div class="alert-row-lbl dotted-lbl">Remind every </div>
-        <select id="alert-break-time" class="alert-interval-select" aria-label="Eyes (20-20-20) reminder interval" onchange="onAlertTimeChange('break')"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20" selected>20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60">60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
+<div class="alert-row alert-interval-row">
+        <div class="alert-row-lbl">• Remind every</div>
+        <select id="alert-break-time" class="alert-interval-select" aria-label="Eye break reminder interval" onchange="onAlertTimeChange('break')"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20" selected>20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60">60 min</option></select>
       </div>
 
       <div class="alert-row">
@@ -4049,7 +4047,7 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
       <div class="alert-task" id="alert-schedule-task" style="display:none">
         <p class="alert-card-sub">Applies to every nudge above — Eyes, Walk, Water and Eyes (Exercise) only remind you inside this window.</p>
         <ul>
-          <li>Eyes, Walk and Water keep their own “Remind every” interval, but stay quiet outside the window</li>
+          <li>Water and Walk remind every 60 minutes; Eyes (20-20-20) reminds every 20 minutes, only within this window</li>
           <li>Eyes (Exercise) reminds you at the start of the window (1 time a day) or at the start and end (2 times a day), on the days set in its own section</li>
         </ul>
       </div>
@@ -8322,7 +8320,7 @@ function inScheduleWindow(d){
   if(a===null || b===null || a===b) return true;      // incomplete / identical → no restriction
   return a<b ? (cur>=a && cur<=b) : (cur>=a || cur<=b); // overnight windows supported
 }
-const ALERT_DEFAULTS={ break:{minutes:20,sound:'chime'}, walk:{minutes:45,sound:'drum'}, drink:{minutes:60,sound:'drop'} };
+const ALERT_DEFAULTS={ break:{minutes:20,sound:'chime'}, walk:{minutes:60,sound:'drum'}, drink:{minutes:60,sound:'drop'} };
 const ALERT_LABELS={
   break:{title:'Eyes', icon:'👁️', msg:'Look 20 feet away for 20 seconds — 20-20-20 time!'},
   walk: {title:'Walk',  icon:'🚶', msg:'Time for a 2–5 minute walk or stretch!'},
@@ -8900,21 +8898,34 @@ function setMasterNotifyFlag(on){
 // flag, without touching whether that reminder itself is on or off.
 function syncAllReminderNotifyFlags(forceState){
   const masterOn=typeof forceState==='boolean' ? forceState : isMasterNotifyOn();
-  ['break','walk','drink'].forEach(key=>{
-    const st=alertState[key];
+  const canSendSystemNotifications=masterOn && typeof Notification!=='undefined' && Notification.permission==='granted';
+
+  // Explicitly update the four visible top-row switches in Reminders.
+  // Keep the input checked state (which drives the switch styling), the
+  // reminder runtime state, and the browser-notification state in sync.
+  ['drink','walk','break'].forEach(key=>{
     const cb=document.getElementById('alert-'+key+'-notify');
-    if(cb) cb.checked=masterOn;
+    if(cb){
+      cb.checked=masterOn;
+      cb.setAttribute('aria-checked',String(masterOn));
+    }
+    const st=alertState && alertState[key];
     if(st){
       st.enabled=masterOn;
-      st.notify=masterOn && typeof Notification!=='undefined' && Notification.permission==='granted';
+      st.notify=canSendSystemNotifications;
       scheduleAlertTimer(key);
     }
   });
+
+  // Eyes (Exercise) has a separate state object and switch.
   const eyeCb=document.getElementById('eye-ex-notify');
-  if(eyeCb) eyeCb.checked=masterOn;
+  if(eyeCb){
+    eyeCb.checked=masterOn;
+    eyeCb.setAttribute('aria-checked',String(masterOn));
+  }
   if(typeof eyeExState!=='undefined'){
     eyeExState.enabled=masterOn;
-    eyeExState.notify=masterOn && typeof Notification!=='undefined' && Notification.permission==='granted';
+    eyeExState.notify=canSendSystemNotifications;
   }
 }
 // The single handler behind both "Enable"/"Disable" buttons (the top
@@ -9642,10 +9653,7 @@ function resetRemindersToDefault(){
     const def=ALERT_DEFAULTS[key];
     Object.assign(alertState[key], { enabled:true, minutes:def.minutes, sound:def.sound, muted:false, notify:permGranted });
 
-    const slider=document.getElementById('alert-'+key+'-time');
-    slider.value=def.minutes;
-    document.getElementById('alert-'+key+'-time-val').textContent=def.minutes+' min';
-    updateSliderFill(slider,'var(--alert-2)');
+    // Reminder cadence is fixed in the UI; only the internal default is reset here.
     document.getElementById('alert-'+key+'-sound').value=def.sound;
     const muteBtn=document.getElementById('alert-'+key+'-mute');
     muteBtn.textContent='🔊'; muteBtn.classList.remove('muted');
@@ -11583,6 +11591,9 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   document.addEventListener('keydown',e=>{ if(e.target.matches&&e.target.matches('.tab-panel select')) size(e.target); },true);
 })();
 </script>
+<style id="ayu-install-modal-style">
+.ayu-install-modal-backdrop{position:fixed;inset:0;z-index:20000;background:rgba(15,23,42,.48);display:flex;align-items:center;justify-content:center;padding:20px}.ayu-install-modal{width:min(440px,100%);background:var(--card-bg,#fff);color:var(--text,#1f2937);border-radius:18px;padding:22px;box-shadow:0 18px 60px rgba(0,0,0,.25);border:1px solid rgba(100,116,139,.25)}.ayu-install-modal h3{margin:0 0 12px;font-size:1.12rem}.ayu-install-modal p{line-height:1.55;margin:0 0 18px}.ayu-install-modal-actions{display:flex;justify-content:flex-end;gap:10px}.ayu-install-modal-actions button{border-radius:10px;padding:9px 16px;cursor:pointer;font:inherit}.ayu-install-modal-close{border:1px solid #94a3b8;background:transparent;color:inherit}
+</style>
 <script id="ayu-install-js">
 (function(){
   // One shared note, used by every notification "i" button.
@@ -11649,7 +11660,24 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     } else {
       help.innerHTML='<b>Desktop:</b> in Chrome or Edge, use the browser menu or address-bar install icon and choose <b>Install AyuBase6</b> / <b>Install app</b>. If unavailable, this browser may not support installation here.';
     }
-    if(help) help.style.display='block';
+    // If the browser has no native install prompt, show a focused help popup.
+    if(help){
+      var message=help.innerHTML;
+      if(section==='routines' && !message.trim()) message=ios
+        ? '<b>iPhone/iPad:</b> open this page in Safari, tap <b>Share</b>, then choose <b>Add to Home Screen</b> and tap <b>Add</b>.'
+        : android
+          ? '<b>Android:</b> open the browser menu (⋮) and choose <b>Install app</b> or <b>Add to Home screen</b>. If unavailable, try Chrome.'
+          : '<b>Desktop:</b> in Chrome or Edge, use the browser menu or address-bar install icon and choose <b>Install AyuBase6</b> / <b>Install app</b>. If unavailable, this browser may not support installation here.';
+      var backdrop=document.createElement('div'); backdrop.className='ayu-install-modal-backdrop';
+      var modal=document.createElement('div'); modal.className='ayu-install-modal'; modal.setAttribute('role','dialog'); modal.setAttribute('aria-modal','true'); modal.setAttribute('aria-label','Add AyuBase6');
+      modal.innerHTML='<h3>Add AyuBase6</h3><p>'+message+'</p><div class="ayu-install-modal-actions"><button type="button" class="ayu-install-modal-close">Close</button></div>';
+      backdrop.appendChild(modal); document.body.appendChild(backdrop);
+      function closeInstallModal(){backdrop.remove();document.removeEventListener('keydown',onEsc);}
+      function onEsc(e){if(e.key==='Escape')closeInstallModal();}
+      modal.querySelector('button').addEventListener('click',closeInstallModal);
+      backdrop.addEventListener('click',function(e){if(e.target===backdrop)closeInstallModal();});
+      document.addEventListener('keydown',onEsc);
+    }
   };
   refresh();
 
@@ -11950,7 +11978,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
 <script id="reminder-clock-picker-script">
 (()=>{let target=null,chosen=20;const overlay=document.getElementById('reminder-interval-picker'),face=document.getElementById('clock-picker-face'),current=document.getElementById('clock-picker-current'),title=document.getElementById('clock-picker-title');
 function close(){overlay.classList.remove('open');target=null;}
-function openPicker(sel){target=sel;chosen=Number(sel.value)||20;title.textContent=(sel.getAttribute('aria-label')||'Reminder').replace(' reminder interval','')+' · Remind every';current.textContent=chosen+' min';face.innerHTML='';const vals=[5,10,15,20,25,30,35,40,45,50,55,60,70,80,90,100,110,120];vals.forEach((v,i)=>{const b=document.createElement('button');b.type='button';b.className='clock-choice'+(v===chosen?' active':'');b.textContent=v;b.setAttribute('aria-label',v+' minutes');const a=(i/vals.length)*Math.PI*2-Math.PI/2;const r=42; b.style.left=(50+Math.cos(a)*r)+'%';b.style.top=(50+Math.sin(a)*r)+'%';b.onclick=()=>{chosen=v;current.textContent=v+' min';face.querySelectorAll('.clock-choice').forEach(x=>x.classList.toggle('active',Number(x.textContent)===v));};face.appendChild(b);});overlay.classList.add('open');}
+function openPicker(sel){target=sel;chosen=Number(sel.value)||20;title.textContent=(sel.getAttribute('aria-label')||'Reminder').replace(' reminder interval','')+' · Remind every';current.textContent=chosen+' min';face.innerHTML='';const vals=Array.from(sel.options).map(o=>Number(o.value));vals.forEach((v,i)=>{const b=document.createElement('button');b.type='button';b.className='clock-choice'+(v===chosen?' active':'');b.textContent=v;b.setAttribute('aria-label',v+' minutes');const a=(i/vals.length)*Math.PI*2-Math.PI/2;const r=42; b.style.left=(50+Math.cos(a)*r)+'%';b.style.top=(50+Math.sin(a)*r)+'%';b.onclick=()=>{chosen=v;current.textContent=v+' min';face.querySelectorAll('.clock-choice').forEach(x=>x.classList.toggle('active',Number(x.textContent)===v));};face.appendChild(b);});overlay.classList.add('open');}
 document.querySelectorAll('.alert-interval-select').forEach(sel=>{sel.addEventListener('pointerdown',e=>{e.preventDefault();openPicker(sel);});sel.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openPicker(sel);}});sel.setAttribute('aria-haspopup','dialog');});
 document.getElementById('clock-picker-close').onclick=close;document.getElementById('clock-picker-cancel').onclick=close;overlay.addEventListener('click',e=>{if(e.target===overlay)close();});document.getElementById('clock-picker-done').onclick=()=>{if(target){target.value=String(chosen);target.dispatchEvent(new Event('change',{bubbles:true}));}close();};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))close();});})();
 </script>
