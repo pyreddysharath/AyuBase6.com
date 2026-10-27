@@ -2657,6 +2657,14 @@ html[data-petal-card="e"] :is(.card,.body-age-section,.activity-type-section,.ro
 }
 </style>
 
+<style id="body-activity-flower-foreground">
+/* Body > Activity Type?: place the lotus motif in the foreground. */
+html[data-petal-card="e"] #activity-panel .activity-type-section::after {
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
+</style>
+
 <style id="ayubase6-desktop-polish-2026">
 /* Option A: calm tab-aware gradient header, without lotus imagery. */
 body { --header-rgb:37,92,192; }
@@ -8835,15 +8843,15 @@ function requestNotificationPermission(){
 // turn-on, while permission is still undecided ('default'), does.
 const NOTIF_MASTER_KEY='ayubase6-notif-master-on';
 function isMasterNotifyOn(){
-  if(typeof Notification==='undefined' || Notification.permission!=='granted') return false;
+  // Track the app-level master switch independently of browser permission.
+  // This lets Disable work reliably and lets all section switches stay in
+  // sync even when the browser blocks system notifications.
   try{
     const v=localStorage.getItem(NOTIF_MASTER_KEY);
-    // Never explicitly toggled by this person yet: default to "on" so
-    // anyone who already granted permission before this switch existed
-    // keeps getting real notifications, same as before.
-    if(v===null) return true;
-    return v==='1';
-  }catch(e){ return true; }
+    if(v!==null) return v==='1';
+  }catch(e){}
+  // Preserve the previous default for people who already granted permission.
+  return typeof Notification!=='undefined' && Notification.permission==='granted';
 }
 function setMasterNotifyFlag(on){
   try{ localStorage.setItem(NOTIF_MASTER_KEY, on?'1':'0'); }catch(e){}
@@ -8858,7 +8866,7 @@ function syncAllReminderNotifyFlags(forceState){
     if(cb) cb.checked=masterOn;
     if(st){
       st.enabled=masterOn;
-      st.notify=masterOn;
+      st.notify=masterOn && typeof Notification!=='undefined' && Notification.permission==='granted';
       scheduleAlertTimer(key);
     }
   });
@@ -8866,7 +8874,7 @@ function syncAllReminderNotifyFlags(forceState){
   if(eyeCb) eyeCb.checked=masterOn;
   if(typeof eyeExState!=='undefined'){
     eyeExState.enabled=masterOn;
-    eyeExState.notify=masterOn;
+    eyeExState.notify=masterOn && typeof Notification!=='undefined' && Notification.permission==='granted';
   }
 }
 // The single handler behind both "Enable"/"Disable" buttons (the top
@@ -8889,35 +8897,43 @@ function toggleMasterNotify(errorHintId){
   const installHelp=document.getElementById('install-help'); if(installHelp) installHelp.style.display='none';
   const routinesInstallHelp=document.getElementById('routines-install-help'); if(routinesInstallHelp) routinesInstallHelp.style.display='none';
   if(errorHintId) hideNotifHint(errorHintId);
-  const fail=msg=>{ if(errorHintId) showNotifBlockedHint(errorHintId, msg); refreshNotifStatusUI(); };
-  if(typeof Notification==='undefined'){ fail(notifProblemMessage()); return; }
-  refreshNotifStatusUI();
-  const banner=document.getElementById('reminders-notif-banner');
-  const bannerBtn=banner ? banner.querySelector('.reminders-notif-banner-btn') : null;
-  const footerBtn=document.getElementById('notif-enable-btn');
-  const visibleBtn = (bannerBtn && bannerBtn.style.display!=='none') ? bannerBtn : footerBtn;
-  const currentlyOn = visibleBtn ? /disable/i.test(visibleBtn.textContent) : isMasterNotifyOn();
+  const fail=msg=>{ if(errorHintId) showNotifBlockedHint(errorHintId, msg); };
+  const currentlyOn=isMasterNotifyOn();
   if(currentlyOn){
     setMasterNotifyFlag(false);
     syncAllAppNotifications(false);
     refreshNotifStatusUI();
     return;
   }
-  if(Notification.permission==='granted'){
+  const activate=()=>{
     setMasterNotifyFlag(true);
     syncAllAppNotifications(true);
     refreshNotifStatusUI();
+  };
+  if(typeof Notification==='undefined'){
+    // Keep every section switch in sync; browser/system notifications are
+    // unavailable, so reminders use their in-app fallback instead.
+    activate();
+    fail(notifProblemMessage());
     return;
   }
-  if(Notification.permission==='denied' || isRestrictedFileOrigin()){ fail(notifProblemMessage()); return; }
+  if(Notification.permission==='granted'){
+    activate();
+    return;
+  }
+  if(Notification.permission==='denied' || isRestrictedFileOrigin()){
+    activate();
+    fail(notifProblemMessage());
+    return;
+  }
   requestNotificationPermission().then(perm=>{
-    if(perm==='granted'){
-      setMasterNotifyFlag(true);
-      syncAllAppNotifications(true);
-      refreshNotifStatusUI();
-    } else {
+    if(perm==='granted') activate();
+    else {
+      // Enable the section-level reminders even if OS notifications are
+      // declined; the app will use its in-app reminder fallback.
+      activate();
       const msg=notifProblemMessage(perm);
-      if(msg) fail(msg); else refreshNotifStatusUI();
+      if(msg) fail(msg);
     }
   });
 }
@@ -8966,8 +8982,9 @@ function refreshNotifStatusUI(){
   const masterOn=isMasterNotifyOn();
   if(dot) dot.className='notif-status-dot '+(masterOn?'granted':'');
   if(statusText){
-    statusText.textContent = perm==='denied' ? '🚫 Notifications are blocked for this site.'
-      : masterOn ? '✅ Notifications are enabled.'
+    statusText.textContent = perm==='denied' ? (masterOn ? '🚫 Browser notifications are blocked; reminders remain enabled inside the app.' : '🚫 Notifications are blocked for this site.')
+      : masterOn && perm==='granted' ? '✅ Notifications are enabled.'
+      : masterOn ? '🔔 Reminders are enabled; allow browser notifications for system popups.'
       : perm==='granted' ? '🔕 Notifications are currently turned off.'
       : 'Notifications are not yet enabled.';
   }
@@ -12183,4 +12200,45 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
 #routines-panel #rout-notify-btn,
 #routines-panel #rout-notify-btn.notifications-on,
 #routines-panel #rout-notify-btn:not(.notifications-on){color:#fff!important}
+</style>
+
+<style id="body-activity-flower-true-foreground">
+/* Body > Activity Type?: keep the lotus above the Exercise/Yoga option rows. */
+html[data-petal-card="e"] body #activity-panel .activity-type-wrap .activity-type-section::after {
+  z-index: 5 !important;
+  pointer-events: none !important;
+}
+html[data-petal-card="e"] body #activity-panel .activity-type-wrap .activity-type-section > * {
+  position: relative;
+  z-index: 1;
+}
+</style>
+
+<style id="body-activity-flower-foreground-final-fix">
+/* Explicitly paint the lotus OVER the Activity Type controls; pointer-events stay off. */
+html[data-petal-card="e"] #activity-panel .activity-type-section {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: visible !important;
+}
+html[data-petal-card="e"] #activity-panel .activity-type-section::after {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  left: var(--lotus-x, 50%) !important;
+  top: var(--lotus-y, 50%) !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(calc(100% - 16px), var(--lotus-w, 260px)) !important;
+  height: min(calc(100% - 16px), var(--lotus-h, 180px)) !important;
+  background: var(--petal) !important;
+  -webkit-mask: var(--lotus-mask) center / contain no-repeat !important;
+  mask: var(--lotus-mask) center / contain no-repeat !important;
+  opacity: .30 !important;
+  z-index: 2147483647 !important;
+  pointer-events: none !important;
+}
+html[data-petal-card="e"] #activity-panel .activity-type-section > * {
+  position: relative !important;
+  z-index: auto !important;
+}
 </style>
