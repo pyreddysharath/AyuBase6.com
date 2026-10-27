@@ -11653,16 +11653,9 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   var deferred=null;
   var installed=function(){ return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone===true; };
   var installedMessage=function(){
-    var ua=navigator.userAgent||'';
-    var ios=/iPhone|iPad|iPod/.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-    var android=/Android/i.test(ua);
-    var desktop=/Windows|Macintosh|Linux/i.test(ua) && !android && !ios;
-    if(ios) return '<b>AyuBase6 is already added to your Home Screen.</b>';
-    if(android) return '<b>AyuBase6 is already installed on your home screen.</b>';
-    if(desktop) return '<b>AyuBase6 is already installed on your desktop.</b>';
-    return '<b>AyuBase6 is already installed.</b>';
+    return '<b>AyuBase6 is already installed. Please check your home screen.</b>';
   };
-  var androidHelp='<b>AyuBase6 installation is not available in this browser.</b><br>If you have already installed AyuBase6, open it from your home screen.';
+  var androidHelp='<b>AyuBase6 is already installed. Please check your home screen.</b>';
   var refresh=function(){
     var isInstalled=installed();
     var row=document.getElementById('install-row'); if(row) row.style.display='flex';
@@ -11698,11 +11691,11 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     if(android){
       help.innerHTML=androidHelp;
     } else if(ios){
-      help.innerHTML='<b>Add AyuBase6</b><br>iPhone/iPad: open this page in Safari, tap Share, then choose Add to Home Screen and tap Add.';
+      help.innerHTML=androidHelp;
     } else if(safari){
-      help.innerHTML='<b>Add AyuBase6</b><br>Mac Safari: use File → Add to Dock on supported macOS versions. Other browsers may offer Install app from their menu.';
+      help.innerHTML=androidHelp;
     } else {
-      help.innerHTML='<b>Add AyuBase6</b><br>Desktop: in Chrome or Edge, use the browser menu or address-bar install icon and choose Install AyuBase6 / Install app. If unavailable, this browser may not support installation here.';
+      help.innerHTML=androidHelp;
     }
     help.style.display='block';
   };
