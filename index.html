@@ -4028,7 +4028,7 @@ html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { backgrou
     <div class="reminders-notif-banner nudges-actions" id="reminders-notif-banner">
       <div class="master-notif-row">
         <div class="master-notif-group">
-          <button type="button" class="reminders-notif-banner-btn" onclick="toggleMasterNotify('reminders-notif-error')"><span class="master-notif-label">Enable All Notifications</span><span role="button" tabindex="0" class="alert-info-btn notif-info-btn master-notif-info-btn" onclick="event.stopPropagation();toggleNotifInfo(this,'master-notif-info')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();toggleNotifInfo(this,'master-notif-info')}" title="About notifications" aria-label="About notifications" aria-expanded="false">i</span></button>
+          <button type="button" class="reminders-notif-banner-btn" onclick="toggleMasterNotify('reminders-notif-error')"><span class="master-notif-icon section-notif-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 22a2.2 2.2 0 0 0 2.18-2h-4.36A2.2 2.2 0 0 0 12 22ZM19 16.5V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5.5l-2 2V20h18v-1.5l-2-2Z"/></svg></span><span class="master-notif-label">Enable All Notifications</span><span role="button" tabindex="0" class="alert-info-btn notif-info-btn master-notif-info-btn" onclick="event.stopPropagation();toggleNotifInfo(this,'master-notif-info')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();toggleNotifInfo(this,'master-notif-info')}" title="About notifications" aria-label="About notifications" aria-expanded="false">i</span></button>
         </div>
         <div class="reminders-reset-row"><button type="button" class="reset-icon-btn" title="Reset Reminders to defaults" onclick="resetRemindersToDefault()">↺ Reset</button></div>
       </div>
@@ -8671,7 +8671,7 @@ function routineNotificationsEnabled(){
 function updateRoutineNotifyButtons(){
   const enabled=routineNotificationsEnabled();
   const notify=document.getElementById('rout-notify-btn');
-  if(notify){notify.textContent=enabled?'🔔 Disable Notifications':'🔔 Enable Notifications';notify.setAttribute('aria-pressed',String(enabled));notify.classList.toggle('notifications-on',enabled);}
+  if(notify){notify.innerHTML=(enabled?'<span class="routine-notif-icon section-notif-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 22a2.2 2.2 0 0 0 2.18-2h-4.36A2.2 2.2 0 0 0 12 22ZM19 16.5V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5.5l-2 2V20h18v-1.5l-2-2ZM1.5 1.5l21 21"/></svg></span>':'<span class="routine-notif-icon section-notif-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 22a2.2 2.2 0 0 0 2.18-2h-4.36A2.2 2.2 0 0 0 12 22ZM19 16.5V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5.5l-2 2V20h18v-1.5l-2-2Z"/></svg></span>')+(enabled?'Disable Notifications':'Enable Notifications');notify.setAttribute('aria-pressed',String(enabled));notify.classList.toggle('notifications-on',enabled);}
 }
 function enableRoutineNotifications(){
   const hintId='rout-notif-hint';
@@ -8838,8 +8838,8 @@ function setMasterNotifyFlag(on){
 }
 // Applies the master on/off state to every reminder's real-notification
 // flag, without touching whether that reminder itself is on or off.
-function syncAllReminderNotifyFlags(){
-  const masterOn=isMasterNotifyOn();
+function syncAllReminderNotifyFlags(forceState){
+  const masterOn=typeof forceState==='boolean' ? forceState : isMasterNotifyOn();
   ['break','walk','drink'].forEach(key=>{
     const st=alertState[key];
     const cb=document.getElementById('alert-'+key+'-notify');
@@ -8873,13 +8873,13 @@ function toggleMasterNotify(errorHintId){
   if(currentlyOn){
     // Turning off is purely in-app — no browser call.
     setMasterNotifyFlag(false);
-    syncAllReminderNotifyFlags();
+    syncAllReminderNotifyFlags(false);
     refreshNotifStatusUI();
     return;
   }
   if(Notification.permission==='granted'){
     setMasterNotifyFlag(true);
-    syncAllReminderNotifyFlags();
+    syncAllReminderNotifyFlags(true);
     refreshNotifStatusUI();
     return;
   }
@@ -8887,7 +8887,7 @@ function toggleMasterNotify(errorHintId){
   // 'default' is the only state where asking the browser is needed.
   requestNotificationPermission().then(perm=>{
     if(perm==='granted') setMasterNotifyFlag(true);
-    syncAllReminderNotifyFlags();
+    syncAllReminderNotifyFlags(true);
     const msg=notifProblemMessage(perm);
     if(msg) fail(msg); else refreshNotifStatusUI();
   });
@@ -8965,6 +8965,7 @@ function updateRemindersNotifBanner(){
     btn.style.display='inline-block';
     const on=isMasterNotifyOn();
     const label=btn.querySelector('.master-notif-label'); if(label) label.textContent = on ? 'Disable All Notifications' : 'Enable All Notifications'; else btn.textContent = on ? 'Disable All Notifications' : 'Enable All Notifications';
+    const icon=btn.querySelector('.master-notif-icon'); if(icon) icon.innerHTML=on ? '<svg viewBox="0 0 24 24" focusable="false"><path d="M12 22a2.2 2.2 0 0 0 2.18-2h-4.36A2.2 2.2 0 0 0 12 22ZM19 16.5V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5.5l-2 2V20h18v-1.5l-2-2ZM1.5 1.5l21 21"/></svg>' : '<svg viewBox="0 0 24 24" focusable="false"><path d="M12 22a2.2 2.2 0 0 0 2.18-2h-4.36A2.2 2.2 0 0 0 12 22ZM19 16.5V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5.5l-2 2V20h18v-1.5l-2-2Z"/></svg>'; 
     btn.classList.toggle('notifications-on',on);
     btn.setAttribute('aria-pressed',String(on));
   }
@@ -11881,7 +11882,14 @@ document.getElementById('clock-picker-close').onclick=close;document.getElementB
 #reminders-notif-banner .reminders-notif-banner-btn.notifications-on{background:#087f75!important;border-color:#066b63!important;box-shadow:inset 0 0 0 2px rgba(255,255,255,.22)!important}
 #reminders-notif-banner .reminders-notif-banner-btn:not(.notifications-on){background:#0f9488!important;border-color:#0f9488!important;box-shadow:none!important}
 #routines-panel #rout-notify-btn.notifications-on{background:#75400b!important;border-color:#75400b!important;box-shadow:inset 0 0 0 2px rgba(255,255,255,.24)!important}
-#routines-panel #rout-notify-btn:not(.notifications-on){background:#96500d!important;border-color:#96500d!important;box-shadow:none!important}
+#routines-panel #rout-notify-btn:not(.notifications-on){background:#c8873d!important;border-color:#c8873d!important;box-shadow:none!important}
+/* Filled notification icons follow the button text colour. */
+#reminders-notif-banner .master-notif-icon{color:inherit!important;}
+#routines-panel #rout-notify-btn .routine-notif-icon{color:#fff!important;}
+.section-notif-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 18px;width:18px;height:18px;vertical-align:middle;}
+.section-notif-icon svg{display:block;width:18px;height:18px;fill:currentColor;stroke:currentColor;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;}
+#routines-panel #rout-notify-btn{display:inline-flex!important;align-items:center;justify-content:center;gap:7px;}
+
 </style>
 
 </body>
