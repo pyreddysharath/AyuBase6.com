@@ -3868,7 +3868,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
         <div class="alert-sound-row">
           <select id="alert-drink-sound" class="alert-sound-select" onchange="onAlertSoundChange('drink')">
-            <option value="drop">Water Drop (default)</option>
+            <option value="drop">Water Drop</option>
             <option value="bubble">Bubble</option>
             <option value="splash">Splash</option>
             <option value="bell">Soft Bell</option>
@@ -3914,7 +3914,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
         <div class="alert-sound-row">
           <select id="alert-walk-sound" class="alert-sound-select" onchange="onAlertSoundChange('walk')">
-            <option value="drum">Drum Beat (default)</option>
+            <option value="drum">Drum Beat</option>
             <option value="footsteps">Footsteps</option>
             <option value="xylophone">Xylophone</option>
             <option value="ping">Ping</option>
@@ -3960,7 +3960,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
         <div class="alert-sound-row">
           <select id="alert-break-sound" class="alert-sound-select" onchange="onAlertSoundChange('break')">
-            <option value="chime">Gentle Chime (default)</option>
+            <option value="chime">Gentle Chime</option>
             <option value="bell">Soft Bell</option>
             <option value="ping">Ping</option>
             <option value="marimba">Marimba Pop</option>
@@ -4030,7 +4030,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
           <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
           <div class="alert-sound-row">
             <select id="eye-ex-sound" class="alert-sound-select" onchange="onEyeExSoundChange()">
-              <option value="xylophone">Xylophone (default)</option>
+              <option value="xylophone">Xylophone</option>
               <option value="chime">Gentle Chime</option>
               <option value="bell">Soft Bell</option>
               <option value="marimba">Marimba Pop</option>
@@ -11832,7 +11832,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     let duration=Number(saved.duration)||15;
     function renderFrequency(){
       if(mode.value==='regular'){
-        fields.innerHTML='<label>Minutes <button type="button" class="duration-clock-trigger" aria-haspopup="dialog"></button></label>';
+        fields.innerHTML='<label>Time <button type="button" class="duration-clock-trigger" aria-haspopup="dialog"></button></label>';
         const btn=fields.querySelector('.duration-clock-trigger');
         function showDuration(){btn.textContent=durationLabel(duration)} showDuration();
         btn.addEventListener('click',()=>openDurationPicker(duration,v=>{duration=v;showDuration()}));
@@ -12028,6 +12028,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
 function close(){overlay.classList.remove('open');target=null;}
 function commitAndClose(v){if(target){target.value=String(v);target.dispatchEvent(new Event('change',{bubbles:true}));}close();}
 function openPicker(sel){target=sel;chosen=Number(sel.value)||20;current.textContent=chosen+' min';face.innerHTML='';const vals=Array.from(sel.options).map(o=>Number(o.value));vals.forEach((v,i)=>{const b=document.createElement('button');b.type='button';b.className='clock-choice'+(v===chosen?' active':'');b.textContent=v;b.setAttribute('aria-label',v+' minutes');const a=(i/vals.length)*Math.PI*2-Math.PI/2;const r=42;b.style.left=(50+Math.cos(a)*r)+'%';b.style.top=(50+Math.sin(a)*r)+'%';b.onclick=()=>{chosen=v;current.textContent=v+' min';commitAndClose(v);};face.appendChild(b);});overlay.classList.add('open');}
+window.openReminderIntervalPicker = openPicker;
 document.querySelectorAll('.alert-interval-select').forEach(sel=>{sel.addEventListener('pointerdown',e=>{e.preventDefault();openPicker(sel);});sel.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openPicker(sel);}});sel.setAttribute('aria-haspopup','dialog');});
 document.getElementById('clock-picker-close').onclick=close;overlay.addEventListener('click',e=>{if(e.target===overlay)close();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))close();});})();
 </script>
@@ -12266,6 +12267,30 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
 }
 #reminders-notif-banner .reset-lucide-icon { display: block; width: 16px; height: 16px; flex: 0 0 auto; }
 </style>
+
+<style id="requested-reminders-transparent-dropdowns-and-clock-20261029">
+/* Only the requested Reminders dropdown appearance: let the lotus/background image show through. */
+#alerts-panel select,
+#alerts-panel .reminder-custom-select-trigger,
+#alerts-panel .alert-sound-row .reminder-custom-select-trigger {
+  background-color: transparent !important;
+}
+/* Keep the same visible down-chevron on every custom dropdown, including sound fields. */
+#alerts-panel .reminder-custom-select-trigger .reminder-select-chevron {
+  display: inline-block !important; visibility: visible !important; opacity: 1 !important;
+  flex: 0 0 auto !important; margin-left: 6px !important;
+}
+#alerts-panel .reminder-custom-select-trigger .reminder-clock-icon {
+  display: inline-block !important; flex: 0 0 12px !important;
+  width: 12px !important; height: 12px !important; margin-right: 5px !important;
+  background-repeat: no-repeat; background-position: center; background-size: 12px 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='13' r='8' fill='none' stroke='%2308766e' stroke-width='2'/%3E%3Cpath d='M12 8v5l3 2M9 2h6' fill='none' stroke='%2308766e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+#alerts-panel .reminder-custom-select-trigger .reminder-trigger-label {
+  flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+</style>
+
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
@@ -13324,4 +13349,227 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
   background-color: var(--rout-3, #fcd34d) !important;
   border-color: var(--rout-3, #fcd34d) !important;
 }
+</style>
+
+
+
+
+<style id="reminders-custom-option-menus-20261029">
+/* Native Android select popups ignore option typography. Use an in-page menu for the
+   reminder controls, matching the My Reminders sound option typography while preserving
+   each closed field's existing appearance. */
+#alerts-panel .reminder-custom-select-trigger {
+  box-sizing: border-box; display: inline-flex; align-items: center; justify-content: space-between;
+  gap: 8px; min-height: 34px; max-width: 100%; padding: 5px 8px;
+  border: 1px solid #99d9ce; border-radius: 10px; background: #e8f8f4; color: #164e48;
+  font: inherit; font-size: var(--fs-xs, .86rem); line-height: 1.25; text-align: left;
+  white-space: nowrap; overflow: hidden; cursor: pointer;
+}
+#alerts-panel .alert-sound-row .reminder-custom-select-trigger {
+  border: 1.5px solid var(--alert-3); border-radius: 8px; background: #fff; color: #134e4a;
+  font-size: .82rem; padding: 8px 10px; min-height: 34px; flex: 1 1 0; min-width: 0;
+}
+#alerts-panel .reminder-custom-select-trigger .reminder-select-chevron { flex: 0 0 auto; font-size: .8em; }
+.reminder-custom-select-menu {
+  position: fixed; z-index: 2147483000; display: none; overflow-y: auto; overscroll-behavior: contain;
+  max-height: min(48vh, 360px); min-width: 160px; padding: 4px; margin: 0;
+  border: 1px solid #99d9ce; border-radius: 10px; background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 70, 64, .18); color: #134e4a;
+  font-family: inherit; font-size: .9rem; font-style: normal; font-weight: 400;
+}
+.reminder-custom-select-menu.open { display: block; }
+.reminder-custom-select-menu button {
+  display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: 6px;
+  background: transparent; color: #134e4a; text-align: left; white-space: normal;
+  font: inherit; font-style: normal; font-weight: 400; cursor: pointer;
+}
+.reminder-custom-select-menu button[aria-selected="true"] { font-weight: 500; background: #ccfbf1; }
+.reminder-custom-select-menu button:focus-visible,
+.reminder-custom-select-menu button:hover { outline: none; background: #d9fdf5; }
+@media (prefers-reduced-motion: no-preference) {
+  .reminder-custom-select-menu button { transition: background-color .12s ease; }
+}
+</style>
+<script id="reminders-custom-dropdown-behaviour-20261029">
+(function(){
+  'use strict';
+  const panel = document.getElementById('alerts-panel');
+  if (!panel || panel.dataset.customOptionMenusReady === '1') return;
+  panel.dataset.customOptionMenusReady = '1';
+  let active = null;
+  function closeMenu(){
+    if (!active) return;
+    active.menu.classList.remove('open');
+    active.trigger.setAttribute('aria-expanded','false');
+    active = null;
+  }
+  function placeMenu(item){
+    const r = item.trigger.getBoundingClientRect();
+    item.menu.style.minWidth = Math.max(160, r.width) + 'px';
+    item.menu.style.maxWidth = Math.max(160, Math.min(window.innerWidth - 16, r.width + 120)) + 'px';
+    item.menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - Math.max(160,r.width) - 8)) + 'px';
+    item.menu.style.visibility = 'hidden';
+    item.menu.classList.add('open');
+    const h = item.menu.getBoundingClientRect().height;
+    const below = window.innerHeight - r.bottom - 8;
+    const above = r.top - 8;
+    item.menu.style.top = (below >= Math.min(h, 220) || below >= above ? Math.min(window.innerHeight-h-8, r.bottom+4) : Math.max(8,r.top-h-4)) + 'px';
+    item.menu.style.visibility = '';
+  }
+  function build(select){
+    if (select.dataset.customOptionMenu === '1' || !select.options.length) return;
+    // Leave the My Reminders reference controls native; only replace menus in the reminder cards.
+    if (select.closest('#custom-reminders-card')) return;
+    select.dataset.customOptionMenu = '1';
+    const cs = getComputedStyle(select);
+    const wrap = document.createElement('span');
+    wrap.className = 'reminder-custom-select-wrap';
+    wrap.style.cssText = 'position:relative;display:inline-flex;min-width:0;max-width:100%;vertical-align:middle;';
+    if (select.classList.contains('alert-sound-select')) wrap.style.flex = '1 1 0';
+    else if (select.classList.contains('alert-interval-select')) { wrap.style.flex = '0 1 auto'; wrap.style.maxWidth = '132px'; }
+    select.parentNode.insertBefore(wrap, select);
+    wrap.appendChild(select);
+    select.style.setProperty('position','absolute','important');
+    select.style.setProperty('inset','0','important');
+    select.style.setProperty('width','100%','important');
+    select.style.setProperty('height','100%','important');
+    select.style.setProperty('opacity','0','important');
+    select.style.setProperty('pointer-events','none','important');
+    select.style.setProperty('z-index','-1','important');
+    const trigger = document.createElement('button');
+    trigger.type = 'button'; trigger.className = 'reminder-custom-select-trigger';
+    trigger.setAttribute('aria-haspopup','listbox'); trigger.setAttribute('aria-expanded','false');
+    trigger.setAttribute('aria-label', select.getAttribute('aria-label') || select.id || 'Choose an option');
+    const isSound = select.classList.contains('alert-sound-select') && select.closest('.alert-sound-row');
+    if (isSound) trigger.classList.add('sound-trigger');
+    // Retain the closed field's measured size and flex behaviour; menu options use shared typography.
+    const rect = select.getBoundingClientRect();
+    if (rect.width > 0) trigger.style.width = '100%';
+    if (select.classList.contains('alert-interval-select')) trigger.style.maxWidth = '132px';
+    const menu = document.createElement('div'); menu.className = 'reminder-custom-select-menu';
+    menu.setAttribute('role','listbox'); menu.setAttribute('aria-label',trigger.getAttribute('aria-label'));
+    const item = {select,trigger,menu,wrap};
+    function sync(){
+      const opt = select.options[select.selectedIndex];
+      trigger.replaceChildren();
+      const label = document.createElement('span'); label.className='reminder-trigger-label'; label.textContent = opt ? opt.textContent.trim() : '';
+      label.style.cssText = 'overflow:hidden;text-overflow:ellipsis;';
+      const chevron = document.createElement('span'); chevron.className='reminder-select-chevron'; chevron.setAttribute('aria-hidden','true'); chevron.textContent='▾';
+      trigger.append(label,chevron);
+      [...menu.children].forEach((b,i)=>{b.setAttribute('aria-selected',String(i===select.selectedIndex));});
+    }
+    [...select.options].forEach((opt,i)=>{
+      const b=document.createElement('button'); b.type='button'; b.setAttribute('role','option');
+      b.textContent=opt.textContent.trim(); b.setAttribute('aria-selected',String(i===select.selectedIndex));
+      b.addEventListener('click',()=>{
+        select.selectedIndex=i;
+        select.dispatchEvent(new Event('change',{bubbles:true}));
+        sync(); closeMenu(); trigger.focus({preventScroll:true});
+      });
+      menu.appendChild(b);
+    });
+    trigger.addEventListener('click',()=>{
+      if (select.classList.contains('alert-interval-select') && typeof window.openReminderIntervalPicker === 'function') {
+        closeMenu();
+        window.openReminderIntervalPicker(select);
+        return;
+      }
+      if(active && active.trigger===trigger){closeMenu();return;}
+      closeMenu(); active=item; sync(); placeMenu(item); trigger.setAttribute('aria-expanded','true');
+      const chosen=menu.querySelector('[aria-selected="true"]'); if(chosen) chosen.scrollIntoView({block:'nearest'});
+    });
+    select.addEventListener('change',sync);
+    wrap.appendChild(trigger); document.body.appendChild(menu);
+    // CSS width follows the original control's flex sizing, including the sound-row controls.
+    const ro = new ResizeObserver(()=>{
+      const r=select.getBoundingClientRect();
+      if(r.width>0){wrap.style.width=r.width+'px'; trigger.style.width='100%';}
+    });
+    ro.observe(wrap);
+    sync();
+  }
+  function init(){ panel.querySelectorAll('select').forEach(build); }
+  init();
+  // Eye exercise / other controls can be rendered later; initialize any new selects without touching My Reminders.
+  const observer = new MutationObserver(()=>init()); observer.observe(panel,{childList:true,subtree:true});
+  document.addEventListener('click',e=>{if(active && !active.menu.contains(e.target) && !active.trigger.contains(e.target)) closeMenu();});
+  document.addEventListener('keydown',e=>{
+    if(!active)return;
+    if(e.key==='Escape'){closeMenu();return;}
+    const buttons=[...active.menu.querySelectorAll('button')]; const idx=buttons.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();(buttons[Math.max(0,Math.min(buttons.length-1,idx+(e.key==='ArrowDown'?1:-1)))]||buttons[0])?.focus();}
+    if(e.key==='Tab') closeMenu();
+  });
+  window.addEventListener('resize',()=>{if(active)placeMenu(active);});
+  window.addEventListener('scroll',()=>{if(active)placeMenu(active);},true);
+})();
+</script>
+
+
+<style id="requested-reminders-dropdown-and-minute-clock-fix">
+/* Requested only: make Sessions per day and Days per week use the same filled dropdown background as the other Reminders dropdowns. */
+#alerts-panel select#eye-ex-count,
+#alerts-panel select#eye-ex-days {
+  background-color: color-mix(in srgb, #2dd4bf 22%, white) !important;
+}
+/* Restore a small minute-clock symbol inside each Remind every field, while retaining its chevron and existing dimensions. */
+#alerts-panel select.alert-interval-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='13' r='8' fill='none' stroke='%2308766e' stroke-width='2'/%3E%3Cpath d='M12 8v5l3 2M9 2h6' fill='none' stroke='%2308766e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2308766e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-position: left 6px center, right 6px center !important;
+  background-size: 12px 12px, 8px 5px !important;
+  padding-left: 22px !important;
+  padding-right: 16px !important;
+}
+</style>
+
+<style id="requested-dropdown-transparency-chevron-and-original-minute-clock-20261029">
+/* Requested: all closed dropdown fields in Reminders and My Reminders are transparent. */
+#alerts-panel select,
+#alerts-panel .reminder-custom-select-trigger,
+#alerts-panel #custom-reminders-card select,
+#alerts-panel #custom-reminders-card .reminder-custom-select-trigger {
+  background-color: transparent !important;
+}
+/* Use the same down-chevron on dropdown fields, matching the Frequency control. */
+#alerts-panel select:not([multiple]),
+#alerts-panel .reminder-custom-select-trigger,
+#alerts-panel #custom-reminders-card select:not([multiple]) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2308766e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px 8px;
+}
+/* Custom trigger already draws its own chevron; keep that icon aligned with the Frequency chevron. */
+#alerts-panel .reminder-custom-select-trigger .reminder-select-chevron {
+  display: inline-block; font-size: 0; width: 12px; height: 8px; flex: 0 0 12px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2308766e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px 8px no-repeat;
+}
+</style>
+
+
+<style id="requested-dropdown-final-adjustments-20261029">
+/* Requested: all dropdown fields, including Frequency in My Reminders, show the page background. */
+#alerts-panel select,
+#alerts-panel .reminder-custom-select-trigger,
+#alerts-panel #custom-reminders-card select,
+#alerts-panel #custom-reminders-card .reminder-custom-select-trigger {
+  background-color: transparent !important;
+}
+/* Match the arrow artwork used by the Frequency field; custom fields use the same chevron asset. */
+#alerts-panel select:not([multiple]) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2308766e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 8px center !important;
+  background-size: 12px 8px !important;
+}
+#alerts-panel .reminder-custom-select-trigger {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+#alerts-panel .reminder-custom-select-trigger > * {
+  pointer-events: none !important;
+}
+/* Show only the selected interval value and its down arrow; no clock symbol in Remind every. */
+#alerts-panel .reminder-custom-select-trigger .reminder-clock-icon { display: none !important; }
 </style>
