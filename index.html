@@ -3851,13 +3851,12 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
       </div>
 
       <div class="alert-task" id="alert-drink-task" style="display:none">
-        <p class="alert-card-sub">Stay on top of hydration through the day.</p>
-        <strong>How much to drink:</strong> aim for roughly 200–250ml (a glass) at each reminder — that works out
-        to about 2–3 litres across a day for most adults, adjusted for activity level and climate.
+        <p class="alert-card-sub">Stay hydrated through the day.</p>
+        <strong>Have a glass (200–250 ml) at each reminder</strong> — about 2–3 litres a day, more in heat or when active.
         <ul>
-          <li>Supports concentration and energy — even mild dehydration affects focus</li>
-          <li>Helps digestion and keeps skin and joints healthier</li>
-          <li>Small, frequent sips are easier on the body than drinking a lot at once</li>
+          <li>Supports focus and energy</li>
+          <li>Aids digestion; keeps skin and joints healthier</li>
+          <li>Small, frequent sips are easier on the body</li>
         </ul>
       </div>
 <div class="alert-row alert-interval-row">
@@ -3865,7 +3864,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         <select id="alert-drink-time" class="alert-interval-select" aria-label="Water reminder interval" onchange="onAlertTimeChange('drink')"><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60" selected>60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
       </div>
 
-      <div class="alert-row">
+      <div class="alert-row alert-sound-line">
         <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
         <div class="alert-sound-row">
           <select id="alert-drink-sound" class="alert-sound-select" onchange="onAlertSoundChange('drink')">
@@ -3879,11 +3878,10 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         </div>
       </div>
 
-      <div class="alert-row alert-preview-row"><button type="button" class="alert-preview-btn" onclick="previewAlertNotification('drink')">Preview notification</button></div>
+      <div class="alert-row alert-preview-row"><span class="row-dot" aria-hidden="true">•</span><button type="button" class="alert-preview-btn" onclick="previewAlertNotification('drink')">Preview notification</button></div>
       <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
         <input type="checkbox" id="alert-drink-notify" class="notify-cb" onchange="onAlertNotifyChange('drink')"><label for="alert-drink-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
       <div class="notif-blocked-hint" id="alert-drink-notif-hint" style="display:none"></div>
-      <div class="notif-info" id="alert-drink-notif-info" style="display:none"></div>
       <div class="notif-mock" id="alert-drink-notif-mock">
         <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-drink-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8 8 4 12.5 4 16a8 8 0 0016 0c0-3.5-4-8-8-14z"/></svg></span>
@@ -3899,13 +3897,12 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
       </div>
 
       <div class="alert-task" id="alert-walk-task" style="display:none">
-        <p class="alert-card-sub">Short movement breaks to counter prolonged sitting.</p>
-        <strong>2–5 minute movement breaks:</strong> stand up, stretch, or take a short walk every so often —
-        even a lap around the room counts.
+        <p class="alert-card-sub">Short movement breaks to offset long sitting.</p>
+        <strong>Stand, stretch or walk for 2–5 minutes</strong> at each reminder.
         <ul>
-          <li>Improves blood circulation and reduces stiffness</li>
-          <li>Counters the posture strain of prolonged sitting</li>
-          <li>Gives a small energy and focus boost for the next stretch of work</li>
+          <li>Improves circulation and reduces stiffness</li>
+          <li>Eases posture strain</li>
+          <li>Gives a small energy and focus boost</li>
         </ul>
       </div>
 <div class="alert-row alert-interval-row">
@@ -3913,7 +3910,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         <select id="alert-walk-time" class="alert-interval-select" aria-label="Walk reminder interval" onchange="onAlertTimeChange('walk')"><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45" selected>45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60">60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
       </div>
 
-      <div class="alert-row">
+      <div class="alert-row alert-sound-line">
         <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
         <div class="alert-sound-row">
           <select id="alert-walk-sound" class="alert-sound-select" onchange="onAlertSoundChange('walk')">
@@ -3927,11 +3924,10 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         </div>
       </div>
 
-      <div class="alert-row alert-preview-row"><button type="button" class="alert-preview-btn" onclick="previewAlertNotification('walk')">Preview notification</button></div>
+      <div class="alert-row alert-preview-row"><span class="row-dot" aria-hidden="true">•</span><button type="button" class="alert-preview-btn" onclick="previewAlertNotification('walk')">Preview notification</button></div>
       <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
         <input type="checkbox" id="alert-walk-notify" class="notify-cb" onchange="onAlertNotifyChange('walk')"><label for="alert-walk-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
       <div class="notif-blocked-hint" id="alert-walk-notif-hint" style="display:none"></div>
-      <div class="notif-info" id="alert-walk-notif-info" style="display:none"></div>
       <div class="notif-mock" id="alert-walk-notif-mock">
         <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-walk-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.5a2 2 0 100-4 2 2 0 000 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg></span>
@@ -3947,13 +3943,12 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
       </div>
 
       <div class="alert-task" id="alert-break-task" style="display:none">
-        <p class="alert-card-sub">Regular eye breaks while looking at screens.</p>
-        <strong>The 20-20-20 rule:</strong> every 20 minutes, look at something about 20 feet (6 metres) away for
-        at least 20 seconds. It gives your eye's focusing muscles a rest from close-up screen work.
+        <p class="alert-card-sub">Give your eyes a break from screens.</p>
+        <strong>The 20-20-20 rule:</strong> every 20 minutes, look at something 20 feet (6 m) away for 20 seconds.
         <ul>
-          <li>Reduces digital eye strain, dryness and blurry vision</li>
-          <li>Cuts down on headaches from prolonged screen focus</li>
-          <li>Encourages a natural blink reset, which re-moistens the eyes</li>
+          <li>Reduces eye strain, dryness and blurred vision</li>
+          <li>Fewer screen-related headaches</li>
+          <li>Encourages blinking, which re-moistens the eyes</li>
         </ul>
       </div>
 <div class="alert-row alert-interval-row">
@@ -3961,7 +3956,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         <select id="alert-break-time" class="alert-interval-select" aria-label="Eye break reminder interval" onchange="onAlertTimeChange('break')"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20" selected>20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60">60 min</option></select>
       </div>
 
-      <div class="alert-row">
+      <div class="alert-row alert-sound-line">
         <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
         <div class="alert-sound-row">
           <select id="alert-break-sound" class="alert-sound-select" onchange="onAlertSoundChange('break')">
@@ -3975,11 +3970,10 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         </div>
       </div>
 
-      <div class="alert-row alert-preview-row"><button type="button" class="alert-preview-btn" onclick="previewAlertNotification('break')">Preview notification</button></div>
+      <div class="alert-row alert-preview-row"><span class="row-dot" aria-hidden="true">•</span><button type="button" class="alert-preview-btn" onclick="previewAlertNotification('break')">Preview notification</button></div>
       <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
         <input type="checkbox" id="alert-break-notify" class="notify-cb" onchange="onAlertNotifyChange('break')"><label for="alert-break-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
       <div class="notif-blocked-hint" id="alert-break-notif-hint" style="display:none"></div>
-      <div class="notif-info" id="alert-break-notif-info" style="display:none"></div>
       <div class="notif-mock" id="alert-break-notif-mock">
         <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-break-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/></svg></span>
@@ -3994,12 +3988,12 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
       </div>
 
       <div class="alert-task" id="alert-break-ex-task" style="display:none">
-        <strong>Guided eye exercise:</strong> the moving dot cycles through seven patterns — zigzag, figure-8,
-        loop, star, cross, and a row scan — directions your eyes rarely get from a fixed screen.
+        <p class="alert-card-sub">A guided exercise for your eye muscles.</p>
+        <strong>Follow the moving dot</strong> through seven patterns: zigzag, figure-8, loop, star, cross and row scan.
         <ul>
-          <li>Max 2 sessions a day — one in the morning to wake up focus, one in the evening after screen work</li>
-          <li>Each session is exactly 2:15 — don't repeat it back-to-back; over-exercising can cause tension headaches or eye strain</li>
-          <li>Aim for 3–5 days a week — resting the other days prevents ciliary muscle fatigue and focus cramping</li>
+          <li>Up to 2 sessions a day: morning and evening</li>
+          <li>Each session lasts 2:15 — don't repeat it back-to-back</li>
+          <li>3–5 days a week; rest on the other days</li>
         </ul>
       </div>
 
@@ -4032,7 +4026,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
           </select>
         </div>
 
-        <div class="alert-row">
+        <div class="alert-row alert-sound-line">
           <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
           <div class="alert-sound-row">
             <select id="eye-ex-sound" class="alert-sound-select" onchange="onEyeExSoundChange()">
@@ -4046,11 +4040,10 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
           </div>
         </div>
 
-          <div class="alert-row alert-preview-row"><button type="button" class="alert-preview-btn" onclick="previewEyeExNotification()">Preview notification</button></div>
+          <div class="alert-row alert-preview-row"><span class="row-dot" aria-hidden="true">•</span><button type="button" class="alert-preview-btn" onclick="previewEyeExNotification()">Preview notification</button></div>
         <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
           <input type="checkbox" id="eye-ex-notify" class="notify-cb" checked onchange="onEyeExNotifyChange()"><label for="eye-ex-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
         <div class="notif-blocked-hint" id="eye-ex-notif-hint" style="display:none"></div>
-        <div class="notif-info" id="eye-ex-notif-info" style="display:none"></div>
         <div class="notif-mock" id="eye-ex-notif-mock">
         <button type="button" class="notif-mock-close" onclick="document.getElementById('eye-ex-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
           <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0-6a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z"/></svg></span>
@@ -4110,7 +4103,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
       <button type="button" class="install-btn" id="install-app-btn" onclick="installApp('reminders')">Add AyuBase6 Shortcut</button>
       <button type="button" class="alert-info-btn small-info install-info-overlay" onclick="toggleNotifInfo(this,'install-help')" title="About adding a shortcut" aria-label="About adding a shortcut" aria-expanded="false">i</button>
     </div>
-    <div class="notif-info" id="install-help" style="display:none">Add AyuBase6 to your Home Screen, Dock, or desktop using your browser’s install/share menu. The browser uses the site’s app icon (the AyuBase6 lotus logo). Shortcut creation is controlled by the operating system and browser, so the steps differ by device and some browsers do not support automatic installation.</div>
+    <div class="notif-info" id="install-help" style="display:none">Add AyuBase6 to your Home Screen, Dock or desktop from your browser’s install or share menu. Steps vary by device, and some browsers can’t install automatically.</div>
 
   </div>
 </div>
@@ -8357,7 +8350,8 @@ function onAlertTimeChange(key){
   const slider=document.getElementById('alert-'+key+'-time');
   const val=+slider.value;
   alertState[key].minutes=val;
-  document.getElementById('alert-'+key+'-time-val').textContent=val+' min';
+  const valEl=document.getElementById('alert-'+key+'-time-val');   // not present with the dropdown; don't let a missing label stop the timer being rescheduled
+  if(valEl) valEl.textContent=val+' min';
   if (slider && slider.tagName === 'INPUT' && slider.type === 'range') updateSliderFill(slider,'var(--alert-2)');
   scheduleAlertTimer(key);
 }
@@ -8382,11 +8376,12 @@ function toggleAlertTask(key){
 }
 
 function toggleAlertSectionInfo(key){
+  // The section "i" only shows that section's own explanation. The shared notification
+  // notes now live under the main "i" beside Enable/Disable All Notifications.
   toggleAlertTask(key);
-  const ids={drink:'alert-drink-notif-info',walk:'alert-walk-notif-info',break:'alert-break-notif-info','break-ex':'eye-ex-notif-info',schedule:'alert-schedule-notif-info'};
-  const panel=document.getElementById(ids[key]);
+  const body=document.getElementById('alert-'+key+'-task');
   const btn=document.getElementById('alert-'+key+'-info-btn');
-  if(panel){ const open=panel.style.display==='none'; panel.style.display=open?'block':'none'; if(btn) btn.setAttribute('aria-expanded',String(open)); }
+  if(body && btn) btn.setAttribute('aria-expanded',String(body.style.display!=='none'));
 }
 // ── Why a notification couldn't be turned on, in plain words. Returns
 //    null when nothing is wrong (permission granted). Used only right after
@@ -8989,6 +8984,8 @@ function syncAllAppNotifications(forceState){
     routineNotifyTimer=setInterval(checkRoutineNotificationSchedule,15000);
   }
   if(typeof updateRoutineNotifyButtons==='function') updateRoutineNotifyButtons();
+  // Remember every section's new on/off state so a reload restores it.
+  try{ if(typeof window.ayuSaveReminderStates==='function') window.ayuSaveReminderStates(); }catch(e){}
 }
 function toggleMasterNotify(errorHintId){
   const installHelp=document.getElementById('install-help'); if(installHelp) installHelp.style.display='none';
@@ -11649,7 +11646,27 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     +'<li>Allow notifications when your browser asks. Keep AyuBase6 open in a browser tab or installed app; closing it pauses scheduled reminders.</li>'
     +'<li>On iPhone/iPad, add the page to the Home Screen (Share → Add to Home Screen) and open it there.</li>'
     +'<li>Battery saving or a locked device may delay reminders.</li></ul>'; 
-  document.querySelectorAll('.notif-info').forEach(function(el){ if(el.id!=='install-help') el.innerHTML=NOTE; });
+  var REM_NOTE='<strong>Notification controls</strong><ul>'
+    +'<li>Each section’s switch turns that reminder on or off.</li>'
+    +'<li><b>Enable/Disable All Notifications</b> switches every section at once.</li>'
+    +'<li><b>Preview notification</b> is only an example and changes no settings.</li>'
+    +'<li>On a shown preview, <b>Disable all notifications</b> turns every reminder off.</li></ul>'
+    +'<strong>Delivery requirements</strong><ul>'
+    +'<li>Allow notifications when your browser asks.</li>'
+    +'<li>Keep AyuBase6 open in a browser tab or installed app — closing it pauses reminders.</li>'
+    +'<li>On iPhone/iPad, add it to the Home Screen (Share → Add to Home Screen) and open it from there.</li>'
+    +'<li>Battery saver or a locked device may delay reminders.</li></ul>';
+  var SEC_NOTE='<ul><li>Use this section’s switch to turn its reminder on or off.</li>'
+    +'<li><b>Preview notification</b> is only an example and changes no settings.</li>'
+    +'<li>Reminders run only while AyuBase6 is open in a browser tab or installed app.</li>';
+  document.querySelectorAll('.notif-info').forEach(function(el){ if(el.id!=='install-help') el.innerHTML=(el.id==='master-notif-info'?REM_NOTE:NOTE); });
+  // Each section's own "i" panel also carries the notification notes, under a separate title.
+  ['drink','walk','break','break-ex'].forEach(function(k){
+    var task=document.getElementById('alert-'+k+'-task'); if(!task||task.querySelector('.section-notif-note')) return;
+    var d=document.createElement('div'); d.className='section-notif-note';
+    d.innerHTML='<strong class="section-notif-title">Notifications</strong>'+SEC_NOTE;
+    task.appendChild(d);
+  });
   window.toggleNotifInfo=function(btn,id){
     var p=document.getElementById(id); if(!p) return;
     var open=p.style.display==='none';
@@ -12692,28 +12709,76 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
     });
     try{localStorage.setItem(STATE_KEY,JSON.stringify(states))}catch(e){}
   }
+  const SECTION_CARD={drink:'alert-card-drink',walk:'alert-card-walk',break:'alert-card-break',eyeex:'alert-card-break-ex'};
+  function masterExplicitlyOn(){
+    try{ return localStorage.getItem('ayubase6-notif-master-on')==='1'; }catch(e){ return false; }
+  }
   function applySavedStates(){
-    const states=getStates();
+    let states=getStates();
+    const hasSaved=KEYS.some(k=>typeof states[k]==='boolean');
+    // Older visits saved only the master button state: if it was "Disable All", every section was on.
+    if(!hasSaved){
+      // Nothing saved: every section starts off (all on only if the master was left on).
+      const allOn=masterExplicitlyOn();
+      states={}; KEYS.forEach(k=>{states[k]=allOn;});
+    }
     KEYS.forEach(k=>{
       const el=document.getElementById(k==='eyeex'?'eye-ex-notify':'alert-'+k+'-notify');
       if(!el || typeof states[k]!=='boolean') return;
-      el.checked=states[k];
-      el.setAttribute('aria-checked',String(states[k]));
-      if(window.alertState && alertState[k]){
-        alertState[k].enabled=states[k];
-        if(!states[k]) alertState[k].notify=false;
-        else if(typeof isMasterNotifyOn==='function') alertState[k].notify=isMasterNotifyOn() && typeof Notification!=='undefined' && Notification.permission==='granted';
+      const on=states[k];
+      el.checked=on;
+      el.setAttribute('aria-checked',String(on));
+      // The visible switch in the card header, and the card's dimmed look.
+      const card=document.getElementById(SECTION_CARD[k]);
+      if(card){
+        const hdrToggle=card.querySelector('.alert-enabled-toggle input');
+        if(hdrToggle) hdrToggle.checked=on;
+        card.classList.toggle('alert-disabled',!on);
+      }
+      const canNotify=on && typeof isMasterNotifyOn==='function' && isMasterNotifyOn() && typeof Notification!=='undefined' && Notification.permission==='granted';
+      if(k==='eyeex'){
+        if(typeof eyeExState!=='undefined'){ eyeExState.enabled=on; eyeExState.notify=canNotify; }
+      } else if(typeof alertState!=='undefined' && alertState[k]){
+        alertState[k].enabled=on;
+        alertState[k].notify=canNotify;
         if(typeof scheduleAlertTimer==='function') scheduleAlertTimer(k);
       }
     });
     if(typeof refreshNotifStatusUI==='function') refreshNotifStatusUI();
+  }
+  window.ayuSaveReminderStates=saveStates;
+  // Each section's "i" panel opens directly under its title row (above the From / Remind every rows).
+  function placeInfoPanels(){
+    ['drink','walk','break','break-ex'].forEach(function(k){
+      var card=document.getElementById('alert-card-'+k);
+      var hdr=card && card.querySelector('.alert-card-hdr');
+      var task=document.getElementById('alert-'+k+'-task');
+      if(hdr && task && hdr.nextElementSibling!==task) hdr.after(task);
+    });
+  }
+  // The Eyes (Exercise) header switch drives that section's own control, like the other three do.
+  function linkExerciseHeaderSwitch(){
+    const card=document.getElementById('alert-card-break-ex');
+    const hdr=card && card.querySelector('.alert-enabled-toggle input');
+    const main=document.getElementById('eye-ex-notify');
+    if(!hdr || !main || hdr.dataset.ayuLinked) return;
+    hdr.dataset.ayuLinked='1';
+    hdr.addEventListener('change',function(){
+      if(main.checked!==hdr.checked){
+        main.checked=hdr.checked;
+        main.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    });
   }
   document.addEventListener('change',function(e){
     if(e.target && (e.target.matches('#alerts-panel .notify-cb') || e.target.id==='eye-ex-notify')){
       saveStates();
     }
   },true);
+  window.addEventListener('load',function(){ placeInfoPanels(); linkExerciseHeaderSwitch(); applySavedStates(); });
   document.addEventListener('DOMContentLoaded',function(){
+    placeInfoPanels();
+    linkExerciseHeaderSwitch();
     applySavedStates();
     // Add explicit controls to in-page notification cards so the current
     // notification can be dismissed or all reminders disabled immediately.
@@ -12801,4 +12866,75 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
   max-width: 100% !important;
 }
 @supports (width: fit-content) { #alerts-panel .alert-sound-row select.alert-sound-select { width: fit-content !important; } }
+</style>
+
+<style id="reminders-requested-changes-20261028">
+/* Remind every / From / to: regular weight text, same dropdown arrow as Notification Sound. */
+#alerts-panel select.alert-interval-select,
+#alerts-panel select.alert-interval-select > button,
+#alerts-panel select.alert-interval-select selectedcontent,
+html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > button.eye-ex-time-item[data-time] {
+  font-weight: 400 !important;
+}
+html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > button.eye-ex-time-item[data-time] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2308766e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 7px center !important;
+  background-size: 10px 6px !important;
+  padding: 3px 22px 3px 7px !important;
+  min-width: 100px !important;
+}
+#alerts-panel .per-reminder-schedule .per-reminder-schedule-times > .eye-ex-time-item::after {
+  content: none !important; display: none !important;
+}
+/* Notification Sound: label and dropdown (with play / mute) share one row. */
+#alerts-panel .alert-row.alert-sound-line {
+  display: flex; align-items: center; flex-wrap: nowrap; gap: 8px;
+}
+#alerts-panel .alert-sound-line > .alert-row-lbl { margin: 0; flex: 0 0 auto; white-space: nowrap; }
+#alerts-panel .alert-sound-line > .alert-sound-row { flex: 1 1 auto; min-width: 0; }
+/* Preview notification: a dot first, then the button. */
+#alerts-panel .alert-preview-row .row-dot { display: inline-block; flex: 0 0 auto; margin-right: -2px; }
+/* Notification notes inside a section's "i" panel. */
+#alerts-panel .section-notif-note { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(100,116,139,.25); font-size: .78rem; line-height: 1.5; }
+#alerts-panel .section-notif-note ul { margin: 6px 0 0 18px; padding: 0; }
+#alerts-panel .section-notif-note li { margin: 3px 0; }
+#alerts-panel .section-notif-title { display: block; margin-bottom: 4px; }
+</style>
+
+<style id="reminders-info-panels-same-font-20261028">
+/* Every "i" panel in Reminders uses the same font, size, line height and colours. */
+#alerts-panel .alert-task,
+#alerts-panel .alert-task p,
+#alerts-panel .alert-task li,
+#alerts-panel .alert-task strong,
+#alerts-panel .alert-task .alert-card-sub,
+#alerts-panel .section-notif-note,
+#alerts-panel .section-notif-note li,
+#alerts-panel .section-notif-note strong,
+#alerts-panel .notif-info,
+#alerts-panel .notif-info li,
+#alerts-panel .notif-info strong,
+#alerts-panel .notif-info b {
+  font-family: inherit !important;
+  font-size: .78rem !important;
+  line-height: 1.5 !important;
+  font-style: normal !important;
+  letter-spacing: 0 !important;
+  color: #134e4a !important;
+  font-weight: 400 !important;
+}
+#alerts-panel .alert-task strong,
+#alerts-panel .section-notif-note strong,
+#alerts-panel .notif-info strong,
+#alerts-panel .notif-info b,
+#alerts-panel .section-notif-note b { font-weight: 700 !important; }
+#alerts-panel .alert-task p,
+#alerts-panel .alert-task .alert-card-sub { margin: 0 0 6px !important; }
+#alerts-panel .alert-task ul,
+#alerts-panel .section-notif-note ul,
+#alerts-panel .notif-info ul { margin: 4px 0 0 18px !important; padding: 0 !important; }
+#alerts-panel .alert-task li,
+#alerts-panel .section-notif-note li,
+#alerts-panel .notif-info li { margin: 3px 0 !important; }
 </style>
