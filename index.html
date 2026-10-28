@@ -4095,7 +4095,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
           <button type="button" class="reminders-notif-banner-btn" onclick="toggleMasterNotify('reminders-notif-error')"><span class="master-notif-icon section-notif-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 22a2.2 2.2 0 0 0 2.18-2h-4.36A2.2 2.2 0 0 0 12 22ZM19 16.5V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5.5l-2 2V20h18v-1.5l-2-2Z"/></svg></span><span class="master-notif-label">Enable All Notifications</span><span role="button" tabindex="0" class="alert-info-btn notif-info-btn master-notif-info-btn" onclick="event.stopPropagation();toggleNotifInfo(this,'master-notif-info')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();toggleNotifInfo(this,'master-notif-info')}" title="About notifications" aria-label="About notifications" aria-expanded="false">i</span></button>
         </div>
         <div class="install-row reminder-install-row" id="install-row"><button type="button" class="install-btn" id="install-app-btn" onclick="installApp('reminders')" title="Install App" aria-label="Install App"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg><span class="install-label">Install App</span></button></div>
-        <div class="reminders-reset-row"><button type="button" class="reset-icon-btn" title="Reset Reminders to defaults" aria-label="Reset Reminders to defaults" onclick="resetRemindersToDefault()">↺</button></div>
+        <div class="reminders-reset-row"><button type="button" class="reset-icon-btn" title="Reset Reminders to defaults" aria-label="Reset Reminders to defaults" onclick="resetRemindersToDefault()"><svg class="reset-lucide-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 2v6h6"/><path d="M3.05 13A9 9 0 1 0 5.64 5.64L3 8"/></svg></button></div>
       </div>
     </div>
     <div class="notif-blocked-hint reminders-notif-error" id="reminders-notif-error" style="display:none"></div>
@@ -12237,6 +12237,35 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
 #activity-panel .activity-type-options { margin-top:0 !important; }
 /* Make installed/home-screen lotus mark use more of its 512px icon canvas. */
 </style>
+
+<style id="confirmed-title-matched-button-colours-and-reset-icon">
+/* Routines install/download button follows the Base6 wordmark while Routines is active. */
+#routines-panel #routines-install-app-btn {
+  background: #f59e0b !important;
+  border-color: #f59e0b !important;
+  color: #3b2605 !important;
+}
+#routines-panel #routines-install-app-btn svg,
+#routines-panel #routines-install-app-btn .install-label { color: #3b2605 !important; }
+#routines-panel #routines-install-app-btn:hover,
+#routines-panel #routines-install-app-btn:focus-visible {
+  background: #e58b00 !important; border-color: #e58b00 !important;
+}
+/* Reminders is the Alerts tab: Base6 is teal and Ayu is amber in its title. */
+#reminders-notif-banner #install-app-btn {
+  background: #2dd4bf !important; border-color: #2dd4bf !important; color: #123b37 !important;
+}
+#reminders-notif-banner #install-app-btn svg,
+#reminders-notif-banner #install-app-btn .install-label { color: #123b37 !important; }
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn {
+  color: #f59e0b !important; border-color: #f59e0b !important;
+}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn:hover,
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn:focus-visible {
+  background: #f59e0b !important; border-color: #f59e0b !important; color: #fff !important;
+}
+#reminders-notif-banner .reset-lucide-icon { display: block; width: 16px; height: 16px; flex: 0 0 auto; }
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
@@ -12977,4 +13006,322 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
 .install-btn svg { flex: 0 0 auto; }
 .install-btn .install-label { display: none; }
 @media (min-width: 560px) { .install-btn .install-label { display: inline; } }
+
+/* User-requested responsive and accent refinements (2026-10-28). */
+@media (max-width: 640px) {
+  /* On phones, put Notification Sound on its own line above its controls. */
+  #alerts-panel .alert-row.alert-sound-line {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+  }
+  #alerts-panel .alert-row.alert-sound-line > .alert-row-lbl {
+    align-self: flex-start !important;
+  }
+  #alerts-panel .alert-row.alert-sound-line > .alert-sound-row {
+    width: 100% !important;
+    flex: 1 1 auto !important;
+  }
+  /* Keep From, to, and both time fields together on one mobile row. */
+  #alerts-panel .per-reminder-schedule .per-reminder-schedule-times {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 5px !important;
+    width: 100% !important;
+  }
+  #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > .eye-ex-time-item {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+}
+@media (min-width: 641px) {
+  /* Desktop keeps the Notification Sound label and dropdown on one row. */
+  #alerts-panel .alert-row.alert-sound-line {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+}
+/* Match action buttons to the section in which they appear. */
+#routines-panel #rout-notify-btn {
+  background: #96500d !important;
+  border-color: #96500d !important;
+  color: #fff !important;
+}
+#routines-panel #routines-install-app-btn {
+  background: #96500d !important;
+  border-color: #96500d !important;
+  color: #fff !important;
+}
+#routines-panel #routines-install-app-btn svg,
+#routines-panel #routines-install-app-btn .install-label,
+#routines-panel .routines-install-row .install-info-overlay {
+  color: #fff !important;
+  fill: currentColor !important;
+  border-color: #fff !important;
+}
+#reminders-notif-banner #install-app-btn,
+#reminders-notif-banner .reminders-notif-banner-btn {
+  background: #08766e !important;
+  border-color: #08766e !important;
+  color: #fff !important;
+}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn {
+  color: #08766e !important;
+  border-color: #08766e !important;
+}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn:hover {
+  background: #08766e !important;
+  color: #fff !important;
+  border-color: #08766e !important;
+}
+/* Keep From, both time buttons and to on one line on narrow screens. */
+@media (max-width: 640px) {
+  #alerts-panel .per-reminder-schedule .per-reminder-schedule-times {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 4px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+  }
+  #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+  }
+  #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from::before {
+    flex: 0 0 7px !important;
+    width: 7px !important;
+    margin-right: 2px !important;
+  }
+  #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > span:not(.per-reminder-from) {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+  #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > .eye-ex-time-item {
+    flex: 1 1 0 !important;
+    width: 1% !important;
+    min-width: 0 !important;
+    max-width: 84px !important;
+    padding: 6px 3px !important;
+    box-sizing: border-box !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* Reminders: match the install/download button to the Base6 wordmark colour
+   and the reset control to the Ayu wordmark colour while Reminders is active. */
+#reminders-notif-banner #install-app-btn {
+  background: #5eead4 !important;
+  border-color: #5eead4 !important;
+  color: #134e4a !important;
+}
+#reminders-notif-banner #install-app-btn svg,
+#reminders-notif-banner #install-app-btn .install-label {
+  color: #134e4a !important;
+}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn {
+  color: #0d9488 !important;
+  border-color: #0d9488 !important;
+}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn:hover {
+  background: #0d9488 !important;
+  color: #fff !important;
+  border-color: #0d9488 !important;
+}
+
+</style>
+
+<style id="final-verified-section-title-colours-and-reset-icon">
+/* Routines: match the active title's Base6 colour (--rout-3). */
+#routines-panel #routines-install-app-btn {
+  background: var(--rout-3, #fcd34d) !important;
+  background-color: var(--rout-3, #fcd34d) !important;
+  border-color: var(--rout-3, #fcd34d) !important;
+  color: #422006 !important;
+}
+#routines-panel #routines-install-app-btn svg,
+#routines-panel #routines-install-app-btn .install-label { color: #422006 !important; }
+#routines-panel #routines-install-app-btn:hover,
+#routines-panel #routines-install-app-btn:focus-visible {
+  background: #fbbf24 !important; background-color: #fbbf24 !important; border-color: #fbbf24 !important;
+}
+
+/* Reminders: match Base6 to --alert-3 and Ayu to --alert-2 in the title. */
+#reminders-notif-banner #install-app-btn {
+  background: var(--alert-3, #5eead4) !important;
+  background-color: var(--alert-3, #5eead4) !important;
+  border-color: var(--alert-3, #5eead4) !important;
+  color: #134e4a !important;
+}
+#reminders-notif-banner #install-app-btn svg,
+#reminders-notif-banner #install-app-btn .install-label { color: #134e4a !important; }
+#reminders-notif-banner #install-app-btn:hover,
+#reminders-notif-banner #install-app-btn:focus-visible {
+  background: #2dd4bf !important; background-color: #2dd4bf !important; border-color: #2dd4bf !important;
+}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn {
+  color: var(--alert-2, #0d9488) !important;
+  border-color: var(--alert-2, #0d9488) !important;
+}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn .reset-lucide-icon {
+  display: block !important; width: 16px !important; height: 16px !important;
+  stroke: currentColor !important; fill: none !important;
+}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn:hover,
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn:focus-visible {
+  background: var(--alert-2, #0d9488) !important;
+  background-color: var(--alert-2, #0d9488) !important;
+  border-color: var(--alert-2, #0d9488) !important; color: #fff !important;
+}
+</style>
+
+<style id="reminders-reset-button-final-fix-20261028">
+/* Reset should use the same filled teal as Enable All Notifications. */
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn {
+  background: #0f9488 !important;
+  background-color: #0f9488 !important;
+  border: 1px solid #0f9488 !important;
+  color: #ffffff !important;
+  padding: 0 !important;
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  box-sizing: border-box !important;
+  line-height: 1 !important;
+}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn::before,
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn::after {
+  content: none !important;
+  display: none !important;
+}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn .reset-lucide-icon {
+  display: block !important;
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  stroke: currentColor !important;
+  fill: none !important;
+}
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn:hover,
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn:focus-visible {
+  background: #087f75 !important;
+  background-color: #087f75 !important;
+  border-color: #087f75 !important;
+  color: #ffffff !important;
+}
+</style>
+
+
+<style id="routines-notification-colour-and-reminders-reset-size-20261028">
+/* Routines: use the same accent as the Ayu text in the section title. */
+#routines-panel #rout-notify-btn,
+#routines-panel #rout-notify-btn.notifications-on {
+  background: var(--rout-2, #f59e0b) !important;
+  background-color: var(--rout-2, #f59e0b) !important;
+  border-color: var(--rout-2, #f59e0b) !important;
+  color: #422006 !important;
+}
+
+/* Reminders: match the adjacent Install App button's dimensions. On phones
+   that button is icon-only, so Reset follows its compact 44px square size. */
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn {
+  box-sizing: border-box !important;
+  width: 118px !important;
+  min-width: 118px !important;
+  max-width: 118px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+@media (max-width: 559px) {
+  #reminders-notif-banner .reminders-reset-row .reset-icon-btn {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+  }
+}
+#reminders-notif-banner .reminders-reset-row .reset-lucide-icon {
+  display: block !important;
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 18px !important;
+}
+</style>
+
+
+<style id="reminders-from-dot-align-remind-dot-20261028">
+/* Align the leading dot before From with the leading dot before “Remind every”,
+   while keeping From, the start time, “to”, and end time on the same row. */
+#alerts-panel .per-reminder-schedule .per-reminder-schedule-times {
+  margin-left: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+</style>
+
+
+<style id="reminders-from-remind-dot-alignment-fix-20261028">
+/* Keep the From row's dot in exactly the same 10px slot as the Remind every row's dot,
+   including on mobile where an earlier rule narrowed the From dot slot. */
+#alerts-panel .per-reminder-schedule .per-reminder-schedule-times {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  box-sizing: border-box !important;
+}
+#alerts-panel .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from::before {
+  content: "•" !important;
+  display: inline-block !important;
+  box-sizing: border-box !important;
+  width: 10px !important;
+  min-width: 10px !important;
+  flex: 0 0 10px !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  color: #087e75 !important;
+  margin-right: 6px !important;
+  vertical-align: baseline !important;
+}
+</style>
+
+
+<style id="routines-download-button-match-base6-title-20261028">
+/* Routines: match Install App/download button background to the Base6 title text. */
+#routines-panel #routines-install-app-btn {
+  background: var(--rout-3, #fcd34d) !important;
+  background-color: var(--rout-3, #fcd34d) !important;
+  border-color: var(--rout-3, #fcd34d) !important;
+  color: #422006 !important;
+}
+#routines-panel #routines-install-app-btn svg,
+#routines-panel #routines-install-app-btn .install-label {
+  color: #422006 !important;
+  stroke: currentColor !important;
+}
+#routines-panel #routines-install-app-btn:hover,
+#routines-panel #routines-install-app-btn:focus-visible {
+  background: var(--rout-3, #fcd34d) !important;
+  background-color: var(--rout-3, #fcd34d) !important;
+  border-color: var(--rout-3, #fcd34d) !important;
+}
 </style>
