@@ -3860,7 +3860,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         </ul>
       </div>
 <div class="alert-row alert-interval-row">
-        <div class="alert-row-lbl">• Remind every</div>
+        <div class="alert-row-lbl dotted-lbl">Remind every</div>
         <select id="alert-drink-time" class="alert-interval-select" aria-label="Water reminder interval" onchange="onAlertTimeChange('drink')"><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60" selected>60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
       </div>
 
@@ -3906,7 +3906,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         </ul>
       </div>
 <div class="alert-row alert-interval-row">
-        <div class="alert-row-lbl">• Remind every</div>
+        <div class="alert-row-lbl dotted-lbl">Remind every</div>
         <select id="alert-walk-time" class="alert-interval-select" aria-label="Walk reminder interval" onchange="onAlertTimeChange('walk')"><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45" selected>45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60">60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
       </div>
 
@@ -3952,7 +3952,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         </ul>
       </div>
 <div class="alert-row alert-interval-row">
-        <div class="alert-row-lbl">• Remind every</div>
+        <div class="alert-row-lbl dotted-lbl">Remind every</div>
         <select id="alert-break-time" class="alert-interval-select" aria-label="Eye break reminder interval" onchange="onAlertTimeChange('break')"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20" selected>20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60">60 min</option></select>
       </div>
 
@@ -4094,15 +4094,12 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         <div class="master-notif-group">
           <button type="button" class="reminders-notif-banner-btn" onclick="toggleMasterNotify('reminders-notif-error')"><span class="master-notif-icon section-notif-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 22a2.2 2.2 0 0 0 2.18-2h-4.36A2.2 2.2 0 0 0 12 22ZM19 16.5V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5.5l-2 2V20h18v-1.5l-2-2Z"/></svg></span><span class="master-notif-label">Enable All Notifications</span><span role="button" tabindex="0" class="alert-info-btn notif-info-btn master-notif-info-btn" onclick="event.stopPropagation();toggleNotifInfo(this,'master-notif-info')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();toggleNotifInfo(this,'master-notif-info')}" title="About notifications" aria-label="About notifications" aria-expanded="false">i</span></button>
         </div>
-        <div class="reminders-reset-row"><button type="button" class="reset-icon-btn" title="Reset Reminders to defaults" onclick="resetRemindersToDefault()">↺ Reset</button></div>
+        <div class="install-row reminder-install-row" id="install-row"><button type="button" class="install-btn" id="install-app-btn" onclick="installApp('reminders')" title="Install App" aria-label="Install App"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg><span class="install-label">Install App</span></button></div>
+        <div class="reminders-reset-row"><button type="button" class="reset-icon-btn" title="Reset Reminders to defaults" aria-label="Reset Reminders to defaults" onclick="resetRemindersToDefault()">↺</button></div>
       </div>
     </div>
     <div class="notif-blocked-hint reminders-notif-error" id="reminders-notif-error" style="display:none"></div>
     <div class="notif-info" id="master-notif-info" style="display:none"></div>
-    <div class="install-row reminder-install-row" id="install-row">
-      <button type="button" class="install-btn" id="install-app-btn" onclick="installApp('reminders')">Add AyuBase6 Shortcut</button>
-      <button type="button" class="alert-info-btn small-info install-info-overlay" onclick="toggleNotifInfo(this,'install-help')" title="About adding a shortcut" aria-label="About adding a shortcut" aria-expanded="false">i</button>
-    </div>
     <div class="notif-info" id="install-help" style="display:none">Add AyuBase6 to your Home Screen, Dock or desktop from your browser’s install or share menu. Steps vary by device, and some browsers can’t install automatically.</div>
 
   </div>
@@ -4200,12 +4197,9 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
     <div class="rout-remind-row">
       <div class="rout-notify-actions">
         <button type="button" class="refresh-btn" id="rout-notify-btn" onclick="enableRoutineNotifications()">🔔 Enable Notifications</button>
+        <div class="install-row reminder-install-row routines-install-row" id="routines-install-row"><button type="button" class="install-btn" id="routines-install-app-btn" onclick="installApp('routines')" title="Install App" aria-label="Install App"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg><span class="install-label">Install App</span></button></div>
       </div>
       <div class="notif-blocked-hint" id="rout-notif-hint" style="display:none"></div>
-      <div class="install-row reminder-install-row routines-install-row" id="routines-install-row">
-        <button type="button" class="install-btn" id="routines-install-app-btn" onclick="installApp('routines')">Add AyuBase6 Shortcut</button>
-        <button type="button" class="alert-info-btn small-info install-info-overlay" onclick="toggleNotifInfo(this,'routines-install-help')" title="About adding a shortcut" aria-label="About adding a shortcut" aria-expanded="false">i</button>
-      </div>
       <div class="notif-info" id="routines-install-help" style="display:none"></div>
     </div>
 
@@ -11658,7 +11652,8 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     +'<li>Battery saver or a locked device may delay reminders.</li></ul>';
   var SEC_NOTE='<ul><li>Use this section’s switch to turn its reminder on or off.</li>'
     +'<li><b>Preview notification</b> is only an example and changes no settings.</li>'
-    +'<li>Reminders run only while AyuBase6 is open in a browser tab or installed app.</li>';
+    +'<li>Reminders run only while AyuBase6 is open in a browser tab or installed app.</li>'
+    +'<li>Full details are under the <b>i</b> beside Enable All Notifications.</li></ul>';
   document.querySelectorAll('.notif-info').forEach(function(el){ if(el.id!=='install-help') el.innerHTML=(el.id==='master-notif-info'?REM_NOTE:NOTE); });
   // Each section's own "i" panel also carries the notification notes, under a separate title.
   ['drink','walk','break','break-ex'].forEach(function(k){
@@ -11687,9 +11682,10 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     var routinesRow=document.getElementById('routines-install-row'); if(routinesRow) routinesRow.style.display='flex';
     var btn=document.getElementById('install-app-btn');
     var routinesBtn=document.getElementById('routines-install-app-btn');
-    var addLabel='Add AyuBase6 Shortcut';
-    if(btn){btn.textContent=addLabel;btn.disabled=false;btn.setAttribute('aria-label',addLabel);}
-    if(routinesBtn){routinesBtn.textContent=addLabel;routinesBtn.disabled=false;routinesBtn.setAttribute('aria-label',addLabel);}
+    var addLabel='Install App';
+    var addHtml='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg><span class="install-label">'+addLabel+'</span>';
+    if(btn){btn.innerHTML=addHtml;btn.disabled=false;btn.setAttribute('aria-label',addLabel);btn.title=addLabel;}
+    if(routinesBtn){routinesBtn.innerHTML=addHtml;routinesBtn.disabled=false;routinesBtn.setAttribute('aria-label',addLabel);routinesBtn.title=addLabel;}
   };
   window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; refresh(); });
   window.addEventListener('appinstalled',function(){ deferred=null; refresh(); });
@@ -11714,13 +11710,13 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     var android=/Android/i.test(ua);
     var safari=/Safari/i.test(ua) && !/Chrome|CriOS|Edg|OPR|Firefox/i.test(ua);
     if(android){
-      help.innerHTML=androidHelp;
+      help.innerHTML='Open the browser menu (⋮) and choose <b>Install app</b> or <b>Add to Home screen</b>.';
     } else if(ios){
-      help.innerHTML=androidHelp;
+      help.innerHTML='Tap the <b>Share</b> button, then choose <b>Add to Home Screen</b>.';
     } else if(safari){
-      help.innerHTML=androidHelp;
+      help.innerHTML='In Safari, choose <b>File → Add to Dock</b>.';
     } else {
-      help.innerHTML=androidHelp;
+      help.innerHTML='Use the install icon in the address bar, or the browser menu → <b>Install AyuBase6</b>. If neither appears, this browser may not support installing.';
     }
     help.style.display='block';
   };
@@ -12937,4 +12933,48 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
 #alerts-panel .alert-task li,
 #alerts-panel .section-notif-note li,
 #alerts-panel .notif-info li { margin: 3px 0 !important; }
+</style>
+
+<style id="reminders-routines-action-rows-and-dots-20261028">
+/* ---- Dots: option B (larger, bolder teal dot in an equal-width slot), same on every row ---- */
+#alerts-panel .dotted-lbl::before,
+#alerts-panel .per-reminder-schedule-times > .per-reminder-from::before {
+  content: "•" !important; display: inline-block; width: 10px; text-align: center;
+  font-size: 16px !important; font-weight: 800 !important; line-height: 1;
+  color: #087e75 !important; margin-right: 6px !important; vertical-align: baseline;
+}
+#alerts-panel .alert-preview-row .row-dot {
+  display: inline-block; width: 10px; text-align: center; font-size: 16px !important; font-weight: 800 !important;
+  line-height: 1; color: #087e75 !important; margin-right: -4px !important;
+}
+
+/* ---- Reminders: Enable All | Install | Reset on one row ---- */
+#reminders-notif-banner .master-notif-row {
+  display: flex !important; flex-wrap: nowrap !important; align-items: stretch !important; gap: 8px !important;
+}
+#reminders-notif-banner .master-notif-group { flex: 1 1 auto !important; min-width: 0 !important; }
+#reminders-notif-banner .master-notif-group { align-items: stretch !important; }
+#reminders-notif-banner .master-notif-group .reminders-notif-banner-btn { line-height: 1.2; align-self: stretch; height: auto !important; min-height: 44px; }
+#reminders-notif-banner #install-row { display: contents !important; }
+#reminders-notif-banner #install-app-btn {
+  display: inline-flex !important; align-items: center; justify-content: center; gap: 6px;
+  flex: 0 0 auto !important; width: auto !important; min-width: 44px; margin: 0 !important; padding: 0 12px !important;
+}
+#reminders-notif-banner .reminders-reset-row { flex: 0 0 auto !important; align-items: stretch !important; }
+#reminders-notif-banner .reminders-reset-row .reset-icon-btn {
+  min-width: 44px !important; width: 44px !important; height: 100%; padding: 0 !important; font-size: 20px !important; line-height: 1;
+}
+
+/* ---- Routines: Enable Notifications | Install on one row ---- */
+#routines-panel .rout-notify-actions { flex-wrap: nowrap !important; align-items: stretch !important; justify-content: stretch !important; gap: 8px !important; }
+#routines-panel .rout-notify-actions .refresh-btn { flex: 1 1 auto !important; min-width: 0; }
+#routines-panel #routines-install-row { display: contents !important; }
+#routines-panel #routines-install-app-btn {
+  display: inline-flex !important; align-items: center; justify-content: center; gap: 6px;
+  flex: 0 0 auto !important; width: auto !important; min-width: 44px; margin: 0 !important; padding: 0 12px !important;
+}
+/* Install button: icon only on phones, icon + "Install App" when there is room. */
+.install-btn svg { flex: 0 0 auto; }
+.install-btn .install-label { display: none; }
+@media (min-width: 560px) { .install-btn .install-label { display: inline; } }
 </style>
