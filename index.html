@@ -3567,6 +3567,33 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
   background:transparent !important;border:1px solid rgb(119,180,175) !important;border-radius:10px !important;
 }
 </style>
+
+<style id="fixed-frequency-label-dot-style">
+/* Match the fixed cadence label to the existing From label and hide its interval picker. */
+#alerts-panel .alert-fixed-frequency-row { display:flex !important; align-items:center !important; justify-content:flex-start !important; gap:0 !important; }
+#alerts-panel .alert-fixed-frequency-row .alert-fixed-frequency {
+  display:inline-flex !important; align-items:center !important;
+  font-size:13px !important; font-weight:600 !important; color:#134e4a !important;
+  white-space:nowrap;
+}
+#alerts-panel .alert-fixed-frequency-row .alert-fixed-frequency::before {
+  content: "•" !important;
+  display: inline-block !important;
+  box-sizing: border-box !important;
+  width: 10px !important;
+  min-width: 10px !important;
+  flex: 0 0 10px !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  color: #087e75 !important;
+  margin-right: 6px !important;
+  vertical-align: baseline !important;
+}
+#alerts-panel .alert-fixed-frequency-row select,
+#alerts-panel .alert-fixed-frequency-row .alert-interval-select { display:none !important; visibility:hidden !important; }
+</style>
 </head>
 <body>
 
@@ -3790,8 +3817,8 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         <p class="calc-sub" style="margin:0 0 6px">Pick a reading, add a value, and it gets its own section below. Colours show how your latest reading compares:</p>
         <ul style="margin:6px 0 0 18px;padding:0">
           <li><span class="trk-green"><b>Green</b></span> — the latest reading is within the acceptable range</li>
-          <li><span class="trk-redgreen"><b>Red &amp; green</b></span> — outside the range, but closer to it than the previous reading (improved)</li>
-          <li><span class="trk-redorange"><b>Red &amp; orange</b></span> — outside the range, and the same as the previous reading</li>
+          <li><span class="trk-redgreen"><b>Red &amp; green</b></span> — top half red, bottom half green: outside the range, but closer to it than the previous reading (improved)</li>
+          <li><span class="trk-redorange"><b>Red &amp; orange</b></span> — top half red, bottom half orange: outside the range, and unchanged from the previous reading</li>
           <li><span class="trk-red"><b>Red</b></span> — outside the range, and further from it than the previous reading, or no previous reading to compare with</li>
           <li><span class="trk-grey"><b>Grey</b></span> — no range to compare against</li>
         </ul>
@@ -3801,7 +3828,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
 
       <div class="lab-manual-row" style="margin-bottom:8px">
         <select id="tracker-select" class="lab-select" onchange="onTrackerSelect()" aria-label="Reading to add">
-          <option value="" selected disabled hidden style="display:none">Reading type</option>
+          <option value="" selected hidden>Select a reading</option>
         </select>
       </div>
 
@@ -3852,18 +3879,15 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
       </div>
 
       <div class="alert-task" id="alert-drink-task" style="display:none">
-        <p class="alert-card-sub">Stay hydrated through the day.</p>
-        <strong>Have a glass (200–250 ml) at each reminder</strong> — about 2–3 litres a day, more in heat or when active.
+        <p class="alert-card-sub">Drink steadily through the day rather than trying to catch up all at once.</p>
+        <strong>Take small, comfortable sips and swallow slowly.</strong> You do not need to gulp or force a full glass at once.
         <ul>
-          <li>Supports focus and energy</li>
-          <li>Aids digestion; keeps skin and joints healthier</li>
-          <li>Small, frequent sips are easier on the body</li>
+          <li>Slow sipping is more comfortable and may reduce bloating or stomach discomfort from drinking too quickly.</li>
+          <li>Pause between sips and stop when comfortably hydrated; avoid forcing excess water.</li>
+          <li>Drink more when it is hot or you are active, and follow any fluid limits advised by your clinician.</li>
         </ul>
       </div>
-<div class="alert-row alert-interval-row">
-        <div class="alert-row-lbl dotted-lbl">Remind every</div>
-        <select id="alert-drink-time" class="alert-interval-select" aria-label="Water reminder interval" onchange="onAlertTimeChange('drink')"><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60" selected>60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
-      </div>
+<div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 60 minutes</span><select style="display:none" id="alert-drink-time" class="alert-interval-select" style="display:none" aria-label="Water reminder interval" onchange="onAlertTimeChange('drink')"><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60" selected>60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select></div>
 
       <div class="alert-row alert-sound-line">
         <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
@@ -3906,10 +3930,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
           <li>Gives a small energy and focus boost</li>
         </ul>
       </div>
-<div class="alert-row alert-interval-row">
-        <div class="alert-row-lbl dotted-lbl">Remind every</div>
-        <select id="alert-walk-time" class="alert-interval-select" aria-label="Walk reminder interval" onchange="onAlertTimeChange('walk')"><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45" selected>45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60">60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select>
-      </div>
+<div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 60 minutes</span><select style="display:none" id="alert-walk-time" class="alert-interval-select" style="display:none" aria-label="Walk reminder interval" onchange="onAlertTimeChange('walk')"><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60" selected>60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select></div>
 
       <div class="alert-row alert-sound-line">
         <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
@@ -3952,10 +3973,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
           <li>Encourages blinking, which re-moistens the eyes</li>
         </ul>
       </div>
-<div class="alert-row alert-interval-row">
-        <div class="alert-row-lbl dotted-lbl">Remind every</div>
-        <select id="alert-break-time" class="alert-interval-select" aria-label="Eye break reminder interval" onchange="onAlertTimeChange('break')"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20" selected>20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60">60 min</option></select>
-      </div>
+<div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 20 minutes</span><input type="hidden" id="alert-break-time" value="20" aria-label="Eye break reminder interval"></div>
 
       <div class="alert-row alert-sound-line">
         <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
@@ -4387,7 +4405,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
       <div class="cart-wrapper" id="cart-wrapper">
         <div class="cart-header" id="cov-toggle-hdr">
           <span class="cart-title">📋 Nutrients & Food</span>
-          <span class="sec-toplevel-arr" id="cov-toggle-arr">▸</span>
+          <span class="sec-toplevel-arr food-chevron" id="cov-toggle-arr" aria-hidden="true"><svg viewBox="0 0 8 12" width="10" height="14"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </div>
         <div id="coverage-table-wrap" style="display:none"></div>
       </div>
@@ -4396,7 +4414,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         <div class="weekly-plan-card">
           <div class="wp-header" id="wp-header">
             <span class="wp-title">Plan</span>
-            <span class="wp-arr" id="wp-arr">▶</span>
+            <span class="wp-arr food-chevron" id="wp-arr" aria-hidden="true"><svg viewBox="0 0 8 12" width="10" height="14"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           </div>
           <div class="wp-body" id="wp-body">
             <!-- Groceries sub-collapse -->
@@ -4406,7 +4424,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
                 <span class="wp-sub-icons">
                   <span class="wp-sub-icon-btn" id="groc-expandall-btn" title="Expand/collapse all"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"/></svg></span>
                 </span>
-                <span class="wp-sub-arr">▶</span>
+                <span class="wp-sub-arr food-chevron" aria-hidden="true"><svg viewBox="0 0 8 12" width="9" height="13"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
               </div>
               <div class="wp-sub-body" id="wsb-groc">
                 <div id="groc-wrap"></div>
@@ -4415,7 +4433,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
             <!-- Recipes sub-collapse -->
             <div class="wp-sub-block">
               <div class="wp-sub-hdr" id="wsh-rec">
-                <span>🍲 Recipes For You</span><span class="wp-sub-arr">▶</span>
+                <span>🍲 Recipes For You</span><span class="wp-sub-arr food-chevron" aria-hidden="true"><svg viewBox="0 0 8 12" width="9" height="13"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
               </div>
               <div class="wp-sub-body" id="wsb-rec">
                 <div id="rec-wrap"></div>
@@ -5778,7 +5796,7 @@ function appendCoverageRow(sec, selNutrients, showNutrientCols){
   const n=checked[sec.key]?.size||0, total=sec.src().length;
 
   const tr=document.createElement('tr'); tr.id='cov-row-'+sec.key;
-  let rowHtml=`<td class="cov-rowlbl" id="cov-lbl-${sec.key}"><span class="cov-arr" id="cov-arr-${sec.key}">▸</span>${sec.ttl}<div class="cov-count" id="cov-count-${sec.key}" onclick="event.stopPropagation(); openWish('${sec.key}')">${n}/${total} items selected ${EDIT_ICON_SVG}</div></td>`;
+  let rowHtml=`<td class="cov-rowlbl" id="cov-lbl-${sec.key}"><span class="cov-arr food-chevron" id="cov-arr-${sec.key}" aria-hidden="true"><svg viewBox="0 0 8 12" width="8" height="12"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${sec.ttl}<div class="cov-count" id="cov-count-${sec.key}" onclick="event.stopPropagation(); openWish('${sec.key}')">${n}/${total} items selected ${EDIT_ICON_SVG}</div></td>`;
   if(showNutrientCols){
     selNutrients.forEach(nk=>{
       const cov=sectionWeeklyCoverage(sec.key,nk);
@@ -6118,7 +6136,7 @@ function rebuildGroceries(){
   const sec=document.createElement('div'); sec.className='groc-section';
   sec.innerHTML=`<div class="advisory-hdr" id="groc-advisory-hdr">
       <span class="advisory-hdr-label"><span class="advisory-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 3.83L19.53 19H4.47L12 5.83zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg></span>Allergy Advisory</span>
-      <span class="sec-toplevel-arr" id="groc-advisory-arr">▸</span>
+      <span class="sec-toplevel-arr food-chevron" id="groc-advisory-arr" aria-hidden="true"><svg viewBox="0 0 8 12" width="10" height="14"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </div>
     <div class="allergy-advisory" id="groc-advisory-body" style="display:none">
       <div class="advisory-text">
@@ -6141,7 +6159,7 @@ function rebuildGroceries(){
     const groupEl=document.createElement('div'); groupEl.className='groc-group';
     const rowViewCls=(typeof grocRowView==='undefined'||grocRowView)?' groc-row-view':'';
     const openCls=(typeof grocAllExpanded!=='undefined'&&grocAllExpanded)?' open':'';
-    groupEl.innerHTML=`<div class="groc-group-title">${ttl} <span class="groc-group-count">${items.length} item${items.length>1?'s':''}</span><span class="sec-toplevel-arr${openCls}" style="margin-left:auto">▸</span></div>
+    groupEl.innerHTML=`<div class="groc-group-title">${ttl} <span class="groc-group-count">${items.length} item${items.length>1?'s':''}</span><span class="sec-toplevel-arr food-chevron${openCls}" style="margin-left:auto" aria-hidden="true"><svg viewBox="0 0 8 12" width="10" height="14"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
       <div class="groc-grid groc-group-body${rowViewCls}${openCls}"></div>`;
     groupsWrap.appendChild(groupEl);
     const titleEl=groupEl.querySelector('.groc-group-title');
@@ -6248,7 +6266,7 @@ function buildRecipes(diets){
   const sec=document.createElement('div'); sec.className='rec-section';
   sec.innerHTML=`<div class="advisory-hdr" id="rec-advisory-hdr">
       <span class="advisory-hdr-label"><span class="advisory-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 3.83L19.53 19H4.47L12 5.83zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg></span>Allergy Advisory</span>
-      <span class="sec-toplevel-arr" id="rec-advisory-arr">▸</span>
+      <span class="sec-toplevel-arr food-chevron" id="rec-advisory-arr" aria-hidden="true"><svg viewBox="0 0 8 12" width="10" height="14"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </div>
     <div class="allergy-advisory" id="rec-advisory-body" style="display:none">
       <div class="advisory-text">
@@ -8345,7 +8363,9 @@ const alertState={};
 
 function onAlertTimeChange(key){
   const slider=document.getElementById('alert-'+key+'-time');
-  const val=+slider.value;
+  const fixedMinutes={break:20,walk:60,drink:60};
+  const val=fixedMinutes[key]||+slider.value;
+  if(slider) slider.value=String(val);
   alertState[key].minutes=val;
   const valEl=document.getElementById('alert-'+key+'-time-val');   // not present with the dropdown; don't let a missing label stop the timer being rescheduled
   if(valEl) valEl.textContent=val+' min';
@@ -8526,7 +8546,7 @@ function nudgeInPageFallback(key){
   const mock=document.getElementById(key==='eyeex'?'eye-ex-notif-mock':'alert-'+key+'-notif-mock');
   if(!mock) return;
   mock.classList.add('show');
-  if(key!=='break') setTimeout(()=>mock.classList.remove('show'),4000);
+  setTimeout(()=>mock.classList.remove('show'),300000);
 }
 // Shows one nudge as a real notification. Returns true if one was shown (or is on its way).
 // - lotus icon / banner / badge, and it stays on screen until closed
@@ -8546,7 +8566,10 @@ function showNudgeNotification(title, body, o){
   if(icon) opts.icon=icon; if(badge) opts.badge=badge;
   const viaReg=reg=>{
     if(o.actions) opts.actions=o.actions;
-    const show=()=>reg.showNotification(title, opts);
+    const show=()=>reg.showNotification(title, opts).then(()=>{
+      // Best-effort auto-dismiss after five minutes while this page remains alive.
+      if(fresh) setTimeout(()=>{ try{ reg.getNotifications({tag:opts.tag}).then(list=>list.forEach(n=>n.close())).catch(()=>{}); }catch(e){} },300000);
+    });
     return fresh ? reg.getNotifications({tag:opts.tag}).then(l=>{ l.forEach(n=>n.close()); return show(); }) : show();
   };
   try{
@@ -8560,11 +8583,12 @@ function showNudgeNotification(title, body, o){
     }
     if(fresh && nudgeLast[key]){ try{ nudgeLast[key].close(); }catch(e){} }
     const n=new Notification(title, opts);   // (buttons aren't allowed on plain notifications)
+    if(fresh) setTimeout(()=>{ try{ n.close(); }catch(e){} },300000);
     nudgeLast[key]=n;
     if(o.onclick) n.onclick=()=>{ try{ n.close(); }catch(e){} o.onclick(); };
     return true;
   }catch(e){
-    try{ new Notification(title,{body:body}); return true; }catch(e2){ return false; }
+    try{ const n=new Notification(title,{body:body}); setTimeout(()=>{ try{ n.close(); }catch(e3){} },300000); return true; }catch(e2){ return false; }
   }
 }
 
@@ -8703,12 +8727,18 @@ function openNudgeBrowserPopup(key, title, msg, timer, W, H, exerciseVideoSrc){
     if(!w || w.closed) return false;
     nudgePopupContent(w, title, msg, timer, exerciseVideoSrc);
     try{ w.focus(); }catch(e){}
+    try{ w.setTimeout(()=>{ if(!w.closed) w.close(); },300000); }catch(e){}
     return true;
   }catch(e){ return false; }
 }
 function openNudgePopup(key, title, msg, o){
   o=o||{};
-  const timer=!!o.timer, W=320, H=timer?150:(key==='eyeex'?150:92);
+  const timer=!!o.timer;
+  // Size each popup to its own title/body instead of giving every reminder a large fixed window.
+  const textLen=String(msg||'').length+String(title||'').length;
+  const W=Math.max(270,Math.min(360,Math.round(250+Math.min(110,textLen)*0.65)));
+  const lines=Math.max(1,Math.ceil(String(msg||'').length/Math.max(28,Math.floor((W-36)/7))));
+  const H=Math.max(timer?140:82,Math.min(210,58+lines*19+(timer?48:0)));
   const exerciseVideoSrc=key==='eyeex'?(document.getElementById('eye-ex-video')?.currentSrc||document.getElementById('eye-ex-video')?.src||''):'';
   const onFail=o.onFail||(()=>nudgeNativeFallback(key,title,msg));
   try{
@@ -8716,7 +8746,7 @@ function openNudgePopup(key, title, msg, o){
     // it straight after a click (e.g. Preview), so scheduled reminders skip to the pop-up.
     if(window.documentPictureInPicture && navigator.userActivation && navigator.userActivation.isActive){
       window.documentPictureInPicture.requestWindow({width:W, height:H})
-        .then(w=>nudgePopupContent(w, title, msg, timer, exerciseVideoSrc))
+        .then(w=>{ nudgePopupContent(w, title, msg, timer, exerciseVideoSrc); try{ w.setTimeout(()=>{ if(!w.closed) w.close(); },300000); }catch(e){} })
         .catch(()=>{ if(!openNudgeBrowserPopup(key,title,msg,timer,W,H,exerciseVideoSrc)) onFail(); });
       return true;
     }
@@ -8826,11 +8856,15 @@ function initRoutineNotifications(){
 }
 initRoutineNotifications();
 function previewAlertNotification(key){
-  // Preview should always show a real OS/taskbar notification when
-  // permission allows it — regardless of whether the Notify toggle for
-  // this reminder happens to be on — and the popup should stay up until
-  // the person dismisses it, not auto-close.
+  // On phones, preview the real system notification first; opening a popup
+  // here can otherwise prevent Android Chrome from showing the notification.
+  // Desktop keeps its existing popup preview behaviour.
   if(!alertState[key].muted) playAlertPreset(alertState[key].sound);
+  if(NUDGE_IS_PHONE && typeof Notification!=='undefined' && Notification.permission==='granted'){
+    const info=ALERT_LABELS[key];
+    if(key==='break'){ if(showEyeReminderNotification()) return; }
+    else if(showNudgeNotification(info.title, info.msg, {key:key})) return;
+  }
   if(openNudgePopup(key, ALERT_LABELS[key].title, ALERT_LABELS[key].msg, {timer:key==='break'})) return;
   if(typeof Notification!=='undefined' && Notification.permission==='granted'){
     const info=ALERT_LABELS[key];
@@ -8854,7 +8888,7 @@ function fireAlert(key){
       mock.classList.add('show');
       // Eyes keeps its in-app card up (with the timer button) until it's closed.
       if(key==='break') attachMockEyeTimer();
-      else setTimeout(()=>mock.classList.remove('show'), 4000);
+      else setTimeout(()=>mock.classList.remove('show'), 300000);
     }
   }
 }
@@ -11410,6 +11444,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
           +'<span class="trk-chev" aria-hidden="true"><svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1.5l5 5 5-5"/></svg></span></button>'
         +'<div class="trk-body"'+(isOpen?'':' hidden')+'>'
           +'<div class="trk-line">Acceptable range: <b>'+rangeText(m,last)+'</b></div>'
+          +'<button type="button" class="trk-add-entry" data-act="add" data-metric="'+m.id+'" aria-label="Add a new '+m.name+' reading" title="Add reading">+</button>'
           +'<ul class="trk-list">'+rows+'</ul>'
         +'</div></div>';
     });
@@ -11423,12 +11458,12 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   function buildTrackerSelect(){
     var sel=$('tracker-select'); if(!sel) return;
     var selected=sel.value;
-    while(sel.options.length>1) sel.remove(1);
+    while(sel.children.length>1) sel.removeChild(sel.lastElementChild);
     var byName=function(a,b){ return a.localeCompare(b,undefined,{sensitivity:'base'}); };
     var saved=METRICS.filter(function(m){ return data[m.id]&&data[m.id].length; })
       .sort(function(a,b){ return byName(a.name,b.name); });
     if(saved.length){
-      var yours=document.createElement('optgroup'); yours.label='My readings'; yours.className='tracker-my-readings';
+      var yours=document.createElement('optgroup'); yours.label='Your readings'; yours.className='tracker-my-readings';
       saved.forEach(function(m){ var o=document.createElement('option'); o.value=m.id; o.textContent=m.name; yours.appendChild(o); });
       sel.appendChild(yours);
     }
@@ -11438,16 +11473,63 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       g.ids.slice().sort(function(x,y){ return byName(byId[x].name,byId[y].name); }).forEach(function(id){ var o=document.createElement('option'); o.value=id; o.textContent=byId[id].name; og.appendChild(o); });
       sel.appendChild(og);
     });
-    sel.value=byId[selected]?selected:'';
+    if(byId[selected]) sel.value=selected; else { sel.selectedIndex=0; }
   }
   buildTrackerSelect();
+  // Keep the placeholder as the closed-control value, but permanently exclude it from the option list.
+  (function(){
+    var sel=$('tracker-select'); if(!sel) return;
+    var placeholder=sel.querySelector('option[value=""]');
+    if(placeholder) placeholder.hidden=true;
+  })();
 
+  // Keep the Tracker form in its original location by default, but allow each + button
+  // to place it directly underneath that reading section's add button.
+  var trackerFieldsAnchor=document.createElement('span');
+  trackerFieldsAnchor.id='tracker-fields-anchor';
+  trackerFieldsAnchor.hidden=true;
+  var trackerSliders=$('tracker-sliders'), trackerEntry=$('tracker-entry'), trackerHint=$('tracker-hint'), trackerMsg=$('tracker-msg');
+  var trackerFieldsWrap=document.createElement('div');
+  trackerFieldsWrap.id='tracker-inline-fields';
+  trackerFieldsWrap.className='tracker-inline-fields';
+  if(trackerSliders&&trackerEntry&&trackerHint&&trackerMsg){
+    trackerSliders.parentNode.insertBefore(trackerFieldsAnchor,trackerSliders);
+    [trackerSliders,trackerEntry,trackerHint,trackerMsg].forEach(function(el){trackerFieldsWrap.appendChild(el);});
+    trackerFieldsAnchor.parentNode.insertBefore(trackerFieldsWrap,trackerFieldsAnchor.nextSibling);
+  }
+  trackerFieldsWrap.style.display='contents';
+  function restoreTrackerFields(){
+    if(!trackerFieldsAnchor.parentNode) return;
+    trackerFieldsAnchor.parentNode.insertBefore(trackerFieldsWrap,trackerFieldsAnchor.nextSibling);
+    trackerFieldsWrap.style.display='contents';
+  }
+  function placeTrackerFieldsAfter(button){
+    if(!button||!trackerFieldsWrap) return;
+    trackerFieldsWrap.style.display='block';
+    button.insertAdjacentElement('afterend',trackerFieldsWrap);
+  }
+
+  var activeTrackerMetric='';
   var listEl=$('tracker-list');
   if(listEl) listEl.addEventListener('click',function(e){
     var b=e.target.closest('[data-act]'); if(!b) return;
     var sec=b.closest('.trk-sec'); if(!sec) return;
     var id=sec.getAttribute('data-id');
-    if(b.getAttribute('data-act')==='toggle'){
+    if(b.getAttribute('data-act')==='add'){
+      e.preventDefault(); e.stopPropagation();
+      var metric=b.getAttribute('data-metric')||id, sel=$('tracker-select');
+      restoreTrackerFields();
+      activeTrackerMetric=metric;
+      if(sel){ sel.value=metric; window.onTrackerSelect(); sel.value=''; }
+      // The acceptable range is already shown in the saved-reading section header.
+      var rangeHint=$('tracker-hint'); if(rangeHint) rangeHint.style.display='none';
+      placeTrackerFieldsAfter(b);
+      var entry=$('tracker-entry');
+      if(entry){ entry.style.display='flex'; entry.scrollIntoView({behavior:'smooth',block:'center'}); }
+      var sliders=$('tracker-sliders');
+      if(sliders && byId[metric] && byId[metric].slider) sliders.style.display='block';
+      var first=$('tracker-v1'); if(first && first.style.display!=='none') first.focus({preventScroll:true});
+    } else if(b.getAttribute('data-act')==='toggle'){
       var body=sec.querySelector('.trk-body'), willOpen=body.hasAttribute('hidden');
       if(willOpen) body.removeAttribute('hidden'); else body.setAttribute('hidden','');
       b.setAttribute('aria-expanded',String(willOpen)); sec.classList.toggle('open',willOpen); open[id]=willOpen;
@@ -11484,17 +11566,20 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     return 'Acceptable range: '+rangeText(m,rd);
   }
   function refreshHint(){
-    var sel=$('tracker-select'), hint=$('tracker-hint');
-    if(hint && sel && byId[sel.value]) hint.textContent=currentHint(byId[sel.value]);
+    var hint=$('tracker-hint');
+    if(hint && activeTrackerMetric && byId[activeTrackerMetric]) hint.textContent=currentHint(byId[activeTrackerMetric]);
   }
   var mainEl=$('tracker-slider-main'), hEl=$('tracker-slider-h');
-  if(mainEl) mainEl.addEventListener('input',function(){ var m=byId[$('tracker-select').value]; if(m&&m.slider) paintSlider(mainEl,$('trk-main-val'),m.slider); });
+  if(mainEl) mainEl.addEventListener('input',function(){ var m=byId[activeTrackerMetric]; if(m&&m.slider) paintSlider(mainEl,$('trk-main-val'),m.slider); });
   if(hEl) hEl.addEventListener('input',function(){ paintSlider(hEl,$('trk-h-val'),HCFG); refreshHint(); });
 
   window.onTrackerSelect=function(){
-    var m=byId[$('tracker-select').value], box=$('tracker-entry'), sl=$('tracker-sliders');
+    if(trackerFieldsWrap && trackerFieldsWrap.parentNode!==trackerFieldsAnchor.parentNode) restoreTrackerFields();
+    var sel=$('tracker-select'), selected=sel.value, m=byId[selected], box=$('tracker-entry'), sl=$('tracker-sliders');
     $('tracker-msg').textContent='';
-    if(!m){ box.style.display='none'; sl.style.display='none'; $('tracker-hint').textContent=''; return; }
+    if(!m){ activeTrackerMetric=''; box.style.display='none'; sl.style.display='none'; $('tracker-hint').textContent=''; $('tracker-hint').style.display=''; return; }
+    activeTrackerMetric=m.id;
+    $('tracker-hint').style.display='';
     box.style.display='flex';
     var v1=$('tracker-v1'), v2=$('tracker-v2'), two=m.parts.length>1;
     if(m.slider){
@@ -11517,13 +11602,38 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     }
     var dt=$('tracker-date'); dt.max=ymd(new Date()); dt.value=ymd(new Date());
     refreshHint();
+    var existingSection=(data[m.id]&&data[m.id].length)?document.querySelector('.trk-sec[data-id="'+m.id+'"]'):null;
+    if(existingSection){
+      // Selecting a reading that already has saved entries expands its section,
+      // then places the new-entry fields under that section's + button.
+      var sectionBody=existingSection.querySelector('.trk-body');
+      var sectionToggle=existingSection.querySelector('[data-act="toggle"]');
+      if(sectionBody) sectionBody.removeAttribute('hidden');
+      if(sectionToggle) sectionToggle.setAttribute('aria-expanded','true');
+      existingSection.classList.add('open');
+      open[m.id]=true;
+      var addButton=existingSection.querySelector('[data-act="add"]');
+      if(addButton){
+        var rangeHint=$('tracker-hint'); if(rangeHint) rangeHint.style.display='none';
+        placeTrackerFieldsAfter(addButton);
+      }
+      // Bring the existing reading section into view and focus its first entry control.
+      existingSection.scrollIntoView({behavior:'smooth',block:'start'});
+      var firstControl=(m.slider?mainEl:v1);
+      if(firstControl){
+        window.setTimeout(function(){
+          firstControl.focus({preventScroll:true});
+        },350);
+      }
+      if(sel){ sel.value=''; sel.selectedIndex=0; }
+    }
   };
 
   function fail(msg,el){
     var o=$('tracker-msg'); o.textContent=msg; o.className='trk-msg trk-red'; if(el) el.focus();
   }
   window.addTrackerReading=function(){
-    var m=byId[$('tracker-select').value]; if(!m) return;
+    var m=byId[activeTrackerMetric]; if(!m) return;
     var vals=[], extra={};
     if(m.slider){
       vals.push(parseFloat(mainEl.value));
@@ -11550,7 +11660,16 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     open[m.id]=true;
     save();
     buildTrackerSelect();
+    var trackerSelectAfterSave=$('tracker-select');
+    if(trackerSelectAfterSave){ trackerSelectAfterSave.value=''; trackerSelectAfterSave.selectedIndex=0; }
     if(!m.slider){ $('tracker-v1').value=''; $('tracker-v2').value=''; }
+    $('tracker-entry').style.display='none';
+    $('tracker-sliders').style.display='none';
+    restoreTrackerFields();
+    // Return the dropdown to its placeholder after saving.
+    activeTrackerMetric='';
+    $('tracker-select').value=''; $('tracker-select').selectedIndex=0;
+    $('tracker-hint').textContent='';
     var o=$('tracker-msg'); o.textContent='Saved \u2014 see \u201C'+m.name+'\u201D below.'; o.className='trk-msg trk-green';
     render();
   };
@@ -11559,7 +11678,8 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     if(!confirm('Reset the Tracker? This deletes all saved readings on this device.')) return;
     data={}; open={}; save();
     buildTrackerSelect();
-    var sel=$('tracker-select'); if(sel) sel.value='';
+    var sel=$('tracker-select'); if(sel){ sel.selectedIndex=0; }
+    activeTrackerMetric='';
     $('tracker-entry').style.display='none'; $('tracker-sliders').style.display='none';
     $('tracker-hint').textContent=''; $('tracker-msg').textContent='';
     render();
@@ -11946,6 +12066,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   function addSchedule(spec){
     const card=document.getElementById(spec.id);if(!card)return;
     const state={start:defaults.start,end:defaults.end};cards[spec.key]=state;
+    // Keep the From/To schedule controls; the fixed interval row is separate.
     const row=document.createElement('div');row.className='per-reminder-schedule';row.setAttribute('aria-label',spec.title+' schedule');
     row.innerHTML='<div class="per-reminder-schedule-times"><span class="per-reminder-from">From</span><button type="button" class="eye-ex-time-item" data-time="start" aria-label="'+spec.title+' start time"></button><span>to</span><button type="button" class="eye-ex-time-item" data-time="end" aria-label="'+spec.title+' end time"></button></div>';
     const task=card.querySelector('.alert-task');
@@ -12090,6 +12211,8 @@ document.getElementById('clock-picker-close').onclick=close;overlay.addEventList
 .section-notif-icon svg{display:block;width:18px;height:18px;fill:currentColor;stroke:currentColor;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;}
 #routines-panel #rout-notify-btn{display:inline-flex!important;align-items:center;justify-content:center;gap:7px;}
 
+/* Keep the fixed-interval field beside “Every 20 minutes” hidden; its interval is fixed. */
+#alerts-panel .alert-fixed-frequency-row #alert-break-time { display:none !important; visibility:hidden !important; pointer-events:none !important; width:0 !important; min-width:0 !important; height:0 !important; padding:0 !important; margin:0 !important; border:0 !important; }
 </style>
 
 
@@ -12298,6 +12421,61 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
 }
 </style>
 
+
+<style id="requested-tracker-reminder-polish-20261029">
+/* Tracker add control, fixed reminder cadence, food chevrons, and centered exercise video. */
+#tracker-card .trk-add-entry{display:inline-flex;align-items:center;justify-content:center;flex:0 0 24px;width:24px;height:24px;margin:4px 0 8px;padding:0;border:1.5px solid var(--calc-2);border-radius:50%;color:var(--calc-2);font-size:19px;font-weight:700;line-height:1;cursor:pointer;background:rgba(255,255,255,.8)}
+#tracker-card .trk-add-entry:focus-visible{outline:2px solid var(--calc-2);outline-offset:2px}
+#alerts-panel .alert-fixed-frequency{font-size:.85rem;font-weight:600;color:var(--alert-1);white-space:nowrap}
+#nutrition-panel .food-chevron{display:inline-flex;align-items:center;justify-content:center;font-size:0;line-height:0;transition:transform .18s ease}
+#nutrition-panel .food-chevron svg{display:block;flex:none}
+#nutrition-panel .cov-table td.cov-rowlbl .cov-arr{display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px}
+#nutrition-panel .sec-toplevel-arr.open,#nutrition-panel .wp-arr.open,#nutrition-panel .wp-sub-arr.open{transform:rotate(90deg)}
+#nutrition-panel #cov-toggle-arr{font-size:0}
+#alerts-panel .eye-ex-wrap{display:flex;flex-direction:column;align-items:center;width:100%}
+#alerts-panel #eye-ex-stage{margin-left:auto;margin-right:auto}
+@media(max-width:640px){#tracker-card .trk-add-entry{flex-basis:22px;width:22px;height:22px;margin-top:4px;margin-bottom:8px}}
+</style>
+
+
+<style id="tracker-lab-dropdown-and-inline-form-fixes">
+/* Keep Tracker and Lab Insights dropdowns visually identical. */
+#tracker-card #tracker-select, #lab-insights-card #lab-test-select {
+  box-sizing:border-box !important; width:100%; min-height:44px; padding:10px 12px;
+  border:1.5px solid var(--calc-3) !important; border-radius:10px !important;
+  background:#fff !important; color:#0c3d4d !important; font:inherit; font-size:.88rem;
+}
+@supports (appearance: base-select) {
+  #tracker-card #tracker-select, #lab-insights-card #lab-test-select { appearance:base-select; }
+  #tracker-card #tracker-select::picker(select), #lab-insights-card #lab-test-select::picker(select) {
+    color:#0c3d4d; background:#fff; border:1.5px solid var(--calc-3); border-radius:10px;
+    max-height:min(60vh,420px); overflow-y:auto;
+  }
+  #tracker-card #tracker-select option, #lab-insights-card #lab-test-select option {
+    padding:9px 12px; min-height:44px; color:#0c3d4d; background:#fff; font:inherit;
+  }
+  #tracker-card #tracker-select::picker(select) option[value=""] { display:none; }
+  #tracker-card #tracker-select option:checked, #lab-insights-card #lab-test-select option:checked {
+    background:color-mix(in srgb,var(--calc-3) 18%,white); color:#0c3d4d;
+  }
+}
+#tracker-card .tracker-inline-fields {
+  width:100%; box-sizing:border-box; margin:8px 0 10px; padding:10px;
+  border:1px solid color-mix(in srgb,var(--calc-3) 50%,white); border-radius:10px;
+  background:color-mix(in srgb,var(--calc-3) 8%,white);
+}
+#tracker-card .tracker-inline-fields .trk-entry { margin-top:8px; }
+#tracker-card .tracker-inline-fields .trk-msg, #tracker-card .tracker-inline-fields .trk-hint { margin-bottom:0; }
+#alerts-panel .alert-fixed-frequency-row { display:flex; align-items:center; justify-content:flex-start; margin:8px 0 12px; }
+#alerts-panel .alert-fixed-frequency { font-size:.9rem; font-weight:650; color:var(--accent,#0e7490); }
+#alerts-panel .alert-fixed-frequency-row select { display:none !important; }
+</style>
+<style id="food-chevron-direction-fix">
+/* Food disclosure arrows point down when collapsed and up when expanded. */
+#nutrition-panel .food-chevron { transform:rotate(90deg); transition:transform .18s ease; }
+#nutrition-panel .food-chevron.open, #nutrition-panel .sec-toplevel-arr.open,
+#nutrition-panel .wp-arr.open, #nutrition-panel .wp-sub-arr.open { transform:rotate(-90deg) !important; }
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
@@ -13679,8 +13857,8 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
 
 /* 3. Tracker colours: red + green (improved) and red + orange (unchanged). */
 .trk-redgreen, .trk-redorange { color:transparent !important; -webkit-text-fill-color:transparent; -webkit-background-clip:text; background-clip:text; }
-.trk-redgreen { background-image:linear-gradient(90deg,#b91c1c 30%,#15803d 70%); }
-.trk-redorange { background-image:linear-gradient(90deg,#b91c1c 30%,#ea580c 70%); }
+.trk-redgreen { background-image:linear-gradient(180deg,#b91c1c 0 50%,#15803d 50% 100%); }
+.trk-redorange { background-image:linear-gradient(180deg,#b91c1c 0 50%,#ea580c 50% 100%); }
 
 /* 2. Vitals dropdowns: tick like the Notification Sound list in Reminders. */
 .tab-panel:not(#alerts-panel) select option::checkmark {
