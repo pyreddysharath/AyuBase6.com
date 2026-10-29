@@ -3613,6 +3613,29 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
   vertical-align: baseline !important;
 }
 </style>
+
+<style id="ayu-fields-neutral-until-focused-20261030">
+/* Keep all form fields neutral at rest; apply the active tab accent only while a field is focused. */
+.tab-panel :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  select, textarea, [contenteditable="true"],
+  .lab-select, .lab-value-input, .lab-row-val-input, .modal-search,
+  .alert-sound-select, .eye-ex-time-item, .dpill, .gender-btn, .activity-check
+):not(:focus):not(.selected):not(.active):not(.on) {
+  border-color: #d1d5db !important;
+  outline: none;
+}
+.tab-panel :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  select, textarea, [contenteditable="true"],
+  .lab-select, .lab-value-input, .lab-row-val-input, .modal-search,
+  .alert-sound-select
+):focus {
+  border-color: var(--accent, #2563eb) !important;
+  outline: 2px solid color-mix(in srgb, var(--accent, #2563eb) 28%, transparent) !important;
+  outline-offset: 1px;
+}
+</style>
 </head>
 <body>
 
@@ -12543,6 +12566,19 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
   gap: 8px !important;
 }
 </style>
+
+<style id="tracker-select-visible-chevron-fix-20261030">
+/* Keep a visible down chevron on Vitals > Tracker > Select a reading,
+   including browsers that hide the native select arrow. */
+html body #tracker-card .tracker-select-wrap { position:relative !important; }
+html body #tracker-card .tracker-select-wrap::after {
+  content:"" !important; position:absolute !important; right:15px !important; top:50% !important;
+  width:7px !important; height:7px !important; border-right:2px solid #08766e !important;
+  border-bottom:2px solid #08766e !important; transform:translateY(-70%) rotate(45deg) !important;
+  pointer-events:none !important; z-index:3 !important; display:block !important;
+}
+html body #tracker-card #tracker-select { padding-right:38px !important; }
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
@@ -14266,5 +14302,24 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
   line-height: 1 !important;
   color: #087e75 !important;
   vertical-align: baseline !important;
+}
+</style>
+
+<style id="all-section-fields-neutral-until-focused-20261030">
+/* Across every tab and section, form fields stay neutral until the user focuses them. */
+html body :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]), select, textarea, [contenteditable="true"], .reminder-custom-select-trigger, .duration-clock-trigger) {
+  background-color: #fff !important;
+  border-color: #cbd5e1 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+html body :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]), select, textarea, [contenteditable="true"], .reminder-custom-select-trigger, .duration-clock-trigger):focus,
+html body :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]), select, textarea, [contenteditable="true"], .reminder-custom-select-trigger, .duration-clock-trigger):focus-visible,
+html body :is(.reminder-custom-select-trigger[aria-expanded="true"], .duration-clock-trigger[aria-expanded="true"]) {
+  background-color: #fff !important;
+  border-color: #0d9488 !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 </style>
