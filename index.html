@@ -1565,7 +1565,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   background:#fff;color:var(--alert-2);cursor:pointer;
 }
 .notif-mock{
-  display:none;align-items:flex-start;gap:10px;margin-top:10px;padding:10px 12px;
+  display:none;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-top:10px;padding:10px 12px;
   background:#f0fdfa;border:1px solid rgba(94,234,212,.6);box-shadow:0 4px 14px rgba(13,148,136,.18);
   border-radius:10px;max-width:320px;position:relative;
 }
@@ -3594,6 +3594,25 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
 #alerts-panel .alert-fixed-frequency-row select,
 #alerts-panel .alert-fixed-frequency-row .alert-interval-select { display:none !important; visibility:hidden !important; }
 </style>
+
+<style id="schedule-from-dot-alignment-fix-20261030">
+/* Keep the dot before the shared Schedule "From" label in the same fixed-width slot as the dots on the following reminder rows. */
+#alerts-panel #alert-card-schedule .schedule-times > .schedule-lbl:first-child::before {
+  content: "•" !important;
+  display: inline-block !important;
+  box-sizing: border-box !important;
+  width: 10px !important;
+  min-width: 10px !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  color: #087e75 !important;
+  margin-left: 2px !important;
+  margin-right: 6px !important;
+  vertical-align: baseline !important;
+}
+</style>
 </head>
 <body>
 
@@ -3827,9 +3846,11 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
       </div>
 
       <div class="lab-manual-row" style="margin-bottom:8px">
-        <select id="tracker-select" class="lab-select" onchange="onTrackerSelect()" aria-label="Reading to add">
-          <option value="" selected hidden>Select a reading</option>
-        </select>
+        <div id="tracker-select-wrap" class="tracker-select-wrap">
+          <select id="tracker-select" class="lab-select tracker-placeholder-active" onchange="syncTrackerSelectPlaceholder(); onTrackerSelect()" aria-label="Reading to add">
+          </select>
+          <span id="tracker-select-placeholder" class="tracker-select-placeholder" aria-hidden="true">Select a reading</span>
+        </div>
       </div>
 
       <div id="tracker-sliders" style="display:none">
@@ -3887,7 +3908,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
           <li>Drink more when it is hot or you are active, and follow any fluid limits advised by your clinician.</li>
         </ul>
       </div>
-<div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 60 minutes</span><select style="display:none" id="alert-drink-time" class="alert-interval-select" style="display:none" aria-label="Water reminder interval" onchange="onAlertTimeChange('drink')"><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60" selected>60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select></div>
+<div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 60 minutes</span></div>
 
       <div class="alert-row alert-sound-line">
         <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
@@ -3908,7 +3929,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         <input type="checkbox" id="alert-drink-notify" class="notify-cb" onchange="onAlertNotifyChange('drink')"><label for="alert-drink-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
       <div class="notif-blocked-hint" id="alert-drink-notif-hint" style="display:none"></div>
       <div class="notif-mock" id="alert-drink-notif-mock">
-        <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-drink-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
+        <button type="button" class="notif-mock-close" aria-label="Dismiss" onclick="document.getElementById('alert-drink-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8 8 4 12.5 4 16a8 8 0 0016 0c0-3.5-4-8-8-14z"/></svg></span>
         <div class="notif-mock-text"><strong>Water</strong><span>Drink a glass of water — about 200ml keeps you on track!</span></div>
       </div>
@@ -3930,7 +3951,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
           <li>Gives a small energy and focus boost</li>
         </ul>
       </div>
-<div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 60 minutes</span><select style="display:none" id="alert-walk-time" class="alert-interval-select" style="display:none" aria-label="Walk reminder interval" onchange="onAlertTimeChange('walk')"><option value="15">15 min</option><option value="20">20 min</option><option value="25">25 min</option><option value="30">30 min</option><option value="35">35 min</option><option value="40">40 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="55">55 min</option><option value="60" selected>60 min</option><option value="65">65 min</option><option value="70">70 min</option><option value="75">75 min</option><option value="80">80 min</option><option value="85">85 min</option><option value="90">90 min</option><option value="95">95 min</option><option value="100">100 min</option><option value="105">105 min</option><option value="110">110 min</option><option value="115">115 min</option><option value="120">120 min</option></select></div>
+<div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 45 minutes</span></div>
 
       <div class="alert-row alert-sound-line">
         <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
@@ -3951,7 +3972,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         <input type="checkbox" id="alert-walk-notify" class="notify-cb" onchange="onAlertNotifyChange('walk')"><label for="alert-walk-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
       <div class="notif-blocked-hint" id="alert-walk-notif-hint" style="display:none"></div>
       <div class="notif-mock" id="alert-walk-notif-mock">
-        <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-walk-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
+        <button type="button" class="notif-mock-close" aria-label="Dismiss" onclick="document.getElementById('alert-walk-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.5a2 2 0 100-4 2 2 0 000 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg></span>
         <div class="notif-mock-text"><strong>Walk</strong><span>Time for a 2–5 minute walk or stretch!</span></div>
       </div>
@@ -3973,7 +3994,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
           <li>Encourages blinking, which re-moistens the eyes</li>
         </ul>
       </div>
-<div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 20 minutes</span><input type="hidden" id="alert-break-time" value="20" aria-label="Eye break reminder interval"></div>
+<div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 20 minutes</span></div>
 
       <div class="alert-row alert-sound-line">
         <div class="alert-row-lbl dotted-lbl">Notification Sound</div>
@@ -3994,7 +4015,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
         <input type="checkbox" id="alert-break-notify" class="notify-cb" onchange="onAlertNotifyChange('break')"><label for="alert-break-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
       <div class="notif-blocked-hint" id="alert-break-notif-hint" style="display:none"></div>
       <div class="notif-mock" id="alert-break-notif-mock">
-        <button type="button" class="notif-mock-close" onclick="document.getElementById('alert-break-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
+        <button type="button" class="notif-mock-close" aria-label="Dismiss" onclick="document.getElementById('alert-break-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/></svg></span>
         <div class="notif-mock-text"><strong>Eyes</strong><span>Look 20 feet away for 20 seconds — 20-20-20 time!</span></div>
       </div>
@@ -4066,7 +4087,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
           <input type="checkbox" id="eye-ex-notify" class="notify-cb" checked onchange="onEyeExNotifyChange()"><label for="eye-ex-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
         <div class="notif-blocked-hint" id="eye-ex-notif-hint" style="display:none"></div>
         <div class="notif-mock" id="eye-ex-notif-mock">
-        <button type="button" class="notif-mock-close" onclick="document.getElementById('eye-ex-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
+        <button type="button" class="notif-mock-close" aria-label="Dismiss" onclick="document.getElementById('eye-ex-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
           <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0-6a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z"/></svg></span>
           <div class="notif-mock-text"><strong>Eye Exercise</strong><span>Time for your guided eye exercise — follow the dot for 30 seconds.</span></div>
         </div>
@@ -8097,10 +8118,6 @@ const RECIPES_DATA = [
       <div class="footer-tab-btn" id="tab-cookies" title="Cookies" onclick="showFooterSection('cookies')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 000 20 3 3 0 003-3 2 2 0 012-2 3 3 0 003-3A10 10 0 0012 2zM7 10a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3 6a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm4-8a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
       </div>
-      <div class="footer-tab-btn" id="tab-notifications" title="Notification Settings" onclick="handleNotifBellClick()">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 002.5-2.5h-5A2.5 2.5 0 0012 22zm7-6v-5a7 7 0 00-5.5-6.84V3a1.5 1.5 0 00-3 0v1.16A7 7 0 005 11v5l-2 2v1h18v-1l-2-2z"/></svg>
-        <span class="notif-status-dot" id="notif-status-dot"></span>
-      </div>
       <div class="footer-tab-btn" id="tab-othersites" title="Our Other Sites" onclick="showFooterSection('othersites')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
       </div>
@@ -8350,7 +8367,7 @@ function inScheduleWindow(d){
   if(a===null || b===null || a===b) return true;      // incomplete / identical → no restriction
   return a<b ? (cur>=a && cur<=b) : (cur>=a || cur<=b); // overnight windows supported
 }
-const ALERT_DEFAULTS={ break:{minutes:20,sound:'chime'}, walk:{minutes:60,sound:'drum'}, drink:{minutes:60,sound:'drop'} };
+const ALERT_DEFAULTS={ break:{minutes:20,sound:'chime'}, walk:{minutes:45,sound:'drum'}, drink:{minutes:60,sound:'drop'} };
 const ALERT_LABELS={
   break:{title:'Eyes', icon:'👁️', msg:'Look 20 feet away for 20 seconds — 20-20-20 time!'},
   walk: {title:'Walk',  icon:'🚶', msg:'Time for a 2–5 minute walk or stretch!'},
@@ -8363,8 +8380,9 @@ const alertState={};
 
 function onAlertTimeChange(key){
   const slider=document.getElementById('alert-'+key+'-time');
-  const fixedMinutes={break:20,walk:60,drink:60};
-  const val=fixedMinutes[key]||+slider.value;
+  // Fixed-frequency reminders have no interval field in the DOM; preserve the configured interval.
+  const fixedMinutes={break:20,walk:45,drink:60};
+  const val=fixedMinutes[key] ?? (slider ? +slider.value : ALERT_DEFAULTS[key].minutes);
   if(slider) slider.value=String(val);
   alertState[key].minutes=val;
   const valEl=document.getElementById('alert-'+key+'-time-val');   // not present with the dropdown; don't let a missing label stop the timer being rescheduled
@@ -11455,10 +11473,20 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   window.ayuTrackerRender=render;
 
   // ---- the dropdown (saved readings first, then alphabetical categories) ----
+  // The placeholder is a visual overlay, not an option in the opened native picker.
+  window.syncTrackerSelectPlaceholder=function(){
+    var sel=$('tracker-select'), label=$('tracker-select-placeholder');
+    if(!sel || !label) return;
+    var empty=sel.value==='';
+    sel.classList.toggle('tracker-placeholder-active',empty);
+    label.hidden=!empty;
+  };
   function buildTrackerSelect(){
     var sel=$('tracker-select'); if(!sel) return;
-    var selected=sel.value;
-    while(sel.children.length>1) sel.removeChild(sel.lastElementChild);
+    // Rebuilds happen after saving/resetting; always start from the placeholder
+    // instead of restoring the metric that was just saved.
+    sel.selectedIndex=-1;
+    while(sel.firstChild) sel.removeChild(sel.firstChild);
     var byName=function(a,b){ return a.localeCompare(b,undefined,{sensitivity:'base'}); };
     var saved=METRICS.filter(function(m){ return data[m.id]&&data[m.id].length; })
       .sort(function(a,b){ return byName(a.name,b.name); });
@@ -11473,15 +11501,11 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       g.ids.slice().sort(function(x,y){ return byName(byId[x].name,byId[y].name); }).forEach(function(id){ var o=document.createElement('option'); o.value=id; o.textContent=byId[id].name; og.appendChild(o); });
       sel.appendChild(og);
     });
-    if(byId[selected]) sel.value=selected; else { sel.selectedIndex=0; }
+    sel.selectedIndex=-1;
+    window.syncTrackerSelectPlaceholder();
   }
   buildTrackerSelect();
-  // Keep the placeholder as the closed-control value, but permanently exclude it from the option list.
-  (function(){
-    var sel=$('tracker-select'); if(!sel) return;
-    var placeholder=sel.querySelector('option[value=""]');
-    if(placeholder) placeholder.hidden=true;
-  })();
+  // The placeholder is an overlay only, never an option in the opened picker.
 
   // Keep the Tracker form in its original location by default, but allow each + button
   // to place it directly underneath that reading section's add button.
@@ -11520,7 +11544,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       var metric=b.getAttribute('data-metric')||id, sel=$('tracker-select');
       restoreTrackerFields();
       activeTrackerMetric=metric;
-      if(sel){ sel.value=metric; window.onTrackerSelect(); sel.value=''; }
+      if(sel){ sel.value=metric; window.syncTrackerSelectPlaceholder(); window.onTrackerSelect(); sel.selectedIndex=-1; window.syncTrackerSelectPlaceholder(); }
       // The acceptable range is already shown in the saved-reading section header.
       var rangeHint=$('tracker-hint'); if(rangeHint) rangeHint.style.display='none';
       placeTrackerFieldsAfter(b);
@@ -11625,7 +11649,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
           firstControl.focus({preventScroll:true});
         },350);
       }
-      if(sel){ sel.value=''; sel.selectedIndex=0; }
+      if(sel){ sel.selectedIndex=-1; window.syncTrackerSelectPlaceholder(); }
     }
   };
 
@@ -11661,14 +11685,15 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     save();
     buildTrackerSelect();
     var trackerSelectAfterSave=$('tracker-select');
-    if(trackerSelectAfterSave){ trackerSelectAfterSave.value=''; trackerSelectAfterSave.selectedIndex=0; }
+    if(trackerSelectAfterSave){ trackerSelectAfterSave.selectedIndex=-1; window.syncTrackerSelectPlaceholder(); }
     if(!m.slider){ $('tracker-v1').value=''; $('tracker-v2').value=''; }
     $('tracker-entry').style.display='none';
     $('tracker-sliders').style.display='none';
     restoreTrackerFields();
     // Return the dropdown to its placeholder after saving.
     activeTrackerMetric='';
-    $('tracker-select').value=''; $('tracker-select').selectedIndex=0;
+    $('tracker-select').selectedIndex=-1;
+    window.syncTrackerSelectPlaceholder();
     $('tracker-hint').textContent='';
     var o=$('tracker-msg'); o.textContent='Saved \u2014 see \u201C'+m.name+'\u201D below.'; o.className='trk-msg trk-green';
     render();
@@ -11678,7 +11703,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     if(!confirm('Reset the Tracker? This deletes all saved readings on this device.')) return;
     data={}; open={}; save();
     buildTrackerSelect();
-    var sel=$('tracker-select'); if(sel){ sel.selectedIndex=0; }
+    var sel=$('tracker-select'); if(sel){ sel.selectedIndex=-1; window.syncTrackerSelectPlaceholder(); }
     activeTrackerMetric='';
     $('tracker-entry').style.display='none'; $('tracker-sliders').style.display='none';
     $('tracker-hint').textContent=''; $('tracker-msg').textContent='';
@@ -12454,11 +12479,16 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
   #tracker-card #tracker-select option, #lab-insights-card #lab-test-select option {
     padding:9px 12px; min-height:44px; color:#0c3d4d; background:#fff; font:inherit;
   }
-  #tracker-card #tracker-select::picker(select) option[value=""] { display:none; }
   #tracker-card #tracker-select option:checked, #lab-insights-card #lab-test-select option:checked {
     background:color-mix(in srgb,var(--calc-3) 18%,white); color:#0c3d4d;
   }
 }
+/* Tracker placeholder overlay: visible when closed, absent from the opened picker. */
+#tracker-card .tracker-select-wrap { position:relative; width:100%; }
+#tracker-card #tracker-select.tracker-placeholder-active { color:transparent !important; }
+#tracker-card #tracker-select option { color:#0c3d4d; }
+#tracker-card .tracker-select-placeholder { position:absolute; left:12px; top:50%; transform:translateY(-50%); z-index:1; color:#0c3d4d; pointer-events:none; font:inherit; opacity:.85; }
+#tracker-card .tracker-select-placeholder[hidden] { display:none !important; }
 #tracker-card .tracker-inline-fields {
   width:100%; box-sizing:border-box; margin:8px 0 10px; padding:10px;
   border:1px solid color-mix(in srgb,var(--calc-3) 50%,white); border-radius:10px;
@@ -12475,6 +12505,33 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
 #nutrition-panel .food-chevron { transform:rotate(90deg); transition:transform .18s ease; }
 #nutrition-panel .food-chevron.open, #nutrition-panel .sec-toplevel-arr.open,
 #nutrition-panel .wp-arr.open, #nutrition-panel .wp-sub-arr.open { transform:rotate(-90deg) !important; }
+</style>
+
+<style id="eyes-exercise-dot-alignment-fix-20261030">
+/* Align the Eyes (Exercise) field bullets with the bullet before From in the Schedule row. */
+#alerts-panel #alert-card-break-ex .eye-ex-wrap > .alert-row {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  align-self: stretch !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+#alerts-panel #alert-card-break-ex .eye-ex-wrap > .alert-row > .alert-row-lbl.dotted-lbl::before,
+#alerts-panel #alert-card-break-ex .eye-ex-wrap > .alert-row.alert-preview-row > .row-dot {
+  display: inline-block !important;
+  box-sizing: border-box !important;
+  width: 10px !important;
+  min-width: 10px !important;
+  margin-left: 0 !important;
+  text-align: center !important;
+}
+#alerts-panel #alert-card-break-ex .eye-ex-wrap > .alert-row.alert-preview-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
 </style>
 </body>
 
@@ -12553,6 +12610,7 @@ html[data-petal-card="e"] #nutrition-panel #sec-gender::after {
   box-sizing:border-box !important; padding:3px 18px 3px 6px !important;
 }
 </style>
+
 </html>
 <style id="reminders-final-layout-fixes">
 /* Reminders actions: notification and reset share one row; shortcut spans the same full width below. */
@@ -12926,9 +12984,13 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
 #alerts-panel .per-reminder-schedule,
 #alerts-panel .eye-ex-time-list { margin-bottom:4px !important; }
 #alerts-panel .alert-interval-row { margin-top:2px !important; }
-/* In-app notification controls */
-.ayu-notification-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.ayu-notification-actions button{border:1px solid currentColor;border-radius:7px;padding:5px 9px;background:transparent;font:inherit;font-size:12px;cursor:pointer}
+/* In-app notification icon actions */
+.ayu-notification-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 0 auto;width:100%;flex:1 0 100%;padding-right:2px}
+.ayu-notification-actions button{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid currentColor;border-radius:50%;padding:0;background:rgba(255,255,255,.7);color:var(--alert-1);cursor:pointer;position:relative;transition:background .15s ease,transform .15s ease}
+.ayu-notification-actions button:hover{background:#fff;transform:translateY(-1px)}
+.ayu-notification-actions button:focus-visible,.notif-mock-close:focus-visible{outline:2px solid var(--alert-2);outline-offset:2px}
+.ayu-notification-actions svg{width:17px;height:17px;display:block}
+.ayu-notification-actions button[data-tooltip]:hover::after,.ayu-notification-actions button[data-tooltip]:focus-visible::after{content:attr(data-tooltip);position:absolute;right:0;bottom:calc(100% + 7px);z-index:20;white-space:nowrap;padding:5px 8px;border-radius:5px;background:#173f3a;color:#fff;font-size:11px;font-weight:500;line-height:1.3;box-shadow:0 2px 7px rgba(0,0,0,.18);pointer-events:none}
 </style>
 <script id="ayubase6-requested-notification-persistence">
 (function(){
@@ -13021,13 +13083,29 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
       if(mock.querySelector('.ayu-notification-actions')) return;
       const actions=document.createElement('div');
       actions.className='ayu-notification-actions';
-      actions.innerHTML='<button type="button" data-ayu-dismiss>Dismiss this notification</button><button type="button" data-ayu-disable-all>Disable all notifications</button>';
+      actions.innerHTML='<button type="button" data-ayu-disable-current data-tooltip="Disable this reminder" title="Disable this reminder" aria-label="Disable this reminder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h13"/><path d="M10 21h4"/><path d="M16 12h6"/></svg></button><button type="button" data-ayu-disable-all data-tooltip="Disable all notifications" title="Disable all notifications" aria-label="Disable all notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/><path d="M4 4l16 16"/></svg></button>';
       mock.appendChild(actions);
     });
   });
   document.addEventListener('click',function(e){
-    const dismiss=e.target.closest('[data-ayu-dismiss]');
-    if(dismiss){const card=dismiss.closest('.notif-mock');if(card)card.classList.remove('show');return}
+    const disableCurrent=e.target.closest('[data-ayu-disable-current]');
+    if(disableCurrent){
+      const card=disableCurrent.closest('.notif-mock');
+      const keyByCard={'alert-drink-notif-mock':'drink','alert-walk-notif-mock':'walk','alert-break-notif-mock':'break','eye-ex-notif-mock':'eyeex'};
+      const key=card && keyByCard[card.id];
+      if(key){
+        const input=document.getElementById(key==='eyeex'?'eye-ex-notify':'alert-'+key+'-notify');
+        if(input){input.checked=false;input.setAttribute('aria-checked','false');input.dispatchEvent(new Event('change',{bubbles:true}));}
+        const sectionCard=document.getElementById(({drink:'alert-card-drink',walk:'alert-card-walk',break:'alert-card-break',eyeex:'alert-card-break-ex'})[key]);
+        if(sectionCard){const headerSwitch=sectionCard.querySelector('.alert-enabled-toggle input');if(headerSwitch)headerSwitch.checked=false;sectionCard.classList.add('alert-disabled');}
+        if(window.alertState && alertState[key]){alertState[key].enabled=false;alertState[key].notify=false;if(typeof scheduleAlertTimer==='function')scheduleAlertTimer(key);}
+        if(key==='eyeex' && typeof eyeExState!=='undefined'){eyeExState.enabled=false;eyeExState.notify=false;}
+        if(typeof saveStates==='function')saveStates();
+        if(typeof refreshNotifStatusUI==='function')refreshNotifStatusUI();
+      }
+      if(card) card.classList.remove('show');
+      return;
+    }
     const disable=e.target.closest('[data-ayu-disable-all]');
     if(disable){
       if(typeof setMasterNotifyFlag==='function') setMasterNotifyFlag(false);
@@ -14041,3 +14119,142 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
 })();
 </script>
 
+
+
+
+
+<style id="tracker-fields-no-focus-box-20261030">
+/* Tracker entry fields should not show a surrounding focus box when selected. */
+#tracker-card input:focus,
+#tracker-card input:focus-visible,
+#tracker-card select:focus,
+#tracker-card select:focus-visible,
+#tracker-card textarea:focus,
+#tracker-card textarea:focus-visible,
+#tracker-card .lab-value-input:focus,
+#tracker-card .lab-value-input:focus-visible,
+#tracker-card .trk-date:focus,
+#tracker-card .trk-date:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+</style>
+
+
+<style id="lab-manual-and-custom-reminder-focus-box-removal-20261030">
+/* Match the focus treatment requested for Lab Insights > Manual and My Reminders > Reminder name. */
+#lab-test-select:focus,
+#lab-test-select:focus-visible,
+#lab-test-value:focus,
+#lab-test-value:focus-visible,
+#custom-reminders-list .custom-reminder-form input[name="name"]:focus,
+#custom-reminders-list .custom-reminder-form input[name="name"]:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+</style>
+
+
+
+
+<style id="manual-test-name-focus-and-water-eyes-dot-match-20261030">
+/* Lab Insights > Manual: keep the Test name visible beside Value and Add. */
+#lab-insights-card .lab-manual-row:has(#lab-test-select) {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+#lab-insights-card #lab-test-select {
+  flex: 1 1 0 !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  text-overflow: clip !important;
+  background-color: #fff !important;
+  border-color: var(--calc-3) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+#lab-insights-card #lab-test-select:focus,
+#lab-insights-card #lab-test-select:focus-visible {
+  background-color: #fff !important;
+  border-color: var(--calc-2) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+#lab-insights-card #lab-test-value {
+  flex: 0 0 100px !important;
+  width: 100px !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+#lab-insights-card #lab-add-btn { flex: 0 0 auto !important; }
+
+/* My Reminders > Reminder name: neutral at rest, matching the Value field's focus feedback. */
+#alerts-panel #custom-reminders-list .custom-reminder-form input[name="name"] {
+  background-color: #fff !important;
+  border-color: var(--alert-3, #b6e3dd) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+#alerts-panel #custom-reminders-list .custom-reminder-form input[name="name"]:focus,
+#alerts-panel #custom-reminders-list .custom-reminder-form input[name="name"]:focus-visible {
+  background-color: #fff !important;
+  border-color: var(--alert-2, #0891b2) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Tracker > Select a reading: use the same neutral/resting and focused border treatment as Value. */
+#tracker-card #tracker-select {
+  background-color: #fff !important;
+  border-color: var(--calc-3) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+#tracker-card #tracker-select:focus,
+#tracker-card #tracker-select:focus-visible {
+  background-color: #fff !important;
+  border-color: var(--calc-2) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Make Eyes (Exercise) > From use the exact same dot slot and spacing as Water > From. */
+#alerts-panel #alert-card-drink .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from,
+#alerts-panel #alert-card-break-ex .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  position: static !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: nowrap !important;
+}
+#alerts-panel #alert-card-drink .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from::before,
+#alerts-panel #alert-card-break-ex .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from::before {
+  content: "•" !important;
+  display: inline-block !important;
+  position: static !important;
+  left: auto !important;
+  box-sizing: border-box !important;
+  flex: 0 0 10px !important;
+  width: 10px !important;
+  min-width: 10px !important;
+  margin-left: 0 !important;
+  margin-right: 6px !important;
+  padding: 0 !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  color: #087e75 !important;
+  vertical-align: baseline !important;
+}
+</style>
