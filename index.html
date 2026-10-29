@@ -11695,7 +11695,17 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     $('tracker-select').selectedIndex=-1;
     window.syncTrackerSelectPlaceholder();
     $('tracker-hint').textContent='';
-    var o=$('tracker-msg'); o.textContent='Saved \u2014 see \u201C'+m.name+'\u201D below.'; o.className='trk-msg trk-green';
+    var o=$('tracker-msg');
+    var savedMessage='Saved \u2014 see \u201C'+m.name+'\u201D below.';
+    if(o._trackerSavedMessageTimer) clearTimeout(o._trackerSavedMessageTimer);
+    o.textContent=savedMessage; o.className='trk-msg trk-green';
+    o._trackerSavedMessageTimer=setTimeout(function(){
+      // Only clear this save confirmation; don't erase a newer validation/error message.
+      if(o.textContent===savedMessage && o.className==='trk-msg trk-green'){
+        o.textContent=''; o.className='trk-msg';
+      }
+      o._trackerSavedMessageTimer=null;
+    },3000);
     render();
   };
 
