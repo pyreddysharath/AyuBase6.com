@@ -13573,3 +13573,94 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
 /* Show only the selected interval value and its down arrow; no clock symbol in Remind every. */
 #alerts-panel .reminder-custom-select-trigger .reminder-clock-icon { display: none !important; }
 </style>
+
+<style id="dropdown-arrow-tick-transparent-20261029">
+/* Notification Sound-style dropdowns in the section cards: same customizable dropdown as My Reminders
+   (dark triangle arrow, tick on the left of the selected option). */
+/* Notification Sound fields in the section cards: same arrow as the My Reminders dropdowns (dark filled triangle). */
+html body #alerts-panel .reminder-custom-select-trigger.sound-trigger .reminder-select-chevron {
+  display: inline-block !important; flex: 0 0 10px !important; width: 10px !important; height: 9px !important;
+  font-size: 0 !important; margin-right: 1px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='9' viewBox='0 0 10 9'%3E%3Cpath d='M0 0h10L5 9z' fill='%23134e4a'/%3E%3C/svg%3E") center / 10px 9px no-repeat !important;
+}
+/* Every dropdown list: a tick on the left of the selected value (other rows keep the same indent). */
+html body .reminder-custom-select-menu button {
+  display: flex !important; align-items: center; gap: 8px;
+}
+html body .reminder-custom-select-menu button::before {
+  content: ""; flex: 0 0 1em; width: 1em; text-align: center; color: #134e4a; font-weight: 600;
+}
+html body .reminder-custom-select-menu button[aria-selected="true"]::before { content: "\2713"; }
+/* My Reminders: dropdown backgrounds transparent like the Time field, and one arrow only. */
+#alerts-panel #custom-reminders-card .custom-reminder-form select,
+#alerts-panel #custom-reminders-card .custom-reminder-form select:focus {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  background-image: none !important;
+}
+/* My Reminders: the Time field gets the same arrow. */
+#alerts-panel #custom-reminders-card .reminder-frequency-fields label > .duration-clock-trigger:not(.selected-time-btn) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='9' viewBox='0 0 10 9'%3E%3Cpath d='M0 0h10L5 9z' fill='%23134e4a'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 10.5px center !important;
+  background-size: 10px 9px !important;
+  padding-right: 34px !important;
+  text-align: left;
+}
+</style>
+
+<style id="all-dropdown-triangle-and-selected-colour-20261029">
+/* One arrow everywhere: the dark filled triangle used in My Reminders. */
+html body #alerts-panel .reminder-custom-select-trigger { background-image: none !important; }
+html body #alerts-panel .reminder-custom-select-trigger .reminder-select-chevron {
+  display: inline-block !important; flex: 0 0 10px !important; width: 10px !important; height: 9px !important;
+  font-size: 0 !important; margin-right: 1px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='9' viewBox='0 0 10 9'%3E%3Cpath d='M0 0h10L5 9z' fill='%23134e4a'/%3E%3C/svg%3E") center / 10px 9px no-repeat !important;
+}
+html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > button.eye-ex-time-item[data-time] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='9' viewBox='0 0 10 9'%3E%3Cpath d='M0 0h10L5 9z' fill='%23134e4a'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 10px 9px !important;
+}
+/* Selected value in every dropdown list: same mint highlight as the Notification Sound list. */
+html body .reminder-custom-select-menu button[aria-selected="true"],
+html body #alerts-panel #custom-reminders-card select option:checked {
+  background-color: #ccfbf1 !important;
+}
+</style>
+
+<style id="all-dropdown-chevron-20261029">
+/* One arrow everywhere: the thin teal down chevron. */
+html body #alerts-panel .reminder-custom-select-trigger .reminder-select-chevron,
+html body #alerts-panel .reminder-custom-select-trigger.sound-trigger .reminder-select-chevron {
+  display: inline-block !important; flex: 0 0 12px !important; width: 12px !important; height: 8px !important;
+  font-size: 0 !important; margin-right: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2308766e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px 8px no-repeat !important;
+}
+html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > button.eye-ex-time-item[data-time] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2308766e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-position: right 8px center !important;
+  background-size: 12px 8px !important;
+}
+#alerts-panel #custom-reminders-card .custom-reminder-form select::picker-icon {
+  content: "" !important; display: block !important; flex: 0 0 12px; width: 12px; height: 8px;
+  font-size: 0; color: transparent; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2308766e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px 8px no-repeat !important;
+}
+#alerts-panel #custom-reminders-card .reminder-frequency-fields label > .duration-clock-trigger:not(.selected-time-btn) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2308766e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-position: right 9px center !important;
+  background-size: 12px 8px !important;
+}
+</style>
+
+<style id="other-tabs-dropdown-chevron-20261029">
+/* Dropdowns outside Reminders (Vitals: Test name, Reading type): same thin down chevron, in each field's own text colour. */
+@supports (appearance: base-select) {
+  .tab-panel:not(#alerts-panel) select::picker-icon {
+    content: "" !important; display: block !important; flex: 0 0 12px; width: 12px; height: 8px;
+    font-size: 0; background: currentColor !important;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px 8px no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px 8px no-repeat;
+  }
+}
+</style>
+
