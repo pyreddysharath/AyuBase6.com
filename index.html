@@ -3962,14 +3962,23 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
   <h1 class="ayu-content-page-title" style="--ayu-page-accent:#0891b2">Reminders</h1>
   <div class="alert-page">
 
+    <!-- Reminder hours: one From/To for every section (each section can still be changed on its own) -->
+    <div class="alert-card reminder-hours-card" id="reminder-hours-card">
+      <div class="alert-card-hdr">
+        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="section-title-text">Reminder hours</span></h2>
+      </div>
+      <div class="per-reminder-schedule" aria-label="All sections schedule"><div class="per-reminder-schedule-times"><span class="per-reminder-from">From</span><button type="button" class="eye-ex-time-item" data-time="start" aria-label="All sections start time"></button><span>to</span><button type="button" class="eye-ex-time-item" data-time="end" aria-label="All sections end time"></button></div></div>
+      <p class="reminder-hours-note">Sets the same hours for every section below. You can still change the hours inside each section.</p>
+    </div>
+
     <!-- EYES: 20-20-20 — most frequent -->
-    <div class="alert-card" id="alert-card-drink">
+    <div class="alert-card collapsed" id="alert-card-drink">
       <div class="alert-card-hdr">
         <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8 8 4 12.5 4 16a8 8 0 0016 0c0-3.5-4-8-8-14z"/></svg><span class="section-title-text">Water</span></h2>
-        <button type="button" class="alert-info-btn" id="alert-drink-info-btn" onclick="toggleAlertSectionInfo('drink')" title="Why it helps">i</button>
+        <button type="button" class="alert-card-chev" aria-label="Expand or collapse" aria-expanded="false" tabindex="-1"><svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg></button>
       </div>
 
-      <div class="alert-task" id="alert-drink-task" style="display:none">
+      <div class="alert-task" id="alert-drink-task">
         <p class="alert-card-sub">Drink steadily through the day rather than trying to catch up all at once.</p>
         <strong>Take small, comfortable sips and swallow slowly.</strong> You do not need to gulp or force a full glass at once.
         <ul>
@@ -4006,13 +4015,13 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
 
     </div>
 
-<div class="alert-card" id="alert-card-walk">
+<div class="alert-card collapsed" id="alert-card-walk">
       <div class="alert-card-hdr">
         <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.5a2 2 0 100-4 2 2 0 000 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg><span class="section-title-text">Walk</span></h2>
-        <button type="button" class="alert-info-btn" id="alert-walk-info-btn" onclick="toggleAlertSectionInfo('walk')" title="Why it helps">i</button>
+        <button type="button" class="alert-card-chev" aria-label="Expand or collapse" aria-expanded="false" tabindex="-1"><svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg></button>
       </div>
 
-      <div class="alert-task" id="alert-walk-task" style="display:none">
+      <div class="alert-task" id="alert-walk-task">
         <p class="alert-card-sub">Short movement breaks to offset long sitting.</p>
         <strong>Stand, stretch or walk for 2–5 minutes</strong> at each reminder.
         <ul>
@@ -4049,13 +4058,13 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
 
     </div>
 
-<div class="alert-card" id="alert-card-break">
+<div class="alert-card collapsed" id="alert-card-break">
       <div class="alert-card-hdr">
         <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/></svg><span class="section-title-text">Eyes (20-20-20)</span></h2>
-        <button type="button" class="alert-info-btn" id="alert-break-info-btn" onclick="toggleAlertSectionInfo('break')" title="Why it helps">i</button>
+        <button type="button" class="alert-card-chev" aria-label="Expand or collapse" aria-expanded="false" tabindex="-1"><svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg></button>
       </div>
 
-      <div class="alert-task" id="alert-break-task" style="display:none">
+      <div class="alert-task" id="alert-break-task">
         <p class="alert-card-sub">Give your eyes a break from screens.</p>
         <strong>The 20-20-20 rule:</strong> every 20 minutes, look at something 20 feet (6 m) away for 20 seconds.
         <ul>
@@ -4091,13 +4100,13 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       </div>
     </div>
 
-<div class="alert-card" id="alert-card-break-ex">
+<div class="alert-card collapsed" id="alert-card-break-ex">
       <div class="alert-card-hdr">
         <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/></svg><span class="section-title-text">Eyes (Exercise)</span></h2>
-        <button type="button" class="alert-info-btn" id="alert-break-ex-info-btn" onclick="toggleAlertSectionInfo('break-ex')" title="Why it helps">i</button>
+        <button type="button" class="alert-card-chev" aria-label="Expand or collapse" aria-expanded="false" tabindex="-1"><svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg></button>
       </div>
 
-      <div class="alert-task" id="alert-break-ex-task" style="display:none">
+      <div class="alert-task" id="alert-break-ex-task">
         <p class="alert-card-sub">A guided exercise for your eye muscles.</p>
         <strong>Follow the moving dot</strong> through seven patterns: zigzag, figure-8, loop, star, cross and row scan.
         <ul>
@@ -12063,10 +12072,11 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       const custom=document.getElementById('custom-reminders-card');
       const bottomIds=['reminders-notif-banner','reminders-notif-error','master-notif-info','install-row','install-help'];
       const bottom=bottomIds.map(id=>document.getElementById(id)).filter(el=>el && el.parentElement===page);
-      const reserved=new Set([...ordered,custom,...bottom].filter(Boolean));
+      const topCard=document.getElementById('reminder-hours-card');
+      const reserved=new Set([topCard,...ordered,custom,...bottom].filter(Boolean));
       const remaining=[...page.children].filter(el=>!reserved.has(el));
       // Re-append in explicit order so repeated calls cannot reverse cards or lift actions.
-      [...ordered, ...(custom && custom.parentElement===page ? [custom] : []), ...remaining, ...bottom]
+      [...(topCard && topCard.parentElement===page ? [topCard] : []), ...ordered, ...(custom && custom.parentElement===page ? [custom] : []), ...remaining, ...bottom]
         .filter(Boolean).forEach(el=>page.appendChild(el));
     }
   }
@@ -12194,6 +12204,27 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     eyeExState.times=count===1?[c.start]:[c.start,c.end];
     eyeExState.lastFiredKey=null;
   }
+  const topState={start:defaults.start,end:defaults.end};
+  function setAllSchedules(){
+    specs.forEach(spec=>{
+      const st=cards[spec.key],card=document.getElementById(spec.id);if(!st||!card)return;
+      st.start=topState.start;st.end=topState.end;
+      ['start','end'].forEach(w=>{const b=card.querySelector('.per-reminder-schedule [data-time="'+w+'"]');if(b)drawButton(b,st[w])});
+    });
+    updateExerciseTimes();
+    ['break','walk','drink'].forEach(k=>{if(typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)});
+  }
+  function wireTopSchedule(){
+    const row=document.querySelector('#reminder-hours-card .per-reminder-schedule');if(!row)return;
+    ['start','end'].forEach(which=>{
+      const btn=row.querySelector('[data-time="'+which+'"]');drawButton(btn,topState[which]);
+      if(btn.dataset.wired)return;btn.dataset.wired='1';
+      btn.addEventListener('click',()=>{
+        const picker=window.openTimePicker;if(typeof picker!=='function')return;
+        picker('custom',topState[which],value=>{topState[which]=value;drawButton(btn,value);setAllSchedules()},'All sections — '+(which==='start'?'From':'To'));
+      });
+    });
+  }
   function addSchedule(spec){
     const card=document.getElementById(spec.id);if(!card)return;
     const state={start:defaults.start,end:defaults.end};cards[spec.key]=state;
@@ -12230,7 +12261,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     const custom=document.getElementById('custom-reminders-card');if(custom)page.appendChild(custom);
   }
   function install(){
-    specs.forEach(addSchedule);reorder();
+    specs.forEach(addSchedule);reorder();wireTopSchedule();
     // Retain the legacy hidden schedule controls for reset compatibility, but remove its card from the UI.
     const oldStart=document.getElementById('schedule-start'),oldEnd=document.getElementById('schedule-end');
     if(oldStart)oldStart.value=defaults.start;if(oldEnd)oldEnd.value=defaults.end;
@@ -12255,7 +12286,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   const oldEyeCountChange=window.onEyeExCountChange;
   window.onEyeExCountChange=function(){if(typeof oldEyeCountChange==='function')oldEyeCountChange();updateExerciseTimes()};
   const oldReset=window.resetRemindersToDefault;
-  window.resetRemindersToDefault=function(){if(typeof oldReset==='function')oldReset();Object.values(cards).forEach(w=>{w.start=defaults.start;w.end=defaults.end});document.querySelectorAll('#alerts-panel .per-reminder-schedule').forEach(row=>{const spec=specs.find(x=>row.closest('#'+x.id));if(!spec)return;row.querySelector('[data-time="start"]').textContent='9:00 AM';row.querySelector('[data-time="end"]').textContent='6:00 PM'});['break','walk','drink'].forEach(k=>window.scheduleAlertTimer(k));updateExerciseTimes()};
+  window.resetRemindersToDefault=function(){if(typeof oldReset==='function')oldReset();topState.start=defaults.start;topState.end=defaults.end;wireTopSchedule();Object.values(cards).forEach(w=>{w.start=defaults.start;w.end=defaults.end});document.querySelectorAll('#alerts-panel .per-reminder-schedule').forEach(row=>{const spec=specs.find(x=>row.closest('#'+x.id));if(!spec)return;row.querySelector('[data-time="start"]').textContent='9:00 AM';row.querySelector('[data-time="end"]').textContent='6:00 PM'});['break','walk','drink'].forEach(k=>window.scheduleAlertTimer(k));updateExerciseTimes()};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })();
 </script>
@@ -13399,9 +13430,9 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
   function placeInfoPanels(){
     ['drink','walk','break','break-ex'].forEach(function(k){
       var card=document.getElementById('alert-card-'+k);
-      var hdr=card && card.querySelector('.alert-card-hdr');
+      var anchor=card && card.querySelector('.alert-preview-row');
       var task=document.getElementById('alert-'+k+'-task');
-      if(hdr && task && hdr.nextElementSibling!==task) hdr.after(task);
+      if(anchor && task && anchor.nextElementSibling!==task) anchor.after(task);
     });
   }
   // The Eyes (Exercise) header switch drives that section's own control, like the other three do.
@@ -14688,4 +14719,43 @@ html body :is(.reminder-custom-select-trigger[aria-expanded="true"], .duration-c
 #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedule { align-self: stretch !important; width: 100% !important; }
 #alerts-panel #alert-card-break-ex .per-reminder-schedule .per-reminder-schedule-times { justify-content: flex-start !important; }
 </style>
+
+<style id="reminders-collapsible-sections-20261030">
+/* Collapsible sections: header = icon + name + switch + chevron. */
+#alerts-panel .alert-card:is(#alert-card-drink,#alert-card-walk,#alert-card-break,#alert-card-break-ex) > .alert-card-hdr { cursor:pointer; flex-wrap:nowrap !important; }
+#alerts-panel .alert-card-hdr > h2 { flex:1 1 auto; min-width:0; }
+#alerts-panel .alert-card-chev { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; padding:0; border:0; background:transparent; color:var(--alert-1,#0f766e); cursor:pointer; transition:transform .18s ease; }
+#alerts-panel .alert-card:not(.collapsed) .alert-card-chev { transform:rotate(180deg); }
+#alerts-panel .alert-card.collapsed > :not(.alert-card-hdr) { display:none !important; }
+#alerts-panel .alert-card.collapsed { padding-bottom:14px; }
+#alerts-panel .alert-card.collapsed .alert-card-hdr { margin-bottom:0; }
+/* The explanation sits after Preview notification, separated by a line. */
+#alerts-panel .alert-card > .alert-task { display:block !important; margin:12px 0 0; padding:12px 0 0; background:transparent !important; border:0 !important; border-top:1px solid rgba(100,116,139,.35) !important; border-radius:0 !important; box-shadow:none !important; }
+/* Reminder hours card */
+#alerts-panel .reminder-hours-note { margin:2px 0 0; font-size:.78rem; line-height:1.45; color:#134e4a; }
+</style>
+<script id="reminders-collapsible-sections-js-20261030">
+(function(){
+  var IDS=['alert-card-drink','alert-card-walk','alert-card-break','alert-card-break-ex'];
+  function setCollapsed(card,collapsed){
+    card.classList.toggle('collapsed',collapsed);
+    var chev=card.querySelector('.alert-card-chev'); if(chev) chev.setAttribute('aria-expanded',String(!collapsed));
+    var hdr=card.querySelector('.alert-card-hdr'); if(hdr) hdr.setAttribute('aria-expanded',String(!collapsed));
+    // Hiding the exercise video while it plays would leave it running unseen: pause it.
+    if(collapsed && card.id==='alert-card-break-ex' && typeof eyeExPhase!=='undefined' && eyeExPhase==='running' && typeof handleEyeExButtonClick==='function'){ try{ handleEyeExButtonClick(); }catch(e){} }
+  }
+  function wire(){
+    IDS.forEach(function(id){
+      var card=document.getElementById(id), hdr=card&&card.querySelector('.alert-card-hdr'); if(!hdr) return;
+      var chev=hdr.querySelector('.alert-card-chev'); if(chev) hdr.appendChild(chev);   // after the on/off switch
+      hdr.setAttribute('role','button'); hdr.setAttribute('tabindex','0'); hdr.setAttribute('aria-expanded',String(!card.classList.contains('collapsed')));
+      if(hdr.dataset.collapseWired) return; hdr.dataset.collapseWired='1';
+      hdr.addEventListener('click',function(e){ if(e.target.closest('.alert-enabled-toggle')) return; setCollapsed(card,!card.classList.contains('collapsed')); });
+      hdr.addEventListener('keydown',function(e){ if((e.key==='Enter'||e.key===' ') && e.target===hdr){ e.preventDefault(); setCollapsed(card,!card.classList.contains('collapsed')); } });
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire); else wire();
+  window.addEventListener('load',wire); setTimeout(wire,900);
+})();
+</script>
 
