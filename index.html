@@ -3637,43 +3637,8 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .per-reminder-sch
 }
 </style>
 
-<style id="eyes-exercise-from-dot-final-fix-20261030">
-/* Ensure the leading dot is visible before From in Eyes (Exercise), matching Water. */
-html body #alerts-panel #alert-card-break-ex .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from {
-  display: inline-flex !important;
-  align-items: center !important;
-  white-space: nowrap !important;
-}
-html body #alerts-panel #alert-card-break-ex .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from::before {
-  content: "•" !important;
-  display: inline-block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  width: 10px !important;
-  min-width: 10px !important;
-  flex: 0 0 10px !important;
-  margin: 0 6px 0 0 !important;
-  padding: 0 !important;
-  color: #087e75 !important;
-  font-size: 16px !important;
-  font-weight: 800 !important;
-  line-height: 1 !important;
-  text-align: center !important;
-}
-</style>
-
-<style id="eyes-exercise-from-dot-label-gap-20261030">
-/* Add one more increment of space between the aligned dot and From label in Eyes (Exercise) only. */
-#alerts-panel #alert-card-break-ex .per-reminder-schedule-times > .per-reminder-from::before {
-  margin-right: 14px !important;
-}
-</style>
-<style id="eyes-exercise-from-dot-gap-final-20261030">
-/* Eyes (Exercise): increase the gap after the aligned dot by one more increment. */
-html body #alerts-panel #alert-card-break-ex .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from::before {
-  margin-right: 18px !important;
-}
-/* Reduce the vertical space below the From/time row before the following row. */
+<style id="eyes-exercise-from-row-vertical-spacing-20261030">
+/* Keep the previously requested tighter spacing below the Eyes (Exercise) From row. */
 html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedule {
   margin-bottom: 4px !important;
   padding-bottom: 2px !important;
@@ -12672,13 +12637,6 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   margin-left: 2px !important;
 }
 </style>
-
-<style id="eyes-exercise-from-dot-gap-override-20261030">
-/* Final override: later and more specific than the existing responsive dot rules. */
-html body #alerts-panel #alert-card-break-ex .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from::before {
-  margin-right: 12px !important;
-}
-</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
@@ -14523,49 +14481,4 @@ html body :is(.reminder-custom-select-trigger[aria-expanded="true"], .duration-c
   margin-left: 3px !important;
 }
 </style>
-
-<style id="eyes-exercise-from-dot-align-to-sessions-row-20261030">
-/* Align only the From dot in Eyes (Exercise) to the actual Sessions per day dot position. */
-#alerts-panel #alert-card-break-ex .per-reminder-schedule-times > .per-reminder-from::before {
-  transform: translateX(var(--eye-ex-from-dot-shift, 0px)) !important;
-  /* Keep a wider, visible gap after the dot; this is the last applicable rule. */
-  margin-right: 18px !important;
-}
-</style>
-<script id="eyes-exercise-from-dot-align-to-sessions-row-script-20261030">
-(function () {
-  function alignEyesExerciseFromDot() {
-    var card = document.getElementById('alert-card-break-ex');
-    if (!card) return;
-    var labels = card.querySelectorAll('.eye-ex-wrap > .alert-row .alert-row-lbl.dotted-lbl');
-    var sessionsLabel = Array.prototype.find.call(labels, function (label) {
-      return (label.textContent || '').trim() === 'Sessions per day';
-    });
-    var fromLabel = card.querySelector('.per-reminder-schedule-times > .per-reminder-from');
-    if (!sessionsLabel || !fromLabel) return;
-
-    var labelRect = sessionsLabel.getBoundingClientRect();
-    var fromRect = fromLabel.getBoundingClientRect();
-    var labelStyle = window.getComputedStyle(sessionsLabel);
-    var fromStyle = window.getComputedStyle(fromLabel);
-    var targetX = labelRect.left + parseFloat(labelStyle.borderLeftWidth || 0) + parseFloat(labelStyle.paddingLeft || 0);
-    var currentX = fromRect.left + parseFloat(fromStyle.borderLeftWidth || 0) + parseFloat(fromStyle.paddingLeft || 0);
-    var shift = targetX - currentX;
-    if (Number.isFinite(shift)) fromLabel.style.setProperty('--eye-ex-from-dot-shift', shift.toFixed(2) + 'px');
-  }
-  function scheduleAlign() {
-    window.requestAnimationFrame(alignEyesExerciseFromDot);
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      scheduleAlign();
-      window.setTimeout(scheduleAlign, 150);
-    }, { once: true });
-  } else {
-    scheduleAlign();
-    window.setTimeout(scheduleAlign, 150);
-  }
-  window.addEventListener('resize', scheduleAlign, { passive: true });
-})();
-</script>
 
