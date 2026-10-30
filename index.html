@@ -3644,6 +3644,44 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
   padding-bottom: 2px !important;
 }
 </style>
+
+<style id="eyes-from-dot-leading-space-20261030">
+/* Add a small leading space before the dot in Eyes (Exercise) > From. */
+#alerts-panel #alert-card-break-ex .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from::before {
+  margin-left: 6px !important;
+}
+</style>
+<style id="tracker-custom-date-picker-css-20261030">
+#tracker-card .trk-entry{position:relative}
+#tracker-card .trk-date-display{flex:1 1 170px!important;min-width:170px!important;width:100%!important;max-width:100%;white-space:nowrap;text-overflow:clip;cursor:pointer;padding-right:12px!important;}
+#tracker-card #tracker-date-calendar{position:absolute;z-index:10050;background:#fff;border:1px solid var(--calc-2,#0e7490);border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.16);padding:10px;width:min(296px,calc(100vw - 64px));top:calc(100% + 4px);left:0;margin-top:0;color:#164e63;}
+#tracker-card #tracker-date-calendar[hidden]{display:none!important}
+#tracker-card .trk-cal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+#tracker-card .trk-cal-month{font-weight:750;text-align:center;flex:1;white-space:nowrap;border:0;background:transparent;color:inherit;font-family:inherit;font-size:inherit;cursor:pointer;border-radius:8px;padding:6px 4px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+#tracker-card .trk-cal-month:hover{background:#e6f7f8}
+#tracker-card .trk-jump{display:flex;flex-direction:column;gap:8px}
+#tracker-card .trk-jump-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#tracker-card .trk-jump-title{font-weight:750;text-align:center;flex:1;white-space:nowrap;font-size:15px}
+#tracker-card .trk-jump-grid{display:grid;gap:4px;text-align:center}
+#tracker-card .trk-jump-grid.cols4{grid-template-columns:repeat(4,minmax(0,1fr))}
+#tracker-card .trk-jump-grid.cols3{grid-template-columns:repeat(3,minmax(0,1fr))}
+#tracker-card .trk-jump-grid.cols7{grid-template-columns:repeat(7,minmax(0,1fr))}
+#tracker-card .trk-jump-grid.scroll{max-height:236px;overflow-y:auto;padding-right:2px}
+#tracker-card .trk-jump-wk{font-size:11px;font-weight:700;color:#64748b;margin-bottom:2px}
+#tracker-card .trk-jump-opt{height:38px;border:0;border-radius:8px;background:#f0fdfa;color:#164e63;font:inherit;cursor:pointer}
+#tracker-card .trk-jump-opt.day{height:34px}
+#tracker-card .trk-jump-opt.current{background:var(--calc-2,#0e7490);color:#fff;font-weight:800}
+#tracker-card .trk-jump-opt.future{background:#f1f5f9;color:#cbd5e1;cursor:not-allowed}
+#tracker-card .trk-cal-nav-spacer{display:inline-block;width:34px;height:34px;flex:0 0 34px}
+#tracker-card .trk-cal-nav{border:0;border-radius:8px;background:#e6f7f8;color:#0e7490;font-size:24px;line-height:30px;width:34px;height:34px;cursor:pointer}
+#tracker-card .trk-cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center}
+#tracker-card .trk-cal-week{font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px}
+#tracker-card .trk-cal-day{height:34px;border:0;border-radius:8px;background:#f0fdfa;color:#164e63;font:inherit;cursor:pointer}
+#tracker-card .trk-cal-day.today{outline:1px solid #0e7490;font-weight:800}
+#tracker-card .trk-cal-day.selected{background:var(--calc-2,#0e7490);color:#fff;font-weight:800}
+#tracker-card .trk-cal-day.future{background:#f1f5f9;color:#cbd5e1;cursor:not-allowed;text-decoration:none}
+#tracker-card .trk-cal-empty{height:34px}
+</style>
 </head>
 <body>
 
@@ -3898,7 +3936,8 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       <div class="trk-entry" id="tracker-entry" style="display:none">
         <input type="number" inputmode="decimal" step="any" id="tracker-v1" class="lab-value-input" placeholder="Value">
         <input type="number" inputmode="decimal" step="any" id="tracker-v2" class="lab-value-input" placeholder="Diastolic" style="display:none">
-        <input type="date" id="tracker-date" class="lab-value-input trk-date" aria-label="Date of reading">
+        <input type="hidden" id="tracker-date" aria-label="Date of reading">
+        <input type="text" id="tracker-date-display" class="lab-value-input trk-date trk-date-display" aria-label="Choose reading date" placeholder="Select date" readonly autocomplete="off">
         <button type="button" id="tracker-add-btn" class="lab-add-icon-btn tracker-save-btn" title="Save reading" onclick="addTrackerReading()">Save</button>
       </div>
       <p class="trk-hint" id="tracker-hint"></p>
@@ -12637,6 +12676,168 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   margin-left: 2px !important;
 }
 </style>
+
+<script id="tracker-custom-date-picker-20261030">
+(function () {
+  'use strict';
+  var field, display, popup, monthCursor, today, selected;
+  function pad(n){ return n < 10 ? '0' + n : String(n); }
+  function ymd(d){ return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+  function parseYmd(s){ var a=(s||'').split('-').map(Number); return a.length===3 && a[0] ? new Date(a[0],a[1]-1,a[2]) : new Date(); }
+  function fmt(d){ return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+  function refreshToday(){ var n=new Date(); today=new Date(n.getFullYear(),n.getMonth(),n.getDate()); }
+  function close(){ if(popup) popup.hidden=true; if(display) display.setAttribute('aria-expanded','false'); var en=document.getElementById('tracker-entry'); if(en) en.style.paddingBottom=''; }
+  function render(){
+    if(!popup) return;
+    refreshToday();
+    var y=monthCursor.getFullYear(), m=monthCursor.getMonth();
+    var atLatest=(y>today.getFullYear()||(y===today.getFullYear()&&m>=today.getMonth()));   // no later month to go to
+    var first=new Date(y,m,1), offset=(first.getDay()+6)%7;
+    var days=new Date(y,m+1,0).getDate();
+    var html='<div class="trk-cal-head"><button type="button" class="trk-cal-nav" data-cal="prev" aria-label="Previous month">‹</button><button type="button" class="trk-cal-month" data-cal="jump" aria-haspopup="dialog" aria-label="Choose year, month and day">'+monthCursor.toLocaleDateString('en-GB',{month:'long',year:'numeric'})+' <svg viewBox="0 0 12 8" width="11" height="8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg></button>'+(atLatest?'<span class="trk-cal-nav-spacer" aria-hidden="true"></span>':'<button type="button" class="trk-cal-nav" data-cal="next" aria-label="Next month">›</button>')+'</div>';
+    html+='<div class="trk-cal-grid trk-cal-week">'+['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(function(x){return '<span>'+x+'</span>';}).join('')+'</div>';
+    html+='<div class="trk-cal-grid">';
+    for(var i=0;i<offset;i++) html+='<span class="trk-cal-empty"></span>';
+    for(var d=1;d<=days;d++){
+      var date=new Date(y,m,d), key=ymd(date), disabled=date>today, isSelected=selected&&key===ymd(selected), isToday=key===ymd(today);
+      html+='<button type="button" class="trk-cal-day'+(disabled?' future':'')+(isSelected?' selected':'')+(isToday?' today':'')+'" data-date="'+key+'"'+(disabled?' disabled aria-disabled="true"':'')+'>'+d+'</button>';
+    }
+    html+='</div>';
+    popup.innerHTML=html;
+  }
+  function sync(){
+    refreshToday();
+    if(!field.value || field.value>ymd(today)) field.value=ymd(today);
+    selected=parseYmd(field.value);
+    if(display) display.value=fmt(selected);
+  }
+  function place(){
+    if(!popup||popup.hidden) return;
+    var entry=document.getElementById('tracker-entry');
+    // Directly under the date field, left edges aligned, kept inside the entry area.
+    var avail=Math.min(entry.clientWidth, innerWidth-32);
+    popup.style.width=Math.min(296,avail)+'px';
+    var w=popup.offsetWidth, maxLeft=Math.max(0,entry.clientWidth-w);
+    popup.style.left=Math.max(0,Math.min(display.offsetLeft,maxLeft))+'px';
+    var top=display.offsetTop+display.offsetHeight+4;
+    popup.style.top=top+'px';
+    // Make room for the calendar inside the card so it is never cut off and the page can scroll to it.
+    entry.style.paddingBottom='';
+    var natural=entry.offsetHeight, over=top+popup.offsetHeight+10-natural;
+    entry.style.paddingBottom=over>0?over+'px':'';
+  }
+  function bottomLimit(){
+    // Top edge of anything fixed to the bottom of the screen (the footer bar), else the window bottom.
+    var el=document.elementFromPoint(Math.round(innerWidth/2),innerHeight-6), lim=innerHeight;
+    while(el && el!==document.body && el!==document.documentElement){
+      if(getComputedStyle(el).position==='fixed'){ lim=Math.min(lim,el.getBoundingClientRect().top); break; }
+      el=el.parentElement;
+    }
+    return lim;
+  }
+  function reveal(){
+    if(!popup||popup.hidden) return;
+    var r=popup.getBoundingClientRect(), d=display.getBoundingClientRect();
+    var need=r.bottom+12-bottomLimit();
+    if(need>0){ window.scrollBy({top:Math.min(need,Math.max(0,d.top-12)),behavior:'smooth'}); }
+  }
+  function open(){
+    sync(); monthCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
+    render(); popup.hidden=false; display.setAttribute('aria-expanded','true');
+    place(); reveal();
+  }
+  // ---- year -> month -> day chooser (one step after the other) ----
+  var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var jump={y:0,m:0,d:1,step:'year'};
+  function dim(y,m){ return new Date(y,m+1,0).getDate(); }
+  function renderJump(){
+    refreshToday();
+    var ty=today.getFullYear(), tm=today.getMonth(), td=today.getDate(), html='', title='', grid='';
+    if(jump.step==='year'){
+      title='Select year';
+      for(var y=ty;y>=ty-100;y--) grid+='<button type="button" class="trk-jump-opt'+(y===jump.y?' current':'')+'" data-pick="year" data-val="'+y+'">'+y+'</button>';
+      grid='<div class="trk-jump-grid cols4 scroll">'+grid+'</div>';
+    } else if(jump.step==='month'){
+      title='Month · '+jump.y;
+      for(var m=0;m<12;m++){ var fut=(jump.y===ty&&m>tm);
+        grid+='<button type="button" class="trk-jump-opt'+(m===jump.m?' current':'')+(fut?' future':'')+'" data-pick="month" data-val="'+m+'"'+(fut?' disabled':'')+'>'+MONTHS[m].slice(0,3)+'</button>'; }
+      grid='<div class="trk-jump-grid cols3">'+grid+'</div>';
+    } else {
+      title='Day · '+MONTHS[jump.m].slice(0,3)+' '+jump.y;
+      var days=dim(jump.y,jump.m), offset=(new Date(jump.y,jump.m,1).getDay()+6)%7, wk='';
+      ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(function(x){ wk+='<span class="trk-jump-wk">'+x+'</span>'; });
+      for(var i=0;i<offset;i++) grid+='<span class="trk-cal-empty"></span>';
+      for(var d=1;d<=days;d++){ var fd=(jump.y===ty&&jump.m===tm&&d>td);
+        grid+='<button type="button" class="trk-jump-opt day'+(fd?' future':'')+'" data-pick="day" data-val="'+d+'"'+(fd?' disabled':'')+'>'+d+'</button>'; }
+      grid='<div class="trk-jump-grid cols7">'+wk+grid+'</div>';
+    }
+    popup.innerHTML='<div class="trk-jump"><div class="trk-jump-head"><button type="button" class="trk-cal-nav" data-cal="jump-back" aria-label="Back">‹</button>'
+      +'<div class="trk-jump-title">'+title+'</div><button type="button" class="trk-cal-nav" data-cal="jump-cancel" aria-label="Close">✕</button></div>'+grid+'</div>';
+    var cur=popup.querySelector('.trk-jump-opt.current'); if(cur && cur.scrollIntoView) cur.scrollIntoView({block:'center'});
+    place(); reveal();
+  }
+  function openJump(){
+    jump.y=monthCursor.getFullYear(); jump.m=monthCursor.getMonth(); jump.d=selected?selected.getDate():1; jump.step='year';
+    renderJump();
+  }
+  function applyJump(){
+    var pick=new Date(jump.y,jump.m,jump.d); if(pick>today) pick=new Date(today);
+    field.value=ymd(pick); selected=parseYmd(field.value); display.value=fmt(selected);
+    monthCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
+    field.dispatchEvent(new Event('change',{bubbles:true})); close();
+  }
+  function init(){
+    field=document.getElementById('tracker-date');
+    display=document.getElementById('tracker-date-display');
+    var entry=document.getElementById('tracker-entry');
+    if(!field||!display||!entry) return;
+    refreshToday(); field.value=ymd(today); sync();
+    popup=document.createElement('div'); popup.id='tracker-date-calendar'; popup.className='trk-date-calendar'; popup.hidden=true;
+    popup.setAttribute('role','dialog'); popup.setAttribute('aria-label','Choose reading date');
+    display.insertAdjacentElement('afterend',popup);
+    display.addEventListener('click',open);
+    display.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();open();} if(e.key==='Escape')close(); });
+    popup.addEventListener('click',function(e){
+      e.trkInsideCalendar=true;   // the popup re-renders itself, so remember the click started inside it
+      e.stopPropagation();
+      var pk=e.target.closest('[data-pick]');
+      if(pk && !pk.disabled){
+        var kind=pk.getAttribute('data-pick'), val=parseInt(pk.getAttribute('data-val'),10);
+        if(kind==='year'){ jump.y=val; jump.step='month'; renderJump(); }
+        else if(kind==='month'){ jump.m=val; jump.step='day'; renderJump(); }
+        else { jump.d=val; applyJump(); }
+        return;
+      }
+      var nav=e.target.closest('[data-cal]');
+      if(nav){
+        var act=nav.getAttribute('data-cal');
+        if(act==='jump'){ openJump(); return; }
+        if(act==='jump-cancel'){ render(); place(); return; }
+        if(act==='jump-back'){
+          if(jump.step==='day'){ jump.step='month'; renderJump(); }
+          else if(jump.step==='month'){ jump.step='year'; renderJump(); }
+          else { render(); place(); }
+          return;
+        }
+        monthCursor.setMonth(monthCursor.getMonth()+(act==='next'?1:-1)); render(); place(); return;
+      }
+      var day=e.target.closest('[data-date]');
+      if(day&&!day.disabled){ field.value=day.getAttribute('data-date'); selected=parseYmd(field.value); display.value=fmt(selected); field.dispatchEvent(new Event('change',{bubbles:true})); close(); }
+    });
+    document.addEventListener('click',function(e){ if(e.trkInsideCalendar||popup.contains(e.target)||e.target===display) return; close(); });
+    window.addEventListener('resize',place);
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+    var original=window.onTrackerSelect;
+    if(typeof original==='function') window.onTrackerSelect=function(){ var result=original.apply(this,arguments); sync(); return result; };
+    // When the entry row is opened from a saved metric's + button, refresh the display too.
+    var observer=new MutationObserver(function(){ if(entry.style.display!=='none') sync(); });
+    observer.observe(entry,{attributes:true,attributeFilter:['style']});
+    window.addEventListener('focus',sync);
+    document.addEventListener('visibilitychange',function(){if(!document.hidden)sync();});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
@@ -14480,5 +14681,11 @@ html body :is(.reminder-custom-select-trigger[aria-expanded="true"], .duration-c
   flex: 0 0 auto !important;
   margin-left: 3px !important;
 }
+</style>
+
+<style id="eyes-exercise-from-row-aligned-20261030">
+/* Eyes (Exercise): the From row starts at the same left edge as Sessions per day and the rows below. */
+#alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedule { align-self: stretch !important; width: 100% !important; }
+#alerts-panel #alert-card-break-ex .per-reminder-schedule .per-reminder-schedule-times { justify-content: flex-start !important; }
 </style>
 
