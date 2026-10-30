@@ -12579,6 +12579,30 @@ html body #tracker-card .tracker-select-wrap::after {
 }
 html body #tracker-card #tracker-select { padding-right:38px !important; }
 </style>
+
+
+<style id="lab-test-name-font-and-row-spacing-20261030">
+/* Lab Insights > Manual: match Test name typography to Tracker's Select a reading. */
+#lab-insights-card #lab-test-select,
+#lab-insights-card #lab-test-select option {
+  font-family: inherit !important;
+  font-size: .82rem !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+  letter-spacing: normal !important;
+}
+/* Give the Test name dropdown a little more room; move + right and narrow Value slightly. */
+#lab-insights-card .lab-manual-row:has(#lab-test-select) {
+  gap: 10px !important;
+}
+#lab-insights-card #lab-test-value {
+  flex: 0 0 90px !important;
+  width: 90px !important;
+}
+#lab-insights-card #lab-add-btn {
+  margin-left: 2px !important;
+}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
@@ -12655,6 +12679,52 @@ html[data-petal-card="e"] #nutrition-panel #sec-gender::after {
   width:80px !important; min-width:80px !important; max-width:80px !important;
   box-sizing:border-box !important; padding:3px 18px 3px 6px !important;
 }
+</style>
+
+<style id="lab-insights-dropdown-typography-row-final-20261030">
+/* Use the same explicit app font on both selects and their option lists. */
+#tracker-card #tracker-select,
+#lab-insights-card #lab-test-select {
+  font-family: var(--font) !important;
+  font-size: .88rem !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  letter-spacing: normal !important;
+  line-height: 1.45 !important;
+}
+#tracker-card #tracker-select option,
+#lab-insights-card #lab-test-select option {
+  font-family: var(--font) !important;
+  font-size: .88rem !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  letter-spacing: normal !important;
+}
+@supports (appearance: base-select) {
+  #tracker-card #tracker-select,
+  #lab-insights-card #lab-test-select { appearance: base-select !important; }
+  #tracker-card #tracker-select::picker(select),
+  #lab-insights-card #lab-test-select::picker(select) {
+    font-family: var(--font) !important;
+    font-size: .88rem !important;
+  }
+  #tracker-card #tracker-select option,
+  #lab-insights-card #lab-test-select option {
+    font: 400 .88rem/1.45 var(--font) !important;
+  }
+}
+/* Give Test name more room, keep Value compact, and add a little space before +. */
+#lab-insights-card .lab-manual-row:has(#lab-test-select) {
+  display: flex !important; flex-wrap: nowrap !important; align-items: stretch !important;
+  gap: 10px !important; width: 100% !important;
+}
+#lab-insights-card #lab-test-select {
+  flex: 1 1 0% !important; width: 0 !important; min-width: 0 !important; box-sizing: border-box !important;
+}
+#lab-insights-card #lab-test-value {
+  flex: 0 0 82px !important; width: 82px !important; min-width: 0 !important; box-sizing: border-box !important;
+}
+#lab-insights-card #lab-add-btn { flex: 0 0 auto !important; margin-left: 3px !important; }
 </style>
 
 </html>
@@ -14321,5 +14391,51 @@ html body :is(.reminder-custom-select-trigger[aria-expanded="true"], .duration-c
   border-color: #0d9488 !important;
   outline: none !important;
   box-shadow: none !important;
+}
+</style>
+
+<style id="lab-insights-manual-final-layout-20261030">
+/* Final override: keep Test name typography aligned with Tracker's Select a reading. */
+#tracker-card #tracker-select,
+#lab-insights-card #lab-test-select {
+  font-family: inherit !important;
+  font-size: .88rem !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  letter-spacing: normal !important;
+  line-height: 1.45 !important;
+  color: #0c3d4d !important;
+}
+#tracker-card #tracker-select option,
+#lab-insights-card #lab-test-select option {
+  font-family: inherit !important;
+  font-size: .88rem !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  letter-spacing: normal !important;
+}
+/* Keep all three controls on one row; give Test name the available width. */
+#lab-insights-card .lab-manual-row:has(#lab-test-select) {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+#lab-insights-card #lab-test-select {
+  flex: 1 1 0% !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+#lab-insights-card #lab-test-value {
+  flex: 0 0 82px !important;
+  width: 82px !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+#lab-insights-card #lab-add-btn {
+  flex: 0 0 auto !important;
+  margin-left: 3px !important;
 }
 </style>
