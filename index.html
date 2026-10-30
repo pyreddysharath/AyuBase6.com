@@ -8610,9 +8610,14 @@ function initNudgeSW(){
   }catch(e){}
 }
 function handleNudgeClick(key, action){
-  if(key!=='break') return;
-  if(action==='cancel') cancelEyeTimer();
-  else startEyeTimer();
+  if(key==='break'){
+    if(action==='cancel') cancelEyeTimer();
+    else startEyeTimer();
+    return;
+  }
+  if(typeof key==='string' && key.indexOf('routine-checkin-')===0 && typeof window.handleRoutineNotificationAction==='function'){
+    window.handleRoutineNotificationAction(key.slice('routine-checkin-'.length), action);
+  }
 }
 // Phones can't build Notification objects directly (Chrome on Android throws) — they must go
 // through a service worker, which is also what lets a reminder appear on the lock screen.
@@ -14255,17 +14260,25 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
   function show(key){
     var cb=cbFor(key); if(!cb){ showing=false; next(); return; }
     showing=true; current=key;
-    var o=document.createElement('div'); o.className='rout-ask-overlay'; o.setAttribute('role','dialog'); o.setAttribute('aria-modal','true');
-    o.innerHTML='<div class="rout-card rout-ask-card"><div class="rout-ask-sec"></div><h3 class="rout-ask-title"></h3><div class="rout-ask-time"></div>'
-      +'<p class="rout-ask-q">Have you done this?</p><div class="rout-ask-btns"><button type="button" class="rout-ask-yes">Yes, done</button><button type="button" class="rout-ask-no">No</button></div></div>';
-    o.querySelector('.rout-ask-sec').textContent=sectionOf(cb);
-    o.querySelector('.rout-ask-title').textContent=nameOf(cb);
-    o.querySelector('.rout-ask-time').textContent=timeOf(cb);
-    o.querySelector('.rout-ask-yes').addEventListener('click',function(){ answer(key,true); closePopup(); });
-    o.querySelector('.rout-ask-no').addEventListener('click',function(){ answer(key,false); closePopup(); });
-    document.body.appendChild(o);
+    var title=nameOf(cb), section=sectionOf(cb), when=timeOf(cb);
+    var body='Have you completed this activity? '+section+' · '+when;
+    var shown=typeof showNudgeNotification==='function' && showNudgeNotification('Routine check-in · '+title, body, {
+      key:'routine-checkin-'+key,
+      actions:[{action:'done',title:'✓ Yes, done'},{action:'not-done',title:'Not yet'}]
+    });
+    // If system notifications are unavailable, do not replace them with an
+    // interruptive in-page popup. The routine remains available in the checklist.
+    if(!shown){ showing=false; current=null; return; }
+    showing=false; current=null;
   }
-  function next(){ if(showing) return; var k=queue.shift(); if(k) show(k); }
+  function next(){
+    if(showing) return;
+    while(queue.length){ var k=queue.shift(); if(k) show(k); }
+  }
+  window.handleRoutineNotificationAction=function(key,action){
+    if(action!=='done' && action!=='not-done') return;
+    answer(key, action==='done');
+  };
 
   function check(){
     // A new day: clear the ticks, the "Not done" marks and what was already asked.
