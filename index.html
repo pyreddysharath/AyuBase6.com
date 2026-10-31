@@ -12389,6 +12389,26 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     {id:'alert-card-break-ex',key:'break-ex',title:'Eyes (Exercise)'}
   ];
   const cards={};
+  // The chosen From/To hours (all sections, and each section's own) are kept on this device.
+  const HOURS_KEY='ayuBase6-reminder-hours';
+  const validTime=t=>/^\d{1,2}:\d{2}$/.test(String(t||''));
+  function saveHours(){
+    try{
+      const sections={};Object.keys(cards).forEach(k=>{sections[k]={start:cards[k].start,end:cards[k].end}});
+      localStorage.setItem(HOURS_KEY,JSON.stringify({top:{start:topState.start,end:topState.end},sections}));
+    }catch(e){}
+  }
+  function restoreHours(){
+    let saved=null;try{saved=JSON.parse(localStorage.getItem(HOURS_KEY)||'null')}catch(e){}
+    if(!saved)return;
+    if(saved.top&&validTime(saved.top.start)&&validTime(saved.top.end)){topState.start=saved.top.start;topState.end=saved.top.end;wireTopSchedule()}
+    specs.forEach(spec=>{
+      const st=cards[spec.key],sv=saved.sections&&saved.sections[spec.key],card=document.getElementById(spec.id);
+      if(!st||!sv||!validTime(sv.start)||!validTime(sv.end))return;
+      st.start=sv.start;st.end=sv.end;
+      ['start','end'].forEach(w=>{const b=card&&card.querySelector('.per-reminder-schedule [data-time="'+w+'"]');if(b)drawButton(b,st[w])});
+    });
+  }
   function inWindow(start,end,date){
     const now=date||new Date(),cur=now.getHours()*60+now.getMinutes();
     const val=t=>{const m=/^(\d{1,2}):(\d{2})$/.exec(t||'');return m?+m[1]*60+(+m[2]):null};
@@ -12412,6 +12432,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     });
     updateExerciseTimes();
     ['break','walk','drink'].forEach(k=>{if(typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)});
+    saveHours();
   }
   function wireTopSchedule(){
     const row=document.querySelector('#reminder-hours-card .per-reminder-schedule');if(!row)return;
@@ -12448,6 +12469,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
           state[which]=value;drawButton(btn,value);
           if(spec.key==='break-ex')updateExerciseTimes();
           if(spec.key!=='break-ex'&&typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(spec.key);
+          saveHours();
         },spec.title+' — '+(which==='start'?'From':'To'));
       });
     });
@@ -12460,7 +12482,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     const custom=document.getElementById('custom-reminders-card');if(custom)page.appendChild(custom);
   }
   function install(){
-    specs.forEach(addSchedule);reorder();wireTopSchedule();
+    specs.forEach(addSchedule);reorder();wireTopSchedule();restoreHours();
     // Retain the legacy hidden schedule controls for reset compatibility, but remove its card from the UI.
     const oldStart=document.getElementById('schedule-start'),oldEnd=document.getElementById('schedule-end');
     if(oldStart)oldStart.value=defaults.start;if(oldEnd)oldEnd.value=defaults.end;
@@ -12527,7 +12549,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   const oldEyeCountChange=window.onEyeExCountChange;
   window.onEyeExCountChange=function(){if(typeof oldEyeCountChange==='function')oldEyeCountChange();updateExerciseTimes()};
   const oldReset=window.resetRemindersToDefault;
-  window.resetRemindersToDefault=function(){if(typeof oldReset==='function')oldReset();topState.start=defaults.start;topState.end=defaults.end;wireTopSchedule();Object.values(cards).forEach(w=>{w.start=defaults.start;w.end=defaults.end});document.querySelectorAll('#alerts-panel .per-reminder-schedule').forEach(row=>{const spec=specs.find(x=>row.closest('#'+x.id));if(!spec)return;row.querySelector('[data-time="start"]').textContent='9:00 AM';row.querySelector('[data-time="end"]').textContent='6:00 PM'});['break','walk','drink'].forEach(k=>window.scheduleAlertTimer(k));updateExerciseTimes()};
+  window.resetRemindersToDefault=function(){try{localStorage.removeItem(HOURS_KEY)}catch(e){}if(typeof oldReset==='function')oldReset();topState.start=defaults.start;topState.end=defaults.end;wireTopSchedule();Object.values(cards).forEach(w=>{w.start=defaults.start;w.end=defaults.end});document.querySelectorAll('#alerts-panel .per-reminder-schedule').forEach(row=>{const spec=specs.find(x=>row.closest('#'+x.id));if(!spec)return;row.querySelector('[data-time="start"]').textContent='9:00 AM';row.querySelector('[data-time="end"]').textContent='6:00 PM'});['break','walk','drink'].forEach(k=>window.scheduleAlertTimer(k));updateExerciseTimes()};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })();
 </script>
