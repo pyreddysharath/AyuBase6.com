@@ -10560,7 +10560,7 @@ async function ayuOfflineRefresh(setName, progress){
       text = 'Update the saved ' + set.label + ' videos' + (leftBytes ? ' (' + ayuMB(leftBytes) + ')' : '') + '.';
       btnLabel = 'Save again';
     } else if(saved === videos.length){ text = '✓ All ' + set.label + ' videos are saved on this device and play without internet.'; btnHidden = true; }
-    else text = (saved ? 'Some ' + set.label + ' videos are saved. ' : 'Play ' + set.label + ' videos without internet. ') + 'Save ' + (saved ? 'the rest' : 'them') + ' (' + ayuMB(leftBytes) + ').';
+    else { const some = deliberate && saved > 0; text = (some ? 'Some ' + set.label + ' videos are saved. ' : 'Play ' + set.label + ' videos without internet. ') + 'Save ' + (some ? 'the rest' : 'them') + ' (' + ayuMB(leftBytes) + ').'; }
   }
   boxes.forEach(b => {
     b.hidden = false;
