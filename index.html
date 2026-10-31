@@ -8656,7 +8656,15 @@ function nudgeOpenFromWindow(win, key){
   try{ if(typeof switchTab==='function') switchTab(section); }catch(e){}
   nudgeShowSection(key);
 }
+// Phones: Reminders notifications carry two text buttons (Android shows them; iPhone does not).
+function nudgeDisableActions(){
+  return NUDGE_IS_PHONE ? [ {action:'disable-this', title:'Disable this'}, {action:'disable-all', title:'Disable all'} ] : undefined;
+}
 function handleNudgeClick(key, action){
+  if((action==='disable-this'||action==='disable-all') && /^(break|walk|drink|eyeex)$/.test(String(key))){
+    try{ const h=nudgeDefaultHandlers(key); (action==='disable-all'?h.onDisableAll:h.onDisableThis)(); }catch(e){}
+    return;
+  }
   if(key==='break') return;   // Eyes (20-20-20) has no timer; tapping it just opens the app
   if(typeof key==='string' && /^routine-(end-|again-)?[a-z]+$/.test(key) && (action==='done'||action==='not-yet')){
     routineAction(key.replace(/^routine-(end-|again-)?/,''), action); return;
@@ -8741,7 +8749,7 @@ function eyeStartPrompt(){
 }
 function showEyeReminderNotification(){
   return showNudgeNotification(ALERT_LABELS.break.title, eyeStartPrompt(), {
-    key:'break'
+    key:'break', actions:nudgeDisableActions()
   });
 }
 function startEyeTimer(){
@@ -9142,7 +9150,7 @@ function fireAlert(key){
   let shown=false;
   if(alertState[key].notify && typeof Notification!=='undefined' && Notification.permission==='granted'){
     shown = (!NUDGE_IS_PHONE && openNudgePopup(key, info.title, info.msg, {}))
-      || ((key==='break') ? showEyeReminderNotification() : showNudgeNotification(info.title, info.msg, {key:key}));
+      || ((key==='break') ? showEyeReminderNotification() : showNudgeNotification(info.title, info.msg, {key:key, actions:nudgeDisableActions()}));
   }
   if(!shown){
     const mock=document.getElementById('alert-'+key+'-notif-mock');
@@ -9636,7 +9644,7 @@ function fireEyeExAlert(){
   let shown=false;
   if(eyeExState.notify && typeof Notification!=='undefined' && Notification.permission==='granted'){
     shown=(!NUDGE_IS_PHONE && openNudgePopup('eyeex', 'Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {timer:true,timerSecs:30}))
-      || showNudgeNotification('Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {key:'eyeex'});
+      || showNudgeNotification('Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {key:'eyeex', actions:nudgeDisableActions()});
   }
   if(!shown){
     const mock=document.getElementById('eye-ex-notif-mock');

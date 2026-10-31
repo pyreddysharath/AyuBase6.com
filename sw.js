@@ -124,6 +124,10 @@ self.addEventListener('notificationclick', event => {
     }
 
     if (self.clients.openWindow) {
+      // A button tapped while the app was closed: pass it on so the page can carry it out once it opens.
+      if (event.action && data.key) {
+        targetUrl.hash = 'nudge=' + encodeURIComponent(data.key) + '&action=' + encodeURIComponent(event.action);
+      }
       return self.clients.openWindow(targetUrl.href);
     }
   })());
