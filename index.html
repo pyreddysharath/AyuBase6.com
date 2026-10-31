@@ -4236,7 +4236,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
 
     <div class="rout-card">
       <div class="rout-card-hdr">
-        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg> Wake-Up Time</h2>
+        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg> Daily Rhythm</h2>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('wake')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-wake" style="display:none">
@@ -4253,11 +4253,12 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         to give at least 8 hours before the next wake-up.<br><br>
         <strong>Remind me</strong> applies to every activity. <b>At start only</b> sends one notification when an
         activity begins. <b>Start + before it ends</b> adds a reminder 15 minutes before its time window closes
-        (activities with a single time get only the start). Each notification has <b>Done</b>, which ticks the
+        (activities shorter than 15 minutes get only the start). Each notification has <b>Done</b>, which ticks the
         activity, and <b>Not yet</b>.
       </div>
       <div class="wake-control">
         <div class="wake-control-hdr">
+          <span class="wake-label">Wake-up time</span>
           <strong id="wake-time-val">5:45 AM</strong>
         </div>
         <input type="range" id="wake-time-slider" min="180" max="540" step="15" value="345" class="wake-slider">
@@ -4270,7 +4271,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       <h2>☀️ Morning</h2>
 
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="palms"> <span>Rub palms together and place over closed eyes <span class="rout-time" id="rt-palms">(5:45 AM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="palms"> <span>Rub palms together and place over closed eyes <span class="rout-time" id="rt-palms">(5:45 – 5:50 AM)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('palms')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-palms" style="display:none">
@@ -4278,7 +4279,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         rest, easing the eyes into the day rather than opening straight into bright light or a screen.
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="water"> <span>Drink water <span class="rout-time" id="rt-water">(5:50 AM, 1–2 glasses)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="water"> <span>Drink water <span class="rout-time" id="rt-water">(5:50 – 6:00 AM, 1–2 glasses)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('water')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-water" style="display:none">
@@ -4286,7 +4287,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         your body loses water through breathing and sweat even while asleep.
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="bathroom"> <span>Wait a while, then go to the bathroom <span class="rout-time" id="rt-bathroom">(6:00 AM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="bathroom"> <span>Wait a while, then go to the bathroom <span class="rout-time" id="rt-bathroom">(6:00 – 6:15 AM)</span></span></label>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="walkex"> <span>Walk or Exercise <span class="rout-time" id="rt-walkex">(6:15 – 7:00 AM)</span></span></label>
@@ -4299,7 +4300,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
     <div class="rout-card">
       <h2>🌤️ Afternoon</h2>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="fruits"> <span>Fruits <span class="rout-time" id="rt-fruits">(11:00 AM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="fruits"> <span>Fruits <span class="rout-time" id="rt-fruits">(11:00 – 11:30 AM)</span></span></label>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="lunch"> <span>Lunch <span class="rout-time" id="rt-lunch">(12:30 – 1:30 PM)</span></span></label>
@@ -9058,7 +9059,8 @@ function routineAction(key, action){
     closeRoutineNotices(key);
   } else if(action==='not-yet'){
     closeRoutineNotices(key);
-    if(routineEndMinute(key)===null){
+    var _e=routineEndMinute(key), _st=routineItemMinute(key);
+    if(_e===null || _st===null || _e-15<=_st){
       const item=ROUTINE_NOTIFY_ITEMS[key]; if(!item) return;
       setTimeout(()=>{ const cb=routineCb(key); if(cb&&cb.checked) return; if(routineIsMuted(key)) return; notifyRoutine('again-'+key,item.title,'Still to do: '+item.body,{ actions:[{action:'done',title:'✓ Done'}], buttons:[{act:'done',label:'Done',primary:true}], onAction:a=>routineAction(key,a) }); }, 15*60000);
     }
@@ -9859,12 +9861,12 @@ initRoutinesChecklist();
 //  minutes) from whatever wake time is chosen.
 // ════════════════════════════════════════════════
 const WAKE_OFFSETS = {
-  palms:     [0],
-  water:     [5],
-  bathroom:  [15],
+  palms:     [0, 5],
+  water:     [5, 15],
+  bathroom:  [15, 30],
   walkex:    [30, 75],
   breakfast: [105, 165],
-  fruits:    [315],
+  fruits:    [315, 345],
   lunch:     [405, 465],
   snacks:    [615, 675],
   dinner:    [795, 855],
@@ -9899,7 +9901,8 @@ function updateWakeSchedule(){
     if(!el) return;
     const offsets=WAKE_OFFSETS[key];
     if(offsets.length===2){
-      el.textContent=`(${minutesToClock(wake+offsets[0])} – ${minutesToClock(wake+offsets[1])})`;
+      const extra=(key==='water')?', 1–2 glasses':'';
+      el.textContent=`(${minutesToClock(wake+offsets[0])} – ${minutesToClock(wake+offsets[1])}${extra})`;
     } else {
       let extra='';
       if(key==='water') extra=', 1–2 glasses';
@@ -15044,7 +15047,15 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
   }
   function syncRoutines(){ if(window.__routPending) return; var t=$('routines-master-toggle'); var on=(typeof routineNotificationsEnabled==='function')&&!!routineNotificationsEnabled(); if(t) t.checked=on; var rp=$('routines-remind-panel'); if(rp) rp.hidden=!on; var nd=$('routines-install-nudge'); if(nd && !on) nd.hidden=true; }
   function initRoutines(){
-    var card=document.querySelector('#routines-panel .rout-card'); if(!card) return;
+    var card0=document.querySelector('#routines-panel .rout-card'); if(!card0) return;
+    var card=$('routines-notify-card');
+    if(!card){
+      card=document.createElement('div'); card.className='rout-card'; card.id='routines-notify-card';
+      card.innerHTML='<div class="rout-card-hdr"><h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 22a2.2 2.2 0 0 0 2.18-2h-4.36A2.2 2.2 0 0 0 12 22ZM19 16.5V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5.5l-2 2V20h18v-1.5l-2-2Z"/></svg> Notify Me</h2>'
+        +'<button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo(\'notify\')" title="Why?">i</button></div>'
+        +'<div class="calc-task rout-info-panel" id="rout-info-notify" style="display:none"></div>';
+      card0.after(card);
+    }
     var hdr=card.querySelector('.rout-card-hdr');
     if(hdr && !$('routines-master-toggle')){
       var l=document.createElement('label'); l.className='master-switch rout-master-switch'; l.title='Turn Checks notifications on or off';
@@ -15067,8 +15078,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     if(!$('routines-remind-panel')){
       var rp=document.createElement('div'); rp.id='routines-remind-panel'; rp.className='routines-remind-panel'; rp.hidden=true;
       rp.setAttribute('role','radiogroup'); rp.setAttribute('aria-label','Remind me');
-      rp.innerHTML='<div class="routines-remind-title">Remind me</div>'
-        +'<label><input type="radio" name="routines-remind" value="start"><span>At start only</span></label>'
+      rp.innerHTML='<label><input type="radio" name="routines-remind" value="start"><span>At start only</span></label>'
         +'<label><input type="radio" name="routines-remind" value="beforeend"><span>Start + before it ends</span></label>';
       card.insertBefore(rp,foot);
       var cur=(typeof routineRemindMode==='function')?routineRemindMode():'start';
@@ -15079,7 +15089,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. Use the install icon below if the install box does not appear.';
       card.insertBefore(nd,foot);
     }
-    (function(){ var hd=card.querySelector('.rout-card-hdr'); if(hd) ['routines-install-nudge','rout-notif-hint','routines-install-help','routines-remind-panel'].reverse().forEach(function(id){ var el=$(id); if(el) hd.after(el); }); })();
+    (function(){ var hd=$('routines-notify-row')||card.querySelector('.rout-card-hdr'); if(hd) ['routines-remind-panel','routines-install-nudge','rout-notif-hint','routines-install-help'].reverse().forEach(function(id){ var el=$(id); if(el) hd.after(el); }); })();
     syncRoutines();
   }
   function addAbout(){
@@ -15178,7 +15188,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
   }
   function placeAll(){
     place($('reminder-hours-card'),'.alert-card-hdr',['reminders-install-nudge','reminders-notif-error']);
-    place(document.querySelector('#routines-panel .rout-card'),'.rout-card-hdr',['routines-remind-panel','routines-install-nudge','rout-notif-hint']);
+    place($('routines-notify-card'),'.rout-card-hdr',['routines-remind-panel','routines-install-nudge','rout-notif-hint']);
   }
 
   // ---------- a message that disappears once it has been readable long enough ----------
@@ -15219,10 +15229,9 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
   // ---------- an i panel opens directly under the row that holds its i ----------
   var INFO={ 'lab-info-btn':['lab-info-panel','.calc-card-hdr'], 'lab-disclaimer-btn':['lab-disclaimer-panel','.calc-card-hdr'],
              'tracker-info-btn':['tracker-info-panel','.calc-card-hdr'], 'reminder-hours-info-btn':['reminder-hours-info','.alert-card-hdr'] };
-  document.querySelectorAll('.rout-info-btn').forEach(function(b){ var m=/'(\w+)'/.exec(b.getAttribute('onclick')||''); if(m && m[1]==='wake') b.dataset.uxPanel='rout-info-wake'; });
   function pairFor(btn){
     if(INFO[btn.id]) return INFO[btn.id];
-    if(btn.dataset.uxPanel) return [btn.dataset.uxPanel,'.rout-card-hdr'];
+    if(btn.classList.contains('rout-info-btn')){ var m=/'(\w+)'/.exec(btn.getAttribute('onclick')||''); if(m && (m[1]==='wake'||m[1]==='notify')) return ['rout-info-'+m[1],'.rout-card-hdr']; }
     return null;
   }
   document.addEventListener('click',function(e){
@@ -15281,11 +15290,13 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       +'<li><b>5:30 – 6:30 AM</b> green, the sweet spot: fits the natural cortisol rhythm and gives a calm start</li>'
       +'<li><b>6:30 – 7:30 AM</b> orange-green: healthy and common</li>'
       +'<li><b>7:30 – 9:00 AM</b> orange: squeezes the rest of the day’s routine</li></ul>'
-      +'Every activity shifts with your wake time, and Sleep is always set at least 8 hours before the next wake-up.'
-      +'<br><br><strong>Remind me</strong><ul style="margin:4px 0 0 18px;padding:0"><li><b>At start only:</b> one notification when an activity begins.</li>'
-      +'<li><b>Start + before it ends:</b> also a reminder 15 minutes before its window closes (single-time activities get only the start).</li>'
+      +'Every activity shifts with your wake time, and Sleep is always set at least 8 hours before the next wake-up.'; }
+    var rn=$('rout-info-notify'); if(rn && rn.dataset.ux!=='1'){ rn.dataset.ux='1';
+      rn.innerHTML='<strong>Notify Me</strong><p style="margin:2px 0 6px">The switch turns notifications for every activity on or off. The options appear once it is on.</p>'
+      +'<ul style="margin:4px 0 8px 18px;padding:0"><li><b>At start only:</b> one notification when an activity begins.</li>'
+      +'<li><b>Start + before it ends:</b> also a reminder 15 minutes before its window closes (activities shorter than 15 minutes get only the start).</li>'
       +'<li>Each notification has <b>Done</b> (ticks it) and <b>Not yet</b>.</li></ul>'
-      +'<br><strong>Notifications</strong><ul style="margin:4px 0 0 18px;padding:0"><li>They run only while AyuBase6 is open in a browser tab or installed app.</li>'
+      +'<strong>Good to know</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Notifications run only while AyuBase6 is open in a browser tab or installed app.</li>'
       +'<li><b>To install:</b> Chrome or Edge: the install icon in the address bar, or menu → Install AyuBase6. Android: ⋮ → Install app. iPhone/iPad: Share → Add to Home Screen. Safari on Mac: File → Add to Dock.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li></ul>'; }
     var rp=$('rout-info-palms'); if(rp && rp.dataset.ux!=='1'){ rp.dataset.ux='1'; rp.textContent='The warmth and gentle pressure relax the eye muscles and improve blood flow, easing your eyes into the day instead of going straight to bright light or a screen.'; }
@@ -15296,3 +15307,12 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
   window.addEventListener('load',go); [900,2000,4000].forEach(function(ms){ setTimeout(go,ms); });
 })();
 </script>
+
+<style id="daily-rhythm-20261031">
+#routines-panel .wake-control-hdr{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#routines-panel .wake-label{font-size:.86rem;font-weight:700;color:#7a4510}
+#routines-panel .routines-notify-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(166,124,60,.35)}
+#routines-panel .routines-notify-title{font-size:15px;font-weight:800;color:#7a4510;border-left:4px solid #e6a93a;padding:1px 0 1px 9px}
+#routines-panel .routines-notify-row .master-switch{margin:0}
+#routines-panel .routines-remind-panel{margin-top:12px;margin-bottom:0}
+</style>
