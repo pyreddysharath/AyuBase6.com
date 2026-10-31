@@ -8624,8 +8624,10 @@ function initNudgeSW(){
       const w=reg.installing||reg.waiting; if(!w) return;
       w.addEventListener('statechange', ()=>{ if(w.state==='activated') nudgeSwReg=reg; });
     };
-    navigator.serviceWorker.register('./sw.js', {scope: './'}).then(adopt).catch(()=>{});
-  }catch(e){}
+    navigator.serviceWorker.register('./sw.js', {scope: './'})
+      .then(adopt)
+      .catch(error=>console.error('[AyuBase6] Service worker registration failed:', error));
+  }catch(e){ console.error('[AyuBase6] Service worker setup failed:', e); }
 }
 function handleNudgeClick(key, action){
   if(key==='break'){
@@ -8644,9 +8646,9 @@ const NUDGE_IS_PHONE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent
 function getNudgeReg(){
   if(nudgeSwReg) return Promise.resolve(nudgeSwReg);
   if(!('serviceWorker' in navigator)) return Promise.resolve(null);
-  return navigator.serviceWorker.getRegistrations()
-    .then(list=>{ const r=list.find(x=>x.active)||null; if(r) nudgeSwReg=r; return r; })
-    .catch(()=>null);
+  return navigator.serviceWorker.ready
+    .then(reg=>{ if(reg && reg.active) nudgeSwReg=reg; return nudgeSwReg; })
+    .catch(error=>{ console.error('[AyuBase6] No active service worker:', error); return null; });
 }
 // Last resort when no system notification can be made: the in-app card for that nudge.
 function nudgeInPageFallback(key){
@@ -8682,11 +8684,23 @@ function showNudgeNotification(title, body, o){
   };
   try{
     if(nudgeSwReg){
-      viaReg(nudgeSwReg).catch(()=>{ try{ delete opts.actions; new Notification(title, opts); }catch(e){} });
+      viaReg(nudgeSwReg).catch(error=>{
+        console.error('[AyuBase6] Service-worker notification failed:', error);
+        if(NUDGE_IS_PHONE) nudgeInPageFallback(key);
+        else { try{ delete opts.actions; new Notification(title, opts); }catch(e){ nudgeInPageFallback(key); } }
+      });
       return true;
     }
-    if(NUDGE_IS_PHONE && 'serviceWorker' in navigator){
-      getNudgeReg().then(reg=>{ if(reg) return viaReg(reg); nudgeInPageFallback(key); }).catch(()=>nudgeInPageFallback(key));
+    if('serviceWorker' in navigator){
+      getNudgeReg().then(reg=>{
+        if(reg) return viaReg(reg).catch(error=>{
+          console.error('[AyuBase6] Service-worker notification failed:', error);
+          if(NUDGE_IS_PHONE) nudgeInPageFallback(key);
+          else { try{ delete opts.actions; new Notification(title, opts); }catch(e){ nudgeInPageFallback(key); } }
+        });
+        if(NUDGE_IS_PHONE) nudgeInPageFallback(key);
+        else { try{ delete opts.actions; const n=new Notification(title, opts); if(fresh) setTimeout(()=>{try{n.close()}catch(e){}},300000); }catch(e){ nudgeInPageFallback(key); } }
+      }).catch(error=>{ console.error('[AyuBase6] Notification dispatch failed:', error); nudgeInPageFallback(key); });
       return true;
     }
     if(fresh && nudgeLast[key]){ try{ nudgeLast[key].close(); }catch(e){} }
@@ -12240,7 +12254,36 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   }
   function startReminder(item){
     const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name)return;
-    const notify=()=>{try{if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()})}catch(_){}};
+    const notify=()=>{
+      if(data.sound==='none'||!('Notification' in window)||Notification.permission!=='granted') return;
+      const options={
+        body:'It is time for your reminder.',
+        tag:'ayubase6-custom-'+item.dataset.reminderId,
+        renotify:true,
+        requireInteraction:true,
+        icon:'./icons/icon-192.png',
+        badge:'./icons/icon-192.png',
+        data:{url:'./'}
+      };
+      const display=reg=>{
+        if(!reg||!reg.active) throw new Error('No active service worker registration');
+        return reg.showNotification(data.name, options);
+      };
+      if('serviceWorker' in navigator){
+        (nudgeSwReg?Promise.resolve(nudgeSwReg):getNudgeReg())
+          .then(reg=>{
+            if(reg) return display(reg);
+            if(!NUDGE_IS_PHONE) return new Notification(data.name, options);
+            throw new Error('Service worker unavailable on mobile');
+          })
+          .catch(error=>{
+            console.error('[AyuBase6] Custom reminder notification failed:', error);
+            if(!NUDGE_IS_PHONE){try{new Notification(data.name, options)}catch(e){}}
+          });
+      }else if(!NUDGE_IS_PHONE){
+        try{new Notification(data.name, options)}catch(e){}
+      }
+    };
     if(data.mode==='regular')item._reminderTimer=setInterval(notify,Math.max(1,Number(data.duration)||1)*60000);
     else {item._reminderTimeouts=[];item._reminderTimers=[];data.times.forEach(t=>{const [hh,mm]=t.split(':').map(Number),now=new Date(),next=new Date();next.setHours(hh,mm,0,0);if(next<=now)next.setDate(next.getDate()+1);const delay=next-now;item._reminderTimeouts.push(setTimeout(()=>{notify();item._reminderTimers.push(setInterval(notify,24*60*60*1000))},delay))})}
   }
