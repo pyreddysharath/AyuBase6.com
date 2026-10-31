@@ -3959,7 +3959,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
 
 <!-- ══ ALERTS PANEL ═════════════════════════ -->
 <div id="alerts-panel" class="tab-panel" style="display:none">
-  <h1 class="ayu-content-page-title" style="--ayu-page-accent:#0891b2">Reminders</h1>
+  <h1 class="ayu-content-page-title" style="--ayu-page-accent:#0d9488">Reminders</h1>
   <div class="alert-page">
 
     <!-- Reminder hours: one From/To for every section (each section can still be changed on its own) -->
@@ -8573,31 +8573,36 @@ function drawNudgeLotus(ctx, cx, cy, scale, fill, alpha){
   ctx.restore();
 }
 const _nudgeArt={};
-function nudgeArt(kind){
-  if(_nudgeArt[kind]!==undefined) return _nudgeArt[kind];
+const NUDGE_THEMES={
+  reminders:{g0:'#f0fdfa',g1:'#ccfbf1',gi:'#99f6e4',big:'#5eead4',deep:'#0d9488'},
+  routines:{g0:'#fffbeb',g1:'#fde68a',gi:'#fcd34d',big:'#fbbf24',deep:'#d97706'}
+};
+function nudgeArt(kind,theme){
+  const T=NUDGE_THEMES[theme]||NUDGE_THEMES.reminders, ck=kind+':'+(theme||'reminders');
+  if(_nudgeArt[ck]!==undefined) return _nudgeArt[ck];
   let url;
   try{
     const c=document.createElement('canvas'), x=c.getContext('2d');
-    if(kind==='banner'){            // wide picture shown in the notification
+    if(kind==='banner'){
       c.width=720; c.height=360;
       const g=x.createLinearGradient(0,0,720,360);
-      g.addColorStop(0,'#f0fdfa'); g.addColorStop(1,'#ccfbf1');
+      g.addColorStop(0,T.g0); g.addColorStop(1,T.g1);
       x.fillStyle=g; x.fillRect(0,0,720,360);
-      drawNudgeLotus(x, 470, 335, 14.5, '#5eead4', .55);   // big lotus, tab colour
-      drawNudgeLotus(x, 150, 360, 6.5,  '#0d9488', .22);   // smaller deeper-teal one
-    }else if(kind==='badge'){       // small monochrome mark (Android status bar)
+      drawNudgeLotus(x, 470, 335, 14.5, T.big, .55);
+      drawNudgeLotus(x, 150, 360, 6.5,  T.deep, .22);
+    }else if(kind==='badge'){
       c.width=96; c.height=96;
       drawNudgeLotus(x, 48, 76, 2.0, '#000', 1);
-    }else{                          // icon
+    }else{
       c.width=192; c.height=192;
       const g=x.createLinearGradient(0,0,192,192);
-      g.addColorStop(0,'#f0fdfa'); g.addColorStop(1,'#99f6e4');
+      g.addColorStop(0,T.g0); g.addColorStop(1,T.gi);
       x.fillStyle=g; x.fillRect(0,0,192,192);
-      drawNudgeLotus(x, 96, 142, 3.7, '#0d9488', .95);   // lotus fills the icon
+      drawNudgeLotus(x, 96, 142, 3.7, T.deep, .95);
     }
     url=c.toDataURL('image/png');
   }catch(e){ url=undefined; }
-  return (_nudgeArt[kind]=url);
+  return (_nudgeArt[ck]=url);
 }
 
 // Service worker (optional, needs sw.js next to this page and http/https):
@@ -8664,8 +8669,9 @@ function showNudgeNotification(title, body, o){
   const fresh=!o.silent;
   const opts={ body:body, tag:'nudge-'+key, requireInteraction:true, silent:!!o.silent, renotify:fresh, data:{key:key}, timestamp:Date.now() };
   if(fresh) opts.vibrate=[200,100,200,100,200];
-  const icon=nudgeArt('icon'), badge=nudgeArt('badge');
+  const icon=nudgeArt('icon',o.theme), badge=nudgeArt('badge',o.theme);
   if(icon) opts.icon=icon; if(badge) opts.badge=badge;
+  if(o.theme==='routines'){ const img=nudgeArt('banner','routines'); if(img) opts.image=img; }
   const viaReg=reg=>{
     if(o.actions) opts.actions=o.actions;
     const show=()=>reg.showNotification(title, opts).then(()=>{
@@ -8781,28 +8787,60 @@ function attachMockEyeTimer(){
 // Picture-in-Picture style window, which has no address bar; otherwise as a
 // small browser pop-up. If neither is allowed the normal system notification is used.
 function nudgeEsc(t){ return String(t).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc){
+const NUDGE_ICON_THIS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h13"/><path d="M10 21h4"/><path d="M16 12h6"/></svg>';
+const NUDGE_ICON_CLOSE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const NUDGE_ICON_ALL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/><path d="M4 4l16 16"/></svg>';
+function nudgePopupIcons(o){
+  const t=nudgeEsc(o.thisLabel||'Disable this reminder'), a=nudgeEsc(o.allLabel||'Disable all notifications'), c=nudgeEsc(o.closeLabel||'Close');
+  return '<div class="ic"><button type="button" data-pop-this data-tip="'+t+'" aria-label="'+t+'">'+NUDGE_ICON_THIS+'</button>'
+    +'<button type="button" data-pop-all data-tip="'+a+'" aria-label="'+a+'">'+NUDGE_ICON_ALL+'</button>'
+    +'<button type="button" data-pop-close data-tip="'+c+'" aria-label="'+c+'">'+NUDGE_ICON_CLOSE+'</button></div>';
+}
+function nudgePopupButtons(o){
+  if(!o.buttons||!o.buttons.length) return '';
+  return '<div class="btns">'+o.buttons.map(b=>'<button type="button" data-pop-act="'+nudgeEsc(b.act)+'"'+(b.primary?' class="y"':'')+'>'+nudgeEsc(b.label)+'</button>').join('')+'</div>';
+}
+function nudgePopupWire(win, doc, o){
+  const closeWin=()=>{ try{ win.close(); }catch(e){} };
+  const t=doc.querySelector('[data-pop-this]'), a=doc.querySelector('[data-pop-all]'), x=doc.querySelector('[data-pop-close]');
+  if(x) x.onclick=closeWin;
+  if(t) t.onclick=()=>{ try{ o.onDisableThis&&o.onDisableThis(); }catch(e){} closeWin(); };
+  if(a) a.onclick=()=>{ try{ o.onDisableAll&&o.onDisableAll(); }catch(e){} closeWin(); };
+  doc.querySelectorAll('[data-pop-act]').forEach(btn=>{ btn.onclick=()=>{ try{ o.onAction&&o.onAction(btn.getAttribute('data-pop-act')); }catch(e){} closeWin(); }; });
+}
+function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
+  o=o||{};
   const doc=win.document;
+  const T=o.theme==='routines'?{bg:'linear-gradient(135deg,#fffbeb,#fde68a)',lotus:'#fbbf24',text:'#78350f',accent:'#b45309'}:{bg:'linear-gradient(135deg,#f0fdfa,#ccfbf1)',lotus:'#5eead4',text:'#134e4a',accent:'#0d9488'};
   const lotus=[-75,-45,-15,15,45,75].map(a=>'<path d="'+NUDGE_LOTUS_PETAL+'" transform="translate(32 34) rotate('+a+')"/>').join('');
   const css='html,body{margin:0;height:100%}'
-    +'body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#134e4a;background:linear-gradient(135deg,#f0fdfa,#ccfbf1);position:relative;overflow:hidden}'
-    +'svg.bg{position:absolute;right:-8px;bottom:-14px;width:75%;height:auto;opacity:.6;fill:#5eead4}'
+    +'body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:'+T.text+';background:'+T.bg+';position:relative;overflow:hidden}'
+    +'svg.bg{position:absolute;right:-8px;bottom:-14px;width:75%;height:auto;opacity:.6;fill:'+T.lotus+'}'
     +'.c{position:relative;box-sizing:border-box;padding:12px 14px}'
     +'h1{margin:0 0 4px;font-size:15px;font-weight:800}'
     +'p{margin:0;font-size:13px;line-height:1.4}'
-    +'.t{margin-top:16px;font-size:28px;font-weight:800;color:#0d9488;line-height:1;cursor:pointer;user-select:none}'
+    +'.t{margin-top:16px;font-size:28px;font-weight:800;color:'+T.accent+';line-height:1;cursor:pointer;user-select:none}'
     +'.t.run,.t.done{cursor:default}'
-    +'.ex-toggle{display:inline-flex;align-items:center;gap:6px;margin-top:10px;border:1px solid #0d9488;border-radius:9px;padding:6px 9px;background:#fff;color:#0d9488;font-weight:700;cursor:pointer;font-size:12px}'+'.ex-toggle svg{width:15px;height:15px;display:block;fill:currentColor;flex:none}'
+    +'.ex-toggle{display:inline-flex;align-items:center;gap:6px;margin-top:10px;border:1px solid '+T.accent+';border-radius:9px;padding:6px 9px;background:#fff;color:'+T.accent+';font-weight:700;cursor:pointer;font-size:12px}'+'.ex-toggle svg{width:15px;height:15px;display:block;fill:currentColor;flex:none}'
     +'.ex-video{display:none;width:100%;max-height:58vh;margin-top:8px;border-radius:10px;background:#001410}'
+    +'h1{padding-right:104px}'
+    +'.ic{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:2}'
+    +'.ic button{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border:1px solid '+T.accent+';border-radius:50%;background:rgba(255,255,255,.85);color:'+T.accent+';cursor:pointer}'
+    +'.ic button:hover{background:#fff}.ic svg{width:15px;height:15px;display:block}'
+    +'.ic button{position:relative}'
+    +'.ic button::after{content:attr(data-tip);position:absolute;top:32px;right:0;white-space:nowrap;padding:4px 8px;border-radius:6px;background:rgba(17,24,39,.9);color:#fff;font:600 11px/1.2 system-ui,sans-serif;opacity:0;pointer-events:none;transition:opacity .12s;z-index:5}'
+    +'.ic button:hover::after,.ic button:focus-visible::after{opacity:1}'
+    +'.btns{display:flex;gap:8px;margin-top:10px}.btns button{flex:1;min-height:32px;border-radius:9px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;border:1px solid '+T.accent+';background:#fff;color:'+T.accent+'}.btns button.y{background:'+T.accent+';color:#fff}'
     +'.c.expanded{max-height:90vh;overflow:auto}'
     +'.c.expanded .ex-video{display:block}';
   doc.title=title;
   doc.head.innerHTML='<meta charset="utf-8"><style>'+css+'</style>';
   doc.body.innerHTML='<svg class="bg" viewBox="9.5 11.5 45 27" aria-hidden="true">'+lotus+'</svg>'
-    +'<div class="c"><h1>'+nudgeEsc(title)+'</h1><p>'+nudgeEsc(msg)+'</p>'
+    +'<div class="c">'+nudgePopupIcons(o)+'<h1>'+nudgeEsc(title)+'</h1><p>'+nudgeEsc(msg)+'</p>'+nudgePopupButtons(o)
     +(withTimer?'<div class="t" id="n" title="Click to start the timer">\u25B6 '+EYE_TIMER_SECS+'s</div>':'')
     +(title==='Eye Exercise' && exerciseVideoSrc?'<button type="button" class="ex-toggle" id="ex-toggle" aria-expanded="false" title="Expand guided eye exercise video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span></button><video class="ex-video" id="ex-video" controls playsinline muted preload="metadata" src="'+exerciseVideoSrc.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></video>':'')+'</div>';
   if(title==='Eye Exercise'){const toggle=doc.getElementById('ex-toggle'), card=doc.querySelector('.c'), video=doc.getElementById('ex-video');if(toggle&&card&&video)toggle.onclick=()=>{const expanded=card.classList.toggle('expanded');toggle.setAttribute('aria-expanded',String(expanded));toggle.innerHTML=expanded?'✕ <span>Hide exercise video</span>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span>';if(expanded){try{win.resizeTo(420,520)}catch(e){};video.play().catch(()=>{});}else{video.pause();try{win.resizeTo(320,150)}catch(e){}}};}
+  nudgePopupWire(win, doc, o);
   if(!withTimer) return;
   const num=doc.getElementById('n'); let iv=null, end=0;
   const tick=()=>{
@@ -8822,38 +8860,66 @@ function nudgeNativeFallback(key, title, msg){
   const mock=document.getElementById(key==='eyeex' ? 'eye-ex-notif-mock' : 'alert-'+key+'-notif-mock');
   if(mock){ mock.classList.add('show'); if(key==='break') attachMockEyeTimer(); }
 }
-function openNudgeBrowserPopup(key, title, msg, timer, W, H, exerciseVideoSrc){
+const NUDGE_WINS=[];   // open reminder windows, so a new one is placed above the others instead of on top of them
+function nudgePrune(){
+  for(let i=NUDGE_WINS.length-1;i>=0;i--){ let gone=true; try{ gone=!NUDGE_WINS[i].win||NUDGE_WINS[i].win.closed; }catch(e){} if(gone) NUDGE_WINS.splice(i,1); }
+}
+function nudgeSlot(key,W,H){
+  nudgePrune();
+  const aw=screen.availWidth||1024, ah=screen.availHeight||768, gap=10, floor=ah-100;
+  let col=0, used=0;
+  NUDGE_WINS.filter(x=>x.key!==key).forEach(x=>{ if(floor-used-x.H<10){ col++; used=0; } used+=x.H+gap; });
+  if(floor-used-H<10){ col++; used=0; }
+  return { left:Math.max(0,aw-W-20-col*(W+gap)), top:Math.max(0,floor-used-H) };
+}
+function nudgeDefaultHandlers(key){
+  if(/^routine-/.test(key)){
+    const act=key.replace(/^routine-(checkin-)?/,'');
+    return { thisLabel:'Disable this activity’s reminders', allLabel:'Disable all routine notifications',
+      onDisableThis:()=>{ if(typeof muteRoutineNotification==='function') muteRoutineNotification(act); },
+      onDisableAll:()=>{ if(typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()) enableRoutineNotifications(); } };
+  }
+  const mock=key==='eyeex' ? 'eye-ex-notif-mock' : 'alert-'+key+'-notif-mock';
+  return { thisLabel:'Disable this reminder', allLabel:'Disable all notifications',
+    onDisableThis:()=>{ const b=document.querySelector('#'+mock+' [data-ayu-disable-current]'); if(b) b.click(); },
+    onDisableAll:()=>{ const b=document.querySelector('[data-ayu-disable-all]'); if(b) b.click(); } };
+}
+function openNudgeBrowserPopup(key, title, msg, timer, W, H, exerciseVideoSrc, o){
   try{
-    const left=Math.max(0,(screen.availWidth||1024)-W-20), top=Math.max(0,(screen.availHeight||768)-H-100);
-    const w=window.open('', 'nudge-'+key, 'popup=yes,width='+W+',height='+H+',left='+left+',top='+top);
+    const pos=nudgeSlot(key,W,H);
+    const w=window.open('', 'nudge-'+key, 'popup=yes,width='+W+',height='+H+',left='+pos.left+',top='+pos.top);
     if(!w || w.closed) return false;
-    nudgePopupContent(w, title, msg, timer, exerciseVideoSrc);
+    nudgePopupContent(w, title, msg, timer, exerciseVideoSrc, o);
+    NUDGE_WINS.filter(x=>x.key===key).forEach(x=>NUDGE_WINS.splice(NUDGE_WINS.indexOf(x),1));
+    NUDGE_WINS.push({key:key, win:w, W:W, H:H});
     try{ w.focus(); }catch(e){}
     try{ w.setTimeout(()=>{ if(!w.closed) w.close(); },300000); }catch(e){}
     return true;
   }catch(e){ return false; }
 }
 function openNudgePopup(key, title, msg, o){
-  o=o||{};
+  o=Object.assign({}, nudgeDefaultHandlers(key), o||{});
   const timer=!!o.timer;
   // Size each popup to its own title/body instead of giving every reminder a large fixed window.
-  const textLen=String(msg||'').length+String(title||'').length;
+  const msgLen=String(msg||'').length, titleLen=String(title||'').length, textLen=msgLen+titleLen;
   const W=Math.max(270,Math.min(360,Math.round(250+Math.min(110,textLen)*0.65)));
-  const lines=Math.max(1,Math.ceil(String(msg||'').length/Math.max(28,Math.floor((W-36)/7))));
-  const H=Math.max(timer?140:82,Math.min(210,58+lines*19+(timer?48:0)));
+  const titleLines=Math.max(1,Math.ceil(titleLen*8.8/(W-36-62)));          // the title leaves room for the two icons
+  const msgLines=Math.max(1,Math.ceil(msgLen*7.2/(W-36)));
+  const H=Math.max(timer?140:82, Math.min(280, 34+titleLines*21+msgLines*19+(timer?48:0)+((o.buttons&&o.buttons.length)?46:0)));
   const exerciseVideoSrc=key==='eyeex'?(document.getElementById('eye-ex-video')?.currentSrc||document.getElementById('eye-ex-video')?.src||''):'';
   const onFail=o.onFail||(()=>nudgeNativeFallback(key,title,msg));
   try{
     // Picture-in-Picture style window: no address bar, but the browser only allows
     // it straight after a click (e.g. Preview), so scheduled reminders skip to the pop-up.
-    if(window.documentPictureInPicture && navigator.userActivation && navigator.userActivation.isActive){
+    // Only one such window can exist at a time, so while one is open the others use pop-ups (which stack).
+    if(window.documentPictureInPicture && !window.documentPictureInPicture.window && navigator.userActivation && navigator.userActivation.isActive){
       window.documentPictureInPicture.requestWindow({width:W, height:H})
-        .then(w=>{ nudgePopupContent(w, title, msg, timer, exerciseVideoSrc); try{ w.setTimeout(()=>{ if(!w.closed) w.close(); },300000); }catch(e){} })
-        .catch(()=>{ if(!openNudgeBrowserPopup(key,title,msg,timer,W,H,exerciseVideoSrc)) onFail(); });
+        .then(w=>{ nudgePopupContent(w, title, msg, timer, exerciseVideoSrc, o); try{ w.setTimeout(()=>{ if(!w.closed) w.close(); },300000); }catch(e){} })
+        .catch(()=>{ if(!openNudgeBrowserPopup(key,title,msg,timer,W,H,exerciseVideoSrc,o)) onFail(); });
       return true;
     }
   }catch(e){}
-  return openNudgeBrowserPopup(key, title, msg, timer, W, H);
+  return openNudgeBrowserPopup(key, title, msg, timer, W, H, undefined, o);
 }
 
 initNudgeSW();
@@ -8863,6 +8929,20 @@ initNudgeSW();
 // page/app is open. The browser cannot reliably run page timers after it closes.
 const ROUTINE_NOTIFY_KEY='ayuBase6-routine-notifications-enabled';
 const ROUTINE_SENT_KEY='ayuBase6-routine-notifications-sent';
+const ROUTINE_MUTED_KEY='ayuBase6-routine-notifications-muted';
+function routineMutedList(){ try{ const l=JSON.parse(localStorage.getItem(ROUTINE_MUTED_KEY)||'[]'); return Array.isArray(l)?l:[]; }catch(e){ return []; } }
+function routineIsMuted(k){ return routineMutedList().indexOf(k)>-1; }
+function muteRoutineNotification(k){ const l=routineMutedList(); if(l.indexOf(k)<0) l.push(k); try{ localStorage.setItem(ROUTINE_MUTED_KEY,JSON.stringify(l)); }catch(e){} }
+// A Routines notification: amber window on desktop, amber icon/picture as a system notification elsewhere.
+function notifyRoutine(key,title,body,o){
+  o=o||{}; const nk='routine-'+key;
+  const sys=()=>showNudgeNotification(title,body,{key:nk,theme:'routines',actions:o.actions});
+  if(!NUDGE_IS_PHONE && typeof openNudgePopup==='function'){
+    const ok=openNudgePopup(nk,title,body,{theme:'routines',buttons:o.buttons,onAction:o.onAction,onFail:sys});
+    if(ok) return true;
+  }
+  return sys();
+}
 let routineNotifyTimer=null;
 const ROUTINE_NOTIFY_ITEMS={
   walkex:{title:'Walk or Exercise',body:'It’s time for your walk or exercise.'},
@@ -8895,7 +8975,7 @@ function enableRoutineNotifications(){
     return;
   }
   const activate=()=>{
-    try{localStorage.setItem(ROUTINE_NOTIFY_KEY,'1');localStorage.removeItem(ROUTINE_SENT_KEY);}catch(e){}
+    try{localStorage.setItem(ROUTINE_NOTIFY_KEY,'1');localStorage.removeItem(ROUTINE_SENT_KEY);localStorage.removeItem(ROUTINE_MUTED_KEY);}catch(e){}
     updateRoutineNotifyButtons();
     checkRoutineNotificationSchedule();
     if(routineNotifyTimer) clearInterval(routineNotifyTimer);
@@ -8938,8 +9018,9 @@ function checkRoutineNotificationSchedule(){
     if(scheduled===null||scheduled!==minute)return;
     const sentKey=day+':'+key;
     if(sent[sentKey])return;
+    if(routineIsMuted(key))return;
     const item=ROUTINE_NOTIFY_ITEMS[key];
-    showNudgeNotification(item.title,item.body,{key:'routine-'+key});
+    notifyRoutine(key,item.title,item.body);
     sent[sentKey]=true;
   });
   try{
@@ -14427,6 +14508,11 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
   function timeOf(cb){ var t=document.getElementById('rt-'+cb.dataset.key); return t?t.textContent.trim():''; }
   function sectionOf(cb){ var c=cb.closest('.rout-card'), h=c&&c.querySelector('h2'); return h?h.textContent.trim():''; }
 
+  function endMinute(key){
+    var el=document.getElementById('rt-'+key), text=el?el.textContent:'', re=/(\d{1,2}):(\d{2})\s*(AM|PM)/gi, m, last=null, n=0;
+    while((m=re.exec(text))){ n++; var h=Number(m[1])%12; if(m[3].toUpperCase()==='PM') h+=12; last=h*60+Number(m[2]); }
+    return n>=2 ? last : null;
+  }
   function renderMissed(){
     cbs().forEach(function(cb){
       var sp=cb.closest('label').querySelector('span'), tag=sp.querySelector('.rout-status');
@@ -14449,16 +14535,19 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
   function closePopup(){ var o=document.querySelector('.rout-ask-overlay'); if(o) o.remove(); showing=false; current=null; next(); }
   function show(key){
     var cb=cbFor(key); if(!cb){ showing=false; next(); return; }
+    if((typeof routineNotificationsEnabled==='function' && !routineNotificationsEnabled()) || (typeof routineIsMuted==='function' && routineIsMuted(key))){ asked.asked[key]=true; save(ASK_KEY,asked); showing=false; return; }
     showing=true; current=key;
     var title=nameOf(cb), section=sectionOf(cb), when=timeOf(cb);
     var body='Have you completed this activity? '+section+' · '+when;
-    var shown=typeof showNudgeNotification==='function' && showNudgeNotification('Routine check-in · '+title, body, {
-      key:'routine-checkin-'+key,
-      actions:[{action:'done',title:'✓ Yes, done'},{action:'not-done',title:'Not yet'}]
+    var shown=typeof notifyRoutine==='function' && notifyRoutine('checkin-'+key, 'Routine check-in · '+title, body, {
+      actions:[{action:'done',title:'✓ Yes, done'},{action:'not-done',title:'Not yet'}],
+      buttons:[{act:'done',label:'Yes, done',primary:true},{act:'not-done',label:'Not yet'}],
+      onAction:function(act){ if(window.handleRoutineNotificationAction) window.handleRoutineNotificationAction(key,act); }
     });
     // If system notifications are unavailable, do not replace them with an
     // interruptive in-page popup. The routine remains available in the checklist.
     if(!shown){ showing=false; current=null; return; }
+    asked.asked[key]=true; save(ASK_KEY,asked);   // ask once per activity per day, not every 20 seconds
     showing=false; current=null;
   }
   function next(){
@@ -14481,7 +14570,7 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
     cbs().forEach(function(cb){
       var key=cb.dataset.key;
       if(asked.asked[key] || key===current || queue.indexOf(key)>-1) return;
-      var due=(typeof routineItemMinute==='function')?routineItemMinute(key):null;
+      var due=endMinute(key);          // only activities that have an end time are checked, and only when it is reached
       if(due===null) return;
       if(cb.checked){ asked.asked[key]=true; save(ASK_KEY,asked); return; }
       if(minute>=due && minute<due+20) queue.push(key);
