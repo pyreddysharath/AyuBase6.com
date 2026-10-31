@@ -4250,7 +4250,11 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         <strong>7:30 – 9:00 AM</strong> tends to compress the rest of the day's routine into a shorter window —
         orange zone.<br>
         Every activity below shifts automatically with whatever you pick here, and the Sleep time is always set
-        to give at least 8 hours before the next wake-up.
+        to give at least 8 hours before the next wake-up.<br><br>
+        <strong>Remind me</strong> applies to every activity. <b>At start only</b> sends one notification when an
+        activity begins. <b>Start + before it ends</b> adds a reminder 15 minutes before its time window closes
+        (activities with a single time get only the start). Each notification has <b>Done</b>, which ticks the
+        activity, and <b>Not yet</b>.
       </div>
       <div class="wake-control">
         <div class="wake-control-hdr">
@@ -8522,7 +8526,8 @@ function showNotifBlockedHint(hintId, msg){
   if(msg) hint.textContent='🚫 '+msg;
   hint.style.display='block';
   clearTimeout(hint._hideTimer);
-  hint._hideTimer=setTimeout(()=>{ hint.style.display='none'; }, 7000);
+  if(window.ayuArmGroup && window.ayuArmGroup(hintId)) return;
+  hint._hideTimer=setTimeout(()=>{ hint.style.display='none'; }, Math.max(6000, 4000+String(hint.textContent||'').trim().split(/\s+/).length*330));
 }
 function hideNotifHint(hintId){
   const hint=document.getElementById(hintId);
@@ -8652,6 +8657,9 @@ function nudgeOpenFromWindow(win, key){
 }
 function handleNudgeClick(key, action){
   if(key==='break') return;   // Eyes (20-20-20) has no timer; tapping it just opens the app
+  if(typeof key==='string' && /^routine-(end-|again-)?[a-z]+$/.test(key) && (action==='done'||action==='not-yet')){
+    routineAction(key.replace(/^routine-(end-|again-)?/,''), action); return;
+  }
   if(typeof key==='string' && key.indexOf('routine-checkin-')===0 && typeof window.handleRoutineNotificationAction==='function'){
     window.handleRoutineNotificationAction(key.slice('routine-checkin-'.length), action);
   }
@@ -9025,6 +9033,43 @@ function routineItemMinute(key){
   let h=Number(m[1])%12;if(m[3].toUpperCase()==='PM')h+=12;
   return h*60+Number(m[2]);
 }
+const ROUTINE_REMIND_KEY='ayuBase6-routine-remind-mode';
+function routineRemindMode(){ try{ return localStorage.getItem(ROUTINE_REMIND_KEY)==='beforeend'?'beforeend':'start'; }catch(e){ return 'start'; } }
+function setRoutineRemindMode(v){ try{ localStorage.setItem(ROUTINE_REMIND_KEY, v==='beforeend'?'beforeend':'start'); }catch(e){} }
+function routineCb(key){ return document.querySelector('.rout-cb[data-key="'+key+'"]'); }
+function routineWindowText(key){ const el=document.getElementById('rt-'+key); return el?el.textContent.replace(/[()]/g,'').trim():''; }
+function routineEndMinute(key){
+  const text=routineWindowText(key), re=/(\d{1,2}):(\d{2})\s*(AM|PM)/gi; let m,last=null,n=0;
+  while((m=re.exec(text))){ n++; let h=Number(m[1])%12; if(m[3].toUpperCase()==='PM') h+=12; last=h*60+Number(m[2]); }
+  return n>=2 ? last : null;
+}
+// Close the start / ending-soon notification of an activity (a newer one replaces it, or it was answered).
+function closeRoutineNotices(key){
+  ['routine-'+key,'routine-end-'+key].forEach(k=>{
+    try{ NUDGE_WINS.filter(x=>x.key===k).forEach(x=>{ try{ x.win.close(); }catch(e){} }); }catch(e){}
+    try{ if('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(r=>{ if(r) return r.getNotifications({tag:'nudge-'+k}).then(l=>l.forEach(n=>n.close())); }).catch(()=>{}); }catch(e){}
+  });
+}
+// Done ticks the activity; Not yet leaves it (a single-time activity asks once more, 15 minutes later).
+function routineAction(key, action){
+  if(action==='done'){
+    const cb=routineCb(key);
+    if(cb && !cb.checked){ cb.checked=true; cb.dispatchEvent(new Event('change',{bubbles:true})); }
+    closeRoutineNotices(key);
+  } else if(action==='not-yet'){
+    closeRoutineNotices(key);
+    if(routineEndMinute(key)===null){
+      const item=ROUTINE_NOTIFY_ITEMS[key]; if(!item) return;
+      setTimeout(()=>{ const cb=routineCb(key); if(cb&&cb.checked) return; if(routineIsMuted(key)) return; notifyRoutine('again-'+key,item.title,'Still to do: '+item.body,{ actions:[{action:'done',title:'✓ Done'}], buttons:[{act:'done',label:'Done',primary:true}], onAction:a=>routineAction(key,a) }); }, 15*60000);
+    }
+  }
+}
+function routineButtons(nk,key){
+  key=key||nk;
+  return { actions:[{action:'done',title:'✓ Done'},{action:'not-yet',title:'Not yet'}],
+           buttons:[{act:'done',label:'Done',primary:true},{act:'not-yet',label:'Not yet'}],
+           onAction:act=>routineAction(key,act) };
+}
 function checkRoutineNotificationSchedule(){
   if(!routineNotificationsEnabled()||typeof Notification==='undefined'||Notification.permission!=='granted')return;
   const now=new Date(), minute=now.getHours()*60+now.getMinutes();
@@ -9032,13 +9077,28 @@ function checkRoutineNotificationSchedule(){
   const day=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
   Object.keys(ROUTINE_NOTIFY_ITEMS).forEach(key=>{
     const scheduled=routineItemMinute(key);
-    if(scheduled===null||scheduled!==minute)return;
-    const sentKey=day+':'+key;
-    if(sent[sentKey])return;
-    if(routineIsMuted(key))return;
+    if(scheduled===null||routineIsMuted(key))return;
     const item=ROUTINE_NOTIFY_ITEMS[key];
-    notifyRoutine(key,item.title,item.body);
-    sent[sentKey]=true;
+    // At the start of the activity.
+    if(scheduled===minute){
+      const sentKey=day+':'+key;
+      if(!sent[sentKey]){
+        notifyRoutine(key,item.title,item.body,routineButtons(key));
+        sent[sentKey]=true;
+      }
+    }
+    // "Remind me: Start + before it ends": a nudge 15 minutes before the window closes.
+    if(routineRemindMode()==='beforeend'){
+      const end=routineEndMinute(key);
+      if(end!==null && end-15>scheduled && minute===end-15){
+        const endKey=day+':end:'+key, cb=routineCb(key);
+        if(!sent[endKey] && !(cb&&cb.checked)){
+          closeRoutineNotices(key);
+          notifyRoutine('end-'+key,item.title+' · ending soon','This window ends in 15 minutes ('+routineWindowText(key)+').',routineButtons('end-'+key,key));
+          sent[endKey]=true;
+        }
+      }
+    }
   });
   try{
     const keys=Object.keys(sent);if(keys.length>150)keys.slice(0,keys.length-100).forEach(k=>delete sent[k]);
@@ -14527,7 +14587,15 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
   function endMinute(key){
     var el=document.getElementById('rt-'+key), text=el?el.textContent:'', re=/(\d{1,2}):(\d{2})\s*(AM|PM)/gi, m, last=null, n=0;
     while((m=re.exec(text))){ n++; var h=Number(m[1])%12; if(m[3].toUpperCase()==='PM') h+=12; last=h*60+Number(m[2]); }
-    return n>=2 ? last : null;
+    if(n>=2) return last;
+    if(n===1) return Math.min(last+30,1439);   // single-time activity: ask 30 minutes after it starts
+    return null;
+  }
+  // The start notification is no longer needed once the end check-in appears: close it.
+  function closeStartNotice(key){
+    var k='routine-'+key;
+    try{ if(typeof NUDGE_WINS!=='undefined') NUDGE_WINS.filter(function(x){ return x.key===k; }).forEach(function(x){ try{ x.win.close(); }catch(e){} }); }catch(e){}
+    try{ if('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(function(r){ if(r) return r.getNotifications({tag:'nudge-'+k}).then(function(l){ l.forEach(function(n){ n.close(); }); }); }).catch(function(){}); }catch(e){}
   }
   function renderMissed(){
     cbs().forEach(function(cb){
@@ -14555,6 +14623,7 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
     showing=true; current=key;
     var title=nameOf(cb), section=sectionOf(cb), when=timeOf(cb);
     var body='Have you completed this activity? '+section+' · '+when;
+    closeStartNotice(key);
     var shown=typeof notifyRoutine==='function' && notifyRoutine('checkin-'+key, 'Check-in · '+title, body, {
       actions:[{action:'done',title:'✓ Yes, done'},{action:'not-done',title:'Not yet'}],
       buttons:[{act:'done',label:'Yes, done',primary:true},{act:'not-done',label:'Not yet'}],
@@ -14589,7 +14658,7 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
       var due=endMinute(key);          // only activities that have an end time are checked, and only when it is reached
       if(due===null) return;
       if(cb.checked){ asked.asked[key]=true; save(ASK_KEY,asked); return; }
-      if(minute>=due && minute<due+20) queue.push(key);
+      // (the end-of-activity check-in has been replaced by Done / Not yet on the start notification)
     });
     next();
   }
@@ -14922,19 +14991,39 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     if(!pnl.innerHTML) pnl.innerHTML=HOURS_INFO;
     var open=pnl.style.display==='none'; pnl.style.display=open?'block':'none'; if(btn) btn.setAttribute('aria-expanded',String(open));
   };
-  function syncMaster(){ var t=$('reminder-master-toggle'); if(t && typeof isMasterNotifyOn==='function') t.checked=!!isMasterNotifyOn(); }
+  function ayuInstalled(){ return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }
+  // Switching notifications on: say why installing helps, and open the browser's install box (or show the steps).
+  window.ayuOfferInstall=function(section){
+    var sec=(section==='routines')?'routines':'reminders';
+    var nd=$(sec==='routines'?'routines-install-nudge':'reminders-install-nudge');
+    if(ayuInstalled()){
+      if(nd){ nd.innerHTML='<b>AyuBase6 is installed.</b> Keep it open so reminders keep running.'; nd.hidden=false; }
+      return;
+    }
+    if(nd){ nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. If you have already installed it, open it from your home screen or desktop app window instead of this tab.'; nd.hidden=false; }
+    try{ if(typeof installApp==='function') installApp(sec); }catch(e){}
+  };
+  window.addEventListener('appinstalled',function(){ ['routines-install-nudge','reminders-install-nudge'].forEach(function(id){ var n=$(id); if(n) n.hidden=true; }); });
+  function syncMaster(){ var t=$('reminder-master-toggle'); var on=(typeof isMasterNotifyOn==='function')&&!!isMasterNotifyOn(); if(t) t.checked=on; var nd=$('reminders-install-nudge'); if(nd && !on) nd.hidden=true; }
   function initReminders(){
     var card=$('reminder-hours-card'), foot=$('reminder-hours-foot'); if(!card||!foot) return;
     var inst=$('install-row'), rst=document.querySelector('.reminders-reset-row .reset-icon-btn');
     if(inst && !foot.contains(inst)) foot.appendChild(inst);
     if(rst && !foot.contains(rst)) foot.appendChild(rst);
     ['reminders-notif-error','install-help'].forEach(function(id){ var el=$(id); if(el && el.parentNode!==card) card.insertBefore(el,foot); });
+    if(!$('reminders-install-nudge')){
+      var nd=document.createElement('div'); nd.id='reminders-install-nudge'; nd.className='install-nudge'; nd.hidden=true;
+      nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. Use the install icon below if the install box does not appear.';
+      card.insertBefore(nd,foot);
+    }
+    (function(){ var hd=card.querySelector('.alert-card-hdr'); if(hd) ['reminders-install-nudge','reminders-notif-error','install-help'].reverse().forEach(function(id){ var el=$(id); if(el) hd.after(el); }); })();
     var t=$('reminder-master-toggle');
     if(t && !t.dataset.wired){
       t.dataset.wired='1';
       t.addEventListener('change',function(){
         var btn=document.querySelector('#reminders-notif-banner .reminders-notif-banner-btn');
         if(btn && t.checked!==isMasterNotifyOn()) btn.click();     // same action the old Enable / Disable All button had
+        if(t.checked) ayuOfferInstall('reminders');
         setTimeout(syncMaster,500); setTimeout(syncMaster,2500);
       });
       var orig=window.updateRemindersNotifBanner;
@@ -14942,7 +15031,18 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     }
     syncMaster();
   }
-  function syncRoutines(){ var t=$('routines-master-toggle'); if(t && typeof routineNotificationsEnabled==='function') t.checked=!!routineNotificationsEnabled(); }
+  function routSettle(){
+    window.__routPending=true;
+    (function tick(i){
+      if(typeof Notification!=='undefined' && Notification.permission==='default' && i<240){ setTimeout(function(){ tick(i+1); },500); return; }
+      setTimeout(function(){
+        var t=$('routines-master-toggle');
+        if(t && t.checked && !routineNotificationsEnabled()){ try{ localStorage.setItem(ROUTINE_NOTIFY_KEY,'1'); }catch(e){} if(typeof updateRoutineNotifyButtons==='function') updateRoutineNotifyButtons(); }
+        window.__routPending=false; syncRoutines();
+      },400);
+    })(0);
+  }
+  function syncRoutines(){ if(window.__routPending) return; var t=$('routines-master-toggle'); var on=(typeof routineNotificationsEnabled==='function')&&!!routineNotificationsEnabled(); if(t) t.checked=on; var rp=$('routines-remind-panel'); if(rp) rp.hidden=!on; var nd=$('routines-install-nudge'); if(nd && !on) nd.hidden=true; }
   function initRoutines(){
     var card=document.querySelector('#routines-panel .rout-card'); if(!card) return;
     var hdr=card.querySelector('.rout-card-hdr');
@@ -14952,8 +15052,10 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       hdr.appendChild(l);
       var t=l.querySelector('input');
       t.addEventListener('change',function(){
+        var rpn=$('routines-remind-panel'); if(rpn) rpn.hidden=!t.checked;
         if(t.checked!==routineNotificationsEnabled()) enableRoutineNotifications();
-        setTimeout(syncRoutines,500); setTimeout(syncRoutines,2500);
+        if(t.checked) ayuOfferInstall('routines');
+        routSettle();
       });
       var orig=window.updateRoutineNotifyButtons;
       if(typeof orig==='function') window.updateRoutineNotifyButtons=function(){ orig.apply(this,arguments); syncRoutines(); };
@@ -14962,6 +15064,22 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     if(!foot){ foot=document.createElement('div'); foot.className='rout-card-foot'; card.appendChild(foot); }
     ['rout-notif-hint','routines-install-help'].forEach(function(id){ var el=$(id); if(el && el.parentNode!==card) card.insertBefore(el,foot); });
     var inst=$('routines-install-row'); if(inst && !foot.contains(inst)) foot.appendChild(inst);
+    if(!$('routines-remind-panel')){
+      var rp=document.createElement('div'); rp.id='routines-remind-panel'; rp.className='routines-remind-panel'; rp.hidden=true;
+      rp.setAttribute('role','radiogroup'); rp.setAttribute('aria-label','Remind me');
+      rp.innerHTML='<div class="routines-remind-title">Remind me</div>'
+        +'<label><input type="radio" name="routines-remind" value="start"><span>At start only</span></label>'
+        +'<label><input type="radio" name="routines-remind" value="beforeend"><span>Start + before it ends</span></label>';
+      card.insertBefore(rp,foot);
+      var cur=(typeof routineRemindMode==='function')?routineRemindMode():'start';
+      rp.querySelectorAll('input').forEach(function(r){ r.checked=(r.value===cur); r.addEventListener('change',function(){ if(r.checked) setRoutineRemindMode(r.value); }); });
+    }
+    if(!$('routines-install-nudge')){
+      var nd=document.createElement('div'); nd.id='routines-install-nudge'; nd.className='install-nudge'; nd.hidden=true;
+      nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. Use the install icon below if the install box does not appear.';
+      card.insertBefore(nd,foot);
+    }
+    (function(){ var hd=card.querySelector('.rout-card-hdr'); if(hd) ['routines-install-nudge','rout-notif-hint','routines-install-help','routines-remind-panel'].reverse().forEach(function(id){ var el=$(id); if(el) hd.after(el); }); })();
     syncRoutines();
   }
   function addAbout(){
@@ -15023,3 +15141,158 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 /* Option D: "About" and "Notifications" read as titles (bold, teal bar on the left). */
 #alerts-panel .section-notif-title{display:block!important;font-size:15px!important;font-weight:800!important;color:#065f58!important;border-left:4px solid #42d8c5!important;padding:1px 0 1px 9px!important;margin:0 0 8px!important}
 </style>
+
+<style id="routines-remind-20261031">
+#routines-panel .rout-card-foot .routines-remind-group{display:flex;align-items:center;gap:8px;margin-right:auto;font-size:.82rem;font-weight:600;min-width:0;flex-wrap:wrap}
+#routines-panel .rout-card-foot .routines-remind-group select{min-width:0;max-width:190px;font-size:.82rem}
+</style>
+
+<style id="install-remind-radios-20261031">
+.install-nudge{margin-top:10px;padding:9px 12px;border-radius:10px;font-size:.84rem;line-height:1.45;background:rgba(255,255,255,.7);border:1px solid #8fd3c7;color:#065f58}
+.install-nudge[hidden]{display:none}
+#routines-panel .install-nudge{border-color:#e6c27a;color:#7a4510;background:rgba(255,255,255,.7)}
+.routines-remind-panel{margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.7);border:1px solid #e6c27a;display:flex;flex-direction:column;gap:8px}
+.routines-remind-panel[hidden]{display:none}
+.routines-remind-title{font-size:.84rem;font-weight:800;color:#7a4510;border-left:4px solid #e6a93a;padding-left:9px}
+.routines-remind-panel label{display:flex;align-items:center;gap:9px;font-size:.88rem;cursor:pointer;color:inherit}
+.routines-remind-panel input[type=radio]{appearance:auto;width:18px;height:18px;margin:0;accent-color:#a75b12;flex:0 0 auto}
+</style>
+<style id="routines-remind-spacing-20261031">#routines-panel .routines-remind-panel{margin-bottom:14px}</style>
+
+<style id="ux-pass-20261031">
+/* One install message per section: the separate steps box is folded into it. */
+#install-help, #routines-install-help { display:none !important; }
+</style>
+<script id="ux-pass-js-20261031">
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+  function ready(ms){ var w=String(ms||'').trim().split(/\s+/).length; return Math.max(6000, 4000+w*330); }
+  function installed(){ return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }
+
+  // ---------- order under a toggle header: i panel, options, install message, blocked message last ----------
+  function place(card,hdrSel,ids){
+    var hd=card&&card.querySelector(hdrSel); if(!hd) return;
+    var anchor=hd, info=card.querySelector('.ux-info-open'); if(info && info.previousElementSibling===hd) anchor=info;
+    ids.forEach(function(id){ var el=$(id); if(el){ anchor.after(el); anchor=el; } });
+  }
+  function placeAll(){
+    place($('reminder-hours-card'),'.alert-card-hdr',['reminders-install-nudge','reminders-notif-error']);
+    place(document.querySelector('#routines-panel .rout-card'),'.rout-card-hdr',['routines-remind-panel','routines-install-nudge','rout-notif-hint']);
+  }
+
+  // ---------- a message that disappears once it has been readable long enough ----------
+  // Messages that are on screen together disappear together: the time is twice the reading time
+  // of all of their text combined.
+  var GROUPS={ reminders:['reminders-install-nudge','reminders-notif-error'], routines:['routines-install-nudge','rout-notif-hint'] };
+  var GROUP_OF={ 'reminders-notif-error':'reminders','reminders-install-nudge':'reminders','rout-notif-hint':'routines','routines-install-nudge':'routines' };
+  function isShown(el){ return el && !el.hidden && getComputedStyle(el).display!=='none'; }
+  function armGroup(g){
+    var ids=GROUPS[g], text='', els=ids.map($).filter(isShown);
+    els.forEach(function(el){ text+=' '+el.textContent; });
+    clearTimeout(GROUPS[g].timer);
+    GROUPS[g].timer=setTimeout(function(){ ids.forEach(function(id){ var el=$(id); if(!el) return; el.hidden=true; if(el.style.display) el.style.display='none'; }); }, ready(text)*2);
+  }
+  window.ayuArmGroup=function(hintId){ var g=GROUP_OF[hintId]; if(!g) return false; setTimeout(function(){ armGroup(g); },0); return true; };
+  function showTimed(el){
+    if(!el) return; el.hidden=false; armGroup(GROUP_OF[el.id]);
+  }
+  var SHORT='<b>Install AyuBase6</b> so reminders keep running in its own window.';
+  function nudgeFor(sec){ return $(sec==='routines'?'routines-install-nudge':'reminders-install-nudge'); }
+  var origInstall=window.installApp;
+  window.installApp=function(section){
+    var sec=(section==='routines')?'routines':'reminders';
+    var help=$(sec==='routines'?'routines-install-help':'install-help'), nd=nudgeFor(sec);
+    if(typeof origInstall==='function') origInstall(section);
+    if(!nd) return;
+    if(installed()){ nd.innerHTML='<b>AyuBase6 is installed.</b> Keep it open so reminders keep running.'; }
+    else if(help && help.style.display!=='none' && help.innerHTML){ nd.innerHTML=SHORT+' '+help.innerHTML+' Already installed? Open it from your home screen or app window.'; }
+    else { nd.innerHTML=SHORT; }
+    if(help) help.style.display='none';
+    placeAll(); showTimed(nd);
+  };
+  window.ayuOfferInstall=function(section){ window.installApp(section==='routines'?'routines':'reminders'); };
+
+  // the "Notifications are blocked…" messages hide themselves too (they already do; keep them last)
+  placeAll();
+
+  // ---------- an i panel opens directly under the row that holds its i ----------
+  var INFO={ 'lab-info-btn':['lab-info-panel','.calc-card-hdr'], 'lab-disclaimer-btn':['lab-disclaimer-panel','.calc-card-hdr'],
+             'tracker-info-btn':['tracker-info-panel','.calc-card-hdr'], 'reminder-hours-info-btn':['reminder-hours-info','.alert-card-hdr'] };
+  document.querySelectorAll('.rout-info-btn').forEach(function(b){ var m=/'(\w+)'/.exec(b.getAttribute('onclick')||''); if(m && m[1]==='wake') b.dataset.uxPanel='rout-info-wake'; });
+  function pairFor(btn){
+    if(INFO[btn.id]) return INFO[btn.id];
+    if(btn.dataset.uxPanel) return [btn.dataset.uxPanel,'.rout-card-hdr'];
+    return null;
+  }
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest&&e.target.closest('button'); if(!btn) return;
+    var pr=pairFor(btn); if(!pr) return;
+    setTimeout(function(){
+      var panel=$(pr[0]), hd=btn.closest(pr[1]); if(!panel||!hd) return;
+      document.querySelectorAll('.ux-info-open').forEach(function(x){ if(x!==panel) x.classList.remove('ux-info-open'); });
+      if(getComputedStyle(panel).display!=='none'){ hd.after(panel); panel.classList.add('ux-info-open'); } else panel.classList.remove('ux-info-open');
+    },0);
+  },true);
+
+  // ---------- Reminder hours i: shorter ----------
+  window.toggleReminderHoursInfo=function(){
+    var pnl=$('reminder-hours-info'), btn=$('reminder-hours-info-btn'); if(!pnl) return;
+    pnl.innerHTML='<strong>Reminder hours</strong><p>Sets the hours for every section. You can still change them inside a section.</p>'
+      +'<strong>Controls</strong><ul><li>The switch (top right) turns all reminders on or off. The first time, your browser asks for permission.</li>'
+      +'<li>The install icon adds AyuBase6 to your Home Screen or desktop; the reset icon restores the defaults.</li></ul>'
+      +'<strong>Good to know</strong><ul><li>Reminders run only while AyuBase6 is open in a browser tab or installed app. Battery saver or a locked device may delay them.</li>'
+      +'<li><b>To install:</b> Chrome or Edge: the install icon in the address bar, or menu → Install AyuBase6. Android: ⋮ → Install app. iPhone/iPad: Share → Add to Home Screen. Safari on Mac: File → Add to Dock.</li>'
+      +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li>'
+      +'<li>Each notification window can disable that reminder, disable all, or close.</li></ul>';
+    var open=pnl.style.display==='none'; pnl.style.display=open?'block':'none'; if(btn) btn.setAttribute('aria-expanded',String(open));
+  };
+
+  // ---------- shorter wording ----------
+  var NOTE='<div class="section-notif-note"><strong class="section-notif-title">Notifications</strong><ul><li><b>Preview notification</b> is only an example and changes no settings.</li><li>Reminders run only while AyuBase6 is open in a browser tab or installed app.</li></ul></div>';
+  var ABOUT={
+    'break':'<p class="alert-card-sub">Give your eyes a break from screens.</p><strong>The 20-20-20 rule:</strong> every 20 minutes, look at something 20 feet (6 m) away for 20 seconds.<ul><li>Reduces eye strain and dryness</li><li>Fewer screen-related headaches</li><li>Encourages blinking, which re-moistens the eyes</li></ul>',
+    'walk':'<p class="alert-card-sub">Short movement breaks to offset long sitting.</p>Stand, stretch or walk for 2–5 minutes at each reminder.<ul><li>Improves circulation and reduces stiffness</li><li>Eases posture strain</li><li>Gives a small energy and focus boost</li></ul>',
+    'drink':'<p class="alert-card-sub">Drink steadily through the day, in small slow sips.</p><ul><li>Slow sipping is gentler on the stomach and may reduce bloating</li><li>Stop when comfortably hydrated; don’t force extra water</li><li>Drink more when it is hot or you are active, and follow any fluid limits your clinician advises</li></ul>',
+    'break-ex':'<p class="alert-card-sub">A guided exercise for your eye muscles.</p>Follow the moving dot through seven patterns, such as zigzag, figure-8, loop, star and cross.<ul><li>Up to 2 sessions a day: morning and evening</li><li>Each session lasts 2:15; don’t repeat it back-to-back</li><li>3–5 days a week; rest on the other days</li></ul>'
+  };
+  function rewrite(){
+    Object.keys(ABOUT).forEach(function(k){
+      var t=$('alert-'+k+'-task'); if(!t || t.dataset.ux==='1') return;
+      t.innerHTML='<strong class="section-notif-title section-about-title">About</strong>'+ABOUT[k]+NOTE; t.dataset.ux='1';
+    });
+    var tp=$('tracker-info-panel');
+    if(tp && tp.dataset.ux!=='1'){ tp.dataset.ux='1';
+      tp.innerHTML='<p class="calc-sub" style="margin:0 0 6px">Add a reading and it gets its own section. Colours compare your latest reading with its range:</p>'
+      +'<ul style="margin:6px 0 0 18px;padding:0">'
+      +'<li><span class="trk-green"><b>Green</b></span> — within the range</li>'
+      +'<li><span class="trk-redgreen"><b>Red, green side bar</b></span> — outside the range, but closer than the previous reading (improved)</li>'
+      +'<li><span class="trk-redorange"><b>Red, orange side bar</b></span> — outside the range, same as the previous reading</li>'
+      +'<li><span class="trk-red"><b>Red</b></span> — outside the range and further than before, or nothing to compare with</li>'
+      +'<li><span class="trk-grey"><b>Grey</b></span> — no range to compare with</li></ul>'
+      +'<p class="calc-sub" style="margin:8px 0 0"><b>Weight</b> is judged against the healthy BMI range (18.5–24.9) for your saved height. <b>Height</b> is green when higher than the previous reading. <b>Blood Pressure</b> judges systolic and diastolic together. Each entry in a list is coloured against the one before it.</p>'
+      +'<p class="calc-sub" style="margin:8px 0 0">Educational only, not a diagnosis. Readings stay on this device.</p>'; }
+    var li=$('lab-info-panel'); if(li && li.dataset.ux!=='1'){ li.dataset.ux='1'; li.textContent='Upload a text-based PDF lab report or add values yourself. We flag anything outside the normal range, what it relates to, and food-based remedies.'; }
+    var ld=$('lab-disclaimer-panel'); if(ld && ld.dataset.ux!=='1'){ ld.dataset.ux='1'; ld.innerHTML='<b>Disclaimer:</b> educational information only, not a diagnosis. Your numbers are compared with general reference ranges, and nothing here prescribes medicine. Review your results, and any medicine or supplement decisions, with a doctor.'; }
+    var rw=$('rout-info-wake'); if(rw && rw.dataset.ux!=='1'){ rw.dataset.ux='1';
+      rw.innerHTML='<strong>Wake-up zones</strong><ul style="margin:4px 0 8px 18px;padding:0">'
+      +'<li><b>3:00 – 4:30 AM</b> red: far earlier than your body’s natural rhythm; usually cuts sleep short</li>'
+      +'<li><b>4:30 – 5:30 AM</b> orange: fine for early risers, but can still shorten sleep</li>'
+      +'<li><b>5:30 – 6:30 AM</b> green, the sweet spot: fits the natural cortisol rhythm and gives a calm start</li>'
+      +'<li><b>6:30 – 7:30 AM</b> orange-green: healthy and common</li>'
+      +'<li><b>7:30 – 9:00 AM</b> orange: squeezes the rest of the day’s routine</li></ul>'
+      +'Every activity shifts with your wake time, and Sleep is always set at least 8 hours before the next wake-up.'
+      +'<br><br><strong>Remind me</strong><ul style="margin:4px 0 0 18px;padding:0"><li><b>At start only:</b> one notification when an activity begins.</li>'
+      +'<li><b>Start + before it ends:</b> also a reminder 15 minutes before its window closes (single-time activities get only the start).</li>'
+      +'<li>Each notification has <b>Done</b> (ticks it) and <b>Not yet</b>.</li></ul>'
+      +'<br><strong>Notifications</strong><ul style="margin:4px 0 0 18px;padding:0"><li>They run only while AyuBase6 is open in a browser tab or installed app.</li>'
+      +'<li><b>To install:</b> Chrome or Edge: the install icon in the address bar, or menu → Install AyuBase6. Android: ⋮ → Install app. iPhone/iPad: Share → Add to Home Screen. Safari on Mac: File → Add to Dock.</li>'
+      +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li></ul>'; }
+    var rp=$('rout-info-palms'); if(rp && rp.dataset.ux!=='1'){ rp.dataset.ux='1'; rp.textContent='The warmth and gentle pressure relax the eye muscles and improve blood flow, easing your eyes into the day instead of going straight to bright light or a screen.'; }
+    var rwt=$('rout-info-water'); if(rwt && rwt.dataset.ux!=='1'){ rwt.dataset.ux='1'; rwt.textContent='Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.'; }
+  }
+  function go(){ rewrite(); placeAll(); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
+  window.addEventListener('load',go); [900,2000,4000].forEach(function(ms){ setTimeout(go,ms); });
+})();
+</script>
