@@ -4251,8 +4251,8 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         orange zone.<br>
         Every activity below shifts automatically with whatever you pick here, and the Sleep time is always set
         to give at least 8 hours before the next wake-up.<br><br>
-        <strong>Remind me</strong> applies to every activity. <b>At start only</b> sends one notification when an
-        activity begins. <b>Start + before it ends</b> adds a reminder 15 minutes before its time window closes
+        <strong>Remind me</strong> applies to every activity. <b>At start</b> sends one notification when an
+        activity begins. <b>Start + before end</b> adds a reminder 15 minutes before its time window closes
         (activities shorter than 15 minutes get only the start). Each notification has <b>Done</b>, which ticks the
         activity, and <b>Not yet</b>.
       </div>
@@ -8658,7 +8658,7 @@ function nudgeOpenFromWindow(win, key){
 }
 // Phones: Reminders notifications carry two text buttons (Android shows them; iPhone does not).
 function nudgeDisableActions(){
-  return NUDGE_IS_PHONE ? [ {action:'disable-this', title:'Disable this'}, {action:'disable-all', title:'Disable all'} ] : undefined;
+  return NUDGE_IS_PHONE ? [ {action:'disable-this', title:'Turn off this'}, {action:'disable-all', title:'Turn off all'} ] : undefined;
 }
 function handleNudgeClick(key, action){
   if((action==='disable-this'||action==='disable-all') && /^(break|walk|drink|eyeex)$/.test(String(key))){
@@ -15182,8 +15182,8 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     if(!$('routines-remind-panel')){
       var rp=document.createElement('div'); rp.id='routines-remind-panel'; rp.className='routines-remind-panel'; rp.hidden=true;
       rp.setAttribute('role','radiogroup'); rp.setAttribute('aria-label','Remind me');
-      rp.innerHTML='<label><input type="radio" name="routines-remind" value="start"><span>At start only</span></label>'
-        +'<label><input type="radio" name="routines-remind" value="beforeend"><span>Start + before it ends</span></label>';
+      rp.innerHTML='<label><input type="radio" name="routines-remind" value="start"><span>At start</span></label>'
+        +'<label><input type="radio" name="routines-remind" value="beforeend"><span>Start + before end</span></label>';
       card.insertBefore(rp,foot);
       var cur=(typeof routineRemindMode==='function')?routineRemindMode():'start';
       rp.querySelectorAll('input').forEach(function(r){ r.checked=(r.value===cur); r.addEventListener('change',function(){ if(r.checked) setRoutineRemindMode(r.value); }); });
@@ -15413,8 +15413,8 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       +'<div style="font-size:.74rem;opacity:.75;margin-top:6px">Sources: AASM/SRS sleep duration consensus (2015); UK Biobank actigraphy study (Sleep journal); Daghlas et al., JAMA Psychiatry 2021.</div>'; }
     var rn=$('rout-info-notify'); if(rn && rn.dataset.ux!=='1'){ rn.dataset.ux='1';
       rn.innerHTML='<strong>Notify Me</strong><p style="margin:2px 0 6px">The switch turns notifications for every activity on or off. The options appear once it is on.</p>'
-      +'<ul style="margin:4px 0 8px 18px;padding:0"><li><b>At start only:</b> one notification when an activity begins.</li>'
-      +'<li><b>Start + before it ends:</b> also a reminder 15 minutes before its window closes (activities shorter than 15 minutes get only the start).</li>'
+      +'<ul style="margin:4px 0 8px 18px;padding:0"><li><b>At start:</b> one notification when an activity begins.</li>'
+      +'<li><b>Start + before end:</b> also a reminder 15 minutes before its window closes (activities shorter than 15 minutes get only the start).</li>'
       +'<li>Each notification has <b>Done</b> (ticks it) and <b>Not yet</b>.</li></ul>'
       +'<strong>Good to know</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Notifications run only while AyuBase6 is open in a browser tab or installed app.</li>'
       +'<li><b>To install:</b> Chrome or Edge: the install icon in the address bar, or menu → Install AyuBase6. Android: ⋮ → Install app. iPhone/iPad: Share → Add to Home Screen. Safari on Mac: File → Add to Dock.</li>'
@@ -15503,6 +15503,6 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 #routines-panel .routines-notify-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(166,124,60,.35)}
 #routines-panel .routines-notify-title{font-size:15px;font-weight:800;color:#7a4510;border-left:4px solid #e6a93a;padding:1px 0 1px 9px}
 #routines-panel .routines-notify-row .master-switch{margin:0}
-#routines-panel .routines-remind-panel{margin-top:12px;margin-bottom:0}
+#routines-panel .routines-remind-panel{margin-top:12px;margin-bottom:0;background:none;border:0;padding:0;border-radius:0}
 </style>
 <style id="notify-foot-hidden-20261031">#routines-notify-card .rout-card-foot[hidden]{display:none!important}</style>
