@@ -12098,13 +12098,42 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
 
   // Install app: use the browser prompt when available; otherwise show instructions inline (never a modal).
   var deferred=null;
-  var installed=function(){ return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone===true; };
-  var installedMessage=function(){
-    return '<b>AyuBase6 is already installed. Please check your home screen.</b>';
+  // Install state. The page cannot see an uninstall, so nothing is trusted from storage:
+  //   'app'       running inside the installed app window -> certainly installed
+  //   'installed' the browser reports the app when asked live (getInstalledRelatedApps), or it was just installed
+  //   'prompt'    the browser is offering its install box -> certainly not installed
+  //   'unknown'   no signal (iPhone/Safari, other browsers, or no answer yet) -> generic wording
+  var liveFound=false, promptSeen=false, justInstalled=false;
+  try{ localStorage.removeItem('ayuBase6-app-installed'); }catch(e){}
+  window.ayuDetectInstalled=function(){
+    try{
+      var mm=function(q){ return !!(window.matchMedia && matchMedia('(display-mode: '+q+')').matches); };
+      return !!(mm('standalone')||mm('minimal-ui')||mm('window-controls-overlay')||navigator.standalone===true||/^android-app:/.test(document.referrer||''));
+    }catch(e){ return false; }
   };
-  var androidHelp='<b>AyuBase6 is already installed. Please check your home screen.</b>';
+  window.ayuInstallState=function(){
+    if(window.ayuDetectInstalled()) return 'app';
+    if(justInstalled) return 'installed';
+    if(promptSeen) return 'prompt';
+    if(liveFound) return 'installed';
+    return 'unknown';
+  };
+  // Ask the browser now (not a saved answer); wait at most 0.7 s.
+  window.ayuResolveState=function(){
+    if(window.ayuDetectInstalled()||!navigator.getInstalledRelatedApps) return Promise.resolve(window.ayuInstallState());
+    return new Promise(function(done){
+      var fin=false, finish=function(){ if(!fin){ fin=true; done(window.ayuInstallState()); } };
+      setTimeout(finish,700);
+      try{ navigator.getInstalledRelatedApps().then(function(l){ liveFound=!!(l&&l.length); finish(); }).catch(finish); }catch(e){ finish(); }
+    });
+  };
+  window.ayuResolveState();
+  var installed=function(){ var st=window.ayuInstallState(); return st==='app'||st==='installed'; };
+  var installedMessage=function(st){
+    return st==='installed' ? '<b>AyuBase6 appears to be installed.</b> Open it from your home screen or app window.'
+                            : '<b>AyuBase6 is installed.</b> Keep it open so reminders keep running.';
+  };
   var refresh=function(){
-    var isInstalled=installed();
     var row=document.getElementById('install-row'); if(row) row.style.display='flex';
     var routinesRow=document.getElementById('routines-install-row'); if(routinesRow) routinesRow.style.display='flex';
     var btn=document.getElementById('install-app-btn');
@@ -12114,38 +12143,37 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     if(btn){btn.innerHTML=addHtml;btn.disabled=false;btn.setAttribute('aria-label',addLabel);btn.title=addLabel;}
     if(routinesBtn){routinesBtn.innerHTML=addHtml;routinesBtn.disabled=false;routinesBtn.setAttribute('aria-label',addLabel);routinesBtn.title=addLabel;}
   };
-  window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; refresh(); });
-  window.addEventListener('appinstalled',function(){ deferred=null; refresh(); });
+  window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; promptSeen=true; justInstalled=false; liveFound=false; refresh(); });
+  window.addEventListener('appinstalled',function(){ deferred=null; promptSeen=false; justInstalled=true; refresh(); });
+  var installSteps=function(){
+    var ua=navigator.userAgent||'';
+    var ios=/iPhone|iPad|iPod/.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+    var android=/Android/i.test(ua);
+    var safari=/Safari/i.test(ua) && !/Chrome|CriOS|Edg|OPR|Firefox/i.test(ua);
+    if(android) return 'Open the browser menu (⋮) and choose <b>Install app</b> or <b>Add to Home screen</b>.';
+    if(ios) return 'Tap the <b>Share</b> button, then choose <b>Add to Home Screen</b>.';
+    if(safari) return 'In Safari, choose <b>File → Add to Dock</b>.';
+    return 'Use the install icon in the address bar, or the browser menu → <b>Install AyuBase6</b>. If neither appears, this browser may not support installing.';
+  };
   window.installApp=function(section){
     section = section === 'routines' ? 'routines' : 'reminders';
     var help=document.getElementById(section==='routines'?'routines-install-help':'install-help');
     var otherHelp=document.getElementById(section==='routines'?'install-help':'routines-install-help');
     if(otherHelp) otherHelp.style.display='none';
-    if(!help) return;
-    if(installed()){
-      help.innerHTML=installedMessage();
-      help.style.display='block';
-      return;
-    }
-    if(deferred){
-      var p=deferred; deferred=null; p.prompt();
-      Promise.resolve(p.userChoice).catch(function(){}).then(refresh);
-      return;
-    }
-    var ua=navigator.userAgent||'';
-    var ios=/iPhone|iPad|iPod/.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-    var android=/Android/i.test(ua);
-    var safari=/Safari/i.test(ua) && !/Chrome|CriOS|Edg|OPR|Firefox/i.test(ua);
-    if(android){
-      help.innerHTML='Open the browser menu (⋮) and choose <b>Install app</b> or <b>Add to Home screen</b>.';
-    } else if(ios){
-      help.innerHTML='Tap the <b>Share</b> button, then choose <b>Add to Home Screen</b>.';
-    } else if(safari){
-      help.innerHTML='In Safari, choose <b>File → Add to Dock</b>.';
-    } else {
-      help.innerHTML='Use the install icon in the address bar, or the browser menu → <b>Install AyuBase6</b>. If neither appears, this browser may not support installing.';
-    }
-    help.style.display='block';
+    if(!help) return Promise.resolve();
+    var show=function(html){ help.innerHTML=html; help.style.display='block'; };
+    var promptNow=function(){
+      var p=deferred; deferred=null;
+      try{ p.prompt(); Promise.resolve(p.userChoice).catch(function(){}).then(refresh); return true; }catch(e){ return false; }
+    };
+    var st=window.ayuInstallState();
+    if(st==='app'){ show(installedMessage('app')); return Promise.resolve(); }
+    if(st==='prompt' && deferred && promptNow()) return Promise.resolve();
+    return window.ayuResolveState().then(function(st2){
+      if(st2==='app'||st2==='installed'){ show(installedMessage(st2)); return; }
+      if(st2==='prompt' && deferred && promptNow()) return;
+      show(installSteps());
+    });
   };
   refresh();
 
@@ -14994,7 +15022,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     if(!pnl.innerHTML) pnl.innerHTML=HOURS_INFO;
     var open=pnl.style.display==='none'; pnl.style.display=open?'block':'none'; if(btn) btn.setAttribute('aria-expanded',String(open));
   };
-  function ayuInstalled(){ return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }
+  function ayuInstalled(){ return typeof window.ayuDetectInstalled==='function' ? window.ayuDetectInstalled() : ((window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true); }
   // Switching notifications on: say why installing helps, and open the browser's install box (or show the steps).
   window.ayuOfferInstall=function(section){
     var sec=(section==='routines')?'routines':'reminders';
@@ -15179,7 +15207,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
   'use strict';
   function $(id){ return document.getElementById(id); }
   function ready(ms){ var w=String(ms||'').trim().split(/\s+/).length; return Math.max(6000, 4000+w*330); }
-  function installed(){ return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }
+  function installed(){ var st=typeof window.ayuInstallState==='function' ? window.ayuInstallState() : 'unknown'; return st==='app'||st==='installed'; }
 
   // ---------- order under a toggle header: i panel, options, install message, blocked message last ----------
   function place(card,hdrSel,ids){
@@ -15209,24 +15237,30 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     if(!el) return; el.hidden=false; armGroup(GROUP_OF[el.id]);
   }
   var SHORT='<b>Install AyuBase6</b> so reminders keep running in its own window.';
+  var GENERIC='<b>Keep AyuBase6 open</b> so reminders keep running, in this tab or the installed app.';
   function nudgeFor(sec){ return $(sec==='routines'?'routines-install-nudge':'reminders-install-nudge'); }
   var origInstall=window.installApp;
   window.installApp=function(section){
     var sec=(section==='routines')?'routines':'reminders';
     var help=$(sec==='routines'?'routines-install-help':'install-help'), nd=nudgeFor(sec);
-    if(typeof origInstall==='function') origInstall(section);
-    if(!nd) return;
-    if(installed()){ nd.innerHTML='<b>AyuBase6 is installed.</b> Keep it open so reminders keep running.'; }
-    else if(help && help.style.display!=='none' && help.innerHTML){ nd.innerHTML=SHORT+' '+help.innerHTML+' Already installed? Open it from your home screen or app window.'; }
-    else { nd.innerHTML=SHORT; }
-    if(help) help.style.display='none';
-    placeAll(); showTimed(nd);
+    return Promise.resolve(typeof origInstall==='function' ? origInstall(section) : 0).then(function(){
+      if(!nd) return;
+      var st=window.ayuInstallState();
+      if(st==='app') nd.innerHTML='<b>AyuBase6 is installed.</b> Keep it open so reminders keep running.';
+      else if(st==='installed') nd.innerHTML='<b>AyuBase6 appears to be installed.</b> Open it from your home screen or app window and keep it open so reminders keep running.';
+      else if(st==='prompt') nd.innerHTML=SHORT;
+      else nd.innerHTML=GENERIC+((help && help.style.display!=='none' && help.innerHTML) ? ' Not installed yet? '+help.innerHTML : '');
+      if(help) help.style.display='none';
+      placeAll(); showTimed(nd);
+    });
   };
-  // Switching notifications on: when the app is already installed there is nothing to suggest.
+  // Switching notifications on: nothing to suggest when the app is certainly or apparently installed.
   window.ayuOfferInstall=function(section){
     var sec=(section==='routines')?'routines':'reminders';
-    if(installed()){ var nd=nudgeFor(sec); if(nd) nd.hidden=true; return; }
-    window.installApp(sec);
+    return window.ayuResolveState().then(function(st){
+      if(st==='app'||st==='installed'){ var nd=nudgeFor(sec); if(nd) nd.hidden=true; return; }
+      return window.installApp(sec);
+    });
   };
 
   // the "Notifications are blocked…" messages hide themselves too (they already do; keep them last)
