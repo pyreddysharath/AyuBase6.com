@@ -10952,8 +10952,22 @@ function toggleSiteInfo(id){
   const panel = document.getElementById('site-info-' + id);
   if(!panel) return;
   const isOpen = panel.style.display === 'block';
-  document.querySelectorAll('.othersites-info-panel').forEach(p => { p.style.display = 'none'; });
-  panel.style.display = isOpen ? 'none' : 'block';
+  panel.style.display = isOpen ? 'none' : 'block';   // several can stay open at once
+  if (isOpen) return;
+  // Scroll so the opened text's bottom sits at the bottom of the screen; if the text is
+  // taller than the screen, keep the site's own row just below the sticky top nav instead.
+  setTimeout(() => {
+    try {
+      const row = panel.previousElementSibling || panel;
+      const nav = document.getElementById('app-nav');
+      const navH = nav ? nav.offsetHeight : 0;
+      const wantDown = panel.getBoundingClientRect().bottom - (window.innerHeight - 12);
+      if (wantDown <= 0) return;
+      const maxDown = row.getBoundingClientRect().top - (navH + 8);
+      const dy = Math.min(wantDown, maxDown);
+      if (dy > 0) window.scrollBy({ top: dy, behavior: 'smooth' });
+    } catch (e) {}
+  }, 30);
 }
 
 // ── "Our Other Sites" — data-driven from config/OurOtherSites.json ──
@@ -11029,13 +11043,16 @@ loadOurOtherSites();
 
 function closeAllFooterSections(){
   FOOTER_SECTIONS.forEach(s => {
-    document.getElementById('sec-' + s).style.display = 'none';
-    document.getElementById('tab-' + s).classList.remove('active');
+    const secEl = document.getElementById('sec-' + s), tabEl = document.getElementById('tab-' + s);
+    if (secEl) secEl.style.display = 'none';
+    if (tabEl) tabEl.classList.remove('active');
   });
 }
 
 function showFooterSection(id){
-  const alreadyActive = document.getElementById('tab-' + id).classList.contains('active');
+  const tabNow = document.getElementById('tab-' + id), secNow = document.getElementById('sec-' + id);
+  if (!tabNow || !secNow) return;
+  const alreadyActive = tabNow.classList.contains('active');
   closeAllFooterSections();
   // Clicking the already-open tab again just closes it.
   if (!alreadyActive) {
@@ -15110,7 +15127,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     try{ if(typeof installApp==='function') installApp(sec); }catch(e){}
   };
   window.addEventListener('appinstalled',function(){ ['routines-install-nudge','reminders-install-nudge'].forEach(function(id){ var n=$(id); if(n) n.hidden=true; }); });
-  function syncMaster(){ var t=$('reminder-master-toggle'); var on=(typeof isMasterNotifyOn==='function')&&!!isMasterNotifyOn(); if(t) t.checked=on; var nd=$('reminders-install-nudge'); if(nd && !on) nd.hidden=true; }
+  function syncMaster(){ var t=$('reminder-master-toggle'); var on=(typeof isMasterNotifyOn==='function')&&!!isMasterNotifyOn(); if(t) t.checked=on; var hc=$('reminder-hours-card'); if(hc) hc.classList.toggle('rh-off',!on); var nd=$('reminders-install-nudge'); if(nd && !on) nd.hidden=true; }
   function initReminders(){
     var card=$('reminder-hours-card'), foot=$('reminder-hours-foot'); if(!card||!foot) return;
     var inst=$('install-row'), rst=document.querySelector('.reminders-reset-row .reset-icon-btn');
@@ -15127,6 +15144,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     if(t && !t.dataset.wired){
       t.dataset.wired='1';
       t.addEventListener('change',function(){
+        var hc0=$('reminder-hours-card'); if(hc0) hc0.classList.toggle('rh-off',!t.checked);
         var btn=document.querySelector('#reminders-notif-banner .reminders-notif-banner-btn');
         if(btn && t.checked!==isMasterNotifyOn()) btn.click();     // same action the old Enable / Disable All button had
         if(t.checked) ayuOfferInstall('reminders');
@@ -15437,6 +15455,22 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 #alerts-panel .nx{margin:2px 0 0 31px;font-size:.78rem;font-weight:600;line-height:1.25;color:#08766e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #alerts-panel .nx[hidden]{display:none}
 </style>
+<style id="info-headings-20261031">
+/* Headings inside i panels: bold with a vertical bar, in the colour of their tab (like "About") */
+#reminder-hours-info > strong,#master-notif-info > strong{display:block;font-size:15px;font-weight:800;color:#065f58;border-left:4px solid #42d8c5;padding:1px 0 1px 9px;margin:10px 0 6px}
+#rout-info-wake > strong,#rout-info-notify > strong{display:block;font-size:15px;font-weight:800;color:#7a4510;border-left:4px solid #e6a93a;padding:1px 0 1px 9px;margin:10px 0 6px}
+#reminder-hours-info > strong:first-child,#master-notif-info > strong:first-child,#rout-info-wake > strong:first-child,#rout-info-notify > strong:first-child{margin-top:0}
+/* no line after "Preview notification": extra space instead */
+#alerts-panel .alert-card .alert-preview-row{border-bottom:0!important;margin-bottom:10px}
+/* space after the Reminder hours i panel when it is open */
+#alerts-panel #reminder-hours-info{margin-bottom:16px}
+/* description boxes in the Reminders tab: a slightly deeper teal */
+#alerts-panel #alert-card-break > .alert-task,
+#alerts-panel #alert-card-walk > .alert-task,
+#alerts-panel #alert-card-drink > .alert-task,
+#alerts-panel #alert-card-break-ex > .alert-task{background:#d9f0ea!important}
+#alerts-panel #reminder-hours-card .reminder-hours-info{background:#bde4db!important}
+</style>
 <script id="reminders-next-20261031-js">
 (function(){
   'use strict';
@@ -15505,4 +15539,6 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 #routines-panel .routines-notify-row .master-switch{margin:0}
 #routines-panel .routines-remind-panel{margin-top:12px;margin-bottom:0;background:none;border:0;padding:0;border-radius:0}
 </style>
-<style id="notify-foot-hidden-20261031">#routines-notify-card .rout-card-foot[hidden]{display:none!important}</style>
+<style id="notify-foot-hidden-20261031">#routines-notify-card .rout-card-foot[hidden]{display:none!important}
+#reminder-hours-card.rh-off .reminder-hours-foot{display:none!important}
+</style>
