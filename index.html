@@ -1227,7 +1227,7 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--rout-1);
   cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.3);
 }
-.wake-zone-label{font-size:.8rem;font-weight:700;text-align:center;margin-top:6px}
+.wake-zone-label{font-size:.8rem;font-weight:700;text-align:left;margin-top:6px;line-height:1.3;min-height:1.3em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rout-row:last-child{border-bottom:none}
 .rout-check{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.9rem;color:var(--rout-1);flex:1}
 .rout-check input[type=checkbox]{width:18px;height:18px;accent-color:var(--rout-2);flex-shrink:0}
@@ -4263,7 +4263,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         </div>
         <input type="range" id="wake-time-slider" min="180" max="540" step="15" value="345" class="wake-slider">
         <div class="wake-range-ends"><span>3:00 AM</span><span>9:00 AM</span></div>
-        <div class="wake-zone-label" id="wake-zone-label">🟢 Healthy range — keep it regular</div>
+        <div class="wake-zone-label" id="wake-zone-label">🟢 Healthy — keep it regular</div>
       </div>
     </div>
 
@@ -9891,11 +9891,11 @@ function updateWakeSchedule(){
   // No clock time is proven best; the bands follow the evidence on 7+ hours of sleep, regularity and morning light.
   const zoneLabel=document.getElementById('wake-zone-label');
   let zoneText, zoneColor;
-  if(wake>=330 && wake<450){ zoneText='🟢 Healthy range — keep it regular'; zoneColor='#16a34a'; }
-  else if(wake>=270 && wake<330){ zoneText='🟠 Early — fine if you still sleep 7+ hours'; zoneColor='#d97706'; }
-  else if(wake>=450 && wake<510){ zoneText='🟠 On the late side — morning light helps your body clock'; zoneColor='#d97706'; }
-  else if(wake<270){ zoneText='🔴 Very early — be sure you still sleep 7+ hours'; zoneColor='#dc2626'; }
-  else { zoneText='🔴 Very late — try an earlier wake-up if you can'; zoneColor='#dc2626'; }
+  if(wake>=330 && wake<450){ zoneText='🟢 Healthy — keep it regular'; zoneColor='#16a34a'; }
+  else if(wake>=270 && wake<330){ zoneText='🟠 Early — fine with 7+ hours sleep'; zoneColor='#d97706'; }
+  else if(wake>=450 && wake<510){ zoneText='🟠 Late side — get morning light'; zoneColor='#d97706'; }
+  else if(wake<270){ zoneText='🔴 Very early — keep 7+ hours sleep'; zoneColor='#dc2626'; }
+  else { zoneText='🔴 Very late — try waking earlier'; zoneColor='#dc2626'; }
   if(zoneLabel){ zoneLabel.textContent=zoneText; zoneLabel.style.color=zoneColor; }
 
   // Ripple the new wake time through every other activity.
@@ -15296,6 +15296,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       +'<strong>Good to know</strong><ul><li>Reminders run only while AyuBase6 is open in a browser tab or installed app. Battery saver or a locked device may delay them.</li>'
       +'<li><b>To install:</b> Chrome or Edge: the install icon in the address bar, or menu → Install AyuBase6. Android: ⋮ → Install app. iPhone/iPad: Share → Add to Home Screen. Safari on Mac: File → Add to Dock.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li>'
+      +'<li><b>Next</b> under a section title is when that reminder will fire while AyuBase6 is open. After a locked or paused phone, it updates when you come back.</li>'
       +'<li>Each notification window can disable that reminder, disable all, or close.</li></ul>';
     var open=pnl.style.display==='none'; pnl.style.display=open?'block':'none'; if(btn) btn.setAttribute('aria-expanded',String(open));
   };
@@ -15352,6 +15353,81 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
   function go(){ rewrite(); placeAll(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
   window.addEventListener('load',go); [900,2000,4000].forEach(function(ms){ setTimeout(go,ms); });
+})();
+</script>
+<style id="reminders-next-20261031">
+/* "Next: ..." line under each Reminders section title: the Reminders tab colour, lighter weight than the title */
+#alerts-panel .alert-card-hdr > .nx-wrap{flex:1 1 auto;min-width:0}
+#alerts-panel .nx-wrap > h2{margin:0}
+#alerts-panel .nx{margin:2px 0 0 31px;font-size:.78rem;font-weight:600;line-height:1.25;color:#08766e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#alerts-panel .nx[hidden]{display:none}
+</style>
+<script id="reminders-next-20261031-js">
+(function(){
+  'use strict';
+  var CARDS=[['break','int'],['walk','int'],['drink','int'],['break-ex','ex']];
+  var startedAt={};
+  var DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  function clock12(d){ var h=d.getHours(), m=d.getMinutes(); return (h%12||12)+':'+(m<10?'0':'')+m+' '+(h>=12?'PM':'AM'); }
+  function dayNo(d){ return Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5); }
+  function label(ts){
+    var d=new Date(ts), diff=dayNo(d)-dayNo(new Date());
+    return (diff<=0 ? '' : diff===1 ? 'tomorrow ' : DAYS[d.getDay()]+' ')+clock12(d);
+  }
+  // the next moment an interval reminder really fires: the timer ticks every N minutes from when it was
+  // (re)started, and a tick outside the Reminder hours does nothing
+  function nextInterval(key){
+    var st=(typeof alertState!=='undefined')&&alertState[key], t0=startedAt[key];
+    if(!st||!st.enabled||!(st.minutes>0)||!t0) return null;
+    var ms=st.minutes*60000, t=t0+(Math.floor((Date.now()-t0)/ms)+1)*ms;
+    for(var i=0;i<4000;i++,t+=ms){ if(inScheduleWindow(new Date(t))) return t; }
+    return null;
+  }
+  // the next listed time on a chosen weekday (Eyes (Exercise) is a clock alarm, not an interval)
+  function nextExercise(){
+    var s=(typeof eyeExState!=='undefined')?eyeExState:null; if(!s||!s.enabled||!s.times||!s.weekdays) return null;
+    var now=new Date(), times=s.times.slice().sort();
+    for(var d=0;d<8;d++){
+      var day=new Date(now.getFullYear(),now.getMonth(),now.getDate()+d);
+      if(s.weekdays.indexOf(day.getDay())<0) continue;
+      for(var i=0;i<times.length;i++){
+        var p=String(times[i]).split(':').map(Number); if(p.length<2||isNaN(p[0])||isNaN(p[1])) continue;
+        var dt=new Date(day.getFullYear(),day.getMonth(),day.getDate(),p[0],p[1]);
+        if(dt.getTime()>now.getTime()) return dt.getTime();
+      }
+    }
+    return null;
+  }
+  function ensure(key){
+    var hdr=document.querySelector('#alert-card-'+key+' .alert-card-hdr'); if(!hdr) return null;
+    var el=document.getElementById('next-'+key); if(el) return el;
+    var h2=hdr.querySelector('h2'); if(!h2) return null;
+    var w=document.createElement('div'); w.className='nx-wrap';
+    h2.parentNode.insertBefore(w,h2); w.appendChild(h2);
+    el=document.createElement('div'); el.className='nx'; el.id='next-'+key; el.hidden=true; w.appendChild(el);
+    return el;
+  }
+  function render(){
+    CARDS.forEach(function(c){
+      var key=c[0], el=ensure(key); if(!el) return;
+      var ts=c[1]==='ex' ? nextExercise() : nextInterval(key);
+      if(!ts){ el.hidden=true; return; }
+      el.textContent='Next: '+label(ts); el.hidden=false;
+      // start exactly under the title text (after the icon)
+      var h2=el.parentNode.querySelector('h2'), tx=h2&&h2.querySelector('.section-title-text');
+      if(h2&&tx){ var hr=h2.getBoundingClientRect(), tr=tx.getBoundingClientRect(); if(hr.width>0) el.style.marginLeft=Math.round((tr.left-hr.left)*10)/10+'px'; }
+    });
+  }
+  // learn when each interval timer was (re)started
+  var orig=window.scheduleAlertTimer;
+  if(typeof orig==='function'){
+    window.scheduleAlertTimer=function(k){ var r=orig.apply(this,arguments); startedAt[k]=Date.now(); setTimeout(render,0); return r; };
+    ['break','walk','drink'].forEach(function(k){ if((typeof alertState!=='undefined')&&alertState[k]&&alertState[k].timerId) window.scheduleAlertTimer(k); });
+  }
+  ['change','click','input'].forEach(function(ev){ document.addEventListener(ev,function(){ setTimeout(render,60); },true); });
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) render(); });
+  setInterval(render,10000);
+  render(); setTimeout(render,400);
 })();
 </script>
 
