@@ -1213,9 +1213,9 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
   background:linear-gradient(to right,
     #ef4444 0%, #ef4444 25%,
     #f59e0b 25%, #f59e0b 41.67%,
-    #22c55e 41.67%, #22c55e 58.33%,
-    #f59e0b 58.33%, #f59e0b 75%,
-    #ef4444 75%, #ef4444 100%);
+    #22c55e 41.67%, #22c55e 75%,
+    #f59e0b 75%, #f59e0b 91.67%,
+    #ef4444 91.67%, #ef4444 100%);
   outline:none;margin:4px 0;
 }
 .wake-range-ends{display:flex;justify-content:space-between;font-size:.72rem;color:var(--rout-1);opacity:.7;margin-top:2px}
@@ -4263,7 +4263,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         </div>
         <input type="range" id="wake-time-slider" min="180" max="540" step="15" value="345" class="wake-slider">
         <div class="wake-range-ends"><span>3:00 AM</span><span>9:00 AM</span></div>
-        <div class="wake-zone-label" id="wake-zone-label">🟢 Great wake-up time</div>
+        <div class="wake-zone-label" id="wake-zone-label">🟢 Healthy range — keep it regular</div>
       </div>
     </div>
 
@@ -9886,13 +9886,16 @@ function updateWakeSchedule(){
   const wake=+slider.value;
   document.getElementById('wake-time-val').textContent=minutesToClock(wake);
 
-  // Colour-zone feedback, matching the slider track's own 5 bands —
-  // red / orange / green / orange / red across the 3:00-9:00 AM range.
+  // Colour-zone feedback, matching the slider track's own 5 bands (3:00-9:00 AM):
+  // red <4:30 / orange 4:30-5:30 / green 5:30-7:30 / orange 7:30-8:30 / red from 8:30.
+  // No clock time is proven best; the bands follow the evidence on 7+ hours of sleep, regularity and morning light.
   const zoneLabel=document.getElementById('wake-zone-label');
   let zoneText, zoneColor;
-  if(wake>=330 && wake<390){ zoneText='🟢 Great wake-up time'; zoneColor='#16a34a'; }
-  else if((wake>=270 && wake<330) || (wake>=390 && wake<450)){ zoneText='🟠 Okay — still a healthy wake-up time'; zoneColor='#d97706'; }
-  else { zoneText='🔴 Quite early or late — adjust if you can'; zoneColor='#dc2626'; }
+  if(wake>=330 && wake<450){ zoneText='🟢 Healthy range — keep it regular'; zoneColor='#16a34a'; }
+  else if(wake>=270 && wake<330){ zoneText='🟠 Early — fine if you still sleep 7+ hours'; zoneColor='#d97706'; }
+  else if(wake>=450 && wake<510){ zoneText='🟠 On the late side — morning light helps your body clock'; zoneColor='#d97706'; }
+  else if(wake<270){ zoneText='🔴 Very early — be sure you still sleep 7+ hours'; zoneColor='#dc2626'; }
+  else { zoneText='🔴 Very late — try an earlier wake-up if you can'; zoneColor='#dc2626'; }
   if(zoneLabel){ zoneLabel.textContent=zoneText; zoneLabel.style.color=zoneColor; }
 
   // Ripple the new wake time through every other activity.
@@ -15325,12 +15328,16 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     var ld=$('lab-disclaimer-panel'); if(ld && ld.dataset.ux!=='1'){ ld.dataset.ux='1'; ld.innerHTML='<b>Disclaimer:</b> educational information only, not a diagnosis. Your numbers are compared with general reference ranges, and nothing here prescribes medicine. Review your results, and any medicine or supplement decisions, with a doctor.'; }
     var rw=$('rout-info-wake'); if(rw && rw.dataset.ux!=='1'){ rw.dataset.ux='1';
       rw.innerHTML='<strong>Wake-up zones</strong><ul style="margin:4px 0 8px 18px;padding:0">'
-      +'<li><b>3:00 – 4:30 AM</b> red: far earlier than your body’s natural rhythm; usually cuts sleep short</li>'
-      +'<li><b>4:30 – 5:30 AM</b> orange: fine for early risers, but can still shorten sleep</li>'
-      +'<li><b>5:30 – 6:30 AM</b> green, the sweet spot: fits the natural cortisol rhythm and gives a calm start</li>'
-      +'<li><b>6:30 – 7:30 AM</b> orange-green: healthy and common</li>'
-      +'<li><b>7:30 – 9:00 AM</b> orange: squeezes the rest of the day’s routine</li></ul>'
-      +'Every activity shifts with your wake time, and Sleep is always set at least 8 hours before the next wake-up.'; }
+      +'<li>🟢 <b>5:30 – 7:30 AM</b> healthy range</li>'
+      +'<li>🟠 <b>4:30 – 5:30</b> early: fine if you still sleep 7+ hours. <b>7:30 – 8:30</b> later side</li>'
+      +'<li>🔴 <b>Before 4:30</b> usually means short sleep. <b>After 8:30</b> is late for morning daylight and a steady body clock</li></ul>'
+      +'<strong>What the evidence says</strong><ul style="margin:4px 0 8px 18px;padding:0">'
+      +'<li>No clock time is proven best. Research supports 7+ hours of sleep, a regular schedule and daylight in the morning.</li>'
+      +'<li>Large studies link very early or very late sleep timing with higher health risks, and genetic studies link earlier sleep timing with lower depression risk. They show association, not cause, and they measure sleep timing, not wake time alone.</li>'
+      +'<li>Waking early is healthy only if you go to bed early enough. Cutting sleep short to wake early is not.</li>'
+      +'<li>Brahma muhurta (about 1½ hours before sunrise) is a traditional practice. No clinical trials show a benefit specific to that time.</li></ul>'
+      +'Pick a time you can keep every day. Every activity shifts with it, and Sleep is set about 7¼–8 hours before the next wake-up. General guidance, not medical advice.'
+      +'<div style="font-size:.74rem;opacity:.75;margin-top:6px">Sources: AASM/SRS sleep duration consensus (2015); UK Biobank actigraphy study (Sleep journal); Daghlas et al., JAMA Psychiatry 2021.</div>'; }
     var rn=$('rout-info-notify'); if(rn && rn.dataset.ux!=='1'){ rn.dataset.ux='1';
       rn.innerHTML='<strong>Notify Me</strong><p style="margin:2px 0 6px">The switch turns notifications for every activity on or off. The options appear once it is on.</p>'
       +'<ul style="margin:4px 0 8px 18px;padding:0"><li><b>At start only:</b> one notification when an activity begins.</li>'
