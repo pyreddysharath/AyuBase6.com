@@ -1,7 +1,53 @@
 AyuBase6 GitHub Pages package
-- index.html at repository/site root
-- config/manifest.json and config/sw.js
-- icon/ contains app icons
-Deploy all files preserving this folder structure.
 
-Note: Service worker scope restrictions in browsers may prevent a worker located in /config/ from controlling pages at the site root unless the host sends Service-Worker-Allowed: /. GitHub Pages does not normally let you configure that response header. If registration fails, root-level sw.js is required for full-site service-worker control.
+FOLDER STRUCTURE
+  index.html          The app (one file). Must sit at the site root.
+  sw.js               Service worker (offline use, notification taps, saved videos). Must sit at the site root.
+  CNAME, ads.txt      Domain and ads settings.
+  config/             manifest.json (install details), OurOtherSites.json (footer list), feedback_apps_script.gs.
+  icons/, favicons/   App icons and favicons.
+  content/            Videos, preview images and the JSON lists that name them (see below).
+
+Deploy all files preserving this folder structure. index.html and sw.js must be uploaded together.
+
+CONTENT FOLDER
+  content/
+    body/
+      yoga/
+        yoga.json         List of yoga videos.
+        media/            Video (.mp4) and preview image (.jpg) for each pose.
+      exercise/
+        exercise.json     List of exercise videos (empty until videos are added).
+        media/            Video and preview image for each exercise.
+    reminders/
+      reminders.json      Eye exercise video for the Reminders tab.
+      media/
+
+Each section has one JSON file next to its media/ folder. A JSON entry looks like this:
+
+  { "name": "Tree Pose", "type": "video", "file": "tree-pose.mp4", "poster": "tree-pose.jpg",
+    "bytes": 160141, "posterBytes": 5000 }
+
+  name         Must match the name shown in the app (yoga pose name or exercise name). Names are case-sensitive.
+  file         Video file name inside that section's media/ folder.
+  poster       Preview image shown before the video loads (optional, but recommended).
+  bytes        Size of the video file in bytes. Used for the download size shown on the Save for offline button.
+  posterBytes  Size of the preview image in bytes (same use).
+
+ADDING OR REPLACING A VIDEO
+  1. Put the video and preview image in the section's media/ folder.
+  2. Add or update its entry in the section's JSON file.
+  3. Exercise videos: the "Save for offline" button appears under Exercise as soon as exercise.json lists a video.
+  Replacing a video: keep the same name and the app tells people to save again (size or last-modified changed),
+  or give the new file a new name in the JSON.
+  GitHub's web upload skips empty folders, so create content/body/exercise/media/ when adding the first exercise video.
+
+OFFLINE VIDEOS
+  Videos load only when they are played. The Save for offline button (under the Yoga and Exercise headings in the
+  Body tab) stores them in the browser's own storage for this site, so they play without internet. The app shows a
+  message to save again when a saved file is missing, renamed, removed, a different size, or newer on the site.
+  Saved files are not visible in a folder; clearing the site's data removes them.
+
+NOTES
+  - The service worker must be at the site root (sw.js) to control the whole site.
+  - Files opened directly from a computer (file://) will not load the content lists; use GitHub Pages or a local server.

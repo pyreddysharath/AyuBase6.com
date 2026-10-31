@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "name": "Eye Exercise",
+      "type": "video",
+      "file": "eye-exercise.mp4",
+      "poster": "eye-exercise.jpg",
+      "seconds": 135.0
+    }
+  ]
+}

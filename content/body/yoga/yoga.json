@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "name": "Tree Pose",
+      "type": "video",
+      "file": "tree-pose.mp4",
+      "poster": "tree-pose.jpg",
+      "seconds": 5.0,
+      "bytes": 160141,
+      "posterBytes": 12012
+    },
+    {
+      "name": "Cobra Pose",
+      "type": "video",
+      "file": "cobra-pose.mp4",
+      "poster": "cobra-pose.jpg",
+      "seconds": 10.0,
+      "bytes": 361320,
+      "posterBytes": 11822
+    },
+    {
+      "name": "Warrior II",
+      "type": "video",
+      "file": "warrior-ii.mp4",
+      "poster": "warrior-ii.jpg",
+      "seconds": 10.0,
+      "bytes": 274921,
+      "posterBytes": 7740
+    },
+    {
+      "name": "Cat-Cow Pose",
+      "type": "video",
+      "file": "cat-cow-pose.mp4",
+      "poster": "cat-cow-pose.jpg",
+      "seconds": 5.0,
+      "bytes": 157723,
+      "posterBytes": 10583
+    },
+    {
+      "name": "Butterfly Pose",
+      "type": "video",
+      "file": "butterfly-pose.mp4",
+      "poster": "butterfly-pose.jpg",
+      "seconds": 10.0,
+      "bytes": 375372,
+      "posterBytes": 13626
+    },
+    {
+      "name": "Plank Pose",
+      "type": "video",
+      "file": "plank-pose.mp4",
+      "poster": "plank-pose.jpg",
+      "seconds": 10.0,
+      "bytes": 284074,
+      "posterBytes": 8828
+    },
+    {
+      "name": "Downward-Facing Dog",
+      "type": "video",
+      "file": "downward-facing-dog.mp4",
+      "poster": "downward-facing-dog.jpg",
+      "seconds": 10.0,
+      "bytes": 359546,
+      "posterBytes": 9796
+    },
+    {
+      "name": "Boat Pose",
+      "type": "video",
+      "file": "boat-pose.mp4",
+      "poster": "boat-pose.jpg",
+      "seconds": 8.0,
+      "bytes": 431058,
+      "posterBytes": 22568
+    },
+    {
+      "name": "Sun Salutation A",
+      "type": "video",
+      "file": "sun-salutation-a.mp4",
+      "poster": "sun-salutation-a.jpg",
+      "seconds": 8.0,
+      "bytes": 565335,
+      "posterBytes": 19327
+    },
+    {
+      "name": "Upward-Facing Dog",
+      "type": "video",
+      "file": "upward-facing-dog.mp4",
+      "poster": "upward-facing-dog.jpg",
+      "seconds": 6.0,
+      "bytes": 270619,
+      "posterBytes": 26114
+    },
+    {
+      "name": "Bridge Pose",
+      "type": "video",
+      "file": "bridge-pose.mp4",
+      "poster": "bridge-pose.jpg",
+      "seconds": 10.0,
+      "bytes": 283769,
+      "posterBytes": 10315
+    },
+    {
+      "name": "Triangle Pose",
+      "type": "video",
+      "file": "triangle-pose.mp4",
+      "poster": "triangle-pose.jpg",
+      "seconds": 10.0,
+      "bytes": 306650,
+      "posterBytes": 11504
+    },
+    {
+      "name": "Palm Tree Pose",
+      "type": "video",
+      "file": "palm-tree-pose.mp4",
+      "poster": "palm-tree-pose.jpg",
+      "seconds": 6.0,
+      "bytes": 344310,
+      "posterBytes": 29302
+    },
+    {
+      "name": "Mountain Pose",
+      "type": "video",
+      "file": "mountain-pose.mp4",
+      "poster": "mountain-pose.jpg",
+      "seconds": 10.1,
+      "bytes": 290886,
+      "posterBytes": 9806
+    },
+    {
+      "name": "Chair Cat-Cow",
+      "type": "video",
+      "file": "chair-cat-cow.mp4",
+      "poster": "chair-cat-cow.jpg",
+      "seconds": 10.1,
+      "bytes": 319913,
+      "posterBytes": 11048
+    },
+    {
+      "name": "Sphinx Pose",
+      "type": "video",
+      "file": "sphinx-pose.mp4",
+      "poster": "sphinx-pose.jpg",
+      "seconds": 10.1,
+      "bytes": 253753,
+      "posterBytes": 6899
+    },
+    {
+      "name": "Standing Side Stretch with Chair",
+      "type": "video",
+      "file": "standing-side-stretch-with-chair.mp4",
+      "poster": "standing-side-stretch-with-chair.jpg",
+      "seconds": 10.1,
+      "bytes": 365043,
+      "posterBytes": 9864
+    },
+    {
+      "name": "Seated Gentle Twist",
+      "type": "video",
+      "file": "seated-gentle-twist.mp4",
+      "poster": "seated-gentle-twist.jpg",
+      "seconds": 10.1,
+      "bytes": 282027,
+      "posterBytes": 8216
+    },
+    {
+      "name": "Gentle Standing Twist",
+      "type": "video",
+      "file": "gentle-standing-twist.mp4",
+      "poster": "gentle-standing-twist.jpg",
+      "seconds": 10.0,
+      "bytes": 332818,
+      "posterBytes": 11053
+    }
+  ]
+}
