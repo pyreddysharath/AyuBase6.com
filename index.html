@@ -15045,7 +15045,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       },400);
     })(0);
   }
-  function syncRoutines(){ if(window.__routPending) return; var t=$('routines-master-toggle'); var on=(typeof routineNotificationsEnabled==='function')&&!!routineNotificationsEnabled(); if(t) t.checked=on; var rp=$('routines-remind-panel'); if(rp) rp.hidden=!on; var nd=$('routines-install-nudge'); if(nd && !on) nd.hidden=true; }
+  function syncRoutines(){ if(window.__routPending) return; var t=$('routines-master-toggle'); var on=(typeof routineNotificationsEnabled==='function')&&!!routineNotificationsEnabled(); if(t) t.checked=on; var rp=$('routines-remind-panel'); if(rp) rp.hidden=!on; var ft=document.querySelector('#routines-notify-card .rout-card-foot'); if(ft) ft.hidden=!on; var nd=$('routines-install-nudge'); if(nd && !on) nd.hidden=true; }
   function initRoutines(){
     var card0=document.querySelector('#routines-panel .rout-card'); if(!card0) return;
     var card=$('routines-notify-card');
@@ -15064,6 +15064,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       var t=l.querySelector('input');
       t.addEventListener('change',function(){
         var rpn=$('routines-remind-panel'); if(rpn) rpn.hidden=!t.checked;
+        var ftn=document.querySelector('#routines-notify-card .rout-card-foot'); if(ftn) ftn.hidden=!t.checked;
         if(t.checked!==routineNotificationsEnabled()) enableRoutineNotifications();
         if(t.checked) ayuOfferInstall('routines');
         routSettle();
@@ -15221,7 +15222,12 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     if(help) help.style.display='none';
     placeAll(); showTimed(nd);
   };
-  window.ayuOfferInstall=function(section){ window.installApp(section==='routines'?'routines':'reminders'); };
+  // Switching notifications on: when the app is already installed there is nothing to suggest.
+  window.ayuOfferInstall=function(section){
+    var sec=(section==='routines')?'routines':'reminders';
+    if(installed()){ var nd=nudgeFor(sec); if(nd) nd.hidden=true; return; }
+    window.installApp(sec);
+  };
 
   // the "Notifications are blocked…" messages hide themselves too (they already do; keep them last)
   placeAll();
@@ -15316,3 +15322,4 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 #routines-panel .routines-notify-row .master-switch{margin:0}
 #routines-panel .routines-remind-panel{margin-top:12px;margin-bottom:0}
 </style>
+<style id="notify-foot-hidden-20261031">#routines-notify-card .rout-card-foot[hidden]{display:none!important}</style>
