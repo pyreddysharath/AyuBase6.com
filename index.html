@@ -10484,6 +10484,7 @@ const ayuStale = {};          // set name -> Set of urls whose saved copy no lon
 const ayuServerChecked = {};  // set name -> true once the server has been asked this visit
 const ayuServerLen = {};      // url -> size the server reported
 const ayuServerMod = {};      // url -> last-modified time (ms) the server reported
+const ayuJustSaved = {};       // set name -> true for a few seconds after a save finishes, so the confirmation can be seen
 const ayuOrphans = {};        // set name -> saved files that are no longer in the JSON (removed or renamed)
 async function ayuSavedLength(resp){
   const h = resp.headers.get('content-length'); if(h && !isNaN(+h)) return +h;
@@ -10532,7 +10533,7 @@ async function ayuOfflineRefresh(setName, progress){
   if(!boxes.length) return;
   const videos = set.files.filter(f => f.video);
   if(!('caches' in window) || !videos.length){ boxes.forEach(b => { b.hidden = true; }); return; }
-  let text, btnHidden = false, btnDisabled = false, btnLabel = 'Save for offline', warn = '';
+  let text, btnHidden = false, btnDisabled = false, btnLabel = 'Save for offline', warn = '', hideBox = false;
   if(ayuSaving[setName] && progress){
     text = 'Saving ' + set.label + ' videos… ' + progress; btnDisabled = true; btnLabel = 'Saving…';
   } else {
@@ -10559,11 +10560,11 @@ async function ayuOfflineRefresh(setName, progress){
       warn = '⚠ Your saved ' + set.label + ' videos are out of date (' + why.join(', ') + '). Save again to update.';
       text = 'Update the saved ' + set.label + ' videos' + (leftBytes ? ' (' + ayuMB(leftBytes) + ')' : '') + '.';
       btnLabel = 'Save again';
-    } else if(saved === videos.length){ text = '✓ All ' + set.label + ' videos are saved on this device and play without internet.'; btnHidden = true; }
-    else { const some = deliberate && saved > 0; text = (some ? 'Some ' + set.label + ' videos are saved. ' : 'Play ' + set.label + ' videos without internet. ') + 'Save ' + (some ? 'the rest' : 'them') + ' (' + ayuMB(leftBytes) + ').'; }
+    } else if(saved === videos.length){ text = '✓ Saved for offline'; btnHidden = true; hideBox = !ayuJustSaved[setName]; }   // in sync: nothing to show once the confirmation has faded
+    else { const some = deliberate && saved > 0; text = some ? 'Some videos saved · ' + ayuMB(leftBytes) + ' left' : 'Play without internet · ' + ayuMB(leftBytes); }
   }
   boxes.forEach(b => {
-    b.hidden = false;
+    b.hidden = hideBox; if(!hideBox) b.classList.remove('media-offline-fade');
     b.querySelector('.media-offline-text').textContent = text;
     const btn = b.querySelector('.media-offline-btn'); btn.hidden = btnHidden; btn.disabled = btnDisabled; btn.textContent = btnLabel;
     const w = b.querySelector('.media-offline-warn'); if(w){ w.textContent = warn; w.hidden = !warn; }
@@ -10593,7 +10594,15 @@ async function ayuSaveOffline(setName){
   try{ const c2 = await caches.open(AYU_MEDIA_CACHE); for(const k of (ayuOrphans[setName] || [])) await c2.delete(k); }catch(e){}
   ayuServerChecked[setName] = false;
   files.forEach(f => { delete ayuServerLen[f.url]; delete ayuServerMod[f.url]; });
+  if(!failed) ayuJustSaved[setName] = true;
   await ayuOfflineRefresh(setName);
+  if(!failed){
+    // Show the confirmation for a few seconds, fade it, then hide the box until something needs saving again.
+    setTimeout(() => {
+      document.querySelectorAll('.media-offline[data-set="' + setName + '"]').forEach(b => b.classList.add('media-offline-fade'));
+      setTimeout(() => { delete ayuJustSaved[setName]; ayuOfflineRefresh(setName); }, 700);
+    }, 4000);
+  }
   if(failed){
     const msg = failed + ' file' + (failed > 1 ? 's' : '') + ' could not be saved. Check your connection and try again.';
     document.querySelectorAll('.media-offline[data-set="' + setName + '"] .media-offline-text').forEach(t => { t.textContent = msg; });
@@ -15721,6 +15730,8 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 #reminder-hours-card.rh-off .reminder-hours-foot{display:none!important}
 
 .media-offline{display:flex;align-items:center;justify-content:space-between;gap:10px 12px;flex-wrap:wrap;margin:10px 0 4px;padding:10px 14px;border-radius:14px;background:#e8f0fe;color:#1e3a8a;font-size:.84rem;line-height:1.35}
+.media-offline{transition:opacity .6s ease}
+.media-offline.media-offline-fade{opacity:0}
 .media-offline[hidden]{display:none}
 .warmup-collapse-body > .media-offline{grid-column:1 / -1;margin:0 0 2px}
 .media-offline-text{flex:1 1 200px}
