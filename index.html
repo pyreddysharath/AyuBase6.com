@@ -10547,11 +10547,12 @@ async function ayuOfflineRefresh(setName, progress){
     }
     let missing = 0;
     for(const f of set.files){ if(f.video && !(await cache.match(ayuMediaKey(f.url)))) missing++; }
-    if(stale.size || orphans.length || (saved > 0 && missing > 0)){
+    // Only warn when videos are actually saved on this device. Preview posters alone (cached automatically) never trigger it.
+    if(saved > 0 && (stale.size || orphans.length || missing > 0)){
       const why = [];
       if(stale.size) why.push('some videos changed');
       if(orphans.length) why.push('some were removed or renamed');
-      if(saved > 0 && missing > 0) why.push('new videos were added');
+      if(missing > 0) why.push('new videos were added');
       warn = '⚠ Your saved ' + set.label + ' videos are out of date (' + why.join(', ') + '). Save again to update.';
       text = 'Update the saved ' + set.label + ' videos' + (leftBytes ? ' (' + ayuMB(leftBytes) + ')' : '') + '.';
       btnLabel = 'Save again';
