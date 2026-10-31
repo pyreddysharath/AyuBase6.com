@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'ayubase6-pwa-v3';
+const CACHE_NAME = 'ayubase6-pwa-v4';
 
 const APP_SHELL = [
   './',
@@ -90,26 +90,21 @@ self.addEventListener('push', event => {
   })());
 });
 
-// Open or focus AyuBase6 when a notification is tapped.
+// Tapping a notification: focus the already-open AyuBase6 tab (no reload) and
+// tell the page which section to show; open a new window only if none is open.
 self.addEventListener('notificationclick', event => {
   event.notification.close();
 
   event.waitUntil((async () => {
-    const requestedUrl =
-      (event.notification.data &&
-        event.notification.data.url) || './';
+    const data = event.notification.data || {};
+    const section = data.section === 'routines' ? 'routines' : (data.section === 'alerts' ? 'alerts' : '');
 
-    const targetUrl = new URL(
-      requestedUrl,
-      self.location.href
-    );
-
-    // Restrict notification navigation to this website.
+    const targetUrl = new URL(data.url || './', self.location.href);
     if (targetUrl.origin !== self.location.origin) {
-      targetUrl.href = new URL(
-        './',
-        self.location.href
-      ).href;
+      targetUrl.href = new URL('./', self.location.href).href;
+    }
+    if (section && !targetUrl.searchParams.has('section')) {
+      targetUrl.searchParams.set('section', section);
     }
 
     const windows = await self.clients.matchAll({
@@ -117,20 +112,15 @@ self.addEventListener('notificationclick', event => {
       includeUncontrolled: true
     });
 
-    for (const client of windows) {
-      if (
-        client.url.startsWith(self.location.origin) &&
-        'focus' in client
-      ) {
-        if (
-          'navigate' in client &&
-          client.url !== targetUrl.href
-        ) {
-          await client.navigate(targetUrl.href);
-        }
-
-        return client.focus();
-      }
+    const open = windows.find(c => c.url.startsWith(self.location.origin));
+    if (open) {
+      open.postMessage({
+        type: 'nudge-click',
+        key: data.key || '',
+        action: event.action || '',
+        section
+      });
+      return 'focus' in open ? open.focus() : undefined;
     }
 
     if (self.clients.openWindow) {

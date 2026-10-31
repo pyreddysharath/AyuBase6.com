@@ -3719,7 +3719,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
   <div id="tab-btns" role="tablist">
     <button class="tab-btn activity active" onclick="switchTab('activity')" role="tab" aria-selected="true"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="3"/><path d="M8 9h8l2 5-3 1-2-3v4l4 6h-4l-3-5-3 5H3l5-8v-3l-2 4-3-1 3-6Z"/></svg></span><span>BODY</span></button>
     <button class="tab-btn nutrition" onclick="switchTab('nutrition')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 3C9 3 4 8 4 15c0 4 3 6 7 6 7 0 12-7 9-18Z"/><path d="M5 21c3-6 7-10 12-13" fill="none" stroke="white" stroke-width="1.7"/></svg></span><span>FOOD</span></button>
-    <button class="tab-btn routines" onclick="switchTab('routines')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="2" width="18" height="20" rx="3"/><path d="m7 8 1.5 1.5L11 7M13 8h4M7 15l1.5 1.5L11 14M13 15h4" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>ROUTINES</span></button>
+    <button class="tab-btn routines" onclick="switchTab('routines')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="2" width="18" height="20" rx="3"/><path d="m7 8 1.5 1.5L11 7M13 8h4M7 15l1.5 1.5L11 14M13 15h4" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>CHECKS</span></button>
     <button class="tab-btn alerts" onclick="switchTab('alerts')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a2 2 0 0 1 2 2c4 1 5 4 5 9 0 2 1 3 2 5H3c1-2 2-3 2-5 0-5 1-8 5-9a2 2 0 0 1 2-2ZM9 20h6a3 3 0 0 1-6 0Z"/><path d="M2 5 1 9M22 5l1 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>REMINDERS</span></button>
     <button class="tab-btn mind" onclick="switchTab('mind')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 5C10 1 5 2 5 6c-4 1-4 6-2 8-2 4 1 7 5 7 2 2 4 0 4-3V5Zm0 0c2-4 7-3 7 1 4 1 4 6 2 8 2 4-1 7-5 7-2 2-4 0-4-3V5Z"/><path d="M12 6v12M6 10l3 2M18 10l-3 2" stroke="white" fill="none" stroke-width="1.3"/></svg></span><span>MIND</span></button>
     <button class="tab-btn calculator" onclick="switchTab('calculator')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.3 3.6 13.4C-1 8.9 5.2 2.2 10.2 6.6L12 8.3l1.8-1.7c5-4.4 11.2 2.3 6.6 6.8L12 21.3Z"/><path d="M3 15.3c1.8-.8 3.5-.7 5.2.5l3.4 2.6c.9.7 2.1.5 2.8-.3l4.1-4.3c.7-.7 1.8-.7 2.4-.1.7.7.7 1.7.1 2.4l-5.7 6.1c-1.4 1.5-3.6 1.7-5.3.6L3 18.4Z"/></svg></span><span>VITALS</span></button>
@@ -3905,8 +3905,8 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         <p class="calc-sub" style="margin:0 0 6px">Pick a reading, add a value, and it gets its own section below. Colours show how your latest reading compares:</p>
         <ul style="margin:6px 0 0 18px;padding:0">
           <li><span class="trk-green"><b>Green</b></span> — the latest reading is within the acceptable range</li>
-          <li><span class="trk-redgreen"><b>Red &amp; green</b></span> — top half red, bottom half green: outside the range, but closer to it than the previous reading (improved)</li>
-          <li><span class="trk-redorange"><b>Red &amp; orange</b></span> — top half red, bottom half orange: outside the range, and unchanged from the previous reading</li>
+          <li><span class="trk-redgreen"><b>Red, green side bar</b></span> — the bar is half red, half green: outside the range, but closer to it than the previous reading (improved)</li>
+          <li><span class="trk-redorange"><b>Red, orange side bar</b></span> — the bar is half red, half orange: outside the range, and unchanged from the previous reading</li>
           <li><span class="trk-red"><b>Red</b></span> — outside the range, and further from it than the previous reading, or no previous reading to compare with</li>
           <li><span class="trk-grey"><b>Grey</b></span> — no range to compare against</li>
         </ul>
@@ -3966,9 +3966,12 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
     <div class="alert-card reminder-hours-card" id="reminder-hours-card">
       <div class="alert-card-hdr">
         <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="section-title-text">Reminder hours</span></h2>
+        <button type="button" class="reminder-hours-info-btn" id="reminder-hours-info-btn" aria-label="About Reminder hours" aria-expanded="false" onclick="toggleReminderHoursInfo()">i</button>
+        <label class="master-switch" title="Turn all reminders on or off"><input type="checkbox" id="reminder-master-toggle" aria-label="Turn all reminders on or off"></label>
       </div>
       <div class="per-reminder-schedule" aria-label="All sections schedule"><div class="per-reminder-schedule-times"><span class="per-reminder-from">From</span><button type="button" class="eye-ex-time-item" data-time="start" aria-label="All sections start time"></button><span>to</span><button type="button" class="eye-ex-time-item" data-time="end" aria-label="All sections end time"></button></div></div>
-      <p class="reminder-hours-note">Sets the same hours for every section below. You can still change the hours inside each section.</p>
+      <div class="reminder-hours-info" id="reminder-hours-info" style="display:none"></div>
+      <div class="reminder-hours-foot" id="reminder-hours-foot"></div>
     </div>
 
     <!-- EYES: 20-20-20 — most frequent -->
@@ -4228,7 +4231,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
 
 <!-- ══ ROUTINES PANEL ═══════════════════════ -->
 <div id="routines-panel" class="tab-panel" style="display:none">
-  <h1 class="ayu-content-page-title" style="--ayu-page-accent:#96500d">Routines</h1>
+  <h1 class="ayu-content-page-title" style="--ayu-page-accent:#96500d">Checks</h1>
   <div class="rout-page">
 
     <div class="rout-card">
@@ -4263,7 +4266,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       <h2>☀️ Morning</h2>
 
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="palms"> <span>Rub palms together and place over closed eyes <span class="rout-time" id="rt-palms">(6:00 AM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="palms"> <span>Rub palms together and place over closed eyes <span class="rout-time" id="rt-palms">(5:45 AM)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('palms')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-palms" style="display:none">
@@ -4271,7 +4274,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         rest, easing the eyes into the day rather than opening straight into bright light or a screen.
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="water"> <span>Drink water <span class="rout-time" id="rt-water">(6:05 AM, 1–2 glasses)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="water"> <span>Drink water <span class="rout-time" id="rt-water">(5:50 AM, 1–2 glasses)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('water')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-water" style="display:none">
@@ -4279,10 +4282,10 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         your body loses water through breathing and sweat even while asleep.
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="bathroom"> <span>Wait a while, then go to the bathroom <span class="rout-time" id="rt-bathroom">(6:15 AM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="bathroom"> <span>Wait a while, then go to the bathroom <span class="rout-time" id="rt-bathroom">(6:00 AM)</span></span></label>
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="walkex"> <span>Walk or Exercise <span class="rout-time" id="rt-walkex">(6:30 – 7:15 AM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="walkex"> <span>Walk or Exercise <span class="rout-time" id="rt-walkex">(6:15 – 7:00 AM)</span></span></label>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="breakfast"> <span>Breakfast <span class="rout-time" id="rt-breakfast">(7:30 – 8:30 AM)</span></span></label>
@@ -8615,7 +8618,10 @@ function initNudgeSW(){
     if(!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
     navigator.serviceWorker.addEventListener('message', ev=>{
       const d=ev.data||{};
-      if(d.type==='nudge-click') handleNudgeClick(d.key, d.action);
+      if(d.type==='nudge-click'){
+        if(d.section && typeof switchTab==='function'){ try{ switchTab(d.section); }catch(e){} nudgeShowSection(d.key); }
+        handleNudgeClick(d.key, d.action);
+      }
     });
     // sw.js is stored at the site root so it can control the whole GitHub Pages site.
     // It shows notifications (with buttons) and handles their taps. If unavailable, we fall back.
@@ -8624,17 +8630,28 @@ function initNudgeSW(){
       const w=reg.installing||reg.waiting; if(!w) return;
       w.addEventListener('statechange', ()=>{ if(w.state==='activated') nudgeSwReg=reg; });
     };
-    navigator.serviceWorker.register('./sw.js', {scope: './'})
-      .then(adopt)
-      .catch(error=>console.error('[AyuBase6] Service worker registration failed:', error));
-  }catch(e){ console.error('[AyuBase6] Service worker setup failed:', e); }
+    navigator.serviceWorker.register('./sw.js', {scope: './'}).then(adopt).catch(()=>{});
+  }catch(e){}
+}
+// Show the tab (and, for Reminders, the section) a notification belongs to.
+function nudgeShowSection(key){
+  try{
+    if(typeof key==='string' && key.indexOf('routine-')!==0){
+      const card=document.getElementById('alert-card-'+(key==='eyeex'?'break-ex':key));
+      if(card){ card.classList.remove('collapsed'); const chev=card.querySelector('.alert-card-chev'); if(chev) chev.setAttribute('aria-expanded','true'); setTimeout(()=>card.scrollIntoView({behavior:'smooth',block:'start'}),50); }
+    }
+  }catch(e){}
+}
+function nudgeOpenFromWindow(win, key){
+  // Clicking a notification window: bring this site's tab forward and show the right tab.
+  try{ if(win && win.opener) win.opener.focus(); }catch(e){}
+  try{ window.focus(); }catch(e){}
+  const section=(typeof key==='string' && key.indexOf('routine-')===0)?'routines':'alerts';
+  try{ if(typeof switchTab==='function') switchTab(section); }catch(e){}
+  nudgeShowSection(key);
 }
 function handleNudgeClick(key, action){
-  if(key==='break'){
-    if(action==='cancel') cancelEyeTimer();
-    else startEyeTimer();
-    return;
-  }
+  if(key==='break') return;   // Eyes (20-20-20) has no timer; tapping it just opens the app
   if(typeof key==='string' && key.indexOf('routine-checkin-')===0 && typeof window.handleRoutineNotificationAction==='function'){
     window.handleRoutineNotificationAction(key.slice('routine-checkin-'.length), action);
   }
@@ -8646,9 +8663,9 @@ const NUDGE_IS_PHONE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent
 function getNudgeReg(){
   if(nudgeSwReg) return Promise.resolve(nudgeSwReg);
   if(!('serviceWorker' in navigator)) return Promise.resolve(null);
-  return navigator.serviceWorker.ready
-    .then(reg=>{ if(reg && reg.active) nudgeSwReg=reg; return nudgeSwReg; })
-    .catch(error=>{ console.error('[AyuBase6] No active service worker:', error); return null; });
+  return navigator.serviceWorker.getRegistrations()
+    .then(list=>{ const r=list.find(x=>x.active)||null; if(r) nudgeSwReg=r; return r; })
+    .catch(()=>null);
 }
 // Last resort when no system notification can be made: the in-app card for that nudge.
 function nudgeInPageFallback(key){
@@ -8669,11 +8686,10 @@ function showNudgeNotification(title, body, o){
   // earlier one with the same tag is still on screen; silent updates (the
   // countdown) just replace the text in place.
   const fresh=!o.silent;
-  const opts={ body:body, tag:'nudge-'+key, requireInteraction:true, silent:!!o.silent, renotify:fresh, data:{key:key}, timestamp:Date.now() };
+  const opts={ body:body, tag:'nudge-'+key, requireInteraction:true, silent:!!o.silent, renotify:fresh, data:{key:key, section:(/^routine-/.test(key)?'routines':'alerts')}, timestamp:Date.now() };
   if(fresh) opts.vibrate=[200,100,200,100,200];
   const icon=nudgeArt('icon',o.theme), badge=nudgeArt('badge',o.theme);
   if(icon) opts.icon=icon; if(badge) opts.badge=badge;
-  if(o.theme==='routines'){ const img=nudgeArt('banner','routines'); if(img) opts.image=img; }
   const viaReg=reg=>{
     if(o.actions) opts.actions=o.actions;
     const show=()=>reg.showNotification(title, opts).then(()=>{
@@ -8684,23 +8700,11 @@ function showNudgeNotification(title, body, o){
   };
   try{
     if(nudgeSwReg){
-      viaReg(nudgeSwReg).catch(error=>{
-        console.error('[AyuBase6] Service-worker notification failed:', error);
-        if(NUDGE_IS_PHONE) nudgeInPageFallback(key);
-        else { try{ delete opts.actions; new Notification(title, opts); }catch(e){ nudgeInPageFallback(key); } }
-      });
+      viaReg(nudgeSwReg).catch(()=>{ try{ delete opts.actions; new Notification(title, opts); }catch(e){} });
       return true;
     }
-    if('serviceWorker' in navigator){
-      getNudgeReg().then(reg=>{
-        if(reg) return viaReg(reg).catch(error=>{
-          console.error('[AyuBase6] Service-worker notification failed:', error);
-          if(NUDGE_IS_PHONE) nudgeInPageFallback(key);
-          else { try{ delete opts.actions; new Notification(title, opts); }catch(e){ nudgeInPageFallback(key); } }
-        });
-        if(NUDGE_IS_PHONE) nudgeInPageFallback(key);
-        else { try{ delete opts.actions; const n=new Notification(title, opts); if(fresh) setTimeout(()=>{try{n.close()}catch(e){}},300000); }catch(e){ nudgeInPageFallback(key); } }
-      }).catch(error=>{ console.error('[AyuBase6] Notification dispatch failed:', error); nudgeInPageFallback(key); });
+    if(NUDGE_IS_PHONE && 'serviceWorker' in navigator){
+      getNudgeReg().then(reg=>{ if(reg) return viaReg(reg); nudgeInPageFallback(key); }).catch(()=>nudgeInPageFallback(key));
       return true;
     }
     if(fresh && nudgeLast[key]){ try{ nudgeLast[key].close(); }catch(e){} }
@@ -8728,9 +8732,7 @@ function eyeStartPrompt(){
 }
 function showEyeReminderNotification(){
   return showNudgeNotification(ALERT_LABELS.break.title, eyeStartPrompt(), {
-    key:'break',
-    actions:[{action:'start', title:'▶ Start 20s timer'}],
-    onclick:()=>startEyeTimer()
+    key:'break'
   });
 }
 function startEyeTimer(){
@@ -8816,6 +8818,7 @@ function nudgePopupButtons(o){
 }
 function nudgePopupWire(win, doc, o){
   const closeWin=()=>{ try{ win.close(); }catch(e){} };
+  doc.body.addEventListener('click',e=>{ if(e.target.closest('button')) return; nudgeOpenFromWindow(win,o.popKey); });
   const t=doc.querySelector('[data-pop-this]'), a=doc.querySelector('[data-pop-all]'), x=doc.querySelector('[data-pop-close]');
   if(x) x.onclick=closeWin;
   if(t) t.onclick=()=>{ try{ o.onDisableThis&&o.onDisableThis(); }catch(e){} closeWin(); };
@@ -8851,7 +8854,7 @@ function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
   doc.head.innerHTML='<meta charset="utf-8"><style>'+css+'</style>';
   doc.body.innerHTML='<svg class="bg" viewBox="9.5 11.5 45 27" aria-hidden="true">'+lotus+'</svg>'
     +'<div class="c">'+nudgePopupIcons(o)+'<h1>'+nudgeEsc(title)+'</h1><p>'+nudgeEsc(msg)+'</p>'+nudgePopupButtons(o)
-    +(withTimer?'<div class="t" id="n" title="Click to start the timer">\u25B6 '+EYE_TIMER_SECS+'s</div>':'')
+    +(withTimer?'<div class="t" id="n" title="Click to start the timer">\u25B6 '+(o.timerSecs||EYE_TIMER_SECS)+'s</div>':'')
     +(title==='Eye Exercise' && exerciseVideoSrc?'<button type="button" class="ex-toggle" id="ex-toggle" aria-expanded="false" title="Expand guided eye exercise video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span></button><video class="ex-video" id="ex-video" controls playsinline muted preload="metadata" src="'+exerciseVideoSrc.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></video>':'')+'</div>';
   if(title==='Eye Exercise'){const toggle=doc.getElementById('ex-toggle'), card=doc.querySelector('.c'), video=doc.getElementById('ex-video');if(toggle&&card&&video)toggle.onclick=()=>{const expanded=card.classList.toggle('expanded');toggle.setAttribute('aria-expanded',String(expanded));toggle.innerHTML=expanded?'✕ <span>Hide exercise video</span>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span>';if(expanded){try{win.resizeTo(420,520)}catch(e){};video.play().catch(()=>{});}else{video.pause();try{win.resizeTo(320,150)}catch(e){}}};}
   nudgePopupWire(win, doc, o);
@@ -8861,18 +8864,18 @@ function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
     const left=Math.max(0, Math.ceil((end-Date.now())/1000));
     if(left>0){ num.textContent=left+'s'; return; }
     win.clearInterval(iv); num.className='t done'; num.textContent='\u2705 Done';
-    if(!alertState.break.muted) playAlertPreset(alertState.break.sound);   // sound when the timer ends
+    try{ const st=o.timerSecs?eyeExState:alertState.break; if(st && !st.muted) playAlertPreset(st.sound); }catch(e){}   // sound when the timer ends
   };
   num.onclick=()=>{
     if(iv) return;
-    num.className='t run'; end=Date.now()+EYE_TIMER_SECS*1000; tick(); iv=win.setInterval(tick,250);
+    num.className='t run'; end=Date.now()+(o.timerSecs||EYE_TIMER_SECS)*1000; tick(); iv=win.setInterval(tick,250);
   };
 }
 function nudgeNativeFallback(key, title, msg){
   const ok = key==='break' ? showEyeReminderNotification() : showNudgeNotification(title, msg, {key:key});
   if(ok) return;
   const mock=document.getElementById(key==='eyeex' ? 'eye-ex-notif-mock' : 'alert-'+key+'-notif-mock');
-  if(mock){ mock.classList.add('show'); if(key==='break') attachMockEyeTimer(); }
+  if(mock){ mock.classList.add('show'); }
 }
 const NUDGE_WINS=[];   // open reminder windows, so a new one is placed above the others instead of on top of them
 function nudgePrune(){
@@ -8889,7 +8892,7 @@ function nudgeSlot(key,W,H){
 function nudgeDefaultHandlers(key){
   if(/^routine-/.test(key)){
     const act=key.replace(/^routine-(checkin-)?/,'');
-    return { thisLabel:'Disable this activity’s reminders', allLabel:'Disable all routine notifications',
+    return { thisLabel:'Disable this activity’s reminders', allLabel:'Disable all Checks notifications',
       onDisableThis:()=>{ if(typeof muteRoutineNotification==='function') muteRoutineNotification(act); },
       onDisableAll:()=>{ if(typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()) enableRoutineNotifications(); } };
   }
@@ -8912,7 +8915,7 @@ function openNudgeBrowserPopup(key, title, msg, timer, W, H, exerciseVideoSrc, o
   }catch(e){ return false; }
 }
 function openNudgePopup(key, title, msg, o){
-  o=Object.assign({}, nudgeDefaultHandlers(key), o||{});
+  o=Object.assign({}, nudgeDefaultHandlers(key), o||{}, {popKey:key});
   const timer=!!o.timer;
   // Size each popup to its own title/body instead of giving every reminder a large fixed window.
   const msgLen=String(msg||'').length, titleLen=String(title||'').length, textLen=msgLen+titleLen;
@@ -9062,21 +9065,21 @@ function previewAlertNotification(key){
     if(key==='break'){ if(showEyeReminderNotification()) return; }
     else if(showNudgeNotification(info.title, info.msg, {key:key})) return;
   }
-  if(openNudgePopup(key, ALERT_LABELS[key].title, ALERT_LABELS[key].msg, {timer:key==='break'})) return;
+  if(openNudgePopup(key, ALERT_LABELS[key].title, ALERT_LABELS[key].msg, {})) return;
   if(typeof Notification!=='undefined' && Notification.permission==='granted'){
     const info=ALERT_LABELS[key];
     if(key==='break'){ if(showEyeReminderNotification()) return; }
     else if(showNudgeNotification(info.title, info.msg, {key:key})) return;
   }
   const mock=document.getElementById('alert-'+key+'-notif-mock');
-  if(mock){ mock.classList.add('show'); if(key==='break') attachMockEyeTimer(); }
+  if(mock){ mock.classList.add('show'); }
 }
 function fireAlert(key){
   const info=ALERT_LABELS[key];
   if(!alertState[key].muted) playAlertPreset(alertState[key].sound);
   let shown=false;
   if(alertState[key].notify && typeof Notification!=='undefined' && Notification.permission==='granted'){
-    shown = (!NUDGE_IS_PHONE && openNudgePopup(key, info.title, info.msg, {timer:key==='break'}))
+    shown = (!NUDGE_IS_PHONE && openNudgePopup(key, info.title, info.msg, {}))
       || ((key==='break') ? showEyeReminderNotification() : showNudgeNotification(info.title, info.msg, {key:key}));
   }
   if(!shown){
@@ -9084,8 +9087,7 @@ function fireAlert(key){
     if(mock){
       mock.classList.add('show');
       // Eyes keeps its in-app card up (with the timer button) until it's closed.
-      if(key==='break') attachMockEyeTimer();
-      else setTimeout(()=>mock.classList.remove('show'), 300000);
+      setTimeout(()=>mock.classList.remove('show'), 300000);
     }
   }
 }
@@ -9560,7 +9562,7 @@ function onEyeExNotifyChange(){
 }
 function previewEyeExNotification(){
   if(!eyeExState.muted) playAlertPreset(eyeExState.sound);
-  if(openNudgePopup('eyeex', 'Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.')) return;
+  if(openNudgePopup('eyeex', 'Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {timer:true,timerSecs:30})) return;
   if(typeof Notification!=='undefined' && Notification.permission==='granted'){
     if(showNudgeNotification('Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {key:'eyeex'})) return;
   }
@@ -9571,7 +9573,7 @@ function fireEyeExAlert(){
   if(!eyeExState.muted) playAlertPreset(eyeExState.sound);
   let shown=false;
   if(eyeExState.notify && typeof Notification!=='undefined' && Notification.permission==='granted'){
-    shown=(!NUDGE_IS_PHONE && openNudgePopup('eyeex', 'Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.'))
+    shown=(!NUDGE_IS_PHONE && openNudgePopup('eyeex', 'Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {timer:true,timerSecs:30}))
       || showNudgeNotification('Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {key:'eyeex'});
   }
   if(!shown){
@@ -9778,7 +9780,7 @@ function initRoutinesChecklist(){
   });
 }
 function resetRoutinesChecklist(){
-  if(!confirm("Reset today's Routines checklist?")) return;
+  if(!confirm("Reset today's Checks?")) return;
   const state={ date:new Date().toDateString(), checked:{} };
   saveRoutinesState(state);
   document.querySelectorAll('.rout-cb').forEach(cb=>{ cb.checked=false; });
@@ -9797,10 +9799,10 @@ initRoutinesChecklist();
 //  minutes) from whatever wake time is chosen.
 // ════════════════════════════════════════════════
 const WAKE_OFFSETS = {
-  palms:     [15],
-  water:     [20],
-  bathroom:  [30],
-  walkex:    [45, 90],
+  palms:     [0],
+  water:     [5],
+  bathroom:  [15],
+  walkex:    [30, 75],
   breakfast: [105, 165],
   fruits:    [315],
   lunch:     [405, 465],
@@ -12015,7 +12017,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   var SEC_NOTE='<ul><li>Use this section’s switch to turn its reminder on or off.</li>'
     +'<li><b>Preview notification</b> is only an example and changes no settings.</li>'
     +'<li>Reminders run only while AyuBase6 is open in a browser tab or installed app.</li>'
-    +'<li>Full details are under the <b>i</b> beside Enable All Notifications.</li></ul>';
+    +'</ul>';
   document.querySelectorAll('.notif-info').forEach(function(el){ if(el.id!=='install-help') el.innerHTML=(el.id==='master-notif-info'?REM_NOTE:NOTE); });
   // Each section's own "i" panel also carries the notification notes, under a separate title.
   ['drink','walk','break','break-ex'].forEach(function(k){
@@ -12254,36 +12256,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   }
   function startReminder(item){
     const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name)return;
-    const notify=()=>{
-      if(data.sound==='none'||!('Notification' in window)||Notification.permission!=='granted') return;
-      const options={
-        body:'It is time for your reminder.',
-        tag:'ayubase6-custom-'+item.dataset.reminderId,
-        renotify:true,
-        requireInteraction:true,
-        icon:'./icons/icon-192.png',
-        badge:'./icons/icon-192.png',
-        data:{url:'./'}
-      };
-      const display=reg=>{
-        if(!reg||!reg.active) throw new Error('No active service worker registration');
-        return reg.showNotification(data.name, options);
-      };
-      if('serviceWorker' in navigator){
-        (nudgeSwReg?Promise.resolve(nudgeSwReg):getNudgeReg())
-          .then(reg=>{
-            if(reg) return display(reg);
-            if(!NUDGE_IS_PHONE) return new Notification(data.name, options);
-            throw new Error('Service worker unavailable on mobile');
-          })
-          .catch(error=>{
-            console.error('[AyuBase6] Custom reminder notification failed:', error);
-            if(!NUDGE_IS_PHONE){try{new Notification(data.name, options)}catch(e){}}
-          });
-      }else if(!NUDGE_IS_PHONE){
-        try{new Notification(data.name, options)}catch(e){}
-      }
-    };
+    const notify=()=>{try{if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()})}catch(_){}};
     if(data.mode==='regular')item._reminderTimer=setInterval(notify,Math.max(1,Number(data.duration)||1)*60000);
     else {item._reminderTimeouts=[];item._reminderTimers=[];data.times.forEach(t=>{const [hh,mm]=t.split(':').map(Number),now=new Date(),next=new Date();next.setHours(hh,mm,0,0);if(next<=now)next.setDate(next.getDate()+1);const delay=next-now;item._reminderTimeouts.push(setTimeout(()=>{notify();item._reminderTimers.push(setInterval(notify,24*60*60*1000))},delay))})}
   }
@@ -14582,7 +14555,7 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
     showing=true; current=key;
     var title=nameOf(cb), section=sectionOf(cb), when=timeOf(cb);
     var body='Have you completed this activity? '+section+' · '+when;
-    var shown=typeof notifyRoutine==='function' && notifyRoutine('checkin-'+key, 'Routine check-in · '+title, body, {
+    var shown=typeof notifyRoutine==='function' && notifyRoutine('checkin-'+key, 'Check-in · '+title, body, {
       actions:[{action:'done',title:'✓ Yes, done'},{action:'not-done',title:'Not yet'}],
       buttons:[{act:'done',label:'Yes, done',primary:true},{act:'not-done',label:'Not yet'}],
       onAction:function(act){ if(window.handleRoutineNotificationAction) window.handleRoutineNotificationAction(key,act); }
@@ -14891,3 +14864,162 @@ html body :is(.reminder-custom-select-trigger[aria-expanded="true"], .duration-c
 })();
 </script>
 
+<style id="hub-cards-descriptions-tracker-20261031">
+/* --- Reminders: one hub card (hours + master switch + install + reset); the old Enable All row is hidden --- */
+#reminders-notif-banner { display:none !important; }
+#alerts-panel #reminder-hours-card { background:linear-gradient(135deg,#dbeafe 0%,#e0f2fe 100%); border:1px solid #93c5fd; }
+#alerts-panel #reminder-hours-card .alert-card-hdr { flex-wrap:nowrap !important; }
+.reminder-hours-info-btn { flex:0 0 auto; width:24px; height:24px; border-radius:50%; border:1px solid #0d9488; background:rgba(255,255,255,.75); color:#0f766e; font:italic 700 13px Georgia,serif; cursor:pointer; padding:0; }
+.master-switch { display:flex; align-items:center; margin-left:4px; flex:0 0 auto; }
+.master-switch input { appearance:none; -webkit-appearance:none; width:38px; height:21px; border-radius:20px; background:#94a3b8; position:relative; cursor:pointer; transition:background .2s; margin:0; }
+.master-switch input:before { content:""; position:absolute; width:17px; height:17px; left:2px; top:2px; border-radius:50%; background:#fff; transition:transform .2s; }
+.master-switch input:checked { background:var(--alert-2,#0d9488); }
+.master-switch input:checked:before { transform:translateX(17px); }
+.rout-master-switch input:checked { background:var(--rout-2,#a75b12); }
+#reminder-hours-card .reminder-hours-foot, #routines-panel .rout-card-foot { display:flex; justify-content:flex-end; align-items:center; gap:8px; margin-top:10px; }
+#reminder-hours-card #install-row, #routines-panel #routines-install-row { display:contents !important; }
+#reminder-hours-card .install-btn, #routines-panel .rout-card-foot .install-btn { width:40px !important; height:40px !important; min-width:40px !important; padding:0 !important; margin:0 !important; border-radius:12px !important; display:inline-flex !important; align-items:center; justify-content:center; }
+#reminder-hours-card .install-btn .install-label, #routines-panel .rout-card-foot .install-btn .install-label { display:none !important; }
+#reminder-hours-card .reset-icon-btn { width:40px; height:40px; min-width:40px; padding:0; display:inline-flex; align-items:center; justify-content:center; }
+.reminder-hours-info { margin-top:12px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.7); font-size:.78rem; line-height:1.5; color:#134e4a; }
+.reminder-hours-info ul { margin:4px 0 0 18px; padding:0; } .reminder-hours-info li { margin:3px 0; } .reminder-hours-info p { margin:0 0 8px; } .reminder-hours-info strong { display:block; margin:8px 0 2px; } .reminder-hours-info > strong:first-child { margin-top:0; }
+/* --- Routines (Checks): switch in the Wake-Up header, install icon bottom right; old buttons hidden --- */
+#routines-panel .rout-notify-actions { display:none !important; }
+#routines-panel .rout-card-hdr .rout-master-switch { margin-left:10px; }
+/* --- Descriptions: each section gets its own tint; separator after Preview notification --- */
+#alerts-panel .alert-card .alert-preview-row { padding-bottom:12px; border-bottom:1px solid rgba(100,116,139,.35); }
+#alerts-panel .alert-card > .alert-task { margin:12px 0 0 !important; padding:12px 14px !important; border:0 !important; border-radius:12px !important; box-sizing:border-box; width:100%; align-self:stretch; }
+#alerts-panel #alert-card-break > .alert-task { background:#e0f2fe !important; }
+#alerts-panel #alert-card-walk > .alert-task { background:#dcfce7 !important; }
+#alerts-panel #alert-card-drink > .alert-task { background:#cffafe !important; }
+#alerts-panel #alert-card-break-ex > .alert-task { background:#ede9fe !important; }
+.section-about-title { display:block; margin-bottom:4px; }
+/* --- Tracker: Option C (red value, split side bar for "improved" / "no change") --- */
+html body .trk-redgreen, html body .trk-redorange { background:none !important; background-image:none !important; color:#b91c1c !important; -webkit-text-fill-color:#b91c1c !important; position:relative; display:inline-block; padding-left:11px; }
+html body .trk-redgreen::before, html body .trk-redorange::before { content:""; position:absolute; left:0; top:50%; transform:translateY(-50%); width:5px; height:1.3em; border-radius:3px; }
+html body .trk-redgreen::before { background:linear-gradient(180deg,#b91c1c 50%,#15803d 50%); }
+html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%,#ea580c 50%); }
+</style>
+<script id="hub-cards-js-20261031">
+(function(){
+  function $(id){ return document.getElementById(id); }
+  var HOURS_INFO='<strong>Reminder hours</strong><p>Sets the same hours for every section below. You can still change the hours inside each section.</p>'
+    +'<strong>Switch, install and reset</strong><ul>'
+    +'<li>The switch at the top right turns every reminder on or off at once. The first time, your browser asks for permission to show notifications.</li>'
+    +'<li>The install icon adds AyuBase6 to your Home Screen or desktop.</li>'
+    +'<li>The reset icon puts every reminder back to its defaults.</li></ul>'
+    +'<strong>Notification controls</strong><ul>'
+    +'<li>Each section’s switch turns that reminder on or off.</li>'
+    +'<li><b>Preview notification</b> is only an example and changes no settings.</li>'
+    +'<li>Every notification window has icons to disable that reminder, disable all, or close it.</li></ul>'
+    +'<strong>Delivery requirements</strong><ul>'
+    +'<li>Allow notifications when your browser asks.</li>'
+    +'<li>Keep AyuBase6 open in a browser tab or installed app — closing it pauses reminders.</li>'
+    +'<li>On iPhone/iPad, add it to the Home Screen (Share → Add to Home Screen) and open it from there.</li>'
+    +'<li>Battery saver or a locked device may delay reminders.</li></ul>';
+  window.toggleReminderHoursInfo=function(){
+    var pnl=$('reminder-hours-info'), btn=$('reminder-hours-info-btn'); if(!pnl) return;
+    if(!pnl.innerHTML) pnl.innerHTML=HOURS_INFO;
+    var open=pnl.style.display==='none'; pnl.style.display=open?'block':'none'; if(btn) btn.setAttribute('aria-expanded',String(open));
+  };
+  function syncMaster(){ var t=$('reminder-master-toggle'); if(t && typeof isMasterNotifyOn==='function') t.checked=!!isMasterNotifyOn(); }
+  function initReminders(){
+    var card=$('reminder-hours-card'), foot=$('reminder-hours-foot'); if(!card||!foot) return;
+    var inst=$('install-row'), rst=document.querySelector('.reminders-reset-row .reset-icon-btn');
+    if(inst && !foot.contains(inst)) foot.appendChild(inst);
+    if(rst && !foot.contains(rst)) foot.appendChild(rst);
+    ['reminders-notif-error','install-help'].forEach(function(id){ var el=$(id); if(el && el.parentNode!==card) card.insertBefore(el,foot); });
+    var t=$('reminder-master-toggle');
+    if(t && !t.dataset.wired){
+      t.dataset.wired='1';
+      t.addEventListener('change',function(){
+        var btn=document.querySelector('#reminders-notif-banner .reminders-notif-banner-btn');
+        if(btn && t.checked!==isMasterNotifyOn()) btn.click();     // same action the old Enable / Disable All button had
+        setTimeout(syncMaster,500); setTimeout(syncMaster,2500);
+      });
+      var orig=window.updateRemindersNotifBanner;
+      if(typeof orig==='function') window.updateRemindersNotifBanner=function(){ orig.apply(this,arguments); syncMaster(); };
+    }
+    syncMaster();
+  }
+  function syncRoutines(){ var t=$('routines-master-toggle'); if(t && typeof routineNotificationsEnabled==='function') t.checked=!!routineNotificationsEnabled(); }
+  function initRoutines(){
+    var card=document.querySelector('#routines-panel .rout-card'); if(!card) return;
+    var hdr=card.querySelector('.rout-card-hdr');
+    if(hdr && !$('routines-master-toggle')){
+      var l=document.createElement('label'); l.className='master-switch rout-master-switch'; l.title='Turn Checks notifications on or off';
+      l.innerHTML='<input type="checkbox" id="routines-master-toggle" aria-label="Turn Checks notifications on or off">';
+      hdr.appendChild(l);
+      var t=l.querySelector('input');
+      t.addEventListener('change',function(){
+        if(t.checked!==routineNotificationsEnabled()) enableRoutineNotifications();
+        setTimeout(syncRoutines,500); setTimeout(syncRoutines,2500);
+      });
+      var orig=window.updateRoutineNotifyButtons;
+      if(typeof orig==='function') window.updateRoutineNotifyButtons=function(){ orig.apply(this,arguments); syncRoutines(); };
+    }
+    var foot=card.querySelector('.rout-card-foot');
+    if(!foot){ foot=document.createElement('div'); foot.className='rout-card-foot'; card.appendChild(foot); }
+    ['rout-notif-hint','routines-install-help'].forEach(function(id){ var el=$(id); if(el && el.parentNode!==card) card.insertBefore(el,foot); });
+    var inst=$('routines-install-row'); if(inst && !foot.contains(inst)) foot.appendChild(inst);
+    syncRoutines();
+  }
+  function addAbout(){
+    ['drink','walk','break','break-ex'].forEach(function(k){
+      var t=$('alert-'+k+'-task'); if(!t || t.querySelector('.section-about-title')) return;
+      var h=document.createElement('strong'); h.className='section-notif-title section-about-title'; h.textContent='About'; t.insertBefore(h,t.firstChild);
+    });
+  }
+  function all(){ initReminders(); initRoutines(); addAbout(); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',all); else all();
+  window.addEventListener('load',all); setTimeout(all,900);
+  // Opened from a notification while the site was closed: go straight to its tab.
+  var m=/[?&]section=(alerts|routines)/.exec(location.search);
+  if(m) window.addEventListener('load',function(){ setTimeout(function(){ if(typeof switchTab==='function') switchTab(m[1]); },300); });
+})();
+</script>
+
+<style id="hub-foot-icons-20261031">
+#reminder-hours-card .reminder-hours-foot #install-app-btn{width:40px!important;height:40px!important;min-width:40px!important;flex:0 0 40px!important;padding:0!important;border-radius:12px!important;display:inline-flex!important;align-items:center;justify-content:center}
+#reminder-hours-card .reminder-hours-foot #install-app-btn span:not(.install-info-overlay){font-size:0!important}
+#reminder-hours-card .reminder-hours-foot .install-info-overlay{display:none!important}
+#reminder-hours-card .reminder-hours-foot .reset-icon-btn{width:40px!important;min-width:40px!important;height:40px!important;flex:0 0 40px!important}
+</style>
+
+<style id="hub-banner-reset-20261031b">
+/* The master switch in Reminder hours replaces the old bottom Enable/Disable All button. */
+#alerts-panel #reminders-notif-banner{display:none!important}
+/* Reset icon: white fill, like the other reset buttons. */
+#reminder-hours-card .reminder-hours-foot .reset-icon-btn{background:#fff!important}
+</style>
+
+<style id="hub-colours-optionA-20261031">
+/* Option A: Reminder hours and every About box follow the Reminders teal. */
+#alerts-panel #reminder-hours-card{background:linear-gradient(135deg,#d6f2ec,#e6f8f4)!important;border:1px solid #8fd3c7!important}
+#alerts-panel #alert-card-break > .alert-task,
+#alerts-panel #alert-card-walk > .alert-task,
+#alerts-panel #alert-card-drink > .alert-task,
+#alerts-panel #alert-card-break-ex > .alert-task,
+#alerts-panel #reminder-hours-card .reminder-hours-info{background:#eaf8f5!important}
+</style>
+
+<style id="hub-reset-colour-20261031">
+/* Reset icon in Reminder hours uses the Reminders-tab "Base6" teal. */
+#reminder-hours-card .reminder-hours-foot .reset-icon-btn{color:#42d8c5!important;border-color:#42d8c5!important}
+#reminder-hours-card .reminder-hours-foot .reset-icon-btn svg{stroke:#42d8c5!important}
+#reminder-hours-card .reminder-hours-foot .reset-icon-btn:hover{background:#42d8c5!important;color:#fff!important}
+#reminder-hours-card .reminder-hours-foot .reset-icon-btn:hover svg{stroke:#fff!important}
+</style>
+
+<style id="hub-reset-fill-20261031">
+/* Reset icon in Reminder hours: whole button in the Reminders-tab "Base6" teal. */
+#reminder-hours-card .reminder-hours-foot .reset-icon-btn,
+#reminder-hours-card .reminder-hours-foot .reset-icon-btn:hover{background:#42d8c5!important;border-color:#42d8c5!important;color:#fff!important}
+#reminder-hours-card .reminder-hours-foot .reset-icon-btn svg,
+#reminder-hours-card .reminder-hours-foot .reset-icon-btn:hover svg{stroke:#fff!important}
+</style>
+
+<style id="hub-heading-optionD-20261031">
+/* Option D: "About" and "Notifications" read as titles (bold, teal bar on the left). */
+#alerts-panel .section-notif-title{display:block!important;font-size:15px!important;font-weight:800!important;color:#065f58!important;border-left:4px solid #42d8c5!important;padding:1px 0 1px 9px!important;margin:0 0 8px!important}
+</style>
