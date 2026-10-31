@@ -9083,7 +9083,7 @@ function checkRoutineNotificationSchedule(){
     const item=ROUTINE_NOTIFY_ITEMS[key];
     // At the start of the activity.
     if(scheduled===minute){
-      const sentKey=day+':'+key;
+      const sentKey=day+':'+key+':'+scheduled;   // per scheduled minute, so a changed wake-up time still notifies at the new time
       if(!sent[sentKey]){
         notifyRoutine(key,item.title,item.body,routineButtons(key));
         sent[sentKey]=true;
@@ -12460,13 +12460,55 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     if(typeof alertState!=='undefined'){['break','walk','drink'].forEach(k=>{if(alertState[k]&&typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)})}
     updateExerciseTimes();
   }
-  // Override the shared-window gate: each timer now checks the From/To values in its own card.
+  // Reminder times are rebuilt from From/To every day: the first reminder is at From, then every N minutes
+  // up to To (inclusive). Nothing is carried over from the previous day, and a change to From/To (a section's
+  // own, or the "All sections" hours) re-arms the timer straight away.
+  function toMin(t){const m=/^(\d{1,2}):(\d{2})$/.exec(t||'');return m?+m[1]*60+(+m[2]):null}
+  function windowsAround(w,ts){
+    let a=toMin(w&&w.start),b=toMin(w&&w.end);
+    if(a===null||b===null||a===b){a=0;b=1439}
+    const base=new Date(ts),out=[];
+    for(let d=-1;d<=3;d++){
+      const y=base.getFullYear(),m=base.getMonth(),dd=base.getDate()+d;
+      out.push([new Date(y,m,dd,0,a).getTime(),new Date(y,m,dd+(a<b?0:1),0,b).getTime()]);
+    }
+    return out;
+  }
+  function stepMs(key){const st=typeof alertState!=='undefined'&&alertState[key];return st&&st.minutes>0?st.minutes*60000:0}
+  function latestSlot(key,ts){
+    const ms=stepMs(key);if(!ms)return null;let best=null;
+    windowsAround(cards[key],ts).forEach(([S,E])=>{if(ts<S)return;const t=Math.min(ts,E),slot=S+Math.floor((t-S)/ms)*ms;if(best===null||slot>best)best=slot});
+    return best;
+  }
+  function nextSlot(key,ts){
+    const ms=stepMs(key);if(!ms)return null;
+    for(const [S,E] of windowsAround(cards[key],ts)){
+      if(E<=ts)continue;
+      const slot=ts<S?S:S+(Math.floor((ts-S)/ms)+1)*ms;
+      if(slot<=E)return slot;
+    }
+    return null;
+  }
+  window.ayuReminderSlots={next:nextSlot,latest:latestSlot};
+  const lastSlot={},GRACE=10*60000;
+  function tick(key){
+    const st=typeof alertState!=='undefined'&&alertState[key];if(!st||!st.enabled)return;
+    const now=Date.now(),slot=latestSlot(key,now);
+    if(slot===null||slot===lastSlot[key])return;
+    lastSlot[key]=slot;
+    // a reminder more than 10 minutes late (a phone that was asleep) is skipped, not fired stale
+    if(now-slot<=GRACE&&typeof window.fireAlert==='function')window.fireAlert(key);
+  }
   const oldScheduleAlertTimer=window.scheduleAlertTimer;
   window.scheduleAlertTimer=function(key){
     const st=(typeof alertState!=='undefined'&&alertState[key])||null;if(!st)return;
     if(st.timerId){clearInterval(st.timerId);st.timerId=null}
-    if(st.enabled&&st.minutes>0){st.timerId=setInterval(()=>{const w=cards[key];if(w&&inWindow(w.start,w.end)&&typeof window.fireAlert==='function')window.fireAlert(key)},st.minutes*60000)}
+    if(st.enabled&&st.minutes>0){
+      lastSlot[key]=latestSlot(key,Date.now());   // only upcoming times fire; switching on or editing hours never fires an old one
+      st.timerId=setInterval(()=>tick(key),15000);
+    }
     else if(typeof oldScheduleAlertTimer==='function'&&key==='__fallback')oldScheduleAlertTimer(key);
+    try{document.dispatchEvent(new Event('ayu-reminders-changed'))}catch(e){}
   };
   // Keep the exercise's one/two daily sessions inside its own schedule window.
   const oldCheck=window.checkEyeExTimes;
@@ -15357,8 +15399,11 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 </script>
 <style id="reminders-next-20261031">
 /* "Next: ..." line under each Reminders section title: the Reminders tab colour, lighter weight than the title */
-#alerts-panel .alert-card-hdr > .nx-wrap{flex:1 1 auto;min-width:0}
-#alerts-panel .nx-wrap > h2{margin:0}
+#alerts-panel .alert-card-hdr:has(> .nx-wrap){display:grid;grid-template-columns:minmax(0,1fr) auto auto;column-gap:10px;row-gap:0;align-items:center}
+#alerts-panel .alert-card-hdr > .nx-wrap{display:contents}
+#alerts-panel .alert-card-hdr:has(> .nx-wrap) > :not(.nx-wrap){grid-row:1}
+#alerts-panel .nx-wrap > h2{grid-row:1;grid-column:1;margin:0;min-width:0}
+#alerts-panel .nx-wrap > .nx{grid-row:2;grid-column:1 / -1}
 #alerts-panel .nx{margin:2px 0 0 31px;font-size:.78rem;font-weight:600;line-height:1.25;color:#08766e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #alerts-panel .nx[hidden]{display:none}
 </style>
@@ -15366,7 +15411,6 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 (function(){
   'use strict';
   var CARDS=[['break','int'],['walk','int'],['drink','int'],['break-ex','ex']];
-  var startedAt={};
   var DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   function clock12(d){ var h=d.getHours(), m=d.getMinutes(); return (h%12||12)+':'+(m<10?'0':'')+m+' '+(h>=12?'PM':'AM'); }
   function dayNo(d){ return Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5); }
@@ -15374,14 +15418,11 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     var d=new Date(ts), diff=dayNo(d)-dayNo(new Date());
     return (diff<=0 ? '' : diff===1 ? 'tomorrow ' : DAYS[d.getDay()]+' ')+clock12(d);
   }
-  // the next moment an interval reminder really fires: the timer ticks every N minutes from when it was
-  // (re)started, and a tick outside the Reminder hours does nothing
+  // the next time an interval reminder fires: From, then every N minutes up to To, rebuilt each day
   function nextInterval(key){
-    var st=(typeof alertState!=='undefined')&&alertState[key], t0=startedAt[key];
-    if(!st||!st.enabled||!(st.minutes>0)||!t0) return null;
-    var ms=st.minutes*60000, t=t0+(Math.floor((Date.now()-t0)/ms)+1)*ms;
-    for(var i=0;i<4000;i++,t+=ms){ if(inScheduleWindow(new Date(t))) return t; }
-    return null;
+    var st=(typeof alertState!=='undefined')&&alertState[key];
+    if(!st||!st.enabled||!window.ayuReminderSlots) return null;
+    return window.ayuReminderSlots.next(key,Date.now());
   }
   // the next listed time on a chosen weekday (Eyes (Exercise) is a clock alarm, not an interval)
   function nextExercise(){
@@ -15418,12 +15459,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       if(h2&&tx){ var hr=h2.getBoundingClientRect(), tr=tx.getBoundingClientRect(); if(hr.width>0) el.style.marginLeft=Math.round((tr.left-hr.left)*10)/10+'px'; }
     });
   }
-  // learn when each interval timer was (re)started
-  var orig=window.scheduleAlertTimer;
-  if(typeof orig==='function'){
-    window.scheduleAlertTimer=function(k){ var r=orig.apply(this,arguments); startedAt[k]=Date.now(); setTimeout(render,0); return r; };
-    ['break','walk','drink'].forEach(function(k){ if((typeof alertState!=='undefined')&&alertState[k]&&alertState[k].timerId) window.scheduleAlertTimer(k); });
-  }
+  document.addEventListener('ayu-reminders-changed',function(){ setTimeout(render,0); });
   ['change','click','input'].forEach(function(ev){ document.addEventListener(ev,function(){ setTimeout(render,60); },true); });
   document.addEventListener('visibilitychange',function(){ if(!document.hidden) render(); });
   setInterval(render,10000);
