@@ -13,7 +13,28 @@ const APP_SHELL = [
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    await cache.addAll(APP_SHELL);
+
+    // Keep the main app pages required for offline use.
+    await cache.add('./');
+    await cache.add('./index.html');
+
+    // Optional assets should not prevent installation.
+    await Promise.all(
+      APP_SHELL
+        .filter(path => path !== './' && path !== './index.html')
+        .map(async path => {
+          try {
+            await cache.add(path);
+          } catch (error) {
+            console.warn(
+              '[AyuBase6 SW] Could not precache:',
+              path,
+              error
+            );
+          }
+        })
+    );
+
     await self.skipWaiting();
   })());
 });
@@ -21,12 +42,100 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
+
     await Promise.all(
       keys
-        .filter(key => key.startsWith('ayubase6-pwa-') && key !== CACHE_NAME)
+        .filter(
+          key =>
+            key.startsWith('ayubase6-pwa-') &&
+            key !== CACHE_NAME
+        )
         .map(key => caches.delete(key))
     );
+
     await self.clients.claim();
+  })());
+});
+
+// Display notifications delivered by a push service.
+self.addEventListener('push', event => {
+  event.waitUntil((async () => {
+    let payload = {};
+
+    try {
+      payload = event.data ? event.data.json() : {};
+    } catch (error) {
+      payload = {
+        body: event.data ? event.data.text() : ''
+      };
+    }
+
+    await self.registration.showNotification(
+      payload.title || 'AyuBase6 reminder',
+      {
+        body: payload.body || 'You have a reminder.',
+        icon: payload.icon || './icons/icon-192.png',
+        badge: payload.badge || './icons/icon-192.png',
+        tag: payload.tag || undefined,
+        renotify: Boolean(payload.renotify),
+        data: {
+          url: payload.url || './',
+          ...(payload.data &&
+          typeof payload.data === 'object'
+            ? payload.data
+            : {})
+        }
+      }
+    );
+  })());
+});
+
+// Open or focus AyuBase6 when a notification is tapped.
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+
+  event.waitUntil((async () => {
+    const requestedUrl =
+      (event.notification.data &&
+        event.notification.data.url) || './';
+
+    const targetUrl = new URL(
+      requestedUrl,
+      self.location.href
+    );
+
+    // Restrict notification navigation to this website.
+    if (targetUrl.origin !== self.location.origin) {
+      targetUrl.href = new URL(
+        './',
+        self.location.href
+      ).href;
+    }
+
+    const windows = await self.clients.matchAll({
+      type: 'window',
+      includeUncontrolled: true
+    });
+
+    for (const client of windows) {
+      if (
+        client.url.startsWith(self.location.origin) &&
+        'focus' in client
+      ) {
+        if (
+          'navigate' in client &&
+          client.url !== targetUrl.href
+        ) {
+          await client.navigate(targetUrl.href);
+        }
+
+        return client.focus();
+      }
+    }
+
+    if (self.clients.openWindow) {
+      return self.clients.openWindow(targetUrl.href);
+    }
   })());
 });
 
@@ -36,6 +145,7 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
+
   if (url.origin !== self.location.origin) return;
 
   event.respondWith((async () => {
@@ -43,11 +153,17 @@ self.addEventListener('fetch', event => {
       return await fetch(request);
     } catch (error) {
       const cache = await caches.open(CACHE_NAME);
-      return (await cache.match(request)) ||
-             (request.mode === 'navigate'
-               ? await cache.match('./index.html')
-               : undefined) ||
-             Response.error();
+      const cachedResponse = await cache.match(request);
+
+      if (cachedResponse) return cachedResponse;
+
+      if (request.mode === 'navigate') {
+        const appShell = await cache.match('./index.html');
+
+        if (appShell) return appShell;
+      }
+
+      return Response.error();
     }
   })());
 });
