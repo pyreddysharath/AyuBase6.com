@@ -13685,7 +13685,7 @@ document.addEventListener('touchstart',function(e){
   function sync(){
     DEF.forEach(function(d){
       var b=document.querySelector('#calculator-panel button[aria-label="'+d[0]+'"]'); if(!b) return;
-      var has=d[1](); if(d[0]==='Reset Lab Insights') b.style.visibility=has?'':'hidden'; if(b.disabled===!has) { if(!b.disabled) b.title=d[0]; return; }
+      var has=d[1](); if(d[0]==='Reset Lab Insights'){ b.style.visibility=''; var rw=b.closest('.page-reset-row'); if(rw) rw.classList.toggle('lab-empty',!has); } if(b.disabled===!has) { if(!b.disabled) b.title=d[0]; return; }
       b.disabled=!has; b.title=has?d[0]:'Nothing to reset'; b.setAttribute('aria-disabled',has?'false':'true');
     });
   }
@@ -14042,6 +14042,10 @@ html body .app-footer{padding-top:6px !important;padding-bottom:6px !important}
 html body #app-nav #footer-tabs-row,html body #footer-tabs-row{margin:0 !important;padding-top:0 !important;padding-bottom:0 !important;row-gap:2px !important}
 #footer-tabs-row .footer-tabs-icons .footer-tab-btn{padding-top:4px !important;padding-bottom:4px !important;min-height:0 !important;height:auto !important}
 }
+</style>
+<style id="lab-reset-empty-20261101">
+#calculator-panel .page-reset-row.lab-empty{display:none !important}
+#calculator-panel .calc-card:has(> .page-reset-row.lab-empty:last-child){padding-bottom:20px}
 </style>
 </body>
 
