@@ -3844,9 +3844,6 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
           <div class="bmi-box"><div class="bmi-lbl">Healthy weight range</div><div class="bmi-num" id="calc-bmi-range">–</div></div>
         </div>
       </div>
-      <div class="page-reset-row" style="margin:14px 0 0">
-        <button type="button" class="reset-icon-btn calc-reset icon-only" title="Reset BMI" aria-label="Reset BMI" onclick="resetBmiToDefault()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
-      </div>
     </div>
 
     <div class="calc-card calc-card-spaced" id="lab-insights-card">
@@ -3892,9 +3889,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         <button type="button" id="lab-add-btn" class="lab-add-icon-btn" title="Add">+</button>
       </div>
       <div id="lab-selected-range" class="lab-card-range" style="margin-top:8px" aria-live="polite"></div>
-      <div class="page-reset-row" style="margin:14px 0 0">
-        <button type="button" class="reset-icon-btn calc-reset icon-only" title="Reset Lab Insights" aria-label="Reset Lab Insights" onclick="resetLabToDefault()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
-      </div>
+      <div class="page-reset-row" style="margin:14px 0 0"><button type="button" class="bf-reset-btn vit-sq" id="lab-reset-btn" title="Reset Lab Insights" aria-label="Reset Lab Insights" onclick="resetLabToDefault()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button></div>
     </div>
 
     <!-- TRACKER — log readings over time; one collapsed section per reading type -->
@@ -3951,9 +3946,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
 
       <div class="trk-actions" id="tracker-actions" style="display:none">
         <button type="button" class="refresh-btn lab-upload-btn" onclick="downloadTrackerPDF()">⬇ Download PDF</button>
-      </div>
-      <div class="page-reset-row" style="margin:14px 0 0">
-        <button type="button" class="reset-icon-btn calc-reset icon-only" title="Reset Tracker" aria-label="Reset Tracker" onclick="resetTracker()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+        <button type="button" class="bf-reset-btn vit-sq" id="tracker-reset-btn" title="Reset Tracker" aria-label="Reset Tracker" onclick="resetTracker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
       </div>
     </div>
 
@@ -4473,7 +4466,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       </div>
       <div id="day-panels"></div>
       <div id="body-download-wrap" style="margin-top:16px;text-align:center">
-        <button id="body-download-btn" class="refresh-btn" onclick="downloadBodyPDF()">📄 Download Body Plan (PDF)</button>
+        <button id="body-download-btn" class="refresh-btn" onclick="downloadBodyPDF()">Download Body Plan (PDF)</button>
       </div>
     </div>
   </div>
@@ -4595,7 +4588,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         </div>
       </div>
       <div id="food-download-wrap" style="margin-top:16px;text-align:center">
-        <button id="food-download-btn" class="refresh-btn" onclick="downloadFoodPDF()">📄 Download Food Plan (PDF)</button>
+        <button id="food-download-btn" class="refresh-btn" onclick="downloadFoodPDF()">Download Food Plan (PDF)</button>
       </div>
     </div>
 
@@ -13683,7 +13676,7 @@ document.addEventListener('touchstart',function(e){
   var DEF=[['Reset Tracker',trackerHas],['Reset BMI',bmiHas],['Reset Lab Insights',labHas]];
   function sync(){
     DEF.forEach(function(d){
-      var b=document.querySelector('#calculator-panel button.reset-icon-btn[aria-label="'+d[0]+'"]'); if(!b) return;
+      var b=document.querySelector('#calculator-panel button[aria-label="'+d[0]+'"]'); if(!b) return;
       var has=d[1](); if(b.disabled===!has) { if(!b.disabled) b.title=d[0]; return; }
       b.disabled=!has; b.title=has?d[0]:'Nothing to reset'; b.setAttribute('aria-disabled',has?'false':'true');
     });
@@ -13697,6 +13690,336 @@ document.addEventListener('touchstart',function(e){
 html body #activity-panel .activity-type-section,
 html body #nutrition-panel #sec-gender{min-height:0 !important}
 @media(max-width:640px){html body #activity-panel .activity-type-section,html body #nutrition-panel #sec-gender{min-height:0 !important}}
+</style>
+<style id="site-tour-20261101">
+#tour-root{position:fixed;inset:0;z-index:2147483640;display:none}
+#tour-root.on{display:block}
+#tour-dim{position:absolute;inset:0;background:transparent}
+#tour-root.nospot #tour-dim{background:rgba(15,23,42,.8)}
+#tour-spot{position:absolute;border-radius:12px;box-shadow:0 0 0 9999px rgba(15,23,42,.8),0 0 0 3px var(--tc,#fff);pointer-events:none;display:none;transition:all .18s}
+#tour-text{position:absolute;left:8px;width:min(340px,calc(100vw - 64px));box-sizing:border-box;color:#fff;font-size:1.08rem;line-height:1.55;font-weight:500;text-shadow:0 1px 3px rgba(0,0,0,.9),0 0 12px rgba(0,0,0,.6)}
+#tour-text p{margin:0}
+#tour-text ul{margin:0;padding-left:20px}
+#tour-text li{margin:4px 0}
+#tour-bar{position:absolute;left:50%;transform:translateX(-50%);bottom:max(14px,env(safe-area-inset-bottom));width:min(360px,calc(100vw - 16px));box-sizing:border-box}
+.tour-pw{display:flex;align-items:center;gap:8px;margin:0 2px 10px}
+.tour-ar{flex:0 0 auto;width:36px;height:36px;border-radius:50%;border:2px solid #fff;background:rgba(15,23,42,.55);color:#fff;font-size:26px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;padding:0 0 3px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.tour-prog{display:flex;flex:1;height:5px;margin:0}
+.tour-prog .seg{display:block;flex:1;min-width:0;border-radius:2px;background:rgba(255,255,255,.28);overflow:hidden}
+.tour-prog i{display:block;height:100%;width:0;background:#fff}
+.tour-row{display:flex;align-items:center;gap:6px;justify-content:center}
+.tour-btn{border:0;border-radius:999px;padding:10px 16px;font:inherit;font-size:.88rem;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.tour-btn{min-width:84px}
+.tour-btn.skip{background:rgba(15,23,42,.55);color:#fff;border:2px solid #fff}
+.tour-btn.pp{background:#fff;color:#0f172a;border:2px solid #fff}
+.tour-btn.sec{background:#fff;color:#0f172a;border:2px solid #fff}
+.tour-btn.pri{background:var(--tc,#2563eb);color:#fff;border:2px solid #fff;box-shadow:0 0 0 3px rgba(255,255,255,.12),0 2px 8px rgba(0,0,0,.3)}
+@media (min-width:900px){#tour-text{width:380px;font-size:1.15rem}#tour-bar{left:230px;right:56px;width:auto;max-width:none;transform:none}.tour-row{justify-content:space-between;gap:24px}.tour-btn{min-width:150px;padding:12px 22px;font-size:.95rem}.tour-prog{margin:0 0 12px}}
+#tour-again{display:inline-block;margin-top:0;font-size:.66rem;font-weight:700;color:var(--footer-accent,var(--act-2));border:1.5px solid currentColor;border-radius:999px;padding:2px 9px;cursor:pointer;background:none;font-family:inherit;text-align:left;line-height:1.4}
+@media (max-width:899px){
+#app-nav #footer-tabs-row,#footer-tabs-row{flex-wrap:wrap !important;align-items:center !important;justify-content:space-between !important;row-gap:6px !important}
+#footer-tabs-row #tour-again{order:1;margin:0;flex:0 0 auto;white-space:nowrap}
+#app-nav #footer-tabs-row .footer-tabs-icons,#footer-tabs-row .footer-tabs-icons{order:2;margin-left:auto;gap:2px !important;flex:0 0 auto}
+#app-nav #footer-tabs-row .footer-copyright,#footer-tabs-row .footer-copyright{order:3;flex:0 0 100% !important;width:100%;text-align:left}
+}
+#footer-tabs-row .footer-copyright{white-space:nowrap}
+@media (min-width:900px){#app-nav #footer-tabs-row #tour-again,#footer-tabs-row #tour-again{order:9 !important;align-self:center;margin:0 0 4px}}
+.bf-reset-row{align-items:stretch !important}
+.bf-reset-btn{height:auto !important;min-height:44px !important;width:44px !important}
+</style>
+<div id="tour-root" role="dialog" aria-modal="true" aria-label="Site tour"><div id="tour-dim"></div><div id="tour-spot"></div><div id="tour-text"></div><div id="tour-bar"></div></div>
+<script id="site-tour-20261101-js">
+(function(){
+  var SEEN='ayuBase6-tour-seen';
+  var C={body:'#2563eb',food:'#22c55e',checks:'var(--rout-2)',rem:'var(--alert-2)',mind:'var(--mind-2)',vit:'var(--calc-2)'};
+  var STEPS=[];
+  function tab(tab,sel,c,text){ STEPS.push({tab:tab,sel:sel,c:c,html:'<p>'+text+'</p>',kind:'tab'}); }
+  function sec(tab,sel,idx,c,text){ STEPS.push({tab:tab,sel:sel,idx:idx||0,c:c,html:'<p>'+text+'</p>',kind:'sec'}); }
+  // Body
+  tab('activity','.tab-btn.activity',C.body,'Your weekly exercise or yoga plan. Your choices are remembered on this device.');
+  sec('activity','.body-age-section',0,C.body,'<b>Age</b>: drag the slider. It picks the plan for your age group.');
+  sec('activity','.activity-type-section',0,C.body,'<b>Activity Type</b>: choose Exercise or Yoga, and Short, Standard or Long sessions. A day-by-day plan appears below, opening on today, with Let\'s Start to run it full screen and a PDF download.');
+  // Food
+  tab('nutrition','.tab-btn.nutrition',C.food,'A weekly food plan built around you.');
+  sec('nutrition','#sec-age',0,C.food,'<b>Age</b>: sets your nutrient targets.');
+  sec('nutrition','#sec-gender',0,C.food,'<b>Gender</b>: refines the targets. Women can also choose Pregnant or Lactating.');
+  sec('nutrition','#sec-physical',0,C.food,'<b>BMI</b>: set height and weight to see your BMI and a healthy weight range. They also tune your calories and protein.');
+  sec('nutrition','#sec-diet',0,C.food,'<b>Dietary Preference</b>: vegetarian, non-vegetarian or vegan. Your plan then appears below: Nutrients &amp; Food, Cart This Week and Recipes For You.');
+  // Checks
+  tab('routines','.tab-btn.routines',C.checks,'Your day, from morning to night.');
+  sec('routines','#routines-panel .rout-page > .rout-card',0,C.checks,'<b>Wake-up time</b>: slide to your wake-up time. Every check below is timed from it.');
+  sec('routines','#routines-notify-card',0,C.checks,'<b>Notify Me</b>: turn on reminders for your checks.');
+  sec('routines','#routines-panel .rout-page > .rout-card',2,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.');
+  sec('routines','#routines-panel .rout-page > .rout-card',3,C.checks,'<b>Afternoon</b>: the same ticks and info for the middle of the day.');
+  sec('routines','#routines-panel .rout-page > .rout-card',4,C.checks,'<b>Evening &amp; Night</b>: checks to wind down. Ticks start fresh each day.');
+  // Reminders
+  tab('alerts','.tab-btn.alerts',C.rem,'Gentle nudges through the day.');
+  sec('alerts','#reminder-hours-card',0,C.rem,'<b>Reminder hours</b>: nudges only arrive between the hours you set.');
+  sec('alerts','#alert-card-break',0,C.rem,'<b>Eyes (20-20-20)</b>: a short eye break at regular intervals. Switch it on and open it to adjust.');
+  sec('alerts','#alert-card-walk',0,C.rem,'<b>Walk</b>: a reminder to get up and move.');
+  sec('alerts','#alert-card-drink',0,C.rem,'<b>Water</b>: a reminder to drink water.');
+  sec('alerts','#alert-card-break-ex',0,C.rem,'<b>Eyes (Exercise)</b>: scheduled eye exercises, with sessions per day and days per week.');
+  sec('alerts','#custom-reminders-card',0,C.rem,'<b>My Reminders</b>: add your own reminders with the + button.');
+  // Mind
+  tab('mind','.tab-btn.mind',C.mind,'Short thoughts for a calmer day.');
+  sec('mind','#mind-panel .mind-card',0,C.mind,'<b>Rise &amp; Reset</b>: a fresh start for the morning.');
+  sec('mind','#mind-panel .mind-card',1,C.mind,'<b>Traffic Therapy</b>: patience for the road.');
+  sec('mind','#mind-panel .mind-card',2,C.mind,'<b>Work on Yourself</b>: thoughts to grow on.');
+  sec('mind','#mind-panel .mind-card',3,C.mind,'<b>Sign-Off</b>: a calm way to end the day.');
+  // Vitals
+  tab('calculator','.tab-btn.calculator',C.vit,'Your numbers in one place.');
+  sec('calculator','#calculator-panel .calc-card',0,C.vit,'<b>BMI</b>: set height and weight to see your BMI.');
+  sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (PDF) or type values in, to see what is in or out of range.');
+  sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
+  // Footer
+  STEPS.push({tab:null,sel:'.footer-tabs-icons',idx:0,c:'#2563eb',kind:'tab',html:'<ul><li><b>Disclaimer</b>: what the app can and cannot do</li><li><b>Feedback</b>: tell us what to improve</li><li><b>Privacy</b> and <b>Cookies</b>: how your data is handled</li><li><b>Backup</b>: save your data to a file and restore it later</li><li><b>Other sites</b>: more from us</li></ul>'});
+
+  var root=document.getElementById('tour-root'), spot=document.getElementById('tour-spot'), txt=document.getElementById('tour-text'), bar=document.getElementById('tour-bar');
+  var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0;
+  function mark(){ try{ localStorage.setItem(SEEN,'1'); }catch(e){} }
+  function seen(){ try{ return !!localStorage.getItem(SEEN); }catch(e){ return true; } }
+  function target(s){ var l=document.querySelectorAll(s.sel); return l[s.idx||0]||null; }
+  function visible(el){ return !!el && (el.offsetParent!==null || getComputedStyle(el).position==='fixed'); }
+  function absTop(el){ return el.getBoundingClientRect().top+window.scrollY; }
+  function maxScroll(){ return Math.max(0,document.documentElement.scrollHeight-innerHeight); }
+  function anchorY(s){ var t=target(s); return t?Math.min(maxScroll(),Math.max(0,absTop(t)-12)):0; }
+  function stepMs(s){ return Math.min(11000,3500+s.html.replace(/<[^>]*>/g,'').length*40); }
+
+  // One timeline per tab: the tab itself and all its sections play as a single continuous scroll.
+  function buildGroup(i){
+    var tab=STEPS[i].tab, gs=i;
+    if(tab!==null) while(gs>0 && STEPS[gs-1].tab===tab) gs--;
+    var idx=[];
+    for(var j=gs;j<STEPS.length;j++){
+      var s=STEPS[j]; if(s.tab!==tab) break;
+      if(tab===null){ if(j!==i) break; }
+      if(s.kind==='tab'||visible(target(s))) idx.push(j);
+      if(tab===null) break;
+    }
+    var dur=[],cum=[],total=0; idx.forEach(function(j){ var d=stepMs(STEPS[j]); cum.push(total); dur.push(d); total+=d; });
+    var kf=[], lastA=0, firstSecA=null;
+    idx.forEach(function(j,n){ var s=STEPS[j]; if(s.kind==='sec'&&firstSecA===null) firstSecA=anchorY(s); });
+    if(tab===null){
+      var ft=target(STEPS[idx[0]]), fy=ft?Math.min(maxScroll(),Math.max(0,absTop(ft)-innerHeight/2+ft.offsetHeight/2)):0;
+      kf=[[0,fy],[total,fy]];
+    } else {
+      idx.forEach(function(j,n){
+        var s=STEPS[j];
+        if(s.kind==='tab'){ kf.push([cum[n],0]); kf.push([cum[n]+dur[n],Math.min(60,(firstSecA||0)*0.25)]); }
+        else { lastA=anchorY(s); kf.push([cum[n]+dur[n]/2,lastA]); }
+      });
+      var lt=null; idx.forEach(function(j){ if(STEPS[j].kind==='sec') lt=target(STEPS[j]); });
+      kf.push([total, lt?Math.min(maxScroll(),lastA+Math.min(lt.offsetHeight*0.5,240)):0]);
+    }
+    return {tab:tab,idx:idx,dur:dur,cum:cum,total:total,kf:kf};
+  }
+  function yAt(gt){
+    var k=grp.kf; if(gt<=k[0][0]) return k[0][1];
+    for(var n=1;n<k.length;n++){ if(gt<=k[n][0]){ var a=k[n-1],b=k[n],q=(gt-a[0])/Math.max(1,b[0]-a[0]); return a[1]+(b[1]-a[1])*q; } }
+    return k[k.length-1][1];
+  }
+  function stepAt(gt){ var n=0; for(var m=0;m<grp.cum.length;m++){ if(gt>=grp.cum[m]) n=m; } return n; }
+
+  function place(){
+    if(!open) return;
+    var s=STEPS[cur], t=target(s), vw=document.documentElement.clientWidth;
+    var barRect=bar.getBoundingClientRect();
+    if(!visible(t)){ root.classList.add('nospot'); spot.style.display='none'; txt.style.top='80px'; return; }
+    root.classList.remove('nospot');
+    var r=t.getBoundingClientRect(), pad=6, h=txt.offsetHeight, w, left, top;
+    if(s.kind==='sec'){
+      var desk=vw>=900;
+      left=desk? barRect.left : 14; w=desk? Math.min(680,vw-barRect.left-56) : vw-44;
+      txt.style.width=w+'px'; h=txt.offsetHeight;
+      top=barRect.top-h-16;
+      var y0=8, y1=top-10, a=Math.max(r.top,y0), z=Math.min(r.bottom,y1);
+      spot.style.display='block';
+      spot.style.left=(r.left-4)+'px'; spot.style.width=(r.width+8)+'px'; spot.style.top=(a-4)+'px'; spot.style.height=Math.max(20,z-a+8)+'px';
+      txt.style.left=left+'px'; txt.style.top=Math.max(8,top)+'px';
+      return;
+    }
+    txt.style.width='';
+    w=txt.offsetWidth; h=txt.offsetHeight;
+    spot.style.display='block';
+    spot.style.left=(r.left-pad)+'px'; spot.style.top=(r.top-pad)+'px'; spot.style.width=(r.width+2*pad)+'px'; spot.style.height=(r.height+2*pad)+'px';
+    if(r.right < vw*0.3 && innerWidth>=700){
+      left=r.right+pad+22; top=(s.sel.indexOf('footer')>=0)? r.bottom-h : r.top-4;
+    } else {
+      left=Math.max(12,Math.min(vw-w-20,r.left+r.width/2-w/2));
+      top=(r.top<innerHeight/2)? r.bottom+pad+18 : r.top-pad-18-h;
+    }
+    txt.style.left=left+'px';
+    txt.style.top=Math.max(8,Math.min(barRect.top-h-12,top))+'px';
+  }
+  function show(i){
+    cur=i; var s=STEPS[i];
+    spot.style.transition=(s.kind==='sec')?'none':'';
+    root.style.setProperty('--tc',s.c);
+    txt.innerHTML=s.html;
+    var gb=groupBounds(i), firstTab=(gb[0]===0), lastTab=(gb[1]>=STEPS.length-1);
+    bar.innerHTML='<div class="tour-pw"><button type="button" class="tour-ar" data-a="prev" aria-label="Previous section"'+(i===0?' style="visibility:hidden"':'')+'>\u2039</button><div class="tour-prog"><span class="seg"><i></i></span></div><button type="button" class="tour-ar" data-a="nxt" aria-label="Next section"'+(i===STEPS.length-1?' style="visibility:hidden"':'')+'>\u203A</button></div><div class="tour-row"><button type="button" class="tour-btn skip" data-a="skip">Skip</button>'+
+      '<button type="button" class="tour-btn pp" data-a="pp">'+(auto?'Pause':'Play')+'</button>'+
+      (firstTab?'':'<button type="button" class="tour-btn sec" data-a="back">Back</button>')+
+      '<button type="button" class="tour-btn pri" data-a="next">'+(lastTab?'Done':'Next')+'</button></div>';
+    place();
+  }
+  // Jump to a step (first entry, Next, Back). Moves to the right tab and puts the timeline at that step.
+  function enter(i,dir){
+    dir=dir||1;
+    while(i>=0 && i<STEPS.length){
+      var s0=STEPS[i];
+      if(s0.tab){ try{ if(typeof currentActiveTab==='undefined'||currentActiveTab!==s0.tab){ switchTab(s0.tab); window.scrollTo(0,0); } }catch(e){} }
+      if(s0.kind==='tab'||visible(target(s0))) break;
+      i+=dir;
+    }
+    if(i>=STEPS.length){ close(); return; }
+    if(i<0) return;
+    try{ if(typeof closeAllFooterSections==='function') closeAllFooterSections(); }catch(e){}
+    if(!grp||grp.tab!==STEPS[i].tab||grp.idx.indexOf(i)<0) grp=buildGroup(i);
+    var n=grp.idx.indexOf(i);
+    gt0=performance.now()-grp.cum[n]; frozen=grp.cum[n];
+    show(i);
+    if(!auto) window.scrollTo({top:Math.round(yAt(grp.cum[n]+grp.dur[n]/2)),behavior:'smooth'});
+  }
+  // One progress bar per tab: a segment for the tab itself and one for each of its sections.
+  function groupBounds(i){
+    var t=STEPS[i].tab; if(t===null) return [i,i];
+    var a=i,b=i; while(a>0&&STEPS[a-1].tab===t) a--; while(b<STEPS.length-1&&STEPS[b+1].tab===t) b++; return [a,b];
+  }
+  function prevTab(){ var g=groupBounds(cur); if(g[0]>0) enter(groupBounds(g[0]-1)[0],1); }
+  function nextTab(){ var g=groupBounds(cur); if(g[1]>=STEPS.length-1) close(); else enter(g[1]+1,1); }
+  // One unbroken progress bar per tab.
+  function fill(gt){
+    var b=bar.querySelector('.tour-prog .seg i'); if(b&&grp) b.style.width=(Math.max(0,Math.min(1,gt/grp.total))*100)+'%';
+  }
+  function loop(){
+    if(!open){ raf=0; return; }
+    place();
+    if(auto && grp){
+      var gt=performance.now()-gt0;
+      if(gt>=grp.total){
+        var last=grp.idx[grp.idx.length-1];
+        if(last>=STEPS.length-1){ close(); return; }
+        enter(last+1,1);
+      } else {
+        var n=stepAt(gt); if(grp.idx[n]!==cur) show(grp.idx[n]);
+        window.scrollTo(0,yAt(gt));
+        fill(gt);
+      }
+    } else if(grp){ fill(frozen); }
+    raf=requestAnimationFrame(loop);
+  }
+  function openTour(){
+    if(open) return;
+    open=true; auto=true; grp=null; mark();
+    try{ origTab=(typeof currentActiveTab!=='undefined')?currentActiveTab:null; }catch(e){ origTab=null; }
+    document.body.style.paddingBottom='260px'; root.classList.add('on'); enter(0,1); if(!raf) raf=requestAnimationFrame(loop);
+  }
+  function close(){
+    if(!open) return; open=false; grp=null; document.body.style.paddingBottom=''; root.classList.remove('on'); spot.style.display='none'; mark();
+    try{ if(origTab && typeof switchTab==='function') switchTab(origTab); }catch(e){}
+    window.scrollTo(0,0);
+  }
+  bar.addEventListener('click',function(e){
+    var el=e.target.closest('button'); if(!el) return;
+    var a=el.dataset.a;
+    if(a==='skip') close();
+    else if(a==='next') nextTab();
+    else if(a==='back') prevTab();
+    else if(a==='prev') enter(cur-1,-1);
+    else if(a==='nxt'){ if(cur>=STEPS.length-1) close(); else enter(cur+1,1); }
+    else if(a==='pp'){
+      if(auto){ frozen=performance.now()-gt0; auto=false; el.textContent='Play'; }
+      else { auto=true; gt0=performance.now()-frozen; el.textContent='Pause'; }
+    }
+  });
+  document.addEventListener('keydown',function(e){
+    if(!open) return;
+    if(e.key==='Escape') close();
+    else if(e.key==='ArrowRight'&&cur<STEPS.length-1) enter(cur+1,1);
+    else if(e.key==='ArrowLeft'&&cur>0) enter(cur-1,-1);
+  });
+  window.addEventListener('resize',place);
+
+  var row=document.getElementById('footer-tabs-row');
+  if(row){ var a=document.createElement('button'); a.type='button'; a.id='tour-again'; a.textContent='▶ Quick tour'; a.addEventListener('click',function(e){ e.stopPropagation(); openTour(); }); row.appendChild(a); }
+  window.ayuTourOpen=openTour;
+
+  if(!seen() && !location.search && !location.hash){
+    var tries=0, iv=setInterval(function(){
+      tries++;
+      var b=document.getElementById('cookie-banner'), bannerUp=b && getComputedStyle(b).display!=='none';
+      if(open||seen()&&tries>1){ clearInterval(iv); return; }
+      if(!bannerUp && tries>2){ clearInterval(iv); setTimeout(function(){ if(!seen()) openTour(); },800); }
+      if(tries>600) clearInterval(iv);
+    },1000);
+  }
+})();
+</script>
+<style id="bodyfood-reset-20261101">
+.bf-reset-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:nowrap}.bf-reset-row .refresh-btn{min-width:0;white-space:nowrap;padding-left:16px;padding-right:16px}.bf-reset-btn{flex:0 0 auto}
+.bf-reset-btn{box-sizing:border-box;width:38px;height:38px;min-height:0;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:11px;border:0;background:var(--bf-c);color:#fff;cursor:pointer;box-shadow:0 3px 9px #24344812}
+.bf-reset-btn svg{width:17px;height:17px;display:block}
+.bf-reset-btn:hover{filter:brightness(.93)}
+#body-reset-btn{--bf-c:#4f8ef7}
+#food-reset-btn{--bf-c:#5ce18d}
+@media (hover:none){.bf-reset-btn:hover{filter:none}}
+</style>
+<script id="bodyfood-reset-20261101-js">
+(function(){
+  var SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
+  function fire(el,t){ el.dispatchEvent(new Event(t,{bubbles:true})); }
+  function add(wrapId,btnId,label,fn){
+    var wrap=document.getElementById(wrapId); if(!wrap) return;
+    wrap.classList.add('bf-reset-row');
+    var b=document.createElement('button'); b.type='button'; b.id=btnId; b.className='bf-reset-btn'; b.title=label; b.setAttribute('aria-label',label); b.innerHTML=SVG;
+    b.addEventListener('click',function(){ try{ fn(); }catch(e){} b.blur(); });
+    wrap.appendChild(b);
+  }
+  function resetBody(){
+    var a=document.getElementById('body-age-slider'); a.value=5; fire(a,'input');
+    ['chk-exercise','chk-yoga'].forEach(function(i){ document.getElementById(i).checked=false; });
+    document.querySelectorAll('input[name="len-exercise"][value="standard"],input[name="len-yoga"][value="standard"]').forEach(function(r){ r.checked=true; });
+    onActivityTypeChange();
+    try{ localStorage.removeItem('ayuBase6-body-choices'); }catch(e){}
+  }
+  function resetFood(){
+    document.getElementById('food-age-slider').value=5;
+    foodGender=null; foodFemState='none';
+    ['gender-male-radio','gender-female-radio'].forEach(function(i){ document.getElementById(i).checked=false; });
+    ['gender-male-btn','gender-female-btn'].forEach(function(i){ document.getElementById(i).classList.remove('selected'); });
+    document.getElementById('female-extra').style.display='none';
+    var none=document.querySelector('input[name="femstate"][value="none"]'); if(none) none.checked=true;
+    heightTouched=false; weightTouched=false;
+    ['height','weight'].forEach(function(n){ var s=document.getElementById(n+'-slider'); s.value=s.min; updateSliderFill(s); document.getElementById(n+'-val').textContent=''; });
+    updateBMI();
+    [].slice.call(document.querySelectorAll('.dpill input:checked')).forEach(function(d){ d.checked=false; fire(d,'change'); });
+    onFoodAgeChange();
+    try{ localStorage.removeItem('ayuBase6-food-choices'); }catch(e){}
+  }
+  add('body-download-wrap','body-reset-btn','Reset Body',resetBody);
+  add('food-download-wrap','food-reset-btn','Reset Food',resetFood);
+})();
+</script>
+<style id="vitals-reset-buttons-20261101">
+#calculator-panel .refresh-btn.vit-reset-btn{display:inline-flex !important;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 20px;background:#fff !important;background-image:none !important;color:var(--calc-2) !important;border:1.5px solid var(--calc-2) !important;box-shadow:none !important;font-weight:700;font-size:.9rem;border-radius:12px;cursor:pointer}
+#calculator-panel .refresh-btn.vit-reset-btn svg{flex:0 0 auto}
+@media (hover:hover){#calculator-panel .refresh-btn.vit-reset-btn:not(:disabled):hover{background:var(--calc-4,#ecfeff) !important}}
+#calculator-panel .refresh-btn.vit-reset-btn:disabled{opacity:.4;cursor:not-allowed}
+#calculator-panel .trk-actions{gap:10px;align-items:stretch;flex-wrap:wrap}
+#calculator-panel #tracker-actions .refresh-btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+#food-reset-btn{color:#064e3b}
+</style>
+<style id="vitals-sq-reset-20261101">
+.bf-reset-btn.vit-sq{--bf-c:#38d7f0;color:#083344;align-self:flex-start}
+.bf-reset-btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.lab-upload-row .bf-reset-btn{margin-left:2px;min-height:46px !important;width:46px !important}
+#tour-again{background:var(--footer-accent,var(--act-2)) !important;color:#fff !important;border-color:transparent !important}
+@media (max-width:899px){
+#tour-bar{width:calc(100% - 20px) !important}
+.tour-row{gap:6px}
+.tour-btn{flex:1 1 0;min-width:0 !important;padding:10px 4px !important;font-size:.84rem}
+}
 </style>
 </body>
 
