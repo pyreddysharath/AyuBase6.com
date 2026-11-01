@@ -13945,7 +13945,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   window.addEventListener('resize',place);
 
   var row=document.getElementById('footer-tabs-row');
-  if(row){ var a=document.createElement('button'); a.type='button'; a.id='tour-again'; a.textContent='▶ Quick tour'; a.addEventListener('click',function(e){ e.stopPropagation(); openTour(); }); row.appendChild(a); }
+  if(row){ var a=document.createElement('button'); a.type='button'; a.id='tour-again'; a.textContent='▶ How it works'; a.addEventListener('click',function(e){ e.stopPropagation(); openTour(); }); row.appendChild(a); }
   window.ayuTourOpen=openTour;
 
   if(!seen() && !location.search && !location.hash){
@@ -14022,6 +14022,17 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
 #tour-bar{width:calc(100% - 20px) !important}
 .tour-row{gap:6px}
 .tour-btn{flex:1 1 0;min-width:0 !important;padding:10px 4px !important;font-size:.84rem}
+}
+</style>
+<style id="footer-mobile-3rows-20261101">
+@media (max-width:899px){
+#app-nav #footer-tabs-row,#footer-tabs-row{justify-content:center !important;row-gap:8px !important}
+#footer-tabs-row #tour-again{order:1 !important;flex:0 0 auto !important;margin:0 auto !important}
+#app-nav #footer-tabs-row .footer-tabs-icons,#footer-tabs-row .footer-tabs-icons{order:2 !important;flex:0 0 100% !important;width:100% !important;margin:0 !important;justify-content:center !important;gap:10px !important}
+#app-nav #footer-tabs-row .footer-copyright,#footer-tabs-row .footer-copyright{order:3 !important;text-align:center !important;line-height:1.1 !important;margin:0 !important;padding:0 !important}
+html body .app-footer{padding-top:6px !important;padding-bottom:6px !important}
+html body #app-nav #footer-tabs-row,html body #footer-tabs-row{margin:0 !important;padding-top:0 !important;padding-bottom:0 !important;row-gap:2px !important}
+#footer-tabs-row .footer-tabs-icons .footer-tab-btn{padding-top:4px !important;padding-bottom:4px !important;min-height:0 !important;height:auto !important}
 }
 </style>
 </body>
