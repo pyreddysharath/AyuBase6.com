@@ -4275,23 +4275,25 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       <h2>☀️ Morning</h2>
 
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="palms"> <span>Rub palms together and place over closed eyes <span class="rout-time" id="rt-palms">(5:45 – 5:50 AM)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="palms"> <span>Rub palms together (10–15 s) and place over closed eyes (30–60 s) <span class="rout-time" id="rt-palms">(5:45 – 5:50 AM)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('palms')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-palms" style="display:none">
-        The warmth and gentle pressure relaxes the eye muscles and improves blood flow after hours of closed-eye
-        rest, easing the eyes into the day rather than opening straight into bright light or a screen.
+        <ol><li>Rub your palms together briskly for 10–15 seconds, with firm but comfortable friction, until they feel warm.</li><li>Close your eyes and cup your warm palms over them. Your palms (not your fingers) cover the eyes, your fingers rest on your forehead, and the heels of your hands sit on your cheekbones.</li><li>Keep a small gap so nothing presses on the eyeballs.</li><li>Hold for 30–60 seconds, breathing slowly.</li></ol><p>The warmth and gentle cover relax the eye muscles and improve blood flow, easing your eyes into the day instead of going straight to bright light or a screen.</p>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="water"> <span>Drink water <span class="rout-time" id="rt-water">(5:50 – 6:00 AM, 1–2 glasses)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('water')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-water" style="display:none">
-        Rehydrates the body after the overnight fast, kick-starts digestion, and helps flush out toxins —
-        your body loses water through breathing and sweat even while asleep.
+        <p>Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.</p><strong>How to drink it</strong><ul><li>Take small sips instead of big gulps, and finish the 1–2 glasses over about 5–10 minutes.</li><li>Pause between sips. Room-temperature or lukewarm water is easiest on an empty stomach.</li></ul><strong>Why slowly</strong><ul><li>Your body takes in water gradually, so more of it is used instead of passing straight through.</li><li>You swallow less air, so there is less bloating and burping.</li><li>An empty stomach copes better with small amounts. Gulping can leave you feeling heavy or queasy.</li></ul>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="bathroom"> <span>Wait a while, then go to the bathroom <span class="rout-time" id="rt-bathroom">(6:00 – 6:15 AM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('bathroom')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-bathroom" style="display:none">
+        <p>Your gut is most active in the morning, and a glass of water plus a little movement often brings on the urge.</p><strong>How long to stay</strong><ul><li>Most people finish within 5 minutes. Try not to sit longer than about 10.</li><li>Go when you feel the urge, and leave your phone outside so you don't lose track of time.</li></ul><strong>If nothing comes</strong><ul><li>Don't strain or force it. Get up after a few minutes and try again later.</li><li>Walk around, drink another glass of water, or do a few minutes of gentle movement. The urge often follows a meal, especially breakfast.</li><li>Over the day, add fibre (fruit, vegetables, whole grains) and enough water, and keep a regular time so your body gets used to it.</li><li>Skipping a day now and then is normal. If it lasts several days, or comes with pain or blood, see a doctor.</li></ul><strong>What prolonged sitting or straining does</strong><ul><li>It raises pressure in the veins around the back passage, which can lead to piles (haemorrhoids) and small tears (fissures).</li><li>Over time, repeated straining can weaken the pelvic floor muscles.</li><li>Sitting for long, especially with a phone, can leave your legs numb and make you light-headed when you stand up.</li></ul>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="walkex"> <span>Walk or Exercise <span class="rout-time" id="rt-walkex">(6:15 – 7:00 AM)</span></span></label>
@@ -8629,6 +8631,7 @@ function initNudgeSW(){
     navigator.serviceWorker.addEventListener('message', ev=>{
       const d=ev.data||{};
       if(d.type==='nudge-click'){
+        if(d.action){ handleNudgeClick(d.key, d.action); return; }   // a button was tapped: act quietly, do not change tab
         if(d.section && typeof switchTab==='function'){ try{ switchTab(d.section); }catch(e){} nudgeShowSection(d.key); }
         handleNudgeClick(d.key, d.action);
       }
@@ -8643,6 +8646,29 @@ function initNudgeSW(){
     navigator.serviceWorker.register('./sw.js', {scope: './'}).then(adopt).catch(()=>{});
   }catch(e){}
 }
+// Buttons tapped on a notification while the app was closed are queued by sw.js; carry them out when the app is next seen.
+(function(){
+  function today(){ const n=new Date(); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0'); }
+  let busy=false;
+  async function drain(){
+    if(busy || !('caches' in window)) return; busy=true;
+    try{
+      const c=await caches.open('ayubase6-pending');
+      for(const req of await c.keys()){
+        let d=null; try{ d=await (await c.match(req)).json(); }catch(e){}
+        await c.delete(req);
+        if(!d || !d.key || !d.action) continue;
+        if(Date.now()-(d.at||0) > 36e5*24) continue;
+        if(d.action==='done' && d.day!==today()) continue;   // a tick from an earlier day must not tick today
+        try{ handleNudgeClick(d.key, d.action); }catch(e){}
+      }
+    }catch(e){} finally{ busy=false; }
+  }
+  window.ayuDrainPending=drain;
+  setTimeout(drain,1500);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) drain(); });
+  window.addEventListener('focus',drain);
+})();
 // Show the tab (and, for Reminders, the section) a notification belongs to.
 function nudgeShowSection(key){
   try{
@@ -8984,7 +9010,7 @@ function notifyRoutine(key,title,body,o){
 let routineNotifyTimer=null;
 const ROUTINE_NOTIFY_ITEMS={
   walkex:{title:'Walk or Exercise',body:'It’s time for your walk or exercise.'},
-  palms:{title:'Relax Your Eyes',body:'Rub your palms together and gently place them over your closed eyes.'},
+  palms:{title:'Relax Your Eyes',body:'Rub your palms briskly for 10–15 seconds until warm, then cup them over your closed eyes for 30–60 seconds. Fingers rest on your forehead; don’t press on your eyes.'},
   water:{title:'Drink Water',body:'Have 1–2 glasses of water.'},
   bathroom:{title:'Bathroom Break',body:'Take a moment to go to the bathroom.'},
   breakfast:{title:'Breakfast',body:'It’s time for breakfast.'},
@@ -13336,6 +13362,30 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
 })();
 </script>
+<style id="checks-info-panels-same-font-20261101">
+/* Every "i" panel in Checks uses the same size, line height and style as the Reminders panels (Checks keeps its own colours). */
+#routines-panel .rout-info-panel,
+#routines-panel .rout-info-panel p,
+#routines-panel .rout-info-panel li,
+#routines-panel .rout-info-panel ul,
+#routines-panel .rout-info-panel ol,
+#routines-panel .rout-info-panel strong,
+#routines-panel .rout-info-panel b {
+  font-family: inherit !important;
+  font-size: .78rem !important;
+  line-height: 1.5 !important;
+  font-style: normal !important;
+  letter-spacing: 0 !important;
+  font-weight: 400 !important;
+}
+#routines-panel .rout-info-panel strong,
+#routines-panel .rout-info-panel b { font-weight: 700 !important; }
+#routines-panel .rout-info-panel p { margin: 0 0 6px !important; }
+#routines-panel .rout-info-panel ul,
+#routines-panel .rout-info-panel ol { margin: 4px 0 6px 18px !important; padding: 0 !important; }
+#routines-panel .rout-info-panel li { margin: 3px 0 !important; }
+#routines-panel .rout-info-panel > *:last-child { margin-bottom: 0 !important; }
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
@@ -15624,8 +15674,8 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       +'<strong>Good to know</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Notifications run only while AyuBase6 is open in a browser tab or installed app.</li>'
       +'<li><b>To install:</b> Chrome or Edge: the install icon in the address bar, or menu → Install AyuBase6. Android: ⋮ → Install app. iPhone/iPad: Share → Add to Home Screen. Safari on Mac: File → Add to Dock.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li></ul>'; }
-    var rp=$('rout-info-palms'); if(rp && rp.dataset.ux!=='1'){ rp.dataset.ux='1'; rp.textContent='The warmth and gentle pressure relax the eye muscles and improve blood flow, easing your eyes into the day instead of going straight to bright light or a screen.'; }
-    var rwt=$('rout-info-water'); if(rwt && rwt.dataset.ux!=='1'){ rwt.dataset.ux='1'; rwt.textContent='Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.'; }
+    var rp=$('rout-info-palms'); if(rp && rp.dataset.ux!=='1'){ rp.dataset.ux='1'; rp.innerHTML='<ol><li>Rub your palms together briskly for 10–15 seconds, with firm but comfortable friction, until they feel warm.</li><li>Close your eyes and cup your warm palms over them. Your palms (not your fingers) cover the eyes, your fingers rest on your forehead, and the heels of your hands sit on your cheekbones.</li><li>Keep a small gap so nothing presses on the eyeballs.</li><li>Hold for 30–60 seconds, breathing slowly.</li></ol><p>The warmth and gentle cover relax the eye muscles and improve blood flow, easing your eyes into the day instead of going straight to bright light or a screen.</p>'; }
+    var rwt=$('rout-info-water'); if(rwt && rwt.dataset.ux!=='1'){ rwt.dataset.ux='1'; rwt.innerHTML='<p>Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.</p><strong>How to drink it</strong><ul><li>Take small sips instead of big gulps, and finish the 1–2 glasses over about 5–10 minutes.</li><li>Pause between sips. Room-temperature or lukewarm water is easiest on an empty stomach.</li></ul><strong>Why slowly</strong><ul><li>Your body takes in water gradually, so more of it is used instead of passing straight through.</li><li>You swallow less air, so there is less bloating and burping.</li><li>An empty stomach copes better with small amounts. Gulping can leave you feeling heavy or queasy.</li></ul>'; }
   }
   function go(){ rewrite(); placeAll(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
