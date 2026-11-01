@@ -3864,31 +3864,30 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       </div>
 
       <div class="lab-sex-row">
-        <span class="lab-sex-lbl">Normal ranges for</span>
-        <span class="lab-sex" role="radiogroup" aria-label="Normal ranges for"><label><input type="radio" name="lab-sex" value="male" checked onchange="renderLabResults()"><span>Men</span></label><label><input type="radio" name="lab-sex" value="female" onchange="renderLabResults()"><span>Women</span></label></span>
+        <span class="lab-sex" role="radiogroup" aria-label="Normal ranges for"><label><input type="radio" name="lab-sex" value="male" checked onchange="renderLabResults()"><span>Adult men</span></label><label><input type="radio" name="lab-sex" value="female" onchange="renderLabResults()"><span>Adult women</span></label></span>
       </div>
 
-      <h3 class="calc-subhdr">• Upload</h3>
+      <div class="lab-mode" role="tablist" aria-label="Add lab values by"><button type="button" role="tab" id="lab-mode-upload" class="on" aria-selected="true" onclick="labSetMode('upload')">Upload</button><button type="button" role="tab" id="lab-mode-manual" aria-selected="false" onclick="labSetMode('manual')">Manual</button></div>
 
+      <div id="lab-pane-upload">
       <div class="lab-upload-row">
         <label class="refresh-btn lab-upload-btn" for="lab-pdf-input">📄 Upload Report (PDF)</label>
         <input type="file" id="lab-pdf-input" accept="application/pdf" style="display:none">
         <a id="lab-file-link" class="lab-file-link" href="#" target="_blank" rel="noopener" style="display:none" title="Open report" aria-label="Open uploaded report in a new tab"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/><text x="12" y="18.2" text-anchor="middle" font-size="5.6" font-weight="700" fill="#fff" font-family="Arial, sans-serif">PDF</text></svg></a>
         <span id="lab-upload-status" class="lab-upload-status"></span>
       </div>
+      </div>
 
-      <div id="lab-results" class="lab-results"></div>
-
-      <div class="lab-section-divider" role="separator"></div>
-
-      <h3 class="calc-subhdr">• Manual</h3>
-
+      <div id="lab-pane-manual" style="display:none">
       <div class="lab-manual-row">
         <select id="lab-test-select" class="lab-select" aria-label="Select a test"></select>
         <input type="number" id="lab-test-value" class="lab-value-input" placeholder="Value" step="any">
         <button type="button" id="lab-add-btn" class="lab-add-icon-btn" title="Add">+</button>
       </div>
       <div id="lab-selected-range" class="lab-card-range" style="margin-top:8px" aria-live="polite"></div>
+      </div>
+
+      <div id="lab-results" class="lab-results"></div>
       <div class="page-reset-row" style="margin:14px 0 0"><button type="button" class="bf-reset-btn vit-sq" id="lab-reset-btn" title="Reset Lab Insights" aria-label="Reset Lab Insights" onclick="resetLabToDefault()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button></div>
     </div>
 
@@ -5248,6 +5247,8 @@ function labExtractFromText(text){
   return {rows,other};
 }
 
+let labFiles=[];            // uploaded reports: {id,name,rows:[{refId,value}],other:[],url,dead}
+let labFileSeq=0, labManualSeq=0;
 let labOther=[];            // tests found in a report that Lab Insights can't analyse (shown in grey)
 const labOpen=new Set();    // which result sections are expanded — all start collapsed
 let labEditing=null;        // id of the test whose value is being edited
@@ -5277,7 +5278,7 @@ let labEditing=null;        // id of the test whose value is being edited
 function addLabRow(refId, value){
   if(refId==null || value==null || isNaN(value)) return;
   const existing=labRows.find(r=>r.refId===refId);
-  if(existing){ existing.value=value; } else { labRows.push({refId, value}); }
+  if(existing){ existing.value=value; } else { if(!labManualSeq) labManualSeq=++labFileSeq; labRows.push({refId, value}); }
   renderLabRows();
 }
 function removeLabRow(refId){
@@ -5330,27 +5331,44 @@ function labSectionHtml(it){
       ${precautions}
     </div></details>`;
 }
+function labGroupHtml(g){
+  const items=[];
+  g.rows.forEach(r=>{
+    const ref0=LAB_REF.find(x=>x.id===r.refId); if(!ref0) return;
+    const rg=labRange(ref0);
+    const st=r.value<rg.low?'low':r.value>rg.high?'high':'ok';
+    const ref=Object.assign({},ref0,{id:g.id+'|'+ref0.id});
+    items.push({key:ref.id,kind:st==='ok'?'ok':'bad',ref,rg,val:r.value,st});
+  });
+  g.other.forEach((o,i)=>items.push({key:g.id+'|other:'+i,kind:'na',o}));
+  if(!items.length) return '';
+  const order={bad:0,ok:1,na:2};
+  items.sort((a,b)=>order[a.kind]-order[b.kind]);
+  const link=g.url?`<a class="lab-grp-link" href="${labEsc(g.url)}" target="_blank" rel="noopener" title="Open ${labEsc(g.title)}" aria-label="Open ${labEsc(g.title)} in a new tab"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg></a>`:'';
+  return `<div class="lab-grp"><div class="lab-grp-hdr"><span class="lab-grp-name">${g.url?'Upload: ':''}${labEsc(g.title)}</span>${link}</div>${items.map(labSectionHtml).join('')}</div>`;
+}
 function renderLabResults(){
   const wrap=document.getElementById('lab-results');
   if(!wrap) return;
-  const items=[];
-  labRows.forEach(r=>{
-    const ref=LAB_REF.find(x=>x.id===r.refId); if(!ref) return;
-    const rg=labRange(ref);
-    const st=r.value<rg.low?'low':r.value>rg.high?'high':'ok';
-    items.push({key:ref.id,kind:st==='ok'?'ok':'bad',ref,rg,val:r.value,st});
-  });
-  labOther.forEach((o,i)=>items.push({key:'other:'+i,kind:'na',o}));
-  if(!items.length){ wrap.innerHTML=''; return; }
-  const order={bad:0,ok:1,na:2};                 // out of range first, then in range, then not analysed
-  items.sort((a,b)=>order[a.kind]-order[b.kind]);
-  wrap.innerHTML=items.map(labSectionHtml).join('');
+  const groups=labFiles.map((f,i)=>({id:f.id,title:f.name,url:f.url,rows:f.rows,other:f.other,seq:i+1}));
+  if(labRows.length) groups.push({id:'m',title:'Manual',url:'',rows:labRows,other:[],seq:labManualSeq||9999});
+  groups.sort((a,b)=>(a.id==='m'?a.seq:+a.id.slice(1))-(b.id==='m'?b.seq:+b.id.slice(1)));
+  wrap.innerHTML=groups.map(labGroupHtml).join('');
+}
+function labSetMode(m){
+  const up=m!=='manual';
+  const pu=document.getElementById('lab-pane-upload'), pm=document.getElementById('lab-pane-manual');
+  if(pu) pu.style.display=up?'':'none'; if(pm) pm.style.display=up?'none':'';
+  const bu=document.getElementById('lab-mode-upload'), bm=document.getElementById('lab-mode-manual');
+  if(bu){ bu.classList.toggle('on',up); bu.setAttribute('aria-selected',up?'true':'false'); }
+  if(bm){ bm.classList.toggle('on',!up); bm.setAttribute('aria-selected',up?'false':'true'); }
 }
 function saveLabEdit(id){
   const inp=document.querySelector('#lab-results .lab-edit-input');
   const v=parseFloat(inp&&inp.value);
   if(!Number.isFinite(v) || v<0){ if(inp){ inp.classList.add('bad'); inp.focus(); } return; }
-  const row=labRows.find(r=>r.refId===id); if(row) row.value=v;
+  const pr=String(id).split('|'), rows=pr[0]==='m'?labRows:((labFiles.find(x=>x.id===pr[0])||{}).rows||[]);
+  const row=rows.find(r=>r.refId===pr[1]); if(row) row.value=v;
   labEditing=null; renderLabResults();
 }
 document.getElementById('lab-results')?.addEventListener('click',e=>{
@@ -5386,6 +5404,7 @@ document.getElementById('lab-add-btn')?.addEventListener('click',()=>{
   if(isNaN(val) || !sel.value) return;     // needs a test to be chosen first
   addLabRow(sel.value, val);
   valInp.value='';
+  if(window.labSelectShowPlaceholder) window.labSelectShowPlaceholder();   // back to "Test name" for the next entry
 });
 
 // The uploaded report, shown as a PDF icon beside the Upload button that
@@ -5441,20 +5460,20 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
   if(!file) return;
   const generation=++labUploadGeneration;
   e.target.value=''; // Allow selecting the same file again.
-  labRows=[]; labOther=[]; labOpen.clear(); labEditing=null;
-  renderLabRows();
-  showLabFileLink(file);
+  const grp={id:'f'+(++labFileSeq),name:file.name,rows:[],other:[],url:URL.createObjectURL(file),dead:false};
+  labFiles.push(grp);
+  const dropGrp=()=>{ labFiles=labFiles.filter(x=>x!==grp); try{ URL.revokeObjectURL(grp.url); }catch(e){} renderLabResults(); };
   statusEl.textContent='Reading PDF…';
   scrollLabInsightsToTop();
   try{
     if(typeof pdfjsLib==='undefined'){
-      statusEl.textContent='Couldn\'t load the PDF reader — please add values manually below.';
+      dropGrp(); statusEl.textContent='Couldn\'t load the PDF reader — please use Manual to add values.';
       scrollLabInsightsToTop();
       return;
     }
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     const buf=await file.arrayBuffer();
-    if(generation!==labUploadGeneration) return;
+    if(grp.dead) return;
     let pdf;
     try{
       // Pass a fresh typed array to PDF.js; worker transfer can detach the input buffer.
@@ -5464,7 +5483,7 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
       console.warn('PDF.js worker read failed; retrying without worker:', firstPdfError);
       pdf=await pdfjsLib.getDocument({data:new Uint8Array(buf), disableWorker:true, isEvalSupported:false}).promise;
     }
-    if(generation!==labUploadGeneration) return;
+    if(grp.dead) return;
     let text='';
     const ocrPdfPage=async(page)=>{
       if(typeof Tesseract==='undefined') return '';
@@ -5478,7 +5497,7 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
     };
     for(let i=1;i<=pdf.numPages;i++){
       const page=await pdf.getPage(i);
-      if(generation!==labUploadGeneration) return;
+      if(grp.dead) return;
       let content=null;
       try{
         // Some tagged PDFs have malformed marked-content metadata. Try the
@@ -5519,21 +5538,23 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
         await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
         const result=await Tesseract.recognize(canvas,'eng');
         text+='\n'+(result.data?.text||'');
-        if(generation!==labUploadGeneration) return;
+        if(grp.dead) return;
       }
     }
     const extracted=labExtractFromText(text);
-    extracted.rows.forEach(r=>addLabRow(r.refId,r.value));
-    labOther=extracted.other;
+    const seen=new Map(); extracted.rows.forEach(r=>seen.set(r.refId,r.value));
+    grp.rows=[...seen].map(([refId,value])=>({refId,value}));
+    grp.other=extracted.other||[];
+    if(!grp.rows.length && !grp.other.length) labFiles=labFiles.filter(x=>x!==grp);
     renderLabResults();
     const totalTests=extracted.rows.length+extracted.other.length;
     statusEl.textContent=totalTests
       ? `${totalTests} test${totalTests===1?'':'s'} found`
-      : 'Couldn’t identify test values automatically. Scanned PDFs are supported when OCR is available; otherwise enter values manually.';
+      : 'Couldn’t identify test values automatically. Scanned PDFs are supported when OCR is available; otherwise use Manual to add values.';
   }catch(err){
-    if(generation!==labUploadGeneration) return;
+    if(grp.dead) return;
     console.error('Lab PDF extraction failed:',err);
-    statusEl.textContent='Couldn\'t read that PDF ('+(err?.message||'unsupported or damaged file')+'). Please try again or add values manually below.';
+    dropGrp(); statusEl.textContent='Couldn\'t read that PDF ('+(err?.message||'unsupported or damaged file')+'). Please try again or use Manual to add values.';
   }
   scrollLabInsightsToTop();
 });
@@ -5568,7 +5589,9 @@ function resetBmiToDefault(){
 function resetLabToDefault(){
   if(!confirm('Reset Lab Insights back to its defaults? This clears any lab values you\'ve added.')) return;
   ++labUploadGeneration; // Ignore any report still being read.
+  labFiles.forEach(x=>{ x.dead=true; try{ URL.revokeObjectURL(x.url); }catch(e){} }); labFiles=[]; labManualSeq=0;
   labRows=[]; labOther=[]; labOpen.clear(); labEditing=null;
+  if(window.labSetMode) labSetMode('upload');
   renderLabRows();
   const calcPanel=document.getElementById('calculator-panel'); if(calcPanel) calcPanel.style.minHeight='';
   const sexMale=document.querySelector('input[name="lab-sex"][value="male"]'); if(sexMale) sexMale.checked=true;
@@ -13680,7 +13703,7 @@ document.addEventListener('touchstart',function(e){
 (function(){
   function trackerHas(){ try{ var o=JSON.parse(localStorage.getItem('ayu_vitals_tracker_v1')||'{}'); return Object.keys(o||{}).some(function(k){ var v=o[k]; return Array.isArray(v)?v.length>0:!!v; }); }catch(e){ return false; } }
   function bmiHas(){ try{ return !!(calcHeightTouched||calcWeightTouched); }catch(e){ return false; } }
-  function labHas(){ try{ return labRows.length>0||labOther.length>0; }catch(e){ return false; } }
+  function labHas(){ try{ return labRows.length>0||labOther.length>0||labFiles.length>0; }catch(e){ return false; } }
   var DEF=[['Reset Tracker',trackerHas],['Reset BMI',bmiHas],['Reset Lab Insights',labHas]];
   function sync(){
     DEF.forEach(function(d){
@@ -14046,6 +14069,48 @@ html body #app-nav #footer-tabs-row,html body #footer-tabs-row{margin:0 !importa
 <style id="lab-reset-empty-20261101">
 #calculator-panel .page-reset-row.lab-empty{display:none !important}
 #calculator-panel .calc-card:has(> .page-reset-row.lab-empty:last-child){padding-bottom:20px}
+</style>
+<style id="lab-mode-groups-20261101">
+.lab-mode{display:flex;gap:0;margin:2px 0 12px;border:2px solid var(--calc-2);border-radius:999px;overflow:hidden;width:max-content;max-width:100%}
+.lab-mode button{border:0;background:transparent;color:var(--calc-1);font:inherit;font-weight:700;font-size:.9rem;padding:8px 22px;cursor:pointer;min-width:104px}
+.lab-mode button.on{background:var(--calc-2);color:#fff}
+#lab-pane-manual{margin-top:2px}
+.lab-results{margin-top:6px}
+.lab-grp{margin-top:14px}
+.lab-grp-hdr{display:flex;align-items:center;gap:8px;margin:0 0 8px;padding-bottom:4px;border-bottom:1.5px dashed rgba(8,145,178,.35)}
+.lab-grp-name{flex:1;min-width:0;font-weight:800;font-size:.86rem;color:var(--calc-1);overflow-wrap:anywhere}
+.lab-grp-link{flex:0 0 auto;display:inline-flex;color:var(--calc-1)}
+.lab-grp-link svg{width:20px;height:20px}
+</style>
+<style id="vitals-fields-uniform-20261101">
+/* Every form field in Vitals shares one resting border; only the focused field's border changes. */
+html body #calculator-panel select,
+html body #calculator-panel input[type="number"]:not(.lab-edit-input),
+html body #calculator-panel input[type="text"]:not(.lab-edit-input),
+html body #calculator-panel input[type="date"],
+html body #calculator-panel textarea{border:1px solid #67e8f9 !important;box-shadow:none !important;outline:none !important}
+html body #calculator-panel select:focus,
+html body #calculator-panel input[type="number"]:not(.lab-edit-input):focus,
+html body #calculator-panel input[type="text"]:not(.lab-edit-input):focus,
+html body #calculator-panel input[type="date"]:focus,
+html body #calculator-panel textarea:focus{border-color:#0e7490 !important;box-shadow:none !important;outline:none !important}
+</style>
+<style id="lab-toggles-option1-20261101">
+/* Adult men | Adult women: light pill. Upload | Manual: underline tabs. */
+html body .lab-sex{border:1.5px solid #67e8f9;background:#fff}
+html body .lab-sex span{color:#64748b}
+html body .lab-sex input:checked + span{background:#4fd0e8;color:#06394a;box-shadow:none}
+html body #calculator-panel .lab-sex,
+html body #calculator-panel .lab-sex:hover,
+html body #calculator-panel .lab-sex:active,
+html body #calculator-panel .lab-sex:focus,
+html body #calculator-panel .lab-sex:focus-within{background:#fff !important;border:1.5px solid #67e8f9 !important;box-shadow:none !important;outline:none !important}
+html body .lab-sex label + label span{border-left:0}
+html body .lab-sex input:checked + span{border-radius:999px}
+html body .lab-mode{display:flex;gap:26px;width:auto;max-width:none;border:0;border-bottom:1.5px solid #cdeef5;border-radius:0;overflow:visible;margin:2px 0 14px}
+html body .lab-mode button{min-width:0;padding:8px 2px;background:transparent;color:#64748b;border:0;border-bottom:3px solid transparent;margin-bottom:-1.5px;font-size:.95rem;border-radius:0}
+html body .lab-mode button.on{background:transparent;color:#0e7490;border-bottom-color:#0e7490}
+html body .lab-mode button:focus-visible{outline:2px solid #0e7490;outline-offset:2px;border-radius:4px}
 </style>
 </body>
 
