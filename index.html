@@ -13652,6 +13652,27 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
 </script>
+<style id="vitals-reset-no-stick-20261101">
+/* After a confirm popup the pointer is still over the button; don't leave it filled. */
+@media (hover:none){#calculator-panel .reset-icon-btn.calc-reset:hover{background:transparent;color:var(--calc-2);border-color:var(--calc-3)}}
+#calculator-panel .reset-icon-btn.calc-reset.after-click,#calculator-panel .reset-icon-btn.calc-reset.after-click:hover,#calculator-panel .reset-icon-btn.calc-reset:focus:not(:hover){background:transparent;color:var(--calc-2);border-color:var(--calc-3)}
+</style>
+<script id="vitals-reset-no-stick-20261101-js">
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('#calculator-panel .reset-icon-btn.calc-reset'); if(!b) return;
+  setTimeout(function(){ b.blur(); b.classList.add('after-click'); },0);
+},true);
+document.addEventListener('mousemove',function(e){
+  document.querySelectorAll('#calculator-panel .reset-icon-btn.after-click').forEach(function(b){
+    if(!b.contains(e.target)) b.classList.remove('after-click');
+  });
+},{passive:true});
+document.addEventListener('touchstart',function(e){
+  document.querySelectorAll('#calculator-panel .reset-icon-btn.after-click').forEach(function(b){
+    if(!b.contains(e.target)) b.classList.remove('after-click');
+  });
+},{passive:true});
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
