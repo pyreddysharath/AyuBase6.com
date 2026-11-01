@@ -5561,7 +5561,6 @@ function toggleLabDisclaimer(){
   if(btn) btn.classList.toggle('active', !isOpen);
 }
 function resetBmiToDefault(){
-  if(!confirm('Reset BMI back to its defaults? This clears your height and weight.')) return;
   const hEl=document.getElementById('calc-height-slider'), wEl=document.getElementById('calc-weight-slider');
   hEl.value=hEl.min; wEl.value=wEl.min;
   calcHeightTouched=false; calcWeightTouched=false;
@@ -13673,6 +13672,32 @@ document.addEventListener('touchstart',function(e){
   });
 },{passive:true});
 </script>
+<style id="vitals-reset-disabled-20261101">
+#calculator-panel .reset-icon-btn.calc-reset:disabled,#calculator-panel .reset-icon-btn.calc-reset:disabled:hover{opacity:.4;cursor:not-allowed;background:transparent;color:var(--calc-2);border-color:var(--calc-3)}
+</style>
+<script id="vitals-reset-disabled-20261101-js">
+(function(){
+  function trackerHas(){ try{ var o=JSON.parse(localStorage.getItem('ayu_vitals_tracker_v1')||'{}'); return Object.keys(o||{}).some(function(k){ var v=o[k]; return Array.isArray(v)?v.length>0:!!v; }); }catch(e){ return false; } }
+  function bmiHas(){ try{ return !!(calcHeightTouched||calcWeightTouched); }catch(e){ return false; } }
+  function labHas(){ try{ return labRows.length>0||labOther.length>0; }catch(e){ return false; } }
+  var DEF=[['Reset Tracker',trackerHas],['Reset BMI',bmiHas],['Reset Lab Insights',labHas]];
+  function sync(){
+    DEF.forEach(function(d){
+      var b=document.querySelector('#calculator-panel button.reset-icon-btn[aria-label="'+d[0]+'"]'); if(!b) return;
+      var has=d[1](); if(b.disabled===!has) { if(!b.disabled) b.title=d[0]; return; }
+      b.disabled=!has; b.title=has?d[0]:'Nothing to reset'; b.setAttribute('aria-disabled',has?'false':'true');
+    });
+  }
+  setInterval(sync,400); sync();
+  document.addEventListener('click',function(){ setTimeout(sync,50); },true);
+})();
+</script>
+<style id="collapse-choice-cards-20261101">
+/* Activity Type and Gender no longer reserve empty space for options that appear after a choice. */
+html body #activity-panel .activity-type-section,
+html body #nutrition-panel #sec-gender{min-height:0 !important}
+@media(max-width:640px){html body #activity-panel .activity-type-section,html body #nutrition-panel #sec-gender{min-height:0 !important}}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
