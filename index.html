@@ -4240,7 +4240,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
 
     <div class="rout-card">
       <div class="rout-card-hdr">
-        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg> Daily Rhythm</h2>
+        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg> Wake-up time</h2>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('wake')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-wake" style="display:none">
@@ -4262,7 +4262,6 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       </div>
       <div class="wake-control">
         <div class="wake-control-hdr">
-          <span class="wake-label">Wake-up time</span>
           <strong id="wake-time-val">5:45 AM</strong>
         </div>
         <input type="range" id="wake-time-slider" min="180" max="540" step="15" value="345" class="wake-slider">
@@ -4286,7 +4285,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('water')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-water" style="display:none">
-        <p>Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.</p><strong>How to drink it</strong><ul><li>Take small sips instead of big gulps, and finish the 1–2 glasses over about 5–10 minutes.</li><li>Pause between sips. Room-temperature or lukewarm water is easiest on an empty stomach.</li></ul><strong>Why slowly</strong><ul><li>Your body takes in water gradually, so more of it is used instead of passing straight through.</li><li>You swallow less air, so there is less bloating and burping.</li><li>An empty stomach copes better with small amounts. Gulping can leave you feeling heavy or queasy.</li></ul>
+        <p>Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.</p><strong>How to drink it</strong><ul><li>Take small sips instead of big gulps, and finish the 1–2 glasses over about 5–10 minutes.</li><li>Pause between sips.</li><li>Warm (not hot) water is a good choice in the morning. It is gentle on an empty stomach, and many people find it helps the bowels move. Plain room-temperature water hydrates just as well, and water that is too hot can scald your mouth and throat.</li></ul><strong>Why slowly</strong><ul><li>Your body takes in water gradually, so more of it is used instead of passing straight through.</li><li>You swallow less air, so there is less bloating and burping.</li><li>An empty stomach copes better with small amounts. Gulping can leave you feeling heavy or queasy.</li></ul>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="bathroom"> <span>Wait a while, then go to the bathroom <span class="rout-time" id="rt-bathroom">(6:00 – 6:15 AM)</span></span></label>
@@ -4297,9 +4296,17 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="walkex"> <span>Walk or Exercise <span class="rout-time" id="rt-walkex">(6:15 – 7:00 AM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('walkex')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-walkex" style="display:none">
+        <strong>Why it helps</strong><ul><li>Lifts mood and energy for the day and helps your heart, blood sugar and weight.</li><li>Morning daylight helps set your body clock, so you sleep better at night.</li></ul><strong>Watch out</strong><ul><li>Hard exercise on a completely empty stomach can make some people dizzy or weak.</li><li>Doing too much too soon strains joints and muscles.</li><li>Early-morning cold, heat or smog can make walking harder on the lungs.</li></ul><strong>Tips</strong><ul><li>Start easy, warm up for a few minutes, and sip water first.</li><li>Check the air quality, and pick a safe, well-lit route.</li><li>If you have a heart condition, or feel chest pain or unusual breathlessness, stop and talk to a doctor.</li></ul>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="breakfast"> <span>Breakfast <span class="rout-time" id="rt-breakfast">(7:30 – 8:30 AM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('breakfast')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-breakfast" style="display:none">
+        <strong>Why it helps</strong><ul><li>Refuels you after the overnight fast and steadies energy and focus.</li><li>Makes it easier not to overeat later in the day.</li></ul><strong>Watch out</strong><ul><li>A sugary or deep-fried breakfast spikes blood sugar, then leaves you tired and hungry.</li><li>Eating in a rush, or very late, upsets digestion.</li><li>Some people feel fine without breakfast, but a balanced one helps most people.</li></ul><strong>Tips</strong><ul><li>Combine protein (eggs, dal, curd, paneer, sprouts) with fibre (oats, millets, fruit).</li><li>Skip sugary drinks, and sit down to eat.</li></ul>
       </div>
     </div>
 
@@ -4307,12 +4314,24 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       <h2>🌤️ Afternoon</h2>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="fruits"> <span>Fruits <span class="rout-time" id="rt-fruits">(11:00 – 11:30 AM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('fruits')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-fruits" style="display:none">
+        <strong>Why it helps</strong><ul><li>Gives fibre, vitamins and water, and keeps you full until lunch.</li><li>A healthy replacement for biscuits or a sugary snack.</li></ul><strong>Watch out</strong><ul><li>Juice has little fibre and raises blood sugar fast, so whole fruit is better.</li><li>Very sweet fruit in large amounts adds a lot of sugar, which matters if you have diabetes.</li><li>Sour fruit on an empty stomach can bother some people.</li></ul><strong>Tips</strong><ul><li>Eat one or two portions of whole, seasonal fruit.</li><li>Wash it well, and vary the kind from day to day.</li></ul>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="lunch"> <span>Lunch <span class="rout-time" id="rt-lunch">(12:30 – 1:30 PM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('lunch')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-lunch" style="display:none">
+        <strong>Why it helps</strong><ul><li>Your main meal while digestion is strong, giving steady energy for the afternoon.</li><li>Eating at a regular time keeps hunger and cravings in check.</li></ul><strong>Watch out</strong><ul><li>A very heavy or oily lunch makes you drowsy in the afternoon.</li><li>Eating at your desk or on your phone leads to eating more without noticing.</li><li>Skipping lunch often leads to overeating at night.</li></ul><strong>Tips</strong><ul><li>Fill half your plate with vegetables or salad, add dal or another protein, and keep rice or roti moderate.</li><li>Chew slowly, and take a 5–10 minute walk afterwards.</li></ul>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="snacks"> <span>Snacks <span class="rout-time" id="rt-snacks">(4:00 – 5:00 PM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('snacks')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-snacks" style="display:none">
+        <strong>Why it helps</strong><ul><li>Stops late-afternoon hunger so you don't overeat at dinner.</li><li>Keeps energy and focus steady until the evening.</li></ul><strong>Watch out</strong><ul><li>Chips, biscuits, sweets and fried snacks add salt, sugar and unhealthy fat.</li><li>Snacking out of habit or boredom adds extra calories.</li><li>A big snack too close to dinner spoils your appetite.</li></ul><strong>Tips</strong><ul><li>Choose roasted chana, a handful of nuts, fruit, sprouts or buttermilk.</li><li>Keep the portion small, and finish about two hours before dinner.</li></ul>
       </div>
     </div>
 
@@ -4320,12 +4339,24 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       <h2>🌙 Evening &amp; Night</h2>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="dinner"> <span>Dinner <span class="rout-time" id="rt-dinner">(7:00 – 8:00 PM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('dinner')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-dinner" style="display:none">
+        <strong>Why it helps</strong><ul><li>Eating early gives your body time to digest before sleep, which helps sleep and weight.</li><li>A lighter evening meal is easier on your stomach.</li></ul><strong>Watch out</strong><ul><li>A late or heavy dinner can cause acidity and poor sleep, and adds weight over time.</li><li>Eating too little can leave you hungry and wake you up at night.</li></ul><strong>Tips</strong><ul><li>Keep it light and easy to digest, such as roti or millet with vegetables and dal, or soup.</li><li>Finish at least 2–3 hours before bed, and take a short walk afterwards.</li></ul>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="nomobile"> <span>Do not use mobile <span class="rout-time" id="rt-nomobile">(9:00 – 10:00 PM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('nomobile')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-nomobile" style="display:none">
+        <strong>Why it helps</strong><ul><li>Helps your mind wind down, so you fall asleep faster and sleep better.</li><li>Gives your eyes a rest after a day of screens.</li></ul><strong>Watch out</strong><ul><li>At first you may feel bored, or worry about missing a message.</li><li>The habit is hard to break, especially if the phone is also your alarm.</li></ul><strong>Tips</strong><ul><li>Charge the phone outside the bedroom, and use an alarm clock.</li><li>Set Do Not Disturb with a few allowed contacts for emergencies.</li><li>Replace scrolling with reading, light stretching or time with family.</li></ul>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="sleep"> <span>Sleep <span class="rout-time" id="rt-sleep">(10:00 – 11:00 PM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('sleep')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-sleep" style="display:none">
+        <strong>Why it helps</strong><ul><li>7–9 hours supports memory, mood, immunity, heart health and healthy weight.</li><li>A fixed bedtime sets your body clock, so you fall asleep more easily.</li></ul><strong>Watch out</strong><ul><li>Regularly sleeping under 6 hours is linked to poor focus, low mood, higher blood pressure and weight gain.</li><li>Irregular sleep times can leave you tired even after enough hours.</li></ul><strong>Tips</strong><ul><li>Keep the same bedtime every day, including weekends, in a cool, dark room.</li><li>Avoid caffeine in the afternoon and heavy meals or screens close to bed.</li><li>If you snore loudly, stop breathing in your sleep, or cannot sleep for weeks, see a doctor.</li></ul>
       </div>
     </div>
 
@@ -6401,8 +6432,9 @@ function buildRecipes(diets){
   const nav=sec.querySelector('#rec-day-nav');
   const panels=sec.querySelector('#rec-day-panels');
 
+  const todayRec=(new Date().getDay()+6)%7;   // week starts on Monday; open on today's tab
   REC_DAYS.forEach((day,di)=>{
-    const tab=document.createElement('div'); tab.className='rec-day-tab'+(di===0?' active':'');
+    const tab=document.createElement('div'); tab.className='rec-day-tab'+(di===todayRec?' active':'');
     tab.textContent=day.slice(0,3);
     tab.addEventListener('click',()=>{
       nav.querySelectorAll('.rec-day-tab').forEach((t,i)=>t.classList.toggle('active',i===di));
@@ -6411,7 +6443,7 @@ function buildRecipes(diets){
     });
     nav.appendChild(tab);
 
-    const panel=document.createElement('div'); panel.className='rec-day-panel'+(di===0?' active':'');
+    const panel=document.createElement('div'); panel.className='rec-day-panel'+(di===todayRec?' active':'');
     MEALS.forEach(([label,pool,offset])=>{
       const mealRow=document.createElement('div'); mealRow.className='rec-meal-row';
       if(!pool.length){
@@ -10867,9 +10899,11 @@ function buildWeekPlan(ag) {
     return;
   }
 
-  // Rebuild day tabs
+  // Rebuild day tabs (the week starts on Monday; open on today's tab)
+  const todayTab = (new Date().getDay() + 6) % 7;
+  currentDayIndex = todayTab;
   weekNav.innerHTML = DAY_SHORT.map((d,i) =>
-    `<div class="day-tab${i===0?' active':''}" onclick="switchDay(${i})">${d}</div>`
+    `<div class="day-tab${i===todayTab?' active':''}" onclick="switchDay(${i})">${d}</div>`
   ).join('');
 
   // Rebuild day panels
@@ -10877,7 +10911,7 @@ function buildWeekPlan(ag) {
 
   plan.forEach((dayPlan, di) => {
     const panel = document.createElement('div');
-    panel.className = 'day-panel' + (di===0 ? ' active' : '');
+    panel.className = 'day-panel' + (di===todayTab ? ' active' : '');
 
     const cardioEx = EX_LIB[dayPlan.cardioId];
     const routineIds = dayPlan.routine.filter(id => EX_LIB[id]);
@@ -15675,7 +15709,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       +'<li><b>To install:</b> Chrome or Edge: the install icon in the address bar, or menu → Install AyuBase6. Android: ⋮ → Install app. iPhone/iPad: Share → Add to Home Screen. Safari on Mac: File → Add to Dock.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li></ul>'; }
     var rp=$('rout-info-palms'); if(rp && rp.dataset.ux!=='1'){ rp.dataset.ux='1'; rp.innerHTML='<ol><li>Rub your palms together briskly for 10–15 seconds, with firm but comfortable friction, until they feel warm.</li><li>Close your eyes and cup your warm palms over them. Your palms (not your fingers) cover the eyes, your fingers rest on your forehead, and the heels of your hands sit on your cheekbones.</li><li>Keep a small gap so nothing presses on the eyeballs.</li><li>Hold for 30–60 seconds, breathing slowly.</li></ol><p>The warmth and gentle cover relax the eye muscles and improve blood flow, easing your eyes into the day instead of going straight to bright light or a screen.</p>'; }
-    var rwt=$('rout-info-water'); if(rwt && rwt.dataset.ux!=='1'){ rwt.dataset.ux='1'; rwt.innerHTML='<p>Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.</p><strong>How to drink it</strong><ul><li>Take small sips instead of big gulps, and finish the 1–2 glasses over about 5–10 minutes.</li><li>Pause between sips. Room-temperature or lukewarm water is easiest on an empty stomach.</li></ul><strong>Why slowly</strong><ul><li>Your body takes in water gradually, so more of it is used instead of passing straight through.</li><li>You swallow less air, so there is less bloating and burping.</li><li>An empty stomach copes better with small amounts. Gulping can leave you feeling heavy or queasy.</li></ul>'; }
+    var rwt=$('rout-info-water'); if(rwt && rwt.dataset.ux!=='1'){ rwt.dataset.ux='1'; rwt.innerHTML='<p>Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.</p><strong>How to drink it</strong><ul><li>Take small sips instead of big gulps, and finish the 1–2 glasses over about 5–10 minutes.</li><li>Pause between sips.</li><li>Warm (not hot) water is a good choice in the morning. It is gentle on an empty stomach, and many people find it helps the bowels move. Plain room-temperature water hydrates just as well, and water that is too hot can scald your mouth and throat.</li></ul><strong>Why slowly</strong><ul><li>Your body takes in water gradually, so more of it is used instead of passing straight through.</li><li>You swallow less air, so there is less bloating and burping.</li><li>An empty stomach copes better with small amounts. Gulping can leave you feeling heavy or queasy.</li></ul>'; }
   }
   function go(){ rewrite(); placeAll(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
@@ -15769,7 +15803,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 </script>
 
 <style id="daily-rhythm-20261031">
-#routines-panel .wake-control-hdr{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#routines-panel .wake-control-hdr{display:flex;align-items:baseline;justify-content:center;gap:10px;flex-wrap:wrap}
 #routines-panel .wake-label{font-size:.86rem;font-weight:700;color:#7a4510}
 #routines-panel .routines-notify-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(166,124,60,.35)}
 #routines-panel .routines-notify-title{font-size:15px;font-weight:800;color:#7a4510;border-left:4px solid #e6a93a;padding:1px 0 1px 9px}
