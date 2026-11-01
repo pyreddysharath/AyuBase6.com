@@ -8917,13 +8917,21 @@ function nudgePopupButtons(o){
   return '<div class="btns">'+o.buttons.map(b=>'<button type="button" data-pop-act="'+nudgeEsc(b.act)+'"'+(b.primary?' class="y"':'')+'>'+nudgeEsc(b.label)+'</button>').join('')+'</div>';
 }
 function nudgePopupWire(win, doc, o){
+  let confirmed=false;
   const closeWin=()=>{ try{ win.close(); }catch(e){} };
-  doc.body.addEventListener('click',e=>{ if(e.target.closest('button')) return; nudgeOpenFromWindow(win,o.popKey); });
+  // After a button: swap the card for a short confirmation in the same window, then close it.
+  const confirmIn=(head,sub)=>{
+    confirmed=true;
+    const c=doc.querySelector('.c'); if(!c) return closeWin();
+    c.innerHTML='<h1 style="padding-right:0">\u2705 '+nudgeEsc(head)+'</h1><p>'+nudgeEsc(sub)+'</p>';
+    win.setTimeout(closeWin,2600);
+  };
+  doc.body.addEventListener('click',e=>{ if(e.target.closest('button')) return; if(confirmed){ closeWin(); return; } nudgeOpenFromWindow(win,o.popKey); });
   const t=doc.querySelector('[data-pop-this]'), a=doc.querySelector('[data-pop-all]'), x=doc.querySelector('[data-pop-close]');
   if(x) x.onclick=closeWin;
-  if(t) t.onclick=()=>{ try{ o.onDisableThis&&o.onDisableThis(); }catch(e){} closeWin(); };
-  if(a) a.onclick=()=>{ try{ o.onDisableAll&&o.onDisableAll(); }catch(e){} closeWin(); };
-  doc.querySelectorAll('[data-pop-act]').forEach(btn=>{ btn.onclick=()=>{ try{ o.onAction&&o.onAction(btn.getAttribute('data-pop-act')); }catch(e){} closeWin(); }; });
+  if(t) t.onclick=()=>{ try{ o.onDisableThis&&o.onDisableThis(); }catch(e){} confirmIn('Reminder turned off','You can turn it back on in Reminders.'); };
+  if(a) a.onclick=()=>{ try{ o.onDisableAll&&o.onDisableAll(); }catch(e){} confirmIn('All reminders turned off','You can turn them back on in Reminders.'); };
+  doc.querySelectorAll('[data-pop-act]').forEach(btn=>{ btn.onclick=()=>{ const act=btn.getAttribute('data-pop-act'); try{ o.onAction&&o.onAction(act); }catch(e){} if(act==='done') confirmIn('Marked as done','Nice work.'); else if(act==='not-yet') confirmIn('Noted \u2014 not yet','We will not mark it as done.'); else closeWin(); }; });
 }
 function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
   o=o||{};

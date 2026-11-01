@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'ayubase6-pwa-v6';
+const CACHE_NAME = 'ayubase6-pwa-v7';
 // Videos and preview images from content/ are kept here the first time they are used.
 // Separate from CACHE_NAME so an app update does not throw the videos away.
 const MEDIA_CACHE = 'ayubase6-media-v2';
@@ -100,6 +100,7 @@ self.addEventListener('notificationclick', event => {
 
   event.waitUntil((async () => {
     const data = event.notification.data || {};
+    if (data.confirm) return;   // tapping the confirmation just dismisses it
     const section = data.section === 'routines' ? 'routines' : (data.section === 'alerts' ? 'alerts' : '');
 
     const targetUrl = new URL(data.url || './', self.location.href);
@@ -108,6 +109,44 @@ self.addEventListener('notificationclick', event => {
     }
     if (section && !targetUrl.searchParams.has('section')) {
       targetUrl.searchParams.set('section', section);
+    }
+
+    const action = event.action || '';
+    if (action) {
+      // A button on the notification (Done, Not yet, Turn off...): carry it out without opening the app.
+      const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      const page = wins.find(c => c.url.startsWith(self.location.origin));
+      if (page) {
+        page.postMessage({ type: 'nudge-click', key: data.key || '', action, section: '' });
+      } else if (action !== 'not-yet') {
+        // The app is closed: remember the tap and apply it the next time the app opens.
+        const n = new Date();
+        const day = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+        const cache = await caches.open('ayubase6-pending');
+        const id = Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+        await cache.put(new URL('./__pending/' + id, self.location.href).href,
+          new Response(JSON.stringify({ key: data.key || '', action, day, at: Date.now() }), { headers: { 'content-type': 'application/json' } }));
+      }
+      // Confirm in the same notification slot, then let it clear itself.
+      const say = {
+        'disable-this': ['Reminder turned off', 'You can turn it back on in Reminders.'],
+        'disable-all': ['All reminders turned off', 'You can turn them back on in Reminders.'],
+        'done': ['Marked as done \u2713', 'Nice work.'],
+        'not-yet': ['Noted \u2014 not yet', 'We will not mark it as done.']
+      }[action];
+      if (say) {
+        const tag = event.notification.tag || ('nudge-' + (data.key || 'x'));
+        try {
+          await self.registration.showNotification(say[0], {
+            body: say[1], tag, icon: './icons/icon-192.png', badge: './icons/icon-192.png',
+            silent: true, renotify: false, requireInteraction: false, data: { confirm: true }
+          });
+          await new Promise(r => setTimeout(r, 3500));
+          const list = await self.registration.getNotifications({ tag });
+          list.forEach(x => { if (x.data && x.data.confirm) x.close(); });
+        } catch (e) {}
+      }
+      return;
     }
 
     const windows = await self.clients.matchAll({
