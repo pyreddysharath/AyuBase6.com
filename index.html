@@ -13685,7 +13685,7 @@ document.addEventListener('touchstart',function(e){
   function sync(){
     DEF.forEach(function(d){
       var b=document.querySelector('#calculator-panel button[aria-label="'+d[0]+'"]'); if(!b) return;
-      var has=d[1](); if(b.disabled===!has) { if(!b.disabled) b.title=d[0]; return; }
+      var has=d[1](); if(d[0]==='Reset Lab Insights') b.style.visibility=has?'':'hidden'; if(b.disabled===!has) { if(!b.disabled) b.title=d[0]; return; }
       b.disabled=!has; b.title=has?d[0]:'Nothing to reset'; b.setAttribute('aria-disabled',has?'false':'true');
     });
   }
