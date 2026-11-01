@@ -13772,7 +13772,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (PDF) or type values in, to see what is in or out of range.');
   sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
   // Footer
-  STEPS.push({tab:null,sel:'.footer-tabs-icons',idx:0,c:'#2563eb',kind:'tab',html:'<ul><li><b>Disclaimer</b>: what the app can and cannot do</li><li><b>Feedback</b>: tell us what to improve</li><li><b>Privacy</b> and <b>Cookies</b>: how your data is handled</li><li><b>Backup</b>: save your data to a file and restore it later</li><li><b>Other sites</b>: more from us</li></ul>'});
+  STEPS.push({tab:null,sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',html:'<ul><li><b>Disclaimer</b>: what the app can and cannot do</li><li><b>Feedback</b>: tell us what to improve</li><li><b>Privacy</b> and <b>Cookies</b>: how your data is handled</li><li><b>Backup</b>: save your data to a file and restore it later</li><li><b>Other sites</b>: more from us</li></ul>'});
 
   var root=document.getElementById('tour-root'), spot=document.getElementById('tour-spot'), txt=document.getElementById('tour-text'), bar=document.getElementById('tour-bar');
   var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0;
@@ -13788,6 +13788,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   // One timeline per tab: the tab itself and all its sections play as a single continuous scroll.
   function buildGroup(i){
     var tab=STEPS[i].tab, gs=i;
+    if(open) document.body.style.paddingBottom='260px';
     if(tab!==null) while(gs>0 && STEPS[gs-1].tab===tab) gs--;
     var idx=[];
     for(var j=gs;j<STEPS.length;j++){
@@ -13800,7 +13801,9 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
     var kf=[], lastA=0, firstSecA=null;
     idx.forEach(function(j,n){ var s=STEPS[j]; if(s.kind==='sec'&&firstSecA===null) firstSecA=anchorY(s); });
     if(tab===null){
-      var ft=target(STEPS[idx[0]]), fy=ft?Math.min(maxScroll(),Math.max(0,absTop(ft)-innerHeight/2+ft.offsetHeight/2)):0;
+      var ft=target(STEPS[idx[0]]), fy=0;
+      if(document.documentElement.clientWidth<900){ document.body.style.paddingBottom=innerHeight+'px'; fy=ft?Math.min(maxScroll(),Math.max(0,absTop(ft)-70)):0; }
+      else fy=ft?Math.min(maxScroll(),Math.max(0,absTop(ft)-innerHeight/2+ft.offsetHeight/2)):0;
       kf=[[0,fy],[total,fy]];
     } else {
       idx.forEach(function(j,n){
