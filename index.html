@@ -9097,6 +9097,8 @@ function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
     +(title==='Eye Exercise' && exerciseVideoSrc?'<button type="button" class="ex-toggle" id="ex-toggle" aria-expanded="false" title="Expand guided eye exercise video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span></button><video class="ex-video" id="ex-video" controls playsinline muted preload="metadata" src="'+exerciseVideoSrc.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></video>':'')+nudgePopupIcons(o)+'</div>';
   if(title==='Eye Exercise'){const toggle=doc.getElementById('ex-toggle'), card=doc.querySelector('.c'), video=doc.getElementById('ex-video');if(toggle&&card&&video)toggle.onclick=()=>{const expanded=card.classList.toggle('expanded');toggle.setAttribute('aria-expanded',String(expanded));toggle.innerHTML=expanded?'✕ <span>Hide exercise video</span>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span>';if(expanded){try{win.resizeTo(420,520)}catch(e){};video.play().catch(()=>{});}else{video.pause();try{win.resizeTo(320,150)}catch(e){}}};}
   nudgePopupWire(win, doc, o);
+  // Fit the window to its content so no empty strip is left below the icons.
+  try{ const card=doc.querySelector('.c'); const dh=Math.ceil(card.getBoundingClientRect().height)-win.innerHeight; if(Math.abs(dh)>1) win.resizeBy(0,dh); }catch(e){}
   if(!withTimer) return;
   const num=doc.getElementById('n'); let iv=null, end=0;
   const tick=()=>{
@@ -9161,7 +9163,7 @@ function openNudgePopup(key, title, msg, o){
   const W=Math.max(270,Math.min(360,Math.round(250+Math.min(110,textLen)*0.65)));
   const titleLines=Math.max(1,Math.ceil(titleLen*8.8/(W-36-62)));          // the title leaves room for the two icons
   const msgLines=Math.max(1,Math.ceil(msgLen*7.2/(W-36)));
-  const H=Math.max(timer?140:82, Math.min(280, 34+titleLines*21+msgLines*19+(timer?48:0)+((o.buttons&&o.buttons.length)?46:0)+44));
+  const H=Math.max(timer?140:82, Math.min(280, 34+titleLines*21+msgLines*19+(timer?48:0)+((o.buttons&&o.buttons.length)?46:0)+36));
   const exerciseVideoSrc=key==='eyeex'?(document.getElementById('eye-ex-video')?.currentSrc||document.getElementById('eye-ex-video')?.src||''):'';
   const onFail=o.onFail||(()=>nudgeNativeFallback(key,title,msg));
   try{
