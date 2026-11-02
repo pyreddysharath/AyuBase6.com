@@ -14340,6 +14340,8 @@ html body #reminder-hours-card .alert-card-hdr > .master-switch{margin-left:auto
 .push-status[hidden]{display:none}
 #push-status-routines{background:#f6e7c8;color:#7a4510;margin:0 0 12px;text-align:left}
 #reminder-hours-card.rh-off .push-status{display:none!important}
+.push-status .ps-l{display:block}
+.push-status .ps-l+.ps-l{margin-top:8px}
 </style>
 <script id="phone-keep-open-note-js-20261102">
 (function(){
@@ -14347,15 +14349,25 @@ html body #reminder-hours-card .alert-card-hdr > .master-switch{margin-left:auto
   function $(id){ return document.getElementById(id); }
   var android=/Android/i.test(navigator.userAgent||'');
   var ios=/iPhone|iPad|iPod/.test(navigator.userAgent||'') || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-  var HTML='<b>Online or offline:</b> reminders come only from the open app, so keep it open. This can’t be guaranteed: your phone may pause it.'+(android?'<br><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).':(ios?'<br><b>iPhone:</b> open the app from its Home Screen icon.':''));
+  var HTML='<span class="ps-l"><b>Online or offline:</b> reminders come only from the open app, so keep it open. This can’t be guaranteed: your phone may pause it.</span>'+(android?'<span class="ps-l"><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</span>':(ios?'<span class="ps-l"><b>iPhone:</b> open the app from its Home Screen icon.</span>':''));
+  var WAIT=Math.min(25000, 3000+HTML.replace(/<[^>]*>/g,' ').trim().split(/\s+/).length*300);
   function phone(){ return typeof NUDGE_IS_PHONE!=='undefined' && !!NUDGE_IS_PHONE; }
   function granted(){ return typeof Notification!=='undefined' && Notification.permission==='granted'; }
-  function show(el,on){ if(!el) return; if(on){ el.innerHTML=HTML; el.hidden=false; } else el.hidden=true; }
+  // Shown only right after a notification switch is turned on, then hidden after a time that fits its length.
+  var armed={rem:false,chk:false}, until={rem:0,chk:0}, prev=null;
   function refresh(){
-    var rem=phone() && granted() && typeof isMasterNotifyOn==='function' && isMasterNotifyOn();
-    var chk=phone() && granted() && typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled();
+    var rem=phone() && granted() && typeof isMasterNotifyOn==='function' && !!isMasterNotifyOn();
+    var chk=phone() && granted() && typeof routineNotificationsEnabled==='function' && !!routineNotificationsEnabled();
+    if(prev){ if(rem && !prev.rem){ armed.rem=true; until.rem=0; } if(chk && !prev.chk){ armed.chk=true; until.chk=0; } }
+    if(!rem){ armed.rem=false; until.rem=0; } if(!chk){ armed.chk=false; until.chk=0; }
+    prev={rem:rem,chk:chk};
     var nd=$('routines-install-nudge'), el2=$('push-status-routines'); if(nd && el2 && nd.nextElementSibling!==el2) nd.after(el2);
-    show($('push-status'),rem); show(el2,chk);
+    [['rem','push-status'],['chk','push-status-routines']].forEach(function(p){
+      var k=p[0], el=$(p[1]); if(!el) return;
+      if(armed[k] && !until[k]){ until[k]=Date.now()+WAIT; setTimeout(refresh, WAIT+80); }
+      if(armed[k] && Date.now()>until[k]) armed[k]=false;
+      if(armed[k]){ el.innerHTML=HTML; el.hidden=false; } else el.hidden=true;
+    });
   }
   document.addEventListener('change',function(){ setTimeout(refresh,300); },true);
   document.addEventListener('click',function(){ setTimeout(refresh,300); },true);

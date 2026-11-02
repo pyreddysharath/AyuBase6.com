@@ -13596,6 +13596,8 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
 .push-status{margin:10px 0 0;padding:9px 12px;border-radius:12px;background:#d9f0ea;color:#08766e;font-size:.82rem;line-height:1.35;font-weight:600}
 .push-status[hidden]{display:none}
 .push-status.warn{background:#fef3c7;color:#92400e}
+.push-status .ps-l{display:block}
+.push-status .ps-l+.ps-l{margin-top:8px}
 #push-status-routines{background:#f6e7c8;color:#7a4510;margin:0 0 12px;text-align:left}
 #push-status-routines.warn{background:#fef3c7;color:#92400e}
 #reminder-hours-card.rh-off .push-status{display:none!important}
@@ -13628,7 +13630,32 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     });
   }
   function isDesktop(){ return !(typeof NUDGE_IS_PHONE!=='undefined' && NUDGE_IS_PHONE); }
+  // The Online / Offline note shows only right after a notification switch is turned on, then hides itself after a time that fits its length.
+  var armed={rem:false,chk:false}, until={rem:0,chk:0}, prevOn=null;
+  function trackSwitches(){
+    var rem=typeof isMasterNotifyOn==='function' && !!isMasterNotifyOn();
+    var chk=typeof routineNotificationsEnabled==='function' && !!routineNotificationsEnabled();
+    if(prevOn){
+      if(rem && !prevOn.rem){ armed.rem=true; until.rem=0; }
+      if(chk && !prevOn.chk){ armed.chk=true; until.chk=0; }
+    }
+    if(!rem){ armed.rem=false; until.rem=0; }
+    if(!chk){ armed.chk=false; until.chk=0; }
+    prevOn={rem:rem,chk:chk};
+  }
+  function timedNote(html){
+    var words=html.replace(/<[^>]*>/g,' ').trim().split(/\s+/).length, wait=Math.min(25000, 3000+words*300);
+    var nd=$('routines-install-nudge'), e2=$('push-status-routines'); if(nd && e2 && nd.nextElementSibling!==e2) nd.after(e2);
+    [['rem','push-status'],['chk','push-status-routines']].forEach(function(p){
+      var k=p[0], el=$(p[1]); if(!el) return;
+      if(armed[k] && !until[k]){ until[k]=Date.now()+wait; setTimeout(refreshStatus, wait+80); }
+      if(armed[k] && Date.now()>until[k]) armed[k]=false;
+      if(!armed[k]){ el.hidden=true; return; }
+      el.hidden=false; el.innerHTML=html; el.classList.remove('warn');
+    });
+  }
   function refreshStatus(){
+    trackSwitches();
     var masterOn = (typeof isMasterNotifyOn==='function' && isMasterNotifyOn()) || (typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled());   // Reminders switch or Checks switch
     if(!masterOn || typeof Notification==='undefined' || Notification.permission!=='granted'){ setStatus(''); return; }
     // Computers: reminders come from the open app or tab (it can sit in the background); there is no background push.
@@ -13639,9 +13666,8 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
       else setStatus('Alerts while the app is closed are not supported in this browser.', true);
       return;
     }
-    if(ayuPush.active) setStatus('Online: alerts also arrive when the app is closed. Offline: keep the app open.', false,
-      '<b>Online:</b> ✓ alerts also arrive when the app is closed.<br><b>Offline:</b> alerts come only from the open app, so keep it open. This can’t be guaranteed: your phone may pause it.'
-      + (/Android/i.test(navigator.userAgent||'') ? '<br><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).' : (isIOS() ? '<br><b>iPhone:</b> open the app from its Home Screen icon.' : '')));
+    if(ayuPush.active) timedNote('<span class="ps-l"><b>Online:</b> alerts also arrive when the app is closed.</span><span class="ps-l"><b>Offline:</b> alerts come only from the open app, so keep it open. This can’t be guaranteed: your phone may pause it.</span>'
+      + (/Android/i.test(navigator.userAgent||'') ? '<span class="ps-l"><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</span>' : (isIOS() ? '<span class="ps-l"><b>iPhone:</b> open the app from its Home Screen icon.</span>' : '')));
     else if(ayuPush.needInstall && !isStandalone()) setStatus('');   // said in the install note under the switch
     else if(ayuPush.error) setStatus('Alerts while the app is closed could not be set up yet. The app will keep trying.', true);
     else setStatus('Setting up alerts for when the app is closed…');
