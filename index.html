@@ -3867,28 +3867,26 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         <span class="lab-sex" role="radiogroup" aria-label="Normal ranges for"><label><input type="radio" name="lab-sex" value="male" checked onchange="renderLabResults()"><span>Adult men</span></label><label><input type="radio" name="lab-sex" value="female" onchange="renderLabResults()"><span>Adult women</span></label></span>
       </div>
 
-      <div class="lab-mode" role="tablist" aria-label="Add lab values by"><button type="button" role="tab" id="lab-mode-upload" class="on" aria-selected="true" onclick="labSetMode('upload')">Upload</button><button type="button" role="tab" id="lab-mode-manual" aria-selected="false" onclick="labSetMode('manual')">Manual</button></div>
-
-      <div id="lab-pane-upload">
-      <div class="lab-upload-row">
-        <label class="refresh-btn lab-upload-btn" for="lab-pdf-input">📄 Upload Report (PDF)</label>
+      <div class="lab-actions-row">
+        <label class="refresh-btn lab-upload-btn" for="lab-pdf-input">Upload Report (PDF)</label>
         <input type="file" id="lab-pdf-input" accept="application/pdf" style="display:none">
         <a id="lab-file-link" class="lab-file-link" href="#" target="_blank" rel="noopener" style="display:none" title="Open report" aria-label="Open uploaded report in a new tab"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/><text x="12" y="18.2" text-anchor="middle" font-size="5.6" font-weight="700" fill="#fff" font-family="Arial, sans-serif">PDF</text></svg></a>
-        <span id="lab-upload-status" class="lab-upload-status"></span>
+        <button type="button" class="refresh-btn lab-upload-btn lab-manual-btn" id="lab-manual-btn" onclick="labOpenManual()">Manual</button>
       </div>
-      </div>
+      <div id="lab-upload-status" class="lab-upload-status" aria-live="polite"></div>
 
       <div id="lab-pane-manual" style="display:none">
       <div class="lab-manual-row">
         <select id="lab-test-select" class="lab-select" aria-label="Select a test"></select>
         <input type="number" id="lab-test-value" class="lab-value-input" placeholder="Value" step="any">
-        <button type="button" id="lab-add-btn" class="lab-add-icon-btn" title="Add">+</button>
       </div>
       <div id="lab-selected-range" class="lab-card-range" style="margin-top:8px" aria-live="polite"></div>
+      <div id="lab-form-msg" class="lab-form-msg" aria-live="polite"></div>
+      <div class="lab-form-actions"><button type="button" class="lab-form-save" id="lab-save-btn" onclick="labManualSave()">Save</button><button type="button" class="lab-form-close" id="lab-close-btn" onclick="labCloseManual()">Close</button></div>
       </div>
 
       <div id="lab-results" class="lab-results"></div>
-      <div class="page-reset-row" style="margin:14px 0 0"><button type="button" class="bf-reset-btn vit-sq" id="lab-reset-btn" title="Reset Lab Insights" aria-label="Reset Lab Insights" onclick="resetLabToDefault()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button></div>
+      <div class="page-reset-row lab-bottom-row" style="margin:14px 0 0"><button type="button" class="refresh-btn lab-upload-btn" id="lab-download-btn" onclick="downloadLabPDF()">Download PDF</button><button type="button" class="bf-reset-btn vit-sq" id="lab-reset-btn" title="Reset Lab Insights" aria-label="Reset Lab Insights" onclick="resetLabToDefault()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button></div>
     </div>
 
     <!-- TRACKER — log readings over time; one collapsed section per reading type -->
@@ -5341,28 +5339,64 @@ function labGroupHtml(g){
     items.push({key:ref.id,kind:st==='ok'?'ok':'bad',ref,rg,val:r.value,st});
   });
   g.other.forEach((o,i)=>items.push({key:g.id+'|other:'+i,kind:'na',o}));
-  if(!items.length) return '';
+  if(!items.length && g.id!=='m') return '';
   const order={bad:0,ok:1,na:2};
   items.sort((a,b)=>order[a.kind]-order[b.kind]);
+  const foot=g.id!=='m'?'':(labManualOpen?'<div id="lab-form-slot" class="lab-form-slot"></div>':(g.rows.length?'<div class="lab-plus-row"><button type="button" class="lab-plus" onclick="labOpenManual()" aria-label="Add another manual value" title="Add another">+</button><span id="lab-plus-note" class="lab-plus-note"></span></div>':''));
   const link=g.url?`<a class="lab-grp-link" href="${labEsc(g.url)}" target="_blank" rel="noopener" title="Open ${labEsc(g.title)}" aria-label="Open ${labEsc(g.title)} in a new tab"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg></a>`:'';
-  return `<div class="lab-grp"><div class="lab-grp-hdr"><span class="lab-grp-name">${g.url?'Upload: ':''}${labEsc(g.title)}</span>${link}</div>${items.map(labSectionHtml).join('')}</div>`;
+  return `<div class="lab-grp"><div class="lab-grp-hdr"><span class="lab-grp-name">${g.url?'Upload: ':''}${labEsc(g.title)}</span>${link}</div>${items.map(labSectionHtml).join('')}${foot}</div>`;
 }
 function renderLabResults(){
   const wrap=document.getElementById('lab-results');
   if(!wrap) return;
   const groups=labFiles.map((f,i)=>({id:f.id,title:f.name,url:f.url,rows:f.rows,other:f.other,seq:i+1}));
-  if(labRows.length) groups.push({id:'m',title:'Manual',url:'',rows:labRows,other:[],seq:labManualSeq||9999});
+  if(labRows.length||labManualOpen) groups.push({id:'m',title:'Manual',url:'',rows:labRows,other:[],seq:labManualSeq||9999});
   groups.sort((a,b)=>(a.id==='m'?a.seq:+a.id.slice(1))-(b.id==='m'?b.seq:+b.id.slice(1)));
+  labParkForm();
   wrap.innerHTML=groups.map(labGroupHtml).join('');
+  if(labManualOpen){
+    const slot=document.getElementById('lab-form-slot'), pane=document.getElementById('lab-pane-manual');
+    if(slot&&pane){ slot.appendChild(pane); pane.style.display=''; }
+  }
 }
-function labSetMode(m){
-  const up=m!=='manual';
-  const pu=document.getElementById('lab-pane-upload'), pm=document.getElementById('lab-pane-manual');
-  if(pu) pu.style.display=up?'':'none'; if(pm) pm.style.display=up?'none':'';
-  const bu=document.getElementById('lab-mode-upload'), bm=document.getElementById('lab-mode-manual');
-  if(bu){ bu.classList.toggle('on',up); bu.setAttribute('aria-selected',up?'true':'false'); }
-  if(bm){ bm.classList.toggle('on',!up); bm.setAttribute('aria-selected',up?'false':'true'); }
+// The Manual form lives at the end of the Manual section while it is open, and is parked out of the way otherwise.
+let labManualOpen=false;
+function labParkForm(){
+  const pane=document.getElementById('lab-pane-manual'), wrap=document.getElementById('lab-results');
+  if(!pane||!wrap) return;
+  if(pane.parentNode!==wrap.parentNode) wrap.parentNode.insertBefore(pane,wrap);
+  pane.style.display='none';
 }
+function labSay(msg){ const el=document.getElementById('lab-upload-status'); if(el) el.textContent=msg||''; }
+function labOpenManual(){
+  labManualOpen=true; if(!labManualSeq) labManualSeq=++labFileSeq;
+  const m=document.getElementById('lab-form-msg'); if(m) m.textContent='';
+  renderLabResults();
+  const slot=document.getElementById('lab-form-slot'), sel=document.getElementById('lab-test-select');
+  if(slot) slot.scrollIntoView({block:'nearest',behavior:'smooth'});
+  if(sel) try{ sel.focus({preventScroll:true}); }catch(e){}
+}
+function labCloseManual(){
+  labManualOpen=false;
+  const v=document.getElementById('lab-test-value'); if(v) v.value='';
+  if(window.labSelectShowPlaceholder) window.labSelectShowPlaceholder();
+  if(!labRows.length) labManualSeq=0;      // an empty Manual section goes away with its form
+  renderLabResults();
+}
+function labManualSave(){
+  const sel=document.getElementById('lab-test-select'), v=document.getElementById('lab-test-value'), msg=document.getElementById('lab-form-msg');
+  const val=parseFloat(v.value);
+  if(!sel.value||isNaN(val)){ if(msg) msg.textContent=!sel.value?'Choose a test first.':'Enter a value.'; return; }
+  const ref=LAB_REF.find(r=>r.id===sel.value), existed=labRows.some(r=>r.refId===sel.value);
+  addLabRow(sel.value,val);
+  labManualOpen=false; v.value='';
+  if(window.labSelectShowPlaceholder) window.labSelectShowPlaceholder();
+  renderLabResults();
+  const said=(existed?'Updated ':'Saved ')+(ref?ref.name+': ':'')+val+(ref?' '+ref.unit:'');
+  labSay('\u2713 '+said);
+  const note=document.getElementById('lab-plus-note'); if(note){ note.textContent='\u2713 '+said; setTimeout(()=>{ const n=document.getElementById('lab-plus-note'); if(n) n.textContent=''; },4000); }
+}
+document.getElementById('lab-test-value')?.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); labManualSave(); } });
 function saveLabEdit(id){
   const inp=document.querySelector('#lab-results .lab-edit-input');
   const v=parseFloat(inp&&inp.value);
@@ -5396,16 +5430,6 @@ document.getElementById('lab-results')?.addEventListener('toggle',e=>{
   const k=d.getAttribute('data-key');
   if(d.open) labOpen.add(k); else labOpen.delete(k);
 },true);
-
-document.getElementById('lab-add-btn')?.addEventListener('click',()=>{
-  const sel=document.getElementById('lab-test-select');
-  const valInp=document.getElementById('lab-test-value');
-  const val=parseFloat(valInp.value);
-  if(isNaN(val) || !sel.value) return;     // needs a test to be chosen first
-  addLabRow(sel.value, val);
-  valInp.value='';
-  if(window.labSelectShowPlaceholder) window.labSelectShowPlaceholder();   // back to "Test name" for the next entry
-});
 
 // The uploaded report, shown as a PDF icon beside the Upload button that
 // opens the file itself in a new tab. Kept only in this browser tab.
@@ -5454,15 +5478,86 @@ function scrollLabInsightsToTop(){
     }catch(err){}
   });
 }
+function downloadLabPDF(){
+  const groups=[];
+  labFiles.forEach(g=>groups.push({title:'Upload: '+g.name,rows:g.rows,other:g.other}));
+  if(labRows.length) groups.push({title:'Manual',rows:labRows,other:[],seq:labManualSeq||9999});
+  if(!groups.length){ alert('Add a report or a value first.'); return; }
+  if(!window.jspdf){ alert('The PDF tool could not be loaded. Please check your internet connection and try again.'); return; }
+  const doc=new window.jspdf.jsPDF({unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=40;
+  let y=M;
+  const INK=[30,41,59], GREEN=[21,128,61], RED=[185,28,28], GREY=[100,116,139], TEAL=[14,116,144];
+  const clean=t=>{ const d=document.createElement('div'); d.innerHTML=String(t==null?'':t); return (d.textContent||'').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018\u2019\u201C\u201D\u2022]/g,'').replace(/\s+/g,' ').trim(); };
+  const write=(txt,size,style,color,gap,indent)=>{
+    doc.setFont('helvetica',style||'normal'); doc.setFontSize(size); doc.setTextColor(color[0],color[1],color[2]);
+    const ind=indent||0, lines=doc.splitTextToSize(clean(txt),W-2*M-ind), h=lines.length*size*1.3;
+    if(y+h>H-M){ doc.addPage(); y=M; }
+    doc.text(lines,M+ind,y+size); y+=h+(gap||0);
+  };
+  write('Lab Insights',20,'bold',TEAL,2);
+  const d=new Date(), pad=n=>String(n).padStart(2,'0');
+  write('Generated on '+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' | Reference ranges: adult '+(labSex()==='female'?'women':'men'),9,'normal',GREY,2);
+  write('Educational information only - not a diagnosis or medical advice. Ranges are general adult reference ranges and may differ from your lab\'s; please review your results with a doctor.',8,'normal',GREY,10);
+  groups.forEach(g=>{
+    const items=[];
+    g.rows.forEach(r=>{ const ref=LAB_REF.find(x=>x.id===r.refId); if(!ref) return; const rg=labRange(ref); const st=r.value<rg.low?'low':r.value>rg.high?'high':'ok'; items.push({kind:st==='ok'?'ok':'bad',ref,rg,val:r.value,st}); });
+    g.other.forEach(o=>items.push({kind:'na',o}));
+    const order={bad:0,ok:1,na:2}; items.sort((a,b)=>order[a.kind]-order[b.kind]);
+    if(y+60>H-M){ doc.addPage(); y=M; }
+    doc.setDrawColor(190,220,228); doc.line(M,y,W-M,y); y+=8;
+    write(g.title,13,'bold',TEAL,6);
+    items.forEach(it=>{
+      if(y+70>H-M){ doc.addPage(); y=M; }
+      if(it.kind==='na'){
+        const o=it.o;
+        write(o.name+' - Not analysed',11,'bold',GREY,2,6);
+        write('Your value: '+o.valueText+' '+o.unit+(o.refRange?'   Range on your report: '+o.refRange+' '+o.unit:''),9.5,'normal',INK,2,6);
+        write('Lab Insights could not analyse this test automatically. Compare it with the range printed on your report and check with your doctor.',9,'normal',GREY,8,6);
+        return;
+      }
+      const ref=it.ref, label=it.st==='low'?'Low':it.st==='high'?'High':'Normal', col=it.st==='ok'?GREEN:RED;
+      const rangeTxt=fmtLabRange(it.rg,ref.unit);
+      write(ref.name+' - '+label,11,'bold',col,2,6);
+      write('Your value: '+it.val+' '+ref.unit+'   Normal: '+rangeTxt,9.5,'normal',INK,2,6);
+      write('Related to: '+ref.system,9,'normal',GREY,2,6);
+      if(it.st==='ok'){
+        write('Within the normal range - nothing to do except keep up your healthy habits. '+(ref.note||''),9,'normal',INK,8,6);
+      }else{
+        const list=((it.st==='low'?ref.remediesLow:ref.remediesHigh)||ref.remedies||[]);
+        const note=(it.st==='high'&&ref.noteHigh)||(it.st==='low'&&ref.noteLow)||ref.note||'';
+        if(list.length){ write('Precautions',9,'bold',INK,1,6); list.forEach((x,i)=>write((i+1)+'. '+x,9,'normal',INK,1,14)); }
+        write(note,9,'normal',INK,8,6);
+      }
+    });
+    y+=4;
+  });
+  const n=doc.internal.getNumberOfPages();
+  for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(GREY[0],GREY[1],GREY[2]); doc.text('Page '+i+' of '+n,W-M,H-18,{align:'right'}); }
+  doc.save('lab-insights-'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'.pdf');
+}
+function labDiff(oldRows,newRows,oldOther,newOther){
+  const om=new Map(oldRows.map(r=>[r.refId,r.value])), nm=new Map(newRows.map(r=>[r.refId,r.value]));
+  let ch=0,ad=0,rm=0;
+  nm.forEach((v,k)=>{ if(!om.has(k)) ad++; else if(om.get(k)!==v) ch++; });
+  om.forEach((v,k)=>{ if(!nm.has(k)) rm++; });
+  const key=o=>[o.name,o.valueText,o.unit].join('|'), os=new Set(oldOther.map(key)), ns=new Set(newOther.map(key));
+  ns.forEach(k=>{ if(!os.has(k)) ad++; }); os.forEach(k=>{ if(!ns.has(k)) rm++; });
+  return {ch,ad,rm};
+}
 document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>{
   const file=e.target.files[0];
   const statusEl=document.getElementById('lab-upload-status');
   if(!file) return;
   const generation=++labUploadGeneration;
   e.target.value=''; // Allow selecting the same file again.
-  const grp={id:'f'+(++labFileSeq),name:file.name,rows:[],other:[],url:URL.createObjectURL(file),dead:false};
-  labFiles.push(grp);
-  const dropGrp=()=>{ labFiles=labFiles.filter(x=>x!==grp); try{ URL.revokeObjectURL(grp.url); }catch(e){} renderLabResults(); };
+  const existing=labFiles.find(x=>x.name===file.name);   // the same file again updates its own section
+  const newUrl=URL.createObjectURL(file);
+  const grp=existing||{id:'f'+(++labFileSeq),name:file.name,rows:[],other:[],url:newUrl,dead:false};
+  const job={}; grp.job=job;
+  const stale=()=>grp.dead||grp.job!==job;
+  if(!existing) labFiles.push(grp);
+  const dropGrp=()=>{ if(existing){ try{ URL.revokeObjectURL(newUrl); }catch(e){} return; } labFiles=labFiles.filter(x=>x!==grp); try{ URL.revokeObjectURL(grp.url); }catch(e){} renderLabResults(); };
   statusEl.textContent='Reading PDF…';
   scrollLabInsightsToTop();
   try{
@@ -5473,7 +5568,7 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
     }
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     const buf=await file.arrayBuffer();
-    if(grp.dead) return;
+    if(stale()) return;
     let pdf;
     try{
       // Pass a fresh typed array to PDF.js; worker transfer can detach the input buffer.
@@ -5483,7 +5578,7 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
       console.warn('PDF.js worker read failed; retrying without worker:', firstPdfError);
       pdf=await pdfjsLib.getDocument({data:new Uint8Array(buf), disableWorker:true, isEvalSupported:false}).promise;
     }
-    if(grp.dead) return;
+    if(stale()) return;
     let text='';
     const ocrPdfPage=async(page)=>{
       if(typeof Tesseract==='undefined') return '';
@@ -5497,7 +5592,7 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
     };
     for(let i=1;i<=pdf.numPages;i++){
       const page=await pdf.getPage(i);
-      if(grp.dead) return;
+      if(stale()) return;
       let content=null;
       try{
         // Some tagged PDFs have malformed marked-content metadata. Try the
@@ -5538,13 +5633,27 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
         await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
         const result=await Tesseract.recognize(canvas,'eng');
         text+='\n'+(result.data?.text||'');
-        if(grp.dead) return;
+        if(stale()) return;
       }
     }
     const extracted=labExtractFromText(text);
     const seen=new Map(); extracted.rows.forEach(r=>seen.set(r.refId,r.value));
-    grp.rows=[...seen].map(([refId,value])=>({refId,value}));
-    grp.other=extracted.other||[];
+    const newRows=[...seen].map(([refId,value])=>({refId,value})), newOther=extracted.other||[];
+    if(existing){
+      if(!newRows.length && !newOther.length){
+        try{ URL.revokeObjectURL(newUrl); }catch(e){}
+        statusEl.textContent='No test values found in the new copy of '+grp.name+' \u2014 the existing results were kept.';
+        renderLabResults(); scrollLabInsightsToTop(); return;
+      }
+      const d=labDiff(grp.rows,newRows,grp.other,newOther);
+      grp.rows=newRows; grp.other=newOther;
+      try{ URL.revokeObjectURL(grp.url); }catch(e){} grp.url=newUrl;
+      renderLabResults();
+      const parts=[]; if(d.ch) parts.push(d.ch+' changed'); if(d.ad) parts.push(d.ad+' added'); if(d.rm) parts.push(d.rm+' removed');
+      statusEl.textContent=parts.length ? '\u2713 Updated '+grp.name+': '+parts.join(', ') : '\u2713 No changes \u2014 '+grp.name+' is already up to date.';
+      scrollLabInsightsToTop(); return;
+    }
+    grp.rows=newRows; grp.other=newOther;
     if(!grp.rows.length && !grp.other.length) labFiles=labFiles.filter(x=>x!==grp);
     renderLabResults();
     const totalTests=extracted.rows.length+extracted.other.length;
@@ -5552,7 +5661,7 @@ document.getElementById('lab-pdf-input')?.addEventListener('change', async (e)=>
       ? `${totalTests} test${totalTests===1?'':'s'} found`
       : 'Couldn’t identify test values automatically. Scanned PDFs are supported when OCR is available; otherwise use Manual to add values.';
   }catch(err){
-    if(grp.dead) return;
+    if(stale()) return;
     console.error('Lab PDF extraction failed:',err);
     dropGrp(); statusEl.textContent='Couldn\'t read that PDF ('+(err?.message||'unsupported or damaged file')+'). Please try again or use Manual to add values.';
   }
@@ -5591,7 +5700,7 @@ function resetLabToDefault(){
   ++labUploadGeneration; // Ignore any report still being read.
   labFiles.forEach(x=>{ x.dead=true; try{ URL.revokeObjectURL(x.url); }catch(e){} }); labFiles=[]; labManualSeq=0;
   labRows=[]; labOther=[]; labOpen.clear(); labEditing=null;
-  if(window.labSetMode) labSetMode('upload');
+  labManualOpen=false;
   renderLabRows();
   const calcPanel=document.getElementById('calculator-panel'); if(calcPanel) calcPanel.style.minHeight='';
   const sexMale=document.querySelector('input[name="lab-sex"][value="male"]'); if(sexMale) sexMale.checked=true;
@@ -14111,6 +14220,36 @@ html body .lab-mode{display:flex;gap:26px;width:auto;max-width:none;border:0;bor
 html body .lab-mode button{min-width:0;padding:8px 2px;background:transparent;color:#64748b;border:0;border-bottom:3px solid transparent;margin-bottom:-1.5px;font-size:.95rem;border-radius:0}
 html body .lab-mode button.on{background:transparent;color:#0e7490;border-bottom-color:#0e7490}
 html body .lab-mode button:focus-visible{outline:2px solid #0e7490;outline-offset:2px;border-radius:4px}
+</style>
+<style id="lab-buttons-manual-form-20261101">
+.lab-actions-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:2px 0 0}
+.lab-actions-row .lab-upload-btn{margin:0;min-height:46px;box-sizing:border-box}
+.lab-manual-btn{border:0;cursor:pointer;font-family:inherit}
+#lab-upload-status{margin-top:8px;font-size:.8rem;font-weight:600;color:#0e7490;line-height:1.35}
+#lab-upload-status:empty{display:none}
+.lab-form-slot{margin-top:6px}
+#lab-pane-manual .lab-manual-row{margin-bottom:0}
+.lab-form-actions{display:flex;gap:8px;margin-top:12px}
+.lab-form-actions button{min-height:40px;padding:0 22px;border-radius:12px;font:inherit;font-weight:700;font-size:.9rem;cursor:pointer}
+.lab-form-save{background:#0e7490;color:#fff;border:2px solid #0e7490}
+.lab-form-close{background:#fff;color:#0e7490;border:2px solid #0e7490}
+.lab-form-msg{margin-top:6px;font-size:.78rem;font-weight:600;color:#b45309}
+.lab-form-msg:empty{display:none}
+.lab-plus-row{display:flex;align-items:center;gap:10px;margin-top:2px}
+.lab-plus{width:40px;height:40px;border-radius:50%;border:0;background:#0e7490;color:#fff;font-size:1.5rem;font-weight:700;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 0 3px}
+.lab-plus-note{font-size:.78rem;font-weight:600;color:#0e7490}
+</style>
+<style id="lab-buttons-restyle-20261101">
+html body .lab-actions-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+html body .lab-actions-row .lab-upload-btn{min-height:0 !important;height:auto !important;padding:10px 16px !important;line-height:1.2 !important;margin:0 !important;font-size:.9rem;display:inline-flex;align-items:center;justify-content:center}
+html body #calculator-panel #lab-insights-card .lab-actions-row #lab-manual-btn{background:#18a2c5 !important;background-color:#18a2c5 !important;background-image:none !important;border:0 !important;color:#fff !important}
+@media (max-width:340px){html body .lab-actions-row .lab-upload-btn{padding:10px 12px !important;font-size:.86rem}}
+html body .lab-plus{width:30px;height:30px;font-size:1.15rem;padding:0 0 2px}
+html body #lab-insights-card .lab-bottom-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:6px}
+@media (max-width:340px){html body #lab-insights-card .lab-bottom-row #lab-download-btn{padding-left:14px !important;padding-right:14px !important;font-size:.88rem}}
+html body #lab-insights-card .lab-bottom-row #lab-download-btn{grid-column:2}
+html body #lab-insights-card .lab-bottom-row #lab-reset-btn{grid-column:3;justify-self:end}
+html body #lab-insights-card .lab-bottom-row .lab-upload-btn{min-height:44px !important;height:44px;padding-top:0 !important;padding-bottom:0 !important;margin:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit}
 </style>
 </body>
 
