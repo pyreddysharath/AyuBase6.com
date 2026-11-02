@@ -4005,7 +4005,6 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         <input type="checkbox" id="alert-drink-notify" class="notify-cb" onchange="onAlertNotifyChange('drink')"><label for="alert-drink-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
       <div class="notif-blocked-hint" id="alert-drink-notif-hint" style="display:none"></div>
       <div class="notif-mock" id="alert-drink-notif-mock">
-        <button type="button" class="notif-mock-close" aria-label="Dismiss" onclick="document.getElementById('alert-drink-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8 8 4 12.5 4 16a8 8 0 0016 0c0-3.5-4-8-8-14z"/></svg></span>
         <div class="notif-mock-text"><strong>Water</strong><span>Drink a glass of water — about 200ml keeps you on track!</span></div>
       </div>
@@ -4048,7 +4047,6 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         <input type="checkbox" id="alert-walk-notify" class="notify-cb" onchange="onAlertNotifyChange('walk')"><label for="alert-walk-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
       <div class="notif-blocked-hint" id="alert-walk-notif-hint" style="display:none"></div>
       <div class="notif-mock" id="alert-walk-notif-mock">
-        <button type="button" class="notif-mock-close" aria-label="Dismiss" onclick="document.getElementById('alert-walk-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.5a2 2 0 100-4 2 2 0 000 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg></span>
         <div class="notif-mock-text"><strong>Walk</strong><span>Time for a 2–5 minute walk or stretch!</span></div>
       </div>
@@ -4091,7 +4089,6 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         <input type="checkbox" id="alert-break-notify" class="notify-cb" onchange="onAlertNotifyChange('break')"><label for="alert-break-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
       <div class="notif-blocked-hint" id="alert-break-notif-hint" style="display:none"></div>
       <div class="notif-mock" id="alert-break-notif-mock">
-        <button type="button" class="notif-mock-close" aria-label="Dismiss" onclick="document.getElementById('alert-break-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/></svg></span>
         <div class="notif-mock-text"><strong>Eyes</strong><span>Look 20 feet away for 20 seconds — 20-20-20 time!</span></div>
       </div>
@@ -4163,7 +4160,6 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
           <input type="checkbox" id="eye-ex-notify" class="notify-cb" checked onchange="onEyeExNotifyChange()"><label for="eye-ex-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
         <div class="notif-blocked-hint" id="eye-ex-notif-hint" style="display:none"></div>
         <div class="notif-mock" id="eye-ex-notif-mock">
-        <button type="button" class="notif-mock-close" aria-label="Dismiss" onclick="document.getElementById('eye-ex-notif-mock').classList.remove('show')" title="Dismiss">&times;</button>
           <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0-6a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z"/></svg></span>
           <div class="notif-mock-text"><strong>Eye Exercise</strong><span>Time for your guided eye exercise — follow the dot for 30 seconds.</span></div>
         </div>
@@ -9095,7 +9091,7 @@ function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
     +'<div class="c"><h1>'+nudgeEsc(title)+'</h1><p>'+nudgeEsc(msg)+'</p>'+nudgePopupButtons(o)
     +(withTimer?'<div class="t" id="n" title="Click to start the timer">\u25B6 '+(o.timerSecs||EYE_TIMER_SECS)+'s</div>':'')
     +(title==='Eye Exercise' && exerciseVideoSrc?'<button type="button" class="ex-toggle" id="ex-toggle" aria-expanded="false" title="Expand guided eye exercise video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span></button><video class="ex-video" id="ex-video" controls playsinline muted preload="metadata" src="'+exerciseVideoSrc.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></video>':'')+nudgePopupIcons(o)+'</div>';
-  if(title==='Eye Exercise'){const toggle=doc.getElementById('ex-toggle'), card=doc.querySelector('.c'), video=doc.getElementById('ex-video');if(toggle&&card&&video)toggle.onclick=()=>{const expanded=card.classList.toggle('expanded');toggle.setAttribute('aria-expanded',String(expanded));toggle.innerHTML=expanded?'✕ <span>Hide exercise video</span>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span>';if(expanded){try{win.resizeTo(420,520)}catch(e){};video.play().catch(()=>{});}else{video.pause();try{win.resizeTo(320,150)}catch(e){}}};}
+  if(title==='Eye Exercise'){const w0=win.innerWidth; const toggle=doc.getElementById('ex-toggle'), card=doc.querySelector('.c'), video=doc.getElementById('ex-video');if(toggle&&card&&video)toggle.onclick=()=>{const expanded=card.classList.toggle('expanded');toggle.setAttribute('aria-expanded',String(expanded));toggle.innerHTML=expanded?'✕ <span>Hide exercise video</span>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span>';if(expanded){try{win.resizeTo(420,520)}catch(e){};video.play().catch(()=>{});}else{video.pause();try{ win.resizeBy(w0-win.innerWidth,0); const dh=Math.ceil(card.getBoundingClientRect().height)-win.innerHeight; if(Math.abs(dh)>1) win.resizeBy(0,dh); }catch(e){}}};}
   nudgePopupWire(win, doc, o);
   // Fit the window to its content so no empty strip is left below the icons.
   try{ const card=doc.querySelector('.c'); const dh=Math.ceil(card.getBoundingClientRect().height)-win.innerHeight; if(Math.abs(dh)>1) win.resizeBy(0,dh); }catch(e){}
@@ -9155,6 +9151,17 @@ function openNudgeBrowserPopup(key, title, msg, timer, W, H, exerciseVideoSrc, o
     return true;
   }catch(e){ return false; }
 }
+// Lay the popup out off-screen at its real width and read its height, so the window is exactly as tall as its content.
+function nudgeMeasureH(title,msg,timer,W,hasVideo,o){
+  try{
+    const f=document.createElement('iframe');
+    f.style.cssText='position:fixed;left:-9999px;top:0;width:'+W+'px;height:900px;border:0;visibility:hidden';
+    document.body.appendChild(f);
+    const w=f.contentWindow; nudgePopupContent(w,title,msg,timer,hasVideo?'about:blank':'',Object.assign({},o));
+    const h=Math.ceil(w.document.querySelector('.c').getBoundingClientRect().height);
+    f.remove(); return h>0?h:0;
+  }catch(e){ return 0; }
+}
 function openNudgePopup(key, title, msg, o){
   o=Object.assign({}, nudgeDefaultHandlers(key), o||{}, {popKey:key});
   const timer=!!o.timer;
@@ -9163,8 +9170,9 @@ function openNudgePopup(key, title, msg, o){
   const W=Math.max(270,Math.min(360,Math.round(250+Math.min(110,textLen)*0.65)));
   const titleLines=Math.max(1,Math.ceil(titleLen*8.8/(W-36-62)));          // the title leaves room for the two icons
   const msgLines=Math.max(1,Math.ceil(msgLen*7.2/(W-36)));
-  const H=Math.max(timer?140:82, Math.min(280, 34+titleLines*21+msgLines*19+(timer?48:0)+((o.buttons&&o.buttons.length)?46:0)+36));
+  let H=Math.max(timer?140:82, Math.min(280, 34+titleLines*21+msgLines*19+(timer?48:0)+((o.buttons&&o.buttons.length)?46:0)+36));
   const exerciseVideoSrc=key==='eyeex'?(document.getElementById('eye-ex-video')?.currentSrc||document.getElementById('eye-ex-video')?.src||''):'';
+  { const mh=nudgeMeasureH(title,msg,timer,W,!!exerciseVideoSrc && !!(window.documentPictureInPicture && !window.documentPictureInPicture.window && navigator.userActivation && navigator.userActivation.isActive),o); if(mh>0) H=mh; }   // exact height of the real content
   const onFail=o.onFail||(()=>nudgeNativeFallback(key,title,msg));
   try{
     // Picture-in-Picture style window: no address bar, but the browser only allows
@@ -9857,7 +9865,7 @@ function onEyeExNotifyChange(){
 }
 function previewEyeExNotification(){
   if(!eyeExState.muted) playAlertPreset(eyeExState.sound);
-  if(openNudgePopup('eyeex', 'Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {timer:true,timerSecs:30})) return;
+  if(openNudgePopup('eyeex', 'Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {})) return;
   if(typeof Notification!=='undefined' && Notification.permission==='granted'){
     if(showNudgeNotification('Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {key:'eyeex'})) return;
   }
@@ -9868,7 +9876,7 @@ function fireEyeExAlert(){
   if(!eyeExState.muted) playAlertPreset(eyeExState.sound);
   let shown=false;
   if(eyeExState.notify && typeof Notification!=='undefined' && Notification.permission==='granted'){
-    shown=(!NUDGE_IS_PHONE && openNudgePopup('eyeex', 'Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {timer:true,timerSecs:30}))
+    shown=(!NUDGE_IS_PHONE && openNudgePopup('eyeex', 'Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {}))
       || showNudgeNotification('Eye Exercise', 'Time for your guided eye exercise — follow the dot for 30 seconds.', {key:'eyeex', actions:nudgeDisableActions()});
   }
   if(!shown){
