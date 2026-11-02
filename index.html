@@ -3942,7 +3942,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       <div id="tracker-list"></div>
 
       <div class="trk-actions" id="tracker-actions" style="display:none">
-        <button type="button" class="refresh-btn lab-upload-btn" onclick="downloadTrackerPDF()">⬇ Download PDF</button>
+        <button type="button" class="refresh-btn lab-upload-btn" onclick="downloadTrackerPDF()">Download PDF</button>
         <button type="button" class="bf-reset-btn vit-sq" id="tracker-reset-btn" title="Reset Tracker" aria-label="Reset Tracker" onclick="resetTracker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
       </div>
     </div>
@@ -14245,11 +14245,31 @@ html body .lab-actions-row .lab-upload-btn{min-height:0 !important;height:auto !
 html body #calculator-panel #lab-insights-card .lab-actions-row #lab-manual-btn{background:#18a2c5 !important;background-color:#18a2c5 !important;background-image:none !important;border:0 !important;color:#fff !important}
 @media (max-width:340px){html body .lab-actions-row .lab-upload-btn{padding:10px 12px !important;font-size:.86rem}}
 html body .lab-plus{width:30px;height:30px;font-size:1.15rem;padding:0 0 2px}
-html body #lab-insights-card .lab-bottom-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:6px}
-@media (max-width:340px){html body #lab-insights-card .lab-bottom-row #lab-download-btn{padding-left:14px !important;padding-right:14px !important;font-size:.88rem}}
-html body #lab-insights-card .lab-bottom-row #lab-download-btn{grid-column:2}
-html body #lab-insights-card .lab-bottom-row #lab-reset-btn{grid-column:3;justify-self:end}
+html body #lab-insights-card .lab-bottom-row{display:flex;align-items:center;justify-content:center;gap:10px}
 html body #lab-insights-card .lab-bottom-row .lab-upload-btn{min-height:44px !important;height:44px;padding-top:0 !important;padding-bottom:0 !important;margin:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit}
+</style>
+<style id="compact-action-buttons-20261101">
+/* One compact height for every action button; the reset squares match it. */
+html body #body-start-btn,
+html body #body-download-btn,
+html body #food-download-btn,
+html body #lab-download-btn,
+html body #calculator-panel #tracker-actions .refresh-btn,
+html body #lab-insights-card .lab-bottom-row #lab-download-btn,
+html body #lab-insights-card .lab-actions-row .lab-upload-btn{
+  height:38px !important;min-height:0 !important;padding:0 18px !important;font-size:.9rem !important;line-height:1 !important;
+  display:inline-flex !important;align-items:center !important;justify-content:center !important;box-sizing:border-box !important;margin-top:0 !important;margin-bottom:0 !important}
+html body .bf-reset-btn,
+html body #body-reset-btn,html body #food-reset-btn,html body #tracker-reset-btn,html body #lab-reset-btn{
+  width:38px !important;height:38px !important;min-height:38px !important;padding:0 !important;box-sizing:border-box !important}
+html body .bf-reset-btn svg{width:17px;height:17px}
+html body #calculator-panel .trk-actions{align-items:center}
+</style>
+<style id="lab-actions-one-row-20261101">
+/* Upload Report (PDF) and Manual always share one row. */
+html body #lab-insights-card .lab-actions-row{flex-wrap:nowrap !important;gap:8px}
+html body #lab-insights-card .lab-actions-row .lab-upload-btn{padding:0 14px !important;white-space:nowrap;flex:0 1 auto;min-width:0;font-size:.88rem !important}
+@media (max-width:350px){html body #lab-insights-card .lab-actions-row{gap:6px}html body #lab-insights-card .lab-actions-row .lab-upload-btn{padding:0 10px !important;font-size:.82rem !important}}
 </style>
 </body>
 
