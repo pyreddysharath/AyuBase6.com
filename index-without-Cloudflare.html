@@ -13742,7 +13742,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   // Groups whose data changed since they were last saved to a file (a never-saved group counts only when it holds real entries, i.e. vitals).
   function changedGroups(){
     var m=stored();
-    return GROUPS.filter(function(g){ return m[g.id] ? fp(g)!==m[g.id] : (g.id==='vitals' && hasVitals()); }).map(function(g){ return g.id; });
+    return GROUPS.filter(function(g){ return m[g.id] ? fp(g)!==m[g.id] : true; }).map(function(g){ return g.id; });   // never-saved sections always count
   }
   function refreshDot(){ var c=changedGroups(), tab=document.getElementById('tab-backup'); if(tab) tab.classList.toggle('needs-backup',c.length>0); return c; }
   function showSectionNote(){
