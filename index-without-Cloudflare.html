@@ -8773,8 +8773,8 @@ function drawNudgeLotus(ctx, cx, cy, scale, fill, alpha){
 }
 const _nudgeArt={};
 const NUDGE_THEMES={
-  reminders:{g0:'#f0fdfa',g1:'#ccfbf1',gi:'#99f6e4',big:'#5eead4',deep:'#0d9488'},
-  routines:{g0:'#fffbeb',g1:'#fde68a',gi:'#fcd34d',big:'#fbbf24',deep:'#d97706'}
+  reminders:{g0:'#f0fdfa',g1:'#ccfbf1',gi:'#99f6e4',big:'#5eead4',deep:'#0d9488',ic0:'#12998c',ic1:'#08766e'},
+  routines:{g0:'#fffbeb',g1:'#fde68a',gi:'#fcd34d',big:'#fbbf24',deep:'#d97706',ic0:'#cc7f1e',ic1:'#b06812'}
 };
 function nudgeArt(kind,theme){
   const T=NUDGE_THEMES[theme]||NUDGE_THEMES.reminders, ck=kind+':'+(theme||'reminders');
@@ -8795,9 +8795,9 @@ function nudgeArt(kind,theme){
     }else{
       c.width=192; c.height=192;
       const g=x.createLinearGradient(0,0,192,192);
-      g.addColorStop(0,T.g0); g.addColorStop(1,T.gi);
+      g.addColorStop(0,T.ic0); g.addColorStop(1,T.ic1);   // solid section colour (Reminders teal, Checks amber) with a white lotus
       x.fillStyle=g; x.fillRect(0,0,192,192);
-      drawNudgeLotus(x, 96, 142, 3.7, T.deep, .95);
+      drawNudgeLotus(x, 96, 142, 3.7, '#ffffff', .96);
     }
     url=c.toDataURL('image/png');
   }catch(e){ url=undefined; }
