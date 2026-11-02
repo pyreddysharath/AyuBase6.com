@@ -8363,6 +8363,9 @@ const RECIPES_DATA = [
   <div class="footer-tabs-row" id="footer-tabs-row">
     <div class="footer-copyright"><strong class="footer-copyright-strong">© <span id="footer-year"></span> AyuBase6.com</strong></div>
     <div class="footer-tabs-icons">
+      <div class="footer-tab-btn" id="tab-backup" title="Backup &amp; restore" onclick="showFooterSection('backup')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
+      </div>
       <div class="footer-tab-btn" id="tab-disclaimer" title="Disclaimer" onclick="showFooterSection('disclaimer')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 15a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4zm-1-8h2v6h-2z"/></svg>
       </div>
@@ -8373,10 +8376,7 @@ const RECIPES_DATA = [
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 10V8a6 6 0 1112 0v2h1a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V11a1 1 0 011-1h1zm2 0h8V8a4 4 0 00-8 0v2z"/></svg>
       </div>
       <div class="footer-tab-btn" id="tab-cookies" title="Cookies" onclick="showFooterSection('cookies')">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 000 20 3 3 0 003-3 2 2 0 012-2 3 3 0 003-3A10 10 0 0012 2zM7 10a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3 6a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm4-8a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
-      </div>
-      <div class="footer-tab-btn" id="tab-backup" title="Backup &amp; restore" onclick="showFooterSection('backup')">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.95 10.99c-1.79-.03-3.7-1.95-2.99-4.59-3.2 1.3-5.5-1.73-4.07-4.11C8.35 1.55 2 6.24 2 12c0 5.52 4.48 10 10 10 6.22 0 10.4-5.29 9.95-11.01zM8.5 15c-.83 0-1.5-.67-1.5-1.5S7.67 12 8.5 12s1.5.67 1.5 1.5S9.33 15 8.5 15zm2-5c-.83 0-1.5-.67-1.5-1.5S9.67 7 10.5 7s1.5.67 1.5 1.5S11.33 10 10.5 10zm4.5 7c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
       </div>
       <div class="footer-tab-btn" id="tab-othersites" title="Our Other Sites" onclick="showFooterSection('othersites')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
@@ -12738,6 +12738,14 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   }
   let customReminderCounter=0;
   function stopReminderTimers(item){if(item._reminderTimer)clearInterval(item._reminderTimer);if(item._reminderTimeout)clearTimeout(item._reminderTimeout);(item._reminderTimeouts||[]).forEach(clearTimeout);(item._reminderTimers||[]).forEach(clearInterval)}
+  function daysLabel(days){
+    if(!Array.isArray(days)||days.length===0||days.length===7)return '';
+    const s=[...days].sort((a,b)=>a-b).join(',');
+    if(s==='1,2,3,4,5')return ' · Weekdays';
+    if(s==='0,6')return ' · Weekends';
+    const N=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    return ' · '+[1,2,3,4,5,6,0].filter(d=>days.includes(d)).map(d=>N[d]).join(', ');
+  }
   function formatClock(v){const [hh,mm]=v.split(':').map(Number);return (hh%12||12)+':'+String(mm).padStart(2,'0')+' '+(hh>=12?'PM':'AM')}
   window.addCustomReminderForm=function(editItem){
     const list=document.getElementById('custom-reminders-list'); if(!list)return;
@@ -12745,15 +12753,27 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     const existing=editItem||null; if(existing)stopReminderTimers(existing);
     const saved=existing?JSON.parse(existing.dataset.reminder||'{}'):{};
     const form=document.createElement('form');form.className='custom-reminder-form';
-    form.innerHTML='<label class="wide">Reminder name<input name="name" required maxlength="80" placeholder="e.g. Take a stretch break"></label>'+ 
+    form.innerHTML='<label class="wide">Reminder name<input name="name" required maxlength="80" placeholder="e.g. Medicines, school pickup"></label>'+ 
       '<label class="wide">Frequency<select name="frequency-mode"><option value="regular">At regular times</option><option value="selected">At selected times</option></select></label>'+ 
       '<div class="wide reminder-frequency-fields"></div>'+ 
+      '<div class="wide repeat-on"><div class="repeat-on-title">Repeat on</div><div class="day-chips" role="group" aria-label="Repeat on"></div><div class="day-quick"><button type="button" data-q="all">Every day</button><button type="button" data-q="week">Weekdays</button></div></div>'+
       '<label>Notification sound<select name="sound"><option value="chime">Chime</option><option value="drop">Water drop</option><option value="drum">Drum</option><option value="none">Silent</option></select></label>'+ 
       '<div class="wide reminder-form-actions"><button class="save-reminder" type="submit">Save reminder</button><button class="cancel-reminder" type="button">Cancel</button></div>';
     const mode=form.querySelector('[name="frequency-mode"]'), fields=form.querySelector('.reminder-frequency-fields');
     form.elements.name.value=saved.name||''; form.elements.sound.value=saved.sound||'chime'; mode.value=saved.mode||'regular';
     let chosenTimes=(saved.times||[]).slice(); if(!chosenTimes.length)chosenTimes=['09:00'];
     let duration=Number(saved.duration)||15;
+    // Days of the week this reminder repeats on (0 = Sunday ... 6 = Saturday); every day unless the person changes it.
+    let days=Array.isArray(saved.days)&&saved.days.length?saved.days.filter(n=>n>=0&&n<=6):[0,1,2,3,4,5,6]; if(!days.length)days=[0,1,2,3,4,5,6];
+    const DAY_ORDER=[1,2,3,4,5,6,0], DAY_LETTER={1:'M',2:'T',3:'W',4:'T',5:'F',6:'S',0:'S'}, DAY_FULL={1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday',6:'Saturday',0:'Sunday'};
+    const chipBox=form.querySelector('.day-chips');
+    function drawDays(){
+      chipBox.innerHTML='';
+      DAY_ORDER.forEach(d=>{const b=document.createElement('button');b.type='button';b.className='day-chip';b.textContent=DAY_LETTER[d];b.setAttribute('aria-label',DAY_FULL[d]);b.setAttribute('aria-pressed',String(days.includes(d)));
+        b.addEventListener('click',()=>{if(days.includes(d)){if(days.length>1)days=days.filter(x=>x!==d)}else days=[...days,d];drawDays()});chipBox.append(b)});
+    }
+    drawDays();
+    form.querySelectorAll('.day-quick button').forEach(b=>b.addEventListener('click',()=>{days=b.dataset.q==='week'?[1,2,3,4,5]:[0,1,2,3,4,5,6];drawDays()}));
     function renderFrequency(){
       if(mode.value==='regular'){
         fields.innerHTML='<label>Time <button type="button" class="duration-clock-trigger" aria-haspopup="dialog"></button></label>';
@@ -12772,9 +12792,9 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     form.addEventListener('submit',function(e){
       e.preventDefault();const d=new FormData(form);const item=existing||document.createElement('div');if(!existing){item.className='custom-reminder-item';item.dataset.reminderId=String(++customReminderCounter)}
       stopReminderTimers(item);
-      const data={name:String(d.get('name')).trim(),mode:mode.value,duration:duration,times:mode.value==='selected'?[...new Set(chosenTimes)].sort():[],sound:d.get('sound')};
+      const data={name:String(d.get('name')).trim(),mode:mode.value,duration:duration,times:mode.value==='selected'?[...new Set(chosenTimes)].sort():[],sound:d.get('sound'),days:[...days].sort((a,b)=>a-b)};
       item.dataset.reminder=JSON.stringify(data);
-      item.innerHTML='';const info=document.createElement('div');const strong=document.createElement('strong');strong.textContent=data.name;const detail=document.createElement('div');detail.style.fontSize='12px';detail.style.opacity='.8';detail.textContent=(data.mode==='regular'?'Every '+durationLabel(data.duration):'At '+data.times.map(formatClock).join(', '))+' · Sound: '+data.sound;info.append(strong,detail);
+      item.innerHTML='';const info=document.createElement('div');const strong=document.createElement('strong');strong.textContent=data.name;const detail=document.createElement('div');detail.style.fontSize='12px';detail.style.opacity='.8';detail.textContent=(data.mode==='regular'?'Every '+durationLabel(data.duration):'At '+data.times.map(formatClock).join(', '))+daysLabel(data.days)+' · Sound: '+data.sound;info.append(strong,detail);
       const edit=document.createElement('button');edit.type='button';edit.className='custom-reminder-edit';edit.textContent='Edit';edit.addEventListener('click',()=>window.addCustomReminderForm(item));
       const del=document.createElement('button');del.type='button';del.className='custom-reminder-delete';del.textContent='×';del.setAttribute('aria-label','Delete reminder');del.title='Delete reminder';del.addEventListener('click',()=>{stopReminderTimers(item);item.remove()});item.append(info,edit,del);
       if(!existing)list.append(item);form.remove();startReminder(item);
@@ -12816,7 +12836,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   function startReminder(item){
     const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name)return;
     item.dataset.startedAt=item.dataset.startedAt||String(Date.now());   // background alerts repeat from this moment
-    const notify=()=>{try{if(window.ayuLeader===false)return;if(window.ayuPush&&window.ayuPush.active&&document.hidden)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()})}catch(_){}};
+    const notify=()=>{try{if(Array.isArray(data.days)&&data.days.length&&!data.days.includes(new Date().getDay()))return;if(window.ayuLeader===false)return;if(window.ayuPush&&window.ayuPush.active&&document.hidden)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()})}catch(_){}};
     if(data.mode==='regular')item._reminderTimer=setInterval(notify,Math.max(1,Number(data.duration)||1)*60000);
     else {item._reminderTimeouts=[];item._reminderTimers=[];data.times.forEach(t=>{const [hh,mm]=t.split(':').map(Number),now=new Date(),next=new Date();next.setHours(hh,mm,0,0);if(next<=now)next.setDate(next.getDate()+1);const delay=next-now;item._reminderTimeouts.push(setTimeout(()=>{notify();item._reminderTimers.push(setInterval(notify,24*60*60*1000))},delay))})}
   }
@@ -13705,6 +13725,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
       try{
         var d = JSON.parse(item.dataset.reminder||'{}'); if(!d.name || d.sound==='none') return;
         var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode };
+        if(Array.isArray(d.days) && d.days.length && d.days.length<7) c.days = d.days.filter(function(n){ return n>=0 && n<=6; });
         if(d.mode==='regular'){ c.every = Math.max(1, Number(d.duration)||1); c.anchor = Number(item.dataset.startedAt)||Date.now(); }
         else c.times = (d.times||[]).map(toMin).filter(function(m){ return m!==null; });
         rules.custom.push(c);
@@ -14139,7 +14160,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (PDF) or type values in, to see what is in or out of range.');
   sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
   // Footer
-  STEPS.push({tab:null,sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',html:'<ul><li><b>Disclaimer</b>: what the app can and cannot do</li><li><b>Feedback</b>: tell us what to improve</li><li><b>Privacy</b> and <b>Cookies</b>: how your data is handled</li><li><b>Backup</b>: save your data to a file and restore it later</li><li><b>Other sites</b>: more from us</li></ul>'});
+  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',html:'<ul class="tf-list"><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 15a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4zm-1-8h2v6h-2z"/></svg></span><span><b>Disclaimer</b>: what the app can and cannot do</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z"/></svg></span><span><b>Feedback</b>: tell us what to improve</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 10V8a6 6 0 1112 0v2h1a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V11a1 1 0 011-1h1zm2 0h8V8a4 4 0 00-8 0v2z"/></svg></span><span><b>Privacy</b>: how your data is handled</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.95 10.99c-1.79-.03-3.7-1.95-2.99-4.59-3.2 1.3-5.5-1.73-4.07-4.11C8.35 1.55 2 6.24 2 12c0 5.52 4.48 10 10 10 6.22 0 10.4-5.29 9.95-11.01zM8.5 15c-.83 0-1.5-.67-1.5-1.5S7.67 12 8.5 12s1.5.67 1.5 1.5S9.33 15 8.5 15zm2-5c-.83 0-1.5-.67-1.5-1.5S9.67 7 10.5 7s1.5.67 1.5 1.5S11.33 10 10.5 10zm4.5 7c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></span><span><b>Cookies</b>: your cookie choices</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
 
   var root=document.getElementById('tour-root'), spot=document.getElementById('tour-spot'), txt=document.getElementById('tour-text'), bar=document.getElementById('tour-bar');
   var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0;
@@ -14531,6 +14552,20 @@ html body #reminder-hours-card .alert-card-hdr > .master-switch{margin-left:auto
 <style id="rh-info-transparent-20261102">
 /* i icon beside "Reminder hours": transparent background */
 #alerts-panel #reminder-hours-info-btn#reminder-hours-info-btn{background:transparent!important}
+</style>
+<style id="repeat-on-days-20261102">
+#alerts-panel .custom-reminder-form .repeat-on{display:block}
+#alerts-panel .custom-reminder-form .repeat-on-title{font-size:13px;margin:0 0 6px}
+#alerts-panel .custom-reminder-form .day-chips{display:flex;gap:6px;flex-wrap:wrap}
+#alerts-panel .custom-reminder-form .day-chip{width:34px;height:34px;min-width:34px;padding:0;border-radius:50%;border:1.5px solid var(--alert-2,#0d9488);background:#fff;color:var(--alert-2,#0d9488);font:700 13px inherit;cursor:pointer}
+#alerts-panel .custom-reminder-form .day-chip[aria-pressed="true"]{background:var(--alert-2,#0d9488);color:#fff}
+#alerts-panel .custom-reminder-form .day-quick{display:flex;gap:6px;margin-top:8px}
+#alerts-panel .custom-reminder-form .day-quick button{border:1px solid var(--alert-2,#0d9488);background:rgba(255,255,255,.7);color:var(--alert-2,#0d9488);border-radius:999px;padding:3px 10px;font:700 11px inherit;cursor:pointer}
+#tour-text ul.tf-list{list-style:none;padding:0;margin:0}
+#tour-text ul.tf-list li{display:flex;align-items:center;gap:12px;margin:0 0 14px}
+#tour-text ul.tf-list li:last-child{margin-bottom:0}
+#tour-text .tf-ic{flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:#fff;color:#2563eb;display:flex;align-items:center;justify-content:center;text-shadow:none}
+#tour-text .tf-ic svg{width:20px;height:20px}
 </style>
 </body>
 
