@@ -14437,6 +14437,25 @@ html body #reminder-hours-card .alert-card-hdr > .master-switch{margin-left:auto
 #tour-text .tf-ic{flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:#fff;color:#2563eb;display:flex;align-items:center;justify-content:center;text-shadow:none}
 #tour-text .tf-ic svg{width:20px;height:20px}
 </style>
+<style id="nav-lotus-20261103">
+/* Footer icons: spread evenly with a taller tap area. */
+#footer-tabs-row .footer-tabs-icons{justify-content:space-evenly;gap:0}
+#footer-tabs-row .footer-tabs-icons .footer-tab-btn{flex:1 1 0;display:flex;justify-content:center;align-items:center;padding-top:10px !important;padding-bottom:10px !important;min-height:0}
+#footer-tabs-row .footer-tab-btn svg{width:22px;height:22px}
+/* Backup dot: a soft halo that pulses a few times. */
+@keyframes backup-halo{0%{box-shadow:0 0 0 1.5px #fff,0 0 0 0 rgba(245,158,11,.55)}70%,100%{box-shadow:0 0 0 1.5px #fff,0 0 0 7px rgba(245,158,11,0)}}
+#tab-backup.needs-backup::after{animation:backup-halo 1.8s ease-out 4}
+@media (prefers-reduced-motion:reduce){#tab-backup.needs-backup::after{animation:none;box-shadow:0 0 0 1.5px #fff,0 0 0 4px rgba(245,158,11,.35)}}
+/* A part of the lotus behind the top section (mobile) / left section (desktop), in the colour of the open section. */
+#nav-lotus{position:absolute;pointer-events:none;z-index:3;inset:0;background:var(--header-lotus,#3b82f6);opacity:.12;
+  -webkit-mask:var(--lotus-mask) right -125px top 20px/260px auto no-repeat;mask:var(--lotus-mask) right -125px top 20px/260px auto no-repeat}
+@media (min-width:900px){
+  #nav-lotus{opacity:.17;-webkit-mask:var(--lotus-mask) left -145px bottom 80px/300px auto no-repeat;mask:var(--lotus-mask) left -145px bottom 80px/300px auto no-repeat}
+}
+</style>
+<script id="nav-lotus-20261103-js">
+(function(){ var n=document.getElementById('app-nav'); if(!n||document.getElementById('nav-lotus')) return; var d=document.createElement('div'); d.id='nav-lotus'; d.setAttribute('aria-hidden','true'); n.appendChild(d); })();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
