@@ -13945,7 +13945,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   function refreshDot(){ var c=changedGroups(), tab=document.getElementById('tab-backup'); if(tab) tab.classList.toggle('needs-backup',c.length>0); return c; }
   function showSectionNote(){
     var c=refreshDot(), m=stored();
-    if(c.length) status((Object.keys(m).length ? 'Changed since your last saved file: ' : 'Not saved to a file yet: ')+names(c)+'. Save again.','warn');
+    if(c.length) status(Object.keys(m).length ? 'Changed since your last backup: '+names(c)+'. Want to take a backup now?' : 'Backup not taken yet for '+names(c)+'. Want to take a backup now?','warn');
     else if(Object.keys(m).length) status('✓ Your latest data is saved in your file.');
     else status('');
   }
