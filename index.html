@@ -14483,6 +14483,18 @@ html body #reminder-hours-card .alert-card-hdr > .master-switch{margin-left:auto
   });
 })();
 </script>
+<style id="page-glow-bg-20261102">
+/* Page background: the tab's colour glows from two corners; the sidebar (top bar on phones) carries a stronger tint of it. */
+html body:has(#activity-panel.active){--t:37,92,192}
+html body:has(#nutrition-panel.active){--t:30,130,76}
+html body:has(#routines-panel.active){--t:224,150,24}
+html body:has(#alerts-panel.active){--t:8,118,110}
+html body:has(#mind-panel.active){--t:98,80,179}
+html body:has(#calculator-panel.active){--t:14,116,144}
+html body:has(#activity-panel.active),html body:has(#nutrition-panel.active),html body:has(#routines-panel.active),html body:has(#alerts-panel.active),html body:has(#mind-panel.active),html body:has(#calculator-panel.active){background:radial-gradient(900px 520px at 100% 0%,rgba(var(--t),.28),transparent 70%),radial-gradient(800px 520px at 0% 100%,rgba(var(--t),.20),transparent 70%),#fbfdfe fixed !important}
+html body .tab-panel{background:transparent !important}
+html body #app-nav{background:linear-gradient(180deg,rgba(var(--t),.28),rgba(var(--t),.10)),#fff !important}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
