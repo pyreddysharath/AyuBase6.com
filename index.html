@@ -3965,6 +3965,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
       </div>
       <div class="per-reminder-schedule" aria-label="All sections schedule"><div class="per-reminder-schedule-times"><span class="per-reminder-from">From</span><button type="button" class="eye-ex-time-item" data-time="start" aria-label="All sections start time"></button><span>to</span><button type="button" class="eye-ex-time-item" data-time="end" aria-label="All sections end time"></button></div></div>
       <div class="reminder-hours-info" id="reminder-hours-info" style="display:none"></div>
+      <div class="push-status" id="push-status" hidden></div>
       <div class="reminder-hours-foot" id="reminder-hours-foot"></div>
     </div>
 
@@ -12794,7 +12795,8 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   }
   function startReminder(item){
     const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name)return;
-    const notify=()=>{try{if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()})}catch(_){}};
+    item.dataset.startedAt=item.dataset.startedAt||String(Date.now());   // background alerts repeat from this moment
+    const notify=()=>{try{if(window.ayuPush&&window.ayuPush.active&&document.hidden)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()})}catch(_){}};
     if(data.mode==='regular')item._reminderTimer=setInterval(notify,Math.max(1,Number(data.duration)||1)*60000);
     else {item._reminderTimeouts=[];item._reminderTimers=[];data.times.forEach(t=>{const [hh,mm]=t.split(':').map(Number),now=new Date(),next=new Date();next.setHours(hh,mm,0,0);if(next<=now)next.setDate(next.getDate()+1);const delay=next-now;item._reminderTimeouts.push(setTimeout(()=>{notify();item._reminderTimers.push(setInterval(notify,24*60*60*1000))},delay))})}
   }
@@ -12956,6 +12958,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     return null;
   }
   window.ayuReminderSlots={next:nextSlot,latest:latestSlot};
+  window.ayuReminderWindows=function(){return cards};   // read by the background-alerts sync
   const lastSlot={},GRACE=10*60000;
   function tick(key){
     const st=typeof alertState!=='undefined'&&alertState[key];if(!st||!st.enabled)return;
@@ -13566,6 +13569,143 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     document.addEventListener('visibilitychange',function(){if(!document.hidden)sync();});
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
+})();
+</script>
+
+<style id="web-push-20261031">
+.push-status{margin:10px 0 0;padding:9px 12px;border-radius:12px;background:#d9f0ea;color:#08766e;font-size:.82rem;line-height:1.35;font-weight:600}
+.push-status[hidden]{display:none}
+.push-status.warn{background:#fef3c7;color:#92400e}
+#reminder-hours-card.rh-off .push-status{display:none!important}
+</style>
+<script id="web-push-20261031-js">
+/* Background alerts (Web Push).
+   The app tells a small server (config/push.json -> "api") when each reminder is due: hours, intervals, Checks times,
+   Eye exercise sessions, My Reminders and the phone's timezone. The server then sends a push at those moments, so
+   reminders arrive even when the app is closed or the phone is locked. The app sends fresh rules whenever
+   something changes. While the app is on screen it still shows its own reminders. */
+(function(){
+  var ayuPush = window.ayuPush = { active:false, api:'', error:'' };
+  var lastSent = '', busy = false, cfgLoaded = false, publicKey = '', lastOkAt = 0;
+
+  function $(id){ return document.getElementById(id); }
+  function toMin(t){ var m=/^(\d{1,2}):(\d{2})$/.exec(t||''); return m ? (+m[1])*60+(+m[2]) : null; }
+  function localDay(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function b64uToBytes(s){ s=String(s).replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; var b=atob(s), o=new Uint8Array(b.length); for(var i=0;i<b.length;i++) o[i]=b.charCodeAt(i); return o; }
+  function isIOS(){ return /iPhone|iPad|iPod/i.test(navigator.userAgent||'') || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1); }
+  function isStandalone(){ try{ return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone===true; }catch(e){ return false; } }
+
+  function setStatus(text, warn){
+    var el=$('push-status'); if(!el) return;
+    if(!text){ el.hidden=true; return; }
+    el.hidden=false; el.textContent=text; el.classList.toggle('warn',!!warn);
+  }
+  function refreshStatus(){
+    if(!ayuPush.api){ setStatus(''); return; }
+    var masterOn = typeof isMasterNotifyOn==='function' && isMasterNotifyOn();
+    if(!masterOn || typeof Notification==='undefined' || Notification.permission!=='granted'){ setStatus(''); return; }
+    if(!('PushManager' in window) || !('serviceWorker' in navigator)){
+      if(isIOS() && !isStandalone()) setStatus('On iPhone, add AyuBase6 to your Home Screen to get alerts when the app is closed.', true);
+      else setStatus('Alerts while the app is closed are not supported in this browser.', true);
+      return;
+    }
+    if(ayuPush.active) setStatus('✓ Alerts also arrive when the app is closed.');
+    else if(ayuPush.error) setStatus('Alerts while the app is closed could not be set up yet. The app will keep trying.', true);
+    else setStatus('Setting up alerts for when the app is closed…');
+  }
+
+  // Everything the server needs, with times already worked out. Returns null when reminders are off.
+  function buildRules(){
+    if(typeof isMasterNotifyOn!=='function' || !isMasterNotifyOn()) return null;
+    if(typeof Notification==='undefined' || Notification.permission!=='granted') return null;
+    var rules = { v:1, tz:'UTC', phone: (typeof NUDGE_IS_PHONE!=='undefined' && !!NUDGE_IS_PHONE), reminders:[], exercise:null, checks:null, custom:[] };
+    try{ rules.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; }catch(e){}
+    var wins = (typeof window.ayuReminderWindows==='function') ? window.ayuReminderWindows() : {};
+    ['break','walk','drink'].forEach(function(key){
+      var st = typeof alertState!=='undefined' && alertState[key]; if(!st || !st.enabled || !(st.minutes>0)) return;
+      var w = wins[key] || {}, lab = ALERT_LABELS[key];
+      rules.reminders.push({ key:key, title:lab.title, body:lab.msg, every:st.minutes, from:toMin(w.start), to:toMin(w.end) });
+    });
+    if(typeof eyeExState!=='undefined' && eyeExState.enabled && eyeExState.times && eyeExState.times.length){
+      var times = eyeExState.times.map(toMin).filter(function(m){ return m!==null; });
+      if(times.length) rules.exercise = { title:'Eye Exercise', body:'Time for your guided eye exercise — follow the dot for 30 seconds.', times:times, weekdays:eyeExState.weekdays.slice() };
+    }
+    if(typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()){
+      var items=[], done=[];
+      Object.keys(ROUTINE_NOTIFY_ITEMS).forEach(function(key){
+        var at = routineItemMinute(key); if(at===null) return;
+        var cb = routineCb(key); if(cb && cb.checked) done.push(key);
+        var it = ROUTINE_NOTIFY_ITEMS[key];
+        items.push({ key:key, title:it.title, body:it.body, at:at, end:routineEndMinute(key), window:routineWindowText(key), muted:routineIsMuted(key) });
+      });
+      rules.checks = { mode:routineRemindMode(), doneDay:localDay(), done:done, items:items };
+    }
+    document.querySelectorAll('#custom-reminders-list .custom-reminder-item').forEach(function(item){
+      try{
+        var d = JSON.parse(item.dataset.reminder||'{}'); if(!d.name || d.sound==='none') return;
+        var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode };
+        if(d.mode==='regular'){ c.every = Math.max(1, Number(d.duration)||1); c.anchor = Number(item.dataset.startedAt)||Date.now(); }
+        else c.times = (d.times||[]).map(toMin).filter(function(m){ return m!==null; });
+        rules.custom.push(c);
+      }catch(e){}
+    });
+    return rules;
+  }
+
+  function api(path, opts){ return fetch(ayuPush.api.replace(/\/+$/,'')+path, opts); }
+
+  async function getSubscription(create){
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if(sub || !create) return sub;
+    if(!publicKey){ var r = await api('/config'); if(!r.ok) throw new Error('config'); publicKey = (await r.json()).publicKey; }
+    return reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:b64uToBytes(publicKey) });
+  }
+
+  async function sync(){
+    if(busy || !ayuPush.api || !('PushManager' in window) || !('serviceWorker' in navigator)) { refreshStatus(); return; }
+    busy = true;
+    try{
+      var rules = buildRules();
+      if(!rules){
+        // reminders are off: forget this phone on the server and stop pushes
+        var existing = await getSubscription(false);
+        if(existing){ try{ await api('/unsubscribe',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({endpoint:existing.endpoint}) }); }catch(e){} try{ await existing.unsubscribe(); }catch(e){} }
+        ayuPush.active=false; ayuPush.error=''; lastSent=''; return;
+      }
+      var body = JSON.stringify(rules);
+      var stale = Date.now()-lastOkAt > 12*3600*1000;   // also refresh now and then, so the server knows this phone is still in use
+      if(body===lastSent && ayuPush.active && !stale) return;
+      var sub = await getSubscription(true);
+      var res = await api('/subscribe',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ subscription:sub.toJSON(), rules:rules }) });
+      if(!res.ok) throw new Error('subscribe '+res.status);
+      lastSent=body; lastOkAt=Date.now(); ayuPush.active=true; ayuPush.error='';
+    }catch(e){
+      ayuPush.active=false; ayuPush.error=String(e&&e.message||e); lastSent='';
+    }finally{ busy=false; refreshStatus(); }
+  }
+  ayuPush.sync = sync;
+  ayuPush.buildRules = buildRules;
+
+  // While background alerts are active and the page is hidden, the server delivers the reminder, so the page stays quiet.
+  function quietWhenHidden(name){
+    var orig = window[name]; if(typeof orig!=='function') return;
+    window[name] = function(){ if(ayuPush.active && document.hidden) return; return orig.apply(this, arguments); };
+  }
+  quietWhenHidden('fireAlert'); quietWhenHidden('fireEyeExAlert'); quietWhenHidden('notifyRoutine');
+
+  function start(){
+    fetch('config/push.json',{cache:'no-cache'}).then(function(r){ return r.ok ? r.json() : null; }).then(function(c){
+      cfgLoaded = true;
+      ayuPush.api = (c && typeof c.api==='string') ? c.api.trim() : '';
+      if(!ayuPush.api) return;
+      sync();
+      setInterval(sync, 5000);                                  // sends only when something changed
+      document.addEventListener('visibilitychange', function(){ if(!document.hidden) sync(); });
+      window.addEventListener('online', sync);
+    }).catch(function(){});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', start, {once:true}); else start();
 })();
 </script>
 <style id="checks-info-panels-same-font-20261101">

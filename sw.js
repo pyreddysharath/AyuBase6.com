@@ -60,7 +60,9 @@ self.addEventListener('activate', event => {
   })());
 });
 
-// Display notifications delivered by a push service.
+// Display notifications delivered by a push service (the reminders the AyuBase6 push server sends).
+// While the app is on screen it shows its own reminder, so the push is skipped then, except on
+// iPhone (the server sets mustShow), where every push has to show a notification.
 self.addEventListener('push', event => {
   event.waitUntil((async () => {
     let payload = {};
@@ -73,23 +75,31 @@ self.addEventListener('push', event => {
       };
     }
 
-    await self.registration.showNotification(
-      payload.title || 'AyuBase6 reminder',
-      {
-        body: payload.body || 'You have a reminder.',
-        icon: payload.icon || './icons/icon-192.png',
-        badge: payload.badge || './icons/icon-192.png',
-        tag: payload.tag || undefined,
-        renotify: Boolean(payload.renotify),
-        data: {
-          url: payload.url || './',
-          ...(payload.data &&
-          typeof payload.data === 'object'
-            ? payload.data
-            : {})
-        }
+    if (!payload.mustShow) {
+      const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      if (windows.some(c => c.visibilityState === 'visible')) return;
+    }
+
+    const key = payload.key || '';
+    const options = {
+      body: payload.body || 'You have a reminder.',
+      icon: payload.icon || './icons/icon-192.png',
+      badge: payload.badge || './icons/icon-192.png',
+      tag: payload.tag || (key ? 'nudge-' + key : undefined),
+      renotify: true,
+      requireInteraction: true,
+      vibrate: [200, 100, 200, 100, 200],
+      timestamp: Date.now(),
+      data: {
+        url: payload.url || './',
+        key: key,
+        section: payload.section || '',
+        ...(payload.data && typeof payload.data === 'object' ? payload.data : {})
       }
-    );
+    };
+    if (Array.isArray(payload.actions) && payload.actions.length) options.actions = payload.actions.slice(0, 2);
+
+    await self.registration.showNotification(payload.title || 'AyuBase6 reminder', options);
   })());
 });
 

@@ -4,7 +4,8 @@ FOLDER STRUCTURE
   index.html          The app (one file). Must sit at the site root.
   sw.js               Service worker (offline use, notification taps, saved videos). Must sit at the site root.
   CNAME, ads.txt      Domain and ads settings.
-  config/             manifest.json (install details), OurOtherSites.json (footer list), feedback_apps_script.gs.
+  config/             manifest.json (install details), OurOtherSites.json (footer list), feedback_apps_script.gs,
+                     push.json (address of the push server; empty = reminders only work while the app is open).
   icons/, favicons/   App icons and favicons.
   content/            Videos, preview images and the JSON lists that name them (see below).
 
@@ -51,3 +52,11 @@ OFFLINE VIDEOS
 NOTES
   - The service worker must be at the site root (sw.js) to control the whole site.
   - Files opened directly from a computer (file://) will not load the content lists; use GitHub Pages or a local server.
+
+REMINDERS WHEN THE APP IS CLOSED (WEB PUSH)
+-------------------------------------------
+Optional. Deploy the separate AyuBase6-push-worker package on Cloudflare (steps in its SETUP.txt), then put its
+address in config/push.json, e.g. { "api": "https://ayubase6-push.yourname.workers.dev" }.
+The app then sends each phone's reminder schedule to that server, which pushes the reminders on time.
+While the app is on screen it shows reminders itself, so you never get doubles. With "api" empty nothing is sent anywhere.
+iPhone needs the app added to the Home Screen first.
