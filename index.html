@@ -9086,8 +9086,7 @@ function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
     +'.btns{display:flex;gap:8px;margin-top:10px}.btns button{flex:1;min-height:32px;border-radius:9px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;border:1px solid '+T.accent+';background:#fff;color:'+T.accent+'}.btns button.y{background:'+T.accent+';color:#fff}'
     +'.c.expanded{max-height:90vh;overflow:auto}'
     +'.c.expanded .ex-video{display:block}';
-  doc.title=title;
-  doc.head.innerHTML='<meta charset="utf-8"><style>'+css+'</style>';
+  doc.head.innerHTML='<meta charset="utf-8"><title>'+nudgeEsc(title)+'</title><style>'+css+'</style>';   // the title must be set after the head is rebuilt, or the window is called "about:blank"
   doc.body.innerHTML='<svg class="bg" viewBox="9.5 11.5 45 27" aria-hidden="true">'+lotus+'</svg>'
     +'<div class="c"><h1>'+nudgeEsc(title)+'</h1><p>'+nudgeEsc(msg)+'</p>'+nudgePopupButtons(o)
     +(withTimer?'<div class="t" id="n" title="Click to start the timer">\u25B6 '+(o.timerSecs||EYE_TIMER_SECS)+'s</div>':'')
