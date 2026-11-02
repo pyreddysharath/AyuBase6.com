@@ -13610,6 +13610,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
       return;
     }
     if(ayuPush.active) setStatus('✓ Alerts also arrive when the app is closed.');
+    else if(ayuPush.needInstall && !isStandalone()) setStatus('Alerts while the app is closed need the app installed (browser menu > Install app, or Add to Home Screen). Until then, alerts come only while the app is open.', true);
     else if(ayuPush.error) setStatus('Alerts while the app is closed could not be set up yet. The app will keep trying.', true);
     else setStatus('Setting up alerts for when the app is closed…');
   }
@@ -13676,7 +13677,11 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
       var body = JSON.stringify(rules);
       var stale = Date.now()-lastOkAt > 12*3600*1000;   // also refresh now and then, so the server knows this phone is still in use
       if(body===lastSent && ayuPush.active && !stale) return;
-      var sub = await getSubscription(true);
+      // Background alerts need the installed app: in a plain browser tab nothing is subscribed, so once the tab is closed no alert arrives.
+      var had = await getSubscription(false);
+      if(!had && !isStandalone()){ ayuPush.active=false; ayuPush.error=''; ayuPush.needInstall=true; lastSent=''; return; }
+      ayuPush.needInstall=false;
+      var sub = had || await getSubscription(true);
       var res = await api('/subscribe',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ subscription:sub.toJSON(), rules:rules }) });
       if(!res.ok) throw new Error('subscribe '+res.status);
       lastSent=body; lastOkAt=Date.now(); ayuPush.active=true; ayuPush.error='';
