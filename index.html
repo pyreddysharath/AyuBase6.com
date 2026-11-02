@@ -13631,7 +13631,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
       else setStatus('Alerts while the app is closed are not supported in this browser.', true);
       return;
     }
-    if(ayuPush.active) setStatus('✓ Alerts also arrive when the app is closed.');
+    if(ayuPush.active) setStatus('✓ Alerts also arrive when the app is closed.' + (/Android/i.test(navigator.userAgent||'') ? ' For on-time alerts, set Battery to Unrestricted: Settings → Apps → AyuBase6 → Battery.' : ''));
     else if(ayuPush.needInstall && !isStandalone()) setStatus('');   // said in the install note under the switch
     else if(ayuPush.error) setStatus('Alerts while the app is closed could not be set up yet. The app will keep trying.', true);
     else setStatus('Setting up alerts for when the app is closed…');
