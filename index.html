@@ -9042,7 +9042,7 @@ function nudgePopupIcons(o){
   const t=nudgeEsc(o.thisLabel||'Disable this reminder'), a=nudgeEsc(o.allLabel||'Disable all notifications'), c=nudgeEsc(o.closeLabel||'Close');
   return '<div class="ic"><button type="button" data-pop-this data-tip="'+t+'" aria-label="'+t+'">'+NUDGE_ICON_THIS+'</button>'
     +'<button type="button" data-pop-all data-tip="'+a+'" aria-label="'+a+'">'+NUDGE_ICON_ALL+'</button>'
-    +'<button type="button" data-pop-close data-tip="'+c+'" aria-label="'+c+'">'+NUDGE_ICON_CLOSE+'</button></div>';
+    +'</div>';
 }
 function nudgePopupButtons(o){
   if(!o.buttons||!o.buttons.length) return '';
@@ -9080,12 +9080,11 @@ function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
     +'.t.run,.t.done{cursor:default}'
     +'.ex-toggle{display:inline-flex;align-items:center;gap:6px;margin-top:10px;border:1px solid '+T.accent+';border-radius:9px;padding:6px 9px;background:#fff;color:'+T.accent+';font-weight:700;cursor:pointer;font-size:12px}'+'.ex-toggle svg{width:15px;height:15px;display:block;fill:currentColor;flex:none}'
     +'.ex-video{display:none;width:100%;max-height:58vh;margin-top:8px;border-radius:10px;background:#001410}'
-    +'h1{padding-right:104px}'
-    +'.ic{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:2}'
+        +'.ic{display:flex;justify-content:flex-end;gap:6px;margin-top:18px;position:relative;z-index:2}'
     +'.ic button{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border:1px solid '+T.accent+';border-radius:50%;background:rgba(255,255,255,.85);color:'+T.accent+';cursor:pointer}'
     +'.ic button:hover{background:#fff}.ic svg{width:15px;height:15px;display:block}'
     +'.ic button{position:relative}'
-    +'.ic button::after{content:attr(data-tip);position:absolute;top:32px;right:0;white-space:nowrap;padding:4px 8px;border-radius:6px;background:rgba(17,24,39,.9);color:#fff;font:600 11px/1.2 system-ui,sans-serif;opacity:0;pointer-events:none;transition:opacity .12s;z-index:5}'
+    +'.ic button::after{content:attr(data-tip);position:absolute;bottom:32px;right:0;white-space:nowrap;padding:4px 8px;border-radius:6px;background:rgba(17,24,39,.9);color:#fff;font:600 11px/1.2 system-ui,sans-serif;opacity:0;pointer-events:none;transition:opacity .12s;z-index:5}'
     +'.ic button:hover::after,.ic button:focus-visible::after{opacity:1}'
     +'.btns{display:flex;gap:8px;margin-top:10px}.btns button{flex:1;min-height:32px;border-radius:9px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;border:1px solid '+T.accent+';background:#fff;color:'+T.accent+'}.btns button.y{background:'+T.accent+';color:#fff}'
     +'.c.expanded{max-height:90vh;overflow:auto}'
@@ -9093,9 +9092,9 @@ function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
   doc.title=title;
   doc.head.innerHTML='<meta charset="utf-8"><style>'+css+'</style>';
   doc.body.innerHTML='<svg class="bg" viewBox="9.5 11.5 45 27" aria-hidden="true">'+lotus+'</svg>'
-    +'<div class="c">'+nudgePopupIcons(o)+'<h1>'+nudgeEsc(title)+'</h1><p>'+nudgeEsc(msg)+'</p>'+nudgePopupButtons(o)
+    +'<div class="c"><h1>'+nudgeEsc(title)+'</h1><p>'+nudgeEsc(msg)+'</p>'+nudgePopupButtons(o)
     +(withTimer?'<div class="t" id="n" title="Click to start the timer">\u25B6 '+(o.timerSecs||EYE_TIMER_SECS)+'s</div>':'')
-    +(title==='Eye Exercise' && exerciseVideoSrc?'<button type="button" class="ex-toggle" id="ex-toggle" aria-expanded="false" title="Expand guided eye exercise video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span></button><video class="ex-video" id="ex-video" controls playsinline muted preload="metadata" src="'+exerciseVideoSrc.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></video>':'')+'</div>';
+    +(title==='Eye Exercise' && exerciseVideoSrc?'<button type="button" class="ex-toggle" id="ex-toggle" aria-expanded="false" title="Expand guided eye exercise video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span></button><video class="ex-video" id="ex-video" controls playsinline muted preload="metadata" src="'+exerciseVideoSrc.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></video>':'')+nudgePopupIcons(o)+'</div>';
   if(title==='Eye Exercise'){const toggle=doc.getElementById('ex-toggle'), card=doc.querySelector('.c'), video=doc.getElementById('ex-video');if(toggle&&card&&video)toggle.onclick=()=>{const expanded=card.classList.toggle('expanded');toggle.setAttribute('aria-expanded',String(expanded));toggle.innerHTML=expanded?'✕ <span>Hide exercise video</span>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span>';if(expanded){try{win.resizeTo(420,520)}catch(e){};video.play().catch(()=>{});}else{video.pause();try{win.resizeTo(320,150)}catch(e){}}};}
   nudgePopupWire(win, doc, o);
   if(!withTimer) return;
@@ -9162,7 +9161,7 @@ function openNudgePopup(key, title, msg, o){
   const W=Math.max(270,Math.min(360,Math.round(250+Math.min(110,textLen)*0.65)));
   const titleLines=Math.max(1,Math.ceil(titleLen*8.8/(W-36-62)));          // the title leaves room for the two icons
   const msgLines=Math.max(1,Math.ceil(msgLen*7.2/(W-36)));
-  const H=Math.max(timer?140:82, Math.min(280, 34+titleLines*21+msgLines*19+(timer?48:0)+((o.buttons&&o.buttons.length)?46:0)));
+  const H=Math.max(timer?140:82, Math.min(280, 34+titleLines*21+msgLines*19+(timer?48:0)+((o.buttons&&o.buttons.length)?46:0)+44));
   const exerciseVideoSrc=key==='eyeex'?(document.getElementById('eye-ex-video')?.currentSrc||document.getElementById('eye-ex-video')?.src||''):'';
   const onFail=o.onFail||(()=>nudgeNativeFallback(key,title,msg));
   try{
