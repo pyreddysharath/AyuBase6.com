@@ -13600,10 +13600,13 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     if(!text){ el.hidden=true; return; }
     el.hidden=false; el.textContent=text; el.classList.toggle('warn',!!warn);
   }
+  function isDesktop(){ return !(typeof NUDGE_IS_PHONE!=='undefined' && NUDGE_IS_PHONE); }
   function refreshStatus(){
-    if(!ayuPush.api){ setStatus(''); return; }
     var masterOn = typeof isMasterNotifyOn==='function' && isMasterNotifyOn();
     if(!masterOn || typeof Notification==='undefined' || Notification.permission!=='granted'){ setStatus(''); return; }
+    // Computers: reminders come from the open app or tab (it can sit in the background); there is no background push.
+    if(isDesktop()){ setStatus('To get reminders on this computer, keep AyuBase6 open, either in a browser tab or as the installed app. You can switch to other tabs or windows.'); return; }
+    if(!ayuPush.api){ setStatus(''); return; }
     if(!('PushManager' in window) || !('serviceWorker' in navigator)){
       if(isIOS() && !isStandalone()) setStatus('On iPhone, add AyuBase6 to your Home Screen to get alerts when the app is closed.', true);
       else setStatus('Alerts while the app is closed are not supported in this browser.', true);
@@ -13667,6 +13670,12 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     if(busy || !ayuPush.api || !('PushManager' in window) || !('serviceWorker' in navigator)) { refreshStatus(); return; }
     busy = true;
     try{
+      if(isDesktop()){
+        // no background push on computers: forget any earlier registration of this browser
+        var old = await getSubscription(false);
+        if(old){ try{ await api('/unsubscribe',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({endpoint:old.endpoint}) }); }catch(e){} try{ await old.unsubscribe(); }catch(e){} }
+        ayuPush.active=false; ayuPush.error=''; lastSent=''; return;
+      }
       var rules = buildRules();
       if(!rules){
         // reminders are off: forget this phone on the server and stop pushes
@@ -13703,7 +13712,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     fetch('config/push.json',{cache:'no-cache'}).then(function(r){ return r.ok ? r.json() : null; }).then(function(c){
       cfgLoaded = true;
       ayuPush.api = (c && typeof c.api==='string') ? c.api.trim() : '';
-      if(!ayuPush.api) return;
+      if(!ayuPush.api){ refreshStatus(); setInterval(refreshStatus, 5000); return; }
       sync();
       setInterval(sync, 5000);                                  // sends only when something changed
       document.addEventListener('visibilitychange', function(){ if(!document.hidden) sync(); });
