@@ -9467,8 +9467,8 @@ function isMasterNotifyOn(){
     const v=localStorage.getItem(NOTIF_MASTER_KEY);
     if(v!==null) return v==='1';
   }catch(e){}
-  // Preserve the previous default for people who already granted permission.
-  return typeof Notification!=='undefined' && Notification.permission==='granted';
+  // Off until the person turns it on, even if the browser permission was already granted.
+  return false;
 }
 function setMasterNotifyFlag(on){
   try{ localStorage.setItem(NOTIF_MASTER_KEY, on?'1':'0'); }catch(e){}
