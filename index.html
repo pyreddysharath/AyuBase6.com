@@ -2,6 +2,9 @@
 <html lang="en" data-petal-card="e">
 <head>
 <meta charset="UTF-8">
+<script>/* Reminder pop-up windows open this same address with ?ayu-popup=1: stop here (the app itself is not started in them), show the clean site address, and tell the app the window is ready. */
+if(/[?&]ayu-popup=1(&|$)/.test(location.search)){try{window.stop()}catch(e){}try{history.replaceState(null,'',location.pathname)}catch(e){}document.documentElement.setAttribute('data-ayu-popup','1');try{window.opener&&window.opener.__ayuPopupReady&&window.opener.__ayuPopupReady(window.name)}catch(e){}}
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- <meta name="theme-color" id="theme-color-meta" content="#60a5fa"> -->
 <title>AyuBase6 - Life Basics</title>
@@ -9065,6 +9068,7 @@ function nudgePopupWire(win, doc, o){
 function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
   o=o||{};
   const doc=win.document;
+  if(!doc.body) doc.documentElement.appendChild(doc.createElement('body'));
   const T=o.theme==='routines'?{bg:'linear-gradient(135deg,#fffbeb,#fde68a)',lotus:'#fbbf24',text:'#78350f',accent:'#b45309'}:{bg:'linear-gradient(135deg,#f0fdfa,#ccfbf1)',lotus:'#5eead4',text:'#134e4a',accent:'#0d9488'};
   const lotus=[-75,-45,-15,15,45,75].map(a=>'<path d="'+NUDGE_LOTUS_PETAL+'" transform="translate(32 34) rotate('+a+')"/>').join('');
   const css='html,body{margin:0;height:100%}'
@@ -9138,16 +9142,32 @@ function nudgeDefaultHandlers(key){
     onDisableThis:()=>{ const b=document.querySelector('#'+mock+' [data-ayu-disable-current]'); if(b) b.click(); },
     onDisableAll:()=>{ const b=document.querySelector('[data-ayu-disable-all]'); if(b) b.click(); } };
 }
+const NUDGE_PENDING={};   // pop-up windows that have been opened and are waiting to be filled
+window.__ayuPopupReady=function(name){ const f=NUDGE_PENDING[name]; if(f){ delete NUDGE_PENDING[name]; setTimeout(f,0); } };
+// The window opens the site's own address (so the address line shows the site, not about:blank); the start of this file
+// stops the app from running inside it, and the reminder is drawn into it from here.
 function openNudgeBrowserPopup(key, title, msg, timer, W, H, exerciseVideoSrc, o){
   try{
     const pos=nudgeSlot(key,W,H);
-    const w=window.open('', 'nudge-'+key, 'popup=yes,width='+W+',height='+H+',left='+pos.left+',top='+pos.top);
+    const name='nudge-'+key;
+    const w=window.open(location.origin+location.pathname+'?ayu-popup=1', name, 'popup=yes,width='+W+',height='+H+',left='+pos.left+',top='+pos.top);
     if(!w || w.closed) return false;
-    nudgePopupContent(w, title, msg, timer, exerciseVideoSrc, o);
     NUDGE_WINS.filter(x=>x.key===key).forEach(x=>NUDGE_WINS.splice(NUDGE_WINS.indexOf(x),1));
     NUDGE_WINS.push({key:key, win:w, W:W, H:H});
     try{ w.focus(); }catch(e){}
-    try{ w.setTimeout(()=>{ if(!w.closed) w.close(); },300000); }catch(e){}
+    let done=false;
+    const fill=()=>{
+      if(done) return; done=true; delete NUDGE_PENDING[name];
+      try{ nudgePopupContent(w, title, msg, timer, exerciseVideoSrc, o); try{ w.setTimeout(()=>{ if(!w.closed) w.close(); },300000); }catch(e){} }
+      catch(e){ try{ w.close(); }catch(_){} try{ (o&&o.onFail||(()=>nudgeNativeFallback(key,title,msg)))(); }catch(_){} }
+    };
+    NUDGE_PENDING[name]=fill;
+    const t0=Date.now();   // backup in case the window's "ready" call does not arrive
+    const iv=setInterval(()=>{
+      if(done||w.closed){ clearInterval(iv); return; }
+      let ok=false; try{ ok=w.document.documentElement.getAttribute('data-ayu-popup')==='1'; }catch(e){}
+      if(ok||Date.now()-t0>4000){ clearInterval(iv); fill(); }
+    },50);
     return true;
   }catch(e){ return false; }
 }
@@ -12600,7 +12620,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     if(android) return 'Open the browser menu (⋮) and choose <b>Install app</b> or <b>Add to Home screen</b>.';
     if(ios) return 'Tap the <b>Share</b> button, then choose <b>Add to Home Screen</b>.';
     if(safari) return 'In Safari, choose <b>File → Add to Dock</b>.';
-    return 'Use the install icon in the address bar, or the browser menu → <b>Install AyuBase6</b>. If neither appears, this browser may not support installing.';
+    return '<ul class="inst-opts"><li>Use the install icon in the address bar</li><li>Or use the browser menu → <b>Install AyuBase6</b></li></ul>If neither appears, this browser may not support installing.';
   };
   window.installApp=function(section){
     section = section === 'routines' ? 'routines' : 'reminders';
@@ -12795,7 +12815,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   function startReminder(item){
     const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name)return;
     item.dataset.startedAt=item.dataset.startedAt||String(Date.now());   // background alerts repeat from this moment
-    const notify=()=>{try{if(window.ayuPush&&window.ayuPush.active&&document.hidden)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()})}catch(_){}};
+    const notify=()=>{try{if(window.ayuLeader===false)return;if(window.ayuPush&&window.ayuPush.active&&document.hidden)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()})}catch(_){}};
     if(data.mode==='regular')item._reminderTimer=setInterval(notify,Math.max(1,Number(data.duration)||1)*60000);
     else {item._reminderTimeouts=[];item._reminderTimers=[];data.times.forEach(t=>{const [hh,mm]=t.split(':').map(Number),now=new Date(),next=new Date();next.setHours(hh,mm,0,0);if(next<=now)next.setDate(next.getDate()+1);const delay=next-now;item._reminderTimeouts.push(setTimeout(()=>{notify();item._reminderTimers.push(setInterval(notify,24*60*60*1000))},delay))})}
   }
@@ -13607,12 +13627,12 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     if(isDesktop()){ setStatus(''); return; }   // the keep-open note for computers is part of the install note under the switch
     if(!ayuPush.api){ setStatus(''); return; }
     if(!('PushManager' in window) || !('serviceWorker' in navigator)){
-      if(isIOS() && !isStandalone()) setStatus('On iPhone, add AyuBase6 to your Home Screen to get alerts when the app is closed.', true);
+      if(isIOS() && !isStandalone()) setStatus('');   // said in the install note under the switch
       else setStatus('Alerts while the app is closed are not supported in this browser.', true);
       return;
     }
     if(ayuPush.active) setStatus('✓ Alerts also arrive when the app is closed.');
-    else if(ayuPush.needInstall && !isStandalone()) setStatus('Alerts while the app is closed need the app installed (browser menu > Install app, or Add to Home Screen). Until then, alerts come only while the app is open.', true);
+    else if(ayuPush.needInstall && !isStandalone()) setStatus('');   // said in the install note under the switch
     else if(ayuPush.error) setStatus('Alerts while the app is closed could not be set up yet. The app will keep trying.', true);
     else setStatus('Setting up alerts for when the app is closed…');
   }
@@ -14433,6 +14453,36 @@ html body #lab-insights-card .lab-actions-row{flex-wrap:nowrap !important;gap:8p
 html body #lab-insights-card .lab-actions-row .lab-upload-btn{padding:0 14px !important;white-space:nowrap;flex:0 1 auto;min-width:0;font-size:.88rem !important}
 @media (max-width:350px){html body #lab-insights-card .lab-actions-row{gap:6px}html body #lab-insights-card .lab-actions-row .lab-upload-btn{padding:0 10px !important;font-size:.82rem !important}}
 </style>
+<style id="install-note-lines-20261102">
+/* The keep-open / install note: one idea per line; Reminders leaves an empty line after it */
+.install-nudge .inst-q{margin-top:6px;font-weight:700}
+.install-nudge ul.inst-opts{margin:2px 0 4px;padding-left:20px}
+.install-nudge ul.inst-opts li{margin:0}
+#reminders-install-nudge:not([hidden]){margin-bottom:1.3em}
+/* the i sits right after the title text (Wake-up time, Notify Me, Reminder hours); the switch stays at the right */
+html body .rout-card-hdr:has(> .rout-info-btn){justify-content:flex-start !important}
+html body .rout-card-hdr > .rout-info-btn{margin-right:0 !important}
+html body #routines-notify-card .rout-card-hdr .rout-master-switch{margin-left:auto !important}
+html body #reminder-hours-card .alert-card-hdr{justify-content:flex-start !important}
+html body #reminder-hours-card .alert-card-hdr > h2{flex:0 1 auto !important}
+html body #reminder-hours-card .alert-card-hdr > .master-switch{margin-left:auto !important}
+</style>
+<script id="tab-leader-20261102">
+/* Several tabs/windows of AyuBase6 can be open at once. Only one of them (the "leader") shows the reminders, so nothing is duplicated.
+   The leader is whoever holds a browser-wide lock; if it is closed, another tab takes over at once. Browsers without Web Locks keep the old behaviour. */
+(function(){
+  var hasLocks = !!(navigator.locks && navigator.locks.request);
+  window.ayuLeader = !hasLocks;
+  if(hasLocks){
+    try{ navigator.locks.request('ayubase6-reminder-leader', function(){ window.ayuLeader = true; return new Promise(function(){}); }); }
+    catch(e){ window.ayuLeader = true; }
+  }
+  ['fireAlert','fireEyeExAlert','notifyRoutine'].forEach(function(name){
+    var orig = window[name]; if(typeof orig !== 'function') return;
+    window[name] = function(){ if(window.ayuLeader === false) return; return orig.apply(this, arguments); };
+  });
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
@@ -16495,7 +16545,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. Use the install icon below if the install box does not appear.';
       card.insertBefore(nd,foot);
     }
-    (function(){ var hd=$('routines-notify-row')||card.querySelector('.rout-card-hdr'); if(hd) ['routines-remind-panel','routines-install-nudge','rout-notif-hint','routines-install-help'].reverse().forEach(function(id){ var el=$(id); if(el) hd.after(el); }); })();
+    (function(){ var hd=$('routines-notify-row')||card.querySelector('.rout-card-hdr'); if(hd) ['routines-install-nudge','rout-notif-hint','routines-install-help','routines-remind-panel'].reverse().forEach(function(id){ var el=$(id); if(el) hd.after(el); }); })();
     syncRoutines();
   }
   function addAbout(){
@@ -16594,7 +16644,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
   }
   function placeAll(){
     place($('reminder-hours-card'),'.alert-card-hdr',['reminders-install-nudge','reminders-notif-error']);
-    place($('routines-notify-card'),'.rout-card-hdr',['routines-remind-panel','routines-install-nudge','rout-notif-hint']);
+    place($('routines-notify-card'),'.rout-card-hdr',['routines-install-nudge','rout-notif-hint','routines-remind-panel']);
   }
 
   // ---------- a message that disappears once it has been readable long enough ----------
@@ -16617,8 +16667,11 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
   // Computers get reminders from the open app or tab (no background push there), so say that, and that other tabs/windows are fine.
   var DESK=!(typeof NUDGE_IS_PHONE!=='undefined' && NUDGE_IS_PHONE);
   var SW=DESK?' Other tabs and windows are fine.':'';
-  var GENERIC=DESK ? '<b>Keep AyuBase6 open</b>, in a browser tab or the installed app, to get reminders on this computer.'+SW
-                   : '<b>Keep AyuBase6 open</b> so reminders keep running, in this tab or the installed app.';
+  function GEN(){
+    if(DESK) return '<b>Keep AyuBase6 open</b>, in a browser tab or the installed app, to get reminders on this computer.'+SW;
+    var bg=(window.ayuPush && window.ayuPush.api) ? ' When the app is closed, alerts arrive only if it is installed.' : '';
+    return '<b>Keep AyuBase6 open</b> so reminders keep running, in this tab or the installed app.'+bg;
+  }
   function nudgeFor(sec){ return $(sec==='routines'?'routines-install-nudge':'reminders-install-nudge'); }
   var origInstall=window.installApp;
   window.installApp=function(section){
@@ -16630,7 +16683,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       if(st==='app') nd.innerHTML='<b>AyuBase6 is installed.</b> Keep it open so reminders keep running.'+SW;
       else if(st==='installed') nd.innerHTML='<b>AyuBase6 appears to be installed.</b> Open it from your home screen or app window and keep it open so reminders keep running.'+SW;
       else if(st==='prompt') nd.innerHTML=SHORT+SW;
-      else nd.innerHTML=GENERIC+((help && help.style.display!=='none' && help.innerHTML) ? ' Not installed yet? '+help.innerHTML : '');
+      else nd.innerHTML='<div>'+GEN()+'</div>'+((help && help.style.display!=='none' && help.innerHTML) ? '<div class="inst-q">Not installed yet?</div><div>'+help.innerHTML+'</div>' : '');
       if(help) help.style.display='none';
       placeAll(); showTimed(nd);
     });
