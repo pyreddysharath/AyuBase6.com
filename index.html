@@ -8774,8 +8774,8 @@ function drawNudgeLotus(ctx, cx, cy, scale, fill, alpha){
 }
 const _nudgeArt={};
 const NUDGE_THEMES={
-  reminders:{g0:'#f0fdfa',g1:'#ccfbf1',gi:'#99f6e4',big:'#5eead4',deep:'#0d9488'},
-  routines:{g0:'#fffbeb',g1:'#fde68a',gi:'#fcd34d',big:'#fbbf24',deep:'#d97706'}
+  reminders:{g0:'#f0fdfa',g1:'#ccfbf1',gi:'#99f6e4',big:'#5eead4',deep:'#0d9488',ic0:'#12998c',ic1:'#08766e'},
+  routines:{g0:'#fffbeb',g1:'#fde68a',gi:'#fcd34d',big:'#fbbf24',deep:'#d97706',ic0:'#cc7f1e',ic1:'#b06812'}
 };
 function nudgeArt(kind,theme){
   const T=NUDGE_THEMES[theme]||NUDGE_THEMES.reminders, ck=kind+':'+(theme||'reminders');
@@ -8796,9 +8796,9 @@ function nudgeArt(kind,theme){
     }else{
       c.width=192; c.height=192;
       const g=x.createLinearGradient(0,0,192,192);
-      g.addColorStop(0,T.g0); g.addColorStop(1,T.gi);
+      g.addColorStop(0,T.ic0); g.addColorStop(1,T.ic1);   // solid section colour (Reminders teal, Checks amber) with a white lotus
       x.fillStyle=g; x.fillRect(0,0,192,192);
-      drawNudgeLotus(x, 96, 142, 3.7, T.deep, .95);
+      drawNudgeLotus(x, 96, 142, 3.7, '#ffffff', .96);
     }
     url=c.toDataURL('image/png');
   }catch(e){ url=undefined; }
@@ -13605,7 +13605,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
    something changes. While the app is on screen it still shows its own reminders. */
 (function(){
   var ayuPush = window.ayuPush = { active:false, api:'', error:'' };
-  var lastSent = '', busy = false, cfgLoaded = false, publicKey = '', lastOkAt = 0;
+  var lastSent = '', busy = false, again = false, cfgLoaded = false, publicKey = '', lastOkAt = 0;
 
   function $(id){ return document.getElementById(id); }
   function toMin(t){ var m=/^(\d{1,2}):(\d{2})$/.exec(t||''); return m ? (+m[1])*60+(+m[2]) : null; }
@@ -13675,7 +13675,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     return rules;
   }
 
-  function api(path, opts){ return fetch(ayuPush.api.replace(/\/+$/,'')+path, opts); }
+  function api(path, opts){ opts=opts||{}; if(opts.method==='POST') opts.keepalive=true; return fetch(ayuPush.api.replace(/\/+$/,'')+path, opts); }   // keepalive: the request still completes if the app is closed right after
 
   async function getSubscription(create){
     var reg = await navigator.serviceWorker.ready;
@@ -13686,7 +13686,8 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   }
 
   async function sync(){
-    if(busy || !ayuPush.api || !('PushManager' in window) || !('serviceWorker' in navigator)) { refreshStatus(); return; }
+    if(busy){ again = true; return; }   // a change made while sending is sent right after
+    if(!ayuPush.api || !('PushManager' in window) || !('serviceWorker' in navigator)) { refreshStatus(); return; }
     busy = true;
     try{
       if(isDesktop()){
@@ -13715,7 +13716,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
       lastSent=body; lastOkAt=Date.now(); ayuPush.active=true; ayuPush.error='';
     }catch(e){
       ayuPush.active=false; ayuPush.error=String(e&&e.message||e); lastSent='';
-    }finally{ busy=false; refreshStatus(); }
+    }finally{ busy=false; refreshStatus(); if(again){ again=false; setTimeout(sync,0); } }
   }
   ayuPush.sync = sync;
   ayuPush.buildRules = buildRules;
@@ -13733,6 +13734,12 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
       ayuPush.api = (c && typeof c.api==='string') ? c.api.trim() : '';
       if(!ayuPush.api){ refreshStatus(); setInterval(refreshStatus, 5000); return; }
       sync();
+      // Send a change straight away (switch on/off, hours, times), and again when the app is left or closed, so nothing waits for the 5-second check.
+      var soon=null; function syncSoon(){ clearTimeout(soon); soon=setTimeout(sync,250); }
+      document.addEventListener('change', syncSoon, true);
+      document.addEventListener('click', syncSoon, true);
+      document.addEventListener('visibilitychange', function(){ if(document.hidden) sync(); });
+      window.addEventListener('pagehide', function(){ sync(); });
       setInterval(sync, 5000);                                  // sends only when something changed
       document.addEventListener('visibilitychange', function(){ if(!document.hidden) sync(); });
       window.addEventListener('online', sync);

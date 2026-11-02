@@ -83,7 +83,7 @@ self.addEventListener('push', event => {
     const key = payload.key || '';
     const options = {
       body: payload.body || 'You have a reminder.',
-      icon: payload.icon || './icons/icon-192.png',
+      icon: payload.icon || (payload.section === 'routines' ? './icons/notif-checks.png' : './icons/notif-reminders.png'),   // section colour: Checks amber, Reminders teal
       badge: payload.badge || './icons/icon-192.png',
       tag: payload.tag || (key ? 'nudge-' + key : undefined),
       renotify: true,
