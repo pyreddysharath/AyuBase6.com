@@ -14602,8 +14602,8 @@ html body #reminder-hours-card .alert-card-hdr > .master-switch{margin-left:auto
 #footer-tabs-row .footer-tabs-icons .footer-tab-btn{flex:1 1 0;display:flex;justify-content:center;align-items:center;padding-top:10px !important;padding-bottom:10px !important;min-height:0}
 #footer-tabs-row .footer-tab-btn svg{width:22px;height:22px}
 /* Backup dot: a soft halo that pulses a few times. */
-@keyframes backup-halo{0%{box-shadow:0 0 0 1.5px #fff,0 0 0 0 rgba(245,158,11,.55)}70%,100%{box-shadow:0 0 0 1.5px #fff,0 0 0 7px rgba(245,158,11,0)}}
-#tab-backup.needs-backup::after{animation:backup-halo 1.8s ease-out 4}
+@keyframes backup-halo{0%{box-shadow:0 0 0 1.5px #fff,0 0 0 3px rgba(245,158,11,.55)}70%,100%{box-shadow:0 0 0 1.5px #fff,0 0 0 11px rgba(245,158,11,0)}}
+#tab-backup.needs-backup::after{box-shadow:0 0 0 1.5px #fff,0 0 0 3px rgba(245,158,11,.4);animation:backup-halo 2s ease-out infinite}
 @media (prefers-reduced-motion:reduce){#tab-backup.needs-backup::after{animation:none;box-shadow:0 0 0 1.5px #fff,0 0 0 4px rgba(245,158,11,.35)}}
 /* A part of the lotus behind the top section (mobile) / left section (desktop), in the colour of the open section. */
 #nav-lotus{position:absolute;pointer-events:none;z-index:3;inset:0;background:var(--header-lotus,#3b82f6);opacity:.12;
