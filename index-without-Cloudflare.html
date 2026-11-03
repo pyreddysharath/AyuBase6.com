@@ -9564,16 +9564,7 @@ function syncAllReminderNotifyFlags(forceState){
 function syncAllAppNotifications(forceState){
   const on=!!forceState;
   syncAllReminderNotifyFlags(on);
-  // The Routines section has its own schedule switch, so include it in the
-  // master action as well as the four Reminders switches.
-  try{ localStorage.setItem(ROUTINE_NOTIFY_KEY,on?'1':'0'); if(!on) localStorage.removeItem(ROUTINE_SENT_KEY); }catch(e){}
-  if(!on && routineNotifyTimer){ clearInterval(routineNotifyTimer); routineNotifyTimer=null; }
-  if(on && typeof Notification!=='undefined' && Notification.permission==='granted'){
-    checkRoutineNotificationSchedule();
-    if(routineNotifyTimer) clearInterval(routineNotifyTimer);
-    routineNotifyTimer=setInterval(checkRoutineNotificationSchedule,15000);
-  }
-  if(typeof updateRoutineNotifyButtons==='function') updateRoutineNotifyButtons();
+  // Checks notifications are independent: only the Checks "Notify Me" switch turns them on or off.
   // Remember every section's new on/off state so a reload restores it.
   try{ if(typeof window.ayuSaveReminderStates==='function') window.ayuSaveReminderStates(); }catch(e){}
 }
