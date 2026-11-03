@@ -15538,6 +15538,86 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ setTimeout(load,800); },{once:true}); else setTimeout(load,800);
 })();
 </script>
+<style id="reset-like-upload-20261104">
+/* Every Reset button looks like Vitals' "Upload Report (PDF)": a solid button in the open section's colour,
+   rounded corners (not round), white bold "Reset" next to its icon. Reminder hours' round reset included. */
+html body .tab-panel .bf-reset-btn,
+html body .tab-panel .reset-icon-btn,
+html body #reminders-notif-banner .reminders-reset-row .reset-icon-btn,
+html body #reminder-hours-card .reminder-hours-foot .reset-icon-btn,
+html body .tab-panel #body-reset-btn,
+html body .tab-panel #food-reset-btn,
+html body .tab-panel #lab-reset-btn,
+html body .tab-panel #tracker-reset-btn{
+  box-sizing:border-box !important;width:auto !important;min-width:0 !important;max-width:none !important;
+  height:38px !important;min-height:38px !important;padding:0 14px !important;flex:0 0 auto !important;
+  display:inline-flex !important;align-items:center !important;justify-content:center !important;gap:6px !important;
+  border:0 !important;border-radius:12px !important;
+  background:var(--footer-accent,#0e7490) !important;background-image:none !important;background-color:var(--footer-accent,#0e7490) !important;
+  color:#fff !important;font-family:inherit !important;font-size:.88rem !important;font-weight:700 !important;line-height:1 !important;
+  letter-spacing:0 !important;white-space:nowrap !important;box-shadow:0 3px 9px rgba(36,52,72,.07) !important;cursor:pointer;
+}
+html body .tab-panel .bf-reset-btn svg,
+html body .tab-panel .reset-icon-btn svg,
+html body #reminders-notif-banner .reminders-reset-row .reset-icon-btn svg,
+html body #reminder-hours-card .reminder-hours-foot .reset-icon-btn svg,
+html body .tab-panel #body-reset-btn svg,
+html body .tab-panel #food-reset-btn svg,
+html body .tab-panel #lab-reset-btn svg,
+html body .tab-panel #tracker-reset-btn svg{
+  width:16px !important;height:16px !important;flex:0 0 16px !important;margin:0 !important;stroke:#fff !important;color:#fff !important;display:block !important
+}
+html body .tab-panel .bf-reset-btn::before,
+html body .tab-panel .reset-icon-btn::before,
+html body #reminders-notif-banner .reminders-reset-row .reset-icon-btn::before,
+html body #reminder-hours-card .reminder-hours-foot .reset-icon-btn::before,
+html body .tab-panel #body-reset-btn::before,
+html body .tab-panel #food-reset-btn::before,
+html body .tab-panel #lab-reset-btn::before,
+html body .tab-panel #tracker-reset-btn::before{content:none !important;display:none !important}
+html body .tab-panel .bf-reset-btn::after,
+html body .tab-panel .reset-icon-btn::after,
+html body #reminders-notif-banner .reminders-reset-row .reset-icon-btn::after,
+html body #reminder-hours-card .reminder-hours-foot .reset-icon-btn::after,
+html body .tab-panel #body-reset-btn::after,
+html body .tab-panel #food-reset-btn::after,
+html body .tab-panel #lab-reset-btn::after,
+html body .tab-panel #tracker-reset-btn::after{
+  content:'Reset' !important;display:inline !important;position:static !important;inset:auto !important;width:auto !important;height:auto !important;
+  font:inherit !important;font-weight:700 !important;color:#fff !important;letter-spacing:0 !important;border-radius:0 !important;background:none !important
+}
+html body .tab-panel .bf-reset-btn:not(:disabled):hover,
+html body .tab-panel .reset-icon-btn:not(:disabled):hover,
+html body #reminders-notif-banner .reminders-reset-row .reset-icon-btn:not(:disabled):hover,
+html body #reminder-hours-card .reminder-hours-foot .reset-icon-btn:not(:disabled):hover,
+html body .tab-panel #body-reset-btn:not(:disabled):hover,
+html body .tab-panel #food-reset-btn:not(:disabled):hover,
+html body .tab-panel #lab-reset-btn:not(:disabled):hover,
+html body .tab-panel #tracker-reset-btn:not(:disabled):hover{filter:brightness(.92) !important;background:var(--footer-accent,#0e7490) !important;color:#fff !important}
+html body .tab-panel .bf-reset-btn:disabled,
+html body .tab-panel .reset-icon-btn:disabled,
+html body #reminders-notif-banner .reminders-reset-row .reset-icon-btn:disabled,
+html body #reminder-hours-card .reminder-hours-foot .reset-icon-btn:disabled,
+html body .tab-panel #body-reset-btn:disabled,
+html body .tab-panel #food-reset-btn:disabled,
+html body .tab-panel #lab-reset-btn:disabled,
+html body .tab-panel #tracker-reset-btn:disabled{opacity:.4 !important;cursor:not-allowed !important;filter:none !important}
+</style>
+<style id="help-real-tabs-20261104">
+/* Help: real tabs. Each tab sits on a light patch of the section colour; the open tab is filled with the
+   section colour and joins the line under the row. */
+html body #sec-help .footer-subtabs{gap:4px !important;border-bottom:2px solid var(--footer-accent,#0d9488) !important;align-items:flex-end}
+html body #sec-help .footer-subtab{
+  flex:1 1 0;border:0 !important;border-radius:10px 10px 0 0 !important;margin:0 !important;padding:9px 6px 8px !important;
+  background:color-mix(in srgb, var(--footer-accent,#0d9488) 12%, #fff) !important;color:var(--footer-accent,#0d9488) !important;
+  opacity:1 !important;font-weight:700 !important;border-bottom:0 !important;box-shadow:none !important
+}
+html body #sec-help .footer-subtab:hover{background:color-mix(in srgb, var(--footer-accent,#0d9488) 20%, #fff) !important}
+html body #sec-help .footer-subtab.active,
+html body #sec-help .footer-subtab.active:hover{background:var(--footer-accent,#0d9488) !important;color:#fff !important;border-bottom:0 !important}
+html body #sec-help .footer-subtab .fs-dot{border-color:#fff}
+html body #sec-help .footer-subtabs:has(#subtab-app) .footer-subtab{flex:1 1 auto;padding-left:4px !important;padding-right:4px !important;font-size:clamp(.66rem,2.85vw,.8rem)}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
