@@ -160,6 +160,10 @@
       key = String(key || '');
       return /^end-/.test(key) || (typeof ROUTINE_NOTIFY_ITEMS !== 'undefined' && Object.prototype.hasOwnProperty.call(ROUTINE_NOTIFY_ITEMS, key));
     });
+    // Help's notification check asks for the background service: on the phone that is the reminder scheduler.
+    var phoneReg = { active:{}, update:function(){ return refreshStatus(); }, getNotifications:function(){ return Promise.resolve([]); },
+                     showNotification:function(t, o){ try{ new AyuNotification(t, o); }catch(e){} return Promise.resolve(); } };
+    if(typeof window.getNudgeReg === 'function') window.getNudgeReg = function(){ return Promise.resolve(phoneReg); };
     refreshStatus().then(function(){ setTimeout(function(){ sync(true); }, 300); });
     var soon = null; function syncSoon(){ clearTimeout(soon); soon = setTimeout(sync, 250); }
     document.addEventListener('change', syncSoon, true);
