@@ -15385,6 +15385,27 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',all); setTimeout(all,800);
 })();
 </script>
+<script id="help-tab-scroll-20261103">
+(function(){
+  // Tapping a Help tab brings the whole text into view, scrolling down only as far as putting the footer icon row just under the top bar.
+  function go(){
+    try{
+      var sec=document.getElementById('sec-help'); if(!sec||sec.style.display==='none') return;
+      var nav=document.getElementById('app-nav'), row=document.getElementById('footer-tabs-row'); if(!row) return;
+      var side=window.matchMedia('(min-width:900px)').matches && row.parentElement===nav;
+      var navH=nav?nav.offsetHeight:0, vh=window.innerHeight, pad=16;
+      var sub=sec.querySelector('.footer-sub:not([style*="display: none"])')||sec;
+      var bottom=sub.getBoundingClientRect().bottom, need=bottom-(vh-pad);            // how far the page must move to show the end of the text
+      var cap=side? sec.getBoundingClientRect().top-24 : row.getBoundingClientRect().top-(navH+12);   // the most it may move: icon row at the top
+      var d=Math.min(need,cap); if(d>2) window.scrollBy({top:d,behavior:'smooth'});
+    }catch(e){}
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('#sec-help .footer-subtab'); if(!b) return;
+    setTimeout(go,120); setTimeout(go,700);   // again once pieces such as the notification test have added their rows
+  },true);
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
