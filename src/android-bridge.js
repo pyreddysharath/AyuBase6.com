@@ -87,8 +87,22 @@
 
   // ── Hand the reminder rules to the phone ──
   var lastSent = null, busy = false, again = false;
+  // Eyes, Walk and Water repeat every N minutes counted from the moment the reminder was turned on or its
+  // frequency, hours or days were changed (not from the start of the reminder hours). That moment is kept per reminder.
+  var ANCHOR_KEY = 'ayuAndroidRemAnchor';
+  function addAnchors(rules){
+    var old = {}, now = {};
+    try{ old = JSON.parse(ls(ANCHOR_KEY) || '{}') || {}; }catch(e){}
+    if(rules && Array.isArray(rules.reminders)) rules.reminders.forEach(function(r){
+      var sig = JSON.stringify([r.every, r.from, r.to, r.days || null]);
+      var a = old[r.key] && old[r.key].sig === sig ? old[r.key].at : Date.now();
+      now[r.key] = { sig:sig, at:a }; r.anchor = a;
+    });
+    ls(ANCHOR_KEY, JSON.stringify(now));   // a reminder turned off forgets its moment, so turning it on starts afresh
+    return rules;
+  }
   function currentRules(){
-    try{ return (window.ayuPush && typeof ayuPush.buildRules === 'function') ? ayuPush.buildRules() : null; }catch(e){ return null; }
+    try{ return addAnchors((window.ayuPush && typeof ayuPush.buildRules === 'function') ? ayuPush.buildRules() : null); }catch(e){ return null; }
   }
   function sync(force){
     if(busy){ again = true; return; }

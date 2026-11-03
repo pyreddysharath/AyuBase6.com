@@ -64,8 +64,10 @@ final class ReminderRules {
         return days == null || days.length() == 0 || hasInt(days, dow);
     }
 
-    // Reminders repeat from "from", every N minutes, up to "to" inclusive (overnight windows allowed).
-    private static boolean inReminderSlot(JSONObject r, int m) {
+    // Reminders repeat every N minutes inside the hours "from" to "to" inclusive (overnight windows allowed).
+    // With "anchor" (ms, set by the phone app when the reminder was turned on or changed) the count starts from
+    // that moment; without it (the push server's rules) it starts at "from".
+    private static boolean inReminderSlot(JSONObject r, int m, long epochMin) {
         Double a = num(r, "from"), b = num(r, "to"), every = num(r, "every");
         if (every == null || every <= 0) return false;
         double from = a == null ? 0 : a, to = b == null ? 0 : b;
@@ -75,6 +77,11 @@ final class ReminderRules {
         else if (m >= from) delta = m - from;
         else if (m <= to) delta = m + 1440 - from;
         else return false;
+        Double anchor = num(r, "anchor");
+        if (anchor != null) {
+            long anchorMin = (long) Math.floor(anchor / 60000d), ev = (long) Math.floor(every);
+            return ev > 0 && epochMin > anchorMin && (epochMin - anchorMin) % ev == 0;
+        }
         return delta % every == 0;
     }
 
@@ -88,7 +95,7 @@ final class ReminderRules {
             JSONObject r = reminders.optJSONObject(i);
             if (r == null || !KEY.matcher(r.optString("key")).matches()) continue;
             if (!dayAllowed(r, local.dow)) continue;
-            if (inReminderSlot(r, m)) out.add(new Due(r.optString("key"), str(r.opt("title"), 80), str(r.opt("body"), 200), "alerts"));
+            if (inReminderSlot(r, m, epochMin)) out.add(new Due(r.optString("key"), str(r.opt("title"), 80), str(r.opt("body"), 200), "alerts"));
         }
 
         JSONObject ex = rules.optJSONObject("exercise");
