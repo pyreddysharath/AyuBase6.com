@@ -8372,8 +8372,8 @@ const RECIPES_DATA = [
       <div class="footer-tab-btn" id="tab-settings" title="Settings: notifications and cookies (a dot means one is on)" onclick="showFooterSection('settings')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg>
       </div>
-      <div class="footer-tab-btn" id="tab-feedback" title="Feedback" onclick="showFooterSection('feedback')">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z"/></svg>
+      <div class="footer-tab-btn" id="tab-help" title="Help: check notifications, troubleshooting, feedback (a dot means a problem was found)" onclick="showFooterSection('help')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
       </div>
       <div class="footer-tab-btn" id="tab-legal" title="Legal: disclaimer and privacy policy" onclick="showFooterSection('legal')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
@@ -8385,20 +8385,6 @@ const RECIPES_DATA = [
   </div>
 
   <div class="footer-inner">
-
-  <div class="footer-acc-body" id="sec-feedback" style="display:none">
-    <div class="footer-sec-title" id="feedback-title">Feedback</div>
-    <div id="feedback-form-section" class="feedback-form-section">
-      <input id="fb-website" type="hidden" value="AyuBase6.com">
-      <input id="fb-name" type="text" placeholder="Your name" maxlength="80">
-      <textarea id="fb-message" placeholder="Your message" rows="3" maxlength="1000"></textarea>
-      <input id="fb-status" type="hidden" value="Open">
-      <button id="fb-submit-btn" onclick="submitFeedback()">Submit</button>
-    </div>
-    <div id="feedback-confirm" class="feedback-confirm" style="display:none">
-      Your feedback has been fed back. Thanks!
-    </div>
-  </div>
 
   <div class="footer-acc-body" id="sec-backup" style="display:none">
     <div class="footer-sec-title backup-title">Backup &amp; restore <button type="button" class="backup-info-btn" id="backup-info-btn" aria-expanded="false" aria-controls="backup-info" title="About backup &amp; restore" onclick="var p=document.getElementById('backup-info');p.hidden=!p.hidden;this.setAttribute('aria-expanded',String(!p.hidden))">i</button></div>
@@ -8430,10 +8416,7 @@ const RECIPES_DATA = [
     <div class="feedback-form-section" style="flex-direction:row; gap:10px;">
       <button id="notif-enable-btn" onclick="toggleMasterNotify()">Enable Notifications</button>
     </div>
-    <div class="notif-test">
-      <button type="button" id="notif-test-btn" onclick="ayuNotifTest()">Send test notification</button>
-      <div class="notif-test-out" id="notif-test-out" role="status"></div>
-    </div>
+    <p class="feedback-note-small" style="margin-top:10px">Having trouble? <a href="#" onclick="showFooterSection('check');return false;" style="font-weight:700">Check notifications in Help</a></p>
     <p class="feedback-note-small" id="notif-denied-help" style="display:none;margin-top:8px">
       Notifications are blocked in your browser. To turn them on, open your browser's site settings for this
       page and allow notifications, then reload.
@@ -8492,6 +8475,41 @@ const RECIPES_DATA = [
     location, device type, and browsing activity on this site. We do not control how third-party ad networks use
     this data — please refer to their own privacy policies for details. You can manage or block ad-related data
     collection through your browser's cookie and privacy settings.</p>
+    </div>
+  </div>
+
+  <div class="footer-acc-body" id="sec-help" style="display:none">
+    <div class="footer-subtabs" role="tablist"><button type="button" class="footer-subtab" id="subtab-check" role="tab" onclick="showFooterSub('help','check')">Check notifications<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-trouble" role="tab" onclick="showFooterSub('help','trouble')">Troubleshooting<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-feedback" role="tab" onclick="showFooterSub('help','feedback')">Feedback<i class="fs-dot"></i></button></div>
+    <div class="footer-sub" id="sec-check" style="display:none">
+      <p>This checks every step that reminders need, one by one. Where something needs you, tap the <b>i</b> to see what to do.</p>
+      <ul class="chk-list" id="chk-list"></ul>
+      <div class="chk-sum" id="chk-sum"></div>
+      <button type="button" class="chk-btn" id="chk-run" onclick="ayuRunCheck()">Run check again</button>
+    </div>
+    <div class="footer-sub" id="sec-trouble" style="display:none">
+    <div class="trb">
+      <details><summary>No notification when the app is closed</summary><p>Reminders while the app is closed need the installed app, allowed notifications and a registered phone. Open <b>Help → Check notifications</b> and fix any step marked ✕. Then close the app completely and test again.</p></details>
+      <details><summary>Notifications only come while the app is open</summary><p>The app is probably open in a browser tab, or this phone is not registered yet. Open the app from its home-screen icon, turn the reminder switch on, and run the check.</p></details>
+      <details><summary>No sound</summary><p>Turn the phone's media or notification volume up and check that the reminder's sound is not muted in its section. In your phone's Settings → Apps → AyuBase6 (or Chrome) → Notifications, make sure sound is on and the channel is not set to silent.</p></details>
+      <details><summary>Notifications are blocked</summary><p>A page cannot unblock itself. Allow notifications in the browser (Chrome menu → Settings → Site settings → Notifications) or long-press the app icon → App info → Notifications, then run the check again.</p></details>
+      <details><summary>iPhone</summary><p>Add the app to the Home Screen first (Share → Add to Home Screen) and open it from that icon. Notifications are not available in a normal Safari tab.</p></details>
+      <details><summary>Reminders are late or skipped</summary><p>Turn off battery saver or "restrict background activity" for the app and Chrome. A reminder missed by more than a few minutes is skipped instead of being shown late, and reminders do not fire on days you did not choose.</p></details>
+      <details><summary>"Tap to copy the URL for this app"</summary><p>That is the phone's own notice that an installed web app is open. It is not from AyuBase6 and goes away when you close the app. You can switch that notice off in the phone's Chrome notification settings; reminders are not affected.</p></details>
+      <details><summary>Nothing helps</summary><p>Uninstall the app, install it again from the website, allow notifications and run the check. Your saved data can be restored from a Backup file. If it still fails, tell us in Feedback.</p></details>
+    </div>
+    </div>
+    <div class="footer-sub" id="sec-feedback" style="display:none">
+    <div class="footer-sec-title" id="feedback-title">Feedback</div>
+    <div id="feedback-form-section" class="feedback-form-section">
+      <input id="fb-website" type="hidden" value="AyuBase6.com">
+      <input id="fb-name" type="text" placeholder="Your name" maxlength="80">
+      <textarea id="fb-message" placeholder="Your message" rows="3" maxlength="1000"></textarea>
+      <input id="fb-status" type="hidden" value="Open">
+      <button id="fb-submit-btn" onclick="submitFeedback()">Submit</button>
+    </div>
+    <div id="feedback-confirm" class="feedback-confirm" style="display:none">
+      Your feedback has been fed back. Thanks!
+    </div>
     </div>
   </div>
 
@@ -11393,14 +11411,16 @@ function downloadBodyPDF(){
 const FEEDBACK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxPwZpVM9hxNnVcH_nPoFLH4pUhcsJhqQlo3IB9OwLLHgFqYvS_NLCN9aCxztz0fkK2/exec';
 const FEEDBACK_STORAGE_KEY = 'healtheeFeedbackEntries';
 const COOKIE_CONSENT_KEY = 'healtheeCookieConsent';
-const FOOTER_SECTIONS = ['settings', 'legal', 'feedback', 'othersites'];
-const FOOTER_ALIAS = {cookies:['settings','cookies'], notifications:['settings','notifications'], disclaimer:['legal','disclaimer'], privacy:['legal','privacy']};
-const FOOTER_SUBS = {settings:['notifications','cookies'], legal:['disclaimer','privacy']}, footerSubNow = {};
+const FOOTER_SECTIONS = ['settings', 'legal', 'help', 'othersites'];
+const FOOTER_ALIAS = {cookies:['settings','cookies'], notifications:['settings','notifications'], disclaimer:['legal','disclaimer'], privacy:['legal','privacy'], feedback:['help','feedback'], check:['help','check'], troubleshoot:['help','trouble']};
+const FOOTER_SUBS = {settings:['notifications','cookies'], legal:['disclaimer','privacy'], help:['check','trouble','feedback']}, footerSubNow = {};
 function showFooterSub(parent, sub){
   footerSubNow[parent] = sub;
   FOOTER_SUBS[parent].forEach(s => { const el=document.getElementById('sec-'+s), b=document.getElementById('subtab-'+s); if(el) el.style.display = s===sub ? 'block' : 'none'; if(b){ b.classList.toggle('active', s===sub); b.setAttribute('aria-selected', s===sub ? 'true' : 'false'); } });
   if(sub==='cookies') renderCookieChoice();
   if(sub==='notifications') refreshNotifStatusUI();
+  if(sub==='feedback') resetFeedbackPanel();
+  if(sub==='check' && window.ayuRunCheck) ayuRunCheck();
 }
 
 // Toggles the short description under one of the "Our Other Sites" entries.
@@ -13823,6 +13843,36 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     }finally{ busy=false; refreshStatus(); if(again){ again=false; setTimeout(sync,0); } }
   }
   ayuPush.sync = sync;
+  // Repair: make sure this phone has a working push address that the server accepted. Used by the check and by the quiet self-heal.
+  ayuPush.repair = async function(){
+    var out={ sub:false, server:false, error:'' };
+    if(!ayuPush.api || !('PushManager' in window) || !('serviceWorker' in navigator)) { out.error='unsupported'; return out; }
+    var rules=buildRules(); if(!rules){ out.error='off'; return out; }
+    try{
+      var reg=await navigator.serviceWorker.ready; try{ await reg.update(); }catch(e){}
+      var sub=await reg.pushManager.getSubscription();
+      if(!sub && !isStandalone()){ out.error='not installed'; return out; }
+      var post=function(sb){ return api('/subscribe',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ subscription:sb.toJSON(), rules:rules }) }); };
+      if(!sub) sub=await getSubscription(true);
+      out.sub=true;
+      var res=await post(sub);
+      if(!res.ok){ try{ await sub.unsubscribe(); }catch(e){} sub=await getSubscription(true); res=await post(sub); }   // a rejected address is replaced by a fresh one, once
+      out.server=res.ok; if(!res.ok) out.error='server '+res.status;
+      if(res.ok){ lastSent=JSON.stringify(rules); lastOkAt=Date.now(); ayuPush.active=true; ayuPush.error=''; }
+    }catch(e){ out.error=String(e&&e.message||e); }
+    refreshStatus();
+    return out;
+  };
+  // Quietly, when the app opens and when it comes back to the front: if background alerts should be working but are not, repair them.
+  var healAt=0;
+  function selfHeal(){
+    try{
+      if(!ayuPush.api || isDesktop() || ayuPush.active || Date.now()-healAt<60000) return;
+      if(typeof Notification==='undefined' || Notification.permission!=='granted' || !buildRules()) return;
+      healAt=Date.now(); ayuPush.repair();
+    }catch(e){}
+  }
+  setTimeout(selfHeal,5000); document.addEventListener('visibilitychange',function(){ if(!document.hidden) setTimeout(selfHeal,1500); });
   ayuPush.buildRules = buildRules;
 
   // While background alerts are active and the page is hidden, the server delivers the reminder, so the page stays quiet.
@@ -14215,7 +14265,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (PDF) or type values in, to see what is in or out of range.');
   sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
   // Footer
-  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications (with a test button) and cookies. A dot in the icon colour means one of them is on</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z"/></svg></span><span><b>Feedback</b>: tell us what to improve</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy policy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
+  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. A dot in the icon colour means one of them is on</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: check that notifications work, troubleshooting tips and feedback. A dot means a problem was found</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy policy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
 
   var root=document.getElementById('tour-root'), spot=document.getElementById('tour-spot'), txt=document.getElementById('tour-text'), bar=document.getElementById('tour-bar');
   var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0;
@@ -14275,7 +14325,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
     if(s.pin){
       // Footer step: the text sits at the top and a row with the footer icons sits just above the buttons, whatever the page length.
       if(!fi.firstChild) fi.innerHTML=Array.prototype.map.call(document.querySelectorAll('.footer-tabs-icons .footer-tab-btn svg'),function(v){ return '<span>'+v.outerHTML+'</span>'; }).join('');
-      if(fi.firstChild){ fi.firstChild.classList.add('has-dot'); if(fi.children[1]) fi.children[1].classList.add('has-dot-c'); }
+      if(fi.firstChild){ fi.firstChild.classList.add('has-dot'); if(fi.children[1]) fi.children[1].classList.add('has-dot-c'); if(fi.children[2]) fi.children[2].classList.add('has-dot-c'); }
       root.classList.add('nospot'); spot.style.display='none';
       var desk0=vw>=900;
       txt.style.width=''; txt.style.left=(desk0?barRect.left:14)+'px'; txt.style.top='16px';
@@ -15157,60 +15207,146 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 <style id="body-nav-topright-20261103">@media (max-width:899px){body:has(#activity-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) left -130px top 55px/250px no-repeat,var(--lotus-mask) right -62px top -22px/150px no-repeat;mask:var(--lotus-mask) left -130px top 55px/250px no-repeat,var(--lotus-mask) right -62px top -22px/150px no-repeat}}</style>
 <style id="title-gap-20261103">@media (min-width:900px){html body .tab-panel > .ayu-content-page-title{padding-bottom:0 !important;margin-bottom:8px !important}}</style>
 <style id="footer-settings-20261103">
-#tab-settings{position:relative}
-#tab-settings.has-on::after{content:'';position:absolute;top:1px;right:calc(50% - 13px);width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 1.5px #fff;pointer-events:none}
-@media (min-width:900px){#tab-settings.has-on::after{width:5px;height:5px;top:2px;right:calc(50% - 11px);box-shadow:0 0 0 1px #fff}}
+#tab-settings,#tab-help{position:relative}
+#tab-settings.has-on::after,#tab-help.has-prob::after{content:'';position:absolute;top:1px;right:calc(50% - 13px);width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 1.5px #fff;pointer-events:none}
+@media (min-width:900px){#tab-settings.has-on::after,#tab-help.has-prob::after{width:5px;height:5px;top:2px;right:calc(50% - 11px);box-shadow:0 0 0 1px #fff}}
 .footer-subtabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
 .footer-subtab{position:relative;font:inherit;font-size:.82rem;font-weight:700;padding:6px 14px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:var(--footer-accent,var(--act-2));cursor:pointer;opacity:.75}
 .footer-subtab.active{background:var(--footer-accent,var(--act-2));color:#fff;opacity:1;border-color:transparent}
 .footer-subtab .fs-dot{display:none;position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:var(--footer-accent,var(--act-2));box-shadow:0 0 0 1.5px #fff}
 .footer-subtab .fs-dot.on{display:block}
-.notif-test{margin-top:10px}
-.notif-test button{font:inherit;font-weight:700;padding:8px 16px;border-radius:10px;border:0;background:var(--footer-accent,var(--act-2));color:#fff;cursor:pointer}
 .nt-ok,.notif-test-out .nt-ok{color:var(--footer-accent,var(--act-2));font-weight:900}
 #sec-cookies .toggle-switch input:checked + .toggle-slider{background:var(--footer-accent,var(--act-2)) !important}
 #sec-cookies .toggle-switch input:disabled:checked + .toggle-slider{opacity:.55}
-.notif-test-out{margin-top:8px;font-size:.84rem;line-height:1.7;white-space:pre-line}
 #tour-text .tf-ic.has-dot-c,#tour-ficons span.has-dot-c{position:relative}
 #tour-text .tf-ic.has-dot-c::after,#tour-ficons span.has-dot-c::after{content:'';position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 0 1.5px #fff}
 #tour-ficons span.has-dot-c::after{top:-5px;right:-6px}
+/* Help: checklist */
+.chk-list{list-style:none;margin:6px 0 10px;padding:0}
+.chk-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:.9rem;line-height:1.35}
+.chk-cb{flex:0 0 22px;width:22px;height:22px;border-radius:6px;border:2px solid var(--footer-accent,var(--act-2));box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;line-height:1;color:#fff;background:transparent}
+.chk-row.run .chk-cb{border-style:dashed;animation:chkpulse 1s ease-in-out infinite}
+.chk-row.ok .chk-cb{background:var(--footer-accent,var(--act-2))}
+.chk-row.ok .chk-cb::after{content:'\2713'}
+.chk-row.bad .chk-cb{border-color:#c0392b;background:#c0392b}
+.chk-row.bad .chk-cb::after{content:'\2715';font-size:12px}
+.chk-row.skip .chk-cb{opacity:.35}
+.chk-row.skip .chk-lab{opacity:.55}
+.chk-lab{flex:1 1 auto}
+.chk-note{display:block;font-size:.78rem;opacity:.65}
+.chk-i{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--footer-accent,var(--act-2));background:#fff;color:var(--footer-accent,var(--act-2));font:italic 700 13px/1 Georgia,serif;cursor:pointer;padding:0;display:none}
+.chk-row.bad .chk-i,.chk-row.hasinfo .chk-i{display:inline-block}
+.chk-sum{font-weight:700;margin:6px 0 8px;min-height:1.3em}
+.chk-btn{font:inherit;font-weight:700;padding:8px 16px;border-radius:10px;border:0;background:var(--footer-accent,var(--act-2));color:#fff;cursor:pointer}
+@keyframes chkpulse{50%{opacity:.4}}
+.trb details{border-bottom:1px solid rgba(0,0,0,.08);padding:6px 0}
+.trb summary{cursor:pointer;font-weight:700;color:var(--footer-accent,var(--act-2));font-size:.9rem}
+.trb details p{margin:6px 0 4px}
+/* popup, in the colour of the section */
+#ayu-pop{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:20px}
+#ayu-pop[hidden]{display:none}
+.ayu-pop-card{max-width:360px;width:100%;border-radius:16px;background:var(--footer-accent,var(--act-2));color:#fff;padding:18px 18px 14px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.ayu-pop-h{font-weight:800;font-size:1.05rem;margin-bottom:8px}
+.ayu-pop-b{font-size:.92rem;line-height:1.55}
+.ayu-pop-ok{display:block;margin:14px 0 0 auto;font:inherit;font-weight:800;padding:7px 22px;border-radius:10px;border:0;background:#fff;color:var(--footer-accent,var(--act-2));cursor:pointer}
 </style>
 <script id="footer-settings-20261103-js">
 (function(){
-  // A dot on the Settings icon when notifications or advertising cookies are on; the same dot on the matching tab inside.
+  function $(id){ return document.getElementById(id); }
+  // Dots: Settings icon = notifications or advertising cookies on; Help icon = a notification problem was found.
   function update(){
-    var n=false,c=false;
+    var n=false,c=false,prob=false;
     try{ n=!!(typeof isMasterNotifyOn==='function' && isMasterNotifyOn()); }catch(e){}
     try{ var cc=getCookieConsent(); c=!!(cc&&cc.advertising); }catch(e){}
-    var t=document.getElementById('tab-settings'); if(t) t.classList.toggle('has-on',n||c);
+    try{
+      var want=n || (typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled());
+      if(want && typeof Notification!=='undefined'){
+        if(Notification.permission==='denied') prob=true;
+        else if(Notification.permission==='granted' && window.ayuPush && ayuPush.api && NUDGE_IS_PHONE && ayuPush.error) prob=true;
+      }
+    }catch(e){}
+    var t=$('tab-settings'); if(t) t.classList.toggle('has-on',n||c);
+    var h=$('tab-help'); if(h) h.classList.toggle('has-prob',prob);
     var a=document.querySelector('#subtab-notifications .fs-dot'), b=document.querySelector('#subtab-cookies .fs-dot');
     if(a) a.classList.toggle('on',n); if(b) b.classList.toggle('on',c);
   }
-  ['refreshNotifStatusUI','renderCookieChoice'].forEach(function(nm){ var o=window[nm]; if(typeof o!=='function'||o._d) return; var w=function(){ var r=o.apply(this,arguments); try{ update(); var st=document.getElementById('notif-status-text'); if(st&&st.textContent.indexOf('\u2705')===0) st.innerHTML='<span class="nt-ok">\u2713</span>'+st.textContent.slice(1); }catch(e){} return r; }; w._d=1; window[nm]=w; });
+  ['refreshNotifStatusUI','renderCookieChoice'].forEach(function(nm){ var o=window[nm]; if(typeof o!=='function'||o._d) return; var w=function(){ var r=o.apply(this,arguments); try{ update(); var st=$('notif-status-text'); if(st&&st.textContent.indexOf('✅')===0) st.innerHTML='<span class="nt-ok">✓</span>'+st.textContent.slice(1); }catch(e){} return r; }; w._d=1; window[nm]=w; });
   window.addEventListener('storage',update); setInterval(update,2500); setTimeout(update,300); update();
-  // Test: shows what is allowed on this phone, then sends one real notification with the reminder sound.
-  window.ayuNotifTest=async function(){
-    var out=document.getElementById('notif-test-out'), L=[];
-    function show(){ if(out) out.innerHTML=L.join('\n').replace(/\u2705/g,'<span class="nt-ok">\u2713</span>'); }
-    try{
-      var perm=typeof Notification==='undefined'?'unsupported':Notification.permission;
-      if(perm==='default'){ try{ perm=await Notification.requestPermission(); }catch(e){} }
-      L.push((perm==='granted'?'✅':'⚠️')+' Browser permission: '+(perm==='granted'?'allowed':perm==='denied'?'blocked (allow it in the browser or phone site settings)':perm));
-      var on=isMasterNotifyOn();
-      L.push((on?'✅':'⚠️')+' Reminder notifications: '+(on?'on':'off (turn on the switch in Reminders)'));
-      var reg=null; try{ reg=await getNudgeReg(); }catch(e){}
-      L.push((reg?'✅':'⚠️')+' Background service: '+(reg?'running':'not running (system notifications may not show)'));
-      var sub=null; try{ sub=reg&&reg.pushManager?await reg.pushManager.getSubscription():null; }catch(e){}
-      L.push((sub?'✅':'ℹ️')+' Reminders while the app is closed: '+(sub?'set up on this device':'not set up on this device, so reminders arrive only while the app is open'));
-      show();
+
+  // Popup in the section's colour
+  var pop=document.createElement('div'); pop.id='ayu-pop'; pop.hidden=true; pop.setAttribute('role','dialog'); pop.setAttribute('aria-modal','true');
+  pop.innerHTML='<div class="ayu-pop-card"><div class="ayu-pop-h"></div><div class="ayu-pop-b"></div><button type="button" class="ayu-pop-ok">OK</button></div>';
+  document.body.appendChild(pop);
+  pop.addEventListener('click',function(e){ if(e.target===pop || (e.target.classList&&e.target.classList.contains('ayu-pop-ok'))) pop.hidden=true; });
+  function showPop(t,m){ pop.querySelector('.ayu-pop-h').textContent=t; pop.querySelector('.ayu-pop-b').innerHTML=m; pop.hidden=false; }
+
+  // The check: every step is ticked one by one; a step that needs a person gets an "i" with the fix.
+  var running=false;
+  var INFO={};
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+  function ok(note){ return {ok:true,note:note}; }
+  function bad(t,m){ return {ok:false,title:t,msg:m}; }
+  function skip(note){ return {skip:true,note:note}; }
+  async function run(){
+    if(running) return; running=true;
+    var list=$('chk-list'), sum=$('chk-sum'), btn=$('chk-run'); if(!list){ running=false; return; }
+    if(btn) btn.disabled=true; sum.textContent='Checking…'; list.innerHTML=''; INFO={};
+    var phone=!!NUDGE_IS_PHONE, push=!!(window.ayuPush && ayuPush.api), rep=null;
+    var granted=function(){ return typeof Notification!=='undefined' && Notification.permission==='granted'; };
+    var remindersOn=function(){ try{ return !!(isMasterNotifyOn() || (typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled())); }catch(e){ return false; } };
+    var steps=[
+      {k:'perm',label:'Notifications allowed',fn:async function(){
+        if(typeof Notification==='undefined') return bad('Not supported','This browser cannot show notifications. On Android use Chrome; on iPhone add the app to the Home Screen first.');
+        var p=Notification.permission; if(p==='default'){ try{ p=await Notification.requestPermission(); }catch(e){} }
+        return p==='granted' ? ok() : bad('Notifications are blocked','Allow them in your browser or phone: <b>Chrome menu → Settings → Site settings → Notifications</b>, or <b>long-press the app icon → App info → Notifications</b>. Allow AyuBase6, then run the check again.'); }},
+      {k:'on',label:'Reminders turned on',fn:async function(){
+        return remindersOn() ? ok() : bad('Reminders are off','Turn on the <b>Reminder hours</b> switch in Reminders, or <b>Notify Me</b> in Checks. Nothing is sent while both are off.'); }},
+      {k:'inst',label:'Opened as the installed app',fn:async function(){
+        if(!phone) return skip('Not needed on a computer');
+        var st=false; try{ st=(matchMedia('(display-mode: standalone)').matches||navigator.standalone===true); }catch(e){}
+        return st ? ok() : bad('Open the installed app','You are in a browser tab. Reminders while the app is closed need the installed app: open AyuBase6 from its icon on your home screen. If there is no icon, use the browser menu → <b>Install app</b> / <b>Add to Home Screen</b>.'); }},
+      {k:'sw',label:'Background service running',fn:async function(){
+        var reg=null; try{ reg=await getNudgeReg(); }catch(e){}
+        if(!reg) return bad('Background service is not running','Close the app completely (swipe it away) and open it again. Do this twice so the newest version loads. If it still fails, uninstall and reinstall the app.');
+        try{ await reg.update(); }catch(e){} return ok(); }}
+    ];
+    if(push) steps.push(
+      {k:'reg',label:'This phone registered',fn:async function(){
+        if(!phone) return skip('Not used on a computer');
+        if(!granted()||!remindersOn()) return skip('Needs the steps above');
+        try{ rep=await ayuPush.repair(); }catch(e){ rep={sub:false,server:false,error:String(e&&e.message||e)}; }
+        if(rep.error==='off') return skip('Needs the steps above');
+        return rep.sub ? ok() : bad('This phone is not registered','The app could not register this phone for closed-app reminders'+(rep.error?' ('+rep.error+')':'')+'. Check your internet connection and run the check again.'); }},
+      {k:'srv',label:'Reminder server accepted it',fn:async function(){
+        if(!phone) return skip('Not used on a computer');
+        if(!rep||rep.error==='off') return skip('Needs the steps above');
+        return rep.server ? ok() : bad('The server did not accept it','The reminder server did not accept this phone'+(rep.error?' ('+rep.error+')':'')+'. Check your internet connection and run the check again. If it keeps failing, tell us in Feedback.'); }}
+    );
+    steps.push({k:'test',label:'Test notification and sound',human:true,fn:async function(){
+      if(!granted()) return skip('Needs notifications allowed');
       try{ if(!alertState.break.muted) playAlertPreset(alertState.break.sound); }catch(e){}
-      if(perm==='granted'){
-        var ok=showNudgeNotification('AyuBase6','Test notification. If you can see and hear this, reminders can reach you.',{key:'test'});
-        L.push(ok?'🔔 Test notification sent. If you did not see or hear it, check this app’s notification settings on your phone (sound on, not silent).':'⚠️ Could not show a notification.');
-      } else L.push('No test notification was sent because the permission is not allowed.');
-    }catch(e){ L.push('⚠️ The test could not finish.'); }
-    show();
-  };
+      var shown=showNudgeNotification('AyuBase6','Test notification. If you can see and hear this, reminders can reach you.',{key:'test'});
+      return shown ? ok('Did it arrive? Tap i') : bad('Could not show a notification','The browser refused to show the notification. Run the check again; if it keeps failing, close and reopen the app.'); },
+      info:['Did it arrive?','You should see a notification and hear the reminder sound. If not, open your phone <b>Settings → Apps → AyuBase6 (or Chrome) → Notifications</b>: allowed, sound on, not silent. Also check Do Not Disturb and battery saver.']});
+    steps.forEach(function(s){
+      var li=document.createElement('li'); li.className='chk-row'; li.id='chk-'+s.k;
+      li.innerHTML='<span class="chk-cb"></span><span class="chk-lab">'+s.label+'<span class="chk-note"></span></span><button type="button" class="chk-i" aria-label="More information">i</button>';
+      li.querySelector('.chk-i').addEventListener('click',function(){ var d=INFO[s.k]; if(d) showPop(d[0],d[1]); });
+      list.appendChild(li);
+    });
+    var allOk=true;
+    for(var i=0;i<steps.length;i++){
+      var s=steps[i], li=$('chk-'+s.k); li.classList.add('run'); await sleep(350);
+      var r; try{ r=await s.fn(); }catch(e){ r=bad('This step could not finish','Run the check again.'); }
+      li.classList.remove('run');
+      if(r.skip){ li.classList.add('skip'); li.querySelector('.chk-note').textContent=r.note||''; }
+      else if(r.ok){ li.classList.add('ok'); li.querySelector('.chk-note').textContent=r.note||''; if(s.info){ INFO[s.k]=s.info; li.classList.add('hasinfo'); } }
+      else { allOk=false; li.classList.add('bad'); INFO[s.k]=[r.title,r.msg]; li.querySelector('.chk-note').textContent=r.title; }
+    }
+    sum.innerHTML= allOk ? '<span class="nt-ok">✓</span> All checks passed.' : 'Tap the <b>i</b> next to a ✕ step to see how to fix it, then run the check again.';
+    if(btn) btn.disabled=false; running=false; update();
+  }
+  window.ayuRunCheck=run;
 })();
 </script>
 </body>
