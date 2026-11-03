@@ -169,7 +169,6 @@ final class ReminderScheduler {
             .setSmallIcon(R.drawable.ic_stat_lotus)
             .setContentTitle(title)
             .setContentText(body)
-            .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
             .setCustomContentView(cardView(c, R.layout.notif_card_small, theme, title, body, 720, 150))
             .setCustomBigContentView(cardView(c, R.layout.notif_card_big, theme, title, body, 720, 300))
             .setColor(theme.deep)
@@ -180,6 +179,9 @@ final class ReminderScheduler {
             .setCategory(silent ? NotificationCompat.CATEGORY_PROGRESS : NotificationCompat.CATEGORY_REMINDER)
             .setPriority(silent ? NotificationCompat.PRIORITY_LOW : NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        // Android 12+ always keeps its own top line (app name, time) and fills the rest with our colour.
+        // Android 8-11 show the coloured view across the whole notification, so no system frame is added there.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) b.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
         try {
             nm.notify(idFor(tag), b.build());
         } catch (SecurityException e) {

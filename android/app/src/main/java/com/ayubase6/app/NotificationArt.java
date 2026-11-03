@@ -81,21 +81,16 @@ final class NotificationArt {
         return b;
     }
 
-    /** Light section-coloured card with a large faint lotus (the web app's notification banner), rounded. */
+    /** Light section-coloured background with a large faint lotus (the web app's notification banner). */
     static Bitmap card(Theme t, int w, int h) {
         Bitmap b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas cv = new Canvas(b);
         Paint bg = new Paint(Paint.ANTI_ALIAS_FLAG);
         bg.setShader(new LinearGradient(0, 0, w, h, t.g0, t.g1, Shader.TileMode.CLAMP));
-        RectF r = new RectF(0, 0, w, h);
-        float rad = h * .14f + 12;
-        cv.drawRoundRect(r, rad, rad, bg);
-        Path clip = new Path(); clip.addRoundRect(r, rad, rad, Path.Direction.CW);
-        cv.save(); cv.clipPath(clip);
+        cv.drawRect(0, 0, w, h, bg);   // square edges: the colour fills the whole notification area, edge to edge
         float k = h / 360f;
         lotus(cv, w - 250 * k, h * .93f, 14.5f * k, t.big, .55f);
         lotus(cv, w * .42f, h, 6.5f * k, t.deep, .14f);
-        cv.restore();
         return b;
     }
 }
