@@ -149,17 +149,59 @@ public class AyuRemindersPlugin extends Plugin {
         call.resolve();
     }
 
+    // ── Settings pages for a permission: as soon as it is allowed there, the app comes back by itself ──
+    private static final int REQ_SETTINGS = 7101;
+    private final android.os.Handler main = new android.os.Handler(android.os.Looper.getMainLooper());
+    private Runnable watcher;
+
+    private void openAndReturn(PluginCall call, Intent intent, java.util.function.BooleanSupplier allowed) {
+        if (allowed.getAsBoolean()) { call.resolve(status()); return; }
+        // Opened in this app's task (no NEW_TASK) and for a result, so the app can close the page again.
+        try { getActivity().startActivityForResult(intent, REQ_SETTINGS); }
+        catch (Exception e) {
+            try { getActivity().startActivityForResult(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getContext().getPackageName())), REQ_SETTINGS); }
+            catch (Exception ignored) { call.resolve(status()); return; }
+        }
+        if (watcher != null) main.removeCallbacks(watcher);
+        final long until = android.os.SystemClock.uptimeMillis() + 3 * 60 * 1000;
+        watcher = new Runnable() {
+            @Override public void run() {
+                if (allowed.getAsBoolean()) {
+                    watcher = null;
+                    try { getActivity().finishActivity(REQ_SETTINGS); } catch (Exception ignored) {}
+                    // If the page lives in another task, bring the app to the front instead.
+                    main.postDelayed(() -> {
+                        try {
+                            if (!getActivity().hasWindowFocus()) {
+                                getActivity().startActivity(new Intent(getContext(), MainActivity.class)
+                                    .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK));
+                            }
+                        } catch (Exception ignored) {}
+                    }, 350);
+                    new Thread(() -> ReminderScheduler.reschedule(getContext()), "ayu-perm").start();
+                    notifyListeners("permissionsChanged", status());
+                    return;
+                }
+                if (android.os.SystemClock.uptimeMillis() < until) main.postDelayed(this, 400);
+                else watcher = null;
+            }
+        };
+        main.postDelayed(watcher, 600);
+        call.resolve(status());
+    }
+
     @PluginMethod
     public void openExactAlarmSettings(PluginCall call) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            openSettings(call, new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:" + getContext().getPackageName())));
-        } else call.resolve();
+            openAndReturn(call, new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:" + getContext().getPackageName())),
+                () -> ReminderScheduler.canExact(getContext()));
+        } else call.resolve(status());
     }
 
     @PluginMethod
     public void openNotificationSettings(PluginCall call) {
         Intent i = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, getContext().getPackageName());
-        openSettings(call, i);
+        openAndReturn(call, i, () -> NotificationManagerCompat.from(getContext()).areNotificationsEnabled());
     }
 
     /** Opens a web address in the phone's browser (e.g. the new app version to download). Only https. */

@@ -48,7 +48,7 @@
   var PERM_KEY = 'ayuAndroidNotifPerm';
   var perm = ls(PERM_KEY) || 'default';
   function mapPerm(s){ return s === 'granted' ? 'granted' : (s === 'denied' ? 'denied' : 'default'); }
-  function setPerm(p){ if(p !== perm){ perm = p; ls(PERM_KEY, p); setTimeout(sync, 50); } }
+  function setPerm(p){ if(p !== perm){ perm = p; ls(PERM_KEY, p); setTimeout(sync, 50); try{ if(typeof refreshNotifStatusUI === 'function') refreshNotifStatusUI(); }catch(e){} } }
   function accent(){
     // Same way as the web app's sectionTheme(): the open section's colour, read as a computed colour.
     try{
@@ -80,7 +80,7 @@
   AyuNotification.maxActions = 0;
   AyuNotification.requestPermission = function(cb){
     return P.requestPermissions().then(function(r){ setPerm(mapPerm(r && r.notifications)); return perm; }, function(){ return perm; })
-      .then(function(p){ if(typeof cb === 'function'){ try{ cb(p); }catch(e){} } refreshStatus(); return p; });
+      .then(function(p){ if(typeof cb === 'function'){ try{ cb(p); }catch(e){} } refreshStatus(); setTimeout(showBlockedCard, 800); return p; });
   };
   try{ window.Notification = AyuNotification; }catch(e){}
   if(window.Notification !== AyuNotification){ try{ Object.defineProperty(window, 'Notification', { value:AyuNotification, configurable:true, writable:true }); }catch(e){} }
@@ -152,17 +152,40 @@
       setPerm(mapPerm(r && r.notifications));
       var ex = !(r && r.exactAlarm === false);
       if(ex !== state.exact){ state.exact = ex; sync(true); }
-      showExactCard();
+      showExactCard(); showBlockedCard();
       return r;
     }).catch(noop);
   }
+
+  // ── Notifications turned off for the app (in Android settings): one tap opens the page, and the app comes back by itself once allowed ──
+  var BLOCK_KEY = 'ayuAndroidBlockedLater';
+  function wantsNotifications(){
+    try{ return !!((typeof isMasterNotifyOn === 'function' && isMasterNotifyOn()) || (typeof routineNotificationsEnabled === 'function' && routineNotificationsEnabled())); }catch(e){ return false; }
+  }
+  function showBlockedCard(){
+    var card = document.getElementById('ayu-blocked-card');
+    var later = Number(ls(BLOCK_KEY)) || 0;
+    var want = perm === 'denied' && wantsNotifications() && Date.now() - later > 3 * 86400000 && document.body;
+    if(!want){ if(card) card.remove(); return; }
+    if(card) return;
+    var ex = document.getElementById('ayu-exact-card'); if(ex) ex.remove();
+    card = document.createElement('div');
+    card.id = 'ayu-blocked-card'; card.className = 'ayu-card'; card.setAttribute('role', 'dialog'); card.setAttribute('aria-label', 'Notifications are off');
+    card.innerHTML = '<div class="ayu-ec-text"><b>Notifications are off</b><span>Turn on notifications for AyuBase6 to get your reminders. The app comes back here once they are on.</span></div>'
+      + '<div class="ayu-ec-btns"><button type="button" class="ayu-ec-later">Later</button><button type="button" class="ayu-ec-allow">Open settings</button></div>';
+    card.querySelector('.ayu-ec-allow').onclick = function(){ P.openNotificationSettings().catch(noop); };
+    card.querySelector('.ayu-ec-later').onclick = function(){ ls(BLOCK_KEY, String(Date.now())); card.remove(); };
+    document.body.appendChild(card);
+  }
+  // Allowed in Android settings: the phone brings the app back and tells us; refresh everything at once.
+  try{ P.addListener('permissionsChanged', function(){ refreshStatus().then(function(){ sync(true); }); }); }catch(e){}
 
   // ── "Alarms & reminders" permission: without it Android may deliver reminders some minutes late ──
   var CARD_KEY = 'ayuAndroidExactLater';
   function showExactCard(){
     var card = document.getElementById('ayu-exact-card');
     var later = Number(ls(CARD_KEY)) || 0;
-    var want = state.active && !state.exact && Date.now() - later > 3 * 86400000 && document.body;
+    var want = state.active && !state.exact && Date.now() - later > 3 * 86400000 && document.body && !document.getElementById('ayu-blocked-card');
     if(!want){ if(card) card.remove(); return; }
     if(card) return;
     card = document.createElement('div');
@@ -265,7 +288,7 @@
     function hideInstall(){ ['install-app-btn','routines-install-app-btn','install-help','routines-install-help'].forEach(function(id){ var el = document.getElementById(id); if(el) el.style.setProperty('display', 'none', 'important'); }); }
     hideInstall(); setTimeout(hideInstall, 1000); setTimeout(hideInstall, 4000);
     refreshStatus().then(function(){ setTimeout(function(){ sync(true); }, 300); });
-    var soon = null; function syncSoon(){ clearTimeout(soon); soon = setTimeout(sync, 250); }
+    var soon = null; function syncSoon(){ clearTimeout(soon); soon = setTimeout(function(){ sync(); showBlockedCard(); }, 250); }
     document.addEventListener('change', syncSoon, true);
     document.addEventListener('click', syncSoon, true);
     document.addEventListener('visibilitychange', function(){ if(document.hidden) sync(); else refreshStatus(); });
