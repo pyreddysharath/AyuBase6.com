@@ -15227,7 +15227,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
         if(typeof m.link.help==='string'&&/^(check|troubleshoot|feedback|announcements)$/.test(m.link.help)) link={text:lt,help:m.link.help};
         else if(typeof m.link.url==='string'&&(/^https:\/\//i.test(m.link.url)||/^[\w\-\/.]+(\?[\w=&%\-.]*)?(#[\w\-]*)?$/.test(m.link.url))) link={text:lt,url:m.link.url};
       }
-      var exp=null, ed=typeof m.expires==='string'?parseD(m.expires.trim()):null; if(ed) exp=new Date(ed.getFullYear(),ed.getMonth(),ed.getDate(),23,59,59).getTime();
+      var exp=null, ed=typeof m.expires==='string'?parseD(m.expires.trim()):null; if(ed) exp=new Date(ed.getFullYear(),ed.getMonth(),ed.getDate(),23,59,59).getTime(); if(exp!==null&&exp<Date.now()) return;   // expired messages are ignored completely
       var dd0=parseD(date), dms=dd0?dd0.getTime():null; if(dd0) date=fmtD(dd0);
       var hasText=!!(title||message);
       out.push({id:id,date:date,dateMs:dms,title:title,message:message,icon:icon,iconKind:iconKind,level:m.level==='warning'?'warning':'info',link:link,expires:exp,banner:m.banner!==false&&hasText,tab:m.tab!==false&&hasText,repair:repair});
