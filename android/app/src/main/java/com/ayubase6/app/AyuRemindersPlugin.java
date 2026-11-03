@@ -117,11 +117,12 @@ public class AyuRemindersPlugin extends Plugin {
     public void show(PluginCall call) {
         String key = call.getString("key", "note");
         String color = call.getString("color", "");
-        int c;
-        try { c = (color != null && color.matches("^#[0-9a-fA-F]{6}$")) ? android.graphics.Color.parseColor(color) : ReminderScheduler.sectionColor(call.getString("section", "")); }
-        catch (Exception e) { c = ReminderScheduler.sectionColor(""); }
+        // A colour is sent only when the notification belongs to the open section (the Help test); otherwise its own section decides.
+        NotificationArt.Theme theme;
+        try { theme = (color != null && color.matches("^#[0-9a-fA-F]{6}$")) ? NotificationArt.fromColor(android.graphics.Color.parseColor(color)) : NotificationArt.forSection(call.getString("section", "")); }
+        catch (Exception e) { theme = NotificationArt.REMINDERS; }
         ReminderScheduler.show(getContext(), key, call.getString("title", "AyuBase6"), call.getString("body", ""),
-            Boolean.TRUE.equals(call.getBoolean("silent", false)), c, call.getString("section", ""), call.getString("tapKey", ""));
+            Boolean.TRUE.equals(call.getBoolean("silent", false)), theme, call.getString("section", ""), call.getString("tapKey", ""));
         call.resolve();
     }
 

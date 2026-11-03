@@ -7,7 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.graphics.Bitmap;
 import android.media.AudioAttributes;
 import android.media.RingtoneManager;
 import android.os.Build;
@@ -15,6 +15,8 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
+import android.widget.RemoteViews;
 
 import org.json.JSONObject;
 
@@ -122,15 +124,12 @@ final class ReminderScheduler {
                 for (ReminderRules.Due d : ReminderRules.due(rules, local(t), t)) latest.put(d.key, d);
             }
             for (ReminderRules.Due d : latest.values()) {
-                show(c, "nudge-" + d.key, d.title, d.body, false, sectionColor(d.section), d.section, d.key);
+                show(c, "nudge-" + d.key, d.title, d.body, false, NotificationArt.forSection(d.section), d.section, d.key);
             }
         }
         reschedule(c);
     }
 
-    static int sectionColor(String section) {
-        return "routines".equals(section) ? Color.parseColor("#d97706") : Color.parseColor("#0d9488");
-    }
 
     static void ensureChannels(Context c) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
@@ -157,7 +156,7 @@ final class ReminderScheduler {
 
     static int idFor(String tag) { return tag == null ? 0 : tag.hashCode(); }
 
-    static void show(Context c, String tag, String title, String body, boolean silent, int color, String section, String tapKey) {
+    static void show(Context c, String tag, String title, String body, boolean silent, NotificationArt.Theme theme, String section, String tapKey) {
         ensureChannels(c);
         NotificationManagerCompat nm = NotificationManagerCompat.from(c);
         if (!nm.areNotificationsEnabled()) return;
@@ -170,8 +169,10 @@ final class ReminderScheduler {
             .setSmallIcon(R.drawable.ic_stat_lotus)
             .setContentTitle(title)
             .setContentText(body)
-            .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
-            .setColor(color)
+            .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+            .setCustomContentView(cardView(c, R.layout.notif_card_small, theme, title, body, 720, 150))
+            .setCustomBigContentView(cardView(c, R.layout.notif_card_big, theme, title, body, 720, 300))
+            .setColor(theme.deep)
             .setContentIntent(pi)
             .setAutoCancel(true)
             .setOnlyAlertOnce(silent)
@@ -184,6 +185,22 @@ final class ReminderScheduler {
         } catch (SecurityException e) {
             Log.w(TAG, "notification permission missing");
         }
+    }
+
+    // The section-coloured card: light section gradient with a faint lotus, the section logo, dark section-coloured text.
+    private static final java.util.Map<String, Bitmap> ART = new java.util.HashMap<>();
+    private static synchronized Bitmap art(String k, java.util.function.Supplier<Bitmap> make) {
+        Bitmap b = ART.get(k); if (b == null) { b = make.get(); ART.put(k, b); } return b;
+    }
+    private static RemoteViews cardView(Context c, int layout, NotificationArt.Theme t, String title, String body, int w, int h) {
+        RemoteViews v = new RemoteViews(c.getPackageName(), layout);
+        v.setImageViewBitmap(R.id.notif_bg, art("card" + t.key() + h, () -> NotificationArt.card(t, w, h)));
+        v.setImageViewBitmap(R.id.notif_logo, art("logo" + t.key(), () -> NotificationArt.logo(t)));
+        v.setTextViewText(R.id.notif_title, title);
+        v.setTextColor(R.id.notif_title, t.title);
+        v.setTextViewText(R.id.notif_body, body);
+        v.setTextColor(R.id.notif_body, t.body);
+        return v;
     }
 
     static void cancel(Context c, String tag) { NotificationManagerCompat.from(c).cancel(idFor(tag)); }

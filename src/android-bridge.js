@@ -50,7 +50,12 @@
   function mapPerm(s){ return s === 'granted' ? 'granted' : (s === 'denied' ? 'denied' : 'default'); }
   function setPerm(p){ if(p !== perm){ perm = p; ls(PERM_KEY, p); setTimeout(sync, 50); } }
   function accent(){
-    try{ var v = getComputedStyle(document.documentElement).getPropertyValue('--footer-accent').trim(); if(/^#[0-9a-f]{6}$/i.test(v)) return v; }catch(e){}
+    // Same way as the web app's sectionTheme(): the open section's colour, read as a computed colour.
+    try{
+      var el = document.createElement('i'); el.style.color = 'var(--footer-accent,#0d9488)'; document.body.appendChild(el);
+      var m = (getComputedStyle(el).color.match(/[\d.]+/g) || []).slice(0, 3).map(Number); el.remove();
+      if(m.length === 3) return '#' + m.map(function(v){ v = Math.max(0, Math.min(255, Math.round(v))); return (v < 16 ? '0' : '') + v.toString(16); }).join('');
+    }catch(e){}
     return '';
   }
   // Reminders the phone already schedules: the app's own timer for these stays quiet, so nothing arrives twice.
@@ -61,8 +66,12 @@
     if(state.active && !opts.silent && SCHEDULED_TAG.test(this.tag)){ this.tag = ''; return; }
     var key = this.tag || ('note-' + Date.now());
     this.tag = key;
-    P.show({ key:key, title:this.title, body:this.body, silent:!!opts.silent, color:accent(),
-             section:(opts.data && opts.data.section) || '', tapKey:(opts.data && opts.data.key) || '' }).catch(noop);
+    // Colours follow the section the notification belongs to (Reminders teal, Checks amber);
+    // the Help test, which belongs to no section, takes the colour of the section that is open.
+    var section = (opts.data && opts.data.section) || '', tapKey = (opts.data && opts.data.key) || '';
+    var own = (section === 'alerts' || section === 'routines') && tapKey !== 'test';
+    P.show({ key:key, title:this.title, body:this.body, silent:!!opts.silent, color:own ? '' : accent(),
+             section:section, tapKey:tapKey }).catch(noop);
   }
   AyuNotification.prototype.close = function(){ if(this.tag) P.cancel({ key:this.tag }).catch(noop); };
   AyuNotification.prototype.addEventListener = noop;
