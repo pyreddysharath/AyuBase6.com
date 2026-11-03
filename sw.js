@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'ayubase6-pwa-v7';
+const CACHE_NAME = 'ayubase6-pwa-v8';   // v8: the site now runs the build without web push
 // Videos and preview images from content/ are kept here the first time they are used.
 // Separate from CACHE_NAME so an app update does not throw the videos away.
 const MEDIA_CACHE = 'ayubase6-media-v2';

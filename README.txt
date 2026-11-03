@@ -1,7 +1,9 @@
 AyuBase6 GitHub Pages package
 
 FOLDER STRUCTURE
-  index.html          The app (one file). Must sit at the site root.
+  index.html          The app (one file), without web push: reminders only while it is open. Must sit at the site root.
+  index-with-Cloudflare.html  The same app with web push (closed-app reminders through the push server).
+                      Not served as the site; the Android app (AyuBase6-Android) is built from it, with push switched off.
   sw.js               Service worker (offline use, notification taps, saved videos). Must sit at the site root.
   CNAME, ads.txt      Domain and ads settings.
   config/             manifest.json (install details), OurOtherSites.json (footer list), feedback_apps_script.gs,
@@ -55,7 +57,11 @@ NOTES
 
 REMINDERS WHEN THE APP IS CLOSED (WEB PUSH)
 -------------------------------------------
-Optional. Deploy the separate AyuBase6-push-worker package on Cloudflare (steps in its SETUP.txt), then put its
+Currently OFF: the site serves index.html (no push) and the push server's timer is paused. The Android app sends
+reminders from the phone itself. To turn web push back on: rename index-with-Cloudflare.html to index.html (keep the
+other as index-without-Cloudflare.html, and point AyuBase6-Android's scripts/prepare-www.mjs at the push build),
+and restore the cron in the push server's wrangler.toml.
+Setup: Deploy the separate AyuBase6-push-worker package on Cloudflare (steps in its SETUP.txt), then put its
 address in config/push.json, e.g. { "api": "https://ayubase6-push.yourname.workers.dev" }.
 The app then sends each phone's reminder schedule to that server, which pushes the reminders on time.
 While the app is on screen it shows reminders itself, so you never get doubles. With "api" empty nothing is sent anywhere.

@@ -8412,9 +8412,9 @@ const RECIPES_DATA = [
     <div class="footer-subtabs" role="tablist"><button type="button" class="footer-subtab" id="subtab-notifications" role="tab" onclick="showFooterSub('settings','notifications')">Notifications<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-cookies" role="tab" onclick="showFooterSub('settings','cookies')">Cookies<i class="fs-dot"></i></button></div>
     <div class="footer-sub" id="sec-notifications" style="display:none">
     <div class="footer-sec-title">Notification Settings</div>
-    <p>The Alerts tab (Break / Walk / Drink reminders) can send you a browser notification when it's time —
-    a popup in your taskbar on desktop, or a system notification on mobile. This needs your browser's permission
-    first.</p>
+    <p>The Reminders tab (Eyes, Walk, Water, Eye Exercise and My Reminders) can send you a notification when it's time —
+    a popup on a computer, or a system notification on a phone. Checks has its own <b>Notify Me</b> switch.
+    Notifications need your permission first.</p>
     <p id="notif-status-text" class="feedback-note-small">Checking permission status…</p>
     <div class="feedback-form-section" style="flex-direction:row; gap:10px;">
       <button id="notif-enable-btn" onclick="toggleMasterNotify()">Enable Notifications</button>
@@ -8497,7 +8497,7 @@ const RECIPES_DATA = [
     <div class="trb">
       <details><summary>No notification when the app is closed</summary><p>Reminders while the app is closed need the installed app, allowed notifications and a registered phone. Open <b>Help → Notifications</b> and fix any step marked ✕. Then close the app completely and test again.</p></details>
       <details><summary>Notifications only come while the app is open</summary><p>The app is probably open in a browser tab, or this phone is not registered yet. Open the app from its home-screen icon, turn the reminder switch on, and run the check.</p></details>
-      <details><summary>Repeating reminders stop when the app is closed</summary><p>Reminders that repeat (every so many minutes) ring only while the app is open, because a web app cannot run once the phone has closed it. Keep the app open, and turn off battery saver or "restrict background activity" for the app and Chrome so the phone does not stop it early.</p></details>
+      <details><summary>Repeating reminders stop when the app is closed</summary><p>Reminders that repeat (every so many minutes) reach a closed app only on the installed app with notifications allowed and this phone registered. Open <b>Help → Notifications</b> and fix any step marked ✕. In a browser tab they ring only while that tab is open.</p></details>
       <details><summary>No sound</summary><p>Turn the phone's media or notification volume up and check that the reminder's sound is not muted in its section. In your phone's Settings → Apps → AyuBase6 (or Chrome) → Notifications, make sure sound is on and the channel is not set to silent.</p></details>
       <details><summary>Notifications are blocked</summary><p>A page cannot unblock itself. Allow notifications in the browser (Chrome menu → Settings → Site settings → Notifications) or long-press the app icon → App info → Notifications, then tap Test again.</p></details>
       <details><summary>iPhone</summary><p>Add the app to the Home Screen first (Share → Add to Home Screen) and open it from that icon. Notifications are not available in a normal Safari tab.</p></details>
@@ -12877,7 +12877,8 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   }
   function startReminder(item){
     const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name)return;
-    const notify=()=>{try{if(Array.isArray(data.days)&&data.days.length&&!data.days.includes(new Date().getDay()))return;if(window.ayuLeader===false)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')(typeof showNudgeNotification==='function'?showNudgeNotification(data.name,'It is time for your reminder.',{key:'custom-'+item.dataset.reminderId}):new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()}))}catch(_){}};
+    item.dataset.startedAt=item.dataset.startedAt||String(Date.now());   // background alerts repeat from this moment
+    const notify=()=>{try{if(Array.isArray(data.days)&&data.days.length&&!data.days.includes(new Date().getDay()))return;if(window.ayuLeader===false)return;if(window.ayuPush&&window.ayuPush.active&&document.hidden)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')(typeof showNudgeNotification==='function'?showNudgeNotification(data.name,'It is time for your reminder.',{key:'custom-'+item.dataset.reminderId}):new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()}))}catch(_){}};
     if(data.mode==='regular')item._reminderTimer=setInterval(notify,Math.max(1,Number(data.duration)||1)*60000);
     else {item._reminderTimeouts=[];item._reminderTimers=[];data.times.forEach(t=>{const [hh,mm]=t.split(':').map(Number),now=new Date(),next=new Date();next.setHours(hh,mm,0,0);if(next<=now)next.setDate(next.getDate()+1);const delay=next-now;item._reminderTimeouts.push(setTimeout(()=>{notify();item._reminderTimers.push(setInterval(notify,24*60*60*1000))},delay))})}
   }
@@ -13061,6 +13062,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     return null;
   }
   window.ayuReminderSlots={next:nextSlot,latest:latestSlot};
+  window.ayuReminderWindows=function(){return cards};   // read by the background-alerts sync
   const lastSlot={},GRACE=5*60000;
   function tick(key){
     const st=typeof alertState!=='undefined'&&alertState[key];if(!st||!st.enabled)return;
@@ -13673,6 +13675,232 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     document.addEventListener('visibilitychange',function(){if(!document.hidden)sync();});
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
+})();
+</script>
+
+<style id="web-push-20261031">
+.push-status{margin:10px 0 0;padding:9px 12px;border-radius:12px;background:#d9f0ea;color:#08766e;font-size:.82rem;line-height:1.35;font-weight:600}
+.push-status[hidden]{display:none}
+.push-status.warn{background:#fef3c7;color:#92400e}
+.push-status .ps-l{display:block}
+.push-status .ps-l+.ps-l{margin-top:8px}
+#push-status-routines{background:#f6e7c8;color:#7a4510;margin:0 0 12px;text-align:left}
+#push-status-routines.warn{background:#fef3c7;color:#92400e}
+#reminder-hours-card.rh-off .push-status{display:none!important}
+</style>
+<script id="web-push-20261031-js">
+/* Background alerts (Web Push).
+   The app tells a small server (config/push.json -> "api") when each reminder is due: hours, intervals, Checks times,
+   Eye exercise sessions, My Reminders and the phone's timezone. The server then sends a push at those moments, so
+   reminders arrive even when the app is closed or the phone is locked. The app sends fresh rules whenever
+   something changes. While the app is on screen it still shows its own reminders. */
+(function(){
+  var ayuPush = window.ayuPush = { active:false, api:'', error:'' };
+  var lastSent = '', busy = false, again = false, cfgLoaded = false, publicKey = '', lastOkAt = 0;
+
+  function $(id){ return document.getElementById(id); }
+  function toMin(t){ var m=/^(\d{1,2}):(\d{2})$/.exec(t||''); return m ? (+m[1])*60+(+m[2]) : null; }
+  function localDay(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function b64uToBytes(s){ s=String(s).replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; var b=atob(s), o=new Uint8Array(b.length); for(var i=0;i<b.length;i++) o[i]=b.charCodeAt(i); return o; }
+  function isIOS(){ return /iPhone|iPad|iPod/i.test(navigator.userAgent||'') || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1); }
+  function isStandalone(){ try{ return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone===true; }catch(e){ return false; } }
+
+  function setStatus(text, warn, html){
+    var el=$('push-status'), el2=$('push-status-routines');
+    var nd=$('routines-install-nudge'); if(nd && el2 && nd.nextElementSibling!==el2) nd.after(el2);   // Checks: right under the Notify Me title
+    [el,el2].forEach(function(e){
+      if(!e) return;
+      var show = !!text && (e!==el2 || (typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()));
+      if(!show){ e.hidden=true; return; }
+      e.hidden=false; if(html) e.innerHTML=html; else e.textContent=text; e.classList.toggle('warn',!!warn);
+    });
+  }
+  function isDesktop(){ return !(typeof NUDGE_IS_PHONE!=='undefined' && NUDGE_IS_PHONE); }
+  // The Online / Offline note shows only right after a notification switch is turned on, then hides itself after a time that fits its length.
+  var armed={rem:false,chk:false}, until={rem:0,chk:0}, prevOn=null;
+  function trackSwitches(){
+    var rem=typeof isMasterNotifyOn==='function' && !!isMasterNotifyOn();
+    var chk=typeof routineNotificationsEnabled==='function' && !!routineNotificationsEnabled();
+    if(prevOn){
+      if(rem && !prevOn.rem){ armed.rem=true; until.rem=0; }
+      if(chk && !prevOn.chk){ armed.chk=true; until.chk=0; }
+    }
+    if(!rem){ armed.rem=false; until.rem=0; }
+    if(!chk){ armed.chk=false; until.chk=0; }
+    prevOn={rem:rem,chk:chk};
+  }
+  function timedNote(html){
+    var words=html.replace(/<[^>]*>/g,' ').trim().split(/\s+/).length, wait=Math.min(25000, 3000+words*300);
+    var nd=$('routines-install-nudge'), e2=$('push-status-routines'); if(nd && e2 && nd.nextElementSibling!==e2) nd.after(e2);
+    [['rem','push-status'],['chk','push-status-routines']].forEach(function(p){
+      var k=p[0], el=$(p[1]); if(!el) return;
+      if(armed[k] && !until[k]){ until[k]=Date.now()+wait; setTimeout(refreshStatus, wait+80); }
+      if(armed[k] && Date.now()>until[k]) armed[k]=false;
+      if(!armed[k]){ el.hidden=true; return; }
+      el.hidden=false; el.innerHTML=html; el.classList.remove('warn');
+    });
+  }
+  function refreshStatus(){
+    trackSwitches();
+    var masterOn = (typeof isMasterNotifyOn==='function' && isMasterNotifyOn()) || (typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled());   // Reminders switch or Checks switch
+    if(!masterOn || typeof Notification==='undefined' || Notification.permission!=='granted'){ setStatus(''); return; }
+    // Computers: reminders come from the open app or tab (it can sit in the background); there is no background push.
+    if(isDesktop()){ setStatus(''); return; }   // the keep-open note for computers is part of the install note under the switch
+    if(!ayuPush.api){ setStatus(''); return; }
+    if(!('PushManager' in window) || !('serviceWorker' in navigator)){
+      if(isIOS() && !isStandalone()) setStatus('');   // said in the install note under the switch
+      else setStatus('Alerts while the app is closed are not supported in this browser.', true);
+      return;
+    }
+    if(ayuPush.active) timedNote('<span class="ps-l"><b>Online:</b> alerts also arrive when the app is closed.</span><span class="ps-l"><b>Offline:</b> alerts come only from the open app, so keep it open. This can’t be guaranteed: your phone may pause it.</span>'
+      + (/Android/i.test(navigator.userAgent||'') ? '<span class="ps-l"><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</span>' : (isIOS() ? '<span class="ps-l"><b>iPhone:</b> open the app from its Home Screen icon.</span>' : '')));
+    else if(ayuPush.needInstall && !isStandalone()) setStatus('');   // said in the install note under the switch
+    else if(ayuPush.error) setStatus('Alerts while the app is closed could not be set up yet. The app will keep trying.', true);
+    else setStatus('Setting up alerts for when the app is closed…');
+  }
+
+  // Everything the server needs, with times already worked out. Returns null when reminders are off.
+  function buildRules(){
+    var remOn = typeof isMasterNotifyOn==='function' && isMasterNotifyOn();
+    var chkOn = typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled();
+    if(!remOn && !chkOn) return null;   // both switches off
+    if(typeof Notification==='undefined' || Notification.permission!=='granted') return null;
+    var rules = { v:1, tz:'UTC', phone: (typeof NUDGE_IS_PHONE!=='undefined' && !!NUDGE_IS_PHONE), reminders:[], exercise:null, checks:null, custom:[] };
+    try{ rules.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; }catch(e){}
+    var wins = (typeof window.ayuReminderWindows==='function') ? window.ayuReminderWindows() : {};
+    if(remOn) ['break','walk','drink'].forEach(function(key){
+      var st = typeof alertState!=='undefined' && alertState[key]; if(!st || !st.enabled || !(st.minutes>0)) return;
+      var w = wins[key] || {}, lab = ALERT_LABELS[key];
+      var rr={ key:key, title:lab.title, body:lab.msg, every:st.minutes, from:toMin(w.start), to:toMin(w.end) }; var rd=window.ayuDays&&window.ayuDays.get('rem'); if(rd&&rd.length<7) rr.days=rd.slice(); rules.reminders.push(rr);
+    });
+    if(remOn && typeof eyeExState!=='undefined' && eyeExState.enabled && eyeExState.times && eyeExState.times.length){
+      var times = eyeExState.times.map(toMin).filter(function(m){ return m!==null; });
+      if(times.length) rules.exercise = { title:'Eye Exercise', body:'Time for your guided eye exercise — follow the dot for 30 seconds.', times:times, weekdays:eyeExState.weekdays.filter(function(d){ var rd=window.ayuDays&&window.ayuDays.get('rem'); return !rd||rd.indexOf(d)>=0; }) };
+    }
+    if(chkOn){
+      var items=[], done=[];
+      Object.keys(ROUTINE_NOTIFY_ITEMS).forEach(function(key){
+        var at = routineItemMinute(key); if(at===null) return;
+        var cb = routineCb(key); if(cb && cb.checked) done.push(key);
+        var it = ROUTINE_NOTIFY_ITEMS[key];
+        items.push({ key:key, title:it.title, body:it.body, at:at, end:routineEndMinute(key), window:routineWindowText(key), muted:routineIsMuted(key) });
+      });
+      rules.checks = { mode:routineRemindMode(), doneDay:localDay(), done:done, items:items }; var cd=window.ayuDays&&window.ayuDays.get('chk'); if(cd&&cd.length<7) rules.checks.days=cd.slice();
+    }
+    if(remOn) document.querySelectorAll('#custom-reminders-list .custom-reminder-item').forEach(function(item){
+      try{
+        var d = JSON.parse(item.dataset.reminder||'{}'); if(!d.name || d.sound==='none') return;
+        var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode };
+        if(Array.isArray(d.days) && d.days.length && d.days.length<7) c.days = d.days.filter(function(n){ return n>=0 && n<=6; });
+        if(d.mode==='regular'){ c.every = Math.max(1, Number(d.duration)||1); c.anchor = Number(item.dataset.startedAt)||Date.now(); }
+        else c.times = (d.times||[]).map(toMin).filter(function(m){ return m!==null; });
+        rules.custom.push(c);
+      }catch(e){}
+    });
+    return rules;
+  }
+
+  function api(path, opts){ opts=opts||{}; if(opts.method==='POST') opts.keepalive=true; return fetch(ayuPush.api.replace(/\/+$/,'')+path, opts); }   // keepalive: the request still completes if the app is closed right after
+
+  async function getSubscription(create){
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if(sub || !create) return sub;
+    if(!publicKey){ var r = await api('/config'); if(!r.ok) throw new Error('config'); publicKey = (await r.json()).publicKey; }
+    return reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:b64uToBytes(publicKey) });
+  }
+
+  async function sync(){
+    if(busy){ again = true; return; }   // a change made while sending is sent right after
+    if(!ayuPush.api || !('PushManager' in window) || !('serviceWorker' in navigator)) { refreshStatus(); return; }
+    busy = true;
+    try{
+      if(isDesktop()){
+        // no background push on computers: forget any earlier registration of this browser
+        var old = await getSubscription(false);
+        if(old){ try{ await api('/unsubscribe',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({endpoint:old.endpoint}) }); }catch(e){} try{ await old.unsubscribe(); }catch(e){} }
+        ayuPush.active=false; ayuPush.error=''; lastSent=''; return;
+      }
+      var rules = buildRules();
+      if(!rules){
+        // reminders are off: forget this phone on the server and stop pushes
+        var existing = await getSubscription(false);
+        if(existing){ try{ await api('/unsubscribe',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({endpoint:existing.endpoint}) }); }catch(e){} try{ await existing.unsubscribe(); }catch(e){} }
+        ayuPush.active=false; ayuPush.error=''; lastSent=''; return;
+      }
+      var body = JSON.stringify(rules);
+      var stale = Date.now()-lastOkAt > 12*3600*1000;   // also refresh now and then, so the server knows this phone is still in use
+      if(body===lastSent && ayuPush.active && !stale) return;
+      // Background alerts need the installed app: in a plain browser tab nothing is subscribed, so once the tab is closed no alert arrives.
+      var had = await getSubscription(false);
+      if(!had && !isStandalone()){ ayuPush.active=false; ayuPush.error=''; ayuPush.needInstall=true; lastSent=''; return; }
+      ayuPush.needInstall=false;
+      var sub = had || await getSubscription(true);
+      var res = await api('/subscribe',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ subscription:sub.toJSON(), rules:rules }) });
+      if(!res.ok) throw new Error('subscribe '+res.status);
+      lastSent=body; lastOkAt=Date.now(); ayuPush.active=true; ayuPush.error='';
+    }catch(e){
+      ayuPush.active=false; ayuPush.error=String(e&&e.message||e); lastSent='';
+    }finally{ busy=false; refreshStatus(); if(again){ again=false; setTimeout(sync,0); } }
+  }
+  ayuPush.sync = sync;
+  // Repair: make sure this phone has a working push address that the server accepted. Used by the check and by the quiet self-heal.
+  ayuPush.repair = async function(){
+    var out={ sub:false, server:false, error:'' };
+    if(!ayuPush.api || !('PushManager' in window) || !('serviceWorker' in navigator)) { out.error='unsupported'; return out; }
+    var rules=buildRules(); if(!rules){ out.error='off'; return out; }
+    try{
+      var reg=await navigator.serviceWorker.ready; try{ await reg.update(); }catch(e){}
+      var sub=await reg.pushManager.getSubscription();
+      if(!sub && !isStandalone()){ out.error='not installed'; return out; }
+      var post=function(sb){ return api('/subscribe',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ subscription:sb.toJSON(), rules:rules }) }); };
+      if(!sub) sub=await getSubscription(true);
+      out.sub=true;
+      var res=await post(sub);
+      if(!res.ok){ try{ await sub.unsubscribe(); }catch(e){} sub=await getSubscription(true); res=await post(sub); }   // a rejected address is replaced by a fresh one, once
+      out.server=res.ok; if(!res.ok) out.error='server '+res.status;
+      if(res.ok){ lastSent=JSON.stringify(rules); lastOkAt=Date.now(); ayuPush.active=true; ayuPush.error=''; }
+    }catch(e){ out.error=String(e&&e.message||e); }
+    refreshStatus();
+    return out;
+  };
+  // Quietly, when the app opens and when it comes back to the front: if background alerts should be working but are not, repair them.
+  var healAt=0;
+  function selfHeal(){
+    try{
+      if(!ayuPush.api || isDesktop() || ayuPush.active || Date.now()-healAt<60000) return;
+      if(typeof Notification==='undefined' || Notification.permission!=='granted' || !buildRules()) return;
+      healAt=Date.now(); ayuPush.repair();
+    }catch(e){}
+  }
+  setTimeout(selfHeal,5000); document.addEventListener('visibilitychange',function(){ if(!document.hidden) setTimeout(selfHeal,1500); });
+  ayuPush.buildRules = buildRules;
+
+  // While background alerts are active and the page is hidden, the server delivers the reminder, so the page stays quiet.
+  function quietWhenHidden(name){
+    var orig = window[name]; if(typeof orig!=='function') return;
+    window[name] = function(){ if(ayuPush.active && document.hidden) return; return orig.apply(this, arguments); };
+  }
+  quietWhenHidden('fireAlert'); quietWhenHidden('fireEyeExAlert'); quietWhenHidden('notifyRoutine');
+
+  function start(){
+    fetch('config/push.json',{cache:'no-cache'}).then(function(r){ return r.ok ? r.json() : null; }).then(function(c){
+      cfgLoaded = true;
+      ayuPush.api = (c && typeof c.api==='string') ? c.api.trim() : '';
+      if(!ayuPush.api){ refreshStatus(); setInterval(refreshStatus, 5000); return; }
+      sync();
+      // Send a change straight away (switch on/off, hours, times), and again when the app is left or closed, so nothing waits for the 5-second check.
+      var soon=null; function syncSoon(){ clearTimeout(soon); soon=setTimeout(sync,250); }
+      document.addEventListener('change', syncSoon, true);
+      document.addEventListener('click', syncSoon, true);
+      document.addEventListener('visibilitychange', function(){ if(document.hidden) sync(); });
+      window.addEventListener('pagehide', function(){ sync(); });
+      setInterval(sync, 5000);                                  // sends only when something changed
+      document.addEventListener('visibilitychange', function(){ if(!document.hidden) sync(); });
+      window.addEventListener('online', sync);
+    }).catch(function(){});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', start, {once:true}); else start();
 })();
 </script>
 <style id="checks-info-panels-same-font-20261101">
@@ -14444,45 +14672,6 @@ html body #reminder-hours-card .alert-card-hdr > .master-switch{margin-left:auto
 /* i icon beside "Reminder hours": transparent background */
 #alerts-panel #reminder-hours-info-btn#reminder-hours-info-btn{background:transparent!important}
 </style>
-<style id="phone-keep-open-note-20261102">
-.push-status{margin:10px 0 0;padding:9px 12px;border-radius:12px;background:#d9f0ea;color:#08766e;font-size:.82rem;line-height:1.35;font-weight:600}
-.push-status[hidden]{display:none}
-#push-status-routines{background:#f6e7c8;color:#7a4510;margin:0 0 12px;text-align:left}
-#reminder-hours-card.rh-off .push-status{display:none!important}
-.push-status .ps-l{display:block}
-.push-status .ps-l+.ps-l{margin-top:8px}
-</style>
-<script id="phone-keep-open-note-js-20261102">
-(function(){
-  // Phones: say that reminders come from the open app (online or offline) and, on Android, how to stop the phone pausing it.
-  function $(id){ return document.getElementById(id); }
-  var android=/Android/i.test(navigator.userAgent||'');
-  var ios=/iPhone|iPad|iPod/.test(navigator.userAgent||'') || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-  var HTML='<span class="ps-l"><b>Online or offline:</b> reminders come only from the open app, so keep it open. This can’t be guaranteed: your phone may pause it.</span>'+(android?'<span class="ps-l"><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</span>':(ios?'<span class="ps-l"><b>iPhone:</b> open the app from its Home Screen icon.</span>':''));
-  var WAIT=Math.min(25000, 3000+HTML.replace(/<[^>]*>/g,' ').trim().split(/\s+/).length*300);
-  function phone(){ return typeof NUDGE_IS_PHONE!=='undefined' && !!NUDGE_IS_PHONE; }
-  function granted(){ return typeof Notification!=='undefined' && Notification.permission==='granted'; }
-  // Shown only right after a notification switch is turned on, then hidden after a time that fits its length.
-  var armed={rem:false,chk:false}, until={rem:0,chk:0}, prev=null;
-  function refresh(){
-    var rem=phone() && granted() && typeof isMasterNotifyOn==='function' && !!isMasterNotifyOn();
-    var chk=phone() && granted() && typeof routineNotificationsEnabled==='function' && !!routineNotificationsEnabled();
-    if(prev){ if(rem && !prev.rem){ armed.rem=true; until.rem=0; } if(chk && !prev.chk){ armed.chk=true; until.chk=0; } }
-    if(!rem){ armed.rem=false; until.rem=0; } if(!chk){ armed.chk=false; until.chk=0; }
-    prev={rem:rem,chk:chk};
-    var nd=$('routines-install-nudge'), el2=$('push-status-routines'); if(nd && el2 && nd.nextElementSibling!==el2) nd.after(el2);
-    [['rem','push-status'],['chk','push-status-routines']].forEach(function(p){
-      var k=p[0], el=$(p[1]); if(!el) return;
-      if(armed[k] && !until[k]){ until[k]=Date.now()+WAIT; setTimeout(refresh, WAIT+80); }
-      if(armed[k] && Date.now()>until[k]) armed[k]=false;
-      if(armed[k]){ el.innerHTML=HTML; el.hidden=false; } else el.hidden=true;
-    });
-  }
-  document.addEventListener('change',function(){ setTimeout(refresh,300); },true);
-  document.addEventListener('click',function(){ setTimeout(refresh,300); },true);
-  setInterval(refresh,3000); setTimeout(refresh,1500);
-})();
-</script>
 <style id="repeat-on-days-20261102">
 #tour-text .tf-ic.has-dot,#tour-ficons span.has-dot{position:relative}
 #tour-text .tf-ic.has-dot::after,#tour-ficons span.has-dot::after{content:'';position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 0 1.5px #fff}
@@ -17651,7 +17840,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     pnl.innerHTML='<strong>Reminder hours</strong><p>Sets the hours for every section. You can still change them inside a section.</p>'
       +'<strong>Controls</strong><ul><li>The switch (top right) turns all reminders on or off. The first time, your browser asks for permission.</li>'
       +'<li>The install icon adds AyuBase6 to your Home Screen or desktop; the reset icon restores the defaults.</li></ul>'
-      +'<strong>On a computer</strong><ul><li>Reminders work whenever AyuBase6 is open in a browser tab or the app window. It does not need to be in front, so you can use other tabs and windows. They work without internet too. The computer must stay awake.</li></ul><strong>On a phone</strong><ul><li>Reminders come only from the open app, so keep it open, with or without internet. This can’t be guaranteed: a phone may pause a locked or background app.</li><li><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</li><li><b>iPhone:</b> open the app from its Home Screen icon. Check that Settings → Notifications → AyuBase6 is allowed. If reminders are late, turn off Low Power Mode and any Focus that silences the app.</li></ul><strong>Good to know</strong><ul>'
+      +'<strong>On a computer</strong><ul><li>Alerts work whenever AyuBase6 is open in a browser tab or the app window. It does not need to be in front, so you can use other tabs and windows. They work without internet too. The computer must stay awake.</li></ul><strong>On a phone</strong><ul><li><b>Online:</b> with the app installed, alerts also arrive when the app is closed.</li><li><b>Offline:</b> alerts come only from the open app, so keep it open. This can’t be guaranteed: a phone may pause a locked or background app.</li><li><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</li><li><b>iPhone:</b> open the app from its Home Screen icon (iOS 16.4 or later is needed for alerts when it is closed). Check that Settings → Notifications → AyuBase6 is allowed. If alerts are late, turn off Low Power Mode and any Focus that silences the app.</li></ul><strong>Good to know</strong><ul>'
       +'<li><b>To install:</b> Chrome or Edge: the install icon in the address bar, or menu → Install AyuBase6. Android: ⋮ → Install app. iPhone/iPad: Share → Add to Home Screen. Safari on Mac: File → Add to Dock.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li>'
       +'<li><b>Next</b> under a section title is when that reminder will fire while AyuBase6 is open. After a locked or paused phone, it updates when you come back.</li>'
@@ -17702,7 +17891,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       +'<ul style="margin:4px 0 8px 18px;padding:0"><li><b>At start:</b> one notification when an activity begins.</li>'
       +'<li><b>Start + before end:</b> also a reminder 15 minutes before its window closes (activities shorter than 15 minutes get only the start).</li>'
       +'<li>Each notification has <b>Done</b> (ticks it) and <b>Not yet</b>.</li></ul>'
-      +'<strong>On a computer</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Notifications work whenever AyuBase6 is open in a browser tab or the app window. It does not need to be in front, so you can use other tabs and windows. They work without internet too. The computer must stay awake.</li></ul><strong>On a phone</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Notifications come only from the open app, so keep it open, with or without internet. This can’t be guaranteed: a phone may pause a locked or background app.</li><li><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</li><li><b>iPhone:</b> open the app from its Home Screen icon. Check that Settings → Notifications → AyuBase6 is allowed. If notifications are late, turn off Low Power Mode and any Focus that silences the app.</li></ul><strong>Good to know</strong><ul style="margin:4px 0 0 18px;padding:0">'
+      +'<strong>On a computer</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Alerts work whenever AyuBase6 is open in a browser tab or the app window. It does not need to be in front, so you can use other tabs and windows. They work without internet too. The computer must stay awake.</li></ul><strong>On a phone</strong><ul style="margin:4px 0 0 18px;padding:0"><li><b>Online:</b> with the app installed, alerts also arrive when the app is closed.</li><li><b>Offline:</b> alerts come only from the open app, so keep it open. This can’t be guaranteed: a phone may pause a locked or background app.</li><li><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</li><li><b>iPhone:</b> open the app from its Home Screen icon (iOS 16.4 or later is needed for alerts when it is closed). Check that Settings → Notifications → AyuBase6 is allowed. If alerts are late, turn off Low Power Mode and any Focus that silences the app.</li></ul><strong>Good to know</strong><ul style="margin:4px 0 0 18px;padding:0">'
       +'<li><b>To install:</b> Chrome or Edge: the install icon in the address bar, or menu → Install AyuBase6. Android: ⋮ → Install app. iPhone/iPad: Share → Add to Home Screen. Safari on Mac: File → Add to Dock.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li></ul>'; }
     var rp=$('rout-info-palms'); if(rp && rp.dataset.ux!=='1'){ rp.dataset.ux='1'; rp.innerHTML='<ol><li>Rub your palms together briskly for 10–15 seconds, with firm but comfortable friction, until they feel warm.</li><li>Close your eyes and cup your warm palms over them. Your palms (not your fingers) cover the eyes, your fingers rest on your forehead, and the heels of your hands sit on your cheekbones.</li><li>Keep a small gap so nothing presses on the eyeballs.</li><li>Hold for 30–60 seconds, breathing slowly.</li></ol><p>The warmth and gentle cover relax the eye muscles and improve blood flow, easing your eyes into the day instead of going straight to bright light or a screen.</p>'; }
