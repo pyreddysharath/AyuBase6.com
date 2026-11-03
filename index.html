@@ -8369,17 +8369,14 @@ const RECIPES_DATA = [
       <div class="footer-tab-btn" id="tab-backup" title="Backup &amp; restore" onclick="showFooterSection('backup')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
       </div>
-      <div class="footer-tab-btn" id="tab-disclaimer" title="Disclaimer" onclick="showFooterSection('disclaimer')">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 15a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4zm-1-8h2v6h-2z"/></svg>
+      <div class="footer-tab-btn" id="tab-settings" title="Settings: notifications and cookies (a dot means one is on)" onclick="showFooterSection('settings')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg>
       </div>
       <div class="footer-tab-btn" id="tab-feedback" title="Feedback" onclick="showFooterSection('feedback')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z"/></svg>
       </div>
-      <div class="footer-tab-btn" id="tab-privacy" title="Privacy Policy" onclick="showFooterSection('privacy')">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 10V8a6 6 0 1112 0v2h1a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V11a1 1 0 011-1h1zm2 0h8V8a4 4 0 00-8 0v2z"/></svg>
-      </div>
-      <div class="footer-tab-btn" id="tab-cookies" title="Cookies" onclick="showFooterSection('cookies')">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.95 10.99c-1.79-.03-3.7-1.95-2.99-4.59-3.2 1.3-5.5-1.73-4.07-4.11C8.35 1.55 2 6.24 2 12c0 5.52 4.48 10 10 10 6.22 0 10.4-5.29 9.95-11.01zM8.5 15c-.83 0-1.5-.67-1.5-1.5S7.67 12 8.5 12s1.5.67 1.5 1.5S9.33 15 8.5 15zm2-5c-.83 0-1.5-.67-1.5-1.5S9.67 7 10.5 7s1.5.67 1.5 1.5S11.33 10 10.5 10zm4.5 7c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      <div class="footer-tab-btn" id="tab-legal" title="Legal: disclaimer and privacy policy" onclick="showFooterSection('legal')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
       </div>
       <div class="footer-tab-btn" id="tab-othersites" title="Our Other Sites" onclick="showFooterSection('othersites')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
@@ -8388,16 +8385,6 @@ const RECIPES_DATA = [
   </div>
 
   <div class="footer-inner">
-
-  <div class="footer-acc-body" id="sec-disclaimer" style="display:none">
-    <div class="footer-sec-title">Disclaimer</div>
-    <p>The Body (exercise &amp; yoga) and Food (nutrition) content in this app is provided for general
-    informational and educational purposes only. It is not medical advice and is not a substitute for guidance
-    from a qualified physician, physiotherapist, or registered dietitian. Always consult a healthcare professional
-    before starting a new exercise routine or changing your diet, especially if you are pregnant, have an injury,
-    or have an existing medical condition.</p>
-    <p><em>For informational purposes only.</em></p>
-  </div>
 
   <div class="footer-acc-body" id="sec-feedback" style="display:none">
     <div class="footer-sec-title" id="feedback-title">Feedback</div>
@@ -8411,24 +8398,6 @@ const RECIPES_DATA = [
     <div id="feedback-confirm" class="feedback-confirm" style="display:none">
       Your feedback has been fed back. Thanks!
     </div>
-  </div>
-
-  <div class="footer-acc-body" id="sec-privacy" style="display:none">
-    <div class="footer-sec-title">Privacy Policy</div>
-    <p><strong>Body &amp; Activity section:</strong> The exercise and yoga recommendations are general fitness
-    guidance based on the age group you select. No personal health information, biometric data, or activity
-    history is collected, stored, or transmitted to any server — all calculations happen locally in your browser.</p>
-    <p><strong>Food &amp; Nutrition section:</strong> The dietary preference and age group you choose to generate
-    nutrition suggestions are used only to compute recommendations within your current browser session. This
-    information is not saved, logged, or shared with us or any third party.</p>
-    <p><strong>Feedback:</strong> If you submit feedback, the name and message you provide are sent to us for
-    review. Please avoid including sensitive personal or medical information in your feedback.</p>
-    <p><strong>Advertising:</strong> This site displays advertisements, which may be served by third-party ad
-    networks. These networks may use cookies, device identifiers, or similar technologies to show ads, measure
-    their performance, and limit how often you see the same ad. This may include information about your general
-    location, device type, and browsing activity on this site. We do not control how third-party ad networks use
-    this data — please refer to their own privacy policies for details. You can manage or block ad-related data
-    collection through your browser's cookie and privacy settings.</p>
   </div>
 
   <div class="footer-acc-body" id="sec-backup" style="display:none">
@@ -8450,7 +8419,27 @@ const RECIPES_DATA = [
     <div class="backup-status" id="backup-status" role="status"></div>
   </div>
 
-  <div class="footer-acc-body" id="sec-cookies" style="display:none">
+  <div class="footer-acc-body" id="sec-settings" style="display:none">
+    <div class="footer-subtabs" role="tablist"><button type="button" class="footer-subtab" id="subtab-notifications" role="tab" onclick="showFooterSub('settings','notifications')">Notifications<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-cookies" role="tab" onclick="showFooterSub('settings','cookies')">Cookies<i class="fs-dot"></i></button></div>
+    <div class="footer-sub" id="sec-notifications" style="display:none">
+    <div class="footer-sec-title">Notification Settings</div>
+    <p>The Alerts tab (Break / Walk / Drink reminders) can send you a browser notification when it's time —
+    a popup in your taskbar on desktop, or a system notification on mobile. This needs your browser's permission
+    first.</p>
+    <p id="notif-status-text" class="feedback-note-small">Checking permission status…</p>
+    <div class="feedback-form-section" style="flex-direction:row; gap:10px;">
+      <button id="notif-enable-btn" onclick="toggleMasterNotify()">Enable Notifications</button>
+    </div>
+    <div class="notif-test">
+      <button type="button" id="notif-test-btn" onclick="ayuNotifTest()">Send test notification</button>
+      <div class="notif-test-out" id="notif-test-out" role="status"></div>
+    </div>
+    <p class="feedback-note-small" id="notif-denied-help" style="display:none;margin-top:8px">
+      Notifications are blocked in your browser. To turn them on, open your browser's site settings for this
+      page and allow notifications, then reload.
+    </p>
+    </div>
+    <div class="footer-sub" id="sec-cookies" style="display:none">
     <div class="footer-sec-title">Cookies</div>
     <p>This site uses two kinds of local storage (cookies and similar browser storage):</p>
     <div class="cookie-cat-row">
@@ -8473,21 +8462,37 @@ const RECIPES_DATA = [
       <button id="cookies-decline-btn" onclick="setCookieConsent(false)">Necessary Only</button>
       <button id="cookies-save-btn" onclick="saveCookiePrefs()">Save Preferences</button>
     </div>
+    </div>
   </div>
 
-  <div class="footer-acc-body" id="sec-notifications" style="display:none">
-    <div class="footer-sec-title">Notification Settings</div>
-    <p>The Alerts tab (Break / Walk / Drink reminders) can send you a browser notification when it's time —
-    a popup in your taskbar on desktop, or a system notification on mobile. This needs your browser's permission
-    first.</p>
-    <p id="notif-status-text" class="feedback-note-small">Checking permission status…</p>
-    <div class="feedback-form-section" style="flex-direction:row; gap:10px;">
-      <button id="notif-enable-btn" onclick="toggleMasterNotify()">Enable Notifications</button>
+  <div class="footer-acc-body" id="sec-legal" style="display:none">
+    <div class="footer-subtabs" role="tablist"><button type="button" class="footer-subtab" id="subtab-disclaimer" role="tab" onclick="showFooterSub('legal','disclaimer')">Disclaimer<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-privacy" role="tab" onclick="showFooterSub('legal','privacy')">Privacy Policy<i class="fs-dot"></i></button></div>
+    <div class="footer-sub" id="sec-disclaimer" style="display:none">
+    <div class="footer-sec-title">Disclaimer</div>
+    <p>The Body (exercise &amp; yoga) and Food (nutrition) content in this app is provided for general
+    informational and educational purposes only. It is not medical advice and is not a substitute for guidance
+    from a qualified physician, physiotherapist, or registered dietitian. Always consult a healthcare professional
+    before starting a new exercise routine or changing your diet, especially if you are pregnant, have an injury,
+    or have an existing medical condition.</p>
+    <p><em>For informational purposes only.</em></p>
     </div>
-    <p class="feedback-note-small" id="notif-denied-help" style="display:none;margin-top:8px">
-      Notifications are blocked in your browser. To turn them on, open your browser's site settings for this
-      page and allow notifications, then reload.
-    </p>
+    <div class="footer-sub" id="sec-privacy" style="display:none">
+    <div class="footer-sec-title">Privacy Policy</div>
+    <p><strong>Body &amp; Activity section:</strong> The exercise and yoga recommendations are general fitness
+    guidance based on the age group you select. No personal health information, biometric data, or activity
+    history is collected, stored, or transmitted to any server — all calculations happen locally in your browser.</p>
+    <p><strong>Food &amp; Nutrition section:</strong> The dietary preference and age group you choose to generate
+    nutrition suggestions are used only to compute recommendations within your current browser session. This
+    information is not saved, logged, or shared with us or any third party.</p>
+    <p><strong>Feedback:</strong> If you submit feedback, the name and message you provide are sent to us for
+    review. Please avoid including sensitive personal or medical information in your feedback.</p>
+    <p><strong>Advertising:</strong> This site displays advertisements, which may be served by third-party ad
+    networks. These networks may use cookies, device identifiers, or similar technologies to show ads, measure
+    their performance, and limit how often you see the same ad. This may include information about your general
+    location, device type, and browsing activity on this site. We do not control how third-party ad networks use
+    this data — please refer to their own privacy policies for details. You can manage or block ad-related data
+    collection through your browser's cookie and privacy settings.</p>
+    </div>
   </div>
 
   <div class="footer-acc-body" id="sec-othersites" style="display:none">
@@ -11388,7 +11393,15 @@ function downloadBodyPDF(){
 const FEEDBACK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxPwZpVM9hxNnVcH_nPoFLH4pUhcsJhqQlo3IB9OwLLHgFqYvS_NLCN9aCxztz0fkK2/exec';
 const FEEDBACK_STORAGE_KEY = 'healtheeFeedbackEntries';
 const COOKIE_CONSENT_KEY = 'healtheeCookieConsent';
-const FOOTER_SECTIONS = ['disclaimer', 'feedback', 'privacy', 'cookies', 'notifications', 'othersites'];
+const FOOTER_SECTIONS = ['settings', 'legal', 'feedback', 'othersites'];
+const FOOTER_ALIAS = {cookies:['settings','cookies'], notifications:['settings','notifications'], disclaimer:['legal','disclaimer'], privacy:['legal','privacy']};
+const FOOTER_SUBS = {settings:['notifications','cookies'], legal:['disclaimer','privacy']}, footerSubNow = {};
+function showFooterSub(parent, sub){
+  footerSubNow[parent] = sub;
+  FOOTER_SUBS[parent].forEach(s => { const el=document.getElementById('sec-'+s), b=document.getElementById('subtab-'+s); if(el) el.style.display = s===sub ? 'block' : 'none'; if(b){ b.classList.toggle('active', s===sub); b.setAttribute('aria-selected', s===sub ? 'true' : 'false'); } });
+  if(sub==='cookies') renderCookieChoice();
+  if(sub==='notifications') refreshNotifStatusUI();
+}
 
 // Toggles the short description under one of the "Our Other Sites" entries.
 // Only one is kept open at a time, matching the tidy accordion feel used
@@ -11495,6 +11508,11 @@ function closeAllFooterSections(){
 }
 
 function showFooterSection(id){
+  if (FOOTER_ALIAS[id]) {   // Cookies / Notifications live in Settings, Disclaimer / Privacy in Legal
+    const a=FOOTER_ALIAS[id], t=document.getElementById('tab-'+a[0]);
+    if (!(t && t.classList.contains('active'))) showFooterSection(a[0]);
+    showFooterSub(a[0], a[1]); return;
+  }
   const tabNow = document.getElementById('tab-' + id), secNow = document.getElementById('sec-' + id);
   if (!tabNow || !secNow) return;
   const alreadyActive = tabNow.classList.contains('active');
@@ -11504,9 +11522,8 @@ function showFooterSection(id){
     const sec = document.getElementById('sec-' + id);
     sec.style.display = 'block';
     document.getElementById('tab-' + id).classList.add('active');
-    if (id === 'cookies') renderCookieChoice();
+    if (FOOTER_SUBS[id]) showFooterSub(id, footerSubNow[id] || FOOTER_SUBS[id][0]);
     if (id === 'feedback') resetFeedbackPanel();
-    if (id === 'notifications') refreshNotifStatusUI();
     // Scroll so the icon row itself lands just below the sticky top nav —
     // not the content section. That way the icons stay visible together
     // with the start of the newly opened content, so the user can tap
@@ -14198,7 +14215,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (PDF) or type values in, to see what is in or out of range.');
   sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
   // Footer
-  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 15a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4zm-1-8h2v6h-2z"/></svg></span><span><b>Disclaimer</b>: what the app can and cannot do</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z"/></svg></span><span><b>Feedback</b>: tell us what to improve</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 10V8a6 6 0 1112 0v2h1a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V11a1 1 0 011-1h1zm2 0h8V8a4 4 0 00-8 0v2z"/></svg></span><span><b>Privacy</b>: how your data is handled</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.95 10.99c-1.79-.03-3.7-1.95-2.99-4.59-3.2 1.3-5.5-1.73-4.07-4.11C8.35 1.55 2 6.24 2 12c0 5.52 4.48 10 10 10 6.22 0 10.4-5.29 9.95-11.01zM8.5 15c-.83 0-1.5-.67-1.5-1.5S7.67 12 8.5 12s1.5.67 1.5 1.5S9.33 15 8.5 15zm2-5c-.83 0-1.5-.67-1.5-1.5S9.67 7 10.5 7s1.5.67 1.5 1.5S11.33 10 10.5 10zm4.5 7c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></span><span><b>Cookies</b>: your cookie choices</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
+  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications (with a test button) and cookies. A dot in the icon colour means one of them is on</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z"/></svg></span><span><b>Feedback</b>: tell us what to improve</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy policy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
 
   var root=document.getElementById('tour-root'), spot=document.getElementById('tour-spot'), txt=document.getElementById('tour-text'), bar=document.getElementById('tour-bar');
   var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0;
@@ -14258,7 +14275,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
     if(s.pin){
       // Footer step: the text sits at the top and a row with the footer icons sits just above the buttons, whatever the page length.
       if(!fi.firstChild) fi.innerHTML=Array.prototype.map.call(document.querySelectorAll('.footer-tabs-icons .footer-tab-btn svg'),function(v){ return '<span>'+v.outerHTML+'</span>'; }).join('');
-      if(fi.firstChild) fi.firstChild.classList.add('has-dot');
+      if(fi.firstChild){ fi.firstChild.classList.add('has-dot'); if(fi.children[1]) fi.children[1].classList.add('has-dot-c'); }
       root.classList.add('nospot'); spot.style.display='none';
       var desk0=vw>=900;
       txt.style.width=''; txt.style.left=(desk0?barRect.left:14)+'px'; txt.style.top='16px';
@@ -15139,6 +15156,60 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 @media (max-width:899px){#nav-lotus{-webkit-mask:var(--lotus-mask) left -130px top 55px/250px no-repeat;mask:var(--lotus-mask) left -130px top 55px/250px no-repeat}}</style>
 <style id="body-nav-topright-20261103">@media (max-width:899px){body:has(#activity-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) left -130px top 55px/250px no-repeat,var(--lotus-mask) right -62px top -22px/150px no-repeat;mask:var(--lotus-mask) left -130px top 55px/250px no-repeat,var(--lotus-mask) right -62px top -22px/150px no-repeat}}</style>
 <style id="title-gap-20261103">@media (min-width:900px){html body .tab-panel > .ayu-content-page-title{padding-bottom:0 !important;margin-bottom:8px !important}}</style>
+<style id="footer-settings-20261103">
+#tab-settings{position:relative}
+#tab-settings.has-on::after{content:'';position:absolute;top:1px;right:calc(50% - 13px);width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 1.5px #fff;pointer-events:none}
+@media (min-width:900px){#tab-settings.has-on::after{width:5px;height:5px;top:2px;right:calc(50% - 11px);box-shadow:0 0 0 1px #fff}}
+.footer-subtabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.footer-subtab{position:relative;font:inherit;font-size:.82rem;font-weight:700;padding:6px 14px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:var(--footer-accent,var(--act-2));cursor:pointer;opacity:.75}
+.footer-subtab.active{background:var(--footer-accent,var(--act-2));color:#fff;opacity:1;border-color:transparent}
+.footer-subtab .fs-dot{display:none;position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:var(--footer-accent,var(--act-2));box-shadow:0 0 0 1.5px #fff}
+.footer-subtab .fs-dot.on{display:block}
+.notif-test{margin-top:10px}
+.notif-test button{font:inherit;font-weight:700;padding:8px 16px;border-radius:10px;border:0;background:var(--footer-accent,var(--act-2));color:#fff;cursor:pointer}
+.notif-test-out{margin-top:8px;font-size:.84rem;line-height:1.7;white-space:pre-line}
+#tour-text .tf-ic.has-dot-c,#tour-ficons span.has-dot-c{position:relative}
+#tour-text .tf-ic.has-dot-c::after,#tour-ficons span.has-dot-c::after{content:'';position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 0 1.5px #fff}
+#tour-ficons span.has-dot-c::after{top:-5px;right:-6px}
+</style>
+<script id="footer-settings-20261103-js">
+(function(){
+  // A dot on the Settings icon when notifications or advertising cookies are on; the same dot on the matching tab inside.
+  function update(){
+    var n=false,c=false;
+    try{ n=!!(typeof isMasterNotifyOn==='function' && isMasterNotifyOn()); }catch(e){}
+    try{ var cc=getCookieConsent(); c=!!(cc&&cc.advertising); }catch(e){}
+    var t=document.getElementById('tab-settings'); if(t) t.classList.toggle('has-on',n||c);
+    var a=document.querySelector('#subtab-notifications .fs-dot'), b=document.querySelector('#subtab-cookies .fs-dot');
+    if(a) a.classList.toggle('on',n); if(b) b.classList.toggle('on',c);
+  }
+  ['refreshNotifStatusUI','renderCookieChoice'].forEach(function(nm){ var o=window[nm]; if(typeof o!=='function'||o._d) return; var w=function(){ var r=o.apply(this,arguments); try{ update(); }catch(e){} return r; }; w._d=1; window[nm]=w; });
+  window.addEventListener('storage',update); setInterval(update,2500); setTimeout(update,300); update();
+  // Test: shows what is allowed on this phone, then sends one real notification with the reminder sound.
+  window.ayuNotifTest=async function(){
+    var out=document.getElementById('notif-test-out'), L=[];
+    function show(){ if(out) out.textContent=L.join('\n'); }
+    try{
+      var perm=typeof Notification==='undefined'?'unsupported':Notification.permission;
+      if(perm==='default'){ try{ perm=await Notification.requestPermission(); }catch(e){} }
+      L.push((perm==='granted'?'✅':'⚠️')+' Browser permission: '+(perm==='granted'?'allowed':perm==='denied'?'blocked (allow it in the browser or phone site settings)':perm));
+      var on=isMasterNotifyOn();
+      L.push((on?'✅':'⚠️')+' Reminder notifications: '+(on?'on':'off (turn on the switch in Reminders)'));
+      var reg=null; try{ reg=await getNudgeReg(); }catch(e){}
+      L.push((reg?'✅':'⚠️')+' Background service: '+(reg?'running':'not running (system notifications may not show)'));
+      var sub=null; try{ sub=reg&&reg.pushManager?await reg.pushManager.getSubscription():null; }catch(e){}
+      L.push((sub?'✅':'ℹ️')+' Reminders while the app is closed: '+(sub?'set up on this device':'not set up on this device, so reminders arrive only while the app is open'));
+      show();
+      try{ if(!alertState.break.muted) playAlertPreset(alertState.break.sound); }catch(e){}
+      if(perm==='granted'){
+        var ok=showNudgeNotification('AyuBase6','Test notification. If you can see and hear this, reminders can reach you.',{key:'test'});
+        L.push(ok?'🔔 Test notification sent. If you did not see or hear it, check this app’s notification settings on your phone (sound on, not silent).':'⚠️ Could not show a notification.');
+      } else L.push('No test notification was sent because the permission is not allowed.');
+    }catch(e){ L.push('⚠️ The test could not finish.'); }
+    show();
+  };
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
