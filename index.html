@@ -3967,6 +3967,7 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
         <label class="master-switch" title="Turn all reminders on or off"><input type="checkbox" id="reminder-master-toggle" aria-label="Turn all reminders on or off"></label>
       </div>
       <div class="per-reminder-schedule" aria-label="All sections schedule"><div class="per-reminder-schedule-times"><span class="per-reminder-from">From</span><button type="button" class="eye-ex-time-item" data-time="start" aria-label="All sections start time"></button><span>to</span><button type="button" class="eye-ex-time-item" data-time="end" aria-label="All sections end time"></button></div></div>
+      <div class="otd-row" id="rh-days" data-otd="rem"></div>
       <div class="reminder-hours-info" id="reminder-hours-info" style="display:none"></div>
       <div class="push-status" id="push-status" hidden></div>
       <div class="reminder-hours-foot" id="reminder-hours-foot"></div>
@@ -9335,6 +9336,7 @@ function routineButtons(nk,key){
            onAction:act=>routineAction(key,act) };
 }
 function checkRoutineNotificationSchedule(){
+  if(window.ayuDays&&!window.ayuDays.ok('chk'))return;   // not one of the chosen days
   if(!routineNotificationsEnabled()||typeof Notification==='undefined'||Notification.permission!=='granted')return;
   const now=new Date(), minute=now.getHours()*60+now.getMinutes();
   let sent={};try{sent=JSON.parse(localStorage.getItem(ROUTINE_SENT_KEY)||'{}')||{};}catch(e){}
@@ -12756,7 +12758,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     form.innerHTML='<label class="wide">Reminder name<input name="name" required maxlength="80" placeholder="e.g. Medicines, school pickup"></label>'+ 
       '<label class="wide">Frequency<select name="frequency-mode"><option value="regular">At regular times</option><option value="selected">At selected times</option></select></label>'+ 
       '<div class="wide reminder-frequency-fields"></div>'+ 
-      '<div class="wide repeat-on"><div class="repeat-on-title">Repeat on</div><div class="day-chips" role="group" aria-label="Repeat on"></div><div class="day-quick"><button type="button" data-q="all">Every day</button><button type="button" data-q="week">Weekdays</button></div></div>'+
+      '<div class="wide repeat-on"><div class="repeat-on-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Every day</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div></div>'+
       '<label>Notification sound<select name="sound"><option value="chime">Chime</option><option value="drop">Water drop</option><option value="drum">Drum</option><option value="none">Silent</option></select></label>'+ 
       '<div class="wide reminder-form-actions"><button class="save-reminder" type="submit">Save reminder</button><button class="cancel-reminder" type="button">Cancel</button></div>';
     const mode=form.querySelector('[name="frequency-mode"]'), fields=form.querySelector('.reminder-frequency-fields');
@@ -12773,7 +12775,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
         b.addEventListener('click',()=>{if(days.includes(d)){if(days.length>1)days=days.filter(x=>x!==d)}else days=[...days,d];drawDays()});chipBox.append(b)});
     }
     drawDays();
-    form.querySelectorAll('.day-quick button').forEach(b=>b.addEventListener('click',()=>{days=b.dataset.q==='week'?[1,2,3,4,5]:[0,1,2,3,4,5,6];drawDays()}));
+    form.querySelectorAll('.day-quick button').forEach(b=>b.addEventListener('click',()=>{days=b.dataset.q==='week'?[1,2,3,4,5]:b.dataset.q==='wkend'?[6,0]:[0,1,2,3,4,5,6];drawDays()}));
     function renderFrequency(){
       if(mode.value==='regular'){
         fields.innerHTML='<label>Time <button type="button" class="duration-clock-trigger" aria-haspopup="dialog"></button></label>';
@@ -12873,7 +12875,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   function saveHours(){
     try{
       const sections={};Object.keys(cards).forEach(k=>{sections[k]={start:cards[k].start,end:cards[k].end}});
-      localStorage.setItem(HOURS_KEY,JSON.stringify({top:{start:topState.start,end:topState.end},sections}));
+      localStorage.setItem(HOURS_KEY,JSON.stringify({top:{start:topState.start,end:topState.end},sections,days:(window.ayuDays?window.ayuDays.get('rem'):undefined)}));
     }catch(e){}
   }
   function restoreHours(){
@@ -13026,6 +13028,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     const now=Date.now(),slot=latestSlot(key,now);
     if(slot===null||slot===lastSlot[key])return;
     lastSlot[key]=slot;
+    if(window.ayuDays&&!window.ayuDays.ok('rem'))return;   // not one of the chosen days
     // a reminder more than 10 minutes late (a phone that was asleep) is skipped, not fired stale
     if(now-slot<=GRACE&&typeof window.fireAlert==='function')window.fireAlert(key);
   }
@@ -13044,12 +13047,13 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   const oldCheck=window.checkEyeExTimes;
   window.checkEyeExTimes=function(){
     const w=cards['break-ex'];if(!w||!inWindow(w.start,w.end))return;
+    if(window.ayuDays&&!window.ayuDays.ok('rem'))return;
     if(typeof oldCheck==='function')oldCheck();
   };
   const oldEyeCountChange=window.onEyeExCountChange;
   window.onEyeExCountChange=function(){if(typeof oldEyeCountChange==='function')oldEyeCountChange();updateExerciseTimes(true)};
   const oldReset=window.resetRemindersToDefault;
-  window.resetRemindersToDefault=function(){try{localStorage.removeItem(HOURS_KEY)}catch(e){}if(typeof oldReset==='function')oldReset();topState.start=defaults.start;topState.end=defaults.end;wireTopSchedule();Object.values(cards).forEach(w=>{w.start=defaults.start;w.end=defaults.end});document.querySelectorAll('#alerts-panel .per-reminder-schedule').forEach(row=>{const spec=specs.find(x=>row.closest('#'+x.id));if(!spec)return;row.querySelector('[data-time="start"]').textContent='9:00 AM';row.querySelector('[data-time="end"]').textContent='6:00 PM'});['break','walk','drink'].forEach(k=>window.scheduleAlertTimer(k));updateExerciseTimes()};
+  window.resetRemindersToDefault=function(){try{localStorage.removeItem(HOURS_KEY)}catch(e){}if(window.ayuDays)window.ayuDays.reset('rem');if(typeof oldReset==='function')oldReset();topState.start=defaults.start;topState.end=defaults.end;wireTopSchedule();Object.values(cards).forEach(w=>{w.start=defaults.start;w.end=defaults.end});document.querySelectorAll('#alerts-panel .per-reminder-schedule').forEach(row=>{const spec=specs.find(x=>row.closest('#'+x.id));if(!spec)return;row.querySelector('[data-time="start"]').textContent='9:00 AM';row.querySelector('[data-time="end"]').textContent='6:00 PM'});['break','walk','drink'].forEach(k=>window.scheduleAlertTimer(k));updateExerciseTimes()};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })();
 </script>
@@ -13726,11 +13730,11 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     if(remOn) ['break','walk','drink'].forEach(function(key){
       var st = typeof alertState!=='undefined' && alertState[key]; if(!st || !st.enabled || !(st.minutes>0)) return;
       var w = wins[key] || {}, lab = ALERT_LABELS[key];
-      rules.reminders.push({ key:key, title:lab.title, body:lab.msg, every:st.minutes, from:toMin(w.start), to:toMin(w.end) });
+      var rr={ key:key, title:lab.title, body:lab.msg, every:st.minutes, from:toMin(w.start), to:toMin(w.end) }; var rd=window.ayuDays&&window.ayuDays.get('rem'); if(rd&&rd.length<7) rr.days=rd.slice(); rules.reminders.push(rr);
     });
     if(remOn && typeof eyeExState!=='undefined' && eyeExState.enabled && eyeExState.times && eyeExState.times.length){
       var times = eyeExState.times.map(toMin).filter(function(m){ return m!==null; });
-      if(times.length) rules.exercise = { title:'Eye Exercise', body:'Time for your guided eye exercise — follow the dot for 30 seconds.', times:times, weekdays:eyeExState.weekdays.slice() };
+      if(times.length) rules.exercise = { title:'Eye Exercise', body:'Time for your guided eye exercise — follow the dot for 30 seconds.', times:times, weekdays:eyeExState.weekdays.filter(function(d){ var rd=window.ayuDays&&window.ayuDays.get('rem'); return !rd||rd.indexOf(d)>=0; }) };
     }
     if(chkOn){
       var items=[], done=[];
@@ -13740,7 +13744,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
         var it = ROUTINE_NOTIFY_ITEMS[key];
         items.push({ key:key, title:it.title, body:it.body, at:at, end:routineEndMinute(key), window:routineWindowText(key), muted:routineIsMuted(key) });
       });
-      rules.checks = { mode:routineRemindMode(), doneDay:localDay(), done:done, items:items };
+      rules.checks = { mode:routineRemindMode(), doneDay:localDay(), done:done, items:items }; var cd=window.ayuDays&&window.ayuDays.get('chk'); if(cd&&cd.length<7) rules.checks.days=cd.slice();
     }
     if(remOn) document.querySelectorAll('#custom-reminders-list .custom-reminder-item').forEach(function(item){
       try{
@@ -13942,7 +13946,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   var GROUPS=[
     {id:'body',label:'Body',keys:['ayuBase6-body-choices']},
     {id:'food',label:'Food',keys:['ayuBase6-food-choices']},
-    {id:'checks',label:'Checks',keys:['ayuBase6WakeUpTime','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-muted']},
+    {id:'checks',label:'Checks',keys:['ayuBase6WakeUpTime','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-muted','ayuBase6-routine-days']},
     {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1']},
     {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1']}
   ];
@@ -14684,6 +14688,67 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
   function scan(){ document.querySelectorAll('.tab-panel '+SEL.split(',').join(', .tab-panel ')).forEach(setup); }
   scan();
   var t=null; new MutationObserver(function(){ clearTimeout(t); t=setTimeout(scan,150); }).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+<style id="hours-hide-20261103">
+/* With the Reminders switch off, the From / To row is hidden too. */
+#reminder-hours-card.rh-off .per-reminder-schedule{display:none !important}
+</style>
+<style id="on-these-days-20261103">
+:is(#alerts-panel,#routines-panel) .otd-row{display:block !important;margin:10px 0 0 !important;position:relative !important}
+:is(#alerts-panel,#routines-panel) .otd-title{font-size:13px;margin:0 0 6px;font-weight:600}
+:is(#alerts-panel,#routines-panel) .otd-row .day-chips{display:flex;gap:6px;flex-wrap:nowrap}
+:is(#alerts-panel,#routines-panel) .otd-row .day-chip{flex:1 1 0;min-width:0;max-width:38px;width:auto;height:auto;aspect-ratio:1/1;padding:0;border-radius:50%;border:1.5px solid var(--otd,#0d9488);background:#fff;color:var(--otd,#0d9488);font:700 13px inherit;cursor:pointer}
+:is(#alerts-panel,#routines-panel) .otd-row .day-chip[aria-pressed="true"]{background:var(--otd,#0d9488);color:#fff}
+:is(#alerts-panel,#routines-panel) .otd-row .day-quick{display:flex;gap:6px;margin-top:8px}
+:is(#alerts-panel,#routines-panel) .otd-row .day-quick button{border:1px solid var(--otd,#0d9488);background:rgba(255,255,255,.7);color:var(--otd,#0d9488);border-radius:999px;padding:3px 10px;font:700 11px inherit;cursor:pointer}
+#routines-panel .otd-row{--otd:#a75b12}
+#reminder-hours-card.rh-off #rh-days{display:none !important}
+#alerts-panel #reminder-hours-card #reminders-notif-error{margin-bottom:14px !important}
+</style>
+<script id="on-these-days-js-20261103">
+(function(){
+  var KEYS={rem:'ayuBase6-reminder-hours',chk:'ayuBase6-routine-days'};
+  var ALL=[0,1,2,3,4,5,6],ORDER=[1,2,3,4,5,6,0],L={1:'M',2:'T',3:'W',4:'T',5:'F',6:'S',0:'S'},F={1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday',6:'Saturday',0:'Sunday'};
+  var cache={};
+  function clean(a){ if(!Array.isArray(a))return ALL.slice(); a=a.filter(function(n){return n>=0&&n<=6}); return a.length?a:ALL.slice(); }
+  function load(k){
+    try{ var v=JSON.parse(localStorage.getItem(KEYS[k])||'null'); return clean(k==='rem'?(v&&v.days):v); }catch(e){ return ALL.slice(); }
+  }
+  function get(k){ if(!cache[k])cache[k]=load(k); return cache[k]; }
+  function save(k){
+    try{
+      if(k==='chk') localStorage.setItem(KEYS.chk,JSON.stringify(cache.chk));
+      else { var v=JSON.parse(localStorage.getItem(KEYS.rem)||'null')||{}; v.days=cache.rem; localStorage.setItem(KEYS.rem,JSON.stringify(v)); }
+    }catch(e){}
+    try{ document.dispatchEvent(new Event('ayu-reminders-changed')); }catch(e){}
+  }
+  var draws={};
+  function build(host,k){
+    host.innerHTML='<div class="otd-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Every day</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div>';
+    var box=host.querySelector('.day-chips');
+    function draw(){
+      var days=get(k);box.innerHTML='';
+      ORDER.forEach(function(d){var b=document.createElement('button');b.type='button';b.className='day-chip';b.textContent=L[d];b.setAttribute('aria-label',F[d]);b.setAttribute('aria-pressed',String(days.indexOf(d)>=0));
+        b.addEventListener('click',function(){var c=get(k);if(c.indexOf(d)>=0){if(c.length>1)cache[k]=c.filter(function(x){return x!==d})}else cache[k]=c.concat([d]);save(k);draw()});box.appendChild(b)});
+    }
+    host.querySelectorAll('.day-quick button').forEach(function(b){b.addEventListener('click',function(){cache[k]=b.dataset.q==='week'?[1,2,3,4,5]:b.dataset.q==='wkend'?[6,0]:ALL.slice();save(k);draw()})});
+    draws[k]=draw;draw();
+  }
+  window.ayuDays={
+    get:function(k){return get(k)},
+    ok:function(k,d){return get(k).indexOf((d||new Date()).getDay())>=0},
+    reset:function(k){cache[k]=ALL.slice();if(draws[k])draws[k]()},
+    refresh:function(){cache={};Object.keys(draws).forEach(function(k){draws[k]()})}
+  };
+  function install(){
+    var h=document.getElementById('rh-days');if(h&&!h.dataset.built){h.dataset.built='1';build(h,'rem')}
+    var p=document.getElementById('routines-remind-panel');
+    if(p&&!document.getElementById('chk-days')){var d=document.createElement('div');d.id='chk-days';d.className='otd-row';d.setAttribute('role','group');p.appendChild(d);build(d,'chk')}
+  }
+  install();
+  var n=0,t=setInterval(function(){install();if(++n>40||(document.getElementById('chk-days')&&document.getElementById('rh-days')&&document.getElementById('rh-days').dataset.built))clearInterval(t)},250);
+  window.addEventListener('ayu-restored',function(){window.ayuDays.refresh()});
 })();
 </script>
 </body>
