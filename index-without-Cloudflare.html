@@ -14560,6 +14560,7 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
     var n=Math.max(one?1:(H>=88?2:1),Math.round(H/STEP));
     while(st.items.length<n){ var j=st.items.length, it=(j===1)?makeSecond(card,W,H):make(card,j,W,H); if(!it){ it={el:document.createElement('div'),top:0,h:0,side:'L',free:true,dead:true}; it.el.style.display='none'; } st.items.push(it); }   // existing ones never move
     st.items.forEach(function(it,j){ if(it.dead) return; it.el.style.display=(j===0||it.free||it.top+it.h<=H-4)?'':'none'; });
+    if(card.id==='lab-insights-card') st.items.forEach(function(it){ if(it.side==='L'||it.el.style.left) it.el.style.display='none'; });   // its left image now sits in the page background, across the gap above it
   }
   window.__secLotusUpdate=update;
   var ro=window.ResizeObserver?new ResizeObserver(function(es){ es.forEach(function(e){ if(e.target._sl) update(e.target); }); }):null;
@@ -14731,9 +14732,11 @@ html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opa
       function addFit(idxs,left,top,w,h,flip){ var d=[0,-12,-24,12,24,-36,36]; for(var q=0;q<d.length;q++){ var x=fitX(idxs,left,top+d[q],w,h); if(x!==null){ add(x,top+d[q],w,h,flip); return; } } add(edgeX(idxs[0],w),top,w,h,flip); }
       var w=Math.round((desk?190:140)*VAR.sm[vi]), h=Math.round(w*K);
       function pair(i,left,flip){ if(cs.length<i+2) return; var bb=rects[i].t+bh(i), g=Math.max(8,rects[i+1].t-rects[i].b);
+        var fx=(!desk&&i===1)?-Math.round(w*.12):null;   // mobile, Eyes and Walk: flush to the left edge, across the gap, clear of the Walk title
+        if(fx!==null){ add(fx,bb+g+22-h,w,h,flip); if(rects[i].b-bb>24) add(fx,rects[i+1].t+22-h,w,h,flip); return; }
         addFit([i,i+1],left,bb+g/2-h/2,w,h,flip);
         if(rects[i].b-bb>24) addFit([i,i+1],left,(rects[i].b+rects[i+1].t)/2-h/2,w,h,flip); }
-      if(cs.length>=3) pair(1,Math.max(tEnd(cs[1]),tEnd(cs[2]))+(desk?40:22),false);
+      if(cs.length>=3) pair(1,desk?Math.max(tEnd(cs[1]),tEnd(cs[2]))+40:rects[1].l+Math.round(w*.15),false);
       if(cs.length>=5) pair(3,P.width/2+(desk?30:8),true);
       var li=cs.length-1;
       if(li>=1){ var bb2=rects[li].t+bh(li), wl=Math.round(w*1.18), hl=Math.round(wl*K), lf=rects[li].l+(rects[li].r-rects[li].l)*.45-wl/2;
@@ -14818,6 +14821,7 @@ html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opa
     var stepG=panel.id==='alerts-panel'?1:2;
     for(var i=0;panel.id!=='activity-panel'&&i+1<cs.length;i+=stepG){
       if(panel.id==='alerts-panel'&&(i===1||i===3)) continue;
+      if(panel.id==='calculator-panel'&&i===0) continue;
       var gy=(rects[i].b+rects[i+1].t)/2+VAR.sv[vi], top=gy-sh/2;
       var pref=panel.id==='nutrition-panel'?((i/stepG)%2===0?'L':'R'):(count('L')<=count('R')?'L':'R'), done=false;
       (panel.id==='nutrition-panel'?[0,-24,-48,-72,24,48,-96]:[0,-24,24]).forEach(function(dy){ if(done) return; (panel.id==='nutrition-panel'?[pref]:[pref,pref==='R'?'L':'R']).forEach(function(side){
@@ -14825,6 +14829,20 @@ html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opa
         if(!clear(box,24)) return; done=true; add(side==='R'?P.width-svis:-(sw-svis),top+dy,sw,sh,VAR.flip[vi]&&side==='L',box);
       }); });
     }
+
+    // Vitals: the image that was inside Lab Insights now sits at the left, across the gap between BMI and Lab Insights
+    if(panel.id==='calculator-panel'&&cs.length>=2) (function(){
+      var gy0=(rects[0].b+rects[1].t)/2, sm=VAR.sm[vi];
+      // 1. left, in the gap between BMI and Lab Insights: smaller and slightly turned
+      var cw=Math.round((desk?150:112)*sm), ch=Math.round(cw*K);
+      add(desk?-Math.round(cw*.1):-Math.round(cw*.15), gy0-Math.round(ch*.62), cw, ch, false); layer.lastChild.style.transform='rotate(-14deg)';
+      // 2. right, in Lab Insights: moved inside, over the bottom edge of the box (partly in it, partly in the page background)
+      if(desk){ var rw=Math.round(250*sm), rh=Math.round(rw*K); add(rects[1].r-Math.round(rw*.95), rects[1].b-Math.round(rh*.82), rw, rh, false); }
+      else { var rw2=Math.round(170*sm), rh2=Math.round(rw2*K); add(rects[1].r-Math.round(rw2*.85), rects[1].t-6, rw2, rh2, false); }
+      // 3. right of the Lab Insights title, across the gap into BMI above
+      var tw=Math.round((desk?250:175)*sm), th=Math.round(tw*K), tx=rects[1].l+Math.round((rects[1].r-rects[1].l)*(desk?.13:.1));
+      if(desk) add(tx, gy0-Math.round(th*.62), tw, th, true);
+    })();
 
     // 7. when a plan has been worked out (Body: the weekly plan; Food: Nutrients & Food, Plan, Recipes), images along its edges
     (function(){
@@ -14961,6 +14979,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 <style id="bg-layer-overflow-20261103">
 @media (max-width:899px){#nav-lotus{-webkit-mask:var(--lotus-mask) left -130px top 55px/250px no-repeat;mask:var(--lotus-mask) left -130px top 55px/250px no-repeat}}</style>
 <style id="body-nav-topright-20261103">@media (max-width:899px){body:has(#activity-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) left -130px top 55px/250px no-repeat,var(--lotus-mask) right -62px top -22px/150px no-repeat;mask:var(--lotus-mask) left -130px top 55px/250px no-repeat,var(--lotus-mask) right -62px top -22px/150px no-repeat}}</style>
+<style id="title-gap-20261103">@media (min-width:900px){html body .tab-panel > .ayu-content-page-title{padding-bottom:0 !important;margin-bottom:8px !important}}</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
