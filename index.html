@@ -15390,6 +15390,10 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 </style>
 <script id="announce-20261103-js">
 (function(){
+  // Dates are written dd-MMM-yyyy, e.g. 05-Nov-2026 (yyyy-mm-dd is still understood)
+  var MON=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'], MONN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function parseD(t){ var a=/^(\d{1,2})[-\/ ]([A-Za-z]{3})[A-Za-z]*[-\/ ,]*(\d{4})$/.exec(t||''), y,mo,d; if(a){ d=+a[1]; mo=MON.indexOf(a[2].toLowerCase()); y=+a[3]; } else if((a=/^(\d{4})-(\d{2})-(\d{2})$/.exec(t||''))){ y=+a[1]; mo=+a[2]-1; d=+a[3]; } else return null; if(mo<0||mo>11||d<1||d>31) return null; var r=new Date(y,mo,d); return r.getMonth()===mo?r:null; }
+  function fmtD(r){ return ('0'+r.getDate()).slice(-2)+'-'+MONN[r.getMonth()]+'-'+r.getFullYear(); }
   var URL_='config/announcements.json', K_LAST='ayuAnnLast', K_CACHE='ayuAnnCache', K_DISM='ayuAnnDismissed', K_READ='ayuAnnRead', EVERY=30*60*1000;
   var msgs=[];
   function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){} return null; }
@@ -15400,7 +15404,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     var out=[]; if(!raw||!Array.isArray(raw.messages)) return out;
     raw.messages.forEach(function(m){
       if(!m||typeof m!=='object') return;
-      var title=str(m.title,90).trim(), message=str(m.message,500).trim(), date=str(m.date,10), repair=m.repair===true; if(!title&&!message&&!repair) return;
+      var title=str(m.title,90).trim(), message=str(m.message,500).trim(), date=str(m.date,12).trim(), repair=m.repair===true; if(!title&&!message&&!repair) return;
       var id=str(m.id,80).trim(); if(!id){ var h=0, sd=date+'|'+title+'|'+message; for(var q=0;q<sd.length;q++) h=(h*31+sd.charCodeAt(q))|0; id='auto-'+(h>>>0).toString(36); }
       var aud=str(m.audience,10)||'all', phone=(typeof NUDGE_IS_PHONE!=='undefined'&&!!NUDGE_IS_PHONE);
       if((aud==='phone'&&!phone)||(aud==='desktop'&&phone)) return;
@@ -15412,12 +15416,12 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
         if(typeof m.link.help==='string'&&/^(check|troubleshoot|feedback|announcements)$/.test(m.link.help)) link={text:lt,help:m.link.help};
         else if(typeof m.link.url==='string'&&(/^https:\/\//i.test(m.link.url)||/^[\w\-\/.]+(\?[\w=&%\-.]*)?(#[\w\-]*)?$/.test(m.link.url))) link={text:lt,url:m.link.url};
       }
-      var exp=null; if(typeof m.expires==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(m.expires)){ var p=m.expires.split('-'); exp=new Date(+p[0],+p[1]-1,+p[2],23,59,59).getTime(); }
-      var dms=null; if(/^\d{4}-\d{2}-\d{2}$/.test(date)){ var dp=date.split('-'); dms=new Date(+dp[0],+dp[1]-1,+dp[2]).getTime(); }
+      var exp=null, ed=typeof m.expires==='string'?parseD(m.expires.trim()):null; if(ed) exp=new Date(ed.getFullYear(),ed.getMonth(),ed.getDate(),23,59,59).getTime();
+      var dd0=parseD(date), dms=dd0?dd0.getTime():null; if(dd0) date=fmtD(dd0);
       var hasText=!!(title||message);
       out.push({id:id,date:date,dateMs:dms,title:title,message:message,icon:icon,iconKind:iconKind,level:m.level==='warning'?'warning':'info',link:link,expires:exp,banner:m.banner!==false&&hasText,tab:m.tab!==false&&hasText,repair:repair});
     });
-    out.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+    out.sort(function(a,b){ return (b.dateMs||0)-(a.dateMs||0); });
     return out.slice(0,50);
   }
   function iconEl(m){ var s=document.createElement('span'); s.className='ann-ic'; if(m.iconKind==='img'){ var im=document.createElement('img'); im.alt=''; im.src=m.icon; im.onerror=function(){ s.textContent='i'; im.remove(); }; s.appendChild(im); } else s.textContent=m.icon; return s; }
@@ -15445,7 +15449,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       var mm=document.createElement('span'); mm.className='ann-m'; mm.textContent=m.message; tx.appendChild(mm);
       var l=linkEl(m); if(l){ tx.appendChild(document.createTextNode(' ')); tx.appendChild(l); }
       var x=document.createElement('button'); x.type='button'; x.className='ann-x'; x.setAttribute('aria-label','Dismiss'); x.textContent='✕';
-      x.addEventListener('click',function(){ var dd=arr(K_DISM); if(dd.indexOf(m.id)<0) dd.push(m.id); ls(K_DISM,JSON.stringify(dd.slice(-50))); renderBanner(); });
+      x.addEventListener('click',function(){ var dd=arr(K_DISM); if(dd.indexOf(m.id)<0) dd.push(m.id); ls(K_DISM,JSON.stringify(dd.slice(-50))); var rd=arr(K_READ); if(rd.indexOf(m.id)<0){ rd.push(m.id); ls(K_READ,JSON.stringify(rd.slice(-100))); } if(m.tab) markSeen([m.id]); renderBanner(); renderList(); dots(); });
       b.appendChild(iconEl(m)); b.appendChild(tx); b.appendChild(x); p.insertBefore(b,p.firstChild);
     });
     try{ window.dispatchEvent(new Event('resize')); }catch(e){}
