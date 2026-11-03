@@ -9,15 +9,21 @@ const web = path.resolve(root, process.env.WEB_DIR || 'web');
 const out = path.join(root, 'www');
 const LIVE = 'https://ayubase6.com/';
 
-if (!fs.existsSync(path.join(web, 'index.html'))) {
+if (!fs.existsSync(web)) {
   console.error('Web app not found at ' + web + ' (set WEB_DIR).');
   process.exit(1);
 }
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(path.join(out, 'config'), { recursive: true });
 
-// index.html (the "with push" build is the base; push is switched off below via an empty push.json)
-let html = fs.readFileSync(path.join(web, 'index.html'), 'utf8');
+// Base: the "with push" build (index-with-Cloudflare.html), because it builds the reminder rules (ayuPush.buildRules)
+// that the phone schedules. Push itself is switched off below (empty push.json). Older checkouts had it as index.html.
+const baseName = ['index-with-Cloudflare.html', 'index.html'].find(f => {
+  const p = path.join(web, f);
+  return fs.existsSync(p) && fs.readFileSync(p, 'utf8').includes('function buildRules(');
+});
+if (!baseName) { console.error('No web app build with buildRules() found in ' + web); process.exit(1); }
+let html = fs.readFileSync(path.join(web, baseName), 'utf8');
 function patch(find, repl, label) {
   const n = html.split(find).length - 1;
   if (n !== 1) { console.error('Patch "' + label + '" expected 1 match, found ' + n); process.exit(1); }
@@ -32,6 +38,37 @@ patch("new URL('content/' + folder + '/media/' + file, document.baseURI)",
 patch('function loadAdSenseScript(){\n  if (adsenseLoaded) return;',
   'function loadAdSenseScript(){\n  if (adsenseLoaded || window.AYU_ANDROID) return;',
   'no web ads in the app');
+// ── Texts that describe the website, said the way the Android app works (reminders arrive with the app closed) ──
+function patchBetween(start, end, repl, label) {
+  const i = html.indexOf(start), j = i < 0 ? -1 : html.indexOf(end, i);
+  if (i < 0 || j < 0 || html.indexOf(start, i + 1) >= 0) { console.error('Patch "' + label + '": markers not found once'); process.exit(1); }
+  html = html.slice(0, i) + repl + html.slice(j + end.length);
+}
+const ALARMS = 'Allow <b>Alarms &amp; reminders</b> for AyuBase6 (Settings → Apps → AyuBase6) so they arrive at the exact minute. If they are late, set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).';
+// Reminder hours i
+patchBetween("<strong>Controls</strong><ul><li>The switch (top right) turns all reminders on or off. The first time, your browser asks for permission.</li>",
+  "<li>Each notification window can disable that reminder, disable all, or close.</li></ul>';",
+  "<strong>Controls</strong><ul><li>The switch (top right) turns all reminders on or off. The first time, the phone asks for permission to show notifications.</li>'\n"
+  + "      +'<li>The reset icon restores the defaults.</li></ul>'\n"
+  + "      +'<strong>On this phone</strong><ul><li>Reminders arrive on time even when AyuBase6 is closed, the phone is locked or has been restarted, with or without internet.</li><li>" + ALARMS + "</li></ul>'\n"
+  + "      +'<strong>Good to know</strong><ul><li>The “notifications blocked” warning appears when you switch the toggle on, then disappears after a while.</li><li>Tap a notification to open its section.</li></ul>';",
+  'reminder hours info');
+// Checks Notify Me i
+patch("<li>Each notification has <b>Done</b> (ticks it) and <b>Not yet</b>.</li>",
+  "<li>Tap a notification to open Checks and tick the activity there.</li>", 'checks notify buttons');
+patchBetween("+'<strong>On a computer</strong><ul style=\"margin:4px 0 0 18px;padding:0\">",
+  "Everything they say is here.</li></ul>'; }",
+  "+'<strong>On this phone</strong><ul style=\"margin:4px 0 0 18px;padding:0\"><li>Notifications arrive on time even when AyuBase6 is closed or the phone is locked, with or without internet.</li><li>" + ALARMS + "</li></ul>'; }",
+  'checks notify info');
+// Help → Troubleshooting
+patchBetween('<div class="trb">', "If it still fails, tell us in Feedback.</p></details>\n    </div>",
+  '<div class="trb">\n'
+  + '      <details><summary>No notification when the app is closed</summary><p>Open <b>Help → Notifications</b> and fix any step marked ✕. In Settings → Apps → AyuBase6, allow <b>Notifications</b> and <b>Alarms &amp; reminders</b>, and set Battery to Unrestricted.</p></details>\n'
+  + '      <details><summary>No sound</summary><p>Turn the phone\'s notification volume up and check that the reminder\'s sound is not muted in its section. In Settings → Apps → AyuBase6 → Notifications → <b>Reminders</b>, make sure sound is on.</p></details>\n'
+  + '      <details><summary>Notifications are blocked</summary><p>Long-press the app icon → App info → Notifications, allow them, then tap Test again.</p></details>\n'
+  + '      <details><summary>Reminders are late or skipped</summary><p>Allow <b>Alarms &amp; reminders</b> for AyuBase6 and set Battery to Unrestricted. A reminder missed while the phone was switched off for more than an hour is skipped instead of being shown late, and reminders do not fire on days you did not choose.</p></details>\n'
+  + '      <details><summary>Nothing helps</summary><p>Make a Backup first. Then uninstall the app, install it again, allow notifications and run the check, and restore your data from the Backup file. If it still fails, tell us in Feedback.</p></details>\n    </div>',
+  'troubleshooting');
 fs.writeFileSync(path.join(out, 'index.html'), html);
 
 function copyDir(rel) {
@@ -49,4 +86,4 @@ fs.writeFileSync(path.join(out, 'config', 'push.json'), '{ "api": "" }\n');
 fs.copyFileSync(path.join(root, 'src', 'android-bridge.js'), path.join(out, 'android-bridge.js'));
 
 const kb = Math.round(fs.statSync(path.join(out, 'index.html')).size / 1024);
-console.log('www/ ready from ' + web + ' (index.html ' + kb + ' KB)');
+console.log('www/ ready from ' + path.join(web, baseName) + ' (index.html ' + kb + ' KB)');

@@ -3,13 +3,14 @@
 Owner: Sharath (Hyderabad, India). App: **AyuBase6**, a health PWA (Body, Food, Checks, Reminders, Mind, Vitals). Live at **ayubase6.com** (GitHub Pages).
 
 ## Repositories
-- App (website): `pyreddysharath/ayubase6.com` — `index.html` (push build), `index-without-Cloudflare.html`, `config/announcements.json`, `content/` JSON, `sw.js`, `icons/`.
-- Push server: `pyreddysharath/ayubase6-push` (Cloudflare Worker `ayubase6-push`, redeploys itself on commit). Free-tier request limit is a concern, so avoid anything that adds server calls.
-- Android: `pyreddysharath/<ANDROID-REPO-NAME>` (private; this project). Plan below. In this repository only, commit and push as you go without waiting for "commit". The website repositories still follow the "commit only when told" rule.
+- App (website): `pyreddysharath/AyuBase6.com` — `index.html` (no-push build, the live site), `index-with-Cloudflare.html` (push build, base of the Android app), `config/announcements.json`, `content/` JSON, `sw.js`, `icons/`.
+- Push server: `pyreddysharath/ayubase6-push` (Cloudflare Worker `ayubase6-push`, redeploys itself on commit). **Paused**: `crons = []` in `wrangler.toml` (no every-minute timer). Free-tier request limit is a concern, so avoid anything that adds server calls.
+- Android: `pyreddysharath/AyuBase6-Android` (private). See "Android app" below and `DECISIONS.md`. In this repository only, commit and push as you go without waiting for "commit". The website and push-server repositories still follow the "commit only when told" rule.
 
 ## Two builds of the same app (single-file HTML)
-- **With Cloudflare** = `index.html` in the repo. Web push through the worker (`push.json` holds the API address). Delivered to Sharath as `index-with-Cloudflare.html`.
-- **Without Cloudflare** = `index-without-Cloudflare.html`. No server; reminders only while the app is open. Delivered as `index-without-Cloudflare.html`.
+- **Without Cloudflare** = `index.html` in the repo (the live site since 03-Nov-2026). No server; reminders only while the app is open. Delivered to Sharath as `index-without-Cloudflare.html`.
+- **With Cloudflare** = `index-with-Cloudflare.html` in the repo. Web push through the worker (`push.json` holds the API address). Not served as the site; the Android app is built from it (it holds `buildRules()`), with push switched off. Delivered as `index-with-Cloudflare.html`.
+- To turn web push back on: swap the two file names again, point the Android `scripts/prepare-www.mjs` at the push build, restore `crons = ["* * * * *"]`.
 - Never write the word "Cloudflare" in user-visible app text.
 - Changes are applied to both builds with exact-count Python string-replace patches (assert each match count). Extra CSS/JS are appended as `<style id=…>` / `<script id=…>` blocks before the last `</body>`.
 
@@ -18,7 +19,7 @@ Owner: Sharath (Hyderabad, India). App: **AyuBase6**, a health PWA (Body, Food, 
 2. Test in a real browser (Playwright) on desktop and mobile before sharing. Check for page errors.
 3. "How about / what do you think" questions: give an opinion first and wait for "go ahead".
 4. Deliver only the modified files, named `index-with-Cloudflare.html` and `index-without-Cloudflare.html`. No zip. New data files (e.g. `announcements.json`) are delivered separately.
-5. Commit and push to GitHub **only when he says "commit"**. Commit footer lines: `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>` and the session link.
+5. Commit and push to GitHub **only when he says "commit"**. Commit footer lines: `Co-Authored-By: Claude <model> <noreply@anthropic.com>` and the session link.
 6. Keep notes short. End by naming the files. Answer his questions at the end of the reply.
 
 ## Features built so far (key facts)
@@ -32,7 +33,7 @@ Owner: Sharath (Hyderabad, India). App: **AyuBase6**, a health PWA (Body, Food, 
 - Tour (How it works) lists all six footer icons.
 
 ## Known limits / not built
-- Repeating reminders only reach a closed app via push (with-Cloudflare build, installed app, registered phone). Web apps cannot run in the background.
+- On the website, reminders (including repeating ones) ring only while the app is open; web push is paused. The Android app delivers them with the app closed.
 - Broadcast push to all users was **not** built (Cloudflare limit). Announcements are checked only when the app is open.
 - Chrome's "Tap to copy the URL for this app" notice is the phone's own, not ours.
 
@@ -40,10 +41,10 @@ Owner: Sharath (Hyderabad, India). App: **AyuBase6**, a health PWA (Body, Food, 
 - Serve copies with `python3 -m http.server`, drive with Playwright (Chromium). Headless reports notification permission "denied", so stub `Notification.permission` and `showNotification` to test. Accept or pre-set the cookie consent key `healtheeCookieConsent` and `ayuBase6-tour-seen` so banners do not block clicks.
 
 ## State at handoff
-- Last commit on `ayubase6.com` main: **f3addc8** (footer highlight, tap states). Everything requested so far is committed. No open web changes.
+- 03-Nov-2026: files swapped (live site = no-push build), Reminders and Checks switches independent, push-server timer paused. Everything requested so far is committed.
 - Section colours (used by `--footer-accent`): Body `#2563eb`, Food `#16a34a`, Checks amber, Reminders teal `#0d9488`, Mind purple, Vitals teal-blue. Popups, banners, footer, test notification and tour follow the open section.
 - Footer/section code: `FOOTER_SECTIONS`, `FOOTER_ALIAS`, `FOOTER_SUBS`, `showFooterSection(id)`, `showFooterSub(parent,sub)`; Help subs are check (shown as "Notifications"), trouble, feedback; Announcements is its own section.
-- Notifications code: `showNudgeNotification`, `nudgeArt` + `NUDGE_THEMES`, `buildRules()` in the push block (this is what the server schedules from: custom reminders, Eyes, Walk, Water, Eyes Exercise, Checks), `ayuPush` (active/api/error/sync/repair).
+- Notifications code: `showNudgeNotification`, `nudgeArt` + `NUDGE_THEMES`, `buildRules()` in the push block of `index-with-Cloudflare.html` (what the server and the Android app schedule from: custom reminders, Eyes, Walk, Water, Eyes Exercise, Checks), `ayuPush` (active/api/error/sync/repair).
 - Storage keys worth knowing: `ayuBase6-reminder-hours`, `ayubase6_reminder_section_states_v1`, `ayuBase6-my-reminders`, `ayuBase6-routine-*`, `ayu_vitals_tracker_v1`, `ayuBase6-body-choices`, `ayuBase6-food-choices`, `healtheeCookieConsent`, `ayuBase6-tour-seen`, `ayuAnn*`. Backup groups: Body, Food, Checks, Reminders, Vitals.
 - Service worker only intercepts `/content/` JSON (network-first). Config files such as `config/announcements.json` pass through.
 
@@ -53,19 +54,10 @@ Owner: Sharath (Hyderabad, India). App: **AyuBase6**, a health PWA (Body, Food, 
 - The test web server dies between shell commands; start it in every command. Page errors about fonts/CDNs in tests are expected and harmless.
 - Headless Chromium reports notification permission as denied; stub `Notification.permission`, `Notification` and `ServiceWorkerRegistration.prototype.showNotification` when testing.
 
-## Android decisions (decide yourself; Sharath does not need to approve at this stage)
-Use the suggestions below, and record every choice with a one-line reason in `DECISIONS.md` in the Android repository so Sharath can change it later.
-- App name and package id (suggest `com.ayubase6.app`), app icon (reuse the lotus icon), minimum Android version (suggest 8.0 / API 26).
-- Whether the Android app loads the live site (always up to date, needs internet first time) or bundles the files (works offline, needs a new release for each change). Suggest bundling, with the announcements file and `content/` JSON fetched live.
-- Whether to keep web push in the Android app (suggest no: use local notifications only, so there is no server dependency).
-- Play Console account (one-time $25), privacy policy URL, health-data declaration, closed-test testers.
-
-## Next: Android app (this project)
-Goal: remove the web-push limits with on-device (local) notifications.
-- Approach: **Capacitor** wrapper around the existing HTML; add the Local Notifications plugin; reschedule on reboot; request exact-alarm permission.
-- Reuse the same app files (single codebase for web and Android).
-- Build and sign through GitHub Actions if the sandbox cannot reach the Android SDK downloads.
-- Google Play: one-time $25 fee; new personal accounts may need a closed test (about 12 testers for 14 days) — verify current rules. Apple costs $99 per year, so iPhone comes later.
-- Mapping idea: reuse the reminder rules that `buildRules()` already produces and turn each into scheduled local notifications; reschedule when reminders, hours or days change, and after reboot.
-- Android needs a notification channel with sound, the notification permission (Android 13+), exact-alarm permission and battery-optimisation advice (the Help text already covers this for the web app).
-- First step: a small proof — the app in the wrapper with one real reminder firing while the app is closed.
+## Android app (`AyuBase6-Android`)
+- Capacitor 8 wrapper, package `com.ayubase6.app`, min Android 8.0. Every choice with its reason is in `DECISIONS.md`.
+- `scripts/prepare-www.mjs` builds `www/` from the website's `index-with-Cloudflare.html` (exact-count patches: bridge script, live media, no ads, Android wording for the Reminder hours i, Checks Notify Me i and Troubleshooting) plus an empty `config/push.json`.
+- `src/android-bridge.js`: phone-backed Notification API, sends `buildRules()` to the phone when anything changes, live `content/` and announcements from ayubase6.com, no service worker, hides install buttons, "Alarms & reminders" card, Eyes/Walk/Water count from the moment they are turned on (and "Next:" shows that time).
+- Native (Java): `AyuRemindersPlugin`, `ReminderRules` (port of the push server's `rules.js`, unit-tested against it), `ReminderScheduler` (one exact alarm for the next due minute, channels, notifications in section colours), `NotificationArt`, `AlarmReceiver`, `BootReceiver`. Text size fixed at 100%.
+- GitHub Actions builds a debug APK on every push to main and publishes it as the `debug-latest` pre-release. A website change needs a push to the Android repo (or a manual run) to reach the APK.
+- Not built yet: buttons on notifications (Done, Not yet, Turn off), offline saved videos in the app, release signing, Play Console listing.

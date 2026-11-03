@@ -13,7 +13,8 @@ Each line: the choice, then why. Change any of them later; the file to touch is 
 ## Web files
 - **Bundled, not loaded from the live site** — the app opens offline and is reviewed as a fixed build; a site change needs a new APK. [scripts/prepare-www.mjs]
 - **Built from the website repository at build time, not copied into this repo** — one codebase for web and Android; the workflow checks out `AyuBase6.com` (main, or a chosen ref). [.github/workflows/android-debug.yml]
-- **Base file: `index.html` (the "with push" build), with push turned off by an empty `config/push.json`** — it is the build that already produces the reminder rules (`ayuPush.buildRules`). [scripts/prepare-www.mjs]
+- **Base file: `index-with-Cloudflare.html` (the "with push" build), with push turned off by an empty `config/push.json`** — it is the build that produces the reminder rules (`ayuPush.buildRules`); the live site's `index.html` is the no-push build since 03-Nov-2026. [scripts/prepare-www.mjs]
+- **Android wording for the Reminder hours i, Checks Notify Me i and Help → Troubleshooting, and no install buttons** — the website texts describe browser tabs, installing and the push server, which do not apply to the app. [scripts/prepare-www.mjs, src/android-bridge.js]
 - **Live from ayubase6.com: `content/` JSON and media, `config/announcements.json`, `config/OurOtherSites.json`** — new videos and announcements reach the app without a new release; GitHub Pages, so no server requests. [src/android-bridge.js, prepare-www.mjs]
 - **Web ads (AdSense) not loaded in the app** — AdSense is for websites, not app web views; an app would need AdMob instead. [prepare-www.mjs]
 - **No service worker in the app** — the phone shows notifications itself; the web cache is not needed for bundled files. Side effect: "Save for offline" videos are not served offline in the app yet. [src/android-bridge.js]

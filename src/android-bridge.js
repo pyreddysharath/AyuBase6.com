@@ -101,6 +101,35 @@
     ls(ANCHOR_KEY, JSON.stringify(now));   // a reminder turned off forgets its moment, so turning it on starts afresh
     return rules;
   }
+  // "Next:" under Eyes, Walk and Water shows the time the phone will actually ring (counted from that moment).
+  function nextFromAnchor(key, fromMs){
+    var rules = currentRules(), r = null;
+    (rules && rules.reminders || []).forEach(function(x){ if(x.key === key) r = x; });
+    if(!r || !(r.every > 0) || !r.anchor) return null;
+    var a = r.from, b = r.to;
+    if(a == null || b == null || a === b){ a = 0; b = 1439; }
+    var anchorMin = Math.floor(r.anchor / 60000), every = Math.floor(r.every);
+    var t = Math.floor(fromMs / 60000) + 1;
+    t += ((every - ((t - anchorMin) % every)) % every + every) % every;   // first minute after now on the count
+    if(t <= anchorMin) t = anchorMin + every;
+    for(var n = 0; n < 4000; n++, t += every){
+      var d = new Date(t * 60000), m = d.getHours() * 60 + d.getMinutes();
+      if(Array.isArray(r.days) && r.days.length && r.days.indexOf(d.getDay()) < 0) continue;
+      var inside = a < b ? (m >= a && m <= b) : (m >= a || m <= b);
+      if(inside) return t * 60000;
+    }
+    return null;
+  }
+  function useAnchorForNext(){
+    var slots = window.ayuReminderSlots;
+    if(!slots || typeof slots.next !== 'function' || slots.next.__ayuAnchor) return;
+    var orig = slots.next;
+    slots.next = function(key, fromMs){
+      if(state.active){ var t = nextFromAnchor(key, fromMs || Date.now()); if(t) return t; }
+      return orig.apply(this, arguments);
+    };
+    slots.next.__ayuAnchor = true;
+  }
   function currentRules(){
     try{ return addAnchors((window.ayuPush && typeof ayuPush.buildRules === 'function') ? ayuPush.buildRules() : null); }catch(e){ return null; }
   }
@@ -153,7 +182,9 @@
       + '#ayu-exact-card .ayu-ec-btns{display:flex;justify-content:flex-end;gap:8px}'
       + '#ayu-exact-card button{border:0;border-radius:10px;padding:8px 16px;font:inherit;font-weight:600;cursor:pointer}'
       + '#ayu-exact-card .ayu-ec-allow{background:var(--footer-accent,#0d9488);color:#fff}'
-      + '#ayu-exact-card .ayu-ec-later{background:transparent;color:var(--footer-accent,#0d9488)}';
+      + '#ayu-exact-card .ayu-ec-later{background:transparent;color:var(--footer-accent,#0d9488)}'
+      // the app is installed already: no install buttons or install tips
+      + '#install-app-btn,#routines-install-app-btn,#install-help,#routines-install-help{display:none!important}';
     document.head.appendChild(st);
   }
 
@@ -187,6 +218,10 @@
     var phoneReg = { active:{}, update:function(){ return refreshStatus(); }, getNotifications:function(){ return Promise.resolve([]); },
                      showNotification:function(t, o){ try{ new AyuNotification(t, o); }catch(e){} return Promise.resolve(); } };
     if(typeof window.getNudgeReg === 'function') window.getNudgeReg = function(){ return Promise.resolve(phoneReg); };
+    useAnchorForNext(); setTimeout(useAnchorForNext, 1000);
+    // The app is installed already: no install buttons (set inline, so the page's own styles cannot bring them back).
+    function hideInstall(){ ['install-app-btn','routines-install-app-btn','install-help','routines-install-help'].forEach(function(id){ var el = document.getElementById(id); if(el) el.style.setProperty('display', 'none', 'important'); }); }
+    hideInstall(); setTimeout(hideInstall, 1000); setTimeout(hideInstall, 4000);
     refreshStatus().then(function(){ setTimeout(function(){ sync(true); }, 300); });
     var soon = null; function syncSoon(){ clearTimeout(soon); soon = setTimeout(sync, 250); }
     document.addEventListener('change', syncSoon, true);
