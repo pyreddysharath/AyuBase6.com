@@ -3689,6 +3689,8 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
 #tracker-card .trk-cal-day.future{background:#f1f5f9;color:#cbd5e1;cursor:not-allowed;text-decoration:none}
 #tracker-card .trk-cal-empty{height:34px}
 </style>
+<style id="deco-hidden-until-ready-20261103">html:not(.lotus-ready) .tab-panel{opacity:0 !important;transition:none !important}html[data-petal-card] body :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel) :is(.body-age-section,.activity-type-section,.card,.rout-card,.mind-card,.alert-card,.calc-card)::after{content:none !important;display:none !important}
+html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacity:0 !important}html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer,html:not(.lotus-ready) .sec-lotus,html:not(.lotus-ready) .sec-bg{opacity:0 !important;transition:none}#nav-lotus,#app-nav::before{transition:none}</style>
 </head>
 <body>
 
@@ -8898,7 +8900,8 @@ function getNudgeReg(){
   if(nudgeSwReg) return Promise.resolve(nudgeSwReg);
   if(!('serviceWorker' in navigator)) return Promise.resolve(null);
   return navigator.serviceWorker.getRegistrations()
-    .then(list=>{ const r=list.find(x=>x.active)||null; if(r) nudgeSwReg=r; return r; })
+    .then(list=>{ const r=list.find(x=>x.active)||null; if(r){ nudgeSwReg=r; return r; }
+      return Promise.race([navigator.serviceWorker.ready, new Promise(res=>setTimeout(()=>res(null),4000))]).then(r2=>{ if(r2) nudgeSwReg=r2; return r2||null; }); })
     .catch(()=>null);
 }
 // Last resort when no system notification can be made: the in-app card for that nudge.
@@ -9916,8 +9919,8 @@ function checkEyeExTimes(){
   if(!eyeExState.weekdays.includes(now.getDay())) return; // rest day — skip
   const nowMin=now.getHours()*60+now.getMinutes();
   // A phone that was locked (page paused) can wake up a few minutes late, so a time counts as
-  // due for 10 minutes after it passes. The key includes the date, so it fires once per day.
-  const due=eyeExState.times.find(t=>{ const p=t.split(':').map(Number); const d=nowMin-(p[0]*60+p[1]); return d>=0 && d<=10; });
+  // due for 5 minutes after it passes (later than that, it is skipped). The key includes the date, so it fires once per day.
+  const due=eyeExState.times.find(t=>{ const p=t.split(':').map(Number); const d=nowMin-(p[0]*60+p[1]); return d>=0 && d<=5; });
   if(!due) return;
   const dayKey=now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate()+' '+due;
   if(eyeExState.lastFiredKey!==dayKey){
@@ -12838,7 +12841,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   function startReminder(item){
     const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name)return;
     item.dataset.startedAt=item.dataset.startedAt||String(Date.now());   // background alerts repeat from this moment
-    const notify=()=>{try{if(Array.isArray(data.days)&&data.days.length&&!data.days.includes(new Date().getDay()))return;if(window.ayuLeader===false)return;if(window.ayuPush&&window.ayuPush.active&&document.hidden)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()})}catch(_){}};
+    const notify=()=>{try{if(Array.isArray(data.days)&&data.days.length&&!data.days.includes(new Date().getDay()))return;if(window.ayuLeader===false)return;if(window.ayuPush&&window.ayuPush.active&&document.hidden)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')(typeof showNudgeNotification==='function'?showNudgeNotification(data.name,'It is time for your reminder.',{key:'custom-'+item.dataset.reminderId}):new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()}))}catch(_){}};
     if(data.mode==='regular')item._reminderTimer=setInterval(notify,Math.max(1,Number(data.duration)||1)*60000);
     else {item._reminderTimeouts=[];item._reminderTimers=[];data.times.forEach(t=>{const [hh,mm]=t.split(':').map(Number),now=new Date(),next=new Date();next.setHours(hh,mm,0,0);if(next<=now)next.setDate(next.getDate()+1);const delay=next-now;item._reminderTimeouts.push(setTimeout(()=>{notify();item._reminderTimers.push(setInterval(notify,24*60*60*1000))},delay))})}
   }
@@ -13022,14 +13025,14 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   }
   window.ayuReminderSlots={next:nextSlot,latest:latestSlot};
   window.ayuReminderWindows=function(){return cards};   // read by the background-alerts sync
-  const lastSlot={},GRACE=10*60000;
+  const lastSlot={},GRACE=5*60000;
   function tick(key){
     const st=typeof alertState!=='undefined'&&alertState[key];if(!st||!st.enabled)return;
     const now=Date.now(),slot=latestSlot(key,now);
     if(slot===null||slot===lastSlot[key])return;
     lastSlot[key]=slot;
     if(window.ayuDays&&!window.ayuDays.ok('rem'))return;   // not one of the chosen days
-    // a reminder more than 10 minutes late (a phone that was asleep) is skipped, not fired stale
+    // a reminder more than 5 minutes late (a phone that was asleep, a page just opened) is skipped, not fired stale
     if(now-slot<=GRACE&&typeof window.fireAlert==='function')window.fireAlert(key);
   }
   const oldScheduleAlertTimer=window.scheduleAlertTimer;
@@ -14631,10 +14634,10 @@ html body #reminder-hours-card .alert-card-hdr > .master-switch{margin-left:auto
 #tab-backup.needs-backup::after{box-shadow:0 0 0 1.5px #fff,0 0 0 3px rgba(245,158,11,.4);animation:backup-halo 2s ease-out infinite}
 @media (prefers-reduced-motion:reduce){#tab-backup.needs-backup::after{animation:none;box-shadow:0 0 0 1.5px #fff,0 0 0 4px rgba(245,158,11,.35)}}
 /* A part of the lotus behind the top section (mobile) / left section (desktop), in the colour of the open section. */
-#nav-lotus{position:absolute;pointer-events:none;z-index:3;inset:0;background:var(--header-lotus,#3b82f6);opacity:.12;
+#nav-lotus{position:absolute;pointer-events:none;z-index:3;inset:0;background:var(--header-lotus,#3b82f6);opacity:.29;
   -webkit-mask:var(--lotus-mask) right -125px top 20px/260px auto no-repeat,var(--lotus-mask) left -130px top 55px/250px auto no-repeat;mask:var(--lotus-mask) right -125px top 20px/260px auto no-repeat,var(--lotus-mask) left -130px top 55px/250px auto no-repeat}
 @media (min-width:900px){
-  #nav-lotus{opacity:.17;-webkit-mask:var(--lotus-mask) left -145px bottom 80px/300px auto no-repeat,var(--lotus-mask) right -150px top 150px/290px auto no-repeat;mask:var(--lotus-mask) left -145px bottom 80px/300px auto no-repeat,var(--lotus-mask) right -150px top 150px/290px auto no-repeat}
+  #nav-lotus{opacity:.37;-webkit-mask:var(--lotus-mask) left -145px bottom 80px/300px auto no-repeat,var(--lotus-mask) right -150px top 105px/290px auto no-repeat;mask:var(--lotus-mask) left -145px bottom 80px/300px auto no-repeat,var(--lotus-mask) right -150px top 105px/290px auto no-repeat}
 }
 </style>
 <script id="nav-lotus-20261103-js">
@@ -14666,23 +14669,65 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
     if(p[1]>0) el.style[edge]=(-Math.round(p[1]*w))+'px';
     else el.style[edge]='max(10px, calc('+((p[2]||.2)*100)+'% - '+Math.round(w/2)+'px))';
     st.layer.appendChild(el);
-    return {el:el,top:top,h:h};
+    var vis=p[1]>0?Math.round(w*(1-p[1])):w, inset=Math.max(10,Math.round((p[2]||.2)*W-w/2)), x0,x1;
+    if(side==='R'){ x1=p[1]>0?W:W-inset; x0=x1-vis; } else { x0=p[1]>0?0:inset; x1=x0+vis; }
+    return {el:el,top:top,h:h,side:side,x0:x0,x1:x1};
+  }
+  // The second image of a section sits on the other side, just past the middle; it is whole or cropped by its size, and the crop (top / bottom / none) changes from one section to the next.
+  var VT=['bottom','mid','top','mid'];   // a bottom crop is never followed by a top crop, so two neighbouring sections never read as one image
+  function makeSecond(card,W,H){
+    var st=card._sl, f=st.items[0], fs=f.side, type=VT[st.vt];
+    var w=Math.min(.62*W,250)*.6, gap=Math.round(.08*W);
+    var startX=fs==='L'?Math.max(Math.round(W/2+gap),Math.round(f.x1+6)):0, avail=fs==='L'?W-startX:Math.min(Math.round(W/2-gap),Math.round(f.x0-6));
+    w=Math.min(w,avail/.62);                       // at most ~40% of it is cropped sideways
+    var h=w*K, maxH=H*.62; if(h>maxH){ w=maxH/K; h=maxH; }
+    w=Math.round(w); h=Math.round(h);
+    if(w<64) return null;
+    var el=document.createElement('div'); el.className='sec-lotus';
+    el.style.width=w+'px'; el.style.height=h+'px'; el.style.opacity='.2';
+    var top;
+    if(type==='bottom') top=H-Math.round(h*.6);
+    else if(type==='top') top=-Math.round(h*.4);
+    else top=(f.top+f.h/2<H/2)?Math.max(6,H-h-8):8;           // whole, in the half the first image is not in
+    el.style.top=top+'px';
+    if(fs==='L'){ el.style.left=startX+'px'; }                  // first at left -> this one slightly right of the middle
+    else { el.style.right=(W-avail)+'px'; }                     // first at right -> slightly left of the middle
+    st.layer.appendChild(el);
+    return {el:el,top:top,h:h,side:fs==='L'?'R':'L',free:true};
   }
   function update(card){
     var st=card._sl, W=card.clientWidth, H=card.clientHeight;
     if(!W||!H) return;
     if(Math.abs(W-st.w)>3){ st.layer.innerHTML=''; st.items=[]; st.w=W; }
-    var n=Math.max(1,Math.round(H/STEP));
-    while(st.items.length<n) st.items.push(make(card,st.items.length,W,H));   // existing ones never move
-    st.items.forEach(function(it,j){ it.el.style.display=(j===0||it.top+it.h<=H-4)?'':'none'; });
+    var pid=(card.closest('.tab-panel')||{}).id, one=/^(activity|nutrition|alerts|calculator)-panel$/.test(pid||'');   // these tabs keep one image per box; the rest go in the page background
+    var spread=(pid==='alerts-panel'&&H>=300);          // an opened reminder card: the image it already had stays put, and more are added below it
+    if(st.h&&Math.abs(H-st.h)>3&&st.items.length>1){ st.items.slice(1).forEach(function(it){ it.el.remove(); }); st.items.length=1; }
+    st.h=H; st.spread=spread;
+    if(spread){
+      if(!st.items.length) st.items.push(make(card,0,W,H));
+      var f0=st.items[0], y0=f0.top+f0.h+10, ne=Math.max(0,Math.floor((H-y0)/210)); if(ne<1&&H-y0>=130) ne=1;
+      while(st.items.length<1+ne){
+        var js=st.items.length, ws=Math.round(Math.min(.5*W,200)*(js%2?1:.88)), hs=Math.round(ws*K), cyS=y0+(js-.5)*(H-y0)/ne, tpS=Math.max(6,Math.min(Math.round(cyS-hs/2),H-hs-6));
+        var sdS=(js%2&&card.id!=='custom-reminders-card')?(f0.side==='L'?'R':'L'):f0.side, elS=document.createElement('div'); elS.className='sec-lotus'; elS.style.width=ws+'px'; elS.style.height=hs+'px'; elS.style.top=tpS+'px';
+        var x0S,x1S;
+        if(js%2){ var shS=.4, vsS=Math.round(ws*(1-shS)); elS.style[sdS==='R'?'right':'left']=(-Math.round(shS*ws))+'px'; x0S=sdS==='R'?W-vsS:0; x1S=sdS==='R'?W:vsS; }      // cropped at the card's edge
+        else { var inS=Math.round(.1*W); elS.style[sdS==='R'?'right':'left']=inS+'px'; x0S=sdS==='R'?W-inS-ws:inS; x1S=x0S+ws; }                                   // whole
+        st.layer.appendChild(elS); st.items.push({el:elS,top:tpS,h:hs,side:sdS,x0:x0S,x1:x1S,free:true}); }
+      st.items.forEach(function(it){ it.el.style.display=''; });
+      return;
+    }
+    var n=Math.max(one?1:(H>=88?2:1),Math.round(H/STEP));
+    while(st.items.length<n){ var j=st.items.length, it=(j===1)?makeSecond(card,W,H):make(card,j,W,H); if(!it){ it={el:document.createElement('div'),top:0,h:0,side:'L',free:true,dead:true}; it.el.style.display='none'; } st.items.push(it); }   // existing ones never move
+    st.items.forEach(function(it,j){ if(it.dead) return; it.el.style.display=(j===0||it.free||it.top+it.h<=H-4)?'':'none'; });
   }
+  window.__secLotusUpdate=update;
   var ro=window.ResizeObserver?new ResizeObserver(function(es){ es.forEach(function(e){ if(e.target._sl) update(e.target); }); }):null;
   function setup(card){
     if(card._sl||!topLevel(card)) return;
     var layer=document.createElement('div'); layer.className='sec-lotus-layer'; layer.setAttribute('aria-hidden','true');
     card.appendChild(layer);
     if(getComputedStyle(card).position==='static') card.style.position='relative';
-    card._sl={layer:layer,items:[],w:0,seed:(count++*5+3)%PATS.length};
+    card._sl={layer:layer,items:[],w:0,seed:(count*5+3)%PATS.length,vt:count%4}; count++;
     if(ro) ro.observe(card); update(card);
   }
   function scan(){ document.querySelectorAll('.tab-panel '+SEL.split(',').join(', .tab-panel ')).forEach(setup); }
@@ -14753,6 +14798,328 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
   window.addEventListener('ayu-restored',function(){window.ayuDays.refresh()});
 })();
 </script>
+<style id="section-lotus-bg-20261103">
+.sec-bg-layer{position:absolute !important;left:0 !important;top:0 !important;right:0 !important;bottom:0 !important;overflow:hidden;pointer-events:none;z-index:2147483646 !important}
+.sec-lotus.sec-bg{opacity:.2}
+@keyframes backup-halo-sm{0%{box-shadow:0 0 0 1px #fff,0 0 0 2px rgba(245,158,11,.5)}70%,100%{box-shadow:0 0 0 1px #fff,0 0 0 6px rgba(245,158,11,0)}}
+@media (min-width:900px){#tab-backup.needs-backup::after{width:5px;height:5px;top:2px;right:calc(50% - 11px);box-shadow:0 0 0 1px #fff,0 0 0 2px rgba(245,158,11,.35);animation:backup-halo-sm 2s ease-out infinite}}
+@media (min-width:900px){html body #activity-panel.tab-panel{min-height:calc(100vh - 4px) !important}}
+#custom-reminders-card > .sec-lotus-layer > .sec-lotus{background:#fff !important;opacity:.32 !important}
+html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opacity:0 !important}
+.sec-lotus-layer,.sec-bg-layer{transition:none}
+</style>
+<script id="section-lotus-bg-20261103-js">
+(function(){
+  // Page-background images. Each tab gets: one behind/at its page title, one cropped at the top, a few across the gaps between boxes
+  // (flush with the page edge), and one in any large white area inside a box. Sizes and positions differ from tab to tab.
+  var PANELS=['activity-panel','nutrition-panel','routines-panel','alerts-panel','mind-panel','calculator-panel'], FILL={'nutrition-panel':1,'alerts-panel':1,'calculator-panel':1}, K=.6;
+  var VAR={
+    tmode:['slight','cover','slight','cover','slight','cover'],      // title: slightly over the end of the title, or right behind all of it
+    tov:[.3,0,.2,0,.4,0], tw:[190,0,170,0,160,0], tdx:[0,-14,0,16,0,-6], tdy:[-4,6,-12,2,10,-8],
+    topPos:['mid','right','right','right','right','right'], topW:[250,200,270,220,240,210], topX:[-.06,0,-.02,0,-.04,.02],
+    corner:['R','L','R','L','R','L'],
+    flip:[0,1,0,1,1,0], sm:[1,.88,1.12,.94,1.06,.9], sv:[0,-18,16,-10,12,-6], vis:[.55,.5,.6,.52,.58,.5]
+  };
+  var CTRL='input,select,textarea,button,svg,img,canvas,progress,[role=slider],[role=button]';
+  var SEL='.body-age-section,.activity-type-section,.card,.rout-card,.mind-card,.alert-card,.calc-card';
+  function obstacles(card,P){
+    var out=[],layer=card.querySelector(':scope > .sec-lotus-layer');
+    function add(r){ if(r.width<1||r.height<1) return; out.push({l:r.left-P.left,t:r.top-P.top,r:r.right-P.left,b:r.bottom-P.top}); }
+    var tw=document.createTreeWalker(card,NodeFilter.SHOW_TEXT,{acceptNode:function(n){ if(!n.nodeValue.trim()) return NodeFilter.FILTER_REJECT; var pe=n.parentElement; if(!pe||/^(SCRIPT|STYLE)$/.test(pe.tagName)||(layer&&layer.contains(n))) return NodeFilter.FILTER_REJECT; return NodeFilter.FILTER_ACCEPT; }});
+    var n,rg=document.createRange(); while((n=tw.nextNode())){ rg.selectNodeContents(n); [].forEach.call(rg.getClientRects(),add); }
+    card.querySelectorAll(CTRL).forEach(function(e){ if(e.closest('.sec-lotus-layer')) return; var cs=getComputedStyle(e); if(cs.visibility==='hidden'||cs.display==='none') return; var q=e.getBoundingClientRect(); if(q.width>.6*(card.getBoundingClientRect().width)&&e.matches('[role=button],button,div,section')&&e.querySelector('h2,.section-title-text')) return; add(q); });
+    return out;
+  }
+  function cardsOf(panel){ return [].filter.call(panel.querySelectorAll(SEL),function(c){ if(c._sl&&c.offsetParent&&window.__secLotusUpdate) window.__secLotusUpdate(c); return c._sl && c.offsetParent && c.getBoundingClientRect().height>20 && !(c.parentElement&&c.parentElement.closest(SEL)); }); }
+  function hit(a,b,m){ return a.l<b.r+m&&a.r>b.l-m&&a.t<b.b+m&&a.b>b.t-m; }
+  function build(panel){
+    var layer=panel.querySelector(':scope > .sec-bg-layer');
+    if(!layer){ layer=document.createElement('div'); layer.className='sec-bg-layer'; layer.setAttribute('aria-hidden','true'); panel.appendChild(layer); }
+    layer.innerHTML='';
+    var P=panel.getBoundingClientRect(); if(P.width<200||P.height<200) return;
+    if(getComputedStyle(panel).position==='static') panel.style.position='relative';
+    var cs=cardsOf(panel); if(cs.length<1) return;
+    var vi=Math.max(0,PANELS.indexOf(panel.id)), desk=P.width>=700;
+    var rects=cs.map(function(c){ var r=c.getBoundingClientRect(); return {l:r.left-P.left,r:r.right-P.left,t:r.top-P.top,b:r.bottom-P.top}; });
+    var firsts=[]; cs.forEach(function(c,i){ [].forEach.call(c.querySelectorAll(':scope > .sec-lotus-layer > .sec-lotus'),function(e){ if(e.style.display==='none') return; var q=e.getBoundingClientRect(); var l=Math.max(q.left,P.left+rects[i].l)-P.left, r=Math.min(q.right,P.left+rects[i].r)-P.left; if(r>l) firsts.push({l:l,r:r,t:q.top-P.top,b:q.bottom-P.top,card:i}); }); });
+    var placed=[];
+    function count(sd){ var n=0; firsts.concat(placed).forEach(function(b){ if(((b.l+b.r)/2<P.width/2?'L':'R')===sd) n++; }); return n; }
+    function clear(box,m){ var all=firsts.concat(placed); for(var i=0;i<all.length;i++) if(hit(box,all[i],m)) return false; return true; }
+    function add(left,top,w,h,flip,box){
+      var el=document.createElement('div'); el.className='sec-lotus sec-bg'; el.style.width=Math.round(w)+'px'; el.style.height=Math.round(h)+'px'; el.style.top=Math.round(top)+'px'; el.style.left=Math.round(left)+'px';
+      if(flip) el.style.transform='scaleX(-1)'; layer.appendChild(el); placed.push(box||{l:Math.max(0,left),r:Math.min(P.width,left+w),t:Math.max(0,top),b:Math.min(P.height,top+h)});
+    }
+    // 1. the page title: slightly over its end, or right behind all of it (desktop)
+    var ttl=panel.querySelector(':scope > .ayu-content-page-title'), titleBox=null;
+    if(desk&&ttl&&ttl.offsetParent){
+      var rg=document.createRange(); rg.selectNodeContents(ttl); var tr=rg.getBoundingClientRect();
+      if(tr.width>0){
+        var tl=tr.left-P.left, trr=tr.right-P.left, cy=(tr.top+tr.bottom)/2-P.top+VAR.tdy[vi], w,l;
+        if(VAR.tmode[vi]==='cover'){ w=Math.round(Math.min(280,Math.max(190,(trr-tl)*1.6))); l=(tl+trr)/2-w/2+VAR.tdx[vi]; }
+        else { w=VAR.tw[vi]; l=trr-VAR.tov[vi]*w; }
+        var h=Math.round(w*K); titleBox={l:l,r:l+w,t:cy-h/2,b:cy+h/2}; add(l,cy-h/2,w,h,VAR.flip[vi],titleBox);
+      }
+    }
+    // 2. one cropped at the top (middle or right)
+    if(panel.id!=='activity-panel'&&(desk||!/^(alerts|mind|calculator)-panel$/.test(panel.id))) (function(){
+      var w=Math.round(Math.max(150,Math.min(VAR.topW[vi],.5*P.width))), h=Math.round(w*K), top=-Math.round(h*.5);
+      var mid=(P.width-w)/2+VAR.topX[vi]*P.width, right=P.width-w-Math.round(.06*P.width)+VAR.topX[vi]*P.width, lft=Math.round(.04*P.width);
+      var cands=panel.id==='activity-panel'?[right,right-.12*P.width,right-.24*P.width]:VAR.topPos[vi]==='mid'?[mid,right,lft,mid-.2*P.width,mid+.2*P.width]:[right,mid,lft,right-.18*P.width,mid-.2*P.width];
+      for(var c=0;c<cands.length;c++){
+        var left=cands[c], box={l:Math.max(0,left),r:Math.min(P.width,left+w),t:0,b:top+h};
+        if(titleBox&&hit(box,titleBox,6)) continue; if(!clear(box,desk?-6:30)) continue;
+        add(left,top,w,h,VAR.flip[vi]&&c===0,box); return;
+      }
+    })();
+
+
+    // Reminders: images placed against the boxes' own edges. One stays at the box's closed edge (so opening a box doesn't move it
+    // away) and an opened box gets a matching one at its new edge. Images slide sideways, never up or down, to stay off the text.
+    if(panel.id==='alerts-panel') (function(){
+      var key=Math.round(P.width); if(!panel._bm||panel._bm.w!==key) panel._bm={w:key,h:{}};
+      cs.forEach(function(c,i){ var id=c.id||('i'+i), h=rects[i].b-rects[i].t, o=panel._bm.h[id]; if(o===undefined||h<o) panel._bm.h[id]=h; });
+      function bh(i){ return panel._bm.h[cs[i].id||('i'+i)]; }
+      function tEnd(c){ var t=c&&c.querySelector('.section-title-text'); return t?t.getBoundingClientRect().right-P.left:0; }
+      var ob={}; function O(i){ return ob[i]||(ob[i]=obstacles(cs[i],P)); }
+      function fitX(idxs,left,top,w,h){ var obs=[]; idxs.forEach(function(i){ obs=obs.concat(O(i)); });
+        var lo=rects[idxs[0]].l-w*.3, hi=rects[idxs[0]].r-w*.7;
+        for(var d=0;d<=P.width;d+=14){ var xs=d?[left+d,left-d]:[left]; for(var q=0;q<xs.length;q++){ var x=xs[q]; if(x<lo||x>hi) continue;
+          var box={l:x,r:x+w,t:top,b:top+h}, ok=true; for(var k=0;k<obs.length;k++) if(hit(box,obs[k],4)){ ok=false; break; } if(ok) return x; } }
+        return null; }
+      function edgeX(i,w){ return rects[i].r-Math.round(w*.18); }
+      function addFit(idxs,left,top,w,h,flip){ var d=[0,-12,-24,12,24,-36,36]; for(var q=0;q<d.length;q++){ var x=fitX(idxs,left,top+d[q],w,h); if(x!==null){ add(x,top+d[q],w,h,flip); return; } } add(edgeX(idxs[0],w),top,w,h,flip); }
+      var w=Math.round((desk?190:140)*VAR.sm[vi]), h=Math.round(w*K);
+      function pair(i,left,flip){ if(cs.length<i+2) return; var bb=rects[i].t+bh(i), g=Math.max(8,rects[i+1].t-rects[i].b);
+        addFit([i,i+1],left,bb+g/2-h/2,w,h,flip);
+        if(rects[i].b-bb>24) addFit([i,i+1],left,(rects[i].b+rects[i+1].t)/2-h/2,w,h,flip); }
+      if(cs.length>=3) pair(1,Math.max(tEnd(cs[1]),tEnd(cs[2]))+(desk?40:22),false);
+      if(cs.length>=5) pair(3,P.width/2+(desk?30:8),true);
+      var li=cs.length-1;
+      if(li>=1){ var bb2=rects[li].t+bh(li), wl=Math.round(w*1.18), hl=Math.round(wl*K), lf=rects[li].l+(rects[li].r-rects[li].l)*.45-wl/2;
+        function split(tp,cb){ var x=fitX([li],lf,tp,wl,hl); if(x===null) x=edgeX(li,wl); add(x,tp,wl,hl,false); var a=layer.lastChild; a.style.clipPath='inset('+Math.max(0,Math.round(cb-tp))+'px 0 0 0)';
+          add(x,tp,wl,hl,false); var b=layer.lastChild; b.className+=' sec-bg-w'; b.style.clipPath='inset(0 0 '+Math.max(0,Math.round(tp+hl-cb))+'px 0)'; }
+        split(bb2-Math.round(hl*.5),bb2);
+        if(rects[li].b-bb2>24) split(rects[li].b-Math.round(hl*.5),rects[li].b); }
+    })();
+    // Body: a fixed set of images anchored to the Age and Activity Type boxes (the box's own height before a choice is made),
+    // so they stay put when a radio button is clicked and the box grows.
+    if(panel.id==='activity-panel') (function(){
+      var ia=-1, ib=-1; cs.forEach(function(c,i){ if(c.classList.contains('body-age-section')) ia=i; if(c.classList.contains('activity-type-section')) ib=i; });
+      if(ia<0||ib<0) return;
+      var A=rects[ia], B=rects[ib], cwA=A.r-A.l, cwB=B.r-B.l, Bc=cs[ib], extra=0;
+      Bc.querySelectorAll('.activity-check.on').forEach(function(e){ var lb=e.querySelector('label'); extra+=Math.max(0,e.getBoundingClientRect().height-((lb?lb.getBoundingClientRect().height:30)+6)); });
+      var bb=B.b-extra, s=desk?1:.78;
+      // Age: a cropped one to the left of the title, and a bigger one across the top-right corner of the box
+      var at=cs[ia].querySelector('.body-age-title'), ar=at?at.getBoundingClientRect():null, ay=ar?(ar.top+ar.bottom)/2-P.top:A.t+40;
+      var w2=Math.round(290*s), h2=Math.round(w2*K); add(A.r+(desk?22:8)-w2, A.t-Math.round(h2*.2), w2, h2, false);
+      // Activity Type: a medium one across the top edge, between the start and the middle
+      var w3=Math.round(210*s), h3=Math.round(w3*K), obs=obstacles(cs[ia],P).concat(obstacles(cs[ib],P)), put=false;
+      [.66,.72,.6,.78,.54,.84].forEach(function(f){ if(put) return; var l=B.l+f*cwB-w3/2, tp=B.t-Math.round(h3*.5), box={l:l,r:l+w3,t:tp,b:tp+h3}, ok=true;
+        for(var k=0;k<obs.length;k++) if(hit(box,obs[k],4)){ ok=false; break; } if(ok&&clear(box,6)){ put=true; add(l,tp,w3,h3,false,box); } });
+      if(!put) add(B.l+.66*cwB-w3/2, B.t-Math.round(h3*.5), w3, h3, false);
+      // the bottom-right one, as before (kept clear of the reset button)
+      var w4=Math.round(Math.max(160,Math.min(240,.2*cwB))), h4=Math.round(w4*K), l4=B.r-w4-Math.round(.06*cwB), t4=bb-Math.round(h4*.55);
+      var rb0=panel.querySelector('.bf-inline-reset button'), rbq=rb0&&rb0.offsetParent?rb0.getBoundingClientRect():null;
+      if(rbq){ var rbl=rbq.left-P.left, rbt=rbq.top-P.top-extra, rbb={l:rbl,r:rbq.right-P.left,t:rbt,b:rbt+rbq.height}; if(hit({l:l4,r:l4+w4,t:t4,b:t4+h4},rbb,6)) l4=rbl-6-w4; }
+      // left background, between the two boxes
+      var w5=Math.round(170*s), h5=Math.round(w5*K); add(-Math.round(w5*.6), (A.b+B.t)/2-h5/2, w5, h5, true);
+      // a bigger one under the Activity Type box, between the start and the middle
+      var w6=Math.round(Math.min(290,.7*cwB)*(desk?1:.9)), h6=Math.round(w6*K); add(B.l+(desk?.6:.52)*cwB-w6/2, bb-Math.round(h6*(desk?.38:.12)), w6, h6, false);
+    })();
+    // 3b. one image across the bottom edge of the last box (partly inside it, partly in the page background), at its right or left end
+    if(panel.id!=='activity-panel'&&panel.id!=='alerts-panel') (function(){
+      var Rl=rects[rects.length-1], cwL=Rl.r-Rl.l, w=Math.round(Math.max(160,Math.min(240,.2*cwL))*VAR.sm[vi]), h=Math.round(w*K), side0=VAR.corner[vi];
+      var rr=panel.querySelector('.bf-inline-reset button'), rrr=rr&&rr.offsetParent?rr.getBoundingClientRect():null, rb=rrr?{l:rrr.left-P.left,r:rrr.right-P.left,t:rrr.top-P.top,b:rrr.bottom-P.top}:null;
+      var al=panel.id==='alerts-panel', sides=al?['M','R','L']:[side0,side0==='R'?'L':'R','M'], dys=[0,16,-16];
+      for(var a=0;a<sides.length;a++) for(var d=0;d<dys.length;d++){
+        var left=sides[a]==='R'?Rl.r-w-Math.round(.06*cwL):sides[a]==='M'?Rl.l+Math.round((cwL-w)*(side0==='R'?.55:.4)):Rl.l+Math.round(.06*cwL), top=Rl.b-Math.round(h*(al?.35:.55))+dys[d], box={l:left,r:left+w,t:top,b:Math.min(P.height,top+h)};
+        if(!clear(box,8)) continue; if(rb&&hit(box,rb,8)) continue; if(top+h*.45>P.height+h*.2) continue;
+        add(left,top,w,h,VAR.flip[vi]&&sides[a]==='L',box); return;
+      }
+    })();
+    // 3. Body: a bigger one cropped at the bottom right
+    if(false){
+      var bw=Math.round(Math.max(240,Math.min(420,.36*P.width))), bh=Math.round(bw*K), bl=Math.round((P.width-bw)/2), bt=P.height-Math.round(bh*.62);
+      var rr0=panel.querySelector('.bf-inline-reset'), rrr=rr0&&rr0.offsetParent?rr0.getBoundingClientRect():null; if(rrr) bt=Math.max(bt,rrr.bottom-P.top+10);
+      var bbox={l:Math.max(0,bl),r:Math.min(P.width,bl+bw),t:bt,b:Math.min(P.height,bt+bh)}, okB=P.height-bt>=40&&clear(bbox,-6);
+      if(okB) add(bl,bt,bw,bh,false,bbox);
+    }
+    // 4. a big empty area inside a box gets an image of its own, clear of text, controls and every other image
+    var fw=Math.round(Math.max(150,Math.min(210,.2*(rects[0].r-rects[0].l))*VAR.sm[vi]));
+    var fk=Math.round(P.width); if(!panel._fm||panel._fm.w!==fk) panel._fm={w:fk,h:{}};
+    cs.forEach(function(c,i){ var id=c.id||('i'+i), h=rects[i].b-rects[i].t, o=panel._fm.h[id]; if(o===undefined||h<o) panel._fm.h[id]=h; });
+    if(FILL[panel.id]) cs.forEach(function(c,i){
+      var R=rects[i], cwid=R.r-R.l, ch=R.b-R.t; if(ch<100||cwid<400) return;
+      if(panel.id==='nutrition-panel'&&ch>panel._fm.h[c.id||('i'+i)]+20) return;   // a box that grew (BMI result) doesn't get new images
+      if(firsts.filter(function(f){return f.card===i}).length>1) return;
+      var obs=obstacles(c,P), times=ch>=420?2:1;
+      for(var rep=0;rep<times;rep++){
+        var best=null;
+        for(var ww=Math.min(.24*cwid,fw+30); ww>=150 && !best; ww-=15){
+          var hh=ww*K, vv=Math.round(ww*.6);
+          ['R','L'].forEach(function(side){
+            var bl2=side==='R'?R.r-vv:R.l, br2=side==='R'?R.r:R.l+vv; if(count(side)>count(side==='L'?'R':'L')) return;
+            for(var t=R.t+6;t+hh<=R.b-6;t+=6){
+              var box={l:bl2,r:br2,t:t,b:t+hh}, ok=true, k;
+              for(k=0;k<obs.length;k++) if(hit(box,obs[k],12)){ ok=false; break; }
+              if(!ok||!clear(box,60)) continue;
+              var sc=Math.abs(t+hh/2-(R.t+R.b)/2);
+              if(!best||sc<best.sc) best={sc:sc,w:ww,side:side,top:t,vv:vv,box:box};
+            }
+          });
+        }
+        if(!best) break;
+        add(best.side==='R'?R.r-best.vv:R.l-(best.w-best.vv),best.top,best.w,best.w*K,false,best.box);
+      }
+    });
+    // 5. across the gaps between boxes, flush with the page edge (every gap in Reminders, every other one elsewhere)
+    var sw=Math.round(Math.max(120,Math.min(220,.42*Math.max.apply(null,rects.map(function(r){return r.r-r.l}))))*VAR.sm[vi]), sh=Math.round(sw*K), svis=Math.round(sw*VAR.vis[vi]);
+    var stepG=panel.id==='alerts-panel'?1:2;
+    for(var i=0;panel.id!=='activity-panel'&&i+1<cs.length;i+=stepG){
+      if(panel.id==='alerts-panel'&&(i===1||i===3)) continue;
+      var gy=(rects[i].b+rects[i+1].t)/2+VAR.sv[vi], top=gy-sh/2;
+      var pref=panel.id==='nutrition-panel'?((i/stepG)%2===0?'L':'R'):(count('L')<=count('R')?'L':'R'), done=false;
+      (panel.id==='nutrition-panel'?[0,-24,-48,-72,24,48,-96]:[0,-24,24]).forEach(function(dy){ if(done) return; (panel.id==='nutrition-panel'?[pref]:[pref,pref==='R'?'L':'R']).forEach(function(side){
+        if(done) return; var box=side==='R'?{l:P.width-svis,r:P.width}:{l:0,r:svis}; box.t=top+dy; box.b=top+dy+sh;
+        if(!clear(box,24)) return; done=true; add(side==='R'?P.width-svis:-(sw-svis),top+dy,sw,sh,VAR.flip[vi]&&side==='L',box);
+      }); });
+    }
+
+    // 7. when a plan has been worked out (Body: the weekly plan; Food: Nutrients & Food, Plan, Recipes), images along its edges
+    (function(){
+      var q=panel.id==='activity-panel'?'#body-week-section':panel.id==='nutrition-panel'?'#results':null, el=q&&panel.querySelector(q);
+      if(!el||!el.offsetParent) return; var r=el.getBoundingClientRect(), R={l:r.left-P.left,r:r.right-P.left,t:r.top-P.top,b:r.bottom-P.top}, hgt=R.b-R.t; if(hgt<150) return;
+      var n=Math.max(1,Math.min(desk?3:4,Math.floor(hgt/(desk?380:520)))), w=Math.round((desk?200:140)*VAR.sm[vi]), h=Math.round(w*K), vv=Math.round(w*.62), obs=obstacles(el,P);
+      for(var k=0;k<n;k++){
+        var cy=R.t+(k+.5)*hgt/n, done=false, pref=count('L')<=count('R')?'L':'R';
+        [0,-50,50,-100,100,-150,150].forEach(function(dy){ if(done) return; [pref,pref==='R'?'L':'R'].forEach(function(side){ if(done) return;
+          var tp=cy-h/2+dy; if(tp<R.t-h*.3||tp+h>R.b+h*.3) return;
+          var inb=side==='R'?{l:R.r-vv,r:R.r,t:tp,b:tp+h}:{l:R.l,r:R.l+vv,t:tp,b:tp+h}, bad=false;
+          for(var j=0;j<obs.length;j++) if(hit(inb,obs[j],8)){ bad=true; break; } if(bad||!clear(inb,30)) return;
+          done=true; add(side==='R'?R.r-vv:R.l-(w-vv),tp,w,h,VAR.flip[vi]&&side==='L',inb); }); });
+      }
+    })();
+    // 6. free space under the last box (tabs without a bottom image of their own)
+    if(panel.id!=='activity-panel'&&panel.id!=='alerts-panel'){
+      var last=rects[rects.length-1], rr=panel.querySelector('.bf-inline-reset'), cb=last.b; if(rr&&rr.offsetParent) cb=Math.max(cb,rr.getBoundingClientRect().bottom-P.top);
+      var free=P.height-cb;
+      if(free>=sh+24){ var side2=count('L')<=count('R')?'L':'R', bx=side2==='R'?P.width-sw-14:14, top2=cb+Math.min(40,(free-sh)/2), b2={l:bx,r:bx+sw,t:top2,b:top2+sh}; if(clear(b2,24)) add(bx,top2,sw,sh,false,b2); }
+    }
+  }
+  function buildFooter(){
+    var foot=document.querySelector('.app-footer'); if(!foot) return;
+    var layer=foot.querySelector(':scope > .sec-bg-layer');
+    var sec=[].filter.call(foot.querySelectorAll('.footer-acc-body'),function(e){ return e.offsetParent&&e.getBoundingClientRect().height>40; })[0];
+    if(!sec){ if(layer) layer.innerHTML=''; return; }
+    if(!layer){ layer=document.createElement('div'); layer.className='sec-bg-layer'; layer.setAttribute('aria-hidden','true'); foot.appendChild(layer); }
+    if(getComputedStyle(foot).position==='static') foot.style.position='relative';
+    layer.innerHTML='';
+    var act=PANELS.map(function(id){return document.getElementById(id);}).filter(function(p){return p&&p.offsetParent;})[0];
+    if(act) layer.style.setProperty('--petal',getComputedStyle(act).getPropertyValue('--petal'));
+    var F=foot.getBoundingClientRect(), sr=sec.getBoundingClientRect(), S={l:sr.left-F.left,r:sr.right-F.left,t:sr.top-F.top,b:sr.bottom-F.top}, H=S.b-S.t, desk=F.width>=700;
+    var vi=Math.max(0,PANELS.indexOf(act&&act.id)), W=S.r-S.l;
+    var w=Math.round((desk?210:150)*VAR.sm[vi]), h=Math.round(w*K), n=Math.max(1,Math.min(4,Math.ceil(H/(desk?300:380))));
+    for(var k=0;k<n;k++){
+      var cy=S.t+(k+.5)*H/n, right=((k+vi)%2===0), cx=S.l+(right?.78:.22)*W, tp=cy-h/2, lf=cx-w/2;
+      var el=document.createElement('div'); el.className='sec-lotus sec-bg'; el.style.cssText='width:'+w+'px;height:'+h+'px;top:'+Math.round(tp)+'px;left:'+Math.round(lf)+'px'+(!right&&VAR.flip[vi]?';transform:scaleX(-1)':''); layer.appendChild(el);
+    }
+  }
+  var timer=null;
+  function run(){ timer=null; PANELS.forEach(function(id){ var p=document.getElementById(id); if(p&&p.offsetParent) build(p); }); try{ buildFooter(); }catch(e){} }
+  window.__ayuFooter=buildFooter;
+  function queue(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; clearTimeout(timer); run(); }); }
+  var raf=0;
+  var ro=window.ResizeObserver?new ResizeObserver(queue):null;
+  PANELS.forEach(function(id){ var p=document.getElementById(id); if(!p) return; if(ro) ro.observe(p);
+    new MutationObserver(function(ms){ if(ms.every(function(m){ return m.target.closest&&m.target.closest('.sec-lotus-layer,.sec-bg-layer'); })) return; if(ms.some(function(m){ return m.target===p&&m.attributeName==='class'; })){ clearTimeout(timer); run(); return; } queue(); }).observe(p,{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden','style']}); });
+  function reveal(){ document.documentElement.classList.add('lotus-ready'); }
+  window.addEventListener('resize',queue);
+  document.addEventListener('click',function(){ clearTimeout(timer); timer=setTimeout(run,120); setTimeout(run,520); },true);
+  run();                                                    // placed before the first paint
+  var settled=0; function again(){ run(); settled++; }
+  // show everything only once the layout has stopped changing (fonts, images, restored state), so nothing pops in at the wrong place
+  var polls=0, poll=setInterval(function(){ run(); if(++polls>=8) clearInterval(poll); },150);   // quiet re-checks while fonts and images arrive
+  requestAnimationFrame(function(){ requestAnimationFrame(reveal); });
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(again); else again();
+  if(document.readyState==='complete') again(); else window.addEventListener('load',again);
+  setTimeout(reveal,1500);                                  // never leave the images hidden
+})();
+</script>
+<style id="bodyfood-reset-inline-20261103">
+.bf-inline-reset{display:flex;justify-content:flex-end;margin:16px 0 14px;position:relative}
+</style>
+<script id="bodyfood-reset-inline-20261103-js">
+(function(){
+  // The Body and Food reset buttons sit right under the last question (not at the end of the page), aligned to the right.
+  function move(btnId,afterSel){
+    var b=document.getElementById(btnId), a=document.querySelector(afterSel); if(!b||!a) return false;
+    var row=document.createElement('div'); row.className='bf-inline-reset'; a.after(row); row.appendChild(b); return true;
+  }
+  function go(){ var ok1=move('body-reset-btn','#activity-panel .activity-type-section'), ok2=move('food-reset-btn','#sec-diet'); return ok1&&ok2; }
+  var n=0,t=setInterval(function(){ if(go()||++n>40) clearInterval(t); },150);
+  // The reset buttons are greyed out until something above them has been changed.
+  function dirtyBody(){
+    var a=document.getElementById('body-age-slider'); if(a&&String(a.value)!=='5') return true;
+    if(document.querySelector('#chk-exercise:checked,#chk-yoga:checked')) return true;
+    var r=document.querySelectorAll('input[name="len-exercise"]:checked,input[name="len-yoga"]:checked'); for(var i=0;i<r.length;i++) if(r[i].value!=='standard') return true;
+    return false;
+  }
+  function dirtyFood(){
+    var a=document.getElementById('food-age-slider'); if(a&&String(a.value)!=='5') return true;
+    try{ if(typeof foodGender!=='undefined'&&foodGender) return true; if((typeof heightTouched!=='undefined'&&heightTouched)||(typeof weightTouched!=='undefined'&&weightTouched)) return true; }catch(e){}
+    return !!document.querySelector('.dpill input:checked');
+  }
+  function sync(){
+    [['body-reset-btn',dirtyBody,'Reset Body'],['food-reset-btn',dirtyFood,'Reset Food']].forEach(function(d){
+      var b=document.getElementById(d[0]); if(!b) return; var on=!!d[1](); b.disabled=!on; b.title=on?d[2]:d[2]+' (nothing to reset yet)';
+    });
+  }
+  ['input','change','click'].forEach(function(ev){ document.addEventListener(ev,function(){ setTimeout(sync,0); setTimeout(sync,250); },true); });
+  setInterval(sync,700); sync();
+})();
+</script>
+<style id="body-fixed-imgs-20261103">#activity-panel .sec-lotus-layer{display:none !important}</style>
+<style id="nav-lotus-per-tab-20261103">
+body:has(#nutrition-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) right -150px top 70px/280px no-repeat,var(--lotus-mask) left -100px top -30px/230px no-repeat;mask:var(--lotus-mask) right -150px top 70px/280px no-repeat,var(--lotus-mask) left -100px top -30px/230px no-repeat;animation:nl-a .5s ease-out}
+body:has(#nutrition-panel[style*="block"]) #app-nav::before{left:22%;top:6%}
+@media (min-width:900px){body:has(#nutrition-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) right -140px bottom 140px/280px no-repeat,var(--lotus-mask) left -150px top 190px/260px no-repeat;mask:var(--lotus-mask) right -140px bottom 140px/280px no-repeat,var(--lotus-mask) left -150px top 190px/260px no-repeat}}
+@keyframes nl-a{from{opacity:0}}
+body:has(#routines-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) left -170px top 40px/300px no-repeat,var(--lotus-mask) right -90px top -40px/220px no-repeat;mask:var(--lotus-mask) left -170px top 40px/300px no-repeat,var(--lotus-mask) right -90px top -40px/220px no-repeat;animation:nl-b .5s ease-out}
+body:has(#routines-panel[style*="block"]) #app-nav::before{left:78%;top:-4%}
+@media (min-width:900px){body:has(#routines-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) left -130px top 90px/270px no-repeat,var(--lotus-mask) right -160px bottom 40px/300px no-repeat;mask:var(--lotus-mask) left -130px top 90px/270px no-repeat,var(--lotus-mask) right -160px bottom 40px/300px no-repeat}}
+@keyframes nl-b{from{opacity:0}}
+body:has(#alerts-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) right -130px top 60px/250px no-repeat,var(--lotus-mask) left -60px top -50px/240px no-repeat;mask:var(--lotus-mask) right -130px top 60px/250px no-repeat,var(--lotus-mask) left -60px top -50px/240px no-repeat;animation:nl-c .5s ease-out}
+body:has(#alerts-panel[style*="block"]) #app-nav::before{left:36%;top:10%}
+@media (min-width:900px){body:has(#alerts-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) right -120px top 110px/250px no-repeat,var(--lotus-mask) left -160px bottom 220px/290px no-repeat;mask:var(--lotus-mask) right -120px top 110px/250px no-repeat,var(--lotus-mask) left -160px bottom 220px/290px no-repeat}}
+@keyframes nl-c{from{opacity:0}}
+body:has(#mind-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) left -110px top 70px/220px no-repeat,var(--lotus-mask) right -160px top -20px/300px no-repeat;mask:var(--lotus-mask) left -110px top 70px/220px no-repeat,var(--lotus-mask) right -160px top -20px/300px no-repeat;animation:nl-d .5s ease-out}
+body:has(#mind-panel[style*="block"]) #app-nav::before{left:68%;top:3%}
+@media (min-width:900px){body:has(#mind-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) left -150px bottom 10px/310px no-repeat,var(--lotus-mask) right -130px top 280px/260px no-repeat;mask:var(--lotus-mask) left -150px bottom 10px/310px no-repeat,var(--lotus-mask) right -130px top 280px/260px no-repeat}}
+@keyframes nl-d{from{opacity:0}}
+body:has(#calculator-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) right -100px top 60px/230px no-repeat,var(--lotus-mask) left -140px top -10px/270px no-repeat;mask:var(--lotus-mask) right -100px top 60px/230px no-repeat,var(--lotus-mask) left -140px top -10px/270px no-repeat;animation:nl-e .5s ease-out}
+body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
+@media (min-width:900px){body:has(#calculator-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) right -150px bottom 60px/290px no-repeat,var(--lotus-mask) left -140px top 330px/250px no-repeat;mask:var(--lotus-mask) right -150px bottom 60px/290px no-repeat,var(--lotus-mask) left -140px top 330px/250px no-repeat}}
+@keyframes nl-e{from{opacity:0}}
+</style>
+<script id="notify-gap-20261103">
+(function(){
+  // When several reminders are due together, they are shown one after another with a gap: twice the time the earlier one asks of you
+  // (Eyes 20 s, Eye exercise 30 s, Walk about 3 min, Water about 30 s, a Checks item about 1 min), never more than 10 minutes.
+  var ACT={break:20,eyeex:30,walk:180,drink:30}, free=0, q=[], timer=null;
+  function gap(key){ var s=ACT[key]; if(!s) s=60; return Math.min(600,2*s)*1000; }
+  function pump(){ timer=null; if(!q.length) return; var now=Date.now(); if(now<free){ timer=setTimeout(pump,free-now+30); return; } var it=q.shift(); free=Date.now()+gap(it.key); try{ it.fn(); }catch(e){} if(q.length) timer=setTimeout(pump,free-Date.now()+30); }
+  function submit(key,fn){ if(q.some(function(x){return x.key===key;})) return true; q.push({key:key,fn:fn}); if(!timer) pump(); return true; }
+  function wrap(name,keyOf){ var orig=window[name]; if(typeof orig!=='function'||orig._gap) return; var w=function(){ var a=arguments, self=this; return submit(keyOf.apply(null,a),function(){ orig.apply(self,a); }); }; w._gap=1; window[name]=w; }
+  wrap('fireAlert',function(k){return k;});
+  wrap('fireEyeExAlert',function(){return 'eyeex';});
+  wrap('notifyRoutine',function(k){return 'routine-'+k;});
+})();
+</script>
+<style id="rem-bg-white-20261103">#alerts-panel .sec-bg.sec-bg-w{background:#fff !important;opacity:.34 !important}</style>
+<script id="footer-sync-20261103">(function(){ var o=window.showFooterSection; if(typeof o!=='function'||o._w) return; var w=function(){ var r=o.apply(this,arguments); try{ if(window.__ayuFooter) window.__ayuFooter(); }catch(e){} return r; }; w._w=1; window.showFooterSection=w; })();</script>
+<style id="bg-layer-overflow-20261103">
+@media (max-width:899px){#nav-lotus{-webkit-mask:var(--lotus-mask) left -130px top 55px/250px no-repeat;mask:var(--lotus-mask) left -130px top 55px/250px no-repeat}}</style>
+<style id="body-nav-topright-20261103">@media (max-width:899px){body:has(#activity-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) left -130px top 55px/250px no-repeat,var(--lotus-mask) right -62px top -22px/150px no-repeat;mask:var(--lotus-mask) left -130px top 55px/250px no-repeat,var(--lotus-mask) right -62px top -22px/150px no-repeat}}</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
