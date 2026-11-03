@@ -8372,7 +8372,7 @@ const RECIPES_DATA = [
       <div class="footer-tab-btn" id="tab-settings" title="Settings: notifications and cookies (a dot means one is on)" onclick="showFooterSection('settings')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg>
       </div>
-      <div class="footer-tab-btn" id="tab-help" title="Help: check notifications, troubleshooting, feedback (a dot means a problem was found)" onclick="showFooterSection('help')">
+      <div class="footer-tab-btn" id="tab-help" title="Help: check notifications, troubleshooting, announcements, feedback (a dot means a problem or a new announcement)" onclick="showFooterSection('help')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
       </div>
       <div class="footer-tab-btn" id="tab-legal" title="Legal: disclaimer and privacy policy" onclick="showFooterSection('legal')">
@@ -8479,7 +8479,7 @@ const RECIPES_DATA = [
   </div>
 
   <div class="footer-acc-body" id="sec-help" style="display:none">
-    <div class="footer-subtabs" role="tablist"><button type="button" class="footer-subtab" id="subtab-check" role="tab" onclick="showFooterSub('help','check')">Check notifications<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-trouble" role="tab" onclick="showFooterSub('help','trouble')">Troubleshooting<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-feedback" role="tab" onclick="showFooterSub('help','feedback')">Feedback<i class="fs-dot"></i></button></div>
+    <div class="footer-subtabs" role="tablist"><button type="button" class="footer-subtab" id="subtab-check" role="tab" onclick="showFooterSub('help','check')">Check notifications<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-trouble" role="tab" onclick="showFooterSub('help','trouble')">Troubleshooting<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-announcements" role="tab" onclick="showFooterSub('help','announcements')">Announcements<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-feedback" role="tab" onclick="showFooterSub('help','feedback')">Feedback<i class="fs-dot"></i></button></div>
     <div class="footer-sub" id="sec-check" style="display:none">
       <p>This checks every step that reminders need, one by one. Where something needs you, tap the <b>i</b> to see what to do.</p>
       <ul class="chk-list" id="chk-list"></ul>
@@ -8497,6 +8497,10 @@ const RECIPES_DATA = [
       <details><summary>"Tap to copy the URL for this app"</summary><p>That is the phone's own notice that an installed web app is open. It is not from AyuBase6 and goes away when you close the app. You can switch that notice off in the phone's Chrome notification settings; reminders are not affected.</p></details>
       <details><summary>Nothing helps</summary><p>Uninstall the app, install it again from the website, allow notifications and run the check. Your saved data can be restored from a Backup file. If it still fails, tell us in Feedback.</p></details>
     </div>
+    </div>
+    <div class="footer-sub" id="sec-announcements" style="display:none">
+      <ul class="ann-list" id="ann-list"></ul>
+      <p class="ann-empty" id="ann-empty">No announcements right now.</p>
     </div>
     <div class="footer-sub" id="sec-feedback" style="display:none">
     <div class="footer-sec-title" id="feedback-title">Feedback</div>
@@ -11412,8 +11416,8 @@ const FEEDBACK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxPwZpVM9hxNn
 const FEEDBACK_STORAGE_KEY = 'healtheeFeedbackEntries';
 const COOKIE_CONSENT_KEY = 'healtheeCookieConsent';
 const FOOTER_SECTIONS = ['settings', 'legal', 'help', 'othersites'];
-const FOOTER_ALIAS = {cookies:['settings','cookies'], notifications:['settings','notifications'], disclaimer:['legal','disclaimer'], privacy:['legal','privacy'], feedback:['help','feedback'], check:['help','check'], troubleshoot:['help','trouble']};
-const FOOTER_SUBS = {settings:['notifications','cookies'], legal:['disclaimer','privacy'], help:['check','trouble','feedback']}, footerSubNow = {};
+const FOOTER_ALIAS = {cookies:['settings','cookies'], notifications:['settings','notifications'], disclaimer:['legal','disclaimer'], privacy:['legal','privacy'], feedback:['help','feedback'], announcements:['help','announcements'], check:['help','check'], troubleshoot:['help','trouble']};
+const FOOTER_SUBS = {settings:['notifications','cookies'], legal:['disclaimer','privacy'], help:['check','trouble','announcements','feedback']}, footerSubNow = {};
 function showFooterSub(parent, sub){
   footerSubNow[parent] = sub;
   FOOTER_SUBS[parent].forEach(s => { const el=document.getElementById('sec-'+s), b=document.getElementById('subtab-'+s); if(el) el.style.display = s===sub ? 'block' : 'none'; if(b){ b.classList.toggle('active', s===sub); b.setAttribute('aria-selected', s===sub ? 'true' : 'false'); } });
@@ -11421,6 +11425,7 @@ function showFooterSub(parent, sub){
   if(sub==='notifications') refreshNotifStatusUI();
   if(sub==='feedback') resetFeedbackPanel();
   if(sub==='check' && window.ayuRunCheck) ayuRunCheck();
+  if(sub==='announcements' && window.ayuAnnOpen) ayuAnnOpen();
 }
 
 // Toggles the short description under one of the "Our Other Sites" entries.
@@ -12813,6 +12818,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       chipBox.innerHTML='';
       DAY_ORDER.forEach(d=>{const b=document.createElement('button');b.type='button';b.className='day-chip';b.textContent=DAY_LETTER[d];b.setAttribute('aria-label',DAY_FULL[d]);b.setAttribute('aria-pressed',String(days.includes(d)));
         b.addEventListener('click',()=>{if(days.includes(d)){if(days.length>1)days=days.filter(x=>x!==d)}else days=[...days,d];drawDays()});chipBox.append(b)});
+      (function(){ var sel=days.slice().sort().join(','); form.querySelectorAll('.day-quick button').forEach(function(b){ var want=b.dataset.q==='week'?'1,2,3,4,5':b.dataset.q==='wkend'?'0,6':'0,1,2,3,4,5,6'; var on=sel===want; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); }); })();
     }
     drawDays();
     form.querySelectorAll('.day-quick button').forEach(b=>b.addEventListener('click',()=>{days=b.dataset.q==='week'?[1,2,3,4,5]:b.dataset.q==='wkend'?[6,0]:[0,1,2,3,4,5,6];drawDays()}));
@@ -14037,7 +14043,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (PDF) or type values in, to see what is in or out of range.');
   sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
   // Footer
-  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. A dot in the icon colour means one of them is on</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: check that notifications work, troubleshooting tips and feedback. A dot means a problem was found</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy policy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
+  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. A dot in the icon colour means one of them is on</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: check that notifications work, troubleshooting tips, announcements and feedback. A dot means a problem or a new announcement</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy policy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
 
   var root=document.getElementById('tour-root'), spot=document.getElementById('tour-spot'), txt=document.getElementById('tour-text'), bar=document.getElementById('tour-bar');
   var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0;
@@ -14650,6 +14656,7 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
     try{ document.dispatchEvent(new Event('ayu-reminders-changed')); }catch(e){}
   }
   var draws={};
+  function markQuick(host,days){ var sel=days.slice().sort().join(','); host.querySelectorAll('.day-quick button').forEach(function(b){ var want=b.dataset.q==='week'?'1,2,3,4,5':b.dataset.q==='wkend'?'0,6':'0,1,2,3,4,5,6'; var on=sel===want; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); }); }
   function build(host,k){
     host.innerHTML='<div class="otd-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Every day</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div>';
     var box=host.querySelector('.day-chips');
@@ -14657,6 +14664,7 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
       var days=get(k);box.innerHTML='';
       ORDER.forEach(function(d){var b=document.createElement('button');b.type='button';b.className='day-chip';b.textContent=L[d];b.setAttribute('aria-label',F[d]);b.setAttribute('aria-pressed',String(days.indexOf(d)>=0));
         b.addEventListener('click',function(){var c=get(k);if(c.indexOf(d)>=0){if(c.length>1)cache[k]=c.filter(function(x){return x!==d})}else cache[k]=c.concat([d]);save(k);draw()});box.appendChild(b)});
+      markQuick(host,days);
     }
     host.querySelectorAll('.day-quick button').forEach(function(b){b.addEventListener('click',function(){cache[k]=b.dataset.q==='week'?[1,2,3,4,5]:b.dataset.q==='wkend'?[6,0]:ALL.slice();save(k);draw()})});
     draws[k]=draw;draw();
@@ -15077,11 +15085,12 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       }
     }catch(e){}
     var t=$('tab-settings'); if(t) t.classList.toggle('has-on',n||c);
-    var h=$('tab-help'); if(h) h.classList.toggle('has-prob',prob);
+    var h=$('tab-help'); if(h) h.classList.toggle('has-prob',prob||!!window.__ayuAnnUnread);
     var a=document.querySelector('#subtab-notifications .fs-dot'), b=document.querySelector('#subtab-cookies .fs-dot');
     if(a) a.classList.toggle('on',n); if(b) b.classList.toggle('on',c);
   }
   ['refreshNotifStatusUI','renderCookieChoice'].forEach(function(nm){ var o=window[nm]; if(typeof o!=='function'||o._d) return; var w=function(){ var r=o.apply(this,arguments); try{ update(); var st=$('notif-status-text'); if(st&&st.textContent.indexOf('✅')===0) st.innerHTML='<span class="nt-ok">✓</span>'+st.textContent.slice(1); }catch(e){} return r; }; w._d=1; window[nm]=w; });
+  window.__ayuHelpDot=update;
   window.addEventListener('storage',update); setInterval(update,2500); setTimeout(update,300); update();
 
   // Popup in the section's colour
@@ -15160,6 +15169,131 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   window.ayuRunCheck=run;
 })();
 </script>
+<style id="announce-20261103">
+.ayu-ann{display:flex;gap:10px;align-items:flex-start;margin:10px 12px 0;padding:10px 12px;border-radius:14px;background:var(--footer-accent,#2563eb);color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.18);font-size:.86rem;line-height:1.4;position:relative;z-index:5}
+.ayu-ann.warn{background:#b45309}
+.ayu-ann .ann-ic{flex:0 0 24px;width:24px;height:24px;border-radius:50%;background:#fff;color:var(--footer-accent,#2563eb);font:700 14px/24px system-ui,sans-serif;text-align:center;overflow:hidden}
+.ayu-ann.warn .ann-ic{color:#b45309}
+.ayu-ann .ann-ic img{width:100%;height:100%;object-fit:contain;display:block}
+.ayu-ann .ann-tx{flex:1 1 auto;min-width:0}
+.ayu-ann .ann-t{display:block;font-weight:800;font-size:.92rem;margin-bottom:2px}
+.ayu-ann .ann-m{white-space:pre-line;overflow-wrap:anywhere}
+.ayu-ann a,.ayu-ann .ann-l{color:#fff;font-weight:800;text-decoration:underline;cursor:pointer;white-space:nowrap}
+.ayu-ann .ann-x{flex:0 0 auto;border:0;background:rgba(255,255,255,.22);color:#fff;width:26px;height:26px;border-radius:50%;font-size:14px;cursor:pointer;padding:0}
+@media (min-width:900px){.ayu-ann{margin:14px 30px 0;max-width:820px}}
+.ann-list{list-style:none;margin:6px 0 0;padding:0}
+.ann-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.08)}
+.ann-item .ann-ic{flex:0 0 26px;width:26px;height:26px;border-radius:50%;background:var(--footer-accent,var(--act-2));color:#fff;font:700 14px/26px system-ui,sans-serif;text-align:center;overflow:hidden}
+.ann-item.warn .ann-ic{background:#b45309}
+.ann-item .ann-ic img{width:100%;height:100%;object-fit:contain;display:block}
+.ann-item .ann-d{font-size:.75rem;opacity:.6}
+.ann-item .ann-t{display:block;font-weight:800}
+.ann-item .ann-m{white-space:pre-line;overflow-wrap:anywhere}
+.ann-item .ann-l{display:inline-block;margin-top:4px;font-weight:800;color:var(--footer-accent,var(--act-2));text-decoration:underline;cursor:pointer}
+.ann-empty{opacity:.65}
+</style>
+<script id="announce-20261103-js">
+(function(){
+  var URL_='config/announcements.json', K_LAST='ayuAnnLast', K_CACHE='ayuAnnCache', K_DISM='ayuAnnDismissed', K_READ='ayuAnnRead', EVERY=30*60*1000;
+  var msgs=[];
+  function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){} return null; }
+  function arr(k){ try{ var a=JSON.parse(ls(k)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+  function str(v,max){ return (typeof v==='string'?v:'').slice(0,max); }
+  // Only plain text and safe links/icons are accepted from the file.
+  function clean(raw){
+    var out=[]; if(!raw||!Array.isArray(raw.messages)) return out;
+    raw.messages.forEach(function(m){
+      if(!m||typeof m!=='object') return;
+      var title=str(m.title,90).trim(), message=str(m.message,500).trim(), date=str(m.date,10), repair=m.repair===true; if(!title&&!message&&!repair) return;
+      var id=str(m.id,80).trim(); if(!id){ var h=0, sd=date+'|'+title+'|'+message; for(var q=0;q<sd.length;q++) h=(h*31+sd.charCodeAt(q))|0; id='auto-'+(h>>>0).toString(36); }
+      var aud=str(m.audience,10)||'all', phone=(typeof NUDGE_IS_PHONE!=='undefined'&&!!NUDGE_IS_PHONE);
+      if((aud==='phone'&&!phone)||(aud==='desktop'&&phone)) return;
+      var icon=str(m.icon,120)||'i', iconKind='char';
+      if(icon==='i'||icon==='!') iconKind='char'; else if(/^icons\/[\w\/.\-]+\.(svg|png|webp|jpg|jpeg)$/i.test(icon)) iconKind='img'; else icon='i';
+      var link=null;
+      if(m.link&&typeof m.link==='object'){
+        var lt=str(m.link.text,40)||'Details';
+        if(typeof m.link.help==='string'&&/^(check|troubleshoot|feedback|announcements)$/.test(m.link.help)) link={text:lt,help:m.link.help};
+        else if(typeof m.link.url==='string'&&(/^https:\/\//i.test(m.link.url)||/^[\w\-\/.]+(\?[\w=&%\-.]*)?(#[\w\-]*)?$/.test(m.link.url))) link={text:lt,url:m.link.url};
+      }
+      var exp=null; if(typeof m.expires==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(m.expires)){ var p=m.expires.split('-'); exp=new Date(+p[0],+p[1]-1,+p[2],23,59,59).getTime(); }
+      var dms=null; if(/^\d{4}-\d{2}-\d{2}$/.test(date)){ var dp=date.split('-'); dms=new Date(+dp[0],+dp[1]-1,+dp[2]).getTime(); }
+      var hasText=!!(title||message);
+      out.push({id:id,date:date,dateMs:dms,title:title,message:message,icon:icon,iconKind:iconKind,level:m.level==='warning'?'warning':'info',link:link,expires:exp,banner:m.banner!==false&&hasText,tab:m.tab!==false&&hasText,repair:repair});
+    });
+    out.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+    return out.slice(0,50);
+  }
+  function iconEl(m){ var s=document.createElement('span'); s.className='ann-ic'; if(m.iconKind==='img'){ var im=document.createElement('img'); im.alt=''; im.src=m.icon; im.onerror=function(){ s.textContent='i'; im.remove(); }; s.appendChild(im); } else s.textContent=m.icon; return s; }
+  function linkEl(m){
+    if(!m.link) return null; var a=document.createElement('a'); a.className='ann-l'; a.textContent=m.link.text;
+    if(m.link.help){ a.href='#'; a.addEventListener('click',function(e){ e.preventDefault(); showFooterSection(m.link.help==='troubleshoot'?'troubleshoot':m.link.help); }); }
+    else { a.href=m.link.url; if(/^https:/i.test(m.link.url)){ a.target='_blank'; a.rel='noopener'; } }
+    return a;
+  }
+  function live(m){ return !m.expires || m.expires>=Date.now(); }
+  var TAB_DAYS=30, TAB_MAX=10;   // a message stays in the Announcements tab for 30 days from its date (no date: while it is in the file); at most 10 are listed
+  function tabList(){ return msgs.filter(function(m){ return m.tab && (!m.dateMs || Date.now()-m.dateMs<=TAB_DAYS*86400000); }).slice(0,TAB_MAX); }
+  function unread(){ var r=arr(K_READ); return tabList().some(function(m){ return live(m) && r.indexOf(m.id)<0; }); }
+  function renderBanner(){
+    document.querySelectorAll('.ayu-ann').forEach(function(e){ e.remove(); });
+    var d=arr(K_DISM), m=msgs.filter(function(x){ return x.banner && live(x) && d.indexOf(x.id)<0; })[0];
+    if(!m) return;
+    document.querySelectorAll('.tab-panel').forEach(function(p){
+      var b=document.createElement('div'); b.className='ayu-ann'+(m.level==='warning'?' warn':''); b.setAttribute('role','status');
+      var tx=document.createElement('div'); tx.className='ann-tx';
+      if(m.title){ var t=document.createElement('span'); t.className='ann-t'; t.textContent=m.title; tx.appendChild(t); }
+      var mm=document.createElement('span'); mm.className='ann-m'; mm.textContent=m.message; tx.appendChild(mm);
+      var l=linkEl(m); if(l){ tx.appendChild(document.createTextNode(' ')); tx.appendChild(l); }
+      var x=document.createElement('button'); x.type='button'; x.className='ann-x'; x.setAttribute('aria-label','Dismiss'); x.textContent='✕';
+      x.addEventListener('click',function(){ var dd=arr(K_DISM); if(dd.indexOf(m.id)<0) dd.push(m.id); ls(K_DISM,JSON.stringify(dd.slice(-50))); renderBanner(); });
+      b.appendChild(iconEl(m)); b.appendChild(tx); b.appendChild(x); p.insertBefore(b,p.firstChild);
+    });
+    try{ window.dispatchEvent(new Event('resize')); }catch(e){}
+  }
+  function renderList(){
+    var ul=document.getElementById('ann-list'), em=document.getElementById('ann-empty'); if(!ul) return;
+    var tl=tabList(); ul.innerHTML=''; if(em) em.style.display=tl.length?'none':'block';
+    tl.forEach(function(m){
+      var li=document.createElement('li'); li.className='ann-item'+(m.level==='warning'?' warn':'');
+      var tx=document.createElement('div');
+      if(m.date){ var d=document.createElement('span'); d.className='ann-d'; d.textContent=m.date; tx.appendChild(d); }
+      if(m.title){ var t=document.createElement('span'); t.className='ann-t'; t.textContent=m.title; tx.appendChild(t); }
+      var mm=document.createElement('span'); mm.className='ann-m'; mm.textContent=m.message; tx.appendChild(mm);
+      var l=linkEl(m); if(l){ tx.appendChild(document.createElement('br')); tx.appendChild(l); }
+      li.appendChild(iconEl(m)); li.appendChild(tx); ul.appendChild(li);
+    });
+  }
+  function dots(){ var u=unread(); var d=document.querySelector('#subtab-announcements .fs-dot'); if(d) d.classList.toggle('on',u); window.__ayuAnnUnread=u; try{ if(window.__ayuHelpDot) window.__ayuHelpDot(); }catch(e){} }
+  var K_REP='ayuAnnRepaired';
+  function runRepairs(){
+    var done=arr(K_REP), todo=msgs.filter(function(m){ return m.repair && live(m) && done.indexOf(m.id)<0; });
+    if(!todo.length) return;
+    todo.forEach(function(m){ done.push(m.id); }); ls(K_REP,JSON.stringify(done.slice(-100)));
+    try{ if('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(function(r){ if(r) return r.update(); }).catch(function(){}); }catch(e){}
+    try{ if(window.ayuPush && ayuPush.repair && window.NUDGE_IS_PHONE!==false) ayuPush.repair(); }catch(e){}
+  }
+  function apply(list){ msgs=list; renderBanner(); renderList(); dots(); runRepairs(); }
+  // Check when the app opens or comes to the front, and again every 30 minutes, but only if the last good check was 30 minutes ago or more.
+  function check(force){
+    var last=+ls(K_LAST)||0;
+    if(!force && Date.now()-last<EVERY) return Promise.resolve();
+    return fetch(URL_,{cache:'no-cache'}).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(j){
+      ls(K_LAST,String(Date.now())); var list=clean(j); ls(K_CACHE,JSON.stringify(j)); apply(list);
+    }).catch(function(){ /* offline or no file: keep what was seen last */ });
+  }
+  window.ayuAnnOpen=function(){ check(true).then(function(){ var ids=tabList().map(function(m){ return m.id; }); ls(K_READ,JSON.stringify(arr(K_READ).concat(ids).slice(-100))); dots(); }); renderList(); var ids=tabList().map(function(m){ return m.id; }); ls(K_READ,JSON.stringify(arr(K_READ).concat(ids).slice(-100))); dots(); };
+  // Open Help on the Announcements tab when something is unread.
+  var oSec=window.showFooterSection; if(typeof oSec==='function'&&!oSec._a){ var w=function(id){ try{ if(id==='help' && window.__ayuAnnUnread && typeof footerSubNow!=='undefined' && !document.getElementById('tab-help').classList.contains('active')) footerSubNow.help='announcements'; }catch(e){} return oSec.apply(this,arguments); }; w._a=1; window.showFooterSection=w; }
+  try{ var cached=JSON.parse(ls(K_CACHE)||'null'); if(cached) msgs=clean(cached); }catch(e){}
+  function start(){ renderBanner(); renderList(); dots(); check(false); }
+  if(document.readyState==='complete') setTimeout(start,800); else window.addEventListener('load',function(){ setTimeout(start,800); });
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden){ check(false); renderBanner(); } });
+  setInterval(function(){ if(!document.hidden) check(false); }, EVERY);
+  window.ayuAnnCheck=check;
+})();
+</script>
+<style id="days-quick-on-20261103">:is(#alerts-panel,#routines-panel) .day-quick button.on,#alerts-panel .custom-reminder-form .day-quick button.on{background:var(--otd,var(--alert-2,#0d9488)) !important;color:#fff !important}</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
