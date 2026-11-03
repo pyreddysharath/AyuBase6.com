@@ -15167,6 +15167,9 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 .footer-subtab .fs-dot.on{display:block}
 .notif-test{margin-top:10px}
 .notif-test button{font:inherit;font-weight:700;padding:8px 16px;border-radius:10px;border:0;background:var(--footer-accent,var(--act-2));color:#fff;cursor:pointer}
+.nt-ok,.notif-test-out .nt-ok{color:var(--footer-accent,var(--act-2));font-weight:900}
+#sec-cookies .toggle-switch input:checked + .toggle-slider{background:var(--footer-accent,var(--act-2)) !important}
+#sec-cookies .toggle-switch input:disabled:checked + .toggle-slider{opacity:.55}
 .notif-test-out{margin-top:8px;font-size:.84rem;line-height:1.7;white-space:pre-line}
 #tour-text .tf-ic.has-dot-c,#tour-ficons span.has-dot-c{position:relative}
 #tour-text .tf-ic.has-dot-c::after,#tour-ficons span.has-dot-c::after{content:'';position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 0 1.5px #fff}
@@ -15183,12 +15186,12 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     var a=document.querySelector('#subtab-notifications .fs-dot'), b=document.querySelector('#subtab-cookies .fs-dot');
     if(a) a.classList.toggle('on',n); if(b) b.classList.toggle('on',c);
   }
-  ['refreshNotifStatusUI','renderCookieChoice'].forEach(function(nm){ var o=window[nm]; if(typeof o!=='function'||o._d) return; var w=function(){ var r=o.apply(this,arguments); try{ update(); }catch(e){} return r; }; w._d=1; window[nm]=w; });
+  ['refreshNotifStatusUI','renderCookieChoice'].forEach(function(nm){ var o=window[nm]; if(typeof o!=='function'||o._d) return; var w=function(){ var r=o.apply(this,arguments); try{ update(); var st=document.getElementById('notif-status-text'); if(st&&st.textContent.indexOf('\u2705')===0) st.innerHTML='<span class="nt-ok">\u2713</span>'+st.textContent.slice(1); }catch(e){} return r; }; w._d=1; window[nm]=w; });
   window.addEventListener('storage',update); setInterval(update,2500); setTimeout(update,300); update();
   // Test: shows what is allowed on this phone, then sends one real notification with the reminder sound.
   window.ayuNotifTest=async function(){
     var out=document.getElementById('notif-test-out'), L=[];
-    function show(){ if(out) out.textContent=L.join('\n'); }
+    function show(){ if(out) out.innerHTML=L.join('\n').replace(/\u2705/g,'<span class="nt-ok">\u2713</span>'); }
     try{
       var perm=typeof Notification==='undefined'?'unsupported':Notification.permission;
       if(perm==='default'){ try{ perm=await Notification.requestPermission(); }catch(e){} }
