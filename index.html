@@ -8489,10 +8489,9 @@ const RECIPES_DATA = [
   <div class="footer-acc-body" id="sec-help" style="display:none">
     <div class="footer-subtabs" role="tablist"><button type="button" class="footer-subtab" id="subtab-check" role="tab" onclick="showFooterSub('help','check')">Notifications<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-trouble" role="tab" onclick="showFooterSub('help','trouble')">Troubleshooting<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-feedback" role="tab" onclick="showFooterSub('help','feedback')">Feedback<i class="fs-dot"></i></button></div>
     <div class="footer-sub" id="sec-check" style="display:none">
-      <p>Tap the button to test every step that reminders need, one by one. This also plays a test notification and sound. Where something needs you, tap the <b>i</b> to see what to do.</p>
+      <div class="chk-top"><button type="button" class="chk-btn" id="chk-run" onclick="ayuRunCheck()">Test my notifications</button></div>
+      <div class="chk-sum" id="chk-sum"></div>
       <ul class="chk-list" id="chk-list"></ul>
-      <div class="chk-sum" id="chk-sum">Nothing has been tested yet.</div>
-      <button type="button" class="chk-btn" id="chk-run" onclick="ayuRunCheck()">Test my notifications</button>
     </div>
     <div class="footer-sub" id="sec-trouble" style="display:none">
     <div class="trb">
@@ -8500,7 +8499,7 @@ const RECIPES_DATA = [
       <details><summary>Notifications only come while the app is open</summary><p>The app is probably open in a browser tab, or this phone is not registered yet. Open the app from its home-screen icon, turn the reminder switch on, and run the check.</p></details>
       <details><summary>Repeating reminders stop when the app is closed</summary><p>Reminders that repeat (every so many minutes) reach a closed app only on the installed app with notifications allowed and this phone registered. Open <b>Help → Notifications</b> and fix any step marked ✕. In a browser tab they ring only while that tab is open.</p></details>
       <details><summary>No sound</summary><p>Turn the phone's media or notification volume up and check that the reminder's sound is not muted in its section. In your phone's Settings → Apps → AyuBase6 (or Chrome) → Notifications, make sure sound is on and the channel is not set to silent.</p></details>
-      <details><summary>Notifications are blocked</summary><p>A page cannot unblock itself. Allow notifications in the browser (Chrome menu → Settings → Site settings → Notifications) or long-press the app icon → App info → Notifications, then run the check again.</p></details>
+      <details><summary>Notifications are blocked</summary><p>A page cannot unblock itself. Allow notifications in the browser (Chrome menu → Settings → Site settings → Notifications) or long-press the app icon → App info → Notifications, then tap Test again.</p></details>
       <details><summary>iPhone</summary><p>Add the app to the Home Screen first (Share → Add to Home Screen) and open it from that icon. Notifications are not available in a normal Safari tab.</p></details>
       <details><summary>Reminders are late or skipped</summary><p>Turn off battery saver or "restrict background activity" for the app and Chrome. A reminder missed by more than a few minutes is skipped instead of being shown late, and reminders do not fire on days you did not choose.</p></details>
       <details><summary>"Tap to copy the URL for this app"</summary><p>That is the phone's own notice that an installed web app is open. It is not from AyuBase6 and goes away when you close the app. You can switch that notice off in the phone's Chrome notification settings; reminders are not affected.</p></details>
@@ -15252,7 +15251,9 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 .chk-note{display:block;font-size:.78rem;opacity:.65}
 .chk-i{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--footer-accent,var(--act-2));background:#fff;color:var(--footer-accent,var(--act-2));font:italic 700 13px/1 Georgia,serif;cursor:pointer;padding:0;display:none}
 .chk-row.bad .chk-i,.chk-row.hasinfo .chk-i{display:inline-block}
-.chk-sum{font-weight:700;margin:6px 0 8px;min-height:1.3em}
+.chk-sum{font-weight:700;margin:6px 0 8px;text-align:center}
+.chk-sum:empty{display:none}
+.chk-top{display:flex;justify-content:center;margin:6px 0 10px}
 .chk-btn{font:inherit;font-weight:700;padding:8px 16px;border-radius:10px;border:0;background:var(--footer-accent,var(--act-2));color:#fff;cursor:pointer}
 @keyframes chkpulse{50%{opacity:.4}}
 .trb details{border-bottom:1px solid rgba(0,0,0,.08);padding:6px 0}
@@ -15315,7 +15316,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       {k:'perm',label:'Notifications allowed',fn:async function(){
         if(typeof Notification==='undefined') return bad('Not supported','This browser cannot show notifications. On Android use Chrome; on iPhone add the app to the Home Screen first.');
         var p=Notification.permission; if(p==='default'){ try{ p=await Notification.requestPermission(); }catch(e){} }
-        return p==='granted' ? ok() : bad('Notifications are blocked','Allow them in your browser or phone: <b>Chrome menu → Settings → Site settings → Notifications</b>, or <b>long-press the app icon → App info → Notifications</b>. Allow AyuBase6, then run the check again.'); }},
+        return p==='granted' ? ok() : bad('Notifications are blocked','Allow them in your browser or phone: <b>Chrome menu → Settings → Site settings → Notifications</b>, or <b>long-press the app icon → App info → Notifications</b>. Allow AyuBase6, then tap Test again.'); }},
       {k:'on',label:'Reminders turned on',fn:async function(){
         return remindersOn() ? ok() : bad('Reminders are off','Turn on the <b>Reminder hours</b> switch in Reminders, or <b>Notify Me</b> in Checks. Nothing is sent while both are off.'); }},
       {k:'inst',label:'Opened as the installed app',fn:async function(){
@@ -15333,18 +15334,18 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
         if(!granted()||!remindersOn()) return skip('Needs the steps above');
         try{ rep=await ayuPush.repair(); }catch(e){ rep={sub:false,server:false,error:String(e&&e.message||e)}; }
         if(rep.error==='off') return skip('Needs the steps above');
-        return rep.sub ? ok() : bad('This phone is not registered','The app could not register this phone for closed-app reminders'+(rep.error?' ('+rep.error+')':'')+'. Check your internet connection and run the check again.'); }},
+        return rep.sub ? ok() : bad('This phone is not registered','The app could not register this phone for closed-app reminders'+(rep.error?' ('+rep.error+')':'')+'. Check your internet connection and tap Test again.'); }},
       {k:'srv',label:'Reminder server accepted it',fn:async function(){
         if(!phone) return skip('Not used on a computer');
         if(!rep||rep.error==='off') return skip('Needs the steps above');
-        return rep.server ? ok() : bad('The server did not accept it','The reminder server did not accept this phone'+(rep.error?' ('+rep.error+')':'')+'. Check your internet connection and run the check again. If it keeps failing, tell us in Feedback.'); }}
+        return rep.server ? ok() : bad('The server did not accept it','The reminder server did not accept this phone'+(rep.error?' ('+rep.error+')':'')+'. Check your internet connection and tap Test again. If it keeps failing, tell us in Feedback.'); }}
     );
     steps.push({k:'test',label:'Test notification and sound',human:true,fn:async function(){
       if(!granted()) return skip('Needs notifications allowed');
       try{ if(!alertState.break.muted) playAlertPreset(alertState.break.sound); }catch(e){}
-      var shown=showNudgeNotification('AyuBase6','Test notification. If you can see and hear this, reminders can reach you.',{key:'test'});
-      return shown ? ok('Did it arrive? Tap i') : bad('Could not show a notification','The browser refused to show the notification. Run the check again; if it keeps failing, close and reopen the app.'); },
-      info:['Did it arrive?','You should see a notification and hear the reminder sound. If not, open your phone <b>Settings → Apps → AyuBase6 (or Chrome) → Notifications</b>: allowed, sound on, not silent. Also check Do Not Disturb and battery saver.']});
+      var shown=showNudgeNotification('AyuBase6','Test notification. If you can see and hear this, reminders can reach you.',{key:'test',theme:sectionTheme()});
+      return shown ? ok('Tap i if it didn\'t arrive') : bad('Could not show a notification','The browser refused to show the notification. Tap Test again; if it keeps failing, close and reopen the app.'); },
+      info:['Didn\'t arrive?','You should see a notification and hear the reminder sound. If not, open your phone <b>Settings → Apps → AyuBase6 (or Chrome) → Notifications</b>: allowed, sound on, not silent. Also check Do Not Disturb and battery saver.']});
     steps.forEach(function(s){
       var li=document.createElement('li'); li.className='chk-row'; li.id='chk-'+s.k;
       li.innerHTML='<span class="chk-cb"></span><span class="chk-lab">'+s.label+'<span class="chk-note"></span></span><button type="button" class="chk-i" aria-label="More information">i</button>';
@@ -15360,8 +15361,22 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       else if(r.ok){ li.classList.add('ok'); li.querySelector('.chk-note').textContent=r.note||''; if(s.info){ INFO[s.k]=s.info; li.classList.add('hasinfo'); } }
       else { allOk=false; li.classList.add('bad'); INFO[s.k]=[r.title,r.msg]; li.querySelector('.chk-note').textContent=r.title; }
     }
-    sum.innerHTML= allOk ? '<span class="nt-ok">✓</span> All checks passed.' : 'Tap the <b>i</b> next to a ✕ step to see how to fix it, then run the check again.';
+    sum.innerHTML= allOk ? '<span class="nt-ok">✓</span> All checks passed.' : 'Tap the <b>i</b> next to a ✕ step to see how to fix it, then tap Test again.';
     if(btn){ btn.disabled=false; btn.textContent='Test again'; } running=false; update();
+  }
+  // The test notification's picture uses the colour of the section you are in.
+  function sectionTheme(){
+    try{
+      var el=document.createElement('i'); el.style.color='var(--footer-accent,#0d9488)'; document.body.appendChild(el); var c=getComputedStyle(el).color; el.remove();
+      var m=(c.match(/[\d.]+/g)||[]).slice(0,3).map(Number); if(m.length<3) return 'reminders';
+      var name='sec-'+m.join('-'); if(typeof NUDGE_THEMES==='undefined') return 'reminders';
+      if(!NUDGE_THEMES[name]){
+        var hex=function(a){ return '#'+a.map(function(v){ v=Math.max(0,Math.min(255,Math.round(v))); return (v<16?'0':'')+v.toString(16); }).join(''); };
+        var mix=function(t){ return hex(m.map(function(v){ return v+(255-v)*t; })); }, dark=function(t){ return hex(m.map(function(v){ return v*(1-t); })); };
+        NUDGE_THEMES[name]={g0:mix(.92),g1:mix(.78),gi:mix(.6),big:mix(.4),deep:dark(.1),ic0:hex(m),ic1:dark(.22)};
+      }
+      return name;
+    }catch(e){ return 'reminders'; }
   }
   window.ayuRunCheck=run;
 })();
