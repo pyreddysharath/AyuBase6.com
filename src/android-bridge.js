@@ -88,6 +88,23 @@
     return loading;
   }
   state.reloadSaved = loadSaved;
+  // The web app compares a saved video's "saved at" time with the site's file time to ask "save again" after a change.
+  // From the app the site's own date is hidden (another address), so the time of saving is written on the saved copy.
+  try{
+    var origPut = Cache.prototype.put;
+    Cache.prototype.put = function(req, resp){
+      try{
+        var u = typeof req === 'string' ? req : (req && req.url);
+        if(isMedia(u) && resp && !resp.headers.get('date')){
+          var h = new Headers();
+          ['content-type', 'content-length', 'last-modified'].forEach(function(k){ var v = resp.headers.get(k); if(v) h.set(k, v); });
+          h.set('date', new Date().toUTCString());
+          resp = new Response(resp.body, { status:resp.status, statusText:resp.statusText, headers:h });
+        }
+      }catch(e){}
+      return origPut.call(this, req, resp);
+    };
+  }catch(e){}
   // Like the website: a video that has played once is kept, so it plays without internet next time.
   function keep(u){
     if(!isMedia(u) || savedUrl(u) || !('caches' in window)) return;
