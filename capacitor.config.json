@@ -1,0 +1,9 @@
+{
+  "appId": "com.ayubase6.app",
+  "appName": "AyuBase6",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#ffffff"
+  }
+}
