@@ -8,6 +8,8 @@ Each line: the choice, then why. Change any of them later; the file to touch is 
 - **Minimum Android 8.0 (API 26)** — covers almost all phones in use and gives notification channels and modern alarms without workarounds. [android/variables.gradle]
 - **Capacitor 8.6** — current stable; wraps the existing single-file app with no rewrite. [package.json]
 
+- **Text size fixed at 100% (the phone's font-size setting does not enlarge the app)** — the app looked larger than the website; pinch-zoom still works. [MainActivity.java]
+
 ## Web files
 - **Bundled, not loaded from the live site** — the app opens offline and is reviewed as a fixed build; a site change needs a new APK. [scripts/prepare-www.mjs]
 - **Built from the website repository at build time, not copied into this repo** — one codebase for web and Android; the workflow checks out `AyuBase6.com` (main, or a chosen ref). [.github/workflows/android-debug.yml]
