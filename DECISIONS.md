@@ -17,7 +17,7 @@ Each line: the choice, then why. Change any of them later; the file to touch is 
 - **Android wording for the Reminder hours i, Checks Notify Me i and Help → Troubleshooting, and no install buttons** — the website texts describe browser tabs, installing and the push server, which do not apply to the app. [scripts/prepare-www.mjs, src/android-bridge.js]
 - **Live from ayubase6.com: `content/` JSON and media, `config/announcements.json`, `config/OurOtherSites.json`** — new videos and announcements reach the app without a new release; GitHub Pages, so no server requests. [src/android-bridge.js, prepare-www.mjs]
 - **Web ads (AdSense) not loaded in the app** — AdSense is for websites, not app web views; an app would need AdMob instead. [prepare-www.mjs]
-- **No service worker in the app** — the phone shows notifications itself; the web cache is not needed for bundled files. Side effect: "Save for offline" videos are not served offline in the app yet. [src/android-bridge.js]
+- **No service worker in the app** — the phone shows notifications itself; the web cache is not needed for bundled files. "Save for offline" still works: the page saves videos in its own storage as on the website, and the bridge plays those saved copies (and keeps a video once played, like the website's service worker). The video lists are kept from the last online start, so the app knows its videos offline. Videos are not bundled in the APK, so new videos need no app release. [src/android-bridge.js]
 
 ## Reminders
 - **Local notifications only, no web push** — no server, no request limit, works offline. [src/android-bridge.js]

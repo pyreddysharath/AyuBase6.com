@@ -25,15 +25,102 @@
     if(u.indexOf(base) === 0) u = u.slice(base.length);
     return u.replace(/^\.\//, '');
   }
+  // The last copy of each list read from the site is kept, so the app knows its videos (and saved copies) offline.
+  var JSON_CACHE = 'ayubase6-app-lists';
+  function liveJson(rel, init){
+    var url = LIVE + rel.replace(/\?.*$/, '');
+    return origFetch.call(window, LIVE + rel, init).then(function(r){
+      if(r.ok && 'caches' in window){ var copy = r.clone(); caches.open(JSON_CACHE).then(function(c){ return c.put(url, copy); }).catch(noop); }
+      return r;
+    }).catch(function(err){
+      var fromCache = ('caches' in window) ? caches.open(JSON_CACHE).then(function(c){ return c.match(url); }).catch(function(){ return null; }) : Promise.resolve(null);
+      return fromCache.then(function(hit){ return hit || origFetch.call(window, rel, init); });
+    });
+  }
   window.fetch = function(input, init){
     try{
       if(typeof input === 'string'){
         var rel = relPath(input);
-        if(LIVE_RE.test(rel)) return origFetch.call(window, LIVE + rel, init).catch(function(){ return origFetch.call(window, rel, init); });
+        if(LIVE_RE.test(rel)) return liveJson(rel, init);
+        // "Save again" asks for a fresh copy with a header meant for the website's service worker; to the live
+        // site from the app that header would block the download, so a plain fresh request is made instead.
+        if(input.indexOf(LIVE) === 0 && init && init.headers && init.headers['x-ayu-refresh']){
+          var copy = {}; for(var k in init) if(k !== 'headers') copy[k] = init[k];
+          copy.cache = 'reload';
+          return origFetch.call(window, input, copy);
+        }
       }
     }catch(e){}
     return origFetch.apply(window, arguments);
   };
+
+  // ── Saved videos (Body → Save for offline) play from the phone ──
+  // The web app saves them in its storage (cache "ayubase6-media-v2"); on the website its service worker plays them
+  // from there. The app has no service worker, so media addresses are switched to the saved copies directly.
+  var MEDIA_CACHE = 'ayubase6-media-v2', MEDIA_RE = /\/content\/.+\/media\//, saved = {};
+  function mediaKey(u){ try{ var x = new URL(u, document.baseURI); return x.origin + x.pathname; }catch(e){ return ''; } }
+  function isMedia(u){ return typeof u === 'string' && u.indexOf(LIVE) === 0 && MEDIA_RE.test(u); }
+  function savedUrl(u){ var s = isMedia(u) && saved[mediaKey(u)]; return s || null; }
+  function swapEl(el){
+    ['src', 'poster'].forEach(function(a){
+      var v = el.getAttribute && el.getAttribute(a); if(!v) return;
+      var l = savedUrl(v); if(l && v !== l){ el.setAttribute('data-ayu-' + a, v); origSetAttr.call(el, a, l); }
+    });
+  }
+  function swapAll(root){
+    try{ (root || document).querySelectorAll('video[src],video[poster],source[src],img[src]').forEach(swapEl); }catch(e){}
+  }
+  var loading = null;
+  function loadSaved(){
+    if(!('caches' in window)) return Promise.resolve();
+    if(loading) return loading;
+    loading = caches.open(MEDIA_CACHE).then(function(c){
+      return c.keys().then(function(reqs){
+        var next = {};
+        return Promise.all(reqs.map(function(rq){
+          return c.match(rq).then(function(r){ return r && r.ok !== false ? r.blob() : null; }).then(function(b){
+            var k = mediaKey(rq.url); if(!b || !k) return;
+            next[k] = URL.createObjectURL(b);   // old addresses are kept, so a video playing now keeps playing
+          });
+        })).then(function(){ saved = next; });
+      });
+    }).catch(noop).then(function(){ loading = null; swapAll(); });
+    return loading;
+  }
+  state.reloadSaved = loadSaved;
+  // Like the website: a video that has played once is kept, so it plays without internet next time.
+  function keep(u){
+    if(!isMedia(u) || savedUrl(u) || !('caches' in window)) return;
+    var key = mediaKey(u);
+    origFetch.call(window, u).then(function(r){
+      if(!r.ok) return;
+      return caches.open(MEDIA_CACHE).then(function(c){ return c.put(key, r.clone()); }).then(function(){ return r.blob(); })
+        .then(function(b){ saved[key] = URL.createObjectURL(b); });
+    }).catch(noop);
+  }
+  document.addEventListener('playing', function(e){
+    var v = e.target; if(!v || !v.tagName) return;
+    keep(v.currentSrc || v.src);
+    if(v.poster) keep(v.getAttribute('data-ayu-poster') || v.poster);   // its preview image too
+  }, true);
+  var origSetAttr = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value){
+    if((name === 'src' || name === 'poster') && /^(VIDEO|SOURCE|IMG)$/.test(this.tagName)){
+      var l = savedUrl(String(value)); if(l){ origSetAttr.call(this, 'data-ayu-' + name, value); value = l; }
+    }
+    return origSetAttr.call(this, name, value);
+  };
+  [[HTMLMediaElement.prototype, 'src'], [HTMLVideoElement.prototype, 'poster'], [HTMLImageElement.prototype, 'src'], [HTMLSourceElement.prototype, 'src']].forEach(function(p){
+    var d = Object.getOwnPropertyDescriptor(p[0], p[1]); if(!d || !d.set) return;
+    Object.defineProperty(p[0], p[1], { configurable:true, enumerable:d.enumerable, get:d.get,
+      set:function(v){ var l = savedUrl(String(v)); d.set.call(this, l || v); } });
+  });
+  try{
+    new MutationObserver(function(list){
+      list.forEach(function(m){ m.addedNodes && m.addedNodes.forEach(function(n){ if(n.nodeType === 1){ if(/^(VIDEO|SOURCE|IMG)$/.test(n.tagName)) swapEl(n); swapAll(n); } }); });
+    }).observe(document.documentElement, { childList:true, subtree:true });
+  }catch(e){}
+  loadSaved();   // early, so videos drawn at start already use the saved copies
 
   // ── The app is "installed": no install prompts, and no service worker (the phone handles notifications) ──
   var origMM = window.matchMedia;
@@ -284,6 +371,11 @@
                      showNotification:function(t, o){ try{ new AyuNotification(t, o); }catch(e){} return Promise.resolve(); } };
     if(typeof window.getNudgeReg === 'function') window.getNudgeReg = function(){ return Promise.resolve(phoneReg); };
     useAnchorForNext(); setTimeout(useAnchorForNext, 1000);
+    loadSaved();
+    if(typeof window.ayuSaveOffline === 'function'){
+      var origSave = window.ayuSaveOffline;
+      window.ayuSaveOffline = function(){ return Promise.resolve(origSave.apply(this, arguments)).then(function(r){ return loadSaved().then(function(){ return r; }); }); };
+    }
     // The app is installed already: no install buttons (set inline, so the page's own styles cannot bring them back).
     function hideInstall(){ ['install-app-btn','routines-install-app-btn','install-help','routines-install-help'].forEach(function(id){ var el = document.getElementById(id); if(el) el.style.setProperty('display', 'none', 'important'); }); }
     hideInstall(); setTimeout(hideInstall, 1000); setTimeout(hideInstall, 4000);
