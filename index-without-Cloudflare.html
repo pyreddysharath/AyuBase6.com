@@ -8372,7 +8372,10 @@ const RECIPES_DATA = [
       <div class="footer-tab-btn" id="tab-settings" title="Settings: notifications and cookies (a dot means one is on)" onclick="showFooterSection('settings')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg>
       </div>
-      <div class="footer-tab-btn" id="tab-help" title="Help: check notifications, troubleshooting, announcements, feedback (a dot means a problem or a new announcement)" onclick="showFooterSection('help')">
+      <div class="footer-tab-btn" id="tab-announcements" title="Announcements (a dot means something new)" onclick="showFooterSection('announcements')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 11v2h4v-2h-4zm-2 6.61c.96.71 2.21 1.65 3.2 2.39.4-.53.8-1.07 1.2-1.6-.99-.74-2.24-1.68-3.2-2.4-.4.54-.8 1.08-1.2 1.61zM20.4 5.6c-.4-.53-.8-1.07-1.2-1.6-.99.74-2.24 1.68-3.2 2.4.4.53.8 1.07 1.2 1.6.96-.72 2.21-1.65 3.2-2.4zM4 9c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v4h2v-4h1l5 3V6L8 9H4zm11.5 3c0-1.33-.58-2.53-1.5-3.35v6.69c.92-.81 1.5-2.01 1.5-3.34z"/></svg>
+      </div>
+      <div class="footer-tab-btn" id="tab-help" title="Help: check notifications, troubleshooting, feedback (a dot means a problem)" onclick="showFooterSection('help')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
       </div>
       <div class="footer-tab-btn" id="tab-legal" title="Legal: disclaimer and privacy policy" onclick="showFooterSection('legal')">
@@ -8478,8 +8481,13 @@ const RECIPES_DATA = [
     </div>
   </div>
 
+  <div class="footer-acc-body" id="sec-announcements" style="display:none">
+    <div class="footer-sec-title">Announcements</div>
+    <ul class="ann-list" id="ann-list"></ul>
+    <p class="ann-empty" id="ann-empty">No announcements right now.</p>
+  </div>
   <div class="footer-acc-body" id="sec-help" style="display:none">
-    <div class="footer-subtabs" role="tablist"><button type="button" class="footer-subtab" id="subtab-check" role="tab" onclick="showFooterSub('help','check')">Check notifications<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-trouble" role="tab" onclick="showFooterSub('help','trouble')">Troubleshooting<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-announcements" role="tab" onclick="showFooterSub('help','announcements')">Announcements<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-feedback" role="tab" onclick="showFooterSub('help','feedback')">Feedback<i class="fs-dot"></i></button></div>
+    <div class="footer-subtabs" role="tablist"><button type="button" class="footer-subtab" id="subtab-check" role="tab" onclick="showFooterSub('help','check')">Check notifications<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-trouble" role="tab" onclick="showFooterSub('help','trouble')">Troubleshooting<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-feedback" role="tab" onclick="showFooterSub('help','feedback')">Feedback<i class="fs-dot"></i></button></div>
     <div class="footer-sub" id="sec-check" style="display:none">
       <p>This checks every step that reminders need, one by one. Where something needs you, tap the <b>i</b> to see what to do.</p>
       <ul class="chk-list" id="chk-list"></ul>
@@ -8497,10 +8505,6 @@ const RECIPES_DATA = [
       <details><summary>"Tap to copy the URL for this app"</summary><p>That is the phone's own notice that an installed web app is open. It is not from AyuBase6 and goes away when you close the app. You can switch that notice off in the phone's Chrome notification settings; reminders are not affected.</p></details>
       <details><summary>Nothing helps</summary><p>Uninstall the app, install it again from the website, allow notifications and run the check. Your saved data can be restored from a Backup file. If it still fails, tell us in Feedback.</p></details>
     </div>
-    </div>
-    <div class="footer-sub" id="sec-announcements" style="display:none">
-      <ul class="ann-list" id="ann-list"></ul>
-      <p class="ann-empty" id="ann-empty">No announcements right now.</p>
     </div>
     <div class="footer-sub" id="sec-feedback" style="display:none">
     <div class="footer-sec-title" id="feedback-title">Feedback</div>
@@ -11415,9 +11419,9 @@ function downloadBodyPDF(){
 const FEEDBACK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxPwZpVM9hxNnVcH_nPoFLH4pUhcsJhqQlo3IB9OwLLHgFqYvS_NLCN9aCxztz0fkK2/exec';
 const FEEDBACK_STORAGE_KEY = 'healtheeFeedbackEntries';
 const COOKIE_CONSENT_KEY = 'healtheeCookieConsent';
-const FOOTER_SECTIONS = ['settings', 'legal', 'help', 'othersites'];
-const FOOTER_ALIAS = {cookies:['settings','cookies'], notifications:['settings','notifications'], disclaimer:['legal','disclaimer'], privacy:['legal','privacy'], feedback:['help','feedback'], announcements:['help','announcements'], check:['help','check'], troubleshoot:['help','trouble']};
-const FOOTER_SUBS = {settings:['notifications','cookies'], legal:['disclaimer','privacy'], help:['check','trouble','announcements','feedback']}, footerSubNow = {};
+const FOOTER_SECTIONS = ['settings', 'announcements', 'legal', 'help', 'othersites'];
+const FOOTER_ALIAS = {cookies:['settings','cookies'], notifications:['settings','notifications'], disclaimer:['legal','disclaimer'], privacy:['legal','privacy'], feedback:['help','feedback'], check:['help','check'], troubleshoot:['help','trouble']};
+const FOOTER_SUBS = {settings:['notifications','cookies'], legal:['disclaimer','privacy'], help:['check','trouble','feedback']}, footerSubNow = {};
 function showFooterSub(parent, sub){
   footerSubNow[parent] = sub;
   FOOTER_SUBS[parent].forEach(s => { const el=document.getElementById('sec-'+s), b=document.getElementById('subtab-'+s); if(el) el.style.display = s===sub ? 'block' : 'none'; if(b){ b.classList.toggle('active', s===sub); b.setAttribute('aria-selected', s===sub ? 'true' : 'false'); } });
@@ -11425,7 +11429,6 @@ function showFooterSub(parent, sub){
   if(sub==='notifications') refreshNotifStatusUI();
   if(sub==='feedback') resetFeedbackPanel();
   if(sub==='check' && window.ayuRunCheck) ayuRunCheck();
-  if(sub==='announcements' && window.ayuAnnOpen) ayuAnnOpen();
 }
 
 // Toggles the short description under one of the "Our Other Sites" entries.
@@ -11549,6 +11552,7 @@ function showFooterSection(id){
     document.getElementById('tab-' + id).classList.add('active');
     if (FOOTER_SUBS[id]) showFooterSub(id, footerSubNow[id] || FOOTER_SUBS[id][0]);
     if (id === 'feedback') resetFeedbackPanel();
+    if (id === 'announcements' && window.ayuAnnOpen) ayuAnnOpen();
     // Scroll so the icon row itself lands just below the sticky top nav —
     // not the content section. That way the icons stay visible together
     // with the start of the newly opened content, so the user can tap
@@ -14043,7 +14047,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (PDF) or type values in, to see what is in or out of range.');
   sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
   // Footer
-  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. A dot in the icon colour means one of them is on</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: check that notifications work, troubleshooting tips, announcements and feedback. A dot means a problem or a new announcement</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy policy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
+  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. A dot in the icon colour means one of them is on</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 11v2h4v-2h-4zm-2 6.61c.96.71 2.21 1.65 3.2 2.39.4-.53.8-1.07 1.2-1.6-.99-.74-2.24-1.68-3.2-2.4-.4.54-.8 1.08-1.2 1.61zM20.4 5.6c-.4-.53-.8-1.07-1.2-1.6-.99.74-2.24 1.68-3.2 2.4.4.53.8 1.07 1.2 1.6.96-.72 2.21-1.65 3.2-2.4zM4 9c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v4h2v-4h1l5 3V6L8 9H4zm11.5 3c0-1.33-.58-2.53-1.5-3.35v6.69c.92-.81 1.5-2.01 1.5-3.34z"/></svg></span><span><b>Announcements</b>: news and important notes from us. A dot means something new</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: check that notifications work, troubleshooting tips and feedback. A dot means a problem</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy policy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
 
   var root=document.getElementById('tour-root'), spot=document.getElementById('tour-spot'), txt=document.getElementById('tour-text'), bar=document.getElementById('tour-bar');
   var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0;
@@ -14103,7 +14107,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
     if(s.pin){
       // Footer step: the text sits at the top and a row with the footer icons sits just above the buttons, whatever the page length.
       if(!fi.firstChild) fi.innerHTML=Array.prototype.map.call(document.querySelectorAll('.footer-tabs-icons .footer-tab-btn svg'),function(v){ return '<span>'+v.outerHTML+'</span>'; }).join('');
-      if(fi.firstChild){ fi.firstChild.classList.add('has-dot'); if(fi.children[1]) fi.children[1].classList.add('has-dot-c'); if(fi.children[2]) fi.children[2].classList.add('has-dot-c'); }
+      if(fi.firstChild){ fi.firstChild.classList.add('has-dot'); if(fi.children[1]) fi.children[1].classList.add('has-dot-c'); if(fi.children[2]) fi.children[2].classList.add('has-dot-c'); if(fi.children[3]) fi.children[3].classList.add('has-dot-c'); }
       root.classList.add('nospot'); spot.style.display='none';
       var desk0=vw>=900;
       txt.style.width=''; txt.style.left=(desk0?barRect.left:14)+'px'; txt.style.top='16px';
@@ -15026,10 +15030,13 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 <style id="body-nav-topright-20261103">@media (max-width:899px){body:has(#activity-panel[style*="block"]) #nav-lotus{-webkit-mask:var(--lotus-mask) left -130px top 55px/250px no-repeat,var(--lotus-mask) right -62px top -22px/150px no-repeat;mask:var(--lotus-mask) left -130px top 55px/250px no-repeat,var(--lotus-mask) right -62px top -22px/150px no-repeat}}</style>
 <style id="title-gap-20261103">@media (min-width:900px){html body .tab-panel > .ayu-content-page-title{padding-bottom:0 !important;margin-bottom:8px !important}}</style>
 <style id="footer-settings-20261103">
-#tab-settings,#tab-help{position:relative}
-#tab-settings.has-on::after,#tab-help.has-prob::after{content:'';position:absolute;top:1px;right:calc(50% - 13px);width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 1.5px #fff;pointer-events:none}
-@media (min-width:900px){#tab-settings.has-on::after,#tab-help.has-prob::after{width:5px;height:5px;top:2px;right:calc(50% - 11px);box-shadow:0 0 0 1px #fff}}
+#tab-settings,#tab-help,#tab-announcements{position:relative}
+#tab-settings.has-on::after,#tab-help.has-prob::after,#tab-announcements.has-ann::after{content:'';position:absolute;top:1px;right:calc(50% - 13px);width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 1.5px #fff;pointer-events:none}
+@media (min-width:900px){#tab-settings.has-on::after,#tab-help.has-prob::after,#tab-announcements.has-ann::after{width:5px;height:5px;top:2px;right:calc(50% - 11px);box-shadow:0 0 0 1px #fff}}
 .footer-subtabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+#sec-help .footer-subtabs{flex-wrap:nowrap;gap:4px}
+#sec-help .footer-subtab{flex:1 1 auto;white-space:nowrap;padding:6px 5px;font-size:.7rem;text-align:center}
+@media (min-width:600px){#sec-help .footer-subtab{flex:0 0 auto;padding:6px 14px;font-size:.82rem}}
 .footer-subtab{position:relative;font:inherit;font-size:.82rem;font-weight:700;padding:6px 14px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:var(--footer-accent,var(--act-2));cursor:pointer;opacity:.75}
 .footer-subtab.active{background:var(--footer-accent,var(--act-2));color:#fff;opacity:1;border-color:transparent}
 .footer-subtab .fs-dot{display:none;position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:var(--footer-accent,var(--act-2));box-shadow:0 0 0 1.5px #fff}
@@ -15085,7 +15092,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       }
     }catch(e){}
     var t=$('tab-settings'); if(t) t.classList.toggle('has-on',n||c);
-    var h=$('tab-help'); if(h) h.classList.toggle('has-prob',prob||!!window.__ayuAnnUnread);
+    var h=$('tab-help'); if(h) h.classList.toggle('has-prob',prob);
     var a=document.querySelector('#subtab-notifications .fs-dot'), b=document.querySelector('#subtab-cookies .fs-dot');
     if(a) a.classList.toggle('on',n); if(b) b.classList.toggle('on',c);
   }
@@ -15233,7 +15240,10 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   }
   function live(m){ return !m.expires || m.expires>=Date.now(); }
   var TAB_DAYS=30, TAB_MAX=10;   // a message stays in the Announcements tab for 30 days from its date (no date: while it is in the file); at most 10 are listed
-  function tabList(){ return msgs.filter(function(m){ return m.tab && (!m.dateMs || Date.now()-m.dateMs<=TAB_DAYS*86400000); }).slice(0,TAB_MAX); }
+  function tabList(){ var sn=seenMap(); return msgs.filter(function(m){ return m.tab && (!m.dateMs || Date.now()-m.dateMs<=TAB_DAYS*86400000) && !(sn[m.id] && Date.now()-sn[m.id]>SEEN_KEEP); }).slice(0,TAB_MAX); }
+  var SEEN_KEEP=24*60*60*1000, K_SEEN='ayuAnnSeen';   // once seen in the tab, a message is kept for 1 day and then removed
+  function seenMap(){ try{ var o=JSON.parse(ls(K_SEEN)||'{}'); return o&&typeof o==='object'?o:{}; }catch(e){ return {}; } }
+  function markSeen(ids){ var o=seenMap(), n=Date.now(), c=0; ids.forEach(function(i){ if(!o[i]){ o[i]=n; c=1; } }); if(c){ var k=Object.keys(o); if(k.length>200) k.slice(0,k.length-200).forEach(function(i){ delete o[i]; }); ls(K_SEEN,JSON.stringify(o)); } }
   function unread(){ var r=arr(K_READ); return tabList().some(function(m){ return live(m) && r.indexOf(m.id)<0; }); }
   function renderBanner(){
     document.querySelectorAll('.ayu-ann').forEach(function(e){ e.remove(); });
@@ -15264,7 +15274,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       li.appendChild(iconEl(m)); li.appendChild(tx); ul.appendChild(li);
     });
   }
-  function dots(){ var u=unread(); var d=document.querySelector('#subtab-announcements .fs-dot'); if(d) d.classList.toggle('on',u); window.__ayuAnnUnread=u; try{ if(window.__ayuHelpDot) window.__ayuHelpDot(); }catch(e){} }
+  function dots(){ var u=unread(); var d=document.getElementById('tab-announcements'); if(d) d.classList.toggle('has-ann',u); window.__ayuAnnUnread=u; try{ if(window.__ayuHelpDot) window.__ayuHelpDot(); }catch(e){} }
   var K_REP='ayuAnnRepaired';
   function runRepairs(){
     var done=arr(K_REP), todo=msgs.filter(function(m){ return m.repair && live(m) && done.indexOf(m.id)<0; });
@@ -15282,9 +15292,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       ls(K_LAST,String(Date.now())); var list=clean(j); ls(K_CACHE,JSON.stringify(j)); apply(list);
     }).catch(function(){ /* offline or no file: keep what was seen last */ });
   }
-  window.ayuAnnOpen=function(){ check(true).then(function(){ var ids=tabList().map(function(m){ return m.id; }); ls(K_READ,JSON.stringify(arr(K_READ).concat(ids).slice(-100))); dots(); }); renderList(); var ids=tabList().map(function(m){ return m.id; }); ls(K_READ,JSON.stringify(arr(K_READ).concat(ids).slice(-100))); dots(); };
-  // Open Help on the Announcements tab when something is unread.
-  var oSec=window.showFooterSection; if(typeof oSec==='function'&&!oSec._a){ var w=function(id){ try{ if(id==='help' && window.__ayuAnnUnread && typeof footerSubNow!=='undefined' && !document.getElementById('tab-help').classList.contains('active')) footerSubNow.help='announcements'; }catch(e){} return oSec.apply(this,arguments); }; w._a=1; window.showFooterSection=w; }
+  window.ayuAnnOpen=function(){ check(true).then(function(){ var ids=tabList().map(function(m){ return m.id; }); ls(K_READ,JSON.stringify(arr(K_READ).concat(ids).slice(-100))); markSeen(ids); dots(); }); renderList(); var ids=tabList().map(function(m){ return m.id; }); ls(K_READ,JSON.stringify(arr(K_READ).concat(ids).slice(-100))); markSeen(ids); dots(); };
   try{ var cached=JSON.parse(ls(K_CACHE)||'null'); if(cached) msgs=clean(cached); }catch(e){}
   function start(){ renderBanner(); renderList(); dots(); check(false); }
   if(document.readyState==='complete') setTimeout(start,800); else window.addEventListener('load',function(){ setTimeout(start,800); });
