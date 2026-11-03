@@ -35,7 +35,12 @@ Each line: the choice, then why. Change any of them later; the file to touch is 
 ## Builds
 - **Debug APK from GitHub Actions** — the sandbox cannot reach the Android SDK or Maven. Each push to main publishes the APK as the `debug-latest` pre-release and as a run artifact. [.github/workflows/android-debug.yml]
 - **Same debug signing key on every build (kept in the Actions cache)** — a new APK installs over the old one and keeps data. The cache expires after 7 days without builds; then uninstall once. To make it permanent, add a repository secret `DEBUG_KEYSTORE_B64`. No keys or passwords are in the repo. [workflow]
-- **Release signing not set up yet** — needs an upload key that Sharath keeps; it goes in repository secrets, never in the repo.
+- **Release APK signed with Sharath's own key from repository secrets** (`RELEASE_KEYSTORE_B64`, `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD`) — the same key for every release so updates install over the old app; never in the repo. [android/app/build.gradle, workflow]
+- **Publishing is a manual run ("publish" ticked), not every push** — people get an update notice only for versions Sharath chooses to release. [workflow]
+- **The public APK is a release in the website repository (`AyuBase6.com`), link `…/releases/latest/download/AyuBase6.apk`, plus `config/android-app.json`** — the Android repo is private; GitHub releases keep the 5 MB file out of the website's history and cost no server requests. Needs secret `WEB_DEPLOY_TOKEN`. [workflow]
+- **Website: a one-time banner on Android phone browsers ("Not now" = 30 days), "Get the app" instead of Install there, and Help → Get app on every device; all hidden until the first version is published and inside the app** — no pop-up on every visit. [website get-app-20261103]
+- **Update notice in the app, read from `config/android-app.json`; "Later" skips that version** — a downloaded APK never updates itself. [src/android-bridge.js]
+- **Backup files saved through the phone (Downloads on Android 10+, share sheet on 8–9)** — the app's web view cannot download the page's own files. [AyuRemindersPlugin.saveFile, src/android-bridge.js]
 
 ## Google Play (later)
 - **Personal developer account, one-time USD 25** — new personal accounts must run a closed test (currently 12 testers for 14 days; check the current rule before starting).

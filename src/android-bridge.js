@@ -17,7 +17,7 @@
 
   // ── Web content: lists and announcements come from the live site, falling back to the bundled copy ──
   var LIVE = window.AYU_LIVE_BASE || 'https://ayubase6.com/';
-  var LIVE_RE = /^(content\/.+\.json|config\/announcements\.json|config\/OurOtherSites\.json)(\?.*)?$/;
+  var LIVE_RE = /^(content\/.+\.json|config\/announcements\.json|config\/OurOtherSites\.json|config\/android-app\.json)(\?.*)?$/;
   var origFetch = window.fetch;
   function relPath(u){
     u = String(u || '');
@@ -175,18 +175,60 @@
   }
   function addStyle(){
     var st = document.createElement('style'); st.id = 'ayu-android-bridge-css';
-    st.textContent = '#ayu-exact-card{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:2147483000;max-width:520px;margin:0 auto;'
+    st.textContent = '#ayu-exact-card,.ayu-card{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:2147483000;max-width:520px;margin:0 auto;'
       + 'background:#fff;color:#2d2b23;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.22);padding:12px 14px;display:flex;flex-direction:column;gap:10px;font:inherit;font-size:.86rem;line-height:1.45;'
       + 'border-left:5px solid var(--footer-accent,#0d9488)}'
-      + '#ayu-exact-card .ayu-ec-text{display:flex;flex-direction:column;gap:2px}'
-      + '#ayu-exact-card .ayu-ec-btns{display:flex;justify-content:flex-end;gap:8px}'
-      + '#ayu-exact-card button{border:0;border-radius:10px;padding:8px 16px;font:inherit;font-weight:600;cursor:pointer}'
-      + '#ayu-exact-card .ayu-ec-allow{background:var(--footer-accent,#0d9488);color:#fff}'
-      + '#ayu-exact-card .ayu-ec-later{background:transparent;color:var(--footer-accent,#0d9488)}'
+      + '#ayu-exact-card .ayu-ec-text,.ayu-card .ayu-ec-text{display:flex;flex-direction:column;gap:2px}'
+      + '#ayu-exact-card .ayu-ec-btns,.ayu-card .ayu-ec-btns{display:flex;justify-content:flex-end;gap:8px}'
+      + '#ayu-exact-card button,.ayu-card button{border:0;border-radius:10px;padding:8px 16px;font:inherit;font-weight:600;cursor:pointer}'
+      + '#ayu-exact-card .ayu-ec-allow,.ayu-card .ayu-ec-allow{background:var(--footer-accent,#0d9488);color:#fff}'
+      + '#ayu-exact-card .ayu-ec-later,.ayu-card .ayu-ec-later{background:transparent;color:var(--footer-accent,#0d9488)}'
+      + '#ayu-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:2147483001;background:#2d2b23;color:#fff;border-radius:12px;padding:10px 16px;font:inherit;font-size:.86rem;max-width:86vw;box-shadow:0 6px 18px rgba(0,0,0,.25)}'
       // the app is installed already: no install buttons or install tips
       + '#install-app-btn,#routines-install-app-btn,#install-help,#routines-install-help{display:none!important}';
     document.head.appendChild(st);
   }
+
+  // ── A new app version: the website's config/android-app.json names it; "Download" opens it in the phone's browser ──
+  var UPD_KEY = 'ayuAndroidUpdateLater';
+  function checkUpdate(){
+    Promise.all([
+      P.getStatus().catch(function(){ return {}; }),
+      fetch('config/android-app.json', { cache:'no-cache' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })
+    ]).then(function(v){
+      var mine = Number(v[0] && v[0].versionCode) || 0, cfg = v[1];
+      if(!cfg || !(Number(cfg.versionCode) > mine) || !/^https:\/\//.test(String(cfg.url || ''))) return;
+      if(String(ls(UPD_KEY)) === String(cfg.versionCode)) return;   // "Later" for this version
+      if(document.getElementById('ayu-update-card') || document.getElementById('ayu-exact-card')) return;
+      var card = document.createElement('div');
+      card.id = 'ayu-update-card'; card.className = 'ayu-card'; card.setAttribute('role', 'dialog'); card.setAttribute('aria-label', 'Update available');
+      card.innerHTML = '<div class="ayu-ec-text"><b>Update available</b><span>Version ' + String(cfg.versionName || '').replace(/[<>&"]/g, '') + ' of AyuBase6 is ready. Download it and tap Install; your data stays.</span></div>'
+        + '<div class="ayu-ec-btns"><button type="button" class="ayu-ec-later">Later</button><button type="button" class="ayu-ec-allow">Download</button></div>';
+      card.querySelector('.ayu-ec-allow').onclick = function(){ P.openUrl({ url:cfg.url }).catch(noop); card.remove(); };
+      card.querySelector('.ayu-ec-later').onclick = function(){ ls(UPD_KEY, String(cfg.versionCode)); card.remove(); };
+      document.body.appendChild(card);
+    });
+  }
+
+  // ── Backup files: the web view cannot download the page's own files, so the phone saves them ──
+  function toast(text){
+    var t = document.getElementById('ayu-toast'); if(t) t.remove();
+    t = document.createElement('div'); t.id = 'ayu-toast'; t.setAttribute('role', 'status'); t.textContent = text;
+    document.body.appendChild(t); setTimeout(function(){ t.remove(); }, 4500);
+  }
+  var origClick = HTMLAnchorElement.prototype.click;
+  HTMLAnchorElement.prototype.click = function(){
+    var a = this;
+    if(a.download && /^blob:/.test(a.href || '')){
+      fetch(a.href).then(function(r){ return r.text(); }).then(function(text){
+        return P.saveFile({ name:a.download, text:text, mime:'application/json' });
+      }).then(function(r){
+        if(r && r.where === 'downloads') toast('Saved to Downloads: ' + r.name);
+      }).catch(function(){ toast('The file could not be saved.'); });
+      return;
+    }
+    return origClick.apply(this, arguments);
+  };
 
   // ── A tapped notification opens its section, like the web app's notification tap ──
   var ready = false, pendingTap = null;
@@ -230,6 +272,8 @@
     window.addEventListener('pagehide', function(){ sync(); });
     setInterval(sync, 5000);   // sends only when something changed
     setTimeout(function(){ ready = true; if(pendingTap){ var d = pendingTap; pendingTap = null; openTap(d); } }, 600);
+    setTimeout(checkUpdate, 4000);
+    document.addEventListener('visibilitychange', function(){ if(!document.hidden) setTimeout(checkUpdate, 1500); });
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once:true }); else start();
 })();

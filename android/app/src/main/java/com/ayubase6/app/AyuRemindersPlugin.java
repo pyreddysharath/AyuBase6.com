@@ -79,6 +79,11 @@ public class AyuRemindersPlugin extends Plugin {
         long next = ReminderScheduler.nextAt(getContext());
         if (next > 0) r.put("next", next); else r.put("next", JSONObject.NULL);
         r.put("rules", ReminderScheduler.loadRules(getContext()) != null);
+        try {
+            android.content.pm.PackageInfo pi = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
+            r.put("versionCode", Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ? pi.getLongVersionCode() : pi.versionCode);
+            r.put("versionName", pi.versionName);
+        } catch (Exception ignored) {}
         return r;
     }
 
@@ -155,6 +160,58 @@ public class AyuRemindersPlugin extends Plugin {
     public void openNotificationSettings(PluginCall call) {
         Intent i = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, getContext().getPackageName());
         openSettings(call, i);
+    }
+
+    /** Opens a web address in the phone's browser (e.g. the new app version to download). Only https. */
+    @PluginMethod
+    public void openUrl(PluginCall call) {
+        String url = call.getString("url", "");
+        if (url == null || !url.startsWith("https://")) { call.reject("https only"); return; }
+        try {
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getActivity().startActivity(i);
+            call.resolve();
+        } catch (Exception e) { call.reject("No browser"); }
+    }
+
+    /**
+     * Saves a text file the app made (the Backup file): to Downloads on Android 10+, otherwise through the share sheet.
+     * The web view cannot download the page's own files, so the bridge hands them here.
+     */
+    @PluginMethod
+    public void saveFile(PluginCall call) {
+        String name = call.getString("name", "AyuBase6.json").replaceAll("[\\\\/:*?\"<>|]", "_");
+        String text = call.getString("text", "");
+        String mime = call.getString("mime", "application/json");
+        byte[] data = text.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        JSObject r = new JSObject();
+        r.put("name", name);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                android.content.ContentValues v = new android.content.ContentValues();
+                v.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, name);
+                v.put(android.provider.MediaStore.MediaColumns.MIME_TYPE, mime);
+                v.put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_DOWNLOADS);
+                Uri uri = getContext().getContentResolver().insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+                if (uri == null) throw new java.io.IOException("no uri");
+                try (java.io.OutputStream os = getContext().getContentResolver().openOutputStream(uri)) {
+                    if (os == null) throw new java.io.IOException("no stream");
+                    os.write(data);
+                }
+                r.put("where", "downloads");
+            } else {
+                java.io.File f = new java.io.File(getContext().getCacheDir(), name);
+                try (java.io.FileOutputStream os = new java.io.FileOutputStream(f)) { os.write(data); }
+                Uri uri = androidx.core.content.FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".fileprovider", f);
+                Intent send = new Intent(Intent.ACTION_SEND).setType(mime).putExtra(Intent.EXTRA_STREAM, uri)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                getActivity().startActivity(Intent.createChooser(send, "Save backup").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                r.put("where", "share");
+            }
+            call.resolve(r);
+        } catch (Exception e) {
+            call.reject("Could not save the file");
+        }
     }
 
     @PluginMethod

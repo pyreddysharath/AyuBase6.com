@@ -2,6 +2,11 @@ name: Android debug APK
 
 # Builds an installable debug APK from this repository plus the web app (pyreddysharath/AyuBase6.com).
 # The APK is attached to this run and published as the "debug-latest" pre-release (Releases page).
+# Run it by hand with "publish" ticked to also build the signed release APK and put it on the website:
+# a release in AyuBase6.com (download link .../releases/latest/download/AyuBase6.apk) and config/android-app.json,
+# which the website's "Get the app" and the app's update notice read.
+# Needs repository secrets: RELEASE_KEYSTORE_B64, RELEASE_KEYSTORE_PASSWORD, RELEASE_KEY_ALIAS, RELEASE_KEY_PASSWORD,
+# and WEB_DEPLOY_TOKEN (fine-grained token, AyuBase6.com, Contents: read and write).
 on:
   push:
     branches: [main]
@@ -10,6 +15,10 @@ on:
       web_ref:
         description: Web app branch, tag or commit to bundle
         default: main
+      publish:
+        description: Also build the signed release APK and publish it on ayubase6.com
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -91,6 +100,55 @@ jobs:
         with:
           name: AyuBase6-debug-${{ github.run_number }}
           path: out/*.apk
+
+      - name: Build signed release APK
+        if: github.event.inputs.publish == 'true'
+        env:
+          RELEASE_KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          if [ -z "$RELEASE_KEYSTORE_B64" ] || [ -z "$RELEASE_KEYSTORE_PASSWORD" ] || [ -z "$RELEASE_KEY_ALIAS" ]; then
+            echo "::error::Release signing secrets are missing (see the top of this workflow)."; exit 1
+          fi
+          echo "$RELEASE_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          export RELEASE_KEYSTORE="$RUNNER_TEMP/release.jks"
+          export RELEASE_KEY_PASSWORD="${RELEASE_KEY_PASSWORD:-$RELEASE_KEYSTORE_PASSWORD}"
+          (cd android && ./gradlew assembleRelease --no-daemon --stacktrace)
+          rm -f "$RUNNER_TEMP/release.jks"
+          cp android/app/build/outputs/apk/release/app-release.apk out/AyuBase6.apk
+          ls -la out
+
+      - name: Publish the release APK on ayubase6.com
+        if: github.event.inputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.WEB_DEPLOY_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then echo "::error::Secret WEB_DEPLOY_TOKEN is missing."; exit 1; fi
+          REPO=pyreddysharath/AyuBase6.com
+          NAME="0.1.${VERSION_CODE}"
+          SIZE=$(stat -c %s out/AyuBase6.apk)
+          gh release create "app-v${VERSION_CODE}" out/AyuBase6.apk -R "$REPO" --latest \
+            --title "AyuBase6 for Android ${NAME}" \
+            --notes "Android app ${NAME}. Download: https://github.com/${REPO}/releases/latest/download/AyuBase6.apk"
+          # The version file the website and the app read (small; committed to the website's main branch).
+          git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" site
+          cat > site/config/android-app.json <<JSON
+          {
+            "versionCode": ${VERSION_CODE},
+            "versionName": "${NAME}",
+            "url": "https://github.com/${REPO}/releases/latest/download/AyuBase6.apk",
+            "sizeBytes": ${SIZE},
+            "date": "$(date -u +%d-%b-%Y)",
+            "minAndroid": "8.0"
+          }
+          JSON
+          cd site
+          git config user.name "AyuBase6 build"
+          git config user.email "noreply@github.com"
+          git add config/android-app.json
+          git commit -m "Android app ${NAME} published" && git push origin HEAD:main
 
       - name: Publish as the "debug-latest" pre-release
         if: github.ref == 'refs/heads/main'
