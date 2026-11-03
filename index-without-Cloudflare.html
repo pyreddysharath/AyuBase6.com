@@ -12893,11 +12893,32 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     return a<b?cur>=a&&cur<=b:cur>=a||cur<=b;
   }
   function drawButton(btn,value){btn.textContent=typeof window.fmt12==='function'?window.fmt12(value):value;}
-  function updateExerciseTimes(){
+  function eyeExNote(msg){
+    const sel=document.getElementById('eye-ex-count');const row=sel&&sel.closest('.alert-row');if(!row)return;
+    let el=document.getElementById('eye-ex-note');
+    if(!el){el=document.createElement('div');el.id='eye-ex-note';el.setAttribute('role','status');el.style.cssText='font-size:.84rem;font-weight:600;color:#a16207;margin:-2px 0 10px;';row.after(el)}
+    el.textContent=msg;el.hidden=false;clearTimeout(el._t);
+    el._t=setTimeout(function(){el.hidden=true},Math.min(25,3+0.3*msg.split(/\s+/).length)*1000);
+  }
+  function updateExerciseTimes(notify){
     const c=cards['break-ex'];
     if(!c||typeof eyeExState==='undefined')return;
-    const count=Number(document.getElementById('eye-ex-count')?.value||eyeExState.count||2);
-    eyeExState.times=count===1?[c.start]:[c.start,c.end];
+    const sel=document.getElementById('eye-ex-count');
+    let count=Number(sel?.value||eyeExState.count||2);
+    const tm=function(h){const p=String(h).split(':').map(Number);return p[0]*60+p[1]};
+    const hm=function(m){return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+    const s0=tm(c.start),e0=tm(c.end);
+    // Sessions start at 12:00 PM (or at From, when From is later); a second one follows 4 hours after the first.
+    let first=Math.max(s0,720);if(first>e0)first=s0;
+    let list=[hm(first)];
+    if(count===2){
+      if(first+240<=e0)list=[hm(first),hm(first+240)];
+      else{
+        count=1;if(sel){sel.value='1';sel.selectedIndex=0;sel.dispatchEvent(new Event('change',{bubbles:true}))}eyeExState.count=1;
+        if(notify)eyeExNote('The From\u2013To window is too short for 2 sessions 4 hours apart, so it was switched to once a day.');
+      }
+    }
+    eyeExState.times=list;
     eyeExState.lastFiredKey=null;
   }
   const topState={start:defaults.start,end:defaults.end};
@@ -12907,7 +12928,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
       st.start=topState.start;st.end=topState.end;
       ['start','end'].forEach(w=>{const b=card.querySelector('.per-reminder-schedule [data-time="'+w+'"]');if(b)drawButton(b,st[w])});
     });
-    updateExerciseTimes();
+    updateExerciseTimes(true);
     ['break','walk','drink'].forEach(k=>{if(typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)});
     saveHours();
   }
@@ -12944,7 +12965,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
         if(typeof picker!=='function')return;
         picker('custom',state[which],value=>{
           state[which]=value;drawButton(btn,value);
-          if(spec.key==='break-ex')updateExerciseTimes();
+          if(spec.key==='break-ex')updateExerciseTimes(true);
           if(spec.key!=='break-ex'&&typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(spec.key);
           saveHours();
         },spec.title+' — '+(which==='start'?'From':'To'));
@@ -13024,7 +13045,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     if(typeof oldCheck==='function')oldCheck();
   };
   const oldEyeCountChange=window.onEyeExCountChange;
-  window.onEyeExCountChange=function(){if(typeof oldEyeCountChange==='function')oldEyeCountChange();updateExerciseTimes()};
+  window.onEyeExCountChange=function(){if(typeof oldEyeCountChange==='function')oldEyeCountChange();updateExerciseTimes(true)};
   const oldReset=window.resetRemindersToDefault;
   window.resetRemindersToDefault=function(){try{localStorage.removeItem(HOURS_KEY)}catch(e){}if(typeof oldReset==='function')oldReset();topState.start=defaults.start;topState.end=defaults.end;wireTopSchedule();Object.values(cards).forEach(w=>{w.start=defaults.start;w.end=defaults.end});document.querySelectorAll('#alerts-panel .per-reminder-schedule').forEach(row=>{const spec=specs.find(x=>row.closest('#'+x.id));if(!spec)return;row.querySelector('[data-time="start"]').textContent='9:00 AM';row.querySelector('[data-time="end"]').textContent='6:00 PM'});['break','walk','drink'].forEach(k=>window.scheduleAlertTimer(k));updateExerciseTimes()};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
@@ -14448,13 +14469,63 @@ html body #reminder-hours-card .alert-card-hdr > .master-switch{margin-left:auto
 @media (prefers-reduced-motion:reduce){#tab-backup.needs-backup::after{animation:none;box-shadow:0 0 0 1.5px #fff,0 0 0 4px rgba(245,158,11,.35)}}
 /* A part of the lotus behind the top section (mobile) / left section (desktop), in the colour of the open section. */
 #nav-lotus{position:absolute;pointer-events:none;z-index:3;inset:0;background:var(--header-lotus,#3b82f6);opacity:.12;
-  -webkit-mask:var(--lotus-mask) right -125px top 20px/260px auto no-repeat;mask:var(--lotus-mask) right -125px top 20px/260px auto no-repeat}
+  -webkit-mask:var(--lotus-mask) right -125px top 20px/260px auto no-repeat,var(--lotus-mask) left -130px top 55px/250px auto no-repeat;mask:var(--lotus-mask) right -125px top 20px/260px auto no-repeat,var(--lotus-mask) left -130px top 55px/250px auto no-repeat}
 @media (min-width:900px){
-  #nav-lotus{opacity:.17;-webkit-mask:var(--lotus-mask) left -145px bottom 80px/300px auto no-repeat;mask:var(--lotus-mask) left -145px bottom 80px/300px auto no-repeat}
+  #nav-lotus{opacity:.17;-webkit-mask:var(--lotus-mask) left -145px bottom 80px/300px auto no-repeat,var(--lotus-mask) right -150px top 150px/290px auto no-repeat;mask:var(--lotus-mask) left -145px bottom 80px/300px auto no-repeat,var(--lotus-mask) right -150px top 150px/290px auto no-repeat}
 }
 </style>
 <script id="nav-lotus-20261103-js">
 (function(){ var n=document.getElementById('app-nav'); if(!n||document.getElementById('nav-lotus')) return; var d=document.createElement('div'); d.id='nav-lotus'; d.setAttribute('aria-hidden','true'); n.appendChild(d); })();
+</script>
+<style id="section-lotus-20261103">
+/* Every section box gets its own lotus (more in a tall box). A lotus is either whole or cropped flush against the box's left/right edge. */
+html[data-petal-card] body :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel) :is(.body-age-section,.activity-type-section,.card,.rout-card,.mind-card,.alert-card,.calc-card)::after{content:none !important;display:none !important}
+html body :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel) :is(.body-age-section,.activity-type-section,.card,.rout-card,.mind-card,.alert-card,.calc-card) > .sec-lotus-layer,.sec-lotus-layer{position:absolute !important;left:0 !important;top:0 !important;right:0 !important;bottom:0 !important;width:auto !important;height:auto !important;margin:0 !important;overflow:hidden;border-radius:inherit;pointer-events:none;z-index:2147483646 !important}
+html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !important}
+.sec-lotus{position:absolute;background:var(--petal,#3b82f6);opacity:.26;-webkit-mask:var(--lotus-mask) center/contain no-repeat;mask:var(--lotus-mask) center/contain no-repeat}
+</style>
+<script id="section-lotus-20261103-js">
+(function(){
+  var SEL='.body-age-section,.activity-type-section,.card,.rout-card,.mind-card,.alert-card,.calc-card', STEP=280, K=0.6, count=0;
+  // [side, share of the lotus that sits outside the box (0 = whole), inset when whole]
+  var PATS=[['R',.38],['L',0,.2],['L',.45],['R',0,.2],['R',.5],['L',.32]];
+  function topLevel(el){ return !el.parentElement || !el.parentElement.closest(SEL); }
+  function size(W,H,j){ var w=Math.min(.62*W,250); w=Math.min(w,(H-14)/K); return Math.max(60,Math.round(w*(j?.85:1))); }
+  function make(card,j,W,H){
+    var st=card._sl, p=PATS[(st.seed+j*2)%PATS.length], side=p[0];
+    if(j%2) side=side==='R'?'L':'R';
+    var w=size(W,H,j), h=Math.round(w*K);
+    var top=Math.round(j*STEP+Math.max(6,(Math.min(STEP,H)-h)/2));
+    top=Math.max(6,Math.min(top,H-h-6));
+    var el=document.createElement('div'); el.className='sec-lotus';
+    el.style.width=w+'px'; el.style.height=h+'px'; el.style.top=top+'px';
+    var edge=side==='R'?'right':'left';
+    if(p[1]>0) el.style[edge]=(-Math.round(p[1]*w))+'px';
+    else el.style[edge]='max(10px, calc('+((p[2]||.2)*100)+'% - '+Math.round(w/2)+'px))';
+    st.layer.appendChild(el);
+    return {el:el,top:top,h:h};
+  }
+  function update(card){
+    var st=card._sl, W=card.clientWidth, H=card.clientHeight;
+    if(!W||!H) return;
+    if(Math.abs(W-st.w)>3){ st.layer.innerHTML=''; st.items=[]; st.w=W; }
+    var n=Math.max(1,Math.round(H/STEP));
+    while(st.items.length<n) st.items.push(make(card,st.items.length,W,H));   // existing ones never move
+    st.items.forEach(function(it,j){ it.el.style.display=(j===0||it.top+it.h<=H-4)?'':'none'; });
+  }
+  var ro=window.ResizeObserver?new ResizeObserver(function(es){ es.forEach(function(e){ if(e.target._sl) update(e.target); }); }):null;
+  function setup(card){
+    if(card._sl||!topLevel(card)) return;
+    var layer=document.createElement('div'); layer.className='sec-lotus-layer'; layer.setAttribute('aria-hidden','true');
+    card.appendChild(layer);
+    if(getComputedStyle(card).position==='static') card.style.position='relative';
+    card._sl={layer:layer,items:[],w:0,seed:(count++*5+3)%PATS.length};
+    if(ro) ro.observe(card); update(card);
+  }
+  function scan(){ document.querySelectorAll('.tab-panel '+SEL.split(',').join(', .tab-panel ')).forEach(setup); }
+  scan();
+  var t=null; new MutationObserver(function(){ clearTimeout(t); t=setTimeout(scan,150); }).observe(document.body,{childList:true,subtree:true});
+})();
 </script>
 </body>
 
