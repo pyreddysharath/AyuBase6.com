@@ -46,6 +46,8 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation "androidx.core:core:$androidxCoreVersion"
+    // Google Mobile Ads SDK, only for the WebView API for Ads (the website's AdSense in the app; no AdMob account needed)
+    implementation "com.google.android.gms:play-services-ads:23.6.0"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')

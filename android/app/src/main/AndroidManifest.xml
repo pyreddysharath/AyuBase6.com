@@ -33,8 +33,11 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+        <!-- Ads: WebView API for Ads only (AdSense in the web view), so no AdMob app ID is needed -->
+        <meta-data android:name="com.google.android.gms.ads.INTEGRATION_MANAGER" android:value="webview" />
         <!-- Reminders scheduled on the phone (see ReminderScheduler) -->
         <receiver android:name=".AlarmReceiver" android:exported="false" />
+        <receiver android:name=".ActionReceiver" android:exported="false" />
         <receiver android:name=".BootReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

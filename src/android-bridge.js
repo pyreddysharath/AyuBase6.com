@@ -343,19 +343,32 @@
     t = document.createElement('div'); t.id = 'ayu-toast'; t.setAttribute('role', 'status'); t.textContent = text;
     document.body.appendChild(t); setTimeout(function(){ t.remove(); }, 4500);
   }
+  // Any file the page makes for you (the Backup file, the Body / Food / lab PDFs) is saved through the phone.
+  function saveDownload(a){
+    var href = a.href || '';
+    if(!a.download || !/^(blob:|data:)/.test(href)) return false;
+    fetch(href).then(function(r){ return r.blob(); }).then(function(b){
+      return new Promise(function(res, rej){ var fr = new FileReader(); fr.onload = function(){ res([b, String(fr.result).split(',')[1] || '']); }; fr.onerror = rej; fr.readAsDataURL(b); });
+    }).then(function(v){
+      var mime = v[0].type || (/\.pdf$/i.test(a.download) ? 'application/pdf' : (/\.json$/i.test(a.download) ? 'application/json' : 'application/octet-stream'));
+      return P.saveFile({ name:a.download, base64:v[1], mime:mime });
+    }).then(function(r){
+      if(r && r.where === 'downloads') toast('Saved to Downloads: ' + r.name);
+    }).catch(function(){ toast('The file could not be saved.'); });
+    return true;
+  }
   var origClick = HTMLAnchorElement.prototype.click;
-  HTMLAnchorElement.prototype.click = function(){
-    var a = this;
-    if(a.download && /^blob:/.test(a.href || '')){
-      fetch(a.href).then(function(r){ return r.text(); }).then(function(text){
-        return P.saveFile({ name:a.download, text:text, mime:'application/json' });
-      }).then(function(r){
-        if(r && r.where === 'downloads') toast('Saved to Downloads: ' + r.name);
-      }).catch(function(){ toast('The file could not be saved.'); });
-      return;
-    }
-    return origClick.apply(this, arguments);
+  HTMLAnchorElement.prototype.click = function(){ if(saveDownload(this)) return; return origClick.apply(this, arguments); };
+  var origDispatch = EventTarget.prototype.dispatchEvent;
+  EventTarget.prototype.dispatchEvent = function(ev){
+    if(ev && ev.type === 'click' && this instanceof HTMLAnchorElement && saveDownload(this)) return true;
+    return origDispatch.apply(this, arguments);
   };
+  // a real tap on such a link
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest && e.target.closest('a[download]');
+    if(a && saveDownload(a)) e.preventDefault();
+  }, true);
 
   // ── A tapped notification opens its section, like the web app's notification tap ──
   var ready = false, pendingTap = null;
@@ -369,6 +382,23 @@
     try{ if(key && typeof handleNudgeClick === 'function') handleNudgeClick(key, ''); }catch(e){}
   }
   try{ P.addListener('reminderTap', openTap); }catch(e){}
+
+  // ── Buttons on reminders (Done, Turn off this, Turn off all) were used, perhaps with the app closed:
+  //    the phone has already acted; here the app does the same (ticks the activity, turns the switch off) ──
+  function todayStr(){ var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function applyActions(){
+    if(typeof P.takeActions !== 'function') return Promise.resolve(0);
+    return P.takeActions().then(function(r){
+      var list = (r && r.actions) || [];
+      list.forEach(function(a){
+        if(!a || !a.key || !a.action) return;
+        if(a.action === 'done' && a.day && a.day !== todayStr()) return;   // a tick from an earlier day must not tick today
+        try{ if(typeof handleNudgeClick === 'function') handleNudgeClick(a.key, a.action); }catch(e){}
+      });
+      return list.length;
+    }).catch(function(){ return 0; });
+  }
+  try{ P.addListener('reminderAction', function(){ applyActions().then(function(n){ if(n) setTimeout(function(){ sync(true); }, 300); }); }); }catch(e){}
 
   function quiet(name, test){
     var orig = window[name]; if(typeof orig !== 'function') return;
@@ -396,11 +426,13 @@
     // The app is installed already: no install buttons (set inline, so the page's own styles cannot bring them back).
     function hideInstall(){ ['install-app-btn','routines-install-app-btn','install-help','routines-install-help'].forEach(function(id){ var el = document.getElementById(id); if(el) el.style.setProperty('display', 'none', 'important'); }); }
     hideInstall(); setTimeout(hideInstall, 1000); setTimeout(hideInstall, 4000);
-    refreshStatus().then(function(){ setTimeout(function(){ sync(true); }, 300); });
+    // Actions from notification buttons first, so the rules sent to the phone already include them.
+    // (after the page's own start-up has drawn its switches)
+    setTimeout(function(){ applyActions().then(refreshStatus).then(function(){ setTimeout(function(){ sync(true); }, 300); }); }, 400);
     var soon = null; function syncSoon(){ clearTimeout(soon); soon = setTimeout(function(){ sync(); showBlockedCard(); }, 250); }
     document.addEventListener('change', syncSoon, true);
     document.addEventListener('click', syncSoon, true);
-    document.addEventListener('visibilitychange', function(){ if(document.hidden) sync(); else refreshStatus(); });
+    document.addEventListener('visibilitychange', function(){ if(document.hidden) sync(); else applyActions().then(function(n){ refreshStatus(); if(n) setTimeout(function(){ sync(true); }, 300); }); });
     window.addEventListener('pagehide', function(){ sync(); });
     setInterval(sync, 5000);   // sends only when something changed
     setTimeout(function(){ ready = true; if(pendingTap){ var d = pendingTap; pendingTap = null; openTap(d); } }, 600);

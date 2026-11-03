@@ -16,7 +16,8 @@ Each line: the choice, then why. Change any of them later; the file to touch is 
 - **Base file: `index-with-Cloudflare.html` (the "with push" build), with push turned off by an empty `config/push.json`** — it is the build that produces the reminder rules (`ayuPush.buildRules`); the live site's `index.html` is the no-push build since 03-Nov-2026. [scripts/prepare-www.mjs]
 - **Android wording for the Reminder hours i, Checks Notify Me i and Help → Troubleshooting, and no install buttons** — the website texts describe browser tabs, installing and the push server, which do not apply to the app. [scripts/prepare-www.mjs, src/android-bridge.js]
 - **Live from ayubase6.com: `content/` JSON and media, `config/announcements.json`, `config/OurOtherSites.json`** — new videos and announcements reach the app without a new release; GitHub Pages, so no server requests. [src/android-bridge.js, prepare-www.mjs]
-- **Web ads (AdSense) not loaded in the app** — AdSense is for websites, not app web views; an app would need AdMob instead. [prepare-www.mjs]
+- **Ads in the app: the website's own AdSense, through Google's WebView API for Ads** (Mobile Ads SDK `registerWebView`, manifest `INTEGRATION_MANAGER=webview`) — Sharath allows ads; one ad setup for web and app, no AdMob account, and it still waits for the person to agree to Advertising. [MainActivity.java, AndroidManifest.xml, android/app/build.gradle]
+- **The app's own address is `https://app.ayubase6.com` (Capacitor `server.hostname`), not `https://localhost`** — AdSense serves ads only on the publisher's site (subdomains of ayubase6.com included). Changing it moves the app's storage, so it was done before the first public release; existing test installs restore from a Backup once. [capacitor.config.json]
 - **No service worker in the app** — the phone shows notifications itself; the web cache is not needed for bundled files. "Save for offline" still works: the page saves videos in its own storage as on the website, and the bridge plays those saved copies (and keeps a video once played, like the website's service worker). The video lists are kept from the last online start, so the app knows its videos offline. Videos are not bundled in the APK, so new videos need no app release. [src/android-bridge.js]
 
 ## Reminders
@@ -30,7 +31,8 @@ Each line: the choice, then why. Change any of them later; the file to touch is 
 - **Settings pages for notifications and "Alarms & reminders" open inside the app's task and close themselves once the permission is allowed** — the app comes back by itself; Back also returns to the app. A "Notifications are off" card with **Open settings** appears when reminders are on but Android has notifications off. [AyuRemindersPlugin.openAndReturn, src/android-bridge.js]
 - **Two notification channels: "Reminders" (sound, vibration, high importance) and "Timers" (quiet countdowns)** — people can change sound per channel in Android settings. [ReminderScheduler.java]
 - **A late alarm (phone off) shows only reminders from the last 60 minutes, latest one each** — same as the server, so nobody gets a flood of old alerts. [ReminderScheduler.java]
-- **Notification buttons (Done, Not yet, Turn off) not in the first version** — tapping opens the right section; buttons come next. [ReminderScheduler.java]
+- **Buttons on notifications, the same as the website's: Checks "✓ Done" / "Not yet", Eyes / Walk / Water / Eye Exercise "Turn off this" / "Turn off all"; none on My Reminders** — they work with the app closed: the phone changes its stored rules at once (Done = ticked for today, Not yet = asked again in 15 minutes, Turn off = that reminder or all Reminders off) and the app applies the same when it next opens. [ActionReceiver.java, ReminderScheduler.applyAction, src/android-bridge.js]
+- **Files the page makes (Backup file, Body / Food / lab PDFs) are saved to Downloads (share sheet on Android 8–9)** — the app's web view cannot download them itself. [AyuRemindersPlugin.saveFile, src/android-bridge.js]
 - **Battery advice stays in the Help text** — exact alarms fire in Doze; `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` is restricted on Play. A settings shortcut exists in the plugin (`openBatterySettings`). [AyuRemindersPlugin.java]
 
 ## Builds
@@ -45,6 +47,7 @@ Each line: the choice, then why. Change any of them later; the file to touch is 
 
 ## Google Play (later)
 - **Personal developer account, one-time USD 25** — new personal accounts must run a closed test (currently 12 testers for 14 days; check the current rule before starting).
-- **Privacy policy URL: a page on ayubase6.com** (e.g. `/privacy`) — Play needs a public URL; the app keeps data on the phone.
-- **Health data declaration: "Health apps" form, data stored on the device only, not shared** — the app tracks vitals and routines but sends nothing to a server.
+- **Privacy policy: https://ayubase6.com/privacy.html** (website and app) — Play needs a public URL; it covers on-device data, reminders, live content, ads and feedback.
+- **Health apps declaration and Data safety answers are prepared in `play/play-console-answers.md`** — what the person enters stays on the device; the ads SDK collects device IDs for advertising; feedback sends a name and message.
+- **Store listing, icon, feature graphic and 6 phone screenshots in `play/`** — ready for the day the app goes to Google Play; the publish run also builds the `.aab` bundle Play needs.
 - **Exact-alarm declaration: reminders at times the person sets** — required for `SCHEDULE_EXACT_ALARM`.

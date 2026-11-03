@@ -5,5 +5,9 @@
   "android": {
     "allowMixedContent": false,
     "backgroundColor": "#ffffff"
+  },
+  "server": {
+    "hostname": "app.ayubase6.com",
+    "androidScheme": "https"
   }
 }

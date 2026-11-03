@@ -91,11 +91,17 @@ final class ReminderScheduler {
         am.cancel(alarmIntent(c, 0));
         JSONObject rules = loadRules(c);
         long next = 0;
+        long now = System.currentTimeMillis() / 60000L;
         if (rules != null) {
-            long now = System.currentTimeMillis() / 60000L;
             for (long t = now + 1; t <= now + SEARCH_DAYS * 1440L; t++) {
                 if (!ReminderRules.due(rules, local(t), t).isEmpty()) { next = t; break; }
             }
+        }
+        // "Not yet" asks again later: the earliest of those, if it comes first
+        org.json.JSONArray sn = snoozes(c);
+        for (int i = 0; i < sn.length(); i++) {
+            long t = sn.optJSONObject(i) == null ? 0 : sn.optJSONObject(i).optLong("t");
+            if (t > now && (next == 0 || t < next)) next = t;
         }
         if (next > 0) {
             long ms = next * 60000L;
@@ -124,9 +130,21 @@ final class ReminderScheduler {
                 for (ReminderRules.Due d : ReminderRules.due(rules, local(t), t)) latest.put(d.key, d);
             }
             for (ReminderRules.Due d : latest.values()) {
-                show(c, "nudge-" + d.key, d.title, d.body, false, NotificationArt.forSection(d.section), d.section, d.key);
+                show(c, "nudge-" + d.key, d.title, d.body, false, NotificationArt.forSection(d.section), d.section, d.key, actionsFor(d.key));
             }
         }
+        // "Not yet" reminders that are due now (or missed by less than an hour)
+        org.json.JSONArray sn = snoozes(c), keep = new org.json.JSONArray();
+        for (int i = 0; i < sn.length(); i++) {
+            JSONObject o = sn.optJSONObject(i); if (o == null) continue;
+            long t = o.optLong("t");
+            if (t > now) { keep.put(o); continue; }
+            if (now - t <= MAX_LATE_MIN) {
+                String k = o.optString("key");
+                show(c, "nudge-" + k, o.optString("title"), o.optString("body"), false, NotificationArt.forSection("routines"), "routines", k, actionsFor(k));
+            }
+        }
+        saveSnoozes(c, keep);
         reschedule(c);
     }
 
@@ -157,6 +175,26 @@ final class ReminderScheduler {
     static int idFor(String tag) { return tag == null ? 0 : tag.hashCode(); }
 
     static void show(Context c, String tag, String title, String body, boolean silent, NotificationArt.Theme theme, String section, String tapKey) {
+        show(c, tag, title, body, silent, theme, section, tapKey, new String[0]);
+    }
+
+    // ── Buttons on reminders, the same as the website's: Checks "✓ Done" / "Not yet", the others "Turn off this" / "Turn off all" ──
+    static final String A_DONE = "done", A_NOT_YET = "not-yet", A_OFF_THIS = "disable-this", A_OFF_ALL = "disable-all";
+    static String[] actionsFor(String key) {
+        if (key.startsWith("routine-")) return new String[]{A_DONE, A_NOT_YET};
+        if (key.matches("^(break|walk|drink|eyeex)$")) return new String[]{A_OFF_THIS, A_OFF_ALL};
+        return new String[0];   // My Reminders: no buttons, as on the website
+    }
+    private static String actionLabel(String a) {
+        switch (a) {
+            case A_DONE: return "✓ Done";
+            case A_NOT_YET: return "Not yet";
+            case A_OFF_THIS: return "Turn off this";
+            default: return "Turn off all";
+        }
+    }
+
+    static void show(Context c, String tag, String title, String body, boolean silent, NotificationArt.Theme theme, String section, String tapKey, String[] actions) {
         ensureChannels(c);
         NotificationManagerCompat nm = NotificationManagerCompat.from(c);
         if (!nm.areNotificationsEnabled()) return;
@@ -182,6 +220,13 @@ final class ReminderScheduler {
         // Android 12+ always keeps its own top line (app name, time) and fills the rest with our colour.
         // Android 8-11 show the coloured view across the whole notification, so no system frame is added there.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) b.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
+        for (String a : actions) {
+            Intent ai = new Intent(c, ActionReceiver.class).setAction("com.ayubase6.app.ACTION." + a)
+                .putExtra(EXTRA_KEY, tapKey).putExtra(ActionReceiver.EXTRA_ACTION, a).putExtra(ActionReceiver.EXTRA_TAG, tag)
+                .putExtra(ActionReceiver.EXTRA_TITLE, title).putExtra(ActionReceiver.EXTRA_BODY, body);
+            PendingIntent api = PendingIntent.getBroadcast(c, (tag + "|" + a).hashCode(), ai, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            b.addAction(0, actionLabel(a), api);
+        }
         try {
             nm.notify(idFor(tag), b.build());
         } catch (SecurityException e) {
@@ -203,6 +248,104 @@ final class ReminderScheduler {
         v.setTextViewText(R.id.notif_body, body);
         v.setTextColor(R.id.notif_body, t.body);
         return v;
+    }
+
+    // ── What a notification button does, on the phone, even with the app closed ──
+    private static final String PREF_SNOOZE = "snoozes", PREF_PENDING = "pending";
+    static synchronized org.json.JSONArray snoozes(Context c) {
+        try { return new org.json.JSONArray(prefs(c).getString(PREF_SNOOZE, "[]")); } catch (Exception e) { return new org.json.JSONArray(); }
+    }
+    static synchronized void saveSnoozes(Context c, org.json.JSONArray a) { prefs(c).edit().putString(PREF_SNOOZE, a.toString()).apply(); }
+
+    /** Actions the app itself must also apply (tick the activity, turn its switch off) when it is next open. */
+    static synchronized org.json.JSONArray takePending(Context c) {
+        org.json.JSONArray a;
+        try { a = new org.json.JSONArray(prefs(c).getString(PREF_PENDING, "[]")); } catch (Exception e) { a = new org.json.JSONArray(); }
+        prefs(c).edit().remove(PREF_PENDING).apply();
+        return a;
+    }
+    private static synchronized void addPending(Context c, String key, String action) {
+        org.json.JSONArray a;
+        try { a = new org.json.JSONArray(prefs(c).getString(PREF_PENDING, "[]")); } catch (Exception e) { a = new org.json.JSONArray(); }
+        try {
+            long now = System.currentTimeMillis();
+            a.put(new JSONObject().put("key", key).put("action", action).put("at", now).put("day", local(now / 60000L).day));
+        } catch (Exception ignored) {}
+        org.json.JSONArray keep = new org.json.JSONArray();   // the last 50 are plenty
+        for (int i = Math.max(0, a.length() - 50); i < a.length(); i++) keep.put(a.opt(i));
+        prefs(c).edit().putString(PREF_PENDING, keep.toString()).apply();
+    }
+
+    static void applyAction(Context c, String key, String action, String tag, String title, String body) {
+        if (key == null) key = "";
+        JSONObject rules = loadRules(c);
+        long now = System.currentTimeMillis() / 60000L;
+        String today = local(now).day;
+        try {
+            if (A_DONE.equals(action) && key.startsWith("routine-")) {
+                mutate(rules, key, action, today);
+                dropSnooze(c, "routine-" + key.replaceFirst("^routine-(end-|again-)?", ""));
+                addPending(c, key, action);
+            } else if (A_NOT_YET.equals(action) && key.startsWith("routine-")) {
+                String item = key.replaceFirst("^routine-(end-|again-)?", "");
+                org.json.JSONArray sn = snoozes(c), keep = new org.json.JSONArray();
+                for (int i = 0; i < sn.length(); i++) { JSONObject o = sn.optJSONObject(i); if (o != null && !("routine-" + item).equals(o.optString("key"))) keep.put(o); }
+                String b = body == null ? "" : body;
+                keep.put(new JSONObject().put("t", now + 15).put("key", "routine-" + item)
+                    .put("title", title == null ? "" : title).put("body", b.startsWith("Still to do: ") ? b : "Still to do: " + b));
+                saveSnoozes(c, keep);
+            } else if ((A_OFF_THIS.equals(action) || A_OFF_ALL.equals(action)) && rules != null) {
+                mutate(rules, key, action, today);
+                addPending(c, key, action);
+            }
+        } catch (Exception e) { Log.w(TAG, "action " + action + " failed", e); }
+        if (rules != null) saveRules(c, rules);
+        if (tag != null) cancel(c, tag);
+        reschedule(c);
+    }
+    /** The change a button makes to the stored rules (Done: ticked for today; Turn off: that reminder, or all Reminders, off). */
+    private static void mutate(JSONObject rules, String key, String action, String today) throws org.json.JSONException {
+        if (rules == null) return;
+        if (A_DONE.equals(action) && key.startsWith("routine-")) {
+            String item = key.replaceFirst("^routine-(end-|again-)?", "");
+            JSONObject ck = rules.optJSONObject("checks");
+            if (ck == null) return;
+            if (!today.equals(ck.optString("doneDay"))) { ck.put("doneDay", today); ck.put("done", new org.json.JSONArray()); }
+            org.json.JSONArray done = ck.optJSONArray("done");
+            if (done == null) { done = new org.json.JSONArray(); ck.put("done", done); }
+            for (int i = 0; i < done.length(); i++) if (item.equals(done.optString(i))) return;
+            done.put(item);
+        } else if (A_OFF_THIS.equals(action)) {
+            if ("eyeex".equals(key)) { rules.put("exercise", JSONObject.NULL); return; }
+            org.json.JSONArray r = rules.optJSONArray("reminders"), keep = new org.json.JSONArray();
+            if (r != null) for (int i = 0; i < r.length(); i++) { JSONObject o = r.optJSONObject(i); if (o != null && !key.equals(o.optString("key"))) keep.put(o); }
+            rules.put("reminders", keep);
+        } else if (A_OFF_ALL.equals(action)) {
+            // the Reminders switch off: Eyes, Walk, Water, Eye Exercise and My Reminders; Checks has its own switch
+            rules.put("reminders", new org.json.JSONArray()); rules.put("exercise", JSONObject.NULL); rules.put("custom", new org.json.JSONArray());
+        }
+    }
+
+    /**
+     * New rules from the app while button actions are still waiting for it: keep those actions in force,
+     * so the app's older state cannot switch a reminder back on before it has applied them.
+     */
+    static synchronized void keepPendingInForce(Context c, JSONObject rules) {
+        if (rules == null) return;
+        org.json.JSONArray a;
+        try { a = new org.json.JSONArray(prefs(c).getString(PREF_PENDING, "[]")); } catch (Exception e) { return; }
+        String today = local(System.currentTimeMillis() / 60000L).day;
+        for (int i = 0; i < a.length(); i++) {
+            JSONObject o = a.optJSONObject(i); if (o == null) continue;
+            if (A_DONE.equals(o.optString("action")) && !today.equals(o.optString("day"))) continue;
+            try { mutate(rules, o.optString("key"), o.optString("action"), today); } catch (Exception ignored) {}
+        }
+    }
+
+    private static void dropSnooze(Context c, String key) {
+        org.json.JSONArray sn = snoozes(c), keep = new org.json.JSONArray();
+        for (int i = 0; i < sn.length(); i++) { JSONObject o = sn.optJSONObject(i); if (o != null && !key.equals(o.optString("key"))) keep.put(o); }
+        saveSnoozes(c, keep);
     }
 
     static void cancel(Context c, String tag) { NotificationManagerCompat.from(c).cancel(idFor(tag)); }

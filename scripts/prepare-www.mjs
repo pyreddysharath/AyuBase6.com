@@ -35,9 +35,8 @@ patch('<head>\n<meta charset="UTF-8">\n',
 patch("new URL('content/' + folder + '/media/' + file, document.baseURI)",
   "new URL('content/' + folder + '/media/' + file, window.AYU_LIVE_BASE || document.baseURI)",
   'live media');
-patch('function loadAdSenseScript(){\n  if (adsenseLoaded) return;',
-  'function loadAdSenseScript(){\n  if (adsenseLoaded || window.AYU_ANDROID) return;',
-  'no web ads in the app');
+// Ads: the website's AdSense (after the person agrees to Advertising) also runs in the app, through Google's
+// WebView API for Ads (registered in MainActivity).
 // ── Texts that describe the website, said the way the Android app works (reminders arrive with the app closed) ──
 function patchBetween(start, end, repl, label) {
   const i = html.indexOf(start), j = i < 0 ? -1 : html.indexOf(end, i);

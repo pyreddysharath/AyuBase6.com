@@ -115,10 +115,19 @@ jobs:
           echo "$RELEASE_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
           export RELEASE_KEYSTORE="$RUNNER_TEMP/release.jks"
           export RELEASE_KEY_PASSWORD="${RELEASE_KEY_PASSWORD:-$RELEASE_KEYSTORE_PASSWORD}"
-          (cd android && ./gradlew assembleRelease --no-daemon --stacktrace)
+          # APK for the website, and the app bundle (.aab) that Google Play asks for, both signed with the same key
+          (cd android && ./gradlew assembleRelease bundleRelease --no-daemon --stacktrace)
           rm -f "$RUNNER_TEMP/release.jks"
           cp android/app/build/outputs/apk/release/app-release.apk out/AyuBase6.apk
-          ls -la out
+          mkdir -p play-out && cp android/app/build/outputs/bundle/release/app-release.aab "play-out/AyuBase6-${VERSION_CODE}.aab"
+          ls -la out play-out
+
+      - name: Keep the Google Play bundle with this run
+        if: github.event.inputs.publish == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: AyuBase6-play-bundle-${{ github.run_number }}
+          path: play-out/*.aab
 
       - name: Publish the release APK on ayubase6.com
         if: github.event.inputs.publish == 'true'
@@ -156,6 +165,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete debug-latest --yes --cleanup-tag || true
-          gh release create debug-latest out/*.apk --prerelease --target "$GITHUB_SHA" \
+          gh release create debug-latest out/AyuBase6-debug-*.apk --prerelease --target "$GITHUB_SHA" \
             --title "Debug build ${VERSION_CODE}" \
             --notes "Debug APK for testing. App ${GITHUB_SHA::7}, web app ${WEB_SHA}. Install on the phone and allow notifications."

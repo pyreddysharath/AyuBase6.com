@@ -12,7 +12,14 @@ public class MainActivity extends BridgeActivity {
         // Text at the same size as the website: the phone's font-size setting does not enlarge the app's text.
         // (Pinch-zoom still works.) To follow the phone again, remove this line.
         if (getBridge() != null && getBridge().getWebView() != null) {
-            getBridge().getWebView().getSettings().setTextZoom(100);
+            android.webkit.WebView wv = getBridge().getWebView();
+            wv.getSettings().setTextZoom(100);
+            // Ads: the website's AdSense runs in the app through Google's WebView API for Ads.
+            wv.getSettings().setJavaScriptEnabled(true);
+            wv.getSettings().setDomStorageEnabled(true);
+            wv.getSettings().setMediaPlaybackRequiresUserGesture(false);
+            android.webkit.CookieManager.getInstance().setAcceptThirdPartyCookies(wv, true);
+            try { com.google.android.gms.ads.MobileAds.registerWebView(wv); } catch (Throwable ignored) {}
         }
     }
 }

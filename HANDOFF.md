@@ -41,7 +41,7 @@ Owner: Sharath (Hyderabad, India). App: **AyuBase6**, a health PWA (Body, Food, 
 - Serve copies with `python3 -m http.server`, drive with Playwright (Chromium). Headless reports notification permission "denied", so stub `Notification.permission` and `showNotification` to test. Accept or pre-set the cookie consent key `healtheeCookieConsent` and `ayuBase6-tour-seen` so banners do not block clicks.
 
 ## State at handoff
-- 03-Nov-2026: files swapped (live site = no-push build), Reminders and Checks switches independent, push-server timer paused, Android app offer on the website (hidden until the first publish). Everything requested so far is committed. Next on Sharath's side: release key + token secrets, then the first publish run.
+- 03-Nov-2026: files swapped (live site = no-push build), Reminders and Checks switches independent, push-server timer paused, Android app offer on the website (hidden until the first publish), privacy page, notification buttons, ads in the app, Play material ready. Everything requested so far is committed. Next on Sharath's side: release key + token secrets, then the first publish run.
 - Section colours (used by `--footer-accent`): Body `#2563eb`, Food `#16a34a`, Checks amber, Reminders teal `#0d9488`, Mind purple, Vitals teal-blue. Popups, banners, footer, test notification and tour follow the open section.
 - Footer/section code: `FOOTER_SECTIONS`, `FOOTER_ALIAS`, `FOOTER_SUBS`, `showFooterSection(id)`, `showFooterSub(parent,sub)`; Help subs are check (shown as "Notifications"), trouble, feedback, app (added at run time by `get-app-20261103`); Announcements is its own section.
 - Notifications code: `showNudgeNotification`, `nudgeArt` + `NUDGE_THEMES`, `buildRules()` in the push block of `index-with-Cloudflare.html` (what the server and the Android app schedule from: custom reminders, Eyes, Walk, Water, Eyes Exercise, Checks), `ayuPush` (active/api/error/sync/repair).
@@ -64,4 +64,8 @@ Owner: Sharath (Hyderabad, India). App: **AyuBase6**, a health PWA (Body, Food, 
 - Website offer (`get-app-20261103` block, both builds): Android phone browsers get a one-time banner (`ayuAppBannerLater`, 30 days) and "Get the app" on the Reminders/Checks install buttons; Help has a fourth tab "Get app" (`sec-app`). Nothing shows until `config/android-app.json` exists, or inside the app (`window.AYU_ANDROID`).
 - The app shows "Update available" when `config/android-app.json` has a higher `versionCode` ("Later" = `ayuAndroidUpdateLater`). Backup files are saved through the phone (`saveFile`).
 - Offline videos in the app: Body → Save for offline stores them in cache `ayubase6-media-v2` (the web app's own code); the bridge switches media addresses to those saved copies and keeps the last video lists (cache `ayubase6-app-lists`).
-- Not built yet: buttons on notifications (Done, Not yet, Turn off), Play Console listing.
+- Notification buttons: Checks "✓ Done" / "Not yet", Eyes/Walk/Water/Eye Exercise "Turn off this" / "Turn off all" (`ActionReceiver`, `ReminderScheduler.applyAction`; queued for the app via `takeActions`, kept in force by `keepPendingInForce`).
+- Ads: the website's AdSense runs in the app through the WebView API for Ads (`play-services-ads`, `MobileAds.registerWebView`); the app's address is `https://app.ayubase6.com` for that reason.
+- Files the page makes (Backup, PDFs) are saved through the phone (`saveFile`, Downloads).
+- Google Play (not uploaded yet): `play/listing.md`, `play/play-console-answers.md`, `play/screenshots/`, `play/icon-512.png`, `play/feature-graphic.png`; the publish run also builds `AyuBase6-<N>.aab` (run artifact). Privacy policy: `https://ayubase6.com/privacy.html` (website repo).
+- Not built yet: Play Console upload and closed test (Sharath's account).

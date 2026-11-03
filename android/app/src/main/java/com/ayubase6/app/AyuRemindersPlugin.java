@@ -36,8 +36,24 @@ import org.json.JSONObject;
 )
 public class AyuRemindersPlugin extends Plugin {
 
+    private static java.lang.ref.WeakReference<AyuRemindersPlugin> current = new java.lang.ref.WeakReference<>(null);
+
+    /** A notification button was used: tell the open app to fetch and apply it (Done ticks, Turn off switches off). */
+    static void actionsWaiting() {
+        AyuRemindersPlugin p = current.get();
+        if (p != null) p.notifyListeners("reminderAction", new JSObject(), true);
+    }
+
+    @PluginMethod
+    public void takeActions(PluginCall call) {
+        JSObject r = new JSObject();
+        r.put("actions", ReminderScheduler.takePending(getContext()));
+        call.resolve(r);
+    }
+
     @Override
     public void load() {
+        current = new java.lang.ref.WeakReference<>(this);
         ReminderScheduler.ensureChannels(getContext());
         if (getActivity() != null) deliverTap(getActivity().getIntent());
     }
@@ -110,6 +126,7 @@ public class AyuRemindersPlugin extends Plugin {
     @PluginMethod
     public void setRules(PluginCall call) {
         JSONObject rules = call.getObject("rules", null);
+        ReminderScheduler.keepPendingInForce(getContext(), rules);
         ReminderScheduler.saveRules(getContext(), rules);
         long next = ReminderScheduler.reschedule(getContext());
         JSObject r = new JSObject();
@@ -217,15 +234,15 @@ public class AyuRemindersPlugin extends Plugin {
     }
 
     /**
-     * Saves a text file the app made (the Backup file): to Downloads on Android 10+, otherwise through the share sheet.
+     * Saves a file the app made (the Backup file, PDFs): to Downloads on Android 10+, otherwise through the share sheet.
      * The web view cannot download the page's own files, so the bridge hands them here.
      */
     @PluginMethod
     public void saveFile(PluginCall call) {
         String name = call.getString("name", "AyuBase6.json").replaceAll("[\\\\/:*?\"<>|]", "_");
-        String text = call.getString("text", "");
+        String text = call.getString("text", ""), b64 = call.getString("base64", null);
         String mime = call.getString("mime", "application/json");
-        byte[] data = text.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        byte[] data = b64 != null ? android.util.Base64.decode(b64, android.util.Base64.DEFAULT) : text.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         JSObject r = new JSObject();
         r.put("name", name);
         try {
@@ -247,7 +264,7 @@ public class AyuRemindersPlugin extends Plugin {
                 Uri uri = androidx.core.content.FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".fileprovider", f);
                 Intent send = new Intent(Intent.ACTION_SEND).setType(mime).putExtra(Intent.EXTRA_STREAM, uri)
                     .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                getActivity().startActivity(Intent.createChooser(send, "Save backup").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                getActivity().startActivity(Intent.createChooser(send, "Save " + name).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 r.put("where", "share");
             }
             call.resolve(r);
