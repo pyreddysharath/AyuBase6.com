@@ -8498,6 +8498,7 @@ const RECIPES_DATA = [
     <div class="trb">
       <details><summary>No notification when the app is closed</summary><p>Reminders while the app is closed need the installed app, allowed notifications and a registered phone. Open <b>Help → Check notifications</b> and fix any step marked ✕. Then close the app completely and test again.</p></details>
       <details><summary>Notifications only come while the app is open</summary><p>The app is probably open in a browser tab, or this phone is not registered yet. Open the app from its home-screen icon, turn the reminder switch on, and run the check.</p></details>
+      <details><summary>Repeating reminders stop when the app is closed</summary><p>Reminders that repeat (every so many minutes) reach a closed app only on the installed app with notifications allowed and this phone registered. Open <b>Help → Check notifications</b> and fix any step marked ✕. In a browser tab they ring only while that tab is open.</p></details>
       <details><summary>No sound</summary><p>Turn the phone's media or notification volume up and check that the reminder's sound is not muted in its section. In your phone's Settings → Apps → AyuBase6 (or Chrome) → Notifications, make sure sound is on and the channel is not set to silent.</p></details>
       <details><summary>Notifications are blocked</summary><p>A page cannot unblock itself. Allow notifications in the browser (Chrome menu → Settings → Site settings → Notifications) or long-press the app icon → App info → Notifications, then run the check again.</p></details>
       <details><summary>iPhone</summary><p>Add the app to the Home Screen first (Share → Add to Home Screen) and open it from that icon. Notifications are not available in a normal Safari tab.</p></details>
@@ -12894,6 +12895,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addSwitches);else addSwitches();
   setTimeout(addSwitches,700);
+  window.__ayuRem={startReminder:startReminder,stopReminderTimers:stopReminderTimers,daysLabel:daysLabel,durationLabel:durationLabel,formatClock:formatClock,bump:function(n){ if(n>customReminderCounter) customReminderCounter=n; }};
 })();
 </script>
 
@@ -14027,7 +14029,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     {id:'body',label:'Body',keys:['ayuBase6-body-choices']},
     {id:'food',label:'Food',keys:['ayuBase6-food-choices']},
     {id:'checks',label:'Checks',keys:['ayuBase6WakeUpTime','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-muted','ayuBase6-routine-days']},
-    {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1']},
+    {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders']},
     {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1']}
   ];
   var FP_KEY='ayu-backup-fingerprints', MAX_BYTES=2*1024*1024;
@@ -15495,6 +15497,65 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 })();
 </script>
 <style id="days-quick-on-20261103">:is(#alerts-panel,#routines-panel) .day-quick button.on,#alerts-panel .custom-reminder-form .day-quick button.on{background:var(--otd,var(--alert-2,#0d9488)) !important;color:#fff !important}</style>
+<script id="my-reminders-save-20261103">
+(function(){
+  // My Reminders are kept on this phone, so they come back after the app is closed or reloaded, and they are part of Backup.
+  var KEY='ayuBase6-my-reminders', list=null, loaded=false, t=null;
+  function save(){
+    if(!loaded||!list) return;
+    try{
+      var out=[]; list.querySelectorAll('.custom-reminder-item').forEach(function(it){ try{ var d=JSON.parse(it.dataset.reminder||'{}'); if(d&&d.name) out.push({d:d,s:it.dataset.startedAt||''}); }catch(e){} });
+      localStorage.setItem(KEY,JSON.stringify(out.slice(0,50)));
+    }catch(e){}
+  }
+  function soon(){ clearTimeout(t); t=setTimeout(save,300); }
+  function render(item,data){
+    var R=window.__ayuRem; item.innerHTML='';
+    var info=document.createElement('div'), strong=document.createElement('strong'), detail=document.createElement('div');
+    strong.textContent=data.name; detail.style.fontSize='12px'; detail.style.opacity='.8';
+    detail.textContent=(data.mode==='regular'?'Every '+R.durationLabel(data.duration):'At '+(data.times||[]).map(R.formatClock).join(', '))+R.daysLabel(data.days||[])+' · Sound: '+data.sound;
+    info.append(strong,detail);
+    var edit=document.createElement('button'); edit.type='button'; edit.className='custom-reminder-edit'; edit.textContent='Edit'; edit.addEventListener('click',function(){ window.addCustomReminderForm(item); });
+    var del=document.createElement('button'); del.type='button'; del.className='custom-reminder-delete'; del.textContent='×'; del.setAttribute('aria-label','Delete reminder'); del.title='Delete reminder'; del.addEventListener('click',function(){ R.stopReminderTimers(item); item.remove(); });
+    item.append(info,edit,del);
+  }
+  function load(){
+    list=document.getElementById('custom-reminders-list'); if(!list||!window.__ayuRem){ return; }
+    var saved=[]; try{ saved=JSON.parse(localStorage.getItem(KEY)||'[]'); if(!Array.isArray(saved)) saved=[]; }catch(e){ saved=[]; }
+    if(!list.querySelector('.custom-reminder-item')){
+      saved.forEach(function(r,i){
+        if(!r||!r.d||!r.d.name) return;
+        var item=document.createElement('div'); item.className='custom-reminder-item'; item.dataset.reminderId=String(i+1);
+        item.dataset.reminder=JSON.stringify(r.d); if(r.s) item.dataset.startedAt=String(r.s);
+        render(item,r.d); list.append(item); try{ window.__ayuRem.startReminder(item); }catch(e){}
+      });
+      window.__ayuRem.bump(saved.length);
+    }
+    loaded=true;
+    new MutationObserver(soon).observe(list,{childList:true,subtree:true,attributes:true,attributeFilter:['data-reminder']});
+    window.addEventListener('pagehide',save); document.addEventListener('visibilitychange',function(){ if(document.hidden) save(); });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ setTimeout(load,0); }); else setTimeout(load,0);
+})();
+</script>
+<style id="reset-label-20261103">
+/* Phones have no hover, so the reset buttons carry a small visible "Reset" next to the icon. */
+@media (max-width:700px),(hover:none){
+  #app-nav ~ * .bf-reset-btn, .tab-panel .bf-reset-btn, .tab-panel .reset-icon-btn{width:auto !important;min-width:44px;padding:0 12px !important;gap:6px;display:inline-flex !important;align-items:center;justify-content:center;border-radius:999px !important}
+  .tab-panel .bf-reset-btn::after, .tab-panel .reset-icon-btn::after{content:'Reset';font:700 12px/1 inherit;letter-spacing:.2px}
+}
+</style>
+<script id="reset-hover-20261103">
+(function(){
+  // Hover text and screen-reader name are "Reset" on every reset icon.
+  var SEL='.bf-reset-btn,.reset-icon-btn';
+  function fix(b){ if(b.getAttribute('title')!=='Reset') b.setAttribute('title','Reset'); if(b.getAttribute('aria-label')!=='Reset') b.setAttribute('aria-label','Reset'); }
+  function all(){ document.querySelectorAll(SEL).forEach(fix); }
+  all();
+  new MutationObserver(function(ms){ ms.forEach(function(m){ if(m.type==='attributes'&&m.target.matches&&m.target.matches(SEL)) fix(m.target); }); }).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['title','aria-label']});
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',all); setTimeout(all,800);
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
