@@ -16665,9 +16665,15 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-f
 @media (max-width:899px){
   html body #alerts-panel #custom-reminders-card .custom-reminder-form .repeat-on .day-quick, html body #rem-alarm-days .day-quick{grid-column:1 / -1 !important;justify-content:flex-end !important}
 }
-html body #start-my-day-card .wake-range-ends{align-items:flex-start !important;margin-top:-4px !important}
+html body #start-my-day-card .wake-range-ends{align-items:flex-start !important;margin-top:-1px !important}
 html body #start-my-day-card .wake-range-ends > span{margin-top:0;line-height:1.2}
-html body #start-my-day-card .wake-range-ends .ayu-time-btn{margin-top:10px}
+html body #start-my-day-card .wake-range-ends .ayu-time-btn{margin-top:7px}
+/* 04-Nov (9): phones: no lotus in Reminders → Alarm; day buttons out to the section's right edge; bar end times a touch lower */
+@media (max-width:899px){
+  html body #rem-alarm-card > .sec-lotus-layer{display:none !important}
+  html body #alerts-panel #custom-reminders-card .custom-reminder-form .repeat-on .day-quick, html body #rem-alarm-days .day-quick{margin-right:-10px !important}
+}
+@media (max-width:359px){ html body #rem-alarm-days .day-quick{margin-right:-4px !important} }
 </style>
 <script id="accent-on-load-20261104">
 /* The section colour (--footer-accent) is set when a tab is switched; set it at load too, so banners and buttons match the first tab. */
