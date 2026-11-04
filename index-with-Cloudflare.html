@@ -14232,7 +14232,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   // Checks
   tab('routines','.tab-btn.routines',C.checks,'Your day, from morning to night.');
   sec('routines','#routines-panel .rout-page > .rout-card',0,C.checks,'<b>My Day Plan</b>: set your wake-up time, any time in 24 hours: slide the bar, or tap the time under it for a clock. Every check below is timed from it. Outside 4–10 AM it becomes a shift schedule, with meals, light and sleep adjusted.');
-  sec('routines','#chk-alarm',0,C.checks,'<b>Alarm</b>: switch it on to wake up at your start time, with your choice of ringtone, ring length and snooze. Tap the i for details.');
+  sec('routines','#chk-alarm',0,C.checks,'<b>Alarm</b>: switch it on to wake up at your wake-up time, with your choice of ringtone, ring length and snooze. Details are in the My Day Plan i.');
   sec('routines','#routines-notify-card',0,C.checks,'<b>Notify Me</b>: turn on notifications for your checks. Its settings open when it is on.');
   sec('routines','#routines-panel .rout-page > .rout-card',1,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.');
   sec('routines','#routines-panel .rout-page > .rout-card',2,C.checks,'<b>Afternoon</b>: the same ticks and info for the middle of the day.');
@@ -16241,7 +16241,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   function smallHours(m){ m=((m%1440)+1440)%1440; return m<360; }            // midnight – 6 AM
   var MEALS={breakfast:1,lunch:1,snacks:1,dinner:1,fruits:1};
   var NOTES={
-    wake:'<strong>Shift schedule</strong><ul><li>A start time outside 4–10 AM counts as a shift schedule. Every check still follows it.</li><li>Keep the same start time on work days, and aim for 7–9 hours of sleep in every 24 hours (one block, or a main sleep plus a nap).</li><li>Meals are named by order. Between midnight and 6 AM, keep them small and light.</li></ul><div style="font-size:.74rem;opacity:.75">Sources: Sleep Health Foundation, Healthy sleep practices for shift workers; NIOSH, Training for nurses on shift work and long work hours.</div>',
+    wake:'<strong>Shift schedule</strong><ul><li>A wake-up time outside 4–10 AM counts as a shift schedule. Every check still follows it.</li><li>Keep the same wake-up time on work days, and aim for 7–9 hours of sleep in every 24 hours (one block, or a main sleep plus a nap).</li><li>Meals are named by order. Between midnight and 6 AM, keep them small and light.</li></ul><div style="font-size:.74rem;opacity:.75">Sources: Sleep Health Foundation, Healthy sleep practices for shift workers; NIOSH, Training for nurses on shift work and long work hours.</div>',
     sun:'<b>On a shift schedule:</b> in daytime, get daylight soon after waking. At night, bright indoor light at the start of your day helps you stay alert. After a night shift, sunglasses on the way home make it easier to fall asleep.',
     meal:'<b>On a shift schedule:</b> between midnight and 6 AM, choose small, light meals; avoid heavy, fatty, spicy or sugary food. Avoid a large meal 1–2 hours before sleep, but don’t go to bed hungry: a small meal before day sleep stops hunger waking you.',
     nomobile:'<b>On a shift schedule:</b> dim lights and screens before sleep, even in daytime, and stop caffeine about 6 hours before you sleep.',
@@ -16528,7 +16528,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
       +'<button type="button" class="ayu-chev'+(id==='rem'?' alert-card-chev':'')+'" aria-label="Open or close Alarm" aria-expanded="false">'+CHEV+'</button>';
     if(id==='wake'){
       wrap=document.createElement('div'); wrap.id='chk-alarm'; wrap.className='ayu-sub ayu-sec ayu-closed';
-      wrap.innerHTML='<div class="ayu-sub-hdr">'+head+'</div><div class="calc-task ayu-al-info" id="'+p+'-info" hidden>'+infoHtml(id)+'</div><div class="ayu-al-body" id="'+p+'-body">'+bodyHtml(id)+'</div>';
+      wrap.innerHTML='<div class="ayu-sub-hdr">'+head.replace(/<button type="button" class="calc-info-btn rout-info-btn ayu-al-ibtn"[^>]*>i<\/button>/,'')+'</div><div class="ayu-al-body" id="'+p+'-body">'+bodyHtml(id)+'</div>';
     } else {
       wrap=document.createElement('div'); wrap.id='rem-alarm-card'; wrap.className='alert-card collapsed';
       wrap.innerHTML='<div class="alert-card-hdr">'+head.replace(/<h3>([\s\S]*?)<span>Alarm<\/span><\/h3>/,'<h2>$1<span class="section-title-text">Alarm</span></h2>').replace('class="ayu-al-ic"','class="ayu-al-ic section-title-icon"')+'</div><div class="calc-task ayu-al-info" id="'+p+'-info" hidden>'+infoHtml(id)+'</div><div class="ayu-al-body" id="'+p+'-body">'+bodyHtml(id)+'</div>';
@@ -16545,7 +16545,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     clickToOpen(sec,ok,sec&&sec.firstElementChild);
     sec.querySelector('.ayu-chev').addEventListener('click',function(e){ e.stopPropagation(); setOpen(sec,ok,sec.classList.contains('collapsed')||sec.classList.contains('ayu-closed'),true); });
     on.addEventListener('change',function(){ var c=get(id); c.on=on.checked; put(id,c); if(c.on) setOpen(sec,ok,true,true); });
-    $(p+'-ibtn').addEventListener('click',function(e){ e.stopPropagation(); var i=$(p+'-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); if(!i.hidden) setOpen(sec,ok,true,false); });
+    var ib=$(p+'-ibtn'); if(ib) ib.addEventListener('click',function(e){ e.stopPropagation(); var i=$(p+'-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); });   // only the text: the section stays as it is
     sel.value=c.tone; if(sel.value!==c.tone) sel.value='rise';
     var prev=sel.value;
     sel.addEventListener('change',function(){
@@ -16965,6 +16965,98 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-f
   }
   ['input','change','click'].forEach(function(t){ document.addEventListener(t,function(){ setTimeout(sync,0); setTimeout(sync,300); },true); });
   setInterval(sync,800); setTimeout(sync,300); setTimeout(sync,1500);
+})();
+</script>
+<style id="mdp-info-20261104">
+/* Checks: dots before Wake-up time, Alarm and Notify Me; no lines around Alarm; one i for My Day Plan */
+.wake-bar-lbl::before, #chk-alarm .ayu-sub-hdr h3::before, html body #routines-notify-card.ayu-in-day .rout-card-hdr h2::before{content:'•';margin-right:6px;color:var(--rout-2,#a75b12);font-weight:800}
+html body #chk-alarm.ayu-sub{border-top:0 !important;border-bottom:0 !important}
+html body #routines-notify-card.ayu-in-day .rout-card-hdr .rout-info-btn{display:none !important}
+#rout-info-wake .mdp-sec{border-left:4px solid #e6a93a;padding:2px 0 2px 10px;margin:0 0 12px}
+#rout-info-wake .mdp-sec:last-of-type{margin-bottom:6px}
+#rout-info-wake .mdp-sec > b.mdp-t{display:block;font-size:.95rem;font-weight:800;color:#7a4510;margin-bottom:3px}
+#rout-info-wake .mdp-sec ul{margin:2px 0 0 16px;padding:0}
+#rout-info-wake .mdp-sec li{margin:2px 0}
+#rout-info-wake .mdp-src{font-size:.72rem;opacity:.75}
+/* Reminders: the i buttons in the Reminders colour; the About text opens from an i next to the title */
+html body #rem-alarm-card .ayu-al-ibtn, #alerts-panel .ayu-desc-btn{flex:0 0 auto;width:24px !important;height:24px !important;min-width:24px !important;border-radius:50% !important;border:1px solid #0d9488 !important;background:rgba(255,255,255,.75) !important;color:#0f766e !important;font:italic 700 13px Georgia,serif !important;cursor:pointer;padding:0 !important;display:inline-flex;align-items:center;justify-content:center}
+html body #alerts-panel .alert-card-hdr h2 > .ayu-desc-btn{margin-left:8px;vertical-align:middle}
+#alerts-panel .ayu-desc-btn::after{content:'i'}
+#alerts-panel .alert-card.ayu-has-desc .alert-task{display:none !important}
+#alerts-panel .alert-card .ayu-desc{display:none}
+html body #alerts-panel .alert-card.ayu-desc-on > .ayu-desc{display:block !important;margin:10px 0 12px;padding:12px 14px;border-radius:12px;background:#eaf8f5;font-size:.86rem;line-height:1.5}
+#alerts-panel .alert-card .ayu-desc ul{margin:4px 0 0 18px;padding:0}
+html body #rem-alarm-card.collapsed > .ayu-al-info:not([hidden]){display:block !important;margin-top:10px}
+html body #rem-alarm-card > .ayu-al-info{padding:12px 14px;border-radius:12px;background:#eaf8f5}
+/* Reminder Hours: a chevron like the sections below */
+#alerts-panel #reminder-hours-card > .alert-card-hdr{cursor:pointer}
+#alerts-panel #reminder-hours-card.collapsed > .reminder-hours-info[style*="block"]{display:block !important}
+#alerts-panel #reminder-hours-card:not(.collapsed) .ayu-hours-chev{transform:rotate(180deg)}
+</style>
+<script id="mdp-info-20261104-js">
+(function(){
+  var APP=!!window.AYU_ANDROID;
+  function $(id){ return document.getElementById(id); }
+  // ── My Day Plan i: Wake-up time, Alarm and Notify Me in one short text ──
+  function mdpInfo(){
+    var w=$('rout-info-wake'); if(!w) return;
+    w.dataset.ux='1';   // the older long text is not put back
+    var note=w.querySelector('.ayu-shift-note');
+    w.innerHTML='<div class="mdp-sec"><b class="mdp-t">Wake-up time</b><ul>'
+      +'<li>🟢 5:30–7:30 AM healthy · 🟠 4:30–5:30 early, 7:30–8:30 later · 🔴 before 4:30 or after 8:30.</li>'
+      +'<li>No clock time is proven best: aim for 7+ hours of sleep, the same time every day and morning daylight.</li>'
+      +'<li>Every check below follows it. Outside 4–10 AM it becomes a shift schedule.</li></ul>'
+      +'<div class="mdp-src">Sources: AASM/SRS sleep consensus 2015; UK Biobank; Daghlas et al. 2021.</div></div>'
+      +'<div class="mdp-sec"><b class="mdp-t">Alarm</b><ul>'
+      +'<li>Rings at your wake-up time on the Notify Me days (every day if Notify Me is off). It works without Notify Me.</li>'
+      +'<li>Choose a ringtone (▶ to hear it, or upload your own), how long it rings, and the snooze length and count.</li>'
+      +(APP?'<li>Rings even when AyuBase6 is closed or the phone is locked. The volume buttons snooze or stop it.</li>'
+           :'<li>Rings while AyuBase6 is open. For an alarm with it closed, use the Android app (Help → Download app).</li>')
+      +'</ul></div>'
+      +'<div class="mdp-sec"><b class="mdp-t">Notify Me</b><ul>'
+      +'<li>Notifications for every check. <b>At start</b>: when it begins. <b>Start + before end</b>: also 15 minutes before it closes.</li>'
+      +'<li><b>On these days</b> picks the days. Each notification has <b>Done</b> and <b>Not yet</b>.</li>'
+      +(APP?'<li>They arrive even when AyuBase6 is closed, with or without internet.</li>'
+           :'<li>They arrive while AyuBase6 is open (any tab or the app window); the computer must stay awake.</li>')
+      +'</ul></div>';
+    if(note) w.appendChild(note);
+    try{ if(window.ayuApplyDayMode) ayuApplyDayMode(); }catch(e){}
+  }
+
+  // ── Reminders: the About text of each section opens from an i next to its title ──
+  function descButtons(){
+    ['alert-card-break','alert-card-walk','alert-card-drink','alert-card-break-ex'].forEach(function(id){
+      var c=$(id), h=c&&c.querySelector('.alert-card-hdr'), t=c&&c.querySelector('.alert-task'); if(!h||!t||h.querySelector('.ayu-desc-btn')) return;
+      var b=document.createElement('button'); b.type='button'; b.className='ayu-desc-btn';   // the “i” is drawn by CSS, so the title's text stays the same for other scripts
+      var name=(h.querySelector('.section-title-text')||h).textContent.trim();
+      b.setAttribute('aria-label','About '+name); b.title='About '+name; b.setAttribute('aria-expanded','false');
+      h.querySelector('h2').appendChild(b);   // right after the title text
+      c.classList.add('ayu-has-desc');
+      var d=document.createElement('div'); d.className='ayu-desc'; d.id=id+'-about'; d.innerHTML=t.innerHTML; h.after(d);   // a copy right under the title; the original stays hidden
+      b.setAttribute('aria-controls',d.id);
+      b.addEventListener('click',function(e){ e.stopPropagation(); var on=!c.classList.contains('ayu-desc-on'); if(on) d.innerHTML=t.innerHTML; c.classList.toggle('ayu-desc-on',on); b.setAttribute('aria-expanded',String(on)); });
+      b.addEventListener('keydown',function(e){ e.stopPropagation(); });
+    });
+  }
+
+  // ── Reminder Hours: open / close with a chevron (stays as the person leaves it) ──
+  var K_OPEN='ayuSectionsOpen';
+  function openGet(){ try{ var o=JSON.parse(localStorage.getItem(K_OPEN)||'{}'); return (o&&typeof o['rem-hours']==='boolean')?o['rem-hours']:true; }catch(e){ return true; } }
+  function openSet(v){ try{ var o=JSON.parse(localStorage.getItem(K_OPEN)||'{}'); if(!o||typeof o!=='object') o={}; o['rem-hours']=!!v; localStorage.setItem(K_OPEN,JSON.stringify(o)); }catch(e){} }
+  function hoursChevron(){
+    var c=$('reminder-hours-card'), h=c&&c.querySelector(':scope > .alert-card-hdr'); if(!h||h.querySelector('.ayu-hours-chev')) return;
+    var b=document.createElement('button'); b.type='button'; b.className='alert-card-chev ayu-hours-chev'; b.setAttribute('aria-label','Open or close Reminder Hours');
+    b.innerHTML='<svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg>'; h.appendChild(b);
+    function set(open,save){ c.classList.toggle('collapsed',!open); b.setAttribute('aria-expanded',String(open)); if(save) openSet(open); }
+    set(openGet(),false);
+    h.addEventListener('click',function(e){ if(e.target.closest('.master-switch, .reminder-hours-info-btn, input, label')) return; set(c.classList.contains('collapsed'),true); });
+    // switching Reminders on opens it
+    var t=$('reminder-master-toggle'); if(t) t.addEventListener('change',function(){ if(t.checked) set(true,true); });
+  }
+
+  function go(){ mdpInfo(); descButtons(); hoursChevron(); }
+  go(); if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go,{once:true});
+  setTimeout(function(){ descButtons(); hoursChevron(); },1000);
 })();
 </script>
 </body>
