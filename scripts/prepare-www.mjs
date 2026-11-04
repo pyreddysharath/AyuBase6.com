@@ -62,7 +62,7 @@ patchBetween("+'<strong>On a computer</strong><ul style=\"margin:4px 0 0 18px;pa
 // Help → Troubleshooting
 patchBetween('<div class="trb">', "If it still fails, tell us in Feedback.</p></details>\n    </div>",
   '<div class="trb">\n'
-  + '      <details><summary>No notification when the app is closed</summary><p>Open <b>Help → Notifications</b> and fix any step marked ✕. In Settings → Apps → AyuBase6, allow <b>Notifications</b> and <b>Alarms &amp; reminders</b>, and set Battery to Unrestricted.</p></details>\n'
+  + '      <details><summary>No notification when the app is closed</summary><p>Tap <b>Test my notifications</b> above and fix any step marked ✕. In Settings → Apps → AyuBase6, allow <b>Notifications</b> and <b>Alarms &amp; reminders</b>, and set Battery to Unrestricted.</p></details>\n'
   + '      <details><summary>No sound</summary><p>Turn the phone\'s notification volume up and check that the reminder\'s sound is not muted in its section. In Settings → Apps → AyuBase6 → Notifications → <b>Reminders</b>, make sure sound is on.</p></details>\n'
   + '      <details><summary>Notifications are blocked</summary><p>Long-press the app icon → App info → Notifications, allow them, then tap Test again.</p></details>\n'
   + '      <details><summary>Reminders are late or skipped</summary><p>Allow <b>Alarms &amp; reminders</b> for AyuBase6 and set Battery to Unrestricted. A reminder missed while the phone was switched off for more than an hour is skipped instead of being shown late, and reminders do not fire on days you did not choose.</p></details>\n'

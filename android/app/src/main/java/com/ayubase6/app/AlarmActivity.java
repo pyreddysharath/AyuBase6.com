@@ -21,7 +21,7 @@ import java.util.Date;
 
 /**
  * The ringing alarm, full screen (also over the lock screen): Snooze, Stop and ✓ Done.
- * The phone's volume buttons Snooze or Stop it, as chosen in Checks → Alarm.
+ * The phone's volume buttons Snooze or Stop it, as chosen in the alarm settings.
  */
 public class AlarmActivity extends Activity {
     private TextView titleView, bodyView;
@@ -35,7 +35,8 @@ public class AlarmActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         AlarmService.screen = new WeakReference<>(this);
 
-        NotificationArt.Theme t = NotificationArt.ROUTINES;
+        AlarmService s0 = AlarmService.current();
+        NotificationArt.Theme t = s0 != null ? s0.theme() : NotificationArt.ROUTINES;   // Checks or Reminders colours
         float dp = getResources().getDisplayMetrics().density;
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);

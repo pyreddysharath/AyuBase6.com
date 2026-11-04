@@ -130,11 +130,10 @@ final class ReminderScheduler {
             for (long t = from; t <= now; t++) {
                 for (ReminderRules.Due d : ReminderRules.due(rules, local(t), t)) { latest.put(d.key, d); dueAt.put(d.key, t); }
             }
-            JSONObject alarm = AlarmService.config(c);
             for (Map.Entry<String, ReminderRules.Due> e : latest.entrySet()) {
                 ReminderRules.Due d = e.getValue();
                 // Checks → Alarm rings (only if it is due now, not hours late); everything else is a notification
-                boolean ring = alarm != null && "alarm".equals(d.key) && now - dueAt.getOrDefault(d.key, 0L) <= 2;
+                boolean ring = d.key.startsWith("alarm-") && AlarmService.config(c, d.key) != null && now - dueAt.getOrDefault(d.key, 0L) <= 2;
                 if (ring && AlarmService.start(c, d.key, d.title, d.body, 0)) continue;
                 show(c, "nudge-" + d.key, d.title, d.body, false, NotificationArt.forSection(d.section), d.section, d.key, actionsFor(d.key));
             }
@@ -145,11 +144,12 @@ final class ReminderScheduler {
             JSONObject o = sn.optJSONObject(i); if (o == null) continue;
             long t = o.optLong("t");
             if (t > now) { keep.put(o); continue; }
-            if (o.optBoolean("alarm", false) && now - t <= 2 && AlarmService.config(c) != null
+            if (o.optBoolean("alarm", false) && now - t <= 2 && AlarmService.config(c, o.optString("key")) != null
                     && AlarmService.start(c, o.optString("key"), o.optString("title"), o.optString("body"), o.optInt("count", 1))) continue;
             if (now - t <= MAX_LATE_MIN) {
                 String k = o.optString("key");
-                show(c, "nudge-" + k, o.optString("title"), o.optString("body"), false, NotificationArt.forSection("routines"), "routines", k, actionsFor(k));
+                String sec = k.equals("alarm-rem") ? "alerts" : "routines";
+                show(c, "nudge-" + k, o.optString("title"), o.optString("body"), false, NotificationArt.forSection(sec), sec, k, actionsFor(k));
             }
         }
         saveSnoozes(c, keep);

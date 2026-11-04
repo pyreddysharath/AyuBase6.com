@@ -234,19 +234,27 @@
     };
     slots.next.__ayuAnchor = true;
   }
-  // Checks → Alarm (at the wake-up time) travels with the rules, so the phone rings it.
+  // Alarms (Checks → Alarm at the start time, Reminders → Alarm at its own time) travel with the rules, so the phone rings them.
+  // They work on their own: with every other reminder off, the rules carry only the alarms.
+  function alarmList(){ try{ return (typeof window.ayuAlarmList === 'function') ? (window.ayuAlarmList() || []) : []; }catch(e){ return []; } }
   function addAlarm(rules){
-    try{
-      var a = (typeof window.ayuAlarmConfig === 'function') ? window.ayuAlarmConfig() : null;
-      var t = (typeof window.ayuAlarmText === 'function') ? window.ayuAlarmText() : null;
-      if(rules && rules.checks && a && a.on && t) rules.checks.alarm = { on:true, at:t.at, title:t.title, body:t.body, tone:a.tone, ring:+a.ring||0, snoozeMin:+a.snoozeMin||5, snoozeMax:+a.snoozeMax||0, keys:a.keys === 'stop' ? 'stop' : 'snooze' };
-    }catch(e){}
+    var list = alarmList().map(function(a){
+      return { id:String(a.id), on:true, at:+a.at, days:a.days, title:a.title, body:a.body, section:a.section === 'alerts' ? 'alerts' : 'routines',
+               tone:a.tone, ring:+a.ring||0, snoozeMin:+a.snoozeMin||5, snoozeMax:+a.snoozeMax||0, keys:a.keys === 'stop' ? 'stop' : 'snooze' };
+    });
+    if(!list.length) return rules;
+    if(!rules) rules = { v:1, tz:(function(){ try{ return Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(e){ return ''; } })(), phone:true, reminders:[], exercise:null, checks:null, custom:[] };
+    rules.alarms = list;
     return rules;
   }
   state.previewTone = function(tone){ return P.previewTone({ tone:String(tone || 'rise') }); };
   state.stopPreview = function(){ return P.stopPreview().catch(noop); };
   state.saveTone = function(b64){ return P.saveTone({ base64:b64 }); };
-  document.addEventListener('ayu-alarm-changed', function(){ setTimeout(function(){ sync(true); }, 100); });
+  document.addEventListener('ayu-alarm-changed', function(){
+    // an alarm needs notifications allowed (its screen and buttons come through one)
+    if(alarmList().length && perm !== 'granted'){ try{ window.Notification.requestPermission(); }catch(e){} }
+    setTimeout(function(){ sync(true); }, 100);
+  });
   function currentRules(){
     try{ return addAlarm(addAnchors((window.ayuPush && typeof ayuPush.buildRules === 'function') ? ayuPush.buildRules() : null)); }catch(e){ return null; }
   }
@@ -277,7 +285,7 @@
   // ── Notifications turned off for the app (in Android settings): one tap opens the page, and the app comes back by itself once allowed ──
   var BLOCK_KEY = 'ayuAndroidBlockedLater';
   function wantsNotifications(){
-    try{ return !!((typeof isMasterNotifyOn === 'function' && isMasterNotifyOn()) || (typeof routineNotificationsEnabled === 'function' && routineNotificationsEnabled())); }catch(e){ return false; }
+    try{ return !!((typeof isMasterNotifyOn === 'function' && isMasterNotifyOn()) || (typeof routineNotificationsEnabled === 'function' && routineNotificationsEnabled()) || alarmList().length); }catch(e){ return false; }
   }
   function showBlockedCard(){
     var card = document.getElementById('ayu-blocked-card');

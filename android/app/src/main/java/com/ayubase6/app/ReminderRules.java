@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 final class ReminderRules {
     private ReminderRules() {}
     private static final Pattern KEY = Pattern.compile("^[a-z]+$");
+    private static final java.util.regex.Pattern ALARM_ID = java.util.regex.Pattern.compile("[a-z]{1,12}");
 
     static final class Due {
         final String key, title, body, section;
@@ -103,13 +104,18 @@ final class ReminderRules {
             out.add(new Due("eyeex", str(ex.opt("title"), 80), str(ex.opt("body"), 200), "alerts"));
         }
 
-        JSONObject ck = rules.optJSONObject("checks");
-        // Checks → Alarm: one daily alarm at the wake-up time, on the Checks days (the phone app only; not in the server rules)
-        JSONObject al = ck == null ? null : ck.optJSONObject("alarm");
-        if (al != null && al.optBoolean("on", false) && dayAllowed(ck, local.dow)) {
+        // Alarms (the phone app only; not in the server rules): Checks → Alarm ("wake", at the start time, on the Checks days)
+        // and Reminders → Alarm ("rem", its own time and days). Key "alarm-<id>".
+        JSONArray alarms = rules.optJSONArray("alarms");
+        for (int i = 0; alarms != null && i < alarms.length(); i++) {
+            JSONObject al = alarms.optJSONObject(i);
+            if (al == null || !al.optBoolean("on", true) || !ALARM_ID.matcher(al.optString("id")).matches()) continue;
+            if (!dayAllowed(al, local.dow)) continue;
             Double at = num(al, "at");
-            if (at != null && at == m) out.add(new Due("alarm", str(al.opt("title"), 80), str(al.opt("body"), 200), "routines"));
+            if (at != null && at == m) out.add(new Due("alarm-" + al.optString("id"), str(al.opt("title"), 80), str(al.opt("body"), 200),
+                "alerts".equals(al.optString("section")) ? "alerts" : "routines"));
         }
+        JSONObject ck = rules.optJSONObject("checks");
         JSONArray items = ck == null ? null : ck.optJSONArray("items");
         if (items != null && dayAllowed(ck, local.dow)) {
             JSONArray done = local.day.equals(ck.optString("doneDay")) ? ck.optJSONArray("done") : null;

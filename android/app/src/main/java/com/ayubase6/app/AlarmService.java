@@ -31,7 +31,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 
 /**
- * Checks alarm (at the wake-up time): rings (looping ringtone, vibration) until stopped or for the chosen minutes,
+ * Checks alarm (at the start time) and Reminders alarm (own time): rings (looping ringtone, vibration) until stopped or for the chosen minutes,
  * with Snooze (up to the chosen number of times) and Stop. Runs as a foreground service so it
  * keeps ringing with the app closed; on a locked phone it opens AlarmActivity full screen.
  */
@@ -53,13 +53,20 @@ public class AlarmService extends Service {
     int count = 0;
     JSONObject cfg = new JSONObject();
 
-    // ── settings sent by the app with the rules (rules.checks.alarm) ──
-    static JSONObject config(Context c) {
+    // ── settings sent by the app with the rules (rules.alarms; key "alarm-<id>") ──
+    static JSONObject config(Context c, String key) {
         JSONObject rules = ReminderScheduler.loadRules(c);
-        JSONObject ck = rules == null ? null : rules.optJSONObject("checks");
-        JSONObject a = ck == null ? null : ck.optJSONObject("alarm");
-        return (a != null && a.optBoolean("on", false)) ? a : null;
+        org.json.JSONArray list = rules == null ? null : rules.optJSONArray("alarms");
+        for (int i = 0; list != null && i < list.length(); i++) {
+            JSONObject a = list.optJSONObject(i);
+            if (a != null && a.optBoolean("on", true) && ("alarm-" + a.optString("id")).equals(key)) return a;
+        }
+        return null;
     }
+
+    /** Colours of the section the alarm belongs to: Checks (wake) or Reminders. */
+    NotificationArt.Theme theme() { return "alerts".equals(section()) ? NotificationArt.REMINDERS : NotificationArt.ROUTINES; }
+    String section() { return "alerts".equals(cfg.optString("section")) ? "alerts" : "routines"; }
 
     /** Starts ringing for a Checks activity. Returns false if Android did not allow it (then a notification is shown). */
     static boolean start(Context c, String key, String title, String body, int count) {
@@ -86,8 +93,8 @@ public class AlarmService extends Service {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
         NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         if (nm == null || nm.getNotificationChannel(CHANNEL_ALARMS) != null) return;
-        NotificationChannel ch = new NotificationChannel(CHANNEL_ALARMS, "Checks alarms", NotificationManager.IMPORTANCE_HIGH);
-        ch.setDescription("Checks activities set to ring like an alarm (the ringtone is chosen in the app)");
+        NotificationChannel ch = new NotificationChannel(CHANNEL_ALARMS, "Alarms", NotificationManager.IMPORTANCE_HIGH);
+        ch.setDescription("Checks and Reminders alarms (the ringtone is chosen in the app)");
         ch.setSound(null, null);          // the alarm plays its own ringtone
         ch.enableVibration(false);        // and vibrates itself
         ch.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
@@ -100,9 +107,9 @@ public class AlarmService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null || !A_START.equals(intent.getAction())) { stopSelf(); return START_NOT_STICKY; }
-        JSONObject c = config(this);
         if (running == this && player != null) { leaveNotice(); stopSound(); }   // a second alarm while one rings: the first one becomes a notification
-        key = str(intent.getStringExtra(EX_KEY)); title = str(intent.getStringExtra(EX_TITLE)); body = str(intent.getStringExtra(EX_BODY));
+        key = str(intent.getStringExtra(EX_KEY));
+        JSONObject c = config(this, key); title = str(intent.getStringExtra(EX_TITLE)); body = str(intent.getStringExtra(EX_BODY));
         count = intent.getIntExtra(EX_COUNT, 0);
         cfg = c != null ? c : new JSONObject();
         running = this;
@@ -112,7 +119,7 @@ public class AlarmService extends Service {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK : 0);
         } catch (Exception e) {
             Log.w(ReminderScheduler.TAG, "alarm foreground refused", e);
-            ReminderScheduler.show(this, "nudge-" + key, title, body, false, NotificationArt.ROUTINES, "routines", key, ReminderScheduler.actionsFor(key));
+            ReminderScheduler.show(this, "nudge-" + key, title, body, false, theme(), section(), key, ReminderScheduler.actionsFor(key));
             running = null; stopSelf(); return START_NOT_STICKY;
         }
         startRinging();
@@ -209,7 +216,7 @@ public class AlarmService extends Service {
             .setContentTitle("⏰ " + title)
             .setContentText(body)
             .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
-            .setColor(NotificationArt.ROUTINES.deep)
+            .setColor(theme().deep)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -248,7 +255,7 @@ public class AlarmService extends Service {
     }
 
     private void leaveNotice() {
-        if (!key.isEmpty()) ReminderScheduler.show(this, "nudge-" + key, title, body, false, NotificationArt.ROUTINES, "routines", key, ReminderScheduler.actionsFor(key));
+        if (!key.isEmpty()) ReminderScheduler.show(this, "nudge-" + key, title, body, false, theme(), section(), key, ReminderScheduler.actionsFor(key));
     }
 
     void stopAll() {
