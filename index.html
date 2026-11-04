@@ -15384,7 +15384,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       var nav=document.getElementById('app-nav'), row=document.getElementById('footer-tabs-row'); if(!row) return;
       var side=window.matchMedia('(min-width:900px)').matches && row.parentElement===nav;
       var navH=nav?nav.offsetHeight:0, vh=window.innerHeight, pad=16;
-      var sub=sec.querySelector('.footer-sub:not([style*="display: none"])')||sec;
+      var sub=[].filter.call(sec.querySelectorAll('.footer-sub'),function(x){ return x.getClientRects().length>0; })[0]||sec;   // the visible tab
       var bottom=sub.getBoundingClientRect().bottom, need=bottom-(vh-pad);            // how far the page must move to show the end of the text
       var cap=side? sec.getBoundingClientRect().top-24 : row.getBoundingClientRect().top-(navH+12);   // the most it may move: icon row at the top
       var d=Math.min(need,cap); if(d>2) window.scrollBy({top:d,behavior:'smooth'});
@@ -15540,9 +15540,18 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   }
 
   // ---- Android phone browsers: banner once an app version is published ----
+  // The first visit opens the tour: the banner waits until it has been closed.
+  var tourWait=0;
+  function tourBusy(){
+    var root=document.getElementById('tour-root');
+    if(root && root.classList.contains('on')) return true;
+    var seen=true; try{ seen=!!localStorage.getItem('ayuBase6-tour-seen'); }catch(e){}
+    return !seen && tourWait<60;   // not opened yet (up to a minute)
+  }
   function banner(){
     if(!ANDROID || !cfg) return;
     var later=Number(ls(K_LATER))||0; if(Date.now()-later < LATER_DAYS*864e5) return;
+    if(tourBusy()){ tourWait++; setTimeout(banner,1000); return; }
     document.querySelectorAll('.ayu-appb').forEach(function(e){ e.remove(); });
     document.querySelectorAll('.tab-panel').forEach(function(p){
       var b=document.createElement('div'); b.className='ayu-appb'; b.setAttribute('role','status');
@@ -15558,10 +15567,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       // Download: first a short note (so it can be read), then the download starts and Help → Download app → Android opens.
       b.querySelector('.appb-get').addEventListener('click',function(){
         ls(K_LATER,String(Date.now()));
-        noteInPlace('Once it has downloaded, follow the steps in <b>Help → Download app</b>, opening now.', 3500, function(){
-          download(true); openHelp();
-          setTimeout(function(){ var d=document.querySelector('#sec-app details[data-part=android]'); if(d){ d.open=true; if(window.ayuFooterFit) ayuFooterFit(); } },350);
-        });
+        noteInPlace('Once it has downloaded, follow the steps in <b>Help → Download app → Android</b> to install it.', 3500, function(){ download(true); });
       });
       b.querySelector('.appb-later').addEventListener('click',later);
       var ann=p.querySelector(':scope > .ayu-ann');   // after an announcement banner, if one is showing
@@ -16618,6 +16624,17 @@ html body #rem-alarm-days .day-quick, html body #rem-alarm-days .day-chips{margi
 /* Daily / Weekdays / Weekends: smaller gaps so the words fit on phones */
 html body :is(#alerts-panel,#routines-panel) .day-quick{gap:4px !important}
 html body :is(#alerts-panel,#routines-panel) .day-quick button{padding:3px 8px !important;white-space:nowrap}
+/* 04-Nov (5): Legal tabs like Help; space after an open Alarm; Reminders Alarm field names like My Reminders; footer headings underlined */
+html body #sec-legal .footer-subtabs{gap:4px !important;border-bottom:2px solid var(--footer-accent,#0d9488) !important;align-items:flex-end}
+html body #sec-legal .footer-subtab{flex:1 1 0;border:0 !important;border-radius:10px 10px 0 0 !important;margin:0 !important;padding:9px 6px 8px !important;
+  background:color-mix(in srgb, var(--footer-accent,#0d9488) 12%, #fff) !important;color:var(--footer-accent,#0d9488) !important;opacity:1 !important;font-weight:700 !important;border-bottom:0 !important;box-shadow:none !important}
+html body #sec-legal .footer-subtab:hover{background:color-mix(in srgb, var(--footer-accent,#0d9488) 20%, #fff) !important}
+html body #sec-legal .footer-subtab.active, html body #sec-legal .footer-subtab.active:hover{background:var(--footer-accent,#0d9488) !important;color:#fff !important}
+html body #chk-alarm.ayu-sub:not(.ayu-closed){padding-bottom:22px !important}
+html body #rem-alarm-card .ayu-al-lbl, html body #rem-alarm-days .otd-title{font-size:13px !important;font-weight:400 !important;color:inherit !important;letter-spacing:0 !important}
+footer .footer-acc-body .footer-sec-title, footer .footer-acc-body .backup-pick-title, footer .footer-acc-body .hlp-h,
+footer #sec-app strong, footer #sec-cookies strong{display:table !important;padding-bottom:3px !important;border-bottom:2px solid color-mix(in srgb,var(--footer-accent,#0d9488) 55%,transparent) !important;margin-bottom:8px !important}
+footer #sec-othersites .footer-sec-title{display:block !important;border-bottom:0 !important}
 </style>
 <script id="accent-on-load-20261104">
 /* The section colour (--footer-accent) is set when a tab is switched; set it at load too, so banners and buttons match the first tab. */
