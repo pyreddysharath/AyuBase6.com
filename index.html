@@ -15901,7 +15901,6 @@ html body #routines-notify-card.ayu-in-day > .sec-lotus-layer{display:none !impo
 html body #routines-notify-card.ayu-in-day .rout-card-hdr h2{font-size:1rem !important}
 html body #routines-notify-card.ayu-in-day .rout-card-hdr{background:none !important;border-bottom:0 !important;padding-bottom:0 !important;margin-bottom:6px !important}
 html body #routines-notify-card.ayu-in-day .rout-card-hdr::after{display:none !important}
-html body #routines-notify-card.ayu-off > :not(.rout-card-hdr):not(.rout-info-panel){display:none !important}
 
 /* ── Alarm settings (Checks and Reminders) ── */
 .ayu-al-body{margin-top:10px;display:grid;gap:8px}
@@ -16102,10 +16101,21 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   }
 
   // Notify Me: collapsed while its switch is off
+  var notifyLastOn=null;
   function syncNotify(){
     var nc=$('routines-notify-card'), t=$('routines-master-toggle'); if(!nc) return;
     var on=!!(t ? t.checked : (typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()));
-    nc.classList.toggle('ayu-off',!on);
+    nc.classList.add('ayu-sec');
+    var hdr=nc.querySelector('.rout-card-hdr');
+    if(hdr && !hdr.querySelector('.ayu-chev')){
+      var b=document.createElement('button'); b.type='button'; b.className='ayu-chev'; b.setAttribute('aria-label','Open or close Notify Me'); b.innerHTML=CHEV;
+      hdr.appendChild(b);
+      b.addEventListener('click',function(e){ e.stopPropagation(); setOpen(nc,'notify',nc.classList.contains('ayu-closed'),true); });
+      clickToOpen(nc,'notify',hdr);
+      setOpen(nc,'notify',openGet('notify',on),false);
+    }
+    if(notifyLastOn===false && on) setOpen(nc,'notify',true,true);   // switched on: open it
+    notifyLastOn=on;
   }
 
   // ───────── clock face ─────────
@@ -16239,16 +16249,36 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
       +'<div class="ayu-al-row"><span class="ayu-al-lbl">Snooze up to</span><select id="'+p+'-smax" aria-label="Snooze how many times">'+opts([[0,'No snooze'],[1,'1 time'],[2,'2 times'],[3,'3 times'],[5,'5 times']],c.snoozeMax)+'</select></div>'
       +(APP?'<div class="ayu-al-row"><span class="ayu-al-lbl">Volume buttons</span><select id="'+p+'-keys" aria-label="Volume buttons">'+opts([['snooze','Snooze'],['stop','Stop']],c.keys)+'</select></div>':'');
   }
+  // Alarm and Notify Me open and close like the Reminders sections: closed at first, open when switched on,
+  // and a section the person closes stays closed (remembered on this device).
+  var K_OPEN='ayuSectionsOpen', CHEV='<svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg>';
+  function openGet(k,def){ try{ var o=JSON.parse(localStorage.getItem(K_OPEN)||'{}'); return (o && typeof o[k]==='boolean') ? o[k] : def; }catch(e){ return def; } }
+  function openSet(k,v){ try{ var o=JSON.parse(localStorage.getItem(K_OPEN)||'{}'); if(!o || typeof o!=='object') o={}; o[k]=!!v; localStorage.setItem(K_OPEN,JSON.stringify(o)); }catch(e){} }
+  function setOpen(sec,k,open,save){
+    if(!sec) return;
+    sec.classList.toggle(sec.classList.contains('alert-card') ? 'collapsed' : 'ayu-closed', !open);
+    sec.querySelectorAll('.ayu-chev').forEach(function(b){ b.setAttribute('aria-expanded',String(open)); });
+    if(save) openSet(k,open);
+  }
+  function clickToOpen(sec,k,hdr){
+    if(!hdr || hdr.dataset.ayuOpen) return; hdr.dataset.ayuOpen='1';
+    hdr.classList.add('ayu-sec-hdr');
+    hdr.addEventListener('click',function(e){
+      if(e.target.closest('.master-switch, .rout-info-btn, .ayu-al-ibtn, input, label')) return;
+      var closed=sec.classList.contains('collapsed')||sec.classList.contains('ayu-closed'); setOpen(sec,k,closed,true);
+    });
+  }
   function buildAlarm(id){
     var c=get(id), p=id+'-al', wrap;
-    var head='<h3>⏰ Alarm</h3><button type="button" class="calc-info-btn rout-info-btn ayu-al-ibtn" id="'+p+'-ibtn" title="About the alarm" aria-label="About the alarm" aria-expanded="false">i</button>'
-      +'<label class="master-switch" title="Turn the alarm on or off"><input type="checkbox" id="'+p+'-on" aria-label="Turn the alarm on or off"></label>';
+    var head='<h3><svg class="ayu-al-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 5.72l-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM7.88 3.39L6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM12.5 8H11v6l4.75 2.85.75-1.23-4-2.37V8zM12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9a9 9 0 000-18zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg><span>Alarm</span></h3><button type="button" class="calc-info-btn rout-info-btn ayu-al-ibtn" id="'+p+'-ibtn" title="About the alarm" aria-label="About the alarm" aria-expanded="false">i</button>'
+      +'<label class="master-switch" title="Turn the alarm on or off"><input type="checkbox" id="'+p+'-on" aria-label="Turn the alarm on or off"></label>'
+      +'<button type="button" class="ayu-chev'+(id==='rem'?' alert-card-chev':'')+'" aria-label="Open or close Alarm" aria-expanded="false">'+CHEV+'</button>';
     if(id==='wake'){
-      wrap=document.createElement('div'); wrap.id='chk-alarm'; wrap.className='ayu-sub';
+      wrap=document.createElement('div'); wrap.id='chk-alarm'; wrap.className='ayu-sub ayu-sec ayu-closed';
       wrap.innerHTML='<div class="ayu-sub-hdr">'+head+'</div><div class="calc-task ayu-al-info" id="'+p+'-info" hidden>'+infoHtml(id)+'</div><div class="ayu-al-body" id="'+p+'-body">'+bodyHtml(id)+'</div>';
     } else {
-      wrap=document.createElement('div'); wrap.id='rem-alarm-card'; wrap.className='alert-card';
-      wrap.innerHTML='<div class="alert-card-hdr">'+head.replace('<h3>⏰ Alarm</h3>','<h2><span class="section-title-text">⏰ Alarm</span></h2>')+'</div><div class="calc-task ayu-al-info" id="'+p+'-info" hidden>'+infoHtml(id)+'</div><div class="ayu-al-body" id="'+p+'-body">'+bodyHtml(id)+'</div>';
+      wrap=document.createElement('div'); wrap.id='rem-alarm-card'; wrap.className='alert-card collapsed';
+      wrap.innerHTML='<div class="alert-card-hdr">'+head.replace(/<h3>([\s\S]*?)<span>Alarm<\/span><\/h3>/,'<h2>$1<span class="section-title-text">Alarm</span></h2>').replace('class="ayu-al-ic"','class="ayu-al-ic section-title-icon"')+'</div><div class="calc-task ayu-al-info" id="'+p+'-info" hidden>'+infoHtml(id)+'</div><div class="ayu-al-body" id="'+p+'-body">'+bodyHtml(id)+'</div>';
     }
     setTimeout(function(){ wire(id); },0);
     return wrap;
@@ -16256,9 +16286,13 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   function wire(id){
     var p=id+'-al', c=get(id);
     var on=$(p+'-on'), body=$(p+'-body'), sel=$(p+'-tone'); if(!on||!body) return;
-    on.checked=!!c.on; body.hidden=!c.on;
-    on.addEventListener('change',function(){ var c=get(id); c.on=on.checked; put(id,c); body.hidden=!c.on; });
-    $(p+'-ibtn').addEventListener('click',function(){ var i=$(p+'-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); });
+    var sec=id==='wake'?$('chk-alarm'):$('rem-alarm-card'), ok=id+'-alarm';
+    on.checked=!!c.on; body.hidden=false;
+    setOpen(sec,ok,openGet(ok,!!c.on),false);
+    clickToOpen(sec,ok,sec&&sec.firstElementChild);
+    sec.querySelector('.ayu-chev').addEventListener('click',function(e){ e.stopPropagation(); setOpen(sec,ok,sec.classList.contains('collapsed')||sec.classList.contains('ayu-closed'),true); });
+    on.addEventListener('change',function(){ var c=get(id); c.on=on.checked; put(id,c); if(c.on) setOpen(sec,ok,true,true); });
+    $(p+'-ibtn').addEventListener('click',function(e){ e.stopPropagation(); var i=$(p+'-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); if(!i.hidden) setOpen(sec,ok,true,false); });
     sel.value=c.tone; if(sel.value!==c.tone) sel.value='rise';
     var prev=sel.value;
     sel.addEventListener('change',function(){
@@ -16416,6 +16450,63 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   }
 })();
 </script>
+<style id="sections-20261104">
+/* Alarm and Notify Me: section titles with a chevron, a light background, closed until opened or switched on. */
+.ayu-sec-hdr{cursor:pointer}
+.ayu-chev{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;border:0;background:transparent;color:var(--rout-2,#a75b12);cursor:pointer;transition:transform .18s ease}
+.ayu-sec:not(.ayu-closed) .ayu-chev{transform:rotate(180deg)}
+#alerts-panel #rem-alarm-card:not(.collapsed) .ayu-chev{transform:rotate(180deg)}
+#alerts-panel #rem-alarm-card .ayu-chev{color:var(--alert-1,#0f766e)}
+.ayu-sec.ayu-closed > :not(.ayu-sub-hdr):not(.rout-card-hdr){display:none !important}
+html body #routines-notify-card.ayu-in-day.ayu-closed > :not(.rout-card-hdr){display:none !important}
+html body #routines-notify-card.ayu-in-day:not(.ayu-closed) #routines-remind-panel[hidden]{display:flex !important}
+/* the two parts of Start My Day: tinted boxes */
+html body #chk-alarm.ayu-sub, html body #routines-notify-card.ayu-in-day{
+  background:color-mix(in srgb,var(--rout-2,#a75b12) 8%,#fff) !important;border:1px solid color-mix(in srgb,var(--rout-2,#a75b12) 24%,transparent) !important;
+  border-radius:14px !important;padding:10px 12px !important;margin:12px 0 0 !important}
+html body #chk-alarm.ayu-sub.ayu-closed, html body #routines-notify-card.ayu-in-day.ayu-closed{padding-bottom:10px !important}
+html body #routines-notify-card.ayu-in-day .rout-card-hdr{margin-bottom:0 !important}
+html body #routines-notify-card.ayu-in-day:not(.ayu-closed) .rout-card-hdr{margin-bottom:8px !important}
+.ayu-sub-hdr h3, html body #routines-notify-card.ayu-in-day .rout-card-hdr h2{font-size:1.02rem !important;font-weight:800;color:var(--rout-2,#a75b12)}
+.ayu-sub-hdr h3 .ayu-al-ic{width:22px;height:22px;flex:0 0 auto;color:var(--rout-2,#a75b12)}
+html body #routines-notify-card.ayu-in-day .rout-card-hdr .master-switch{margin-left:auto}
+html body #routines-notify-card.ayu-in-day .rout-card-hdr{justify-content:flex-start !important;gap:8px}
+/* Reminders → Alarm: icon in the section colour */
+#rem-alarm-card .alert-card-hdr h2 .ayu-al-ic{width:22px;height:22px;flex:0 0 auto;color:var(--alert-1,#0f766e)}
+#rem-alarm-card .alert-card-hdr h2{display:flex;align-items:center;gap:8px}
+/* Field name and field on one row, fields see-through (Alarm and My Reminders) */
+.ayu-al-row{flex-wrap:nowrap}
+.ayu-al-lbl{flex:0 0 104px}
+.ayu-al-row select, .ayu-al-time{background:transparent !important}
+#rem-alarm-card .ayu-al-row .reminder-custom-select-wrap select{background:transparent !important}
+html body #rem-alarm-days.otd-row{display:grid !important;grid-template-columns:104px minmax(0,1fr);align-items:center;column-gap:8px;row-gap:8px}
+html body #rem-alarm-days .otd-title{margin:0 !important;font-size:.84rem;font-weight:700}
+html body #rem-alarm-days .day-chips{display:flex;gap:6px;flex-wrap:nowrap;min-width:0}
+html body #rem-alarm-days .day-chip{flex:1 1 0;min-width:0;max-width:38px;width:auto !important;height:auto !important;aspect-ratio:1/1;padding:0}
+html body #rem-alarm-days .day-quick{grid-column:2;margin:0;display:flex;gap:6px;flex-wrap:wrap}
+@media (max-width:420px){ .ayu-al-lbl{flex-basis:92px} html body #rem-alarm-days.otd-row{grid-template-columns:92px minmax(0,1fr)} }
+html body #alerts-panel #custom-reminders-card .custom-reminder-form{grid-template-columns:1fr !important}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form > label,
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-frequency-fields > label{display:grid !important;grid-template-columns:112px minmax(0,1fr);align-items:center;column-gap:8px;grid-column:1/-1}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .repeat-on{display:grid !important;grid-template-columns:112px minmax(0,1fr);align-items:center;column-gap:8px;row-gap:8px}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .repeat-on-title{margin:0 !important}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .repeat-on .day-quick{grid-column:2;margin-top:0}
+@media (max-width:420px){
+  html body #alerts-panel #custom-reminders-card .custom-reminder-form > label,
+  html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-frequency-fields > label,
+  html body #alerts-panel #custom-reminders-card .custom-reminder-form .repeat-on{grid-template-columns:92px minmax(0,1fr)}
+}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form input,
+html body #alerts-panel #custom-reminders-card .custom-reminder-form select,
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .duration-clock-trigger,
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-custom-select-wrap{background:transparent !important}
+html body #alerts-panel #custom-reminders-card #custom-reminders-list .custom-reminder-form input[name="name"],
+html body #alerts-panel #custom-reminders-card #custom-reminders-list .custom-reminder-form input[name="name"]:focus{background:transparent !important}
+/* Desktop: the open footer section starts with a thick line in the section colour */
+@media (min-width:900px){
+  footer.app-footer .footer-acc-body[style*="display: block"]{border-top:4px solid var(--footer-accent,#0d9488);border-radius:2px;padding-top:14px !important;margin-top:6px}
+}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
