@@ -3458,14 +3458,14 @@ html[data-petal-card="e"] #alerts-panel #alert-card-schedule::after{ background:
 </style>
 
 <style id="my-reminders-form-line-and-colour-fix">
-/* Remove the divider immediately above Reminder name and soften the My Reminders card colour. */
+/* Remove the divider immediately above Reminder name and soften the Personal Reminders card colour. */
 #alerts-panel #custom-reminders-card .custom-reminder-form { border-top: 0 !important; padding-top: 8px !important; }
 html[data-petal-card="e"] #alerts-panel #custom-reminders-card { background-color: #99f6e4 !important; border-color: #5eead4 !important; }
 html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after { background: #fff !important; opacity: .22 !important; }
 </style>
 
 <style id="my-reminders-field-background-colour-fix">
-/* Give My Reminders inputs a soft section-matched mint background instead of white. */
+/* Give Personal Reminders inputs a soft section-matched mint background instead of white. */
 #alerts-panel #custom-reminders-card .custom-reminder-form input,
 #alerts-panel #custom-reminders-card .custom-reminder-form select,
 #alerts-panel #custom-reminders-card .custom-reminder-form textarea {
@@ -3961,11 +3961,11 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
   <h1 class="ayu-content-page-title" style="--ayu-page-accent:#0d9488">Reminders</h1>
   <div class="alert-page">
 
-    <!-- Reminder Hours: one From/To for every section (each section can still be changed on its own) -->
+    <!-- Health Breaks: one From/To for every section (each section can still be changed on its own) -->
     <div class="alert-card reminder-hours-card" id="reminder-hours-card">
       <div class="alert-card-hdr">
-        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="section-title-text">Reminder Hours</span></h2>
-        <button type="button" class="reminder-hours-info-btn" id="reminder-hours-info-btn" aria-label="About Reminder Hours" aria-expanded="false" onclick="toggleReminderHoursInfo()">i</button>
+        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="section-title-text">Health Breaks</span></h2>
+        <button type="button" class="reminder-hours-info-btn" id="reminder-hours-info-btn" aria-label="About Health Breaks" aria-expanded="false" onclick="toggleReminderHoursInfo()">i</button>
         <label class="master-switch" title="Turn all reminders on or off"><input type="checkbox" id="reminder-master-toggle" aria-label="Turn all reminders on or off"></label>
       </div>
       <div class="per-reminder-schedule" aria-label="All sections schedule"><div class="per-reminder-schedule-times"><span class="per-reminder-from">From</span><button type="button" class="eye-ex-time-item" data-time="start" aria-label="All sections start time"></button><span>to</span><button type="button" class="eye-ex-time-item" data-time="end" aria-label="All sections end time"></button></div></div>
@@ -4203,7 +4203,7 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
     <!-- User-defined reminders -->
     <div class="alert-card custom-reminders-card" id="custom-reminders-card">
       <div class="alert-card-hdr">
-        <h2><span class="section-title-text">My Reminders</span></h2>
+        <h2><span class="section-title-text">Personal Reminders</span></h2>
         <button type="button" class="alert-info-btn small-info" id="custom-reminder-add" onclick="addCustomReminderForm()" title="Add a reminder" aria-label="Add a reminder">+</button>
       </div>
       <p class="alert-card-sub"></p>
@@ -8397,7 +8397,7 @@ const RECIPES_DATA = [
       <label><input type="checkbox" value="body" checked> <span><b>Body</b> : Age?, Activity Type?</span></label>
       <label><input type="checkbox" value="food" checked> <span><b>Food</b> : Age?, Gender?, BMI, Dietary Preference?</span></label>
       <label><input type="checkbox" value="checks" checked> <span><b>Checks</b> : Wake-up time, Notify Me</span></label>
-      <label><input type="checkbox" value="reminders" checked> <span><b>Reminders</b> : Reminder Hours, Eyes (20-20-20), Walk, Water, Eyes (Exercise)</span></label>
+      <label><input type="checkbox" value="reminders" checked> <span><b>Reminders</b> : Health Breaks, Eyes (20-20-20), Walk, Water, Eyes (Exercise)</span></label>
       <label><input type="checkbox" value="vitals" checked> <span><b>Vitals</b> : Tracker</span></label>
     </div>
     <div class="backup-actions">
@@ -8412,7 +8412,7 @@ const RECIPES_DATA = [
     <div class="footer-subtabs" role="tablist"><button type="button" class="footer-subtab" id="subtab-notifications" role="tab" onclick="showFooterSub('settings','notifications')">Notifications<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-cookies" role="tab" onclick="showFooterSub('settings','cookies')">Cookies<i class="fs-dot"></i></button></div>
     <div class="footer-sub" id="sec-notifications" style="display:none">
     <div class="footer-sec-title">Notification Settings</div>
-    <p>The Reminders tab (Eyes, Walk, Water, Eye Exercise and My Reminders) can send you a notification when it's time —
+    <p>The Reminders tab (Eyes, Walk, Water, Eye Exercise and Personal Reminders) can send you a notification when it's time —
     a popup on a computer, or a system notification on a phone. Checks has its own <b>Notify Me</b> switch.
     Notifications need your permission first.</p>
     <p id="notif-status-text" class="feedback-note-small">Checking permission status…</p>
@@ -12879,7 +12879,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
 </script>
 
 <style id="per-reminder-schedule-styles">
-/* Each reminder has its own schedule row; My Reminders uses the former Schedule card treatment. */
+/* Each reminder has its own schedule row; Personal Reminders uses the former Schedule card treatment. */
 #alerts-panel #alert-card-schedule{display:none!important}
 html[data-petal-card="e"] #alerts-panel #custom-reminders-card{background-color:#2dd4bf!important;border-color:#14b8a6!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 html[data-petal-card="e"] #alerts-panel #custom-reminders-card::after{background:#fff!important;opacity:.4!important}
@@ -13123,7 +13123,7 @@ document.getElementById('clock-picker-close').onclick=close;overlay.addEventList
 
 
 <style id="my-reminders-plus-smaller-no-circle">
-/* Keep the My Reminders add control compact: smaller bold plus, no enclosing circle. */
+/* Keep the Personal Reminders add control compact: smaller bold plus, no enclosing circle. */
 #alerts-panel #custom-reminder-add {
   font-style:normal !important;
   display:inline-flex !important;
@@ -13681,7 +13681,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
 <script id="web-push-20261031-js">
 /* Background alerts (Web Push).
    The app tells a small server (config/push.json -> "api") when each reminder is due: hours, intervals, Checks times,
-   Eye exercise sessions, My Reminders and the phone's timezone. The server then sends a push at those moments, so
+   Eye exercise sessions, Personal Reminders and the phone's timezone. The server then sends a push at those moments, so
    reminders arrive even when the app is closed or the phone is locked. The app sends fresh rules whenever
    something changes. While the app is on screen it still shows its own reminders. */
 (function(){
@@ -14239,13 +14239,14 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('routines','#routines-panel .rout-page > .rout-card',3,C.checks,'<b>Evening &amp; Night</b>: checks to wind down. Ticks start fresh each day.');
   // Reminders
   tab('alerts','.tab-btn.alerts',C.rem,'Gentle nudges through the day.');
-  sec('alerts','#reminder-hours-card',0,C.rem,'<b>Reminder Hours</b>: nudges only arrive between the hours you set.');
+  sec('alerts','.ayu-rem-tabs',0,C.rem,'<b>Three parts</b>: Health Breaks, Alarm and Personal Reminders. Tap an icon to open one.');
+  sec('alerts','#reminder-hours-card',0,C.rem,'<b>Health Breaks</b>: Eyes, Walk, Water and Eye Exercise reminders. Set the hours and days they arrive; the switch turns them all on or off.');
   sec('alerts','#alert-card-break',0,C.rem,'<b>Eyes (20-20-20)</b>: a short eye break at regular intervals. Switch it on and open it to adjust.');
   sec('alerts','#alert-card-walk',0,C.rem,'<b>Walk</b>: a reminder to get up and move.');
   sec('alerts','#alert-card-drink',0,C.rem,'<b>Water</b>: a reminder to drink water.');
   sec('alerts','#alert-card-break-ex',0,C.rem,'<b>Eyes (Exercise)</b>: scheduled eye exercises, with sessions per day and days per week.');
   sec('alerts','#rem-alarm-card',0,C.rem,'<b>Alarm</b>: an alarm at any time you choose on a clock, on the days you pick. Switch it on to set it up.');
-  sec('alerts','#custom-reminders-card',0,C.rem,'<b>My Reminders</b>: add your own reminders with the + button.');
+  sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: reminders you add yourself, with the + button.');
   // Mind
   tab('mind','.tab-btn.mind',C.mind,'Short thoughts for a calmer day.');
   sec('mind','#mind-panel .mind-card',0,C.mind,'<b>Rise &amp; Reset</b>: a fresh start for the morning.');
@@ -14636,7 +14637,7 @@ html body #lab-insights-card .lab-actions-row .lab-upload-btn{padding:0 14px !im
 .install-nudge ul.inst-opts{margin:2px 0 4px;padding-left:20px}
 .install-nudge ul.inst-opts li{margin:0}
 #reminders-install-nudge:not([hidden]){margin-bottom:1.3em}
-/* the i sits right after the title text (Wake-up time, Notify Me, Reminder Hours); the switch stays at the right */
+/* the i sits right after the title text (Wake-up time, Notify Me, Health Breaks); the switch stays at the right */
 html body .rout-card-hdr:has(> .rout-info-btn){justify-content:flex-start !important}
 html body .rout-card-hdr > .rout-info-btn{margin-right:0 !important}
 html body #routines-notify-card .rout-card-hdr .rout-master-switch{margin-left:auto !important}
@@ -14661,7 +14662,7 @@ html body #reminder-hours-card .alert-card-hdr > .master-switch{margin-left:auto
 })();
 </script>
 <style id="rh-info-transparent-20261102">
-/* i icon beside "Reminder Hours": transparent background */
+/* i icon beside "Health Breaks": transparent background */
 #alerts-panel #reminder-hours-info-btn#reminder-hours-info-btn{background:transparent!important}
 </style>
 <style id="repeat-on-days-20261102">
@@ -15304,7 +15305,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
         var p=Notification.permission; if(p==='default'){ try{ p=await Notification.requestPermission(); }catch(e){} }
         return p==='granted' ? ok() : bad('Notifications are blocked','Allow them in your browser or phone: <b>Chrome menu → Settings → Site settings → Notifications</b>, or <b>long-press the app icon → App info → Notifications</b>. Allow AyuBase6, then tap Test again.'); }},
       {k:'on',label:'Reminders turned on',fn:async function(){
-        return remindersOn() ? ok() : bad('Reminders are off','Turn on the <b>Reminder Hours</b> switch in Reminders, or <b>Notify Me</b> in Checks. Nothing is sent while both are off.'); }},
+        return remindersOn() ? ok() : bad('Reminders are off','Turn on the <b>Health Breaks</b> switch in Reminders, or <b>Notify Me</b> in Checks. Nothing is sent while both are off.'); }},
       {k:'inst',label:'Opened as the installed app',fn:async function(){
         if(!phone) return skip('Not needed on a computer');
         var st=false; try{ st=(matchMedia('(display-mode: standalone)').matches||navigator.standalone===true); }catch(e){}
@@ -15499,7 +15500,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 <style id="days-quick-on-20261103">:is(#alerts-panel,#routines-panel) .day-quick button.on,#alerts-panel .custom-reminder-form .day-quick button.on{background:var(--otd,var(--alert-2,#0d9488)) !important;color:#fff !important}</style>
 <script id="my-reminders-save-20261103">
 (function(){
-  // My Reminders are kept on this phone, so they come back after the app is closed or reloaded, and they are part of Backup.
+  // Personal Reminders are kept on this phone, so they come back after the app is closed or reloaded, and they are part of Backup.
   var KEY='ayuBase6-my-reminders', list=null, loaded=false, t=null;
   function save(){
     if(!loaded||!list) return;
@@ -15783,7 +15784,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 </script>
 <style id="reset-like-upload-20261104">
 /* Every Reset button looks like Vitals' "Upload Report (PDF)": a solid button in the open section's colour,
-   rounded corners (not round), white bold "Reset" next to its icon. Reminder Hours' round reset included. */
+   rounded corners (not round), white bold "Reset" next to its icon. Health Breaks' round reset included. */
 html body .tab-panel .bf-reset-btn,
 html body .tab-panel .reset-icon-btn,
 html body #reminders-notif-banner .reminders-reset-row .reset-icon-btn,
@@ -16661,7 +16662,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   }
   if(!APP){ setInterval(checkTime,15000); document.addEventListener('visibilitychange',function(){ if(!document.hidden) checkTime(); }); }
 
-  // Reminders → Alarm, just before My Reminders
+  // Reminders → Alarm, just before Personal Reminders
   function setupRem(){
     var mr=$('custom-reminders-card'); if(!mr || $('rem-alarm-card')) return;
     mr.parentNode.insertBefore(buildAlarm('rem'), mr);
@@ -16733,7 +16734,7 @@ html body #routines-notify-card.ayu-in-day .rout-card-hdr{justify-content:flex-s
 /* Reminders → Alarm: icon in the section colour */
 #rem-alarm-card .alert-card-hdr h2 .ayu-al-ic{width:22px;height:22px;flex:0 0 auto;color:var(--alert-1,#0f766e)}
 #rem-alarm-card .alert-card-hdr h2{display:flex;align-items:center;gap:8px}
-/* Field name and field on one row, fields see-through (Alarm and My Reminders) */
+/* Field name and field on one row, fields see-through (Alarm and Personal Reminders) */
 .ayu-al-row{flex-wrap:nowrap}
 .ayu-al-lbl{flex:0 0 104px}
 .ayu-al-row select, .ayu-al-time{background:transparent !important}
@@ -16780,7 +16781,7 @@ html body #routines-panel #start-my-day-reset .reset-icon-btn{background:var(--r
   #tour-text li{margin:2px 0 !important}
   #tour-text .tf-ic{transform:scale(.85)}
 }
-/* 04-Nov (3): banner note in place; Checks Alarm / Notify Me without boxes; compact fields; fields like My Reminders' Time field */
+/* 04-Nov (3): banner note in place; Checks Alarm / Notify Me without boxes; compact fields; fields like Personal Reminders' Time field */
 .ayu-appb.appb-note{display:block;transition:opacity .35s}
 .ayu-appb.appb-note.out{opacity:0}
 html body #chk-alarm.ayu-sub, html body #routines-notify-card.ayu-in-day{background:transparent !important;border:0 !important;border-radius:0 !important;padding:0 !important;margin:20px 0 !important}
@@ -16793,7 +16794,7 @@ html body #routines-notify-card.ayu-in-day{margin-top:0 !important}
 .ayu-al-time{height:auto !important;min-height:34px !important;font-size:.95rem !important}
 .ayu-al-play{height:34px;width:36px}
 .ayu-al-body{gap:6px}
-/* Fields: white with a section-colour border, like My Reminders' name field */
+/* Fields: white with a section-colour border, like Personal Reminders' name field */
 html body #chk-alarm .ayu-al-row select{background:#fff !important;border:1.5px solid var(--rout-2,#a75b12) !important;border-radius:12px !important;color:#1e293b !important;box-shadow:none !important}
 html body #rem-alarm-card .ayu-al-row select, html body #rem-alarm-card .ayu-al-row .reminder-custom-select-wrap select, html body #rem-alarm-card .ayu-al-time,
 html body #alerts-panel #custom-reminders-card .custom-reminder-form input,
@@ -16804,7 +16805,7 @@ html body #alerts-panel #custom-reminders-card #custom-reminders-list .custom-re
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-custom-select-wrap, html body #rem-alarm-card .reminder-custom-select-wrap{background:transparent !important}
 html body #alerts-panel #rem-alarm-card .reminder-custom-select-trigger, html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-custom-select-trigger{background:#fff !important;background-color:#fff !important;border:1.5px solid #0f766e !important;border-radius:12px !important;color:#1e293b !important;box-shadow:none !important;min-height:34px !important}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form input::placeholder{color:#6b7280;opacity:1}
-/* My Reminders: keep the lower lotus clear of the day buttons */
+/* Personal Reminders: keep the lower lotus clear of the day buttons */
 #alerts-panel #custom-reminders-card > .sec-lotus-layer .sec-lotus:nth-child(2){top:auto !important;bottom:-40px !important}
 @media (max-width:899px){
   #tour-text{max-height:calc(100dvh - 250px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;pointer-events:auto}
@@ -16818,7 +16819,7 @@ html body #rem-alarm-days .day-quick, html body #rem-alarm-days .day-chips{margi
 /* Daily / Weekdays / Weekends: smaller gaps so the words fit on phones */
 html body :is(#alerts-panel,#routines-panel) .day-quick{gap:4px !important}
 html body :is(#alerts-panel,#routines-panel) .day-quick button{padding:3px 8px !important;white-space:nowrap}
-/* 04-Nov (5): Legal tabs like Help; space after an open Alarm; Reminders Alarm field names like My Reminders; footer headings underlined */
+/* 04-Nov (5): Legal tabs like Help; space after an open Alarm; Reminders Alarm field names like Personal Reminders; footer headings underlined */
 html body #sec-legal .footer-subtabs{gap:4px !important;border-bottom:2px solid var(--footer-accent,#0d9488) !important;align-items:flex-end}
 html body #sec-legal .footer-subtab{flex:1 1 0;border:0 !important;border-radius:10px 10px 0 0 !important;margin:0 !important;padding:9px 6px 8px !important;
   background:color-mix(in srgb, var(--footer-accent,#0d9488) 12%, #fff) !important;color:var(--footer-accent,#0d9488) !important;opacity:1 !important;font-weight:700 !important;border-bottom:0 !important;box-shadow:none !important}
@@ -16848,7 +16849,7 @@ html body #sec-settings .footer-subtab.active, html body #sec-settings .footer-s
 html body :is(#alerts-panel,#routines-panel) .day-quick{flex-wrap:wrap !important;justify-content:flex-start !important}
 html body :is(#alerts-panel,#routines-panel) .day-quick button{flex:0 0 auto !important;width:auto !important;min-width:0 !important;padding:3px 10px !important}
 @media (max-width:420px){ html body :is(#alerts-panel,#routines-panel) .day-quick{gap:3px !important;flex-wrap:nowrap !important} html body :is(#alerts-panel,#routines-panel) .day-quick button{padding:3px 6px !important;font-size:11px !important;letter-spacing:-.1px} }
-/* 04-Nov (7): wake-up time label and time under the bar; Settings tabs without repeated titles; day buttons from the left; My Reminders bottom */
+/* 04-Nov (7): wake-up time label and time under the bar; Settings tabs without repeated titles; day buttons from the left; Personal Reminders bottom */
 html body #start-my-day-card .wake-control-hdr{justify-content:flex-start !important;margin-bottom:6px}
 .wake-bar-lbl{font-size:.9rem;font-weight:700;color:var(--rout-2,#a75b12)}
 html body #start-my-day-card .wake-range-ends{align-items:center;opacity:1 !important;margin-top:4px}
@@ -16902,7 +16903,7 @@ html body #start-my-day-card .wake-range-ends .ayu-time-btn{margin-top:7px}
 html body #routines-panel #start-my-day-reset .reset-icon-btn:disabled{opacity:.4 !important;cursor:not-allowed !important}
 /* Reminders → Alarm: a little lighter */
 html body #rem-alarm-card.alert-card{background-color:#8ff2e0 !important;border-color:#5eead4 !important}
-/* My Reminders: Save reminder and Cancel centred, with space above */
+/* Personal Reminders: Save reminder and Cancel centred, with space above */
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-form-actions{display:flex !important;justify-content:center !important;gap:10px;margin-top:14px !important}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-form-actions .save-reminder{justify-self:auto}
 </style>
@@ -16918,7 +16919,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-f
   function text(b){
     if(TEXT[b.id]) return TEXT[b.id];
     if(b.closest('#start-my-day-reset')) return 'Reset My Day Plan? The wake-up time goes back to 6:30 AM, and Alarm and Notify Me are turned off with their first settings.';
-    if(b.closest('#reminder-hours-card, .reminders-reset-row')) return 'Reset Reminders? Reminder Hours, days and every reminder’s settings go back to their defaults.';
+    if(b.closest('#reminder-hours-card, .reminders-reset-row')) return 'Reset Reminders? Health Breaks, days and every reminder’s settings go back to their defaults.';
     var h=b.closest('.calc-card,.rout-card,.alert-card'); h=h&&h.querySelector('h2');
     return 'Reset '+(h?h.textContent.trim():'this section')+'? Its settings go back to their defaults.';
   }
@@ -17000,7 +17001,7 @@ html body #alerts-panel .alert-card.ayu-desc-on > .ayu-desc{display:block !impor
 #alerts-panel .alert-card .ayu-desc ul{margin:4px 0 0 18px;padding:0}
 html body #rem-alarm-card.collapsed > .ayu-al-info:not([hidden]){display:block !important;margin-top:10px}
 html body #rem-alarm-card > .ayu-al-info{padding:12px 14px;border-radius:12px;background:#eaf8f5}
-/* Reminder Hours: a chevron like the sections below */
+/* Health Breaks: a chevron like the sections below */
 #alerts-panel #reminder-hours-card > .alert-card-hdr{cursor:pointer}
 #alerts-panel #reminder-hours-card.collapsed > .reminder-hours-info[style*="block"]{display:block !important}
 #alerts-panel #reminder-hours-card:not(.collapsed) .ayu-hours-chev{transform:rotate(180deg)}
@@ -17051,13 +17052,13 @@ html body #rem-alarm-card > .ayu-al-info{padding:12px 14px;border-radius:12px;ba
     });
   }
 
-  // ── Reminder Hours: open / close with a chevron (stays as the person leaves it) ──
+  // ── Health Breaks: open / close with a chevron (stays as the person leaves it) ──
   var K_OPEN='ayuSectionsOpen';
   function openGet(){ try{ var o=JSON.parse(localStorage.getItem(K_OPEN)||'{}'); return (o&&typeof o['rem-hours']==='boolean')?o['rem-hours']:true; }catch(e){ return true; } }
   function openSet(v){ try{ var o=JSON.parse(localStorage.getItem(K_OPEN)||'{}'); if(!o||typeof o!=='object') o={}; o['rem-hours']=!!v; localStorage.setItem(K_OPEN,JSON.stringify(o)); }catch(e){} }
   function hoursChevron(){
     var c=$('reminder-hours-card'), h=c&&c.querySelector(':scope > .alert-card-hdr'); if(!h||h.querySelector('.ayu-hours-chev')) return;
-    var b=document.createElement('button'); b.type='button'; b.className='alert-card-chev ayu-hours-chev'; b.setAttribute('aria-label','Open or close Reminder Hours');
+    var b=document.createElement('button'); b.type='button'; b.className='alert-card-chev ayu-hours-chev'; b.setAttribute('aria-label','Open or close Health Breaks');
     b.innerHTML='<svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg>'; h.appendChild(b);
     function set(open,save){ c.classList.toggle('collapsed',!open); b.setAttribute('aria-expanded',String(open)); if(save) openSet(open); }
     set(openGet(),false);
@@ -17066,7 +17067,7 @@ html body #rem-alarm-card > .ayu-al-info{padding:12px 14px;border-radius:12px;ba
     var t=$('reminder-master-toggle'); if(t) t.addEventListener('change',function(){ if(t.checked) set(true,true); });
   }
 
-  function go(){ mdpInfo(); descButtons(); }   // Reminder Hours is always open (no chevron)
+  function go(){ mdpInfo(); descButtons(); }   // Health Breaks is always open (no chevron)
   go(); if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go,{once:true});
   setTimeout(function(){ descButtons(); },1000);
 })();
@@ -17105,7 +17106,7 @@ html body .tab-panel .ayu-page-reset{display:inline-flex;align-items:center;gap:
 .ayu-pr-ask .pr-no{background:transparent;color:var(--pr-c);border:1.5px solid var(--pr-c) !important}
 .ayu-pr-done{margin:6px 0 10px;padding:9px 12px;border-radius:12px;background:var(--pr-c);color:#fff;font-weight:700;font-size:.86rem;text-align:center}
 #routines-panel .ayu-pr-done{--pr-c:var(--rout-2,#a75b12)} #alerts-panel .ayu-pr-done{--pr-c:var(--alert-2,#0d9488)}
-/* Reminders: one box around Reminder Hours … Eyes (Exercise); Reminder Hours itself without a box, always showing its fields */
+/* Reminders: one box around Health Breaks … Eyes (Exercise); Health Breaks itself without a box, always showing its fields */
 .ayu-rem-group{border:1.5px solid color-mix(in srgb,var(--alert-2,#0d9488) 35%,transparent);border-radius:20px;padding:6px 10px 10px;margin:0 0 18px;background:rgba(255,255,255,.35)}
 html body #alerts-panel .ayu-rem-group > #reminder-hours-card{background:transparent !important;border:0 !important;box-shadow:none !important;padding-left:6px !important;padding-right:6px !important}
 html body #alerts-panel .ayu-rem-group > #reminder-hours-card::before, html body #alerts-panel .ayu-rem-group > #reminder-hours-card::after{display:none !important}
@@ -17189,7 +17190,7 @@ html body #chk-alarm > .ayu-al-body{margin-left:16px}
     var b=row.querySelector('button'); b.addEventListener('click',function(){ ask(panel,b,getSections()); });
   }
 
-  // Reminders: the box around Reminder Hours … Eyes (Exercise)
+  // Reminders: the box around Health Breaks … Eyes (Exercise)
   function group(){
     var h=$('reminder-hours-card'); if(!h || h.parentNode.classList.contains('ayu-rem-group')) return;
     var g=document.createElement('div'); g.className='ayu-rem-group'; h.before(g);
@@ -17211,6 +17212,56 @@ html body #chk-alarm > .ayu-al-body{margin-left:16px}
     },600); }
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ setTimeout(setup,400); },{once:true}); else setTimeout(setup,400);
+})();
+</script>
+<style id="rem-tabs-20261104">
+/* Reminders: three icons at the top (Health Breaks, Alarm, Personal Reminders); one part shows at a time. */
+.ayu-rem-tabs{display:flex;gap:8px;margin:0 0 14px;padding:4px;border-radius:16px;background:color-mix(in srgb,var(--alert-2,#0d9488) 10%,#fff)}
+.ayu-rem-tabs button{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:0;border-radius:12px;background:transparent;color:var(--alert-2,#0d9488);font:inherit;font-size:.76rem;font-weight:700;line-height:1.15;cursor:pointer}
+.ayu-rem-tabs button svg{width:22px;height:22px;fill:currentColor}
+.ayu-rem-tabs button[aria-selected="true"]{background:var(--alert-2,#0d9488);color:#fff;box-shadow:0 3px 9px rgba(13,148,136,.25)}
+.ayu-rem-tabs button:focus-visible{outline:2px solid var(--alert-2,#0d9488);outline-offset:2px}
+@media (min-width:900px){ .ayu-rem-tabs button{flex-direction:row;justify-content:center;gap:8px;font-size:.88rem;padding:10px 8px} }
+#alerts-panel .alert-page[data-remtab="breaks"] #rem-alarm-card,
+#alerts-panel .alert-page[data-remtab="breaks"] #custom-reminders-card,
+#alerts-panel .alert-page[data-remtab="alarm"] .ayu-rem-group,
+#alerts-panel .alert-page[data-remtab="alarm"] #custom-reminders-card,
+#alerts-panel .alert-page[data-remtab="personal"] .ayu-rem-group,
+#alerts-panel .alert-page[data-remtab="personal"] #rem-alarm-card{display:none !important}
+/* the tour walks through every part */
+body:has(#tour-root.on) #alerts-panel .alert-page .ayu-rem-group, body:has(#tour-root.on) #alerts-panel .alert-page #rem-alarm-card, body:has(#tour-root.on) #alerts-panel .alert-page #custom-reminders-card{display:block !important}
+</style>
+<script id="rem-tabs-20261104-js">
+(function(){
+  var K='ayuRemTab', TABS=[
+    ['breaks','Health Breaks','M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'],
+    ['alarm','Alarm','M22 5.72l-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM7.88 3.39L6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM12.5 8H11v6l4.75 2.85.75-1.23-4-2.37V8zM12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9a9 9 0 000-18zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z'],
+    ['personal','Personal Reminders','M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z']];
+  function page(){ var g=document.querySelector('#alerts-panel .ayu-rem-group'); return g && g.closest('.alert-page'); }
+  function get(){ try{ var v=localStorage.getItem(K); return /^(breaks|alarm|personal)$/.test(v||'') ? v : 'breaks'; }catch(e){ return 'breaks'; } }
+  function show(t,save){
+    var p=page(); if(!p) return; p.dataset.remtab=t;
+    p.querySelectorAll('.ayu-rem-tabs button').forEach(function(b){ var on=b.dataset.t===t; b.setAttribute('aria-selected',String(on)); b.tabIndex=on?0:-1; });
+    if(save){ try{ localStorage.setItem(K,t); }catch(e){} }
+  }
+  window.ayuRemTab=show;
+  function setup(){
+    var p=page(); if(!p || p.querySelector('.ayu-rem-tabs')) return !!p;
+    var bar=document.createElement('div'); bar.className='ayu-rem-tabs'; bar.setAttribute('role','tablist'); bar.setAttribute('aria-label','Reminders');
+    TABS.forEach(function(x){ var b=document.createElement('button'); b.type='button'; b.dataset.t=x[0]; b.setAttribute('role','tab');
+      b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+x[2]+'"/></svg><span>'+x[1]+'</span>';
+      b.addEventListener('click',function(){ show(x[0],true); }); bar.appendChild(b); });
+    bar.addEventListener('keydown',function(e){ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return; var ids=TABS.map(function(x){return x[0];}), i=ids.indexOf(p.dataset.remtab); i=(i+(e.key==='ArrowRight'?1:2))%3; show(ids[i],true); bar.querySelector('[data-t='+ids[i]+']').focus(); });
+    p.insertBefore(bar, p.querySelector('.ayu-rem-group'));
+    show(get(),false); return true;
+  }
+  // a notification tap opens the right part
+  var orig=window.nudgeShowSection;
+  if(typeof orig==='function') window.nudgeShowSection=function(key){
+    try{ var k=String(key||''); show(/^alarm-rem/.test(k)?'alarm':(/^custom/.test(k)?'personal':'breaks'),false); }catch(e){}
+    return orig.apply(this,arguments);
+  };
+  var n=0,iv=setInterval(function(){ if(setup()||++n>40) clearInterval(iv); },250);
 })();
 </script>
 </body>
@@ -17503,7 +17554,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
 
 
 <style id="reminder-icon-colour-and-plus-alignment-fix">
-/* Keep the My Reminders plus centered and visibly bold inside its circle. */
+/* Keep the Personal Reminders plus centered and visibly bold inside its circle. */
 #alerts-panel #custom-reminder-add {
   display: inline-flex !important;
   align-items: center !important;
@@ -18345,7 +18396,7 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
 
 <style id="reminders-custom-option-menus-20261029">
 /* Native Android select popups ignore option typography. Use an in-page menu for the
-   reminder controls, matching the My Reminders sound option typography while preserving
+   reminder controls, matching the Personal Reminders sound option typography while preserving
    each closed field's existing appearance. */
 #alerts-panel .reminder-custom-select-trigger {
   box-sizing: border-box; display: inline-flex; align-items: center; justify-content: space-between;
@@ -18407,7 +18458,7 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
   }
   function build(select){
     if (select.dataset.customOptionMenu === '1' || !select.options.length) return;
-    // Leave the My Reminders reference controls native; only replace menus in the reminder cards.
+    // Leave the Personal Reminders reference controls native; only replace menus in the reminder cards.
     if (select.closest('#custom-reminders-card')) return;
     select.dataset.customOptionMenu = '1';
     const cs = getComputedStyle(select);
@@ -18479,7 +18530,7 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
   }
   function init(){ panel.querySelectorAll('select').forEach(build); }
   init();
-  // Eye exercise / other controls can be rendered later; initialize any new selects without touching My Reminders.
+  // Eye exercise / other controls can be rendered later; initialize any new selects without touching Personal Reminders.
   const observer = new MutationObserver(()=>init()); observer.observe(panel,{childList:true,subtree:true});
   document.addEventListener('click',e=>{if(active && !active.menu.contains(e.target) && !active.trigger.contains(e.target)) closeMenu();});
   document.addEventListener('keydown',e=>{
@@ -18513,7 +18564,7 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
 </style>
 
 <style id="requested-dropdown-transparency-chevron-and-original-minute-clock-20261029">
-/* Requested: all closed dropdown fields in Reminders and My Reminders are transparent. */
+/* Requested: all closed dropdown fields in Reminders and Personal Reminders are transparent. */
 #alerts-panel select,
 #alerts-panel .reminder-custom-select-trigger,
 #alerts-panel #custom-reminders-card select,
@@ -18538,7 +18589,7 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
 
 
 <style id="requested-dropdown-final-adjustments-20261029">
-/* Requested: all dropdown fields, including Frequency in My Reminders, show the page background. */
+/* Requested: all dropdown fields, including Frequency in Personal Reminders, show the page background. */
 #alerts-panel select,
 #alerts-panel .reminder-custom-select-trigger,
 #alerts-panel #custom-reminders-card select,
@@ -18564,9 +18615,9 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
 </style>
 
 <style id="dropdown-arrow-tick-transparent-20261029">
-/* Notification Sound-style dropdowns in the section cards: same customizable dropdown as My Reminders
+/* Notification Sound-style dropdowns in the section cards: same customizable dropdown as Personal Reminders
    (dark triangle arrow, tick on the left of the selected option). */
-/* Notification Sound fields in the section cards: same arrow as the My Reminders dropdowns (dark filled triangle). */
+/* Notification Sound fields in the section cards: same arrow as the Personal Reminders dropdowns (dark filled triangle). */
 html body #alerts-panel .reminder-custom-select-trigger.sound-trigger .reminder-select-chevron {
   display: inline-block !important; flex: 0 0 10px !important; width: 10px !important; height: 9px !important;
   font-size: 0 !important; margin-right: 1px;
@@ -18580,13 +18631,13 @@ html body .reminder-custom-select-menu button::before {
   content: ""; flex: 0 0 1em; width: 1em; text-align: center; color: #134e4a; font-weight: 600;
 }
 html body .reminder-custom-select-menu button[aria-selected="true"]::before { content: "\2713"; }
-/* My Reminders: dropdown backgrounds transparent like the Time field, and one arrow only. */
+/* Personal Reminders: dropdown backgrounds transparent like the Time field, and one arrow only. */
 #alerts-panel #custom-reminders-card .custom-reminder-form select,
 #alerts-panel #custom-reminders-card .custom-reminder-form select:focus {
   background-color: rgba(255, 255, 255, 0.8) !important;
   background-image: none !important;
 }
-/* My Reminders: the Time field gets the same arrow. */
+/* Personal Reminders: the Time field gets the same arrow. */
 #alerts-panel #custom-reminders-card .reminder-frequency-fields label > .duration-clock-trigger:not(.selected-time-btn) {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='9' viewBox='0 0 10 9'%3E%3Cpath d='M0 0h10L5 9z' fill='%23134e4a'/%3E%3C/svg%3E") !important;
   background-repeat: no-repeat !important;
@@ -18598,7 +18649,7 @@ html body .reminder-custom-select-menu button[aria-selected="true"]::before { co
 </style>
 
 <style id="all-dropdown-triangle-and-selected-colour-20261029">
-/* One arrow everywhere: the dark filled triangle used in My Reminders. */
+/* One arrow everywhere: the dark filled triangle used in Personal Reminders. */
 html body #alerts-panel .reminder-custom-select-trigger { background-image: none !important; }
 html body #alerts-panel .reminder-custom-select-trigger .reminder-select-chevron {
   display: inline-block !important; flex: 0 0 10px !important; width: 10px !important; height: 9px !important;
@@ -18894,7 +18945,7 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
 
 
 <style id="lab-manual-and-custom-reminder-focus-box-removal-20261030">
-/* Match the focus treatment requested for Lab Insights > Manual and My Reminders > Reminder name. */
+/* Match the focus treatment requested for Lab Insights > Manual and Personal Reminders > Reminder name. */
 #lab-test-select:focus,
 #lab-test-select:focus-visible,
 #lab-test-value:focus,
@@ -18947,7 +18998,7 @@ html body #tracker-card .trk-sec.open .trk-chev { transform:rotate(180deg) !impo
 }
 #lab-insights-card #lab-add-btn { flex: 0 0 auto !important; }
 
-/* My Reminders > Reminder name: neutral at rest, matching the Value field's focus feedback. */
+/* Personal Reminders > Reminder name: neutral at rest, matching the Value field's focus feedback. */
 #alerts-panel #custom-reminders-list .custom-reminder-form input[name="name"] {
   background-color: #fff !important;
   border-color: var(--alert-3, #b6e3dd) !important;
@@ -19092,7 +19143,7 @@ html body :is(.reminder-custom-select-trigger[aria-expanded="true"], .duration-c
 #alerts-panel .alert-card.collapsed .alert-card-hdr { margin-bottom:0; }
 /* The explanation sits after Preview notification, separated by a line. */
 #alerts-panel .alert-card > .alert-task { display:block !important; margin:12px 0 0; padding:12px 0 0; background:transparent !important; border:0 !important; border-top:1px solid rgba(100,116,139,.35) !important; border-radius:0 !important; box-shadow:none !important; }
-/* Reminder Hours card */
+/* Health Breaks card */
 #alerts-panel .reminder-hours-note { margin:2px 0 0; font-size:.78rem; line-height:1.45; color:#134e4a; }
 </style>
 <script id="reminders-collapsible-sections-js-20261030">
@@ -19159,7 +19210,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 <script id="hub-cards-js-20261031">
 (function(){
   function $(id){ return document.getElementById(id); }
-  var HOURS_INFO='<strong>Reminder Hours</strong><p>Sets the same hours for every section below. You can still change the hours inside each section.</p>'
+  var HOURS_INFO='<strong>Health Breaks</strong><p>Sets the same hours for every section below. You can still change the hours inside each section.</p>'
     +'<strong>Switch and reset</strong><ul>'
     +'<li>The switch at the top right turns every reminder on or off at once. The first time, your browser asks for permission to show notifications.</li>'
     +'<li>To install AyuBase6, see <b>Help → Download app</b>.</li>'
@@ -19299,14 +19350,14 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 </style>
 
 <style id="hub-banner-reset-20261031b">
-/* The master switch in Reminder Hours replaces the old bottom Enable/Disable All button. */
+/* The master switch in Health Breaks replaces the old bottom Enable/Disable All button. */
 #alerts-panel #reminders-notif-banner{display:none!important}
 /* Reset icon: white fill, like the other reset buttons. */
 #reminder-hours-card .reminder-hours-foot .reset-icon-btn{background:#fff!important}
 </style>
 
 <style id="hub-colours-optionA-20261031">
-/* Option A: Reminder Hours and every About box follow the Reminders teal. */
+/* Option A: Health Breaks and every About box follow the Reminders teal. */
 #alerts-panel #reminder-hours-card{background:linear-gradient(135deg,#d6f2ec,#e6f8f4)!important;border:1px solid #8fd3c7!important}
 #alerts-panel #alert-card-break > .alert-task,
 #alerts-panel #alert-card-walk > .alert-task,
@@ -19316,7 +19367,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 </style>
 
 <style id="hub-reset-colour-20261031">
-/* Reset icon in Reminder Hours uses the Reminders-tab "Base6" teal. */
+/* Reset icon in Health Breaks uses the Reminders-tab "Base6" teal. */
 #reminder-hours-card .reminder-hours-foot .reset-icon-btn{color:#42d8c5!important;border-color:#42d8c5!important}
 #reminder-hours-card .reminder-hours-foot .reset-icon-btn svg{stroke:#42d8c5!important}
 #reminder-hours-card .reminder-hours-foot .reset-icon-btn:hover{background:#42d8c5!important;color:#fff!important}
@@ -19324,7 +19375,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 </style>
 
 <style id="hub-reset-fill-20261031">
-/* Reset icon in Reminder Hours: whole button in the Reminders-tab "Base6" teal. */
+/* Reset icon in Health Breaks: whole button in the Reminders-tab "Base6" teal. */
 #reminder-hours-card .reminder-hours-foot .reset-icon-btn,
 #reminder-hours-card .reminder-hours-foot .reset-icon-btn:hover{background:#42d8c5!important;border-color:#42d8c5!important;color:#fff!important}
 #reminder-hours-card .reminder-hours-foot .reset-icon-btn svg,
@@ -19446,10 +19497,10 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     },0);
   },true);
 
-  // ---------- Reminder Hours i: shorter ----------
+  // ---------- Health Breaks i: shorter ----------
   window.toggleReminderHoursInfo=function(){
     var pnl=$('reminder-hours-info'), btn=$('reminder-hours-info-btn'); if(!pnl) return;
-    pnl.innerHTML='<strong>Reminder Hours</strong><p>Sets the hours for every section. You can still change them inside a section.</p>'
+    pnl.innerHTML='<strong>Health Breaks</strong><p>Sets the hours for every section. You can still change them inside a section.</p>'
       +'<strong>Controls</strong><ul><li>The switch (top right) turns all reminders on or off. The first time, your browser asks for permission.</li>'
       +'<li>The reset icon restores the defaults. To install AyuBase6, see <b>Help → Download app</b>.</li></ul>'
       +'<strong>On a computer</strong><ul><li>Alerts work whenever AyuBase6 is open in a browser tab or the app window. It does not need to be in front, so you can use other tabs and windows. They work without internet too. The computer must stay awake.</li></ul><strong>On a phone</strong><ul><li><b>Online:</b> with the app installed, alerts also arrive when the app is closed.</li><li><b>Offline:</b> alerts come only from the open app, so keep it open. This can’t be guaranteed: a phone may pause a locked or background app.</li><li><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</li><li><b>iPhone:</b> open the app from its Home Screen icon (iOS 16.4 or later is needed for alerts when it is closed). Check that Settings → Notifications → AyuBase6 is allowed. If alerts are late, turn off Low Power Mode and any Focus that silences the app.</li></ul><strong>Good to know</strong><ul>'
@@ -19461,7 +19512,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
   };
 
   // ---------- shorter wording ----------
-  var NOTE='<div class="section-notif-note"><strong class="section-notif-title">Notifications</strong><ul><li><b>Preview notification</b> is only an example and changes no settings.</li><li>How alerts are delivered on a computer and on a phone is in the <b>Reminder Hours</b> (i).</li></ul></div>';
+  var NOTE='<div class="section-notif-note"><strong class="section-notif-title">Notifications</strong><ul><li><b>Preview notification</b> is only an example and changes no settings.</li><li>How alerts are delivered on a computer and on a phone is in the <b>Health Breaks</b> (i).</li></ul></div>';
   var ABOUT={
     'break':'<p class="alert-card-sub">Give your eyes a break from screens.</p><strong>The 20-20-20 rule:</strong> every 20 minutes, look at something 20 feet (6 m) away for 20 seconds.<ul><li>Reduces eye strain and dryness</li><li>Fewer screen-related headaches</li><li>Encourages blinking, which re-moistens the eyes</li></ul>',
     'walk':'<p class="alert-card-sub">Short movement breaks to offset long sitting.</p>Stand, stretch or walk for 2–5 minutes at each reminder.<ul><li>Improves circulation and reduces stiffness</li><li>Eases posture strain</li><li>Gives a small energy and focus boost</li></ul>',
@@ -19531,7 +19582,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 #reminder-hours-info > strong:first-child,#master-notif-info > strong:first-child,#rout-info-wake > strong:first-child,#rout-info-notify > strong:first-child{margin-top:0}
 /* no line after "Preview notification": extra space instead */
 #alerts-panel .alert-card .alert-preview-row{border-bottom:0!important;margin-bottom:10px}
-/* space after the Reminder Hours i panel when it is open */
+/* space after the Health Breaks i panel when it is open */
 #alerts-panel #reminder-hours-info{margin-bottom:16px}
 /* description boxes in the Reminders tab: a slightly deeper teal */
 #alerts-panel #alert-card-break > .alert-task,
