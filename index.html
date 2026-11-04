@@ -16106,7 +16106,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     });
     // zone label for 24 hours
     var z=$('wake-zone-label');
-    if(z && shift){ z.textContent='🔵 Shift schedule — keep the same start time daily'; z.style.whiteSpace='normal'; z.style.color='#4f46e5'; }
+    if(z && shift){ z.textContent='🔵 Shift work — fixed wake time'; z.style.color='#4f46e5'; }
     else if(z && (w>=540 && w<600)){ z.textContent='🔴 Very late — try waking earlier'; z.style.color='#dc2626'; }
     else if(z && w>=240 && w<270){ z.textContent='🔴 Very early — keep 7+ hours sleep'; z.style.color='#dc2626'; }
     if(z && !shift) z.style.whiteSpace='';
