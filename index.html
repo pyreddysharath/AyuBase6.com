@@ -14010,14 +14010,14 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('routines','#routines-panel .rout-page > .rout-card',3,C.checks,'<b>Evening &amp; Night</b>: checks to wind down. Ticks start fresh each day.');
   // Reminders
   tab('alerts','.tab-btn.alerts',C.rem,'Gentle nudges through the day.');
-  sec('alerts','.ayu-rem-tabs',0,C.rem,'<b>Three parts</b>: Health Breaks, Alarm and Personal Reminders. Tap an icon to open one.');
+  sec('alerts','.ayu-rem-tabs',0,C.rem,'<b>Three parts</b>: Health Breaks, Personal Reminders and Alarm. Tap an icon to open one.');
   sec('alerts','#reminder-hours-card',0,C.rem,'<b>Health Breaks</b>: Eyes, Walk, Water and Eye Exercise reminders. Set the hours and days they arrive; the switch turns them all on or off.');
   sec('alerts','#alert-card-break',0,C.rem,'<b>Eyes (20-20-20)</b>: a short eye break at regular intervals. Switch it on and open it to adjust.');
   sec('alerts','#alert-card-walk',0,C.rem,'<b>Walk</b>: a reminder to get up and move.');
   sec('alerts','#alert-card-drink',0,C.rem,'<b>Water</b>: a reminder to drink water.');
   sec('alerts','#alert-card-break-ex',0,C.rem,'<b>Eyes (Exercise)</b>: scheduled eye exercises, with sessions per day and days per week.');
-  sec('alerts','#rem-alarm-card',0,C.rem,'<b>Alarm</b>: an alarm at any time you choose on a clock, on the days you pick. Switch it on to set it up.');
   sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: reminders you add yourself, with the + button.');
+  sec('alerts','#rem-alarm-card',0,C.rem,'<b>Alarm</b>: an alarm at any time you choose on a clock, on the days you pick. Switch it on to set it up.');
   // Mind
   tab('mind','.tab-btn.mind',C.mind,'Short thoughts for a calmer day.');
   sec('mind','#mind-panel .mind-card',0,C.mind,'<b>Rise &amp; Reset</b>: a fresh start for the morning.');
@@ -14026,6 +14026,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('mind','#mind-panel .mind-card',3,C.mind,'<b>Sign-Off</b>: a calm way to end the day.');
   // Vitals
   tab('calculator','.tab-btn.calculator',C.vit,'Your numbers in one place.');
+  sec('calculator','.ayu-vit-tabs',0,C.vit,'<b>Three sections</b>: BMI, Lab Insights and Tracker. Tap an icon to open one.');
   sec('calculator','#calculator-panel .calc-card',0,C.vit,'<b>BMI</b>: set height and weight to see your BMI.');
   sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (a PDF or a photo) or type values in, to see what is in or out of range. The download button by the title (<b>Enable offline reading</b>) reads photos and scanned reports without internet.');
   sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
@@ -16965,14 +16966,17 @@ html body #chk-alarm > .ayu-al-body{margin-left:16px}
     var list=[['reminder-hours-card',function(){ ls('ayuBase6-reminder-hours',null); }]];
     [['alert-card-break','break'],['alert-card-walk','walk'],['alert-card-drink','drink'],['alert-card-break-ex','eyeex']].forEach(function(x){ list.push([x[0],sect(x[1])]); });
     list.push(['rem-alarm-card',function(){ ls('ayuBase6-rem-alarm',null); }]);
-    list.push(['custom-reminders-card',function(){ ls('ayuBase6-my-reminders',null); },'Deletes your reminders']);
+    list.push(['custom-reminders-card',function(){ var l=$('custom-reminders-list'); if(l) l.innerHTML=''; ls('ayuBase6-my-reminders',null); },'Deletes your reminders']);   // the list is emptied too, or it is saved again as the page reloads
+    var pg=document.querySelector('#alerts-panel .alert-page[data-remtab]'), t=pg?pg.dataset.remtab:'';
+    var only={breaks:['reminder-hours-card','alert-card-break','alert-card-walk','alert-card-drink','alert-card-break-ex'],alarm:['rem-alarm-card'],personal:['custom-reminders-card']}[t];
+    if(only) list=list.filter(function(x){ return only.indexOf(x[0])>=0; });
     return list.map(function(x){ var c=$(x[0]); return c ? {name:title(c), clear:x[1], note:x[2]} : null; }).filter(Boolean);
   }
 
   function ask(panel, btn, sections){
     var old=panel.querySelector('.ayu-pr-ask'); if(old){ old.remove(); return; }
     var d=document.createElement('div'); d.className='ayu-pr-ask'; d.setAttribute('role','dialog'); d.setAttribute('aria-label','Choose what to reset');
-    d.innerHTML='<p><b>Reset these sections?</b> Their settings go back to the start.</p><div class="pr-list"></div>'
+    d.innerHTML=(sections.length===1?'<p><b>Reset this section?</b> Its settings go back to the start.</p>':'<p><b>Reset these sections?</b> Their settings go back to the start.</p>')+'<div class="pr-list"></div>'
       +'<div class="pr-btns"><button type="button" class="pr-no">Cancel</button><button type="button" class="pr-yes">Reset</button></div>';
     var list=d.querySelector('.pr-list');
     sections.forEach(function(s,i){
@@ -17025,7 +17029,7 @@ html body #chk-alarm > .ayu-al-body{margin-left:16px}
 })();
 </script>
 <style id="rem-tabs-20261104">
-/* Reminders: three icons at the top (Health Breaks, Alarm, Personal Reminders); one part shows at a time. */
+/* Reminders: three icons at the top (Health Breaks, Personal Reminders, Alarm); one part shows at a time. */
 .ayu-rem-tabs{display:flex;gap:8px;margin:0 0 14px;padding:4px;border-radius:16px;background:color-mix(in srgb,var(--alert-2,#0d9488) 10%,#fff)}
 .ayu-rem-tabs button{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:0;border-radius:12px;background:transparent;color:var(--alert-2,#0d9488);font:inherit;font-size:.76rem;font-weight:700;line-height:1.15;cursor:pointer}
 .ayu-rem-tabs button svg{width:22px;height:22px;fill:currentColor}
@@ -17045,8 +17049,8 @@ body:has(#tour-root.on) #alerts-panel .alert-page .ayu-rem-group, body:has(#tour
 (function(){
   var K='ayuRemTab', TABS=[
     ['breaks','Health Breaks','M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'],
-    ['alarm','Alarm','M22 5.72l-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM7.88 3.39L6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM12.5 8H11v6l4.75 2.85.75-1.23-4-2.37V8zM12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9a9 9 0 000-18zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z'],
-    ['personal','Personal Reminders','M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z']];
+    ['personal','Personal Reminders','M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'],
+    ['alarm','Alarm','M22 5.72l-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM7.88 3.39L6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM12.5 8H11v6l4.75 2.85.75-1.23-4-2.37V8zM12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9a9 9 0 000-18zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z']];
   function page(){ var g=document.querySelector('#alerts-panel .ayu-rem-group'); return g && g.closest('.alert-page'); }
   function get(){ try{ var v=localStorage.getItem(K); return /^(breaks|alarm|personal)$/.test(v||'') ? v : 'breaks'; }catch(e){ return 'breaks'; } }
   function show(t,save){
@@ -17062,7 +17066,7 @@ body:has(#tour-root.on) #alerts-panel .alert-page .ayu-rem-group, body:has(#tour
       b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+x[2]+'"/></svg><span>'+x[1]+'</span>';
       b.addEventListener('click',function(){ show(x[0],true); }); bar.appendChild(b); });
     bar.addEventListener('keydown',function(e){ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return; var ids=TABS.map(function(x){return x[0];}), i=ids.indexOf(p.dataset.remtab); i=(i+(e.key==='ArrowRight'?1:2))%3; show(ids[i],true); bar.querySelector('[data-t='+ids[i]+']').focus(); });
-    p.insertBefore(bar, p.querySelector('.ayu-rem-group'));
+    p.insertBefore(bar, p.firstElementChild);
     show(get(),false); return true;
   }
   // a notification tap opens the right part
@@ -17071,6 +17075,91 @@ body:has(#tour-root.on) #alerts-panel .alert-page .ayu-rem-group, body:has(#tour
     try{ var k=String(key||''); show(/^alarm-rem/.test(k)?'alarm':(/^custom/.test(k)?'personal':'breaks'),false); }catch(e){}
     return orig.apply(this,arguments);
   };
+  var n=0,iv=setInterval(function(){ if(setup()||++n>40) clearInterval(iv); },250);
+})();
+</script>
+<style id="vit-tabs-20261104">
+/* Vitals: three icons at the top (BMI, Lab Insights, Tracker); one section shows at a time. */
+.ayu-vit-tabs{--vt:#0e7490;display:flex;gap:8px;margin:0 0 14px;padding:4px;border-radius:16px;background:color-mix(in srgb,var(--vt) 10%,#fff)}
+.ayu-vit-tabs button{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:0;border-radius:12px;background:transparent;color:var(--vt);font:inherit;font-size:.76rem;font-weight:700;line-height:1.15;cursor:pointer}
+.ayu-vit-tabs button svg{width:22px;height:22px}
+.ayu-vit-tabs button[aria-selected="true"]{background:var(--vt);color:#fff;box-shadow:0 3px 9px rgba(14,116,144,.25)}
+.ayu-vit-tabs button:focus-visible{outline:2px solid var(--vt);outline-offset:2px}
+@media (min-width:900px){ .ayu-vit-tabs button{flex-direction:row;justify-content:center;gap:8px;font-size:.88rem;padding:10px 8px} }
+#calculator-panel .calc-page[data-vittab] > .calc-card:not(.ayu-vit-on){display:none !important}
+#calculator-panel .calc-page[data-vittab] > .calc-card.ayu-vit-on{margin-top:0 !important}
+/* the tour walks through every section */
+body:has(#tour-root.on) #calculator-panel .calc-page[data-vittab] > .calc-card{display:block !important}
+body:has(#tour-root.on) #calculator-panel .calc-page[data-vittab] > .calc-card ~ .calc-card{margin-top:18px !important}
+</style>
+<script id="vit-tabs-20261104-js">
+(function(){
+  var K='ayuVitTab', TABS=[['bmi','BMI',null],['lab','Lab Insights','lab-insights-card'],['tracker','Tracker','tracker-card']];
+  function page(){ return document.querySelector('#calculator-panel .calc-page'); }
+  function cards(p){ var all=[].slice.call(p.querySelectorAll(':scope > .calc-card')); return {bmi:all.filter(function(c){ return !c.id; })[0], lab:document.getElementById('lab-insights-card'), tracker:document.getElementById('tracker-card')}; }
+  function get(){ try{ var v=localStorage.getItem(K); return /^(bmi|lab|tracker)$/.test(v||'') ? v : 'bmi'; }catch(e){ return 'bmi'; } }
+  function show(t,save){
+    var p=page(); if(!p) return; var c=cards(p); p.dataset.vittab=t;
+    TABS.forEach(function(x){ if(c[x[0]]) c[x[0]].classList.toggle('ayu-vit-on',x[0]===t); });
+    p.querySelectorAll('.ayu-vit-tabs button').forEach(function(b){ var on=b.dataset.t===t; b.setAttribute('aria-selected',String(on)); b.tabIndex=on?0:-1; });
+    if(save){ try{ localStorage.setItem(K,t); }catch(e){} }
+  }
+  window.ayuVitTab=show;
+  function setup(){
+    var p=page(); if(!p) return false; if(p.querySelector('.ayu-vit-tabs')) return true;
+    var c=cards(p); if(!c.bmi||!c.lab||!c.tracker) return false;
+    var bar=document.createElement('div'); bar.className='ayu-vit-tabs'; bar.setAttribute('role','tablist'); bar.setAttribute('aria-label','Vitals');
+    TABS.forEach(function(x){ var b=document.createElement('button'); b.type='button'; b.dataset.t=x[0]; b.setAttribute('role','tab');
+      var ic=c[x[0]].querySelector('h2 .sec-logo svg'); b.innerHTML=(ic?ic.outerHTML:'')+'<span>'+x[1]+'</span>';
+      b.addEventListener('click',function(){ show(x[0],true); }); bar.appendChild(b); });
+    bar.addEventListener('keydown',function(e){ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return; var ids=TABS.map(function(x){return x[0];}), i=ids.indexOf(p.dataset.vittab); i=(i+(e.key==='ArrowRight'?1:2))%3; show(ids[i],true); bar.querySelector('[data-t='+ids[i]+']').focus(); });
+    p.insertBefore(bar, c.bmi);
+    show(get(),false); return true;
+  }
+  var n=0,iv=setInterval(function(){ if(setup()||++n>40) clearInterval(iv); },250);
+})();
+</script>
+<style id="rem-flat-20261104">
+/* Reminders: no section titles or outer boxes in Health Breaks, Personal Reminders and Alarm.
+   The on/off switch sits in a "• Turn on (i)" field row; Alarm fields always show. */
+html body #alerts-panel .ayu-rem-group{border:0 !important;background:none !important;padding:0 !important;box-shadow:none !important}
+html body #alerts-panel :is(#reminder-hours-card,#rem-alarm-card,#custom-reminders-card), html[data-petal-card] body #alerts-panel :is(#reminder-hours-card,#rem-alarm-card,#custom-reminders-card){border:0 !important;background:none !important;background-color:transparent !important;box-shadow:none !important;padding:4px 6px 6px !important}
+html body #alerts-panel :is(#rem-alarm-card,#custom-reminders-card)::after,
+html body #alerts-panel :is(#rem-alarm-card,#custom-reminders-card) > .sec-lotus-layer{display:none !important}
+/* the title stays in the page for screen readers and other scripts, but is not shown */
+html body #alerts-panel :is(#reminder-hours-card,#rem-alarm-card,#custom-reminders-card) > .alert-card-hdr > h2{position:absolute !important;width:1px !important;height:1px !important;overflow:hidden !important;clip:rect(0 0 0 0) !important;white-space:nowrap !important;margin:0 !important;padding:0 !important}
+html body #alerts-panel :is(#reminder-hours-card,#rem-alarm-card,#custom-reminders-card) > .alert-card-hdr{background:none !important;padding:0 !important;margin:0 0 14px !important;min-height:30px;display:flex !important;align-items:center !important;gap:8px !important;justify-content:flex-start !important;cursor:default}
+html body #alerts-panel .ayu-on-lbl{font-size:13px;font-weight:600;color:#124b47;display:inline-flex;align-items:center;white-space:nowrap}
+html body #alerts-panel .ayu-on-lbl::before{content:"•";margin-right:7px}
+html body #alerts-panel :is(#reminder-hours-card,#rem-alarm-card) > .alert-card-hdr > .master-switch{margin-left:auto !important}
+html body #alerts-panel #rem-alarm-card > .alert-card-hdr > .ayu-chev{display:none !important}
+html body #alerts-panel #rem-alarm-card.collapsed > .ayu-al-body{display:block !important}
+/* Personal Reminders: a clear "+ Add a reminder" button */
+html body #alerts-panel #custom-reminders-card #custom-reminder-add{display:inline-flex !important;align-items:center !important;gap:8px !important;width:auto !important;height:auto !important;min-width:0 !important;min-height:0 !important;margin:0 !important;padding:9px 16px 9px 10px !important;border:1.5px dashed #0d9488 !important;border-radius:999px !important;background:#fff !important;color:#0f766e !important;font:inherit !important;font-size:.9rem !important;font-weight:700 !important;line-height:1.2 !important;cursor:pointer;box-shadow:none !important}
+html body #alerts-panel #custom-reminders-card #custom-reminder-add .ayu-add-plus{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#0d9488;color:#fff;font-size:17px;font-weight:700;line-height:1}
+html body #alerts-panel #custom-reminders-card #custom-reminder-add:hover{background:#f0fdfa !important}
+html body #alerts-panel #custom-reminders-card > .alert-card-sub:empty{display:none !important}
+</style>
+<script id="rem-flat-20261104-js">
+(function(){
+  function lbl(card, before){
+    var h=card && card.querySelector(':scope > .alert-card-hdr'); if(!h || h.querySelector('.ayu-on-lbl')) return !!h;
+    var s=document.createElement('span'); s.className='ayu-on-lbl'; s.textContent='Turn on';
+    var ref=h.querySelector(before); if(ref) h.insertBefore(s,ref); else h.appendChild(s); return true;
+  }
+  function setup(){
+    var a=lbl(document.getElementById('reminder-hours-card'),'.reminder-hours-info-btn');
+    var b=lbl(document.getElementById('rem-alarm-card'),'.ayu-al-ibtn');
+    var btn=document.getElementById('custom-reminder-add');
+    if(btn && !btn.querySelector('.ayu-add-plus')) btn.innerHTML='<span class="ayu-add-plus" aria-hidden="true">+</span><span>Add a reminder</span>';
+    // clicking the field row does not fold the Alarm away
+    var ah=document.querySelector('#rem-alarm-card > .alert-card-hdr');
+    if(ah && !ah._ayuNoFold){ ah._ayuNoFold=1; ah.addEventListener('click',function(e){ if(e.target.closest('.master-switch,button')) return; e.stopPropagation(); },true); }
+    // the icons stay first in the page (an older ordering script moves Personal Reminders to the top)
+    var bar=document.querySelector('#alerts-panel .ayu-rem-tabs'), pg=bar&&bar.parentNode;
+    if(pg && !pg._ayuTabsFirst){ pg._ayuTabsFirst=1; var fix=function(){ if(pg.firstElementChild!==bar) pg.insertBefore(bar,pg.firstElementChild); }; fix(); new MutationObserver(fix).observe(pg,{childList:true}); }
+    return a && b && !!btn && !!bar;
+  }
   var n=0,iv=setInterval(function(){ if(setup()||++n>40) clearInterval(iv); },250);
 })();
 </script>
