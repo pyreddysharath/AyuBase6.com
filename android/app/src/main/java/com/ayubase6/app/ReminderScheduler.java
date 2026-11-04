@@ -148,7 +148,7 @@ final class ReminderScheduler {
                     && AlarmService.start(c, o.optString("key"), o.optString("title"), o.optString("body"), o.optInt("count", 1))) continue;
             if (now - t <= MAX_LATE_MIN) {
                 String k = o.optString("key");
-                String sec = k.equals("alarm-rem") ? "alerts" : "routines";
+                String sec = k.startsWith("alarm-rem") ? "alerts" : "routines";   // Reminders alarms: "rem", "rem-<id>"
                 show(c, "nudge-" + k, o.optString("title"), o.optString("body"), false, NotificationArt.forSection(sec), sec, k, actionsFor(k));
             }
         }

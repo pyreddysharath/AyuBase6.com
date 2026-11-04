@@ -105,7 +105,7 @@ final class ReminderRules {
         }
 
         // Alarms (the phone app only; not in the server rules): Checks → Alarm ("wake", at the start time, on the Checks days)
-        // and Reminders → Alarm ("rem", its own time and days). Key "alarm-<id>".
+        // and Reminders → Alarm (any number: "rem" or "rem" + 8 letters, each with its own time and days). Key "alarm-<id>".
         JSONArray alarms = rules.optJSONArray("alarms");
         for (int i = 0; alarms != null && i < alarms.length(); i++) {
             JSONObject al = alarms.optJSONObject(i);
