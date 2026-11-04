@@ -14223,9 +14223,9 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
       tries++;
       var b=document.getElementById('cookie-banner'), bannerUp=b && getComputedStyle(b).display!=='none';
       if(open||seen()&&tries>1){ clearInterval(iv); return; }
-      if(!bannerUp && tries>2){ clearInterval(iv); setTimeout(function(){ if(!seen()) openTour(); },800); }
-      if(tries>600) clearInterval(iv);
-    },1000);
+      if(!bannerUp && tries>1){ clearInterval(iv); setTimeout(function(){ if(!seen()) openTour(); },150); }   // about half a second after load (or after the cookie choice)
+      if(tries>2400) clearInterval(iv);
+    },250);
   }
 })();
 </script>
@@ -15386,7 +15386,8 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       var navH=nav?nav.offsetHeight:0, vh=window.innerHeight, pad=16;
       var sub=[].filter.call(sec.querySelectorAll('.footer-sub'),function(x){ return x.getClientRects().length>0; })[0]||sec;   // the visible tab
       var bottom=sub.getBoundingClientRect().bottom, need=bottom-(vh-pad);            // how far the page must move to show the end of the text
-      var cap=side? sec.getBoundingClientRect().top-24 : row.getBoundingClientRect().top-(navH+12);   // the most it may move: icon row at the top
+      var foot=row.closest('footer')||row;
+      var cap=side? sec.getBoundingClientRect().top-24 : foot.getBoundingClientRect().top-navH;   // the most it may move: the start of the footer (the line above How it works) under the top bar
       var d=Math.min(need,cap); if(d>2) window.scrollBy({top:d,behavior:'smooth'});
     }catch(e){}
   }
@@ -15417,13 +15418,13 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 .ayu-appb .appb-later{background:rgba(255,255,255,.22);color:#fff}
 .ayu-appb .appb-x{flex:0 0 auto;border:0;background:rgba(255,255,255,.22);color:#fff;width:26px;height:26px;border-radius:50%;font-size:14px;cursor:pointer;padding:0}
 @media (min-width:900px){.ayu-appb{margin:14px 30px 0;max-width:820px}}
-#sec-app details.app-part{margin:0}
-#sec-app details.app-part > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:8px 2px;font-size:.86rem;font-weight:800;color:var(--footer-accent,#0d9488)}
-#sec-app details.app-part > summary::-webkit-details-marker{display:none}
-#sec-app details.app-part > summary::after{content:'';margin-left:auto;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .18s}
-#sec-app details.app-part[open] > summary::after{transform:rotate(225deg)}
-#sec-app .app-part-b{padding:2px 2px 8px}
-#sec-app hr.app-sep{border:0;border-top:1.5px solid color-mix(in srgb,var(--footer-accent,#0d9488) 30%,transparent);margin:4px 0}
+:is(#sec-app,#sec-trouble) details.app-part{margin:0}
+:is(#sec-app,#sec-trouble) details.app-part > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:8px 2px;font-size:.86rem;font-weight:800;color:var(--footer-accent,#0d9488)}
+:is(#sec-app,#sec-trouble) details.app-part > summary::-webkit-details-marker{display:none}
+:is(#sec-app,#sec-trouble) details.app-part > summary::after{content:'';margin-left:auto;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .18s}
+:is(#sec-app,#sec-trouble) details.app-part[open] > summary::after{transform:rotate(225deg)}
+:is(#sec-app,#sec-trouble) .app-part-b{padding:2px 2px 8px}
+:is(#sec-app,#sec-trouble) hr.app-sep{border:0;border-top:1.5px solid color-mix(in srgb,var(--footer-accent,#0d9488) 30%,transparent);margin:4px 0}
 .ayu-appb{background:var(--appb-c,var(--footer-accent,#0d9488)) !important}
 .ayu-appb .appb-get{color:var(--appb-c,var(--footer-accent,#0d9488)) !important}
 #sec-app .app-get{display:inline-block;border:0;border-radius:10px;padding:10px 18px;font:inherit;font-weight:700;font-size:.9rem;cursor:pointer;background:var(--footer-accent,#0d9488);color:#fff;margin:4px 0 6px}
@@ -15465,7 +15466,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     setTimeout(function(){
       document.querySelectorAll('.ayu-appb.appb-note').forEach(function(b){ b.classList.add('out'); setTimeout(function(){ b.remove(); },400); });
       if(typeof after==='function') setTimeout(after,400);
-    },ms||6000);
+    },ms||10000);
   }
   function download(fromBanner){
     if(!cfg) return;
@@ -15567,7 +15568,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       // Download: first a short note (so it can be read), then the download starts and Help → Download app → Android opens.
       b.querySelector('.appb-get').addEventListener('click',function(){
         ls(K_LATER,String(Date.now()));
-        noteInPlace('Once it has downloaded, follow the steps in <b>Help → Download app → Android</b> to install it.', 3500, function(){ download(true); });
+        noteInPlace('Once it has downloaded, follow the steps in <b>Help → Download app → Android</b> to install it.', 10000, function(){ download(true); });
       });
       b.querySelector('.appb-later').addEventListener('click',later);
       var ann=p.querySelector(':scope > .ayu-ann');   // after an announcement banner, if one is showing
@@ -16493,12 +16494,16 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   function setup(){
     var tr=$('sec-trouble'), ck=$('sec-check'); if(!tr || !ck || tr.dataset.ayuMerged) return;
     tr.dataset.ayuMerged='1';
-    var h1=document.createElement('h3'); h1.className='hlp-h'; h1.id='hlp-notifications'; h1.textContent='Notifications';
-    var h2=document.createElement('h3'); h2.className='hlp-h second'; h2.textContent='Common problems';
-    tr.insertBefore(h1, tr.firstChild);
-    var after=h1;
-    [].slice.call(ck.children).forEach(function(n){ after.after(n); after=n; });
-    after.after(h2);
+    // Two closed sections, like Download app: Notifications (the test) and Common problems
+    function part(id,title){ var d=document.createElement('details'); d.className='app-part'; d.dataset.part=id; d.id='hlp-'+id;
+      d.innerHTML='<summary>'+title+'</summary><div class="app-part-b"></div>'; return d; }
+    var pN=part('notifications','Notifications'), pP=part('problems','Common problems'), sep=document.createElement('hr'); sep.className='app-sep';
+    var bP=pP.querySelector('.app-part-b'), bN=pN.querySelector('.app-part-b');
+    [].slice.call(tr.childNodes).forEach(function(n){ bP.appendChild(n); });
+    [].slice.call(ck.childNodes).forEach(function(n){ bN.appendChild(n); });
+    tr.appendChild(pN); tr.appendChild(sep); tr.appendChild(pP);
+    // a notification problem (the dot on Help): open the test
+    try{ var th=$('tab-help'); if(th && th.classList.contains('has-prob')) pN.open=true; }catch(e){}
     var tb=$('subtab-check'); if(tb) tb.remove();
     ck.remove();
     try{
@@ -16511,7 +16516,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   // A link to the notification test opens Troubleshooting at its Notifications part.
   var orig=window.showFooterSection;
   if(typeof orig==='function'){
-    window.showFooterSection=function(id){ var r=orig.apply(this,arguments); if(id==='check'){ setTimeout(function(){ var h=$('hlp-notifications'); if(h) try{ h.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} },150); } return r; };
+    window.showFooterSection=function(id){ var r=orig.apply(this,arguments); if(id==='check'){ setTimeout(function(){ var h=$('hlp-notifications'); if(h){ h.open=true; try{ h.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} } },150); } return r; };
   }
 })();
 </script>
@@ -16635,6 +16640,15 @@ html body #rem-alarm-card .ayu-al-lbl, html body #rem-alarm-days .otd-title{font
 footer .footer-acc-body .footer-sec-title, footer .footer-acc-body .backup-pick-title, footer .footer-acc-body .hlp-h,
 footer #sec-app strong, footer #sec-cookies strong{display:table !important;padding-bottom:3px !important;border-bottom:2px solid color-mix(in srgb,var(--footer-accent,#0d9488) 55%,transparent) !important;margin-bottom:8px !important}
 footer #sec-othersites .footer-sec-title{display:block !important;border-bottom:0 !important}
+/* 04-Nov (6): Settings tabs like Help; Daily / Weekdays / Weekends sized to their words */
+html body #sec-settings .footer-subtabs{gap:4px !important;border-bottom:2px solid var(--footer-accent,#0d9488) !important;align-items:flex-end}
+html body #sec-settings .footer-subtab{flex:1 1 0;border:0 !important;border-radius:10px 10px 0 0 !important;margin:0 !important;padding:9px 6px 8px !important;
+  background:color-mix(in srgb, var(--footer-accent,#0d9488) 12%, #fff) !important;color:var(--footer-accent,#0d9488) !important;opacity:1 !important;font-weight:700 !important;border-bottom:0 !important;box-shadow:none !important}
+html body #sec-settings .footer-subtab:hover{background:color-mix(in srgb, var(--footer-accent,#0d9488) 20%, #fff) !important}
+html body #sec-settings .footer-subtab.active, html body #sec-settings .footer-subtab.active:hover{background:var(--footer-accent,#0d9488) !important;color:#fff !important}
+html body :is(#alerts-panel,#routines-panel) .day-quick{flex-wrap:wrap !important;justify-content:flex-start !important}
+html body :is(#alerts-panel,#routines-panel) .day-quick button{flex:0 0 auto !important;width:auto !important;min-width:0 !important;padding:3px 10px !important}
+@media (max-width:420px){ html body :is(#alerts-panel,#routines-panel) .day-quick{gap:3px !important;flex-wrap:nowrap !important} html body :is(#alerts-panel,#routines-panel) .day-quick button{padding:3px 6px !important;font-size:11px !important;letter-spacing:-.1px} }
 </style>
 <script id="accent-on-load-20261104">
 /* The section colour (--footer-accent) is set when a tab is switched; set it at load too, so banners and buttons match the first tab. */
@@ -16648,6 +16662,94 @@ footer #sec-othersites .footer-sec-title{display:block !important;border-bottom:
     r.style.setProperty('--footer-accent',ACC[k]); r.style.setProperty('--footer-accent-light',LIGHT[k]);
   }
   set(); if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',set,{once:true});
+})();
+</script>
+<style id="reset-ask-20261104">
+/* Reset asks right below its button (no browser pop-up). */
+.ayu-reset-ask{position:relative;z-index:3;margin:10px 0 4px;padding:12px 14px;border-radius:14px;background:#fff;border:1.5px solid var(--footer-accent,#0d9488);box-shadow:0 6px 18px rgba(0,0,0,.08);color:#2d2b23;font-size:.88rem;line-height:1.45}
+.ayu-reset-ask p{margin:0 0 10px}
+.ayu-reset-ask .ra-btns{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.ayu-reset-ask button{border:0;border-radius:10px;padding:8px 16px;font:inherit;font-weight:700;cursor:pointer}
+.ayu-reset-ask .ra-yes{background:var(--footer-accent,#0d9488);color:#fff}
+.ayu-reset-ask .ra-no{background:transparent;color:var(--footer-accent,#0d9488);border:1.5px solid var(--footer-accent,#0d9488)}
+html body #routines-panel #start-my-day-reset .reset-icon-btn:disabled{opacity:.4 !important;cursor:not-allowed !important}
+/* Reminders → Alarm: a little lighter */
+html body #rem-alarm-card.alert-card{background-color:#8ff2e0 !important;border-color:#5eead4 !important}
+/* My Reminders: Save reminder and Cancel centred, with space above */
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-form-actions{display:flex !important;justify-content:center !important;gap:10px;margin-top:14px !important}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-form-actions .save-reminder{justify-self:auto}
+</style>
+<script id="reset-ask-20261104-js">
+(function(){
+  var SEL='.tab-panel .bf-reset-btn, .tab-panel .reset-icon-btn';
+  var TEXT={
+    'body-reset-btn':'Reset Body? Age and activity choices go back to the start.',
+    'food-reset-btn':'Reset Food? Age, gender, height, weight and diet choices go back to the start.',
+    'lab-reset-btn':'Reset Lab Insights? This clears any lab values you’ve added.',
+    'tracker-reset-btn':'Reset the Tracker? This deletes all saved readings on this device.'
+  };
+  function text(b){
+    if(TEXT[b.id]) return TEXT[b.id];
+    if(b.closest('#start-my-day-reset')) return 'Reset Start My Day? The start time goes back to 6:30 AM, and Alarm and Notify Me are turned off with their first settings.';
+    if(b.closest('#reminder-hours-card, .reminders-reset-row')) return 'Reset Reminders? Reminder hours, days and every reminder’s settings go back to their defaults.';
+    var h=b.closest('.calc-card,.rout-card,.alert-card'); h=h&&h.querySelector('h2');
+    return 'Reset '+(h?h.textContent.trim():'this section')+'? Its settings go back to their defaults.';
+  }
+  function close(){ document.querySelectorAll('.ayu-reset-ask').forEach(function(x){ x.remove(); }); }
+  function ask(b){
+    close();
+    var host=b.closest('.bf-inline-reset,.ayu-day-reset,.reminder-hours-foot,.page-reset-row,.bf-reset-row,.trk-actions')||b.parentElement;
+    var d=document.createElement('div'); d.className='ayu-reset-ask'; d.setAttribute('role','alertdialog');
+    d.innerHTML='<p></p><div class="ra-btns"><button type="button" class="ra-no">Cancel</button><button type="button" class="ra-yes">Reset</button></div>';
+    d.querySelector('p').textContent=text(b);
+    host.after(d);
+    d.querySelector('.ra-no').addEventListener('click',function(e){ e.stopPropagation(); close(); try{ b.focus(); }catch(_){} });
+    d.querySelector('.ra-yes').addEventListener('click',function(e){
+      e.stopPropagation(); close();
+      var oc=window.confirm; window.confirm=function(){ return true; };   // the reset's own question is answered here
+      b.__ayuOk=true; try{ b.click(); }finally{ b.__ayuOk=false; window.confirm=oc; }
+      setTimeout(sync,50);
+    });
+    try{ d.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(_){}
+    try{ d.querySelector('.ra-yes').focus({preventScroll:true}); }catch(_){}
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest(SEL); if(!b || b.__ayuOk || b.disabled) return;
+    e.preventDefault(); e.stopImmediatePropagation(); ask(b);
+  },true);
+
+  // Start My Day and Reminders: Reset is greyed out until something there differs from the first settings.
+  function dayDirty(){
+    try{
+      var w=document.getElementById('wake-time-slider'); if(w && String(w.value)!=='390') return true;
+      var a=JSON.parse(localStorage.getItem('ayuBase6-routine-alarm')||'null');
+      if(a && (a.on || (a.tone&&a.tone!=='rise') || (a.ring!=null&&+a.ring!==2) || (a.snoozeMin!=null&&+a.snoozeMin!==5) || (a.snoozeMax!=null&&+a.snoozeMax!==3) || (a.keys&&a.keys!=='snooze'))) return true;
+      if(typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()) return true;
+      if(typeof routineRemindMode==='function' && routineRemindMode()!=='start') return true;
+      if(window.ayuDays && window.ayuDays.get('chk').length!==7) return true;
+    }catch(e){}
+    return false;
+  }
+  function remDirty(){
+    try{
+      var h=JSON.parse(localStorage.getItem('ayuBase6-reminder-hours')||'null');
+      if(h && ((h.start&&h.start!=='08:00') || (h.end&&h.end!=='20:00'))) return true;
+      if(window.ayuDays && window.ayuDays.get('rem').length!==7) return true;
+      if(typeof alertState!=='undefined' && typeof ALERT_DEFAULTS!=='undefined'){
+        for(var k in ALERT_DEFAULTS){ var s=alertState[k]; if(!s) continue; if(s.sound!==ALERT_DEFAULTS[k].sound || s.muted || (s.minutes&&+s.minutes!==ALERT_DEFAULTS[k].minutes)) return true; }
+      }
+      if(typeof eyeExState!=='undefined'){ if(+eyeExState.count!==2 || +eyeExState.days!==4 || eyeExState.sound!=='xylophone' || eyeExState.muted) return true; }
+    }catch(e){}
+    return false;
+  }
+  function sync(){
+    [[document.querySelector('#start-my-day-reset .reset-icon-btn'),dayDirty],[document.querySelector('#reminder-hours-card .reset-icon-btn, .reminders-reset-row .reset-icon-btn'),remDirty]].forEach(function(x){
+      var b=x[0]; if(!b) return; var on=!!x[1](); if(b.disabled===!on) return;
+      b.disabled=!on; b.setAttribute('aria-disabled',on?'false':'true');
+    });
+  }
+  ['input','change','click'].forEach(function(t){ document.addEventListener(t,function(){ setTimeout(sync,0); setTimeout(sync,300); },true); });
+  setInterval(sync,800); setTimeout(sync,300); setTimeout(sync,1500);
 })();
 </script>
 </body>
