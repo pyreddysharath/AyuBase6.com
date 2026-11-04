@@ -11552,19 +11552,9 @@ function showFooterSection(id){
     // height and offsets for it instead.
     // requestAnimationFrame lets the display:block change above take
     // effect first, so the measurements below reflect the real layout.
-    requestAnimationFrame(() => {
-      try {
-        const nav = document.getElementById('app-nav');
-        const navHeight = nav ? nav.offsetHeight : 0;
-        const iconRow = document.getElementById('footer-tabs-row');
-        const isSidebar = window.matchMedia('(min-width:900px)').matches && iconRow.parentElement === nav;
-        const scrollTarget = isSidebar ? sec : iconRow;
-        const offset = isSidebar ? 24 : navHeight + 12;
-        const targetY = window.scrollY + scrollTarget.getBoundingClientRect().top - offset;
-        window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
-      }
-      catch (err) { /* not fatal if unsupported */ }
-    });
+    // Scroll only as far as needed to show the whole section, at most until the icon row sits under the top bar.
+    requestAnimationFrame(() => { if (window.ayuFooterFit) ayuFooterFit(); });
+    setTimeout(() => { if (window.ayuFooterFit) ayuFooterFit(); }, 700);
   }
 }
 
@@ -14039,7 +14029,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (a PDF or a photo) or type values in, to see what is in or out of range. The download button by the title (<b>Enable offline reading</b>) reads photos and scanned reports without internet.');
   sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
   // Footer
-  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. A dot in the icon colour means one of them is on</span></li><li><span class="tf-ic has-dot-c"><svg class="ann-ic" viewBox="0 0 24 24" fill="currentColor"><g transform="translate(.35 -.9)"><path d="M2 10a2 2 0 012-2h3.5L17 3v18l-9.5-4.5H4a2 2 0 01-2-2v-4zM8.2 18.2h3.3l1 3.3a1 1 0 01-1 1.3H10a1 1 0 01-1-.8l-.8-3.8z"/><path d="M20 8.6a5 5 0 010 6.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g></svg></span><span><b>Announcements</b>: news and important notes from us. A dot means something new</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: Download app (the Android app or the web app), Troubleshooting (check that notifications work, then common problems) and Feedback. A dot means a problem</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy policy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
+  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save or restore your data. Amber dot: a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. Dot: one is on</span></li><li><span class="tf-ic has-dot-c"><svg class="ann-ic" viewBox="0 0 24 24" fill="currentColor"><g transform="translate(.35 -.9)"><path d="M2 10a2 2 0 012-2h3.5L17 3v18l-9.5-4.5H4a2 2 0 01-2-2v-4zM8.2 18.2h3.3l1 3.3a1 1 0 01-1 1.3H10a1 1 0 01-1-.8l-.8-3.8z"/><path d="M20 8.6a5 5 0 010 6.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g></svg></span><span><b>Announcements</b>: news from us. Dot: something new</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: Download app, Troubleshooting (notification test) and Feedback. Dot: a problem</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
 
   var root=document.getElementById('tour-root'), spot=document.getElementById('tour-spot'), txt=document.getElementById('tour-text'), bar=document.getElementById('tour-bar');
   var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0;
@@ -15387,9 +15377,10 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 <script id="help-tab-scroll-20261103">
 (function(){
   // Tapping a Help tab brings the whole text into view, scrolling down only as far as putting the footer icon row just under the top bar.
+  // Used by every footer section: show the whole open section, scrolling at most until the icon row is at the top.
   function go(){
     try{
-      var sec=document.getElementById('sec-help'); if(!sec||sec.style.display==='none') return;
+      var sec=[].filter.call(document.querySelectorAll('footer .footer-acc-body'),function(x){ return x.style.display==='block'; })[0]; if(!sec) return;
       var nav=document.getElementById('app-nav'), row=document.getElementById('footer-tabs-row'); if(!row) return;
       var side=window.matchMedia('(min-width:900px)').matches && row.parentElement===nav;
       var navH=nav?nav.offsetHeight:0, vh=window.innerHeight, pad=16;
@@ -15399,8 +15390,10 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       var d=Math.min(need,cap); if(d>2) window.scrollBy({top:d,behavior:'smooth'});
     }catch(e){}
   }
+  window.ayuFooterFit=go;
+  document.addEventListener('toggle',function(e){ if(e.target.matches && e.target.matches('footer details') && e.target.open) setTimeout(go,60); },true);
   document.addEventListener('click',function(e){
-    var b=e.target.closest&&e.target.closest('#sec-help .footer-subtab'); if(!b) return;
+    var b=e.target.closest&&e.target.closest('footer .footer-subtab'); if(!b) return;
     setTimeout(go,120); setTimeout(go,700);   // again once pieces such as the notification test have added their rows
   },true);
 })();
@@ -15465,11 +15458,14 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   function installed(){ try{ var st=window.ayuInstallState ? window.ayuInstallState() : ''; return st==='app'||st==='installed' || matchMedia('(display-mode: standalone)').matches || navigator.standalone===true; }catch(e){ return false; } }
 
   // The banner turns into a short note in the same place (same colour) for 6 seconds.
-  function noteInPlace(html){
+  function noteInPlace(html,ms,after){
     document.querySelectorAll('.ayu-appb').forEach(function(b){
       b.classList.add('appb-note'); b.innerHTML='<div class="appb-tx">'+html+'</div>';
     });
-    setTimeout(function(){ document.querySelectorAll('.ayu-appb.appb-note').forEach(function(b){ b.classList.add('out'); setTimeout(function(){ b.remove(); },400); }); },6000);
+    setTimeout(function(){
+      document.querySelectorAll('.ayu-appb.appb-note').forEach(function(b){ b.classList.add('out'); setTimeout(function(){ b.remove(); },400); });
+      if(typeof after==='function') setTimeout(after,400);
+    },ms||6000);
   }
   function download(fromBanner){
     if(!cfg) return;
@@ -15559,9 +15555,13 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
         ls(K_LATER,String(Date.now()));
         noteInPlace('You can download the app later from <b>Help → Download app</b> (the ? icon at the bottom of the page).');
       };
+      // Download: first a short note (so it can be read), then the download starts and Help → Download app → Android opens.
       b.querySelector('.appb-get').addEventListener('click',function(){
-        download(true);
-        noteInPlace('Downloading… When it finishes, open the file to install. The steps are in <b>Help → Download app</b>.');
+        ls(K_LATER,String(Date.now()));
+        noteInPlace('Once it has downloaded, follow the steps in <b>Help → Download app</b>, opening now.', 3500, function(){
+          download(true); openHelp();
+          setTimeout(function(){ var d=document.querySelector('#sec-app details[data-part=android]'); if(d){ d.open=true; if(window.ayuFooterFit) ayuFooterFit(); } },350);
+        });
       });
       b.querySelector('.appb-later').addEventListener('click',later);
       var ann=p.querySelector(':scope > .ayu-ann');   // after an announcement banner, if one is showing
@@ -16606,6 +16606,18 @@ html body #alerts-panel #rem-alarm-card .reminder-custom-select-trigger, html bo
 html body #alerts-panel #custom-reminders-card .custom-reminder-form input::placeholder{color:#6b7280;opacity:1}
 /* My Reminders: keep the lower lotus clear of the day buttons */
 #alerts-panel #custom-reminders-card > .sec-lotus-layer .sec-lotus:nth-child(2){top:auto !important;bottom:-40px !important}
+@media (max-width:899px){
+  #tour-text{max-height:calc(100dvh - 250px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;pointer-events:auto}
+}
+/* Checks: a line before and after Alarm */
+html body #chk-alarm.ayu-sub{border-top:1.5px solid color-mix(in srgb,var(--rout-2,#a75b12) 30%,transparent) !important;border-bottom:1.5px solid color-mix(in srgb,var(--rout-2,#a75b12) 30%,transparent) !important;padding:14px 0 !important;margin:16px 0 !important}
+/* Reminders → Alarm: plain field names; days and quick buttons closer */
+html body #rem-alarm-card .ayu-al-lbl, html body #rem-alarm-days .otd-title{font-weight:500 !important}
+html body #rem-alarm-days.otd-row{row-gap:4px !important}
+html body #rem-alarm-days .day-quick, html body #rem-alarm-days .day-chips{margin:0 !important}
+/* Daily / Weekdays / Weekends: smaller gaps so the words fit on phones */
+html body :is(#alerts-panel,#routines-panel) .day-quick{gap:4px !important}
+html body :is(#alerts-panel,#routines-panel) .day-quick button{padding:3px 8px !important;white-space:nowrap}
 </style>
 <script id="accent-on-load-20261104">
 /* The section colour (--footer-accent) is set when a tab is switched; set it at load too, so banners and buttons match the first tab. */
