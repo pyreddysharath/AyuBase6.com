@@ -4257,7 +4257,7 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
         <div class="wake-control-hdr">
           <strong id="wake-time-val">6:30 AM</strong>
         </div>
-        <input type="range" id="wake-time-slider" min="180" max="540" step="15" value="390" class="wake-slider">
+        <input type="range" id="wake-time-slider" min="0" max="1425" step="15" value="390" class="wake-slider">
         <div class="wake-range-ends"><span>3:00 AM</span><span>9:00 AM</span></div>
         <div class="wake-zone-label" id="wake-zone-label">🟢 Healthy — keep it regular</div>
       </div>
@@ -8495,9 +8495,9 @@ const RECIPES_DATA = [
     </div>
     <div class="footer-sub" id="sec-trouble" style="display:none">
     <div class="trb">
-      <details><summary>No notification when the app is closed</summary><p>Reminders while the app is closed need the installed app, allowed notifications and a registered phone. Open <b>Help → Notifications</b> and fix any step marked ✕. Then close the app completely and test again.</p></details>
+      <details><summary>No notification when the app is closed</summary><p>Reminders while the app is closed need the installed app, allowed notifications and a registered phone. Tap <b>Test my notifications</b> above and fix any step marked ✕. Then close the app completely and test again.</p></details>
       <details><summary>Notifications only come while the app is open</summary><p>The app is probably open in a browser tab, or this phone is not registered yet. Open the app from its home-screen icon, turn the reminder switch on, and run the check.</p></details>
-      <details><summary>Repeating reminders stop when the app is closed</summary><p>Reminders that repeat (every so many minutes) reach a closed app only on the installed app with notifications allowed and this phone registered. Open <b>Help → Notifications</b> and fix any step marked ✕. In a browser tab they ring only while that tab is open.</p></details>
+      <details><summary>Repeating reminders stop when the app is closed</summary><p>Reminders that repeat (every so many minutes) reach a closed app only on the installed app with notifications allowed and this phone registered. Tap <b>Test my notifications</b> above and fix any step marked ✕. In a browser tab they ring only while that tab is open.</p></details>
       <details><summary>No sound</summary><p>Turn the phone's media or notification volume up and check that the reminder's sound is not muted in its section. In your phone's Settings → Apps → AyuBase6 (or Chrome) → Notifications, make sure sound is on and the channel is not set to silent.</p></details>
       <details><summary>Notifications are blocked</summary><p>A page cannot unblock itself. Allow notifications in the browser (Chrome menu → Settings → Site settings → Notifications) or long-press the app icon → App info → Notifications, then tap Test again.</p></details>
       <details><summary>iPhone</summary><p>Add the app to the Home Screen first (Share → Add to Home Screen) and open it from that icon. Notifications are not available in a normal Safari tab.</p></details>
@@ -14018,7 +14018,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     {id:'body',label:'Body',keys:['ayuBase6-body-choices']},
     {id:'food',label:'Food',keys:['ayuBase6-food-choices']},
     {id:'checks',label:'Checks',keys:['ayuBase6WakeUpTime','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-muted','ayuBase6-routine-days','ayuBase6-routine-alarm']},
-    {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders']},
+    {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-rem-alarm']},
     {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1']}
   ];
   var FP_KEY='ayu-backup-fingerprints', MAX_BYTES=2*1024*1024;
@@ -14241,11 +14241,12 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('nutrition','#sec-diet',0,C.food,'<b>Dietary Preference</b>: vegetarian, non-vegetarian or vegan. Your plan then appears below: Nutrients &amp; Food, Cart This Week and Recipes For You.');
   // Checks
   tab('routines','.tab-btn.routines',C.checks,'Your day, from morning to night.');
-  sec('routines','#routines-panel .rout-page > .rout-card',0,C.checks,'<b>Wake-up time</b>: slide to your wake-up time. Every check below is timed from it.');
-  sec('routines','#routines-notify-card',0,C.checks,'<b>Notify Me</b>: turn on reminders for your checks.');
-  sec('routines','#routines-panel .rout-page > .rout-card',2,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.');
-  sec('routines','#routines-panel .rout-page > .rout-card',3,C.checks,'<b>Afternoon</b>: the same ticks and info for the middle of the day.');
-  sec('routines','#routines-panel .rout-page > .rout-card',4,C.checks,'<b>Evening &amp; Night</b>: checks to wind down. Ticks start fresh each day.');
+  sec('routines','#routines-panel .rout-page > .rout-card',0,C.checks,'<b>Start My Day</b>: set when your day starts, any time in 24 hours: slide, use − / +, or tap the time for a clock. Every check below is timed from it. Outside 4–10 AM it becomes a shift schedule, with meals, light and sleep adjusted.');
+  sec('routines','#chk-alarm',0,C.checks,'<b>Alarm</b>: switch it on to wake up at your start time, with your choice of ringtone, ring length and snooze. Tap the i for details.');
+  sec('routines','#routines-notify-card',0,C.checks,'<b>Notify Me</b>: turn on notifications for your checks. Its settings open when it is on.');
+  sec('routines','#routines-panel .rout-page > .rout-card',1,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.');
+  sec('routines','#routines-panel .rout-page > .rout-card',2,C.checks,'<b>Afternoon</b>: the same ticks and info for the middle of the day.');
+  sec('routines','#routines-panel .rout-page > .rout-card',3,C.checks,'<b>Evening &amp; Night</b>: checks to wind down. Ticks start fresh each day.');
   // Reminders
   tab('alerts','.tab-btn.alerts',C.rem,'Gentle nudges through the day.');
   sec('alerts','#reminder-hours-card',0,C.rem,'<b>Reminder hours</b>: nudges only arrive between the hours you set.');
@@ -14253,6 +14254,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('alerts','#alert-card-walk',0,C.rem,'<b>Walk</b>: a reminder to get up and move.');
   sec('alerts','#alert-card-drink',0,C.rem,'<b>Water</b>: a reminder to drink water.');
   sec('alerts','#alert-card-break-ex',0,C.rem,'<b>Eyes (Exercise)</b>: scheduled eye exercises, with sessions per day and days per week.');
+  sec('alerts','#rem-alarm-card',0,C.rem,'<b>Alarm</b>: an alarm at any time you choose on a clock, on the days you pick. Switch it on to set it up.');
   sec('alerts','#custom-reminders-card',0,C.rem,'<b>My Reminders</b>: add your own reminders with the + button.');
   // Mind
   tab('mind','.tab-btn.mind',C.mind,'Short thoughts for a calmer day.');
@@ -14266,7 +14268,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (a PDF or a photo) or type values in, to see what is in or out of range. <b>Enable offline reading</b> reads photos and scanned reports without internet.');
   sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
   // Footer
-  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. A dot in the icon colour means one of them is on</span></li><li><span class="tf-ic has-dot-c"><svg class="ann-ic" viewBox="0 0 24 24" fill="currentColor"><g transform="translate(.35 -.9)"><path d="M2 10a2 2 0 012-2h3.5L17 3v18l-9.5-4.5H4a2 2 0 01-2-2v-4zM8.2 18.2h3.3l1 3.3a1 1 0 01-1 1.3H10a1 1 0 01-1-.8l-.8-3.8z"/><path d="M20 8.6a5 5 0 010 6.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g></svg></span><span><b>Announcements</b>: news and important notes from us. A dot means something new</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: check that notifications work, troubleshooting tips, feedback, and Download app (the Android app or the web app). A dot means a problem</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy policy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
+  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. A dot in the icon colour means one of them is on</span></li><li><span class="tf-ic has-dot-c"><svg class="ann-ic" viewBox="0 0 24 24" fill="currentColor"><g transform="translate(.35 -.9)"><path d="M2 10a2 2 0 012-2h3.5L17 3v18l-9.5-4.5H4a2 2 0 01-2-2v-4zM8.2 18.2h3.3l1 3.3a1 1 0 01-1 1.3H10a1 1 0 01-1-.8l-.8-3.8z"/><path d="M20 8.6a5 5 0 010 6.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g></svg></span><span><b>Announcements</b>: news and important notes from us. A dot means something new</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: Download app (the Android app or the web app), Troubleshooting (check that notifications work, then common problems) and Feedback. A dot means a problem</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy policy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
 
   var root=document.getElementById('tour-root'), spot=document.getElementById('tour-spot'), txt=document.getElementById('tour-text'), bar=document.getElementById('tour-bar');
   var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0;
@@ -15696,11 +15698,11 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   function render(){ var s=$('sec-app'); if(s) s.innerHTML=helpHtml(); }
   function addHelpTab(){
     var sec=$('sec-help'); if(!sec || $('sec-app')) return;
-    try{ if(typeof FOOTER_SUBS!=='undefined' && FOOTER_SUBS.help.indexOf('app')<0) FOOTER_SUBS.help.push('app'); }catch(e){}
+    try{ if(typeof FOOTER_SUBS!=='undefined' && FOOTER_SUBS.help.indexOf('app')<0) FOOTER_SUBS.help.unshift('app'); }catch(e){}
     try{ if(typeof FOOTER_ALIAS!=='undefined'){ FOOTER_ALIAS.app=['help','app']; FOOTER_ALIAS.download=['help','app']; } }catch(e){}
     var tabs=sec.querySelector('.footer-subtabs');
     if(tabs){ var b=document.createElement('button'); b.type='button'; b.className='footer-subtab'; b.id='subtab-app'; b.setAttribute('role','tab');
-      b.setAttribute('onclick',"showFooterSub('help','app')"); b.innerHTML='Download app<i class="fs-dot"></i>'; tabs.appendChild(b); }
+      b.setAttribute('onclick',"showFooterSub('help','app')"); b.innerHTML='Download app<i class="fs-dot"></i>'; tabs.insertBefore(b,tabs.firstChild); }
     var d=document.createElement('div'); d.className='footer-sub'; d.id='sec-app'; d.style.display='none'; d.innerHTML=helpHtml();
     var last=sec.querySelectorAll('.footer-sub'); (last.length?last[last.length-1]:tabs).after(d);
   }
@@ -16063,50 +16065,287 @@ html body #sec-help .footer-subtabs:has(#subtab-app) .footer-subtab{flex:1 1 aut
 </script>
 <style id="checks-alarm-20261104">
 /* Installing lives in Help → Download app: no Install buttons in Reminders and Checks. */
-html body #install-row, html body #routines-install-row, html body #install-app-btn, html body #routines-install-app-btn{display:none !important}
+html body #install-row#install-row#install-row, html body #routines-install-row#routines-install-row#routines-install-row,
+html body #install-app-btn#install-app-btn#install-app-btn, html body #routines-install-app-btn#routines-install-app-btn#routines-install-app-btn{display:none !important}
 html body #routines-notify-card .rout-card-foot:not(:has(> :not(.routines-install-row))){display:none !important}
-/* Checks → Alarm */
-#chk-alarm{margin:12px 0 0;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--rout-2,#a75b12) 8%,transparent);border:1px solid color-mix(in srgb,var(--rout-2,#a75b12) 30%,transparent)}
-#chk-alarm .al-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-#chk-alarm .al-title{font-weight:800;color:var(--rout-2,#a75b12)}
-#chk-alarm .al-sw{display:flex;align-items:center;gap:8px;font-size:.86rem;cursor:pointer}
-#chk-alarm .al-sw input{width:18px;height:18px;margin:0;accent-color:var(--rout-2,#a75b12)}
-#chk-alarm .al-body{margin-top:8px;display:grid;gap:8px}
-#chk-alarm .al-body[hidden]{display:none}
-#chk-alarm .al-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-#chk-alarm .al-lbl{flex:0 0 112px;font-size:.84rem;font-weight:700}
-#chk-alarm select{flex:1 1 140px;min-width:0;max-width:100%;padding:7px 8px;border-radius:9px;border:1.5px solid color-mix(in srgb,var(--rout-2,#a75b12) 45%,#fff);background:#fff;font:inherit;font-size:.86rem;color:inherit}
-#chk-alarm .al-pair{flex:1 1 200px;min-width:0;display:flex;gap:6px}
-#chk-alarm .al-pair select{flex:1 1 0;min-width:0}
-#chk-alarm .al-play{flex:0 0 auto;width:38px;height:36px;border:0;border-radius:10px;background:var(--rout-2,#a75b12);color:#fff;font-size:.95rem;cursor:pointer}
-#chk-alarm .al-note{font-size:.76rem;opacity:.75;margin:2px 0 0}
-#chk-alarm .al-msg{font-size:.78rem;font-weight:600;margin:0}
-@media (max-width:380px){ #chk-alarm .al-lbl{flex-basis:100%} }
+
+/* ── Checks: "Start My Day" holds the 24-hour start time, Alarm and Notify Me ── */
+html body #wake-time-slider.wake-slider{background:linear-gradient(to right,
+  #818cf8 0%, #818cf8 16.67%, #ef4444 16.67%, #ef4444 18.75%, #f59e0b 18.75%, #f59e0b 22.92%,
+  #22c55e 22.92%, #22c55e 31.25%, #f59e0b 31.25%, #f59e0b 37.5%, #ef4444 37.5%, #ef4444 41.67%,
+  #818cf8 41.67%, #818cf8 100%) !important}
+.wake-control-hdr{display:flex;align-items:center;justify-content:center;gap:14px}
+.ayu-step{width:36px;height:36px;border-radius:50%;border:2px solid var(--rout-2,#a75b12);background:#fff;color:var(--rout-2,#a75b12);font:700 1.2rem/1 inherit;cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.ayu-step:active{transform:scale(.95)}
+.ayu-time-btn{border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;padding:2px 8px;border-radius:10px}
+.ayu-time-btn:hover{background:color-mix(in srgb,var(--rout-2,#a75b12) 10%,transparent)}
+.ayu-sub{margin:14px 0 0;padding:12px 0 0;border-top:1.5px solid color-mix(in srgb,var(--rout-2,#a75b12) 25%,transparent)}
+.ayu-sub-hdr{display:flex;align-items:center;gap:8px}
+.ayu-sub-hdr h3{margin:0;font-size:1rem;font-weight:800;color:var(--rout-2,#a75b12);display:flex;align-items:center;gap:6px}
+.ayu-sub-hdr .master-switch{margin-left:auto}
+/* Notify Me as a part of Start My Day */
+html body #routines-notify-card.ayu-in-day{background:transparent !important;border:0 !important;box-shadow:none !important;padding:12px 0 0 !important;margin:14px 0 0 !important;
+  border-top:1.5px solid color-mix(in srgb,var(--rout-2,#a75b12) 25%,transparent) !important;border-radius:0 !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+html body #routines-notify-card.ayu-in-day::before, html body #routines-notify-card.ayu-in-day::after{display:none !important}
+html body #routines-notify-card.ayu-in-day > .sec-lotus-layer{display:none !important}
+html body #routines-notify-card.ayu-in-day .rout-card-hdr h2{font-size:1rem !important}
+html body #routines-notify-card.ayu-in-day .rout-card-hdr{background:none !important;border-bottom:0 !important;padding-bottom:0 !important;margin-bottom:6px !important}
+html body #routines-notify-card.ayu-in-day .rout-card-hdr::after{display:none !important}
+html body #routines-notify-card.ayu-off > :not(.rout-card-hdr):not(.rout-info-panel){display:none !important}
+
+/* ── Alarm settings (Checks and Reminders) ── */
+.ayu-al-body{margin-top:10px;display:grid;gap:8px}
+.ayu-al-body[hidden]{display:none}
+.ayu-al-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ayu-al-lbl{flex:0 0 112px;font-size:.84rem;font-weight:700}
+.ayu-al-row select{flex:1 1 140px;min-width:0;max-width:100%;padding:7px 8px;border-radius:9px;border:1.5px solid color-mix(in srgb,var(--al-c) 45%,#fff);background:#fff;font:inherit;font-size:.86rem;color:inherit}
+.ayu-al-play{flex:0 0 auto;width:38px;height:36px;border:0;border-radius:10px;background:var(--al-c);color:#fff;font-size:.95rem;cursor:pointer}
+.ayu-al-msg{font-size:.78rem;font-weight:600;margin:0}
+.ayu-al-time{flex:1 1 140px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-radius:10px;border:1.5px solid color-mix(in srgb,var(--al-c) 45%,#fff);background:#fff;font:inherit;font-size:1.05rem;font-weight:800;cursor:pointer;color:inherit}
+.ayu-al-time span{font-size:.76rem;font-weight:600;opacity:.65}
+.ayu-al-info{font-size:.8rem;line-height:1.5}
+.ayu-al-info ul{margin:4px 0 6px 18px;padding:0}
+.ayu-al-info[hidden]{display:none}
+@media (max-width:380px){ .ayu-al-lbl{flex-basis:100%} }
+#chk-alarm{--al-c:var(--rout-2,#a75b12)}
+#rem-alarm-card{--al-c:#0f766e}
+html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-color:#2dd4bf !important}
+#rem-alarm-card .alert-card-hdr{display:flex;align-items:center;gap:8px}
+#rem-alarm-card .alert-card-hdr{justify-content:flex-start !important}
+#rem-alarm-card .alert-card-hdr h2{margin:0;flex:0 1 auto !important}
+#rem-alarm-card .alert-card-hdr .master-switch{margin-left:auto}
+#rem-alarm-card .ayu-al-row .reminder-custom-select-wrap{flex:1 1 140px !important;width:auto !important;min-width:0 !important}
+#rem-alarm-card .ayu-al-row .reminder-custom-select-wrap select{width:100% !important;max-width:none !important}
+#rem-alarm-card .master-switch input:checked{background:#0f766e}
+#rem-alarm-days{margin-top:2px}
+
+/* ── Clock-face time picker ── */
+#ayu-clock{position:fixed;inset:0;z-index:2147482996;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.45)}
+#ayu-clock .ck-card{width:100%;max-width:330px;background:#fff;color:#2d2b23;border-radius:20px;box-shadow:0 14px 40px rgba(0,0,0,.3);padding:16px;text-align:center}
+#ayu-clock .ck-top{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
+#ayu-clock .ck-hm{font:800 2.2rem/1 inherit;letter-spacing:.5px}
+#ayu-clock .ck-hm button{border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;padding:2px 4px;border-radius:8px;opacity:.55}
+#ayu-clock .ck-hm button.on{opacity:1;background:color-mix(in srgb,var(--ck-c) 12%,transparent);color:var(--ck-c)}
+#ayu-clock .ck-ap{display:flex;flex-direction:column;gap:4px}
+#ayu-clock .ck-ap button{border:1.5px solid var(--ck-c);background:#fff;color:var(--ck-c);border-radius:8px;padding:3px 8px;font:700 .8rem inherit;cursor:pointer}
+#ayu-clock .ck-ap button.on{background:var(--ck-c);color:#fff}
+#ayu-clock .ck-face{position:relative;width:240px;height:240px;margin:0 auto;border-radius:50%;background:color-mix(in srgb,var(--ck-c) 9%,#fff)}
+#ayu-clock .ck-face button{position:absolute;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;border:0;background:transparent;font:700 .95rem inherit;color:inherit;cursor:pointer}
+#ayu-clock .ck-face button.on{background:var(--ck-c);color:#fff}
+#ayu-clock .ck-hand{position:absolute;left:50%;top:50%;height:2px;background:var(--ck-c);transform-origin:0 50%;pointer-events:none}
+#ayu-clock .ck-dot{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--ck-c)}
+#ayu-clock .ck-btns{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+#ayu-clock .ck-btns button{border:0;border-radius:10px;padding:9px 18px;font:inherit;font-weight:700;cursor:pointer}
+#ayu-clock .ck-ok{background:var(--ck-c);color:#fff}
+#ayu-clock .ck-cancel{background:transparent;color:var(--ck-c)}
+
+/* ── Ringing alarm (website) ── */
 #ayu-alarm{position:fixed;inset:0;z-index:2147482995;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.45)}
-#ayu-alarm .aal-card{max-width:420px;width:100%;background:#fff;color:#2d2b23;border-radius:18px;box-shadow:0 14px 40px rgba(0,0,0,.3);padding:18px;text-align:center;border-top:6px solid var(--rout-2,#a75b12)}
-#ayu-alarm .aal-t{display:block;font-weight:800;font-size:1.15rem;color:var(--rout-2,#a75b12);margin:4px 0}
+#ayu-alarm .aal-card{max-width:420px;width:100%;background:#fff;color:#2d2b23;border-radius:18px;box-shadow:0 14px 40px rgba(0,0,0,.3);padding:18px;text-align:center;border-top:6px solid var(--al-c,#a75b12)}
+#ayu-alarm .aal-t{display:block;font-weight:800;font-size:1.15rem;color:var(--al-c,#a75b12);margin:4px 0}
 #ayu-alarm .aal-b{font-size:.92rem;margin:0 0 14px}
 #ayu-alarm .aal-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 #ayu-alarm button{flex:1 1 30%;min-width:96px;border:0;border-radius:11px;padding:11px 12px;font:inherit;font-weight:700;cursor:pointer}
-#ayu-alarm .aal-snz{background:var(--rout-2,#a75b12);color:#fff}
-#ayu-alarm .aal-done{background:#fff;color:var(--rout-2,#a75b12);border:2px solid var(--rout-2,#a75b12) !important}
+#ayu-alarm .aal-snz{background:var(--al-c,#a75b12);color:#fff}
 #ayu-alarm .aal-stop{background:#f1efe9;color:#2d2b23}
+
+/* Shift-schedule notes in the i panels */
+.ayu-shift-note{margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(129,140,248,.12);font-size:.8rem;line-height:1.5}
+.ayu-shift-note[hidden]{display:none}
+/* Help: notification check as the first part of Troubleshooting */
+.hlp-h{margin:4px 0 8px;font-size:.95rem;font-weight:800;color:var(--footer-accent,#0d9488)}
+.hlp-h.second{margin-top:18px}
 </style>
 <script id="checks-alarm-20261104-js">
-/* Checks → Alarm: an activity's start can ring like an alarm.
-   Ringtone: AyuBase6 tones, the phone's default alarm (Android app) or your own sound, with a preview.
-   Ring until stopped or for some minutes; Snooze every N minutes, up to N times; in the app the volume buttons Snooze or Stop.
-   Website: rings while AyuBase6 is open. Android app: the phone rings it, even when the app is closed (see android-bridge.js). */
+/* Checks → "Start My Day": a 24-hour start time (bar, − / +, or the clock face), Alarm and Notify Me in one section.
+   The checks follow the start time; outside 4–10 AM they switch to a shift schedule (neutral names, light, meals, sleep).
+   Two alarms: Checks → Alarm (always at the start time, on the Checks days) and Reminders → Alarm (its own time and days).
+   Website: alarms ring while AyuBase6 is open. Android app: the phone rings them, even when the app is closed (android-bridge.js). */
 (function(){
-  var KEY='ayuBase6-routine-alarm', TONES_CACHE='ayubase6-tones', OWN_URL='ayubase6-own-tone';
   var APP=!!window.AYU_ANDROID;
   var N=function(){ return window.ayuNative && window.ayuNative.native ? window.ayuNative : null; };
   function $(id){ return document.getElementById(id); }
-  function get(){ var d={on:false,tone:'rise',ring:2,snoozeMin:5,snoozeMax:3,keys:'snooze',ownName:''}; try{ var o=JSON.parse(localStorage.getItem(KEY)||'{}'); for(var k in d) if(o[k]!==undefined) d[k]=o[k]; }catch(e){} return d; }
-  function put(c){ try{ localStorage.setItem(KEY,JSON.stringify(c)); }catch(e){} try{ document.dispatchEvent(new CustomEvent('ayu-alarm-changed')); }catch(e){} }
-  window.ayuAlarmConfig=get;
+  function clock(m){ m=((m%1440)+1440)%1440; var h=Math.floor(m/60), mm=m%60; return (h%12||12)+':'+(mm<10?'0':'')+mm+' '+(h>=12?'PM':'AM'); }
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
-  // Two alarm tones next to the Reminders tones
+  // ───────── the start of the day: 24 hours ─────────
+  function slider(){ return $('wake-time-slider'); }
+  function wake(){ var el=slider(); var v=el?Number(el.value):Number(localStorage.getItem('ayuBase6WakeUpTime')); return (v>=0 && v<1440) ? v : 390; }
+  function setWake(v){
+    var el=slider(); if(!el) return;
+    var step=+el.step||15; v=((Math.round(v/step)*step)%1440+1440)%1440;
+    el.value=String(v); el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true}));
+  }
+  function mode(w){ w=w==null?wake():w; return (w>=240 && w<600) ? 'morning' : (w>=600 && w<960 ? 'day' : 'night'); }
+  window.ayuDayMode=mode;
+
+  // Activities for the hour window. Morning keeps the original wording; other wake-up times get a shift schedule.
+  var ORIG={}, ORIG_ITEMS={}, ORIG_H2={};
+  var SHIFT={
+    sun:{label:function(start){ return daylight(start) ? 'Get daylight outdoors (15–20 min)' : 'Bright light (15–20 min)'; },
+         title:function(start){ return daylight(start) ? 'Get Daylight' : 'Bright Light'; },
+         body:function(start){ return daylight(start) ? 'Get 15–20 minutes of daylight outdoors.' : 'Sit in bright light for 15–20 minutes to start your day.'; }},
+    breakfast:{label:'First meal', title:'First Meal', body:'It’s time for your first meal.'},
+    lunch:{label:'Main meal', title:'Main Meal', body:'It’s time for your main meal.'},
+    snacks:{label:'Snack', title:'Snack', body:'It’s time for a light snack.'},
+    dinner:{label:'Light meal', title:'Light Meal', body:'It’s time for a light meal.'},
+    nomobile:{label:'Screens off, dim the lights', title:'Wind Down', body:'Put screens away and dim the lights before sleep.'},
+    sleep:{label:'Sleep (dark, quiet, cool room)', title:'Sleep', body:'Time to sleep. A dark, quiet, cool room helps.'}
+  };
+  function daylight(m){ m=((m%1440)+1440)%1440; return m>=420 && m<1080; }   // roughly 7 AM – 6 PM
+  function smallHours(m){ m=((m%1440)+1440)%1440; return m<360; }            // midnight – 6 AM
+  var MEALS={breakfast:1,lunch:1,snacks:1,dinner:1,fruits:1};
+  var NOTES={
+    wake:'<strong>Shift schedule</strong><ul><li>A start time outside 4–10 AM counts as a shift schedule. Every check still follows it.</li><li>Keep the same start time on work days, and aim for 7–9 hours of sleep in every 24 hours (one block, or a main sleep plus a nap).</li><li>Meals are named by order. Between midnight and 6 AM, keep them small and light.</li></ul><div style="font-size:.74rem;opacity:.75">Sources: Sleep Health Foundation, Healthy sleep practices for shift workers; NIOSH, Training for nurses on shift work and long work hours.</div>',
+    sun:'<b>On a shift schedule:</b> in daytime, get daylight soon after waking. At night, bright indoor light at the start of your day helps you stay alert. After a night shift, sunglasses on the way home make it easier to fall asleep.',
+    meal:'<b>On a shift schedule:</b> between midnight and 6 AM, choose small, light meals; avoid heavy, fatty, spicy or sugary food. Avoid a large meal 1–2 hours before sleep, but don’t go to bed hungry: a small meal before day sleep stops hunger waking you.',
+    nomobile:'<b>On a shift schedule:</b> dim lights and screens before sleep, even in daytime, and stop caffeine about 6 hours before you sleep.',
+    sleep:'<b>Daytime sleep:</b> keep the room dark (blackout curtains or an eye mask), quiet (earplugs) and cool (16–20 °C). A 15–20 minute nap before a shift helps alertness; avoid long naps in the 4–6 hours before your main sleep.'
+  };
+  function rowLabelNode(key){
+    var cb=document.querySelector('.rout-cb[data-key="'+key+'"]'); if(!cb) return null;
+    var sp=cb.parentNode.querySelector('span'); if(!sp) return null;
+    for(var n=sp.firstChild;n;n=n.nextSibling){ if(n.nodeType===3 && n.textContent.trim()) return n; }
+    return null;
+  }
+  function itemStart(key){ try{ return wake()+WAKE_OFFSETS[key][0]; }catch(e){ return null; } }
+  function note(panelId,html){
+    var p=$(panelId); if(!p) return null;
+    var n=p.querySelector('.ayu-shift-note');
+    if(!n){ n=document.createElement('div'); n.className='ayu-shift-note'; p.appendChild(n); }
+    if(n.innerHTML!==html) n.innerHTML=html;
+    return n;
+  }
+  var H2={ '☀️ Morning':'🌅 After waking', '🌤️ Afternoon':'☀️ Middle of the day', '🌙 Evening & Night':'🌙 Before sleep' };
+  function applyMode(){
+    var w=wake(), md=mode(w), shift=md!=='morning';
+    // section titles
+    document.querySelectorAll('#routines-panel .rout-card h2').forEach(function(h){
+      var txt=h.textContent.trim();
+      if(ORIG_H2[txt]===undefined && H2[txt]) ORIG_H2[txt]=txt;
+      var base=h.dataset.ayuOrig || (H2[txt] ? txt : null); if(!base) return;
+      h.dataset.ayuOrig=base;
+      var want=shift ? H2[base] : base; if(txt!==want) h.textContent=want;
+    });
+    // activity names and notification texts
+    Object.keys(SHIFT).concat(['fruits']).forEach(function(key){
+      var node=rowLabelNode(key), item=(typeof ROUTINE_NOTIFY_ITEMS!=='undefined')?ROUTINE_NOTIFY_ITEMS[key]:null;
+      if(node && ORIG[key]===undefined) ORIG[key]=node.textContent;
+      if(item && !ORIG_ITEMS[key]) ORIG_ITEMS[key]={title:item.title, body:item.body};
+      var start=itemStart(key), s=SHIFT[key], label, title, body;
+      if(shift && s){
+        label=typeof s.label==='function'?s.label(start):s.label;
+        title=typeof s.title==='function'?s.title(start):s.title;
+        body=typeof s.body==='function'?s.body(start):s.body;
+      } else {
+        label=ORIG[key]!==undefined?ORIG[key].trim():null; title=ORIG_ITEMS[key]&&ORIG_ITEMS[key].title; body=ORIG_ITEMS[key]&&ORIG_ITEMS[key].body;
+      }
+      if(shift && MEALS[key] && start!==null && smallHours(start)){ label=(label||'').replace(/\s*\(keep it light\)$/,'')+' (keep it light)'; body=(body||'')+' Keep it light at this hour.'; }
+      if(node && label!=null){ var want=label+' '; if(node.textContent!==want) node.textContent=want; }
+      if(item && title){ item.title=title; item.body=body; }
+    });
+    // notes in the i panels
+    [['rout-info-wake',NOTES.wake],['rout-info-sun',NOTES.sun],['rout-info-breakfast',NOTES.meal],['rout-info-lunch',NOTES.meal],['rout-info-snacks',NOTES.meal],
+     ['rout-info-dinner',NOTES.meal],['rout-info-nomobile',NOTES.nomobile],['rout-info-sleep',NOTES.sleep]].forEach(function(x){
+      var n=note(x[0],x[1]); if(n) n.hidden=!shift;
+    });
+    // zone label for 24 hours
+    var z=$('wake-zone-label');
+    if(z && shift){ z.textContent='🔵 Shift schedule — keep the same start time daily'; z.style.whiteSpace='normal'; z.style.color='#4f46e5'; }
+    else if(z && (w>=540 && w<600)){ z.textContent='🔴 Very late — try waking earlier'; z.style.color='#dc2626'; }
+    else if(z && w>=240 && w<270){ z.textContent='🔴 Very early — keep 7+ hours sleep'; z.style.color='#dc2626'; }
+    if(z && !shift) z.style.whiteSpace='';
+    var tb=$('ayu-wake-time'); if(tb) tb.textContent=clock(w);
+  }
+  window.ayuApplyDayMode=applyMode;
+
+  function setupDay(){
+    var sl=slider(); if(!sl) return false;
+    var card=sl.closest('.rout-card'); if(!card) return false;
+    if(!card.dataset.ayuDay){
+      card.dataset.ayuDay='1'; card.id=card.id||'start-my-day-card';
+      var h2=card.querySelector('.rout-card-hdr h2');
+      if(h2){ for(var n=h2.lastChild;n;n=n.previousSibling){ if(n.nodeType===3 && /Wake-up time/.test(n.textContent)){ n.textContent=' Start My Day'; break; } } }
+      // the time: tap for the clock face, − / + for 15 minutes
+      var hdr=card.querySelector('.wake-control-hdr'), val=$('wake-time-val');
+      if(hdr && val){
+        val.style.display='none';
+        var minus=document.createElement('button'); minus.type='button'; minus.className='ayu-step'; minus.textContent='−'; minus.setAttribute('aria-label','15 minutes earlier');
+        var plus=document.createElement('button'); plus.type='button'; plus.className='ayu-step'; plus.textContent='+'; plus.setAttribute('aria-label','15 minutes later');
+        var tb=document.createElement('button'); tb.type='button'; tb.className='ayu-time-btn'; tb.id='ayu-wake-time'; tb.setAttribute('aria-label','Choose the start time on a clock');
+        tb.style.font=getComputedStyle(val).font; tb.style.color=getComputedStyle(val).color;
+        hdr.appendChild(minus); hdr.appendChild(tb); hdr.appendChild(plus);
+        minus.addEventListener('click',function(){ setWake(wake()-(+sl.step||15)); });
+        plus.addEventListener('click',function(){ setWake(wake()+(+sl.step||15)); });
+        tb.addEventListener('click',function(){ pickTime(wake(), +sl.step||15, 'var(--rout-2,#a75b12)', function(v){ setWake(v); }); });
+      }
+      var ends=card.querySelector('.wake-range-ends'); if(ends) ends.innerHTML='<span>12:00 AM</span><span>12 PM</span><span>11:45 PM</span>';
+      sl.addEventListener('input',applyMode); sl.addEventListener('change',applyMode);
+    }
+    // Alarm, then Notify Me, inside the same section
+    var ctl=card.querySelector('.wake-control');
+    if(!$('chk-alarm') && ctl){ var a=buildAlarm('wake'); ctl.after(a); }
+    var nc=$('routines-notify-card');
+    if(nc && nc.parentNode!==card){ ($('chk-alarm')||ctl).after(nc); nc.classList.add('ayu-in-day'); }
+    applyMode();
+    return true;
+  }
+
+  // Notify Me: collapsed while its switch is off
+  function syncNotify(){
+    var nc=$('routines-notify-card'), t=$('routines-master-toggle'); if(!nc) return;
+    var on=!!(t ? t.checked : (typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()));
+    nc.classList.toggle('ayu-off',!on);
+  }
+
+  // ───────── clock face ─────────
+  function pickTime(minutes, step, colour, done){
+    var old=$('ayu-clock'); if(old) old.remove();
+    var h24=Math.floor(minutes/60)%24, mm=minutes%60, stage='h';
+    var d=document.createElement('div'); d.id='ayu-clock'; d.setAttribute('role','dialog'); d.setAttribute('aria-modal','true'); d.setAttribute('aria-label','Choose a time');
+    d.innerHTML='<div class="ck-card" style="--ck-c:'+colour+'"><div class="ck-top"><div class="ck-hm"><button type="button" class="ck-h"></button>:<button type="button" class="ck-m"></button></div>'
+      +'<div class="ck-ap"><button type="button" data-ap="am">AM</button><button type="button" data-ap="pm">PM</button></div></div>'
+      +'<div class="ck-face"><div class="ck-hand"></div><div class="ck-dot"></div></div>'
+      +'<div class="ck-btns"><button type="button" class="ck-cancel">Cancel</button><button type="button" class="ck-ok">OK</button></div></div>';
+    document.body.appendChild(d);
+    var face=d.querySelector('.ck-face'), hand=d.querySelector('.ck-hand');
+    function draw(){
+      var h12=h24%12||12;
+      d.querySelector('.ck-h').textContent=h12; d.querySelector('.ck-m').textContent=(mm<10?'0':'')+mm;
+      d.querySelector('.ck-h').classList.toggle('on',stage==='h'); d.querySelector('.ck-m').classList.toggle('on',stage==='m');
+      d.querySelectorAll('.ck-ap button').forEach(function(b){ b.classList.toggle('on',(b.dataset.ap==='pm')===(h24>=12)); });
+      face.querySelectorAll('.ck-n').forEach(function(b){ b.remove(); });
+      var vals=[], sel;
+      if(stage==='h'){ for(var i=1;i<=12;i++) vals.push(i); sel=h12; }
+      else { var st=Math.max(5,step); if(step>=15) st=15; for(var j=0;j<60;j+=st) vals.push(j); sel=mm; }
+      vals.forEach(function(v){
+        var b=document.createElement('button'); b.type='button'; b.className='ck-n'+(v===sel?' on':'');
+        b.textContent=stage==='h'?v:(v<10?'0':'')+v;
+        var frac=stage==='h'? (v%12)/12 : v/60, a=frac*2*Math.PI-Math.PI/2, r=42;
+        b.style.left=(50+Math.cos(a)*r)+'%'; b.style.top=(50+Math.sin(a)*r)+'%';
+        b.setAttribute('aria-label', stage==='h' ? v+' o’clock' : v+' minutes');
+        b.addEventListener('click',function(){
+          if(stage==='h'){ h24=(v%12)+(h24>=12?12:0); stage='m'; } else { mm=v; }
+          draw();
+        });
+        face.appendChild(b);
+      });
+      var frac=stage==='h'? (h24%12)/12 : mm/60, ang=frac*360-90;
+      hand.style.width='42%'; hand.style.transform='rotate('+ang+'deg)';
+    }
+    d.querySelector('.ck-h').addEventListener('click',function(){ stage='h'; draw(); });
+    d.querySelector('.ck-m').addEventListener('click',function(){ stage='m'; draw(); });
+    d.querySelectorAll('.ck-ap button').forEach(function(b){ b.addEventListener('click',function(){ var pm=b.dataset.ap==='pm'; if(pm && h24<12) h24+=12; if(!pm && h24>=12) h24-=12; draw(); }); });
+    var close=function(){ d.remove(); };
+    d.querySelector('.ck-cancel').addEventListener('click',close);
+    d.addEventListener('click',function(e){ if(e.target===d) close(); });
+    d.querySelector('.ck-ok').addEventListener('click',function(){ close(); done(h24*60+mm); });
+    draw();
+  }
+  window.ayuPickTime=pickTime;
+
+  // ───────── alarms ─────────
+  var TONES_CACHE='ayubase6-tones', OWN_URL='ayubase6-own-tone', K_OWN='ayuAlarmOwnName';
   try{
     if(typeof ALERT_SOUNDS!=='undefined'){
       ALERT_SOUNDS.rise=ALERT_SOUNDS.rise||{wave:'sine',notes:[{f:523,d:.2},{f:659,d:.2},{f:784,d:.2},{f:1046,d:.4}]};
@@ -16114,156 +16353,257 @@ html body #routines-notify-card .rout-card-foot:not(:has(> :not(.routines-instal
     }
   }catch(e){}
   var APP_TONES=[['rise','Rising chime'],['alarm','Classic alarm'],['bell','Soft Bell'],['chime','Chime'],['marimba','Marimba Pop'],['xylophone','Xylophone'],['ping','Ping'],['bubble','Bubble'],['drop','Water drop'],['drum','Drum']];
-  function patternMs(id){ try{ var p=ALERT_SOUNDS[id]; return p.notes.reduce(function(a,n){ return a+(n.d+0.03)*1000; },0); }catch(e){ return 800; } }
-
-  // ── sound playback (website; in the app the phone plays it) ──
-  var loopTimer=null, ownAudio=null, previewing=false;
-  async function ownBlobUrl(){
-    try{ var c=await caches.open(TONES_CACHE); var r=await c.match(OWN_URL); if(!r) return null; return URL.createObjectURL(await r.blob()); }catch(e){ return null; }
+  var DEF={on:false,tone:'rise',ring:2,snoozeMin:5,snoozeMax:3,keys:'snooze'};
+  var A={
+    wake:{ store:'ayuBase6-routine-alarm', colour:'var(--rout-2,#a75b12)', section:'routines',
+           time:function(){ return wake(); }, days:function(){ try{ return window.ayuDays ? window.ayuDays.get('chk') : null; }catch(e){ return null; } },
+           title:function(){ return 'Alarm · '+clock(wake()); }, body:function(){ return mode()==='morning' ? 'Good morning! Time to start your day.' : 'Time to start your day.'; } },
+    rem:{ store:'ayuBase6-rem-alarm', colour:'#0f766e', section:'alerts',
+          time:function(){ var c=get('rem'); return (c.at>=0 && c.at<1440) ? c.at : 420; }, days:function(){ return get('rem').days; },
+          title:function(){ return 'Alarm · '+clock(A.rem.time()); }, body:function(){ return 'Your alarm.'; } }
+  };
+  function get(id){
+    var d={}; for(var k in DEF) d[k]=DEF[k];
+    if(id==='rem'){ d.at=420; d.days=[0,1,2,3,4,5,6]; }
+    try{ var o=JSON.parse(localStorage.getItem(A[id].store)||'{}'); for(var k2 in o) if(o[k2]!==undefined && k2!=='time') d[k2]=o[k2]; }catch(e){}
+    if(!Array.isArray(d.days)||!d.days.length) delete d.days;
+    if(id==='rem' && !d.days) d.days=[0,1,2,3,4,5,6];
+    return d;
   }
-  async function startSound(tone, loop){
+  function put(id,c){ try{ localStorage.setItem(A[id].store,JSON.stringify(c)); }catch(e){} changed(); }
+  function changed(){ try{ document.dispatchEvent(new CustomEvent('ayu-alarm-changed')); }catch(e){} }
+  function ownName(){ try{ return localStorage.getItem(K_OWN)||''; }catch(e){ return ''; } }
+  // for the Android app: every alarm that is on, with its time, days and texts
+  window.ayuAlarmList=function(){
+    return ['wake','rem'].map(function(id){
+      var c=get(id); if(!c.on) return null;
+      return { id:id, at:A[id].time(), days:A[id].days()||[0,1,2,3,4,5,6], title:A[id].title(), body:A[id].body(), section:A[id].section,
+               tone:c.tone, ring:+c.ring||0, snoozeMin:+c.snoozeMin||5, snoozeMax:+c.snoozeMax||0, keys:c.keys==='stop'?'stop':'snooze' };
+    }).filter(Boolean);
+  };
+  window.ayuAlarmConfig=function(){ return get('wake'); };
+  window.ayuAlarmText=function(){ return { at:wake(), title:A.wake.title(), body:A.wake.body() }; };
+
+  // sound (website; in the app the phone plays it)
+  var loopTimer=null, ownAudio=null, previewing=null;
+  function patternMs(t){ try{ return ALERT_SOUNDS[t].notes.reduce(function(a,n){ return a+(n.d+0.03)*1000; },0); }catch(e){ return 800; } }
+  async function ownBlobUrl(){ try{ var c=await caches.open(TONES_CACHE); var r=await c.match(OWN_URL); return r ? URL.createObjectURL(await r.blob()) : null; }catch(e){ return null; } }
+  async function startSound(tone,loop){
     stopSound();
-    if(tone==='own'){
-      var u=await ownBlobUrl();
-      if(u){ ownAudio=new Audio(u); ownAudio.loop=!!loop; try{ await ownAudio.play(); }catch(e){} return; }
-      tone='rise';
-    }
+    if(tone==='own'){ var u=await ownBlobUrl(); if(u){ ownAudio=new Audio(u); ownAudio.loop=!!loop; try{ await ownAudio.play(); }catch(e){} return; } tone='rise'; }
     if(tone==='phone') tone='rise';
     var once=function(){ try{ if(typeof playAlertPreset==='function') playAlertPreset(tone); }catch(e){} };
-    once();
-    if(loop){ var step=patternMs(tone)+700; loopTimer=setInterval(once,step); }
+    once(); if(loop) loopTimer=setInterval(once, patternMs(tone)+700);
   }
   function stopSound(){ if(loopTimer){ clearInterval(loopTimer); loopTimer=null; } if(ownAudio){ try{ ownAudio.pause(); URL.revokeObjectURL(ownAudio.src); }catch(e){} ownAudio=null; } }
 
-  // ── settings UI (inside Checks → Notify Me, under "On these days") ──
-  function toneOptions(c){
+  function opts(list,v){ return list.map(function(o){ return '<option value="'+o[0]+'"'+(String(o[0])===String(v)?' selected':'')+'>'+o[1]+'</option>'; }).join(''); }
+  function toneOptions(){
     var h='<optgroup label="AyuBase6 tones">'+APP_TONES.map(function(t){ return '<option value="'+t[0]+'">'+t[1]+'</option>'; }).join('')+'</optgroup>';
     if(APP) h+='<optgroup label="Phone"><option value="phone">Phone’s default alarm</option></optgroup>';
-    h+='<optgroup label="Your own">'+(c.ownName?'<option value="own">'+String(c.ownName).replace(/[<>&"]/g,'')+'</option>':'')+'<option value="upload">Upload a sound…</option></optgroup>';
+    var nm=ownName();
+    h+='<optgroup label="Your own">'+(nm?'<option value="own">'+esc(nm)+'</option>':'')+'<option value="upload">Upload a sound…</option></optgroup>';
     return h;
   }
-  function opts(list,v){ return list.map(function(o){ return '<option value="'+o[0]+'"'+(String(o[0])===String(v)?' selected':'')+'>'+o[1]+'</option>'; }).join(''); }
-  function build(){
-    var panel=$('routines-remind-panel'); if(!panel || $('chk-alarm')) return;
-    var c=get();
-    var d=document.createElement('div'); d.id='chk-alarm';
-    d.innerHTML='<div class="al-head"><span class="al-title">⏰ Alarm</span><label class="al-sw"><input type="checkbox" id="chk-al-on"> Ring like an alarm</label></div>'
-      +'<div class="al-body" id="chk-al-body">'
-      +'<div class="al-row"><span class="al-lbl">Ringtone</span><select id="chk-al-tone" aria-label="Ringtone"></select><button type="button" class="al-play" id="chk-al-play" title="Preview" aria-label="Preview">▶</button></div>'
-      +'<input type="file" id="chk-al-file" accept="audio/*" hidden>'
-      +'<p class="al-msg" id="chk-al-msg" hidden></p>'
-      +'<div class="al-row"><span class="al-lbl">Ring</span><select id="chk-al-ring" aria-label="Ring">'+opts([[0,'Until stopped'],[1,'For 1 minute'],[2,'For 2 minutes'],[5,'For 5 minutes'],[10,'For 10 minutes']],c.ring)+'</select></div>'
-      +'<div class="al-row"><span class="al-lbl">Snooze for</span><select id="chk-al-snz-min" aria-label="Snooze for">'+opts([[5,'5 minutes'],[10,'10 minutes'],[15,'15 minutes']],c.snoozeMin)+'</select></div>'
-      +'<div class="al-row"><span class="al-lbl">Snooze up to</span><select id="chk-al-snz-max" aria-label="Snooze how many times">'+opts([[0,'No snooze'],[1,'1 time'],[2,'2 times'],[3,'3 times'],[5,'5 times']],c.snoozeMax)+'</select></div>'
-      +(APP?'<div class="al-row"><span class="al-lbl">Volume buttons</span><select id="chk-al-keys" aria-label="Volume buttons">'+opts([['snooze','Snooze'],['stop','Stop']],c.keys)+'</select></div>':'')
-      +'<p class="al-note">'+(APP?'Rings at the start of each activity, even when the app is closed or the phone is locked. Snooze, Stop or ✓ Done.'
-                               :'Rings at the start of each activity while AyuBase6 is open (in any tab or window). Snooze, Stop or ✓ Done.')+'</p>'
-      +'</div>';
-    var anchor=$('chk-days'); (anchor && anchor.parentNode===panel ? anchor : panel.lastChild).after(d);
-    var sel=$('chk-al-tone'); sel.innerHTML=toneOptions(c); sel.value=c.tone; if(sel.value!==c.tone) sel.value='rise';
-    $('chk-al-on').checked=!!c.on; $('chk-al-body').hidden=!c.on;
-    $('chk-al-on').addEventListener('change',function(){ var c=get(); c.on=this.checked; put(c); $('chk-al-body').hidden=!c.on; });
+  function infoHtml(id){
+    var when = id==='wake'
+      ? '<li><b>Time</b> is always your <b>Start My Day</b> time, on the days chosen under Notify Me (every day if Notify Me is off).</li>'
+      : '<li><b>Time</b>: tap it and pick the hour, then the minutes, on the clock (any time of day). <b>On these days</b> picks the days it rings.</li>';
+    return '<strong>Alarm</strong><ul>'+when
+      +'<li><b>Ringtone</b>: AyuBase6’s tones'+(APP?', the phone’s default alarm':'')+', or <b>Upload a sound…</b> for your own (one sound, shared by both alarms). ▶ plays a preview.</li>'
+      +'<li><b>Ring</b>: until you stop it, or for 1–10 minutes.</li>'
+      +'<li><b>Snooze for</b> / <b>Snooze up to</b>: how long each snooze lasts, and how many times you can snooze.</li>'
+      +(APP?'<li><b>Volume buttons</b>: while the alarm screen is shown (on a locked phone), they snooze or stop it.</li>':'')
+      +'</ul>'+(APP?'The phone rings it even when AyuBase6 is closed or the phone is locked. On Android 14 and later, allow <b>Full screen notifications</b> for AyuBase6 to see the alarm screen.'
+                    :'It rings while AyuBase6 is open (in any tab or window). For an alarm with the app closed, use the Android app (Help → Download app).');
+  }
+  function bodyHtml(id){
+    var c=get(id), p=id+'-al';
+    return (id==='rem'
+        ? '<div class="ayu-al-row"><span class="ayu-al-lbl">Time</span><button type="button" class="ayu-al-time" id="'+p+'-time"></button></div><div class="otd-row" id="rem-alarm-days"></div>'
+        : '')
+      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Ringtone</span><select id="'+p+'-tone" aria-label="Ringtone">'+toneOptions()+'</select><button type="button" class="ayu-al-play" id="'+p+'-play" title="Preview" aria-label="Preview">▶</button></div>'
+      +'<input type="file" id="'+p+'-file" accept="audio/*" hidden><p class="ayu-al-msg" id="'+p+'-msg" hidden></p>'
+      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Ring</span><select id="'+p+'-ring" aria-label="Ring">'+opts([[0,'Until stopped'],[1,'For 1 minute'],[2,'For 2 minutes'],[5,'For 5 minutes'],[10,'For 10 minutes']],c.ring)+'</select></div>'
+      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Snooze for</span><select id="'+p+'-smin" aria-label="Snooze for">'+opts([[5,'5 minutes'],[10,'10 minutes'],[15,'15 minutes']],c.snoozeMin)+'</select></div>'
+      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Snooze up to</span><select id="'+p+'-smax" aria-label="Snooze how many times">'+opts([[0,'No snooze'],[1,'1 time'],[2,'2 times'],[3,'3 times'],[5,'5 times']],c.snoozeMax)+'</select></div>'
+      +(APP?'<div class="ayu-al-row"><span class="ayu-al-lbl">Volume buttons</span><select id="'+p+'-keys" aria-label="Volume buttons">'+opts([['snooze','Snooze'],['stop','Stop']],c.keys)+'</select></div>':'');
+  }
+  function buildAlarm(id){
+    var c=get(id), p=id+'-al', wrap;
+    var head='<h3>⏰ Alarm</h3><button type="button" class="calc-info-btn rout-info-btn ayu-al-ibtn" id="'+p+'-ibtn" title="About the alarm" aria-label="About the alarm" aria-expanded="false">i</button>'
+      +'<label class="master-switch" title="Turn the alarm on or off"><input type="checkbox" id="'+p+'-on" aria-label="Turn the alarm on or off"></label>';
+    if(id==='wake'){
+      wrap=document.createElement('div'); wrap.id='chk-alarm'; wrap.className='ayu-sub';
+      wrap.innerHTML='<div class="ayu-sub-hdr">'+head+'</div><div class="calc-task ayu-al-info" id="'+p+'-info" hidden>'+infoHtml(id)+'</div><div class="ayu-al-body" id="'+p+'-body">'+bodyHtml(id)+'</div>';
+    } else {
+      wrap=document.createElement('div'); wrap.id='rem-alarm-card'; wrap.className='alert-card';
+      wrap.innerHTML='<div class="alert-card-hdr">'+head.replace('<h3>⏰ Alarm</h3>','<h2><span class="section-title-text">⏰ Alarm</span></h2>')+'</div><div class="calc-task ayu-al-info" id="'+p+'-info" hidden>'+infoHtml(id)+'</div><div class="ayu-al-body" id="'+p+'-body">'+bodyHtml(id)+'</div>';
+    }
+    setTimeout(function(){ wire(id); },0);
+    return wrap;
+  }
+  function wire(id){
+    var p=id+'-al', c=get(id);
+    var on=$(p+'-on'), body=$(p+'-body'), sel=$(p+'-tone'); if(!on||!body) return;
+    on.checked=!!c.on; body.hidden=!c.on;
+    on.addEventListener('change',function(){ var c=get(id); c.on=on.checked; put(id,c); body.hidden=!c.on; });
+    $(p+'-ibtn').addEventListener('click',function(){ var i=$(p+'-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); });
+    sel.value=c.tone; if(sel.value!==c.tone) sel.value='rise';
     var prev=sel.value;
     sel.addEventListener('change',function(){
-      if(sel.value==='upload'){ sel.value=prev; $('chk-al-file').click(); return; }
-      prev=sel.value; var c=get(); c.tone=sel.value; put(c); preview(true);
+      if(sel.value==='upload'){ sel.value=prev; $(p+'-file').click(); return; }
+      prev=sel.value; var c=get(id); c.tone=sel.value; put(id,c); preview(id,true);
     });
-    $('chk-al-file').addEventListener('change',function(){ var f=this.files&&this.files[0]; this.value=''; if(f) saveOwn(f); });
-    $('chk-al-play').addEventListener('click',function(){ previewing ? stopPreview() : preview(); });
-    ['chk-al-ring','chk-al-snz-min','chk-al-snz-max','chk-al-keys'].forEach(function(id){
-      var e=$(id); if(!e) return;
-      e.addEventListener('change',function(){ var c=get();
-        c.ring=+$('chk-al-ring').value; c.snoozeMin=+$('chk-al-snz-min').value; c.snoozeMax=+$('chk-al-snz-max').value;
-        if($('chk-al-keys')) c.keys=$('chk-al-keys').value; put(c); });
+    $(p+'-file').addEventListener('change',function(){ var f=this.files&&this.files[0]; this.value=''; if(f) saveOwn(id,f); });
+    $(p+'-play').addEventListener('click',function(){ previewing===id ? stopPreview() : preview(id); });
+    ['ring','smin','smax','keys'].forEach(function(k){
+      var e=$(p+'-'+k); if(!e) return;
+      e.addEventListener('change',function(){ var c=get(id);
+        c.ring=+$(p+'-ring').value; c.snoozeMin=+$(p+'-smin').value; c.snoozeMax=+$(p+'-smax').value; if($(p+'-keys')) c.keys=$(p+'-keys').value; put(id,c); });
     });
+    if(id==='rem'){
+      var tb=$(p+'-time');
+      var paint=function(){ tb.innerHTML=clock(A.rem.time())+'<span>Change</span>'; };
+      paint();
+      tb.addEventListener('click',function(){ pickTime(A.rem.time(),5,'#0f766e',function(v){ var c=get('rem'); c.at=v; put('rem',c); paint(); }); });
+      buildDays();
+    }
   }
-  function msg(t){ var m=$('chk-al-msg'); if(!m) return; m.textContent=t||''; m.hidden=!t; }
+  // Reminders → Alarm: its own days
+  function buildDays(){
+    var host=$('rem-alarm-days'); if(!host) return;
+    var ORDER=[1,2,3,4,5,6,0], L={1:'M',2:'T',3:'W',4:'T',5:'F',6:'S',0:'S'}, F={1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday',6:'Saturday',0:'Sunday'};
+    host.innerHTML='<div class="otd-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Every day</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div>';
+    var box=host.querySelector('.day-chips');
+    function set(days){ var c=get('rem'); c.days=days; put('rem',c); draw(); }
+    function draw(){
+      var days=get('rem').days; box.innerHTML='';
+      ORDER.forEach(function(d){ var b=document.createElement('button'); b.type='button'; b.className='day-chip'; b.textContent=L[d]; b.setAttribute('aria-label',F[d]); b.setAttribute('aria-pressed',String(days.indexOf(d)>=0));
+        b.addEventListener('click',function(){ var c=get('rem').days; if(c.indexOf(d)>=0){ if(c.length>1) set(c.filter(function(x){ return x!==d; })); } else set(c.concat([d])); }); box.appendChild(b); });
+      var s=days.slice().sort().join(',');
+      host.querySelectorAll('.day-quick button').forEach(function(b){ var want=b.dataset.q==='week'?'1,2,3,4,5':b.dataset.q==='wkend'?'0,6':'0,1,2,3,4,5,6'; b.classList.toggle('on',s===want); b.setAttribute('aria-pressed',String(s===want)); });
+    }
+    host.querySelectorAll('.day-quick button').forEach(function(b){ b.addEventListener('click',function(){ set(b.dataset.q==='week'?[1,2,3,4,5]:b.dataset.q==='wkend'?[6,0]:[0,1,2,3,4,5,6]); }); });
+    draw();
+  }
+  function msg(id,t){ var m=$(id+'-al-msg'); if(!m) return; m.textContent=t||''; m.hidden=!t; }
   var prevTimer=null;
-  function preview(short){
-    var tone=$('chk-al-tone').value; stopPreview(); msg('');
-    previewing=true; $('chk-al-play').textContent='■'; $('chk-al-play').title='Stop preview';
+  function preview(id,short){
+    var tone=$(id+'-al-tone').value; stopPreview(); msg(id,'');
+    previewing=id; var b=$(id+'-al-play'); b.textContent='■'; b.title='Stop preview';
     var n=N();
-    if(n && n.previewTone){ n.previewTone(tone).catch(function(){ msg('Could not play this sound.'); }); }
-    else startSound(tone, true);
+    if(n && n.previewTone) n.previewTone(tone).catch(function(){ msg(id,'Could not play this sound.'); });
+    else startSound(tone,true);
     prevTimer=setTimeout(stopPreview, short?3000:6000);
   }
   function stopPreview(){
-    clearTimeout(prevTimer); previewing=false;
-    var b=$('chk-al-play'); if(b){ b.textContent='▶'; b.title='Preview'; }
+    clearTimeout(prevTimer);
+    if(previewing){ var b=$(previewing+'-al-play'); if(b){ b.textContent='▶'; b.title='Preview'; } }
+    previewing=null;
     var n=N(); if(n && n.stopPreview) n.stopPreview(); else if(!ringing) stopSound();
   }
-  async function saveOwn(f){
-    if(!/^audio\//.test(f.type) && !/\.(mp3|m4a|aac|ogg|oga|wav|flac|opus)$/i.test(f.name)){ msg('Please choose a sound file (MP3, M4A, OGG or WAV).'); return; }
-    if(f.size>8*1024*1024){ msg('Please choose a sound under 8 MB.'); return; }
-    msg('Saving your sound…');
+  async function saveOwn(id,f){
+    if(!/^audio\//.test(f.type) && !/\.(mp3|m4a|aac|ogg|oga|wav|flac|opus)$/i.test(f.name)){ msg(id,'Please choose a sound file (MP3, M4A, OGG or WAV).'); return; }
+    if(f.size>8*1024*1024){ msg(id,'Please choose a sound under 8 MB.'); return; }
+    msg(id,'Saving your sound…');
     try{
       var n=N();
       if(n && n.saveTone){
         var b64=await new Promise(function(res,rej){ var r=new FileReader(); r.onload=function(){ res(String(r.result).split(',')[1]||''); }; r.onerror=rej; r.readAsDataURL(f); });
         await n.saveTone(b64);
-      } else {
-        var c0=await caches.open(TONES_CACHE); await c0.put(OWN_URL,new Response(f,{headers:{'Content-Type':f.type||'audio/mpeg'}}));
-      }
-      var c=get(); c.tone='own'; c.ownName=f.name.replace(/\.[^.]+$/,'').slice(0,40)||'My sound'; put(c);
-      var sel=$('chk-al-tone'); sel.innerHTML=toneOptions(c); sel.value='own';
-      msg('✓ Saved. Tap ▶ to hear it.'); setTimeout(function(){ msg(''); },4000);
-    }catch(e){ msg('Could not save that sound. Try another file.'); }
+      } else { var c0=await caches.open(TONES_CACHE); await c0.put(OWN_URL,new Response(f,{headers:{'Content-Type':f.type||'audio/mpeg'}})); }
+      try{ localStorage.setItem(K_OWN, f.name.replace(/\.[^.]+$/,'').slice(0,40)||'My sound'); }catch(e){}
+      var c=get(id); c.tone='own'; put(id,c);
+      ['wake','rem'].forEach(function(x){ var s=$(x+'-al-tone'); if(s){ var v=x===id?'own':s.value; s.innerHTML=toneOptions(); s.value=v; } });
+      msg(id,'✓ Saved. Tap ▶ to hear it.'); setTimeout(function(){ msg(id,''); },4000);
+    }catch(e){ msg(id,'Could not save that sound. Try another file.'); }
   }
 
-  // ── ringing on the website (the app's own alarm handles it on the phone) ──
+  // ringing on the website
   var ringing=null, ringStop=null, snoozeTimer={};
-  function card(key,title,body,count){
-    var c=get(), left=Math.max(0,c.snoozeMax-count), d=$('ayu-alarm'); if(d) d.remove();
-    d=document.createElement('div'); d.id='ayu-alarm'; d.setAttribute('role','alertdialog'); d.setAttribute('aria-label',title);
+  function card(id,count){
+    var c=get(id), left=Math.max(0,c.snoozeMax-count), d=$('ayu-alarm'); if(d) d.remove();
+    d=document.createElement('div'); d.id='ayu-alarm'; d.setAttribute('role','alertdialog'); d.style.setProperty('--al-c',A[id].colour);
     d.innerHTML='<div class="aal-card"><div style="font-size:1.8rem">⏰</div><span class="aal-t"></span><p class="aal-b"></p><div class="aal-btns">'
-      +(left>0?'<button type="button" class="aal-snz">Snooze '+c.snoozeMin+' min</button>':'')
-      +'<button type="button" class="aal-done">✓ Done</button><button type="button" class="aal-stop">Stop</button></div></div>';
-    d.querySelector('.aal-t').textContent=title; d.querySelector('.aal-b').textContent=body;
+      +(left>0?'<button type="button" class="aal-snz">Snooze '+c.snoozeMin+' min</button>':'')+'<button type="button" class="aal-stop">Stop</button></div></div>';
+    d.querySelector('.aal-t').textContent=A[id].title(); d.querySelector('.aal-b').textContent=A[id].body();
+    d.setAttribute('aria-label',A[id].title());
     document.body.appendChild(d);
-    var s=d.querySelector('.aal-snz'); if(s) s.addEventListener('click',function(){ snooze(key,title,body,count); });
-    d.querySelector('.aal-done').addEventListener('click',function(){ stopRing(); try{ if(typeof routineAction==='function') routineAction(key,'done'); }catch(e){} });
-    d.querySelector('.aal-stop').addEventListener('click',stopRing);
+    var s=d.querySelector('.aal-snz'); if(s) s.addEventListener('click',function(){ snooze(id,count); });
+    d.querySelector('.aal-stop').addEventListener('click',function(){ stopRing(); });
   }
-  function ring(key,title,body,count){
-    var c=get(); if(!c.on) return;
-    stopRing(true);
-    ringing={key:key,title:title,body:body,count:count||0};
-    startSound(c.tone,true); card(key,title,body,count||0);
+  function ring(id,count){
+    var c=get(id); if(!c.on) return;
+    stopRing(true); ringing={id:id,count:count||0};
+    startSound(c.tone,true); card(id,count||0);
     if(c.ring>0) ringStop=setTimeout(function(){ stopRing(true); }, c.ring*60000);   // the sound stops; the card stays until answered
   }
-  function stopRing(keepCard){
-    clearTimeout(ringStop); ringStop=null; stopSound(); ringing=null;
-    if(!keepCard){ var d=$('ayu-alarm'); if(d) d.remove(); }
-  }
-  function snooze(key,title,body,count){
-    var c=get(); stopRing();
-    if(count>=c.snoozeMax) return;
-    clearTimeout(snoozeTimer[key]);
-    snoozeTimer[key]=setTimeout(function(){
-      try{ var cb=typeof routineCb==='function' && routineCb(key); if(cb && cb.checked) return; }catch(e){}
-      ring(key,title,body,count+1);
-    }, c.snoozeMin*60000);
+  function stopRing(keepCard){ clearTimeout(ringStop); ringStop=null; stopSound(); ringing=null; if(!keepCard){ var d=$('ayu-alarm'); if(d) d.remove(); } }
+  function snooze(id,count){
+    var c=get(id); stopRing(); if(count>=c.snoozeMax) return;
+    clearTimeout(snoozeTimer[id]); snoozeTimer[id]=setTimeout(function(){ ring(id,count+1); }, c.snoozeMin*60000);
   }
   window.ayuAlarmRing=ring;
-  if(!APP && typeof window.notifyRoutine==='function'){
-    var origNotify=window.notifyRoutine;
-    window.notifyRoutine=function(key,title,body){
-      var r=origNotify.apply(this,arguments);
-      try{
-        key=String(key||'');
-        if(get().on && typeof ROUTINE_NOTIFY_ITEMS!=='undefined' && Object.prototype.hasOwnProperty.call(ROUTINE_NOTIFY_ITEMS,key)) ring(key,title,body,0);
-      }catch(e){}
-      return r;
-    };
+  var K_LAST='ayuAlarmLastRung';
+  function checkTime(){
+    if(APP) return;
+    var now=new Date(), mins=now.getHours()*60+now.getMinutes(), day=now.getDay();
+    var last={}; try{ last=JSON.parse(localStorage.getItem(K_LAST)||'{}')||{}; if(typeof last!=='object') last={}; }catch(e){ last={}; }
+    ['wake','rem'].forEach(function(id){
+      var c=get(id); if(!c.on) return;
+      var days=A[id].days(); if(days && days.length && days.indexOf(day)<0) return;
+      var at=A[id].time(), late=mins-at; if(late<0 || late>2) return;
+      var tag=now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate()+'@'+at;
+      if(last[id]===tag) return;
+      last[id]=tag; try{ localStorage.setItem(K_LAST,JSON.stringify(last)); }catch(e){}
+      ring(id,0);
+    });
   }
-  // Done from a notification or the list also silences the alarm for that activity
-  if(typeof window.routineAction==='function'){
-    var origAction=window.routineAction;
-    window.routineAction=function(key,action){ if(action==='done'){ if(ringing && ringing.key===key) stopRing(); clearTimeout(snoozeTimer[key]); } return origAction.apply(this,arguments); };
+  if(!APP){ setInterval(checkTime,15000); document.addEventListener('visibilitychange',function(){ if(!document.hidden) checkTime(); }); }
+
+  // Reminders → Alarm, just before My Reminders
+  function setupRem(){
+    var mr=$('custom-reminders-card'); if(!mr || $('rem-alarm-card')) return;
+    mr.parentNode.insertBefore(buildAlarm('rem'), mr);
   }
 
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',build,{once:true}); else build();
-  setTimeout(build,1500);
+  function start(){
+    setupDay(); setupRem(); syncNotify();
+    var t=$('routines-master-toggle'); if(t && !t.dataset.ayuSync){ t.dataset.ayuSync='1'; t.addEventListener('change',function(){ setTimeout(syncNotify,50); }); }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true}); else start();
+  setTimeout(start,800); setTimeout(start,2000); setInterval(syncNotify,2000);
+  window.addEventListener('ayu-restored',function(){ setTimeout(function(){ applyMode(); changed(); },300); });
+})();
+</script>
+<script id="help-tabs-20261104-js">
+/* Help: Download app (website) | Troubleshooting | Feedback. The notification test is the first part of Troubleshooting. */
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function setup(){
+    var tr=$('sec-trouble'), ck=$('sec-check'); if(!tr || !ck || tr.dataset.ayuMerged) return;
+    tr.dataset.ayuMerged='1';
+    var h1=document.createElement('h3'); h1.className='hlp-h'; h1.id='hlp-notifications'; h1.textContent='Notifications';
+    var h2=document.createElement('h3'); h2.className='hlp-h second'; h2.textContent='Common problems';
+    tr.insertBefore(h1, tr.firstChild);
+    var after=h1;
+    [].slice.call(ck.children).forEach(function(n){ after.after(n); after=n; });
+    after.after(h2);
+    var tb=$('subtab-check'); if(tb) tb.remove();
+    ck.remove();
+    try{
+      FOOTER_SUBS.help=FOOTER_SUBS.help.filter(function(s){ return s!=='check'; });
+      FOOTER_ALIAS.check=['help','trouble'];
+      if(footerSubNow.help==='check') footerSubNow.help='trouble';
+    }catch(e){}
+  }
+  setup(); setTimeout(setup,500);
+  // A link to the notification test opens Troubleshooting at its Notifications part.
+  var orig=window.showFooterSection;
+  if(typeof orig==='function'){
+    window.showFooterSection=function(id){ var r=orig.apply(this,arguments); if(id==='check'){ setTimeout(function(){ var h=$('hlp-notifications'); if(h) try{ h.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} },150); } return r; };
+  }
 })();
 </script>
 </body>
