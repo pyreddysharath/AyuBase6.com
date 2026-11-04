@@ -31,8 +31,8 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 
 /**
- * Checks alarm: rings (looping ringtone, vibration) until stopped or for the chosen minutes,
- * with Snooze (up to the chosen number of times), Stop and ✓ Done. Runs as a foreground service so it
+ * Checks alarm (at the wake-up time): rings (looping ringtone, vibration) until stopped or for the chosen minutes,
+ * with Snooze (up to the chosen number of times) and Stop. Runs as a foreground service so it
  * keeps ringing with the app closed; on a locked phone it opens AlarmActivity full screen.
  */
 public class AlarmService extends Service {
@@ -219,7 +219,7 @@ public class AlarmService extends Service {
             .setFullScreenIntent(full, true);
         if (canSnooze()) b.addAction(0, "Snooze " + snoozeMin() + " min", action("snooze", 7311));
         b.addAction(0, "Stop", action("stop", 7312));
-        b.addAction(0, "✓ Done", action("done", 7313));
+        if (key.startsWith("routine-")) b.addAction(0, "✓ Done", action("done", 7313));
         return b.build();
     }
 

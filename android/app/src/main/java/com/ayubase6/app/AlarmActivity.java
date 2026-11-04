@@ -25,7 +25,7 @@ import java.util.Date;
  */
 public class AlarmActivity extends Activity {
     private TextView titleView, bodyView;
-    private Button snoozeBtn;
+    private Button snoozeBtn, doneBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +58,7 @@ public class AlarmActivity extends Activity {
         snoozeBtn.setOnClickListener(v -> { AlarmService s = AlarmService.current(); if (s != null) s.snooze(); finish(); });
         root.addView(snoozeBtn, lp(36 * dp));
         Button done = button("✓ Done", Color.WHITE, t.deep);
+        doneBtn = done;
         done.setOnClickListener(v -> { AlarmService s = AlarmService.current(); if (s != null) s.done(); finish(); });
         root.addView(done, lp(12 * dp));
         Button stop = button("Stop", Color.TRANSPARENT, t.title);
@@ -97,6 +98,7 @@ public class AlarmActivity extends Activity {
         bodyView.setText(s.body);
         if (s.canSnooze()) { snoozeBtn.setText("Snooze " + s.snoozeMin() + " min"); snoozeBtn.setVisibility(android.view.View.VISIBLE); }
         else snoozeBtn.setVisibility(android.view.View.GONE);
+        doneBtn.setVisibility(s.key.startsWith("routine-") ? android.view.View.VISIBLE : android.view.View.GONE);
     }
 
     @Override

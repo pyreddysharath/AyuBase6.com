@@ -133,9 +133,8 @@ final class ReminderScheduler {
             JSONObject alarm = AlarmService.config(c);
             for (Map.Entry<String, ReminderRules.Due> e : latest.entrySet()) {
                 ReminderRules.Due d = e.getValue();
-                // Checks set to ring like an alarm: the start of an activity rings (only if it is due now, not hours late)
-                boolean ring = alarm != null && "routines".equals(d.section) && START_KEY.matcher(d.key).matches()
-                    && now - dueAt.getOrDefault(d.key, 0L) <= 2;
+                // Checks → Alarm rings (only if it is due now, not hours late); everything else is a notification
+                boolean ring = alarm != null && "alarm".equals(d.key) && now - dueAt.getOrDefault(d.key, 0L) <= 2;
                 if (ring && AlarmService.start(c, d.key, d.title, d.body, 0)) continue;
                 show(c, "nudge-" + d.key, d.title, d.body, false, NotificationArt.forSection(d.section), d.section, d.key, actionsFor(d.key));
             }
@@ -350,8 +349,6 @@ final class ReminderScheduler {
             try { mutate(rules, o.optString("key"), o.optString("action"), today); } catch (Exception ignored) {}
         }
     }
-
-    private static final java.util.regex.Pattern START_KEY = java.util.regex.Pattern.compile("^routine-[a-z]+$");
 
     /** Snooze on a ringing alarm: ring again after `minutes`; `count` snoozes used so far. */
     static void addAlarmSnooze(Context c, String key, String title, String body, int count, int minutes) {

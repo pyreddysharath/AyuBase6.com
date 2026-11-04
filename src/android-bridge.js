@@ -234,11 +234,12 @@
     };
     slots.next.__ayuAnchor = true;
   }
-  // Checks → Alarm settings travel with the rules, so the phone rings the activity's start like an alarm.
+  // Checks → Alarm (at the wake-up time) travels with the rules, so the phone rings it.
   function addAlarm(rules){
     try{
       var a = (typeof window.ayuAlarmConfig === 'function') ? window.ayuAlarmConfig() : null;
-      if(rules && rules.checks && a && a.on) rules.checks.alarm = { on:true, tone:a.tone, ring:+a.ring||0, snoozeMin:+a.snoozeMin||5, snoozeMax:+a.snoozeMax||0, keys:a.keys === 'stop' ? 'stop' : 'snooze' };
+      var t = (typeof window.ayuAlarmText === 'function') ? window.ayuAlarmText() : null;
+      if(rules && rules.checks && a && a.on && t) rules.checks.alarm = { on:true, at:t.at, title:t.title, body:t.body, tone:a.tone, ring:+a.ring||0, snoozeMin:+a.snoozeMin||5, snoozeMax:+a.snoozeMax||0, keys:a.keys === 'stop' ? 'stop' : 'snooze' };
     }catch(e){}
     return rules;
   }

@@ -104,6 +104,12 @@ final class ReminderRules {
         }
 
         JSONObject ck = rules.optJSONObject("checks");
+        // Checks → Alarm: one daily alarm at the wake-up time, on the Checks days (the phone app only; not in the server rules)
+        JSONObject al = ck == null ? null : ck.optJSONObject("alarm");
+        if (al != null && al.optBoolean("on", false) && dayAllowed(ck, local.dow)) {
+            Double at = num(al, "at");
+            if (at != null && at == m) out.add(new Due("alarm", str(al.opt("title"), 80), str(al.opt("body"), 200), "routines"));
+        }
         JSONArray items = ck == null ? null : ck.optJSONArray("items");
         if (items != null && dayAllowed(ck, local.dow)) {
             JSONArray done = local.day.equals(ck.optString("doneDay")) ? ck.optJSONArray("done") : null;
