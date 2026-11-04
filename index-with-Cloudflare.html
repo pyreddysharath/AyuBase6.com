@@ -14017,7 +14017,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   var GROUPS=[
     {id:'body',label:'Body',keys:['ayuBase6-body-choices']},
     {id:'food',label:'Food',keys:['ayuBase6-food-choices']},
-    {id:'checks',label:'Checks',keys:['ayuBase6WakeUpTime','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-muted','ayuBase6-routine-days']},
+    {id:'checks',label:'Checks',keys:['ayuBase6WakeUpTime','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-muted','ayuBase6-routine-days','ayuBase6-routine-alarm']},
     {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders']},
     {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1']}
   ];
@@ -14266,7 +14266,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (a PDF or a photo) or type values in, to see what is in or out of range. <b>Enable offline reading</b> reads photos and scanned reports without internet.');
   sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
   // Footer
-  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. A dot in the icon colour means one of them is on</span></li><li><span class="tf-ic has-dot-c"><svg class="ann-ic" viewBox="0 0 24 24" fill="currentColor"><g transform="translate(.35 -.9)"><path d="M2 10a2 2 0 012-2h3.5L17 3v18l-9.5-4.5H4a2 2 0 01-2-2v-4zM8.2 18.2h3.3l1 3.3a1 1 0 01-1 1.3H10a1 1 0 01-1-.8l-.8-3.8z"/><path d="M20 8.6a5 5 0 010 6.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g></svg></span><span><b>Announcements</b>: news and important notes from us. A dot means something new</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: check that notifications work, troubleshooting tips, feedback and the Android app. A dot means a problem</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy policy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
+  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save your data to a file and restore it later. The amber dot means a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. A dot in the icon colour means one of them is on</span></li><li><span class="tf-ic has-dot-c"><svg class="ann-ic" viewBox="0 0 24 24" fill="currentColor"><g transform="translate(.35 -.9)"><path d="M2 10a2 2 0 012-2h3.5L17 3v18l-9.5-4.5H4a2 2 0 01-2-2v-4zM8.2 18.2h3.3l1 3.3a1 1 0 01-1 1.3H10a1 1 0 01-1-.8l-.8-3.8z"/><path d="M20 8.6a5 5 0 010 6.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g></svg></span><span><b>Announcements</b>: news and important notes from us. A dot means something new</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: check that notifications work, troubleshooting tips, feedback, and Download app (the Android app or the web app). A dot means a problem</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span><span><b>Legal</b>: disclaimer and privacy policy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
 
   var root=document.getElementById('tour-root'), spot=document.getElementById('tour-spot'), txt=document.getElementById('tour-text'), bar=document.getElementById('tour-bar');
   var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0;
@@ -15623,42 +15623,59 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 #sec-help .footer-subtabs:has(#subtab-app) .footer-subtab{flex:1 1 auto;padding-left:3px;padding-right:3px;font-size:clamp(.66rem,2.85vw,.8rem)}
 </style>
 <script id="get-app-20261103-js">
-/* The Android app (config/android-app.json, written when a new app version is published).
-   Android phone browsers: a banner once ("Not now" hides it for 30 days), and the Install buttons in Reminders and Checks
-   become "Get the app". Every device: Help → Get app with the details. Nothing shows inside the Android app itself,
-   or before the first app version is published. */
+/* Help → Download app (every device, not inside the Android app):
+   - Android phones: the Android app (config/android-app.json, written when a version is published), or "coming soon";
+   - every device: install the web app (the browser's own install box, or the steps for this browser).
+   Android phone browsers also get a one-time banner once an app version is published ("Not now" hides it for 30 days).
+   The Install buttons in Reminders and Checks are gone; installing lives here. */
 (function(){
   if(window.AYU_ANDROID) return;   // the Android app has its own update notice
   var CFG_URL='config/android-app.json', K_LATER='ayuAppBannerLater', K_CFG='ayuAppCfg', LATER_DAYS=30;
   var ANDROID=/Android/i.test(navigator.userAgent||'');
-  var cfg=null;
+  var IOS=/iPhone|iPad|iPod/i.test(navigator.userAgent||'') || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  var cfg=null, deferred=null;
+  window.addEventListener('beforeinstallprompt',function(e){ deferred=e; render(); });
+  window.addEventListener('appinstalled',function(){ deferred=null; render(); });
   function $(id){ return document.getElementById(id); }
   function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){} return null; }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function valid(c){ return c && typeof c.url==='string' && /^https:\/\//.test(c.url) && c.versionName; }
   function mb(b){ return b>0 ? (Math.round(b/104857.6)/10)+' MB' : ''; }
+  function installed(){ try{ var st=window.ayuInstallState ? window.ayuInstallState() : ''; return st==='app'||st==='installed' || matchMedia('(display-mode: standalone)').matches || navigator.standalone===true; }catch(e){ return false; } }
 
   function download(){
     if(!cfg) return;
     try{ var a=document.createElement('a'); a.href=cfg.url; a.rel='noopener'; a.style.display='none'; document.body.appendChild(a); a.click(); setTimeout(function(){ a.remove(); },1000); }
     catch(e){ location.href=cfg.url; }
     ls(K_LATER,String(Date.now()));   // no banner again soon after a download
-    var b=document.querySelectorAll('.ayu-appb'); b.forEach(function(x){ x.remove(); });
+    document.querySelectorAll('.ayu-appb').forEach(function(x){ x.remove(); });
     openHelp();
   }
   window.ayuGetApp=download;
   function openHelp(){
     try{ if(typeof showFooterSection==='function') showFooterSection('help'); if(typeof showFooterSub==='function') showFooterSub('help','app'); }catch(e){}
   }
+  function webSteps(){
+    if(ANDROID) return 'Open the browser menu (⋮) and choose <b>Install app</b> or <b>Add to Home screen</b>.';
+    if(IOS) return 'Tap the <b>Share</b> button, then <b>Add to Home Screen</b>, and open AyuBase6 from that icon.';
+    var ua=navigator.userAgent||'';
+    if(/Safari/i.test(ua) && !/Chrome|CriOS|Edg|OPR|Firefox/i.test(ua)) return 'In Safari, choose <b>File → Add to Dock</b>.';
+    if(/Firefox/i.test(ua)) return 'This browser can’t install web apps. Use Chrome or Edge, or keep AyuBase6 open in a tab.';
+    return 'Use the install icon in the address bar, or the browser menu → <b>Install AyuBase6</b>.';
+  }
+  window.ayuInstallWeb=function(){
+    var st=$('app-web-steps');
+    if(deferred){ var d=deferred; deferred=null; try{ d.prompt(); d.userChoice.then(render,render); }catch(e){ if(st) st.innerHTML=webSteps(); } return; }
+    if(st){ st.innerHTML=webSteps(); st.hidden=false; }
+  };
 
-  // ---- Help → Get app ----
-  function helpHtml(){
+  // ---- Help → Download app ----
+  function androidHtml(){
+    if(!ANDROID) return '';
+    if(!cfg) return '<p><b>AyuBase6 for Android</b> is on its way: the same app, with reminders that arrive even when it is closed. Until then, install the web app below.</p>';
     var meta=['Version '+esc(cfg.versionName), mb(cfg.sizeBytes), 'Android '+esc(cfg.minAndroid||'8.0')+' or later'].filter(Boolean).join(' · ');
-    var get = ANDROID
-      ? '<button type="button" class="app-get" onclick="ayuGetApp()">Download the app</button>'
-      : '<p class="app-note">Open <b>ayubase6.com</b> on your Android phone to download it. There is no iPhone app yet.</p>';
     return '<p><b>AyuBase6 for Android</b> is this same app, with reminders that arrive at their time even when the app is closed, the phone is locked or has been restarted.</p>'
-      + get + '<p class="app-meta">'+meta+'</p>'
+      + '<button type="button" class="app-get" onclick="ayuGetApp()">Download the app</button><p class="app-meta">'+meta+'</p>'
       + '<strong>Installing</strong><ol>'
       + '<li>Tap <b>Download the app</b>. When it finishes, tap the downloaded file (or open it from Files → Downloads).</li>'
       + '<li>If asked, allow your browser to install unknown apps, then tap <b>Install</b>.</li>'
@@ -15667,20 +15684,30 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       + '<strong>Your data</strong><p>The app keeps its own copy. To bring what you have here: <b>Backup → Save</b> here, then <b>Backup → Restore</b> in the app and pick that file.</p>'
       + '<strong>Updates</strong><p>The app tells you when a new version is ready.</p>';
   }
+  function webHtml(){
+    var head = (ANDROID && cfg) ? '<strong>Or install the web app</strong>' : '<strong>Install the web app</strong>';
+    if(installed()) return head+'<p>✓ AyuBase6 is installed on this device. Open it from its icon.</p>';
+    return head+'<p>Adds AyuBase6 to your '+(IOS?'Home Screen':(ANDROID?'home screen':'desktop or Dock'))+', in its own window. Reminders still need it open.</p>'
+      + '<button type="button" class="app-get" onclick="ayuInstallWeb()">Install the web app</button>'
+      + '<p class="app-meta" id="app-web-steps"'+(deferred?' hidden':'')+'>'+(deferred?'':webSteps())+'</p>'
+      + (IOS ? '<p class="app-note">There is no iPhone app yet.</p>' : '');
+  }
+  function helpHtml(){ return androidHtml()+webHtml(); }
+  function render(){ var s=$('sec-app'); if(s) s.innerHTML=helpHtml(); }
   function addHelpTab(){
     var sec=$('sec-help'); if(!sec || $('sec-app')) return;
     try{ if(typeof FOOTER_SUBS!=='undefined' && FOOTER_SUBS.help.indexOf('app')<0) FOOTER_SUBS.help.push('app'); }catch(e){}
-    try{ if(typeof FOOTER_ALIAS!=='undefined') FOOTER_ALIAS.app=['help','app']; }catch(e){}
+    try{ if(typeof FOOTER_ALIAS!=='undefined'){ FOOTER_ALIAS.app=['help','app']; FOOTER_ALIAS.download=['help','app']; } }catch(e){}
     var tabs=sec.querySelector('.footer-subtabs');
     if(tabs){ var b=document.createElement('button'); b.type='button'; b.className='footer-subtab'; b.id='subtab-app'; b.setAttribute('role','tab');
-      b.setAttribute('onclick',"showFooterSub('help','app')"); b.innerHTML='Get app<i class="fs-dot"></i>'; tabs.appendChild(b); }
+      b.setAttribute('onclick',"showFooterSub('help','app')"); b.innerHTML='Download app<i class="fs-dot"></i>'; tabs.appendChild(b); }
     var d=document.createElement('div'); d.className='footer-sub'; d.id='sec-app'; d.style.display='none'; d.innerHTML=helpHtml();
     var last=sec.querySelectorAll('.footer-sub'); (last.length?last[last.length-1]:tabs).after(d);
   }
 
-  // ---- Android phone browsers: banner and "Get the app" buttons ----
+  // ---- Android phone browsers: banner once an app version is published ----
   function banner(){
-    if(!ANDROID) return;
+    if(!ANDROID || !cfg) return;
     var later=Number(ls(K_LATER))||0; if(Date.now()-later < LATER_DAYS*864e5) return;
     document.querySelectorAll('.ayu-appb').forEach(function(e){ e.remove(); });
     document.querySelectorAll('.tab-panel').forEach(function(p){
@@ -15698,34 +15725,17 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     });
     try{ window.dispatchEvent(new Event('resize')); }catch(e){}
   }
-  function buttons(){
-    if(!ANDROID) return;
-    ['install-app-btn','routines-install-app-btn'].forEach(function(id){
-      var b=$(id); if(!b) return;
-      b.title='Get the Android app'; b.setAttribute('aria-label','Get the Android app');
-      var l=b.querySelector('.install-label'); if(l) l.textContent='Get the app';
-    });
-    // Only a tap on these buttons downloads; switching notifications on still shows the usual tip.
-    if(!buttons.bound){ buttons.bound=true;
-      document.addEventListener('click',function(e){
-        var b=e.target.closest&&e.target.closest('#install-app-btn,#routines-install-app-btn'); if(!b||!cfg) return;
-        e.preventDefault(); e.stopImmediatePropagation(); download();
-      },true);
-    }
-  }
 
-  function apply(c){
-    if(!valid(c)) return;
-    cfg=c; addHelpTab(); var s=$('sec-app'); if(s) s.innerHTML=helpHtml();
-    buttons(); banner();
-  }
+  function apply(c){ if(!valid(c)) return; cfg=c; render(); banner(); }
   function load(){
+    addHelpTab();
     try{ var c=JSON.parse(ls(K_CFG)||'null'); if(valid(c)) apply(c); }catch(e){}
     fetch(CFG_URL,{cache:'no-cache'}).then(function(r){ return r.ok ? r.json() : null; }).then(function(c){
-      if(valid(c)){ ls(K_CFG,JSON.stringify(c)); if(!cfg) apply(c); else { cfg=c; var s=$('sec-app'); if(s) s.innerHTML=helpHtml(); } }
+      if(valid(c)){ ls(K_CFG,JSON.stringify(c)); if(!cfg) apply(c); else { cfg=c; render(); } }
     }).catch(function(){});
+    setTimeout(render,1500);   // the installed check settles after start-up
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ setTimeout(load,800); },{once:true}); else setTimeout(load,800);
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ setTimeout(load,300); },{once:true}); else setTimeout(load,300);
 })();
 </script>
 <style id="reset-like-upload-20261104">
@@ -16049,6 +16059,211 @@ html body #sec-help .footer-subtabs:has(#subtab-app) .footer-subtab{flex:1 1 aut
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setupLab,{once:true}); else setupLab();
   document.addEventListener('visibilitychange',function(){ if(!document.hidden) refreshBox(); });
+})();
+</script>
+<style id="checks-alarm-20261104">
+/* Installing lives in Help → Download app: no Install buttons in Reminders and Checks. */
+html body #install-row, html body #routines-install-row, html body #install-app-btn, html body #routines-install-app-btn{display:none !important}
+html body #routines-notify-card .rout-card-foot:not(:has(> :not(.routines-install-row))){display:none !important}
+/* Checks → Alarm */
+#chk-alarm{margin:12px 0 0;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--rout-2,#a75b12) 8%,transparent);border:1px solid color-mix(in srgb,var(--rout-2,#a75b12) 30%,transparent)}
+#chk-alarm .al-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#chk-alarm .al-title{font-weight:800;color:var(--rout-2,#a75b12)}
+#chk-alarm .al-sw{display:flex;align-items:center;gap:8px;font-size:.86rem;cursor:pointer}
+#chk-alarm .al-sw input{width:18px;height:18px;margin:0;accent-color:var(--rout-2,#a75b12)}
+#chk-alarm .al-body{margin-top:8px;display:grid;gap:8px}
+#chk-alarm .al-body[hidden]{display:none}
+#chk-alarm .al-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#chk-alarm .al-lbl{flex:0 0 112px;font-size:.84rem;font-weight:700}
+#chk-alarm select{flex:1 1 140px;min-width:0;max-width:100%;padding:7px 8px;border-radius:9px;border:1.5px solid color-mix(in srgb,var(--rout-2,#a75b12) 45%,#fff);background:#fff;font:inherit;font-size:.86rem;color:inherit}
+#chk-alarm .al-pair{flex:1 1 200px;min-width:0;display:flex;gap:6px}
+#chk-alarm .al-pair select{flex:1 1 0;min-width:0}
+#chk-alarm .al-play{flex:0 0 auto;width:38px;height:36px;border:0;border-radius:10px;background:var(--rout-2,#a75b12);color:#fff;font-size:.95rem;cursor:pointer}
+#chk-alarm .al-note{font-size:.76rem;opacity:.75;margin:2px 0 0}
+#chk-alarm .al-msg{font-size:.78rem;font-weight:600;margin:0}
+@media (max-width:380px){ #chk-alarm .al-lbl{flex-basis:100%} }
+#ayu-alarm{position:fixed;inset:0;z-index:2147482995;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.45)}
+#ayu-alarm .aal-card{max-width:420px;width:100%;background:#fff;color:#2d2b23;border-radius:18px;box-shadow:0 14px 40px rgba(0,0,0,.3);padding:18px;text-align:center;border-top:6px solid var(--rout-2,#a75b12)}
+#ayu-alarm .aal-t{display:block;font-weight:800;font-size:1.15rem;color:var(--rout-2,#a75b12);margin:4px 0}
+#ayu-alarm .aal-b{font-size:.92rem;margin:0 0 14px}
+#ayu-alarm .aal-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+#ayu-alarm button{flex:1 1 30%;min-width:96px;border:0;border-radius:11px;padding:11px 12px;font:inherit;font-weight:700;cursor:pointer}
+#ayu-alarm .aal-snz{background:var(--rout-2,#a75b12);color:#fff}
+#ayu-alarm .aal-done{background:#fff;color:var(--rout-2,#a75b12);border:2px solid var(--rout-2,#a75b12) !important}
+#ayu-alarm .aal-stop{background:#f1efe9;color:#2d2b23}
+</style>
+<script id="checks-alarm-20261104-js">
+/* Checks → Alarm: an activity's start can ring like an alarm.
+   Ringtone: AyuBase6 tones, the phone's default alarm (Android app) or your own sound, with a preview.
+   Ring until stopped or for some minutes; Snooze every N minutes, up to N times; in the app the volume buttons Snooze or Stop.
+   Website: rings while AyuBase6 is open. Android app: the phone rings it, even when the app is closed (see android-bridge.js). */
+(function(){
+  var KEY='ayuBase6-routine-alarm', TONES_CACHE='ayubase6-tones', OWN_URL='ayubase6-own-tone';
+  var APP=!!window.AYU_ANDROID;
+  var N=function(){ return window.ayuNative && window.ayuNative.native ? window.ayuNative : null; };
+  function $(id){ return document.getElementById(id); }
+  function get(){ var d={on:false,tone:'rise',ring:2,snoozeMin:5,snoozeMax:3,keys:'snooze',ownName:''}; try{ var o=JSON.parse(localStorage.getItem(KEY)||'{}'); for(var k in d) if(o[k]!==undefined) d[k]=o[k]; }catch(e){} return d; }
+  function put(c){ try{ localStorage.setItem(KEY,JSON.stringify(c)); }catch(e){} try{ document.dispatchEvent(new CustomEvent('ayu-alarm-changed')); }catch(e){} }
+  window.ayuAlarmConfig=get;
+
+  // Two alarm tones next to the Reminders tones
+  try{
+    if(typeof ALERT_SOUNDS!=='undefined'){
+      ALERT_SOUNDS.rise=ALERT_SOUNDS.rise||{wave:'sine',notes:[{f:523,d:.2},{f:659,d:.2},{f:784,d:.2},{f:1046,d:.4}]};
+      ALERT_SOUNDS.alarm=ALERT_SOUNDS.alarm||{wave:'square',notes:[{f:880,d:.12},{f:0,d:.08},{f:880,d:.12},{f:0,d:.08},{f:880,d:.12},{f:0,d:.08},{f:880,d:.12}]};
+    }
+  }catch(e){}
+  var APP_TONES=[['rise','Rising chime'],['alarm','Classic alarm'],['bell','Soft Bell'],['chime','Chime'],['marimba','Marimba Pop'],['xylophone','Xylophone'],['ping','Ping'],['bubble','Bubble'],['drop','Water drop'],['drum','Drum']];
+  function patternMs(id){ try{ var p=ALERT_SOUNDS[id]; return p.notes.reduce(function(a,n){ return a+(n.d+0.03)*1000; },0); }catch(e){ return 800; } }
+
+  // ── sound playback (website; in the app the phone plays it) ──
+  var loopTimer=null, ownAudio=null, previewing=false;
+  async function ownBlobUrl(){
+    try{ var c=await caches.open(TONES_CACHE); var r=await c.match(OWN_URL); if(!r) return null; return URL.createObjectURL(await r.blob()); }catch(e){ return null; }
+  }
+  async function startSound(tone, loop){
+    stopSound();
+    if(tone==='own'){
+      var u=await ownBlobUrl();
+      if(u){ ownAudio=new Audio(u); ownAudio.loop=!!loop; try{ await ownAudio.play(); }catch(e){} return; }
+      tone='rise';
+    }
+    if(tone==='phone') tone='rise';
+    var once=function(){ try{ if(typeof playAlertPreset==='function') playAlertPreset(tone); }catch(e){} };
+    once();
+    if(loop){ var step=patternMs(tone)+700; loopTimer=setInterval(once,step); }
+  }
+  function stopSound(){ if(loopTimer){ clearInterval(loopTimer); loopTimer=null; } if(ownAudio){ try{ ownAudio.pause(); URL.revokeObjectURL(ownAudio.src); }catch(e){} ownAudio=null; } }
+
+  // ── settings UI (inside Checks → Notify Me, under "On these days") ──
+  function toneOptions(c){
+    var h='<optgroup label="AyuBase6 tones">'+APP_TONES.map(function(t){ return '<option value="'+t[0]+'">'+t[1]+'</option>'; }).join('')+'</optgroup>';
+    if(APP) h+='<optgroup label="Phone"><option value="phone">Phone’s default alarm</option></optgroup>';
+    h+='<optgroup label="Your own">'+(c.ownName?'<option value="own">'+String(c.ownName).replace(/[<>&"]/g,'')+'</option>':'')+'<option value="upload">Upload a sound…</option></optgroup>';
+    return h;
+  }
+  function opts(list,v){ return list.map(function(o){ return '<option value="'+o[0]+'"'+(String(o[0])===String(v)?' selected':'')+'>'+o[1]+'</option>'; }).join(''); }
+  function build(){
+    var panel=$('routines-remind-panel'); if(!panel || $('chk-alarm')) return;
+    var c=get();
+    var d=document.createElement('div'); d.id='chk-alarm';
+    d.innerHTML='<div class="al-head"><span class="al-title">⏰ Alarm</span><label class="al-sw"><input type="checkbox" id="chk-al-on"> Ring like an alarm</label></div>'
+      +'<div class="al-body" id="chk-al-body">'
+      +'<div class="al-row"><span class="al-lbl">Ringtone</span><select id="chk-al-tone" aria-label="Ringtone"></select><button type="button" class="al-play" id="chk-al-play" title="Preview" aria-label="Preview">▶</button></div>'
+      +'<input type="file" id="chk-al-file" accept="audio/*" hidden>'
+      +'<p class="al-msg" id="chk-al-msg" hidden></p>'
+      +'<div class="al-row"><span class="al-lbl">Ring</span><select id="chk-al-ring" aria-label="Ring">'+opts([[0,'Until stopped'],[1,'For 1 minute'],[2,'For 2 minutes'],[5,'For 5 minutes'],[10,'For 10 minutes']],c.ring)+'</select></div>'
+      +'<div class="al-row"><span class="al-lbl">Snooze for</span><select id="chk-al-snz-min" aria-label="Snooze for">'+opts([[5,'5 minutes'],[10,'10 minutes'],[15,'15 minutes']],c.snoozeMin)+'</select></div>'
+      +'<div class="al-row"><span class="al-lbl">Snooze up to</span><select id="chk-al-snz-max" aria-label="Snooze how many times">'+opts([[0,'No snooze'],[1,'1 time'],[2,'2 times'],[3,'3 times'],[5,'5 times']],c.snoozeMax)+'</select></div>'
+      +(APP?'<div class="al-row"><span class="al-lbl">Volume buttons</span><select id="chk-al-keys" aria-label="Volume buttons">'+opts([['snooze','Snooze'],['stop','Stop']],c.keys)+'</select></div>':'')
+      +'<p class="al-note">'+(APP?'Rings at the start of each activity, even when the app is closed or the phone is locked. Snooze, Stop or ✓ Done.'
+                               :'Rings at the start of each activity while AyuBase6 is open (in any tab or window). Snooze, Stop or ✓ Done.')+'</p>'
+      +'</div>';
+    var anchor=$('chk-days'); (anchor && anchor.parentNode===panel ? anchor : panel.lastChild).after(d);
+    var sel=$('chk-al-tone'); sel.innerHTML=toneOptions(c); sel.value=c.tone; if(sel.value!==c.tone) sel.value='rise';
+    $('chk-al-on').checked=!!c.on; $('chk-al-body').hidden=!c.on;
+    $('chk-al-on').addEventListener('change',function(){ var c=get(); c.on=this.checked; put(c); $('chk-al-body').hidden=!c.on; });
+    var prev=sel.value;
+    sel.addEventListener('change',function(){
+      if(sel.value==='upload'){ sel.value=prev; $('chk-al-file').click(); return; }
+      prev=sel.value; var c=get(); c.tone=sel.value; put(c); preview(true);
+    });
+    $('chk-al-file').addEventListener('change',function(){ var f=this.files&&this.files[0]; this.value=''; if(f) saveOwn(f); });
+    $('chk-al-play').addEventListener('click',function(){ previewing ? stopPreview() : preview(); });
+    ['chk-al-ring','chk-al-snz-min','chk-al-snz-max','chk-al-keys'].forEach(function(id){
+      var e=$(id); if(!e) return;
+      e.addEventListener('change',function(){ var c=get();
+        c.ring=+$('chk-al-ring').value; c.snoozeMin=+$('chk-al-snz-min').value; c.snoozeMax=+$('chk-al-snz-max').value;
+        if($('chk-al-keys')) c.keys=$('chk-al-keys').value; put(c); });
+    });
+  }
+  function msg(t){ var m=$('chk-al-msg'); if(!m) return; m.textContent=t||''; m.hidden=!t; }
+  var prevTimer=null;
+  function preview(short){
+    var tone=$('chk-al-tone').value; stopPreview(); msg('');
+    previewing=true; $('chk-al-play').textContent='■'; $('chk-al-play').title='Stop preview';
+    var n=N();
+    if(n && n.previewTone){ n.previewTone(tone).catch(function(){ msg('Could not play this sound.'); }); }
+    else startSound(tone, true);
+    prevTimer=setTimeout(stopPreview, short?3000:6000);
+  }
+  function stopPreview(){
+    clearTimeout(prevTimer); previewing=false;
+    var b=$('chk-al-play'); if(b){ b.textContent='▶'; b.title='Preview'; }
+    var n=N(); if(n && n.stopPreview) n.stopPreview(); else if(!ringing) stopSound();
+  }
+  async function saveOwn(f){
+    if(!/^audio\//.test(f.type) && !/\.(mp3|m4a|aac|ogg|oga|wav|flac|opus)$/i.test(f.name)){ msg('Please choose a sound file (MP3, M4A, OGG or WAV).'); return; }
+    if(f.size>8*1024*1024){ msg('Please choose a sound under 8 MB.'); return; }
+    msg('Saving your sound…');
+    try{
+      var n=N();
+      if(n && n.saveTone){
+        var b64=await new Promise(function(res,rej){ var r=new FileReader(); r.onload=function(){ res(String(r.result).split(',')[1]||''); }; r.onerror=rej; r.readAsDataURL(f); });
+        await n.saveTone(b64);
+      } else {
+        var c0=await caches.open(TONES_CACHE); await c0.put(OWN_URL,new Response(f,{headers:{'Content-Type':f.type||'audio/mpeg'}}));
+      }
+      var c=get(); c.tone='own'; c.ownName=f.name.replace(/\.[^.]+$/,'').slice(0,40)||'My sound'; put(c);
+      var sel=$('chk-al-tone'); sel.innerHTML=toneOptions(c); sel.value='own';
+      msg('✓ Saved. Tap ▶ to hear it.'); setTimeout(function(){ msg(''); },4000);
+    }catch(e){ msg('Could not save that sound. Try another file.'); }
+  }
+
+  // ── ringing on the website (the app's own alarm handles it on the phone) ──
+  var ringing=null, ringStop=null, snoozeTimer={};
+  function card(key,title,body,count){
+    var c=get(), left=Math.max(0,c.snoozeMax-count), d=$('ayu-alarm'); if(d) d.remove();
+    d=document.createElement('div'); d.id='ayu-alarm'; d.setAttribute('role','alertdialog'); d.setAttribute('aria-label',title);
+    d.innerHTML='<div class="aal-card"><div style="font-size:1.8rem">⏰</div><span class="aal-t"></span><p class="aal-b"></p><div class="aal-btns">'
+      +(left>0?'<button type="button" class="aal-snz">Snooze '+c.snoozeMin+' min</button>':'')
+      +'<button type="button" class="aal-done">✓ Done</button><button type="button" class="aal-stop">Stop</button></div></div>';
+    d.querySelector('.aal-t').textContent=title; d.querySelector('.aal-b').textContent=body;
+    document.body.appendChild(d);
+    var s=d.querySelector('.aal-snz'); if(s) s.addEventListener('click',function(){ snooze(key,title,body,count); });
+    d.querySelector('.aal-done').addEventListener('click',function(){ stopRing(); try{ if(typeof routineAction==='function') routineAction(key,'done'); }catch(e){} });
+    d.querySelector('.aal-stop').addEventListener('click',stopRing);
+  }
+  function ring(key,title,body,count){
+    var c=get(); if(!c.on) return;
+    stopRing(true);
+    ringing={key:key,title:title,body:body,count:count||0};
+    startSound(c.tone,true); card(key,title,body,count||0);
+    if(c.ring>0) ringStop=setTimeout(function(){ stopRing(true); }, c.ring*60000);   // the sound stops; the card stays until answered
+  }
+  function stopRing(keepCard){
+    clearTimeout(ringStop); ringStop=null; stopSound(); ringing=null;
+    if(!keepCard){ var d=$('ayu-alarm'); if(d) d.remove(); }
+  }
+  function snooze(key,title,body,count){
+    var c=get(); stopRing();
+    if(count>=c.snoozeMax) return;
+    clearTimeout(snoozeTimer[key]);
+    snoozeTimer[key]=setTimeout(function(){
+      try{ var cb=typeof routineCb==='function' && routineCb(key); if(cb && cb.checked) return; }catch(e){}
+      ring(key,title,body,count+1);
+    }, c.snoozeMin*60000);
+  }
+  window.ayuAlarmRing=ring;
+  if(!APP && typeof window.notifyRoutine==='function'){
+    var origNotify=window.notifyRoutine;
+    window.notifyRoutine=function(key,title,body){
+      var r=origNotify.apply(this,arguments);
+      try{
+        key=String(key||'');
+        if(get().on && typeof ROUTINE_NOTIFY_ITEMS!=='undefined' && Object.prototype.hasOwnProperty.call(ROUTINE_NOTIFY_ITEMS,key)) ring(key,title,body,0);
+      }catch(e){}
+      return r;
+    };
+  }
+  // Done from a notification or the list also silences the alarm for that activity
+  if(typeof window.routineAction==='function'){
+    var origAction=window.routineAction;
+    window.routineAction=function(key,action){ if(action==='done'){ if(ringing && ringing.key===key) stopRing(); clearTimeout(snoozeTimer[key]); } return origAction.apply(this,arguments); };
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',build,{once:true}); else build();
+  setTimeout(build,1500);
 })();
 </script>
 </body>
@@ -17998,9 +18213,9 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 (function(){
   function $(id){ return document.getElementById(id); }
   var HOURS_INFO='<strong>Reminder hours</strong><p>Sets the same hours for every section below. You can still change the hours inside each section.</p>'
-    +'<strong>Switch, install and reset</strong><ul>'
+    +'<strong>Switch and reset</strong><ul>'
     +'<li>The switch at the top right turns every reminder on or off at once. The first time, your browser asks for permission to show notifications.</li>'
-    +'<li>The install icon adds AyuBase6 to your Home Screen or desktop.</li>'
+    +'<li>To install AyuBase6, see <b>Help → Download app</b>.</li>'
     +'<li>The reset icon puts every reminder back to its defaults.</li></ul>'
     +'<strong>Notification controls</strong><ul>'
     +'<li>Each section’s switch turns that reminder on or off.</li>'
@@ -18038,7 +18253,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     ['reminders-notif-error','install-help'].forEach(function(id){ var el=$(id); if(el && el.parentNode!==card) card.insertBefore(el,foot); });
     if(!$('reminders-install-nudge')){
       var nd=document.createElement('div'); nd.id='reminders-install-nudge'; nd.className='install-nudge'; nd.hidden=true;
-      nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. Use the install icon below if the install box does not appear.';
+      nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. If the install box does not appear, see <b>Help → Download app</b>.';
       card.insertBefore(nd,foot);
     }
     (function(){ var hd=card.querySelector('.alert-card-hdr'); if(hd) ['reminders-install-nudge','reminders-notif-error','install-help'].reverse().forEach(function(id){ var el=$(id); if(el) hd.after(el); }); })();
@@ -18110,7 +18325,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     }
     if(!$('routines-install-nudge')){
       var nd=document.createElement('div'); nd.id='routines-install-nudge'; nd.className='install-nudge'; nd.hidden=true;
-      nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. Use the install icon below if the install box does not appear.';
+      nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. If the install box does not appear, see <b>Help → Download app</b>.';
       card.insertBefore(nd,foot);
     }
     (function(){ var hd=$('routines-notify-row')||card.querySelector('.rout-card-hdr'); if(hd) ['routines-install-nudge','rout-notif-hint','routines-install-help','routines-remind-panel'].reverse().forEach(function(id){ var el=$(id); if(el) hd.after(el); }); })();
@@ -18291,9 +18506,9 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     var pnl=$('reminder-hours-info'), btn=$('reminder-hours-info-btn'); if(!pnl) return;
     pnl.innerHTML='<strong>Reminder hours</strong><p>Sets the hours for every section. You can still change them inside a section.</p>'
       +'<strong>Controls</strong><ul><li>The switch (top right) turns all reminders on or off. The first time, your browser asks for permission.</li>'
-      +'<li>The install icon adds AyuBase6 to your Home Screen or desktop; the reset icon restores the defaults.</li></ul>'
+      +'<li>The reset icon restores the defaults. To install AyuBase6, see <b>Help → Download app</b>.</li></ul>'
       +'<strong>On a computer</strong><ul><li>Alerts work whenever AyuBase6 is open in a browser tab or the app window. It does not need to be in front, so you can use other tabs and windows. They work without internet too. The computer must stay awake.</li></ul><strong>On a phone</strong><ul><li><b>Online:</b> with the app installed, alerts also arrive when the app is closed.</li><li><b>Offline:</b> alerts come only from the open app, so keep it open. This can’t be guaranteed: a phone may pause a locked or background app.</li><li><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</li><li><b>iPhone:</b> open the app from its Home Screen icon (iOS 16.4 or later is needed for alerts when it is closed). Check that Settings → Notifications → AyuBase6 is allowed. If alerts are late, turn off Low Power Mode and any Focus that silences the app.</li></ul><strong>Good to know</strong><ul>'
-      +'<li><b>To install:</b> Chrome or Edge: the install icon in the address bar, or menu → Install AyuBase6. Android: ⋮ → Install app. iPhone/iPad: Share → Add to Home Screen. Safari on Mac: File → Add to Dock.</li>'
+      +'<li><b>To install:</b> see <b>Help → Download app</b>.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li>'
       +'<li><b>Next</b> under a section title is when that reminder will fire while AyuBase6 is open. After a locked or paused phone, it updates when you come back.</li>'
       +'<li>Each notification window can disable that reminder, disable all, or close.</li></ul>';
@@ -18344,7 +18559,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       +'<li><b>Start + before end:</b> also a reminder 15 minutes before its window closes (activities shorter than 15 minutes get only the start).</li>'
       +'<li>Each notification has <b>Done</b> (ticks it) and <b>Not yet</b>.</li></ul>'
       +'<strong>On a computer</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Alerts work whenever AyuBase6 is open in a browser tab or the app window. It does not need to be in front, so you can use other tabs and windows. They work without internet too. The computer must stay awake.</li></ul><strong>On a phone</strong><ul style="margin:4px 0 0 18px;padding:0"><li><b>Online:</b> with the app installed, alerts also arrive when the app is closed.</li><li><b>Offline:</b> alerts come only from the open app, so keep it open. This can’t be guaranteed: a phone may pause a locked or background app.</li><li><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</li><li><b>iPhone:</b> open the app from its Home Screen icon (iOS 16.4 or later is needed for alerts when it is closed). Check that Settings → Notifications → AyuBase6 is allowed. If alerts are late, turn off Low Power Mode and any Focus that silences the app.</li></ul><strong>Good to know</strong><ul style="margin:4px 0 0 18px;padding:0">'
-      +'<li><b>To install:</b> Chrome or Edge: the install icon in the address bar, or menu → Install AyuBase6. Android: ⋮ → Install app. iPhone/iPad: Share → Add to Home Screen. Safari on Mac: File → Add to Dock.</li>'
+      +'<li><b>To install:</b> see <b>Help → Download app</b>.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li></ul>'; }
     var rp=$('rout-info-palms'); if(rp && rp.dataset.ux!=='1'){ rp.dataset.ux='1'; rp.innerHTML='<ol><li>Rub your palms together briskly for 10–15 seconds, with firm but comfortable friction, until they feel warm.</li><li>Close your eyes and cup your warm palms over them. Your palms (not your fingers) cover the eyes, your fingers rest on your forehead, and the heels of your hands sit on your cheekbones.</li><li>Keep a small gap so nothing presses on the eyeballs.</li><li>Hold for 30–60 seconds, breathing slowly.</li></ol><p>The warmth and gentle cover relax the eye muscles and improve blood flow, easing your eyes into the day instead of going straight to bright light or a screen.</p>'; }
     var rwt=$('rout-info-water'); if(rwt && rwt.dataset.ux!=='1'){ rwt.dataset.ux='1'; rwt.innerHTML='<p>Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.</p><strong>How to drink it</strong><ul><li>Take small sips instead of big gulps, and finish the 1–2 glasses over about 5–10 minutes.</li><li>Pause between sips.</li><li>Warm (not hot) water is a good choice in the morning. It is gentle on an empty stomach, and many people find it helps the bowels move. Plain room-temperature water hydrates just as well, and water that is too hot can scald your mouth and throat.</li></ul><strong>Why slowly</strong><ul><li>Your body takes in water gradually, so more of it is used instead of passing straight through.</li><li>You swallow less air, so there is less bloating and burping.</li><li>An empty stomach copes better with small amounts. Gulping can leave you feeling heavy or queasy.</li></ul>'; }
