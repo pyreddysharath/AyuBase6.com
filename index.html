@@ -12796,7 +12796,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     form.innerHTML='<label class="wide">Reminder name<input name="name" required maxlength="80" placeholder="e.g. Medicines, school pickup"></label>'+ 
       '<label class="wide">Frequency<select name="frequency-mode"><option value="regular">At regular times</option><option value="selected">At selected times</option></select></label>'+ 
       '<div class="wide reminder-frequency-fields"></div>'+ 
-      '<div class="wide repeat-on"><div class="repeat-on-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Every day</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div></div>'+
+      '<div class="wide repeat-on"><div class="repeat-on-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Daily</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div></div>'+
       '<label>Notification sound<select name="sound"><option value="chime">Chime</option><option value="drop">Water drop</option><option value="drum">Drum</option><option value="none">Silent</option></select></label>'+ 
       '<div class="wide reminder-form-actions"><button class="save-reminder" type="submit">Save reminder</button><button class="cancel-reminder" type="button">Cancel</button></div>';
     const mode=form.querySelector('[name="frequency-mode"]'), fields=form.querySelector('.reminder-frequency-fields');
@@ -14654,7 +14654,7 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
   var draws={};
   function markQuick(host,days){ var sel=days.slice().sort().join(','); host.querySelectorAll('.day-quick button').forEach(function(b){ var want=b.dataset.q==='week'?'1,2,3,4,5':b.dataset.q==='wkend'?'0,6':'0,1,2,3,4,5,6'; var on=sel===want; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); }); }
   function build(host,k){
-    host.innerHTML='<div class="otd-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Every day</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div>';
+    host.innerHTML='<div class="otd-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Daily</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div>';
     var box=host.querySelector('.day-chips');
     function draw(){
       var days=get(k);box.innerHTML='';
@@ -15424,8 +15424,6 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 .ayu-appb .appb-later{background:rgba(255,255,255,.22);color:#fff}
 .ayu-appb .appb-x{flex:0 0 auto;border:0;background:rgba(255,255,255,.22);color:#fff;width:26px;height:26px;border-radius:50%;font-size:14px;cursor:pointer;padding:0}
 @media (min-width:900px){.ayu-appb{margin:14px 30px 0;max-width:820px}}
-#ayu-appb-toast{position:fixed;left:50%;bottom:calc(max(18px,env(safe-area-inset-bottom)) + 96px);transform:translateX(-50%);z-index:2147482990;width:max-content;max-width:calc(100vw - 32px);box-sizing:border-box;padding:10px 14px;border-radius:12px;background:var(--footer-accent,#0d9488);color:#fff;font-size:.86rem;line-height:1.4;box-shadow:0 8px 22px rgba(0,0,0,.22);transition:opacity .35s}
-#ayu-appb-toast.out{opacity:0}
 #sec-app details.app-part{margin:0}
 #sec-app details.app-part > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:8px 2px;font-size:.86rem;font-weight:800;color:var(--footer-accent,#0d9488)}
 #sec-app details.app-part > summary::-webkit-details-marker{display:none}
@@ -15466,11 +15464,19 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   function mb(b){ return b>0 ? (Math.round(b/104857.6)/10)+' MB' : ''; }
   function installed(){ try{ var st=window.ayuInstallState ? window.ayuInstallState() : ''; return st==='app'||st==='installed' || matchMedia('(display-mode: standalone)').matches || navigator.standalone===true; }catch(e){ return false; } }
 
-  function download(){
+  // The banner turns into a short note in the same place (same colour) for 6 seconds.
+  function noteInPlace(html){
+    document.querySelectorAll('.ayu-appb').forEach(function(b){
+      b.classList.add('appb-note'); b.innerHTML='<div class="appb-tx">'+html+'</div>';
+    });
+    setTimeout(function(){ document.querySelectorAll('.ayu-appb.appb-note').forEach(function(b){ b.classList.add('out'); setTimeout(function(){ b.remove(); },400); }); },6000);
+  }
+  function download(fromBanner){
     if(!cfg) return;
     try{ var a=document.createElement('a'); a.href=cfg.url; a.rel='noopener'; a.style.display='none'; document.body.appendChild(a); a.click(); setTimeout(function(){ a.remove(); },1000); }
     catch(e){ location.href=cfg.url; }
     ls(K_LATER,String(Date.now()));   // no banner again soon after a download
+    if(fromBanner===true) return;   // the banner shows a note and the page stays where it is
     document.querySelectorAll('.ayu-appb').forEach(function(x){ x.remove(); });
     openHelp();
   }
@@ -15495,22 +15501,20 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   // ---- Help → Download app ----
   function androidHtml(){
     if(!ANDROID) return '';
-    if(!cfg) return '<p><b>AyuBase6 for Android</b> is on its way: the same app, with reminders that arrive even when it is closed. Until then, install the web app below.</p>';
+    if(!cfg) return '<p>Coming soon: the same app, with reminders that arrive even when it is closed. Until then, use the Web App below.</p>';
     var meta=['Version '+esc(cfg.versionName), mb(cfg.sizeBytes), 'Android '+esc(cfg.minAndroid||'8.0')+' or later'].filter(Boolean).join(' · ');
-    return '<p><b>AyuBase6 for Android</b> is this same app, with reminders that arrive at their time even when the app is closed, the phone is locked or has been restarted.</p>'
+    return '<p>The same app, with reminders and alarms that arrive on time even when it is closed or the phone is locked.</p>'
       + '<button type="button" class="app-get" onclick="ayuGetApp()">Download the app</button><p class="app-meta">'+meta+'</p>'
-      + '<strong>Installing</strong><ol>'
-      + '<li>Tap <b>Download the app</b>. When it finishes, tap the downloaded file (or open it from Files → Downloads).</li>'
-      + '<li>If asked, allow your browser to install unknown apps, then tap <b>Install</b>.</li>'
-      + '<li>If Play Protect warns you, tap <b>More details → Install anyway</b>. The app is not on Google Play yet.</li>'
-      + '<li>Open AyuBase6, turn on Reminders, and allow notifications and <b>Alarms &amp; reminders</b>.</li></ol>'
-      + '<strong>Your data</strong><p>The app keeps its own copy. To bring what you have here: <b>Backup → Save</b> here, then <b>Backup → Restore</b> in the app and pick that file.</p>'
-      + '<strong>Updates</strong><p>The app tells you when a new version is ready.</p>';
+      + '<strong>Install</strong><ol>'
+      + '<li>Open the downloaded file (Files → Downloads).</li>'
+      + '<li>Allow installing from this browser if asked, then tap <b>Install</b>. If Play Protect warns, tap <b>More details → Install anyway</b> (not on Google Play yet).</li>'
+      + '<li>Open it and allow notifications and <b>Alarms &amp; reminders</b>.</li></ol>'
+      + '<strong>Your data</strong><p><b>Backup → Save</b> here, then <b>Backup → Restore</b> in the app. The app tells you when an update is ready.</p>';
   }
   function webHtml(){
     var head = (ANDROID && cfg) ? '<strong>Or install the web app</strong>' : '<strong>Install the web app</strong>';
     if(installed()) return head+'<p>✓ AyuBase6 is installed on this device. Open it from its icon.</p>';
-    return head+'<p>Adds AyuBase6 to your '+(IOS?'Home Screen':(ANDROID?'home screen':'desktop or Dock'))+', in its own window. Reminders still need it open.</p>'
+    return head+'<p>Adds AyuBase6 to your '+(IOS?'Home Screen':(ANDROID?'home screen':'desktop or Dock'))+' in its own window. Reminders arrive only while it is open.</p>'
       + '<button type="button" class="app-get" onclick="ayuInstallWeb()">Install the web app</button>'
       + '<p class="app-meta" id="app-web-steps"'+(deferred?' hidden':'')+'>'+(deferred?'':webSteps())+'</p>'
       + (IOS ? '<p class="app-note">There is no iPhone app yet.</p>' : '');
@@ -15519,8 +15523,8 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   function part(id,title,html,only){ return '<details class="app-part" data-part="'+id+'"'+(only?' open':'')+'><summary>'+title+'</summary><div class="app-part-b">'+html+'</div></details>'; }
   function helpHtml(){
     var a=androidHtml(), w=webHtml().replace(/^<strong>(Or install the web app|Install the web app)<\/strong>/,'');
-    if(!a) return part('web','Install the web app',w,true);
-    return part('android','AyuBase6 for Android',a,false)+'<hr class="app-sep">'+part('web','Install the web app',w,false);
+    if(!a) return part('web','Web App',w,true);
+    return part('android','Android',a,false)+'<hr class="app-sep">'+part('web','Web App',w,false);
   }
   function render(){
     var s=$('sec-app'); if(!s) return;
@@ -15552,14 +15556,13 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
         +'<span>Reminders arrive on time even when the app is closed.</span>'
         +'<div class="appb-btns"><button type="button" class="appb-get">Download</button><button type="button" class="appb-later">Not now</button></div></div>';
       var later=function(){
-        ls(K_LATER,String(Date.now())); document.querySelectorAll('.ayu-appb').forEach(function(e){ e.remove(); });
-        // a short note in the section colour: where to find it later
-        var old=document.getElementById('ayu-appb-toast'); if(old) old.remove();
-        var t=document.createElement('div'); t.id='ayu-appb-toast'; t.setAttribute('role','status');
-        t.innerHTML='You can download the app later from <b>Help → Download app</b> (the ? icon at the bottom of the page).';
-        document.body.appendChild(t); setTimeout(function(){ t.classList.add('out'); setTimeout(function(){ t.remove(); },400); },5000);
+        ls(K_LATER,String(Date.now()));
+        noteInPlace('You can download the app later from <b>Help → Download app</b> (the ? icon at the bottom of the page).');
       };
-      b.querySelector('.appb-get').addEventListener('click',download);
+      b.querySelector('.appb-get').addEventListener('click',function(){
+        download(true);
+        noteInPlace('Downloading… When it finishes, open the file to install. The steps are in <b>Help → Download app</b>.');
+      });
       b.querySelector('.appb-later').addEventListener('click',later);
       var ann=p.querySelector(':scope > .ayu-ann');   // after an announcement banner, if one is showing
       if(ann) ann.after(b); else p.insertBefore(b,p.firstChild);
@@ -16374,7 +16377,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   function buildDays(){
     var host=$('rem-alarm-days'); if(!host) return;
     var ORDER=[1,2,3,4,5,6,0], L={1:'M',2:'T',3:'W',4:'T',5:'F',6:'S',0:'S'}, F={1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday',6:'Saturday',0:'Sunday'};
-    host.innerHTML='<div class="otd-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Every day</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div>';
+    host.innerHTML='<div class="otd-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Daily</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div>';
     var box=host.querySelector('.day-chips');
     function set(days){ var c=get('rem'); c.days=days; put('rem',c); draw(); }
     function draw(){
@@ -16534,7 +16537,6 @@ html body #routines-notify-card.ayu-in-day .rout-card-hdr{justify-content:flex-s
 .ayu-al-row{flex-wrap:nowrap}
 .ayu-al-lbl{flex:0 0 104px}
 .ayu-al-row select, .ayu-al-time{background:transparent !important}
-#rem-alarm-card .ayu-al-row .reminder-custom-select-wrap select{background:transparent !important}
 html body #rem-alarm-days.otd-row{display:grid !important;grid-template-columns:104px minmax(0,1fr);align-items:center;column-gap:8px;row-gap:8px}
 html body #rem-alarm-days .otd-title{margin:0 !important;font-size:.84rem;font-weight:700}
 html body #rem-alarm-days .day-chips{display:flex;gap:6px;flex-wrap:nowrap;min-width:0}
@@ -16578,6 +16580,32 @@ html body #routines-panel #start-my-day-reset .reset-icon-btn{background:var(--r
   #tour-text li{margin:2px 0 !important}
   #tour-text .tf-ic{transform:scale(.85)}
 }
+/* 04-Nov (3): banner note in place; Checks Alarm / Notify Me without boxes; compact fields; fields like My Reminders' Time field */
+.ayu-appb.appb-note{display:block;transition:opacity .35s}
+.ayu-appb.appb-note.out{opacity:0}
+html body #chk-alarm.ayu-sub, html body #routines-notify-card.ayu-in-day{background:transparent !important;border:0 !important;border-radius:0 !important;padding:0 !important;margin:20px 0 !important}
+html body #chk-alarm.ayu-sub:not(.ayu-closed), html body #routines-notify-card.ayu-in-day:not(.ayu-closed){padding-bottom:0 !important}
+html body #routines-notify-card.ayu-in-day{margin-top:0 !important}
+.ayu-sub-hdr .master-switch, html body #routines-notify-card.ayu-in-day .rout-card-hdr .master-switch{transform:scale(.9);transform-origin:right center}
+.ayu-sub-hdr .rout-info-btn, html body #routines-notify-card.ayu-in-day .rout-card-hdr .rout-info-btn{width:20px !important;height:20px !important;min-width:20px !important;font-size:11px !important}
+.ayu-chev{width:22px;height:22px}
+.ayu-al-row select, .ayu-al-time, #rem-alarm-card .ayu-al-row .reminder-custom-select-wrap select{min-height:0 !important;height:34px !important;padding:4px 10px !important;font-size:.86rem !important;line-height:1.2 !important}
+.ayu-al-time{height:auto !important;min-height:34px !important;font-size:.95rem !important}
+.ayu-al-play{height:34px;width:36px}
+.ayu-al-body{gap:6px}
+/* Fields: white with a section-colour border, like My Reminders' name field */
+html body #chk-alarm .ayu-al-row select{background:#fff !important;border:1.5px solid var(--rout-2,#a75b12) !important;border-radius:12px !important;color:#1e293b !important;box-shadow:none !important}
+html body #rem-alarm-card .ayu-al-row select, html body #rem-alarm-card .ayu-al-row .reminder-custom-select-wrap select, html body #rem-alarm-card .ayu-al-time,
+html body #alerts-panel #custom-reminders-card .custom-reminder-form input,
+html body #alerts-panel #custom-reminders-card .custom-reminder-form select,
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .duration-clock-trigger,
+html body #alerts-panel #custom-reminders-card #custom-reminders-list .custom-reminder-form input[name="name"],
+html body #alerts-panel #custom-reminders-card #custom-reminders-list .custom-reminder-form input[name="name"]:focus{background:#fff !important;background-color:#fff !important;border:1.5px solid #0f766e !important;border-radius:12px !important;color:#1e293b !important;box-shadow:none !important}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-custom-select-wrap, html body #rem-alarm-card .reminder-custom-select-wrap{background:transparent !important}
+html body #alerts-panel #rem-alarm-card .reminder-custom-select-trigger, html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-custom-select-trigger{background:#fff !important;background-color:#fff !important;border:1.5px solid #0f766e !important;border-radius:12px !important;color:#1e293b !important;box-shadow:none !important;min-height:34px !important}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form input::placeholder{color:#6b7280;opacity:1}
+/* My Reminders: keep the lower lotus clear of the day buttons */
+#alerts-panel #custom-reminders-card > .sec-lotus-layer .sec-lotus:nth-child(2){top:auto !important;bottom:-40px !important}
 </style>
 <script id="accent-on-load-20261104">
 /* The section colour (--footer-accent) is set when a tab is switched; set it at load too, so banners and buttons match the first tab. */
