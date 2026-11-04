@@ -126,10 +126,17 @@ final class ReminderScheduler {
         if (rules != null && target > 0) {
             long from = Math.max(target, now - MAX_LATE_MIN);
             Map<String, ReminderRules.Due> latest = new LinkedHashMap<>();
+            Map<String, Long> dueAt = new java.util.HashMap<>();
             for (long t = from; t <= now; t++) {
-                for (ReminderRules.Due d : ReminderRules.due(rules, local(t), t)) latest.put(d.key, d);
+                for (ReminderRules.Due d : ReminderRules.due(rules, local(t), t)) { latest.put(d.key, d); dueAt.put(d.key, t); }
             }
-            for (ReminderRules.Due d : latest.values()) {
+            JSONObject alarm = AlarmService.config(c);
+            for (Map.Entry<String, ReminderRules.Due> e : latest.entrySet()) {
+                ReminderRules.Due d = e.getValue();
+                // Checks set to ring like an alarm: the start of an activity rings (only if it is due now, not hours late)
+                boolean ring = alarm != null && "routines".equals(d.section) && START_KEY.matcher(d.key).matches()
+                    && now - dueAt.getOrDefault(d.key, 0L) <= 2;
+                if (ring && AlarmService.start(c, d.key, d.title, d.body, 0)) continue;
                 show(c, "nudge-" + d.key, d.title, d.body, false, NotificationArt.forSection(d.section), d.section, d.key, actionsFor(d.key));
             }
         }
@@ -139,6 +146,8 @@ final class ReminderScheduler {
             JSONObject o = sn.optJSONObject(i); if (o == null) continue;
             long t = o.optLong("t");
             if (t > now) { keep.put(o); continue; }
+            if (o.optBoolean("alarm", false) && now - t <= 2 && AlarmService.config(c) != null
+                    && AlarmService.start(c, o.optString("key"), o.optString("title"), o.optString("body"), o.optInt("count", 1))) continue;
             if (now - t <= MAX_LATE_MIN) {
                 String k = o.optString("key");
                 show(c, "nudge-" + k, o.optString("title"), o.optString("body"), false, NotificationArt.forSection("routines"), "routines", k, actionsFor(k));
@@ -340,6 +349,20 @@ final class ReminderScheduler {
             if (A_DONE.equals(o.optString("action")) && !today.equals(o.optString("day"))) continue;
             try { mutate(rules, o.optString("key"), o.optString("action"), today); } catch (Exception ignored) {}
         }
+    }
+
+    private static final java.util.regex.Pattern START_KEY = java.util.regex.Pattern.compile("^routine-[a-z]+$");
+
+    /** Snooze on a ringing alarm: ring again after `minutes`; `count` snoozes used so far. */
+    static void addAlarmSnooze(Context c, String key, String title, String body, int count, int minutes) {
+        try {
+            org.json.JSONArray sn = snoozes(c), keep = new org.json.JSONArray();
+            for (int i = 0; i < sn.length(); i++) { JSONObject o = sn.optJSONObject(i); if (o != null && !key.equals(o.optString("key"))) keep.put(o); }
+            keep.put(new JSONObject().put("t", System.currentTimeMillis() / 60000L + minutes).put("key", key)
+                .put("title", title).put("body", body).put("alarm", true).put("count", count));
+            saveSnoozes(c, keep);
+        } catch (Exception ignored) {}
+        reschedule(c);
     }
 
     private static void dropSnooze(Context c, String key) {

@@ -9,4 +9,5 @@ Capacitor wrapper around the AyuBase6 web app (pyreddysharath/AyuBase6.com), wit
 - `DECISIONS.md` — every choice, with the reason.
 
 Local build (needs Android SDK): `npm ci && WEB_DIR=../AyuBase6.com npm run sync && cd android && ./gradlew assembleDebug`.
+Alarm tones (res/raw) after a tone change: `python3 scripts/make-tones.py`.
 Parity fixture after a change to the server rules: `node scripts/make-parity-fixture.mjs ../ayubase6-push/src/rules.js`.

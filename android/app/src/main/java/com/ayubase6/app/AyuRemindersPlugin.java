@@ -273,6 +273,57 @@ public class AyuRemindersPlugin extends Plugin {
         }
     }
 
+    // ── Checks alarm ringtones ──
+    private android.media.MediaPlayer preview;
+    private final android.os.Handler previewStop = new android.os.Handler(android.os.Looper.getMainLooper());
+
+    /** Keeps the person's own ringtone (one) in the app's private storage. */
+    @PluginMethod
+    public void saveTone(PluginCall call) {
+        String b64 = call.getString("base64", "");
+        try {
+            byte[] data = android.util.Base64.decode(b64, android.util.Base64.DEFAULT);
+            if (data.length == 0 || data.length > 8 * 1024 * 1024) { call.reject("Choose a sound file under 8 MB"); return; }
+            try (java.io.FileOutputStream os = new java.io.FileOutputStream(AlarmService.ownTone(getContext()))) { os.write(data); }
+            call.resolve();
+        } catch (Exception e) { call.reject("Could not save the sound"); }
+    }
+
+    /** Plays a ringtone for a few seconds: an app tone id, "phone" (the phone's default alarm) or "own". */
+    @PluginMethod
+    public void previewTone(PluginCall call) {
+        stopPreviewNow();
+        String tone = call.getString("tone", "rise");
+        android.net.Uri uri;
+        if ("phone".equals(tone)) {
+            uri = android.media.RingtoneManager.getActualDefaultRingtoneUri(getContext(), android.media.RingtoneManager.TYPE_ALARM);
+            if (uri == null) uri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM);
+            if (uri == null) uri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_RINGTONE);
+        } else if ("own".equals(tone) && AlarmService.ownTone(getContext()).exists()) {
+            uri = android.net.Uri.fromFile(AlarmService.ownTone(getContext()));
+        } else uri = AlarmService.rawTone(getContext(), tone);
+        try {
+            preview = new android.media.MediaPlayer();
+            preview.setAudioAttributes(new android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
+            preview.setDataSource(getContext(), uri);
+            preview.setLooping(!"phone".equals(tone) && !"own".equals(tone));
+            preview.prepare(); preview.start();
+            previewStop.postDelayed(this::stopPreviewNow, 6000);
+            call.resolve();
+        } catch (Exception e) { stopPreviewNow(); call.reject("Could not play this sound"); }
+    }
+
+    @PluginMethod
+    public void stopPreview(PluginCall call) { stopPreviewNow(); call.resolve(); }
+
+    private void stopPreviewNow() {
+        previewStop.removeCallbacksAndMessages(null);
+        try { if (preview != null) { preview.stop(); preview.release(); } } catch (Exception ignored) {}
+        preview = null;
+        notifyListeners("previewEnded", new JSObject());
+    }
+
     @PluginMethod
     public void openBatterySettings(PluginCall call) {
         openSettings(call, new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));

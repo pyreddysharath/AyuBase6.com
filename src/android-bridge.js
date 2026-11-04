@@ -234,8 +234,20 @@
     };
     slots.next.__ayuAnchor = true;
   }
+  // Checks → Alarm settings travel with the rules, so the phone rings the activity's start like an alarm.
+  function addAlarm(rules){
+    try{
+      var a = (typeof window.ayuAlarmConfig === 'function') ? window.ayuAlarmConfig() : null;
+      if(rules && rules.checks && a && a.on) rules.checks.alarm = { on:true, tone:a.tone, ring:+a.ring||0, snoozeMin:+a.snoozeMin||5, snoozeMax:+a.snoozeMax||0, keys:a.keys === 'stop' ? 'stop' : 'snooze' };
+    }catch(e){}
+    return rules;
+  }
+  state.previewTone = function(tone){ return P.previewTone({ tone:String(tone || 'rise') }); };
+  state.stopPreview = function(){ return P.stopPreview().catch(noop); };
+  state.saveTone = function(b64){ return P.saveTone({ base64:b64 }); };
+  document.addEventListener('ayu-alarm-changed', function(){ setTimeout(function(){ sync(true); }, 100); });
   function currentRules(){
-    try{ return addAnchors((window.ayuPush && typeof ayuPush.buildRules === 'function') ? ayuPush.buildRules() : null); }catch(e){ return null; }
+    try{ return addAlarm(addAnchors((window.ayuPush && typeof ayuPush.buildRules === 'function') ? ayuPush.buildRules() : null)); }catch(e){ return null; }
   }
   function sync(force){
     if(busy){ again = true; return; }

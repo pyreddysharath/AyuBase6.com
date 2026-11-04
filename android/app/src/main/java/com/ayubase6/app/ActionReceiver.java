@@ -17,6 +17,7 @@ public class ActionReceiver extends BroadcastReceiver {
         new Thread(() -> {
             try {
                 ReminderScheduler.applyAction(app, key, action, tag, title, body);
+                if ("done".equals(action) && key != null) AlarmService.stopIfKey(key);
                 AyuRemindersPlugin.actionsWaiting();   // the app, if it is open, applies it at once
             } finally { done.finish(); }
         }, "ayu-action").start();
