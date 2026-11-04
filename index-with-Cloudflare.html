@@ -14231,7 +14231,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('nutrition','#sec-diet',0,C.food,'<b>Dietary Preference</b>: vegetarian, non-vegetarian or vegan. Your plan then appears below: Nutrients &amp; Food, Cart This Week and Recipes For You.');
   // Checks
   tab('routines','.tab-btn.routines',C.checks,'Your day, from morning to night.');
-  sec('routines','#routines-panel .rout-page > .rout-card',0,C.checks,'<b>Start My Day</b>: set when your day starts, any time in 24 hours: slide, use − / +, or tap the time for a clock. Every check below is timed from it. Outside 4–10 AM it becomes a shift schedule, with meals, light and sleep adjusted.');
+  sec('routines','#routines-panel .rout-page > .rout-card',0,C.checks,'<b>My Day Plan</b>: set your wake-up time, any time in 24 hours: slide the bar, or tap the time under it for a clock. Every check below is timed from it. Outside 4–10 AM it becomes a shift schedule, with meals, light and sleep adjusted.');
   sec('routines','#chk-alarm',0,C.checks,'<b>Alarm</b>: switch it on to wake up at your start time, with your choice of ringtone, ring length and snooze. Tap the i for details.');
   sec('routines','#routines-notify-card',0,C.checks,'<b>Notify Me</b>: turn on notifications for your checks. Its settings open when it is on.');
   sec('routines','#routines-panel .rout-page > .rout-card',1,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.');
@@ -15573,7 +15573,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       var sec=[].filter.call(document.querySelectorAll('footer .footer-acc-body'),function(x){ return x.style.display==='block'; })[0]; if(!sec) return;
       var nav=document.getElementById('app-nav'), row=document.getElementById('footer-tabs-row'); if(!row) return;
       var side=window.matchMedia('(min-width:900px)').matches && row.parentElement===nav;
-      var navH=nav?nav.offsetHeight:0, vh=window.innerHeight, pad=16;
+      var navH=(nav && /sticky|fixed/.test(getComputedStyle(nav).position)) ? Math.max(0,nav.getBoundingClientRect().bottom) : 0, vh=window.innerHeight, pad=16;   // phones: the top bar scrolls away, so it takes no room
       var sub=[].filter.call(sec.querySelectorAll('.footer-sub'),function(x){ return x.getClientRects().length>0; })[0]||sec;   // the visible tab
       var bottom=sub.getBoundingClientRect().bottom, need=bottom-(vh-pad);            // how far the page must move to show the end of the text
       var foot=row.closest('footer')||row;
@@ -15753,7 +15753,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
         +'<div class="appb-btns"><button type="button" class="appb-get">Download</button><button type="button" class="appb-later">Not now</button></div></div>';
       var later=function(){
         ls(K_LATER,String(Date.now()));
-        noteInPlace('You can download the app later from <b>Help → Download app</b> (the ? icon at the bottom of the page).');
+        noteInPlace('You can download the app later from <b>Help</b> <svg class="appb-help-ic" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-label="Help icon" role="img"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg> <b>→ Download app</b>, at the bottom of the page.');
       };
       // Download: first a short note (so it can be read), then the download starts and Help → Download app → Android opens.
       b.querySelector('.appb-get').addEventListener('click',function(){
@@ -16306,7 +16306,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
 
   // Reset Start My Day: start time 6:30 AM, Alarm off with its first settings, Notify Me off, at start, every day.
   function resetDay(){
-    if(!confirm('Reset Start My Day? The start time goes back to 6:30 AM, and Alarm and Notify Me are turned off with their first settings.')) return;
+    if(!confirm('Reset My Day Plan? The wake-up time goes back to 6:30 AM, and Alarm and Notify Me are turned off with their first settings.')) return;
     try{ localStorage.removeItem('ayuBase6-routine-alarm'); localStorage.removeItem('ayuBase6-routine-days'); }catch(e){}
     try{ var o=JSON.parse(localStorage.getItem('ayuSectionsOpen')||'{}')||{}; delete o['wake-alarm']; delete o.notify; localStorage.setItem('ayuSectionsOpen',JSON.stringify(o)); }catch(e){}
     try{ if(typeof setRoutineRemindMode==='function') setRoutineRemindMode('start'); document.querySelectorAll('#routines-remind-panel input[name=routines-remind]').forEach(function(r){ r.checked=(r.value==='start'); }); }catch(e){}
@@ -16324,21 +16324,18 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     if(!card.dataset.ayuDay){
       card.dataset.ayuDay='1'; card.id=card.id||'start-my-day-card';
       var h2=card.querySelector('.rout-card-hdr h2');
-      if(h2){ for(var n=h2.lastChild;n;n=n.previousSibling){ if(n.nodeType===3 && /Wake-up time/.test(n.textContent)){ n.textContent=' Start My Day'; break; } } }
+      if(h2){ for(var n=h2.lastChild;n;n=n.previousSibling){ if(n.nodeType===3 && /Wake-up time/.test(n.textContent)){ n.textContent=' My Day Plan'; break; } } }
       // the time: tap for the clock face, − / + for 15 minutes
       var hdr=card.querySelector('.wake-control-hdr'), val=$('wake-time-val');
       if(hdr && val){
         val.style.display='none';
-        var minus=document.createElement('button'); minus.type='button'; minus.className='ayu-step'; minus.textContent='−'; minus.setAttribute('aria-label','15 minutes earlier');
-        var plus=document.createElement('button'); plus.type='button'; plus.className='ayu-step'; plus.textContent='+'; plus.setAttribute('aria-label','15 minutes later');
-        var tb=document.createElement('button'); tb.type='button'; tb.className='ayu-time-btn'; tb.id='ayu-wake-time'; tb.setAttribute('aria-label','Choose the start time on a clock');
-        tb.style.font=getComputedStyle(val).font; tb.style.color=getComputedStyle(val).color;
-        hdr.appendChild(minus); hdr.appendChild(tb); hdr.appendChild(plus);
-        minus.addEventListener('click',function(){ setWake(wake()-(+sl.step||15)); });
-        plus.addEventListener('click',function(){ setWake(wake()+(+sl.step||15)); });
+        var lb=document.createElement('span'); lb.className='wake-bar-lbl'; lb.id='wake-bar-lbl'; lb.textContent='Wake-up time'; hdr.appendChild(lb);
+        sl.setAttribute('aria-labelledby','wake-bar-lbl');
+        var tb=document.createElement('button'); tb.type='button'; tb.className='ayu-time-btn'; tb.id='ayu-wake-time'; tb.setAttribute('aria-label','Wake-up time: choose it on a clock');
         tb.addEventListener('click',function(){ pickTime(wake(), +sl.step||15, 'var(--rout-2,#a75b12)', function(v){ setWake(v); }); });
       }
-      var ends=card.querySelector('.wake-range-ends'); if(ends) ends.innerHTML='<span>12:00 AM</span><span>12 PM</span><span>11:45 PM</span>';
+      var ends=card.querySelector('.wake-range-ends');
+      if(ends){ ends.innerHTML='<span>12:00 AM</span><span>11:45 PM</span>'; if(tb) ends.insertBefore(tb, ends.lastChild); }
       sl.addEventListener('input',applyMode); sl.addEventListener('change',applyMode);
     }
     // Alarm, then Notify Me, inside the same section
@@ -16483,7 +16480,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   }
   function infoHtml(id){
     var when = id==='wake'
-      ? '<li><b>Time</b> is always your <b>Start My Day</b> time, on the days chosen under Notify Me (every day if Notify Me is off).</li>'
+      ? '<li><b>Time</b> is always your <b>My Day Plan</b> wake-up time, on the days chosen under Notify Me (every day if Notify Me is off).</li>'
       : '<li><b>Time</b>: tap it and pick the hour, then the minutes, on the clock (any time of day). <b>On these days</b> picks the days it rings.</li>';
     return '<strong>Alarm</strong><ul>'+when
       +'<li><b>Ringtone</b>: AyuBase6’s tones'+(APP?', the phone’s default alarm':'')+', or <b>Upload a sound…</b> for your own (one sound, shared by both alarms). ▶ plays a preview.</li>'
@@ -16839,6 +16836,18 @@ html body #sec-settings .footer-subtab.active, html body #sec-settings .footer-s
 html body :is(#alerts-panel,#routines-panel) .day-quick{flex-wrap:wrap !important;justify-content:flex-start !important}
 html body :is(#alerts-panel,#routines-panel) .day-quick button{flex:0 0 auto !important;width:auto !important;min-width:0 !important;padding:3px 10px !important}
 @media (max-width:420px){ html body :is(#alerts-panel,#routines-panel) .day-quick{gap:3px !important;flex-wrap:nowrap !important} html body :is(#alerts-panel,#routines-panel) .day-quick button{padding:3px 6px !important;font-size:11px !important;letter-spacing:-.1px} }
+/* 04-Nov (7): wake-up time label and time under the bar; Settings tabs without repeated titles; day buttons from the left; My Reminders bottom */
+html body #start-my-day-card .wake-control-hdr{justify-content:flex-start !important;margin-bottom:6px}
+.wake-bar-lbl{font-size:.9rem;font-weight:700;color:var(--rout-2,#a75b12)}
+html body #start-my-day-card .wake-range-ends{align-items:center;opacity:1 !important;margin-top:4px}
+html body #start-my-day-card .wake-range-ends > span{opacity:.7}
+html body #start-my-day-card .ayu-time-btn{font-size:1.25rem;font-weight:800;color:var(--rout-2,#a75b12);padding:2px 10px;line-height:1.2}
+.appb-help-ic{display:inline-block;vertical-align:-3px;margin:0 1px}
+html body footer #sec-notifications > .footer-sec-title, html body footer #sec-cookies > .footer-sec-title{display:none !important}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .repeat-on .day-quick{grid-column:1 / -1 !important}
+html body #rem-alarm-days .day-quick{grid-column:1 / -1 !important}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form{padding-bottom:0 !important}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-form-actions{margin-bottom:0 !important}
 </style>
 <script id="accent-on-load-20261104">
 /* The section colour (--footer-accent) is set when a tab is switched; set it at load too, so banners and buttons match the first tab. */
@@ -16880,7 +16889,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-f
   };
   function text(b){
     if(TEXT[b.id]) return TEXT[b.id];
-    if(b.closest('#start-my-day-reset')) return 'Reset Start My Day? The start time goes back to 6:30 AM, and Alarm and Notify Me are turned off with their first settings.';
+    if(b.closest('#start-my-day-reset')) return 'Reset My Day Plan? The wake-up time goes back to 6:30 AM, and Alarm and Notify Me are turned off with their first settings.';
     if(b.closest('#reminder-hours-card, .reminders-reset-row')) return 'Reset Reminders? Reminder hours, days and every reminder’s settings go back to their defaults.';
     var h=b.closest('.calc-card,.rout-card,.alert-card'); h=h&&h.querySelector('h2');
     return 'Reset '+(h?h.textContent.trim():'this section')+'? Its settings go back to their defaults.';
