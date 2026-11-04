@@ -30,7 +30,9 @@ Owner: Sharath (Hyderabad, India). App: **AyuBase6**, a health PWA (Body, Food, 
 - **Day selection** "On these days": everyday by default; Every day / Weekdays / Weekends buttons show selected (`.on`) when they match.
 - **Reset buttons**: look like Vitals' "Upload Report (PDF)" — solid section colour, 12px corners, white icon + "Reset" (`reset-like-upload-20261104`); hover text and accessible name "Reset".
 - **Self-repair** for push (`ayuPush.repair()`), quiet self-heal after 5 s and on returning to the front (at most once a minute).
-- Tour (How it works) lists all six footer icons.
+- Tour (How it works) lists all six footer icons; the Body step mentions Save for offline, the Lab Insights step photos and Enable offline reading.
+- **Offline** (`offline-20261104` block, both builds): "You're offline" notice in Body when the chosen activity videos aren't saved (once per offline spell; "Got it, no need to nag" = `ayuOfflineVideosNoNag`). PDF tools and OCR are served from `lib/` (pdf.js 3.11.174, jsPDF 2.5.1, tesseract.js 5.1.1 + core + `eng.traineddata.gz`); `sw.js` keeps `lib/` PDF tools (cache `ayubase6-lib-v1`).
+- **Lab Insights upload**: "Upload Report" + hint "PDF or photo"; photos (one or several) are turned into one PDF and read with OCR, then "Read from a photo, so check the values…". "Enable offline reading" keeps the OCR engine (Cache Storage `ayubase6-ocr-v1`) and English data (IndexedDB `keyval-store`, key `ayubase6-ocr/eng.traineddata`); `window.Tesseract.recognize` is wrapped to use them.
 
 ## Known limits / not built
 - On the website, reminders (including repeating ones) ring only while the app is open; web push is paused. The Android app delivers them with the app closed.
@@ -41,7 +43,7 @@ Owner: Sharath (Hyderabad, India). App: **AyuBase6**, a health PWA (Body, Food, 
 - Serve copies with `python3 -m http.server`, drive with Playwright (Chromium). Headless reports notification permission "denied", so stub `Notification.permission` and `showNotification` to test. Accept or pre-set the cookie consent key `healtheeCookieConsent` and `ayuBase6-tour-seen` so banners do not block clicks.
 
 ## State at handoff
-- 03-Nov-2026: files swapped (live site = no-push build), Reminders and Checks switches independent, push-server timer paused, Android app offer on the website (hidden until the first publish), privacy page, notification buttons, ads in the app, Play material ready. Everything requested so far is committed. Next on Sharath's side: release key + token secrets, then the first publish run.
+- 03-Nov-2026: files swapped (live site = no-push build), Reminders and Checks switches independent, push-server timer paused, Android app offer on the website (hidden until the first publish), privacy page, notification buttons, ads in the app, Play material ready. 04-Nov-2026: offline notice, PDF tools offline, photos and Enable offline reading in Lab Insights. Everything requested so far is committed. Next on Sharath's side: release key + token secrets, then the first publish run.
 - Section colours (used by `--footer-accent`): Body `#2563eb`, Food `#16a34a`, Checks amber, Reminders teal `#0d9488`, Mind purple, Vitals teal-blue. Popups, banners, footer, test notification and tour follow the open section.
 - Footer/section code: `FOOTER_SECTIONS`, `FOOTER_ALIAS`, `FOOTER_SUBS`, `showFooterSection(id)`, `showFooterSub(parent,sub)`; Help subs are check (shown as "Notifications"), trouble, feedback, app (added at run time by `get-app-20261103`); Announcements is its own section.
 - Notifications code: `showNudgeNotification`, `nudgeArt` + `NUDGE_THEMES`, `buildRules()` in the push block of `index-with-Cloudflare.html` (what the server and the Android app schedule from: custom reminders, Eyes, Walk, Water, Eyes Exercise, Checks), `ayuPush` (active/api/error/sync/repair).
@@ -56,7 +58,7 @@ Owner: Sharath (Hyderabad, India). App: **AyuBase6**, a health PWA (Body, Food, 
 
 ## Android app (`AyuBase6-Android`)
 - Capacitor 8 wrapper, package `com.ayubase6.app`, min Android 8.0. Every choice with its reason is in `DECISIONS.md`.
-- `scripts/prepare-www.mjs` builds `www/` from the website's `index-with-Cloudflare.html` (exact-count patches: bridge script, live media, no ads, Android wording for the Reminder hours i, Checks Notify Me i and Troubleshooting) plus an empty `config/push.json`.
+- `scripts/prepare-www.mjs` builds `www/` from the website's `index-with-Cloudflare.html` (exact-count patches: bridge script, live media, Android wording for the Reminder hours i, Checks Notify Me i and Troubleshooting) plus an empty `config/push.json`, and bundles `lib/pdfjs`, `lib/jspdf` and `lib/tesseract/{tesseract.min.js,worker.min.js}` (the OCR engine and data come from ayubase6.com when first needed).
 - `src/android-bridge.js`: phone-backed Notification API, sends `buildRules()` to the phone when anything changes, live `content/` and announcements from ayubase6.com, no service worker, hides install buttons, "Alarms & reminders" card, Eyes/Walk/Water count from the moment they are turned on (and "Next:" shows that time).
 - Native (Java): `AyuRemindersPlugin`, `ReminderRules` (port of the push server's `rules.js`, unit-tested against it), `ReminderScheduler` (one exact alarm for the next due minute, channels, notifications in section colours), `NotificationArt`, `AlarmReceiver`, `BootReceiver`. Text size fixed at 100%.
 - GitHub Actions builds a debug APK on every push to main and publishes it as the `debug-latest` pre-release. A website change needs a push to the Android repo (or a manual run) to reach the APK.

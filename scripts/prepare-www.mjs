@@ -76,6 +76,17 @@ function copyDir(rel) {
 }
 copyDir('icons');
 copyDir('favicons');
+// PDF reader, PDF maker and the OCR loader are bundled, so Download PDF and reading reports work offline.
+// The OCR engine and English data stay on the website and are kept on the phone after first use
+// (or "Enable offline reading"), which keeps the APK small.
+copyDir('lib/pdfjs');
+copyDir('lib/jspdf');
+fs.mkdirSync(path.join(out, 'lib', 'tesseract'), { recursive: true });
+for (const f of ['tesseract.min.js', 'worker.min.js', 'LICENSE.md', 'LICENSE-core']) {
+  const src = path.join(web, 'lib', 'tesseract', f);
+  if (fs.existsSync(src)) fs.copyFileSync(src, path.join(out, 'lib', 'tesseract', f));
+  else if (/\.js$/.test(f)) { console.error('Missing ' + src); process.exit(1); }
+}
 for (const f of ['manifest.json', 'OurOtherSites.json']) {
   const src = path.join(web, 'config', f);
   if (fs.existsSync(src)) fs.copyFileSync(src, path.join(out, 'config', f));
