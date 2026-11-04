@@ -6,6 +6,9 @@ FOLDER STRUCTURE
                       Not served as the site; the Android app (AyuBase6-Android) is built from it, with push switched off.
   sw.js               Service worker (offline use, notification taps, saved videos). Must sit at the site root.
   CNAME, ads.txt      Domain and ads settings.
+  lib/                PDF reader (pdf.js), PDF maker (jsPDF) and the OCR tool (tesseract.js + English data), served from
+                      this site so they work offline and do not depend on public CDNs. See lib/README.txt.
+  privacy.html        Privacy policy (website and Android app).
   config/             manifest.json (install details), OurOtherSites.json (footer list), feedback_apps_script.gs,
                      push.json (address of the push server; empty = reminders only work while the app is open).
   icons/, favicons/   App icons and favicons.

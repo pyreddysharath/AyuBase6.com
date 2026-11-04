@@ -1,8 +1,18 @@
 
-const CACHE_NAME = 'ayubase6-pwa-v8';   // v8: the site now runs the build without web push
+const CACHE_NAME = 'ayubase6-pwa-v9';   // v9: PDF tools and OCR loader served from lib/ on this site
 // Videos and preview images from content/ are kept here the first time they are used.
 // Separate from CACHE_NAME so an app update does not throw the videos away.
 const MEDIA_CACHE = 'ayubase6-media-v2';
+// The PDF reader, the PDF maker and the OCR loader (lib/ on this site): kept so they work offline.
+// The OCR engine and English data are kept by the page itself (Enable offline reading), not here.
+const LIB_CACHE = 'ayubase6-lib-v1';
+const LIB_FILES = [
+  './lib/pdfjs/pdf.min.js',
+  './lib/pdfjs/pdf.worker.min.js',
+  './lib/jspdf/jspdf.umd.min.js',
+  './lib/tesseract/tesseract.min.js',
+  './lib/tesseract/worker.min.js'
+];
 
 const APP_SHELL = [
   './',
@@ -37,6 +47,14 @@ self.addEventListener('install', event => {
           }
         })
     );
+
+    // PDF tools and the OCR loader (about 2 MB), so Download PDF and reading reports work offline.
+    try {
+      const lib = await caches.open(LIB_CACHE);
+      await Promise.all(LIB_FILES.map(async path => {
+        try { await lib.add(path); } catch (error) { console.warn('[AyuBase6 SW] Could not precache:', path, error); }
+      }));
+    } catch (error) {}
 
     await self.skipWaiting();
   })());
@@ -196,6 +214,19 @@ self.addEventListener('fetch', event => {
 
   if (/\/content\/.+\.(mp4|jpg|jpeg|png|webp|json)$/i.test(url.pathname)) {
     event.respondWith(handleMedia(request, url));
+    return;
+  }
+
+  // lib/ PDF tools and OCR loader: the saved copy straight away, refreshed in the background.
+  const libPath = LIB_FILES.find(p => url.pathname === new URL(p, self.location.href).pathname);
+  if (libPath) {
+    event.respondWith((async () => {
+      const lib = await caches.open(LIB_CACHE);
+      const hit = await lib.match(libPath);
+      const fresh = fetch(request).then(async r => { if (r && r.ok) await lib.put(libPath, r.clone()); return r; }).catch(() => null);
+      if (hit) { event.waitUntil(fresh); return hit; }
+      return (await fresh) || Response.error();
+    })());
     return;
   }
 
