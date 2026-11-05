@@ -279,6 +279,12 @@
   state.sync = function(){ sync(true); };
   // Settings → Notifications button: Android lets only its own settings page turn the permission on or off
   state.openNotifSettings = function(){ return P.openNotificationSettings().catch(noop); };
+  // Clock: the page's timer / stopwatch / World Clock state goes to the phone (live notifications with buttons, the timer's alarm)
+  if(typeof P.clockSet === 'function' && typeof P.clockGet === 'function'){
+    state.clockSet = function(o){ return P.clockSet(o || {}); };
+    state.clockGet = function(){ return P.clockGet(); };
+    try{ P.addListener('clockChanged', function(){ try{ window.dispatchEvent(new Event('ayu-clock-native')); }catch(e){} }); }catch(e){}
+  }
   // Backup to the person's Google account (Android key/value backup of one data copy)
   if(typeof P.backupSave === 'function' && typeof P.backupLoad === 'function'){   // only on an app build that has them
     state.backupSave = function(data){ return P.backupSave({ data:String(data) }); };

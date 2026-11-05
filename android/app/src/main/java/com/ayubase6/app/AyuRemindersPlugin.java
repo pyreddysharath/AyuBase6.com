@@ -44,6 +44,43 @@ public class AyuRemindersPlugin extends Plugin {
         if (p != null) p.notifyListeners("reminderAction", new JSObject(), true);
     }
 
+    /** A Clock button on a notification (or the timer's end) changed the timer or stopwatch: tell the open app. */
+    static void clockChanged() {
+        AyuRemindersPlugin p = current.get();
+        if (p != null) p.notifyListeners("clockChanged", new JSObject(), true);
+    }
+
+    /** The page's Clock state: timer, stopwatch, world (each only if newer than the phone's copy, by its "v"). */
+    @PluginMethod
+    public void clockSet(PluginCall call) {
+        android.content.Context c = getContext();
+        synchronized (ClockReceiver.class) {
+            for (String k : new String[]{"timer", "stopwatch", "world"}) {
+                JSObject o = call.getObject(k);
+                if (o == null) continue;
+                JSONObject mine = ClockNotifier.load(c, k);
+                if (o.optLong("v", 0) >= mine.optLong("v", 0)) ClockNotifier.save(c, k, o);
+            }
+        }
+        ClockNotifier.refresh(c);
+        call.resolve(clockState());
+    }
+
+    @PluginMethod
+    public void clockGet(PluginCall call) { call.resolve(clockState()); }
+
+    private JSObject clockState() {
+        JSObject r = new JSObject();
+        android.content.Context c = getContext();
+        try {
+            r.put("timer", JSObject.fromJSONObject(ClockNotifier.load(c, "timer")));
+            r.put("stopwatch", JSObject.fromJSONObject(ClockNotifier.load(c, "stopwatch")));
+            r.put("world", JSObject.fromJSONObject(ClockNotifier.load(c, "world")));
+        } catch (Exception ignored) {}
+        r.put("now", System.currentTimeMillis());
+        return r;
+    }
+
     @PluginMethod
     public void takeActions(PluginCall call) {
         JSObject r = new JSObject();

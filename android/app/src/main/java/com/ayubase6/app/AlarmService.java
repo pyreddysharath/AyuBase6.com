@@ -37,7 +37,7 @@ import java.lang.ref.WeakReference;
  */
 public class AlarmService extends Service {
     static final String A_START = "com.ayubase6.app.ALARM_START";
-    static final String EX_KEY = "ayu_key", EX_TITLE = "ayu_title", EX_BODY = "ayu_body", EX_COUNT = "ayu_count";
+    static final String EX_KEY = "ayu_key", EX_TITLE = "ayu_title", EX_BODY = "ayu_body", EX_COUNT = "ayu_count", EX_CFG = "ayu_cfg";
     static final String CHANNEL_ALARMS = "alarms";
     static final int NOTIF_ID = 7301;
 
@@ -81,6 +81,19 @@ public class AlarmService extends Service {
         }
     }
 
+    /** Rings with its own settings (the Clock timer: tone, vibrate, ringSec). */
+    static boolean startWith(Context c, String key, String title, String body, JSONObject cfg) {
+        Intent i = new Intent(c, AlarmService.class).setAction(A_START)
+            .putExtra(EX_KEY, key).putExtra(EX_TITLE, title).putExtra(EX_BODY, body).putExtra(EX_COUNT, 0).putExtra(EX_CFG, cfg.toString());
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) c.startForegroundService(i); else c.startService(i);
+            return true;
+        } catch (Exception e) {
+            Log.w(ReminderScheduler.TAG, "timer alarm could not start", e);
+            return false;
+        }
+    }
+
     static AlarmService current() { return running; }
 
     /** A Done from a normal notification for the same activity also silences its alarm. */
@@ -109,7 +122,10 @@ public class AlarmService extends Service {
         if (intent == null || !A_START.equals(intent.getAction())) { stopSelf(); return START_NOT_STICKY; }
         if (running == this && player != null) { leaveNotice(); stopSound(); }   // a second alarm while one rings: the first one becomes a notification
         key = str(intent.getStringExtra(EX_KEY));
-        JSONObject c = config(this, key); title = str(intent.getStringExtra(EX_TITLE)); body = str(intent.getStringExtra(EX_BODY));
+        JSONObject c = config(this, key);
+        String own = intent.getStringExtra(EX_CFG);
+        if (own != null) { try { c = new JSONObject(own); } catch (Exception ignored) {} }
+        title = str(intent.getStringExtra(EX_TITLE)); body = str(intent.getStringExtra(EX_BODY));
         count = intent.getIntExtra(EX_COUNT, 0);
         cfg = c != null ? c : new JSONObject();
         running = this;
@@ -125,7 +141,9 @@ public class AlarmService extends Service {
         startRinging();
         int ringMin = cfg.optInt("ring", 0);
         if (autoStop != null) main.removeCallbacks(autoStop);
-        if (ringMin > 0) { autoStop = this::missed; main.postDelayed(autoStop, ringMin * 60000L); }
+        int ringSec = cfg.optInt("ringSec", 0);
+        if (ringSec > 0) { autoStop = this::missed; main.postDelayed(autoStop, ringSec * 1000L); }
+        else if (ringMin > 0) { autoStop = this::missed; main.postDelayed(autoStop, ringMin * 60000L); }
         AlarmActivity a = screen.get();
         if (a != null) a.refresh();
         return START_NOT_STICKY;
@@ -256,6 +274,7 @@ public class AlarmService extends Service {
     }
 
     private void leaveNotice() {
+        if (key.equals("timer")) return;   // the timer's own notification stays
         if (!key.isEmpty()) ReminderScheduler.show(this, "nudge-" + key, title, body, false, theme(), section(), key, ReminderScheduler.actionsFor(key));
     }
 
