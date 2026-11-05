@@ -280,9 +280,11 @@
   // Settings → Notifications button: Android lets only its own settings page turn the permission on or off
   state.openNotifSettings = function(){ return P.openNotificationSettings().catch(noop); };
   // Backup to the person's Google account (Android key/value backup of one data copy)
-  state.backupSave = function(data){ return P.backupSave({ data:String(data) }); };
-  state.backupLoad = function(){ return P.backupLoad(); };
-  state.backupClear = function(){ return P.backupClear(); };
+  if(typeof P.backupSave === 'function' && typeof P.backupLoad === 'function'){   // only on an app build that has them
+    state.backupSave = function(data){ return P.backupSave({ data:String(data) }); };
+    state.backupLoad = function(){ return P.backupLoad(); };
+    state.backupClear = function(){ return typeof P.backupClear === 'function' ? P.backupClear() : Promise.resolve(); };
+  }
   function refreshStatus(){
     return P.checkPermissions().then(function(r){
       setPerm(mapPerm(r && r.notifications));
