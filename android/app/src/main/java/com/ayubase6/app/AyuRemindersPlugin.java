@@ -221,6 +221,33 @@ public class AyuRemindersPlugin extends Plugin {
         openAndReturn(call, i, () -> NotificationManagerCompat.from(getContext()).areNotificationsEnabled());
     }
 
+    /** Keeps a copy of the app's data for Android's backup to the person's Google account, and asks Android to back it up soon. */
+    @PluginMethod
+    public void backupSave(PluginCall call) {
+        String data = call.getString("data");
+        if (data == null || data.length() > 4_000_000) { call.reject("bad data"); return; }
+        long at = System.currentTimeMillis();
+        getContext().getSharedPreferences(AyuBackupAgent.PREFS, android.content.Context.MODE_PRIVATE).edit()
+            .putString("data", data).putLong("at", at).commit();
+        new android.app.backup.BackupManager(getContext()).dataChanged();
+        JSObject r = new JSObject(); r.put("at", at); call.resolve(r);
+    }
+
+    /** The saved copy, also after Android restored it on a new install. */
+    @PluginMethod
+    public void backupLoad(PluginCall call) {
+        android.content.SharedPreferences sp = getContext().getSharedPreferences(AyuBackupAgent.PREFS, android.content.Context.MODE_PRIVATE);
+        JSObject r = new JSObject(); r.put("data", sp.getString("data", "")); r.put("at", sp.getLong("at", 0)); call.resolve(r);
+    }
+
+    /** Removes the copy, so the next Google backup holds nothing (backup switched off). */
+    @PluginMethod
+    public void backupClear(PluginCall call) {
+        getContext().getSharedPreferences(AyuBackupAgent.PREFS, android.content.Context.MODE_PRIVATE).edit().clear().commit();
+        new android.app.backup.BackupManager(getContext()).dataChanged();
+        call.resolve();
+    }
+
     /** Opens a web address in the phone's browser (e.g. the new app version to download). Only https. */
     @PluginMethod
     public void openUrl(PluginCall call) {
