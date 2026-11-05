@@ -392,6 +392,7 @@
       upd.phase = 'installing'; updEvent();
     }, function(){ upd.phase = ''; upd.error = 'install'; updEvent(); });
   }
+  state.updateInstall = function(){ return openInstaller(); };
   state.updateStart = function(){
     var cfg = upd.latest; if(!cfg) return Promise.resolve();
     if(typeof P.updateDownload !== 'function'){ P.openUrl({ url:cfg.url }).catch(noop); return Promise.resolve(); }   // an app without it: the browser
