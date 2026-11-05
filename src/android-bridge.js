@@ -277,6 +277,8 @@
       .then(function(){ busy = false; if(again){ again = false; setTimeout(sync, 0); } });
   }
   state.sync = function(){ sync(true); };
+  // Settings → Notifications button: Android lets only its own settings page turn the permission on or off
+  state.openNotifSettings = function(){ return P.openNotificationSettings().catch(noop); };
   function refreshStatus(){
     return P.checkPermissions().then(function(r){
       setPerm(mapPerm(r && r.notifications));
