@@ -52,6 +52,15 @@ public class ReminderAlarmTest {
     }
 
     @Test
+    public void vibrateFlagTravels() throws Exception {
+        String r = "{\"alarms\":[{\"id\":\"rem\",\"at\":420,\"section\":\"alerts\",\"title\":\"A\",\"body\":\"x\",\"vibrate\":false},"
+            + "{\"id\":\"wake\",\"at\":420,\"title\":\"B\",\"body\":\"y\"}]}";
+        List<ReminderRules.Due> d = at(r, 420, 2);
+        assertEquals(false, d.get(0).vibrate);
+        assertEquals(true, d.get(1).vibrate);
+    }
+
+    @Test
     public void offOrBadIdMeansNoAlarm() throws Exception {
         assertTrue(at("{\"alarms\":[{\"id\":\"wake\",\"on\":false,\"at\":390}]}", 390, 1).isEmpty());
         assertTrue(at("{\"alarms\":[{\"id\":\"Wake-1\",\"at\":390}]}", 390, 1).isEmpty());

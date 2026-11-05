@@ -38,6 +38,7 @@ final class ReminderScheduler {
 
     static final String TAG = "AyuReminders";
     static final String CHANNEL_REMINDERS = "reminders";
+    static final String CHANNEL_REMINDERS_QUIET = "reminders_novib";
     static final String CHANNEL_UPDATES = "updates";
     static final String EXTRA_MINUTE = "ayu_minute";
     static final String EXTRA_KEY = "ayu_key";
@@ -135,7 +136,7 @@ final class ReminderScheduler {
                 // Checks → Alarm rings (only if it is due now, not hours late); everything else is a notification
                 boolean ring = d.key.startsWith("alarm-") && AlarmService.config(c, d.key) != null && now - dueAt.getOrDefault(d.key, 0L) <= 2;
                 if (ring && AlarmService.start(c, d.key, d.title, d.body, 0)) continue;
-                show(c, "nudge-" + d.key, d.title, d.body, false, NotificationArt.forSection(d.section), d.section, d.key, actionsFor(d.key));
+                show(c, "nudge-" + d.key, d.title, d.body, false, NotificationArt.forSection(d.section), d.section, d.key, actionsFor(d.key), d.vibrate);
             }
         }
         // "Not yet" reminders that are due now (or missed by less than an hour)
@@ -172,6 +173,17 @@ final class ReminderScheduler {
             ch.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
             nm.createNotificationChannel(ch);
         }
+        if (nm.getNotificationChannel(CHANNEL_REMINDERS_QUIET) == null) {
+            NotificationChannel ch = new NotificationChannel(CHANNEL_REMINDERS_QUIET, "Reminders (no vibration)", NotificationManager.IMPORTANCE_HIGH);
+            ch.setDescription("Reminders whose Vibrate switch is off");
+            ch.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
+                new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
+            ch.enableVibration(false);
+            ch.setVibrationPattern(new long[]{0});
+            ch.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+            nm.createNotificationChannel(ch);
+        }
         if (nm.getNotificationChannel(CHANNEL_UPDATES) == null) {
             NotificationChannel ch = new NotificationChannel(CHANNEL_UPDATES, "Timers", NotificationManager.IMPORTANCE_LOW);
             ch.setDescription("Countdowns that update quietly, such as the 20-second eye timer");
@@ -203,6 +215,10 @@ final class ReminderScheduler {
     }
 
     static void show(Context c, String tag, String title, String body, boolean silent, NotificationArt.Theme theme, String section, String tapKey, String[] actions) {
+        show(c, tag, title, body, silent, theme, section, tapKey, actions, true);
+    }
+
+    static void show(Context c, String tag, String title, String body, boolean silent, NotificationArt.Theme theme, String section, String tapKey, String[] actions, boolean vibrate) {
         ensureChannels(c);
         NotificationManagerCompat nm = NotificationManagerCompat.from(c);
         if (!nm.areNotificationsEnabled()) return;
@@ -211,7 +227,8 @@ final class ReminderScheduler {
             .putExtra(EXTRA_KEY, tapKey == null ? "" : tapKey)
             .putExtra(EXTRA_SECTION, section == null ? "" : section);
         PendingIntent pi = PendingIntent.getActivity(c, idFor(tag), open, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        NotificationCompat.Builder b = new NotificationCompat.Builder(c, silent ? CHANNEL_UPDATES : CHANNEL_REMINDERS)
+        // Vibrate switch off: the same sound, without vibration (Android 8+ keeps vibration per channel)
+        NotificationCompat.Builder b = new NotificationCompat.Builder(c, silent ? CHANNEL_UPDATES : (vibrate ? CHANNEL_REMINDERS : CHANNEL_REMINDERS_QUIET))
             .setSmallIcon(R.drawable.ic_stat_lotus)
             .setContentTitle(title)
             .setContentText(body)
@@ -225,6 +242,7 @@ final class ReminderScheduler {
             .setCategory(silent ? NotificationCompat.CATEGORY_PROGRESS : NotificationCompat.CATEGORY_REMINDER)
             .setPriority(silent ? NotificationCompat.PRIORITY_LOW : NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        if (!silent && !vibrate) b.setVibrate(new long[]{0});   // Android 7 and older
         // Android 12+ always keeps its own top line (app name, time) and fills the rest with our colour.
         // Android 8-11 show the coloured view across the whole notification, so no system frame is added there.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) b.setStyle(new NotificationCompat.DecoratedCustomViewStyle());

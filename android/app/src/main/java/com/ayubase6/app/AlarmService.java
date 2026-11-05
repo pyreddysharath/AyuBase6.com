@@ -185,6 +185,7 @@ public class AlarmService extends Service {
                 player.setLooping(true); player.prepare(); player.start();
             } catch (Exception ignored) {}
         }
+        if (cfg != null && !cfg.optBoolean("vibrate", true)) return;   // Vibrate switch off for this alarm
         try {
             vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
             long[] pattern = {0, 700, 700};

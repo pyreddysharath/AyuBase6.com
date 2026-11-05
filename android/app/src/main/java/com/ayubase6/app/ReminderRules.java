@@ -18,9 +18,11 @@ final class ReminderRules {
 
     static final class Due {
         final String key, title, body, section;
+        boolean vibrate = true;   // Vibrate switch in the app (Checks, Health Breaks, each Personal Reminder); missing means on
         Due(String key, String title, String body, String section) {
             this.key = key; this.title = title; this.body = body; this.section = section;
         }
+        Due vib(JSONObject o) { if (o != null) vibrate = o.optBoolean("vibrate", true); return this; }
     }
 
     /** Local time of one minute: day as yyyy-mm-dd, minute of the day, day of week (0 = Sunday). */
@@ -96,12 +98,12 @@ final class ReminderRules {
             JSONObject r = reminders.optJSONObject(i);
             if (r == null || !KEY.matcher(r.optString("key")).matches()) continue;
             if (!dayAllowed(r, local.dow)) continue;
-            if (inReminderSlot(r, m, epochMin)) out.add(new Due(r.optString("key"), str(r.opt("title"), 80), str(r.opt("body"), 200), "alerts"));
+            if (inReminderSlot(r, m, epochMin)) out.add(new Due(r.optString("key"), str(r.opt("title"), 80), str(r.opt("body"), 200), "alerts").vib(r));
         }
 
         JSONObject ex = rules.optJSONObject("exercise");
         if (ex != null && hasInt(ex.optJSONArray("weekdays"), local.dow) && hasInt(ex.optJSONArray("times"), m)) {
-            out.add(new Due("eyeex", str(ex.opt("title"), 80), str(ex.opt("body"), 200), "alerts"));
+            out.add(new Due("eyeex", str(ex.opt("title"), 80), str(ex.opt("body"), 200), "alerts").vib(ex));
         }
 
         // Alarms (the phone app only; not in the server rules): Checks → Alarm ("wake", at the start time, on the Checks days)
@@ -113,7 +115,7 @@ final class ReminderRules {
             if (!dayAllowed(al, local.dow)) continue;
             Double at = num(al, "at");
             if (at != null && at == m) out.add(new Due("alarm-" + al.optString("id"), str(al.opt("title"), 80), str(al.opt("body"), 200),
-                "alerts".equals(al.optString("section")) ? "alerts" : "routines"));
+                "alerts".equals(al.optString("section")) ? "alerts" : "routines").vib(al));
         }
         JSONObject ck = rules.optJSONObject("checks");
         JSONArray items = ck == null ? null : ck.optJSONArray("items");
@@ -126,10 +128,10 @@ final class ReminderRules {
                 Double at = num(it, "at"), end = num(it, "end");
                 if (at == null) continue;
                 String key = it.optString("key");
-                if (m == at) out.add(new Due("routine-" + key, str(it.opt("title"), 80), str(it.opt("body"), 200), "routines"));
+                if (m == at) out.add(new Due("routine-" + key, str(it.opt("title"), 80), str(it.opt("body"), 200), "routines").vib(ck));
                 if ("beforeend".equals(mode) && end != null && end - 15 > at && m == end - 15 && !hasStr(done, key)) {
                     out.add(new Due("routine-end-" + key, str(it.opt("title"), 70) + " · ending soon",
-                        "This window ends in 15 minutes (" + str(it.opt("window"), 40) + ").", "routines"));
+                        "This window ends in 15 minutes (" + str(it.opt("window"), 40) + ").", "routines").vib(ck));
                 }
             }
         }
@@ -149,7 +151,7 @@ final class ReminderRules {
                 isDue = hasInt(c.optJSONArray("times"), m);
             }
             if (isDue) out.add(new Due("custom" + str(c.opt("id"), 12).replaceAll("[^A-Za-z0-9]", ""),
-                str(c.opt("name"), 80), "It is time for your reminder.", "alerts"));
+                str(c.opt("name"), 80), "It is time for your reminder.", "alerts").vib(c));
         }
         return out;
     }

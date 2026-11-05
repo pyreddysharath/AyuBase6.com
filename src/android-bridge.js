@@ -240,7 +240,7 @@
   function addAlarm(rules){
     var list = alarmList().map(function(a){
       return { id:String(a.id), on:true, at:+a.at, days:a.days, title:a.title, body:a.body, section:a.section === 'alerts' ? 'alerts' : 'routines',
-               tone:a.tone, ring:+a.ring||0, snoozeMin:+a.snoozeMin||5, snoozeMax:+a.snoozeMax||0, keys:a.keys === 'stop' ? 'stop' : 'snooze' };
+               tone:a.tone, ring:+a.ring||0, snoozeMin:+a.snoozeMin||5, snoozeMax:+a.snoozeMax||0, keys:a.keys === 'stop' ? 'stop' : 'snooze', vibrate:a.vibrate !== false };
     });
     if(!list.length) return rules;
     if(!rules) rules = { v:1, tz:(function(){ try{ return Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(e){ return ''; } })(), phone:true, reminders:[], exercise:null, checks:null, custom:[] };
@@ -256,7 +256,12 @@
     setTimeout(function(){ sync(true); }, 100);
   });
   function currentRules(){
-    try{ return addAlarm(addAnchors((window.ayuPush && typeof ayuPush.buildRules === 'function') ? ayuPush.buildRules() : null)); }catch(e){ return null; }
+    try{ return addVibrate(addAlarm(addAnchors((window.ayuPush && typeof ayuPush.buildRules === 'function') ? ayuPush.buildRules() : null))); }catch(e){ return null; }
+  }
+  // Vibrate switches (Checks, Health Breaks and each section, each Personal Reminder) go to the phone only, not to the server rules.
+  function addVibrate(rules){
+    try{ if(rules && typeof window.ayuVibrateApply === 'function') window.ayuVibrateApply(rules); }catch(e){}
+    return rules;
   }
   function sync(force){
     if(busy){ again = true; return; }
