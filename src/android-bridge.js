@@ -356,23 +356,73 @@
     document.head.appendChild(st);
   }
 
-  // ── A new app version: the website's config/android-app.json names it; "Download" opens it in the phone's browser ──
-  var UPD_KEY = 'ayuAndroidUpdateLater';
-  function checkUpdate(){
-    Promise.all([
+  // ── A new app version: the website's config/android-app.json names it. Update downloads it here and opens Android's
+  //    "Update this app?" screen. "Later" hides the banner for 3 days. Backup & Restore → App Updates shows the same. ──
+  var UPD_KEY = 'ayuAndroidUpdateLater', LATER_MS = 3 * 86400000;
+  var upd = state.update = { mine:null, latest:null, checkedAt:0, error:'', phase:'', pct:0 };
+  function updEvent(){ try{ window.dispatchEvent(new Event('ayu-update-info')); }catch(e){} }
+  function laterHidden(code){
+    var v = ls(UPD_KEY); if(!v) return false;
+    var o = null; try{ o = JSON.parse(v); }catch(e){}
+    if(!o || typeof o !== 'object'){ o = { v:String(v), at:Date.now() }; ls(UPD_KEY, JSON.stringify(o)); }   // older "Later": count from now
+    return String(o.v) === String(code) && Date.now() - (+o.at || 0) < LATER_MS;
+  }
+  state.updateCheck = function(){
+    upd.error = ''; upd.phase = upd.phase === 'downloading' ? upd.phase : 'checking'; updEvent();
+    return Promise.all([
       P.getStatus().catch(function(){ return {}; }),
-      fetch('config/android-app.json', { cache:'no-cache' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })
+      fetch('config/android-app.json', { cache:'no-cache' }).then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); })
     ]).then(function(v){
-      var mine = Number(v[0] && v[0].versionCode) || 0, cfg = v[1];
-      if(!cfg || !(Number(cfg.versionCode) > mine) || !/^https:\/\//.test(String(cfg.url || ''))) return;
-      if(String(ls(UPD_KEY)) === String(cfg.versionCode)) return;   // "Later" for this version
+      upd.mine = { code:Number(v[0] && v[0].versionCode) || 0, name:String((v[0] && v[0].versionName) || '') };
+      var cfg = v[1];
+      upd.latest = (cfg && Number(cfg.versionCode) > upd.mine.code && /^https:\/\//.test(String(cfg.url || ''))) ? cfg : null;
+      upd.checkedAt = Date.now(); if(upd.phase === 'checking') upd.phase = '';
+      updEvent(); return upd;
+    }, function(){
+      if(!upd.mine) P.getStatus().then(function(st){ upd.mine = { code:Number(st.versionCode) || 0, name:String(st.versionName || '') }; updEvent(); }).catch(noop);
+      upd.error = 'offline'; if(upd.phase === 'checking') upd.phase = ''; updEvent(); return upd;
+    });
+  };
+  // Update: download (progress), then Android's install screen. If installing updates is not allowed yet, Android's
+  // switch opens; coming back to the app continues by itself.
+  var waitAllow = false;
+  function openInstaller(){
+    return P.updateInstall().then(function(r){
+      if(r && r.needAllow){ waitAllow = true; upd.phase = 'allow'; updEvent(); return; }
+      upd.phase = 'installing'; updEvent();
+    }, function(){ upd.phase = ''; upd.error = 'install'; updEvent(); });
+  }
+  state.updateStart = function(){
+    var cfg = upd.latest; if(!cfg) return Promise.resolve();
+    if(typeof P.updateDownload !== 'function'){ P.openUrl({ url:cfg.url }).catch(noop); return Promise.resolve(); }   // an app without it: the browser
+    if(upd.phase === 'downloading') return Promise.resolve();
+    upd.phase = 'downloading'; upd.pct = 0; upd.error = ''; updEvent();
+    return P.updateDownload({ url:String(cfg.url) }).then(function(){ upd.pct = 100; return openInstaller(); },
+      function(){ upd.phase = ''; upd.error = 'download'; updEvent(); });
+  };
+  try{ P.addListener('updateProgress', function(d){ upd.pct = Math.max(0, Math.min(100, +(d && d.pct) || 0)); updEvent(); }); }catch(e){}
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden) return;
+    if(waitAllow && typeof P.updateCanInstall === 'function'){
+      P.updateCanInstall().then(function(r){ if(r && r.allowed && r.ready){ waitAllow = false; openInstaller(); } }).catch(noop);
+    }
+    if(upd.phase === 'installing'){ upd.phase = ''; updEvent(); }   // back from Android's screen without updating
+  });
+
+  function checkUpdate(){
+    state.updateCheck().then(function(){
+      var cfg = upd.latest; if(!cfg) return;
+      if(laterHidden(cfg.versionCode)) return;
       if(document.getElementById('ayu-update-card') || document.getElementById('ayu-exact-card')) return;
       var card = document.createElement('div');
       card.id = 'ayu-update-card'; card.className = 'ayu-card'; card.setAttribute('role', 'dialog'); card.setAttribute('aria-label', 'Update available');
-      card.innerHTML = '<div class="ayu-ec-text"><b>Update available</b><span>Version ' + String(cfg.versionName || '').replace(/[<>&"]/g, '') + ' of AyuBase6 is ready. Download it and tap Install; your data stays.</span></div>'
-        + '<div class="ayu-ec-btns"><button type="button" class="ayu-ec-later">Later</button><button type="button" class="ayu-ec-allow">Download</button></div>';
-      card.querySelector('.ayu-ec-allow').onclick = function(){ P.openUrl({ url:cfg.url }).catch(noop); card.remove(); };
-      card.querySelector('.ayu-ec-later').onclick = function(){ ls(UPD_KEY, String(cfg.versionCode)); card.remove(); };
+      card.innerHTML = '<div class="ayu-ec-text"><b>Update available</b><span>Version ' + String(cfg.versionName || '').replace(/[<>&"]/g, '') + ' of AyuBase6 is ready. Tap Update; your data stays.</span></div>'
+        + '<div class="ayu-ec-btns"><button type="button" class="ayu-ec-later">Later</button><button type="button" class="ayu-ec-allow">Update</button></div>';
+      card.querySelector('.ayu-ec-allow').onclick = function(){
+        card.remove(); state.updateStart();
+        try{ if(typeof window.showFooterSection === 'function'){ window.showFooterSection('backup'); if(typeof window.showFooterSub === 'function') window.showFooterSub('backup', 'app'); } }catch(e){}
+      };
+      card.querySelector('.ayu-ec-later').onclick = function(){ ls(UPD_KEY, JSON.stringify({ v:String(cfg.versionCode), at:Date.now() })); card.remove(); };
       document.body.appendChild(card);
     });
   }

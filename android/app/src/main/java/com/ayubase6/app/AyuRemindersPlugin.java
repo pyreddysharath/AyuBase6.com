@@ -274,7 +274,9 @@ public class AyuRemindersPlugin extends Plugin {
     @PluginMethod
     public void backupLoad(PluginCall call) {
         android.content.SharedPreferences sp = getContext().getSharedPreferences(AyuBackupAgent.PREFS, android.content.Context.MODE_PRIVATE);
-        JSObject r = new JSObject(); r.put("data", sp.getString("data", "")); r.put("at", sp.getLong("at", 0)); call.resolve(r);
+        JSObject r = new JSObject(); r.put("data", sp.getString("data", "")); r.put("at", sp.getLong("at", 0));
+        r.put("lastBackup", getContext().getSharedPreferences(AyuBackupAgent.META, android.content.Context.MODE_PRIVATE).getLong("last", 0));
+        call.resolve(r);
     }
 
     /** Removes the copy, so the next Google backup holds nothing (backup switched off). */
@@ -283,6 +285,99 @@ public class AyuRemindersPlugin extends Plugin {
         getContext().getSharedPreferences(AyuBackupAgent.PREFS, android.content.Context.MODE_PRIVATE).edit().clear().commit();
         new android.app.backup.BackupManager(getContext()).dataChanged();
         call.resolve();
+    }
+
+    // ── Update inside the app: download the new APK here, then open Android's own "Update this app?" screen ──
+    private static volatile boolean downloading = false;
+
+    private java.io.File updateFile() {
+        java.io.File dir = new java.io.File(getContext().getCacheDir(), "updates");
+        if (!dir.exists()) dir.mkdirs();
+        return new java.io.File(dir, "AyuBase6-update.apk");
+    }
+
+    private long myVersion() {
+        try {
+            android.content.pm.PackageInfo pi = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ? pi.getLongVersionCode() : pi.versionCode;
+        } catch (Exception e) { return 0; }
+    }
+
+    /** Downloads the APK (https only), sends "updateProgress" {pct}, and checks it is a newer AyuBase6 before resolving. */
+    @PluginMethod
+    public void updateDownload(PluginCall call) {
+        String url = call.getString("url", "");
+        if (!url.startsWith("https://")) { call.reject("bad url"); return; }
+        if (downloading) { call.reject("busy"); return; }
+        downloading = true;
+        new Thread(() -> {
+            java.io.File out = updateFile(), part = new java.io.File(out.getPath() + ".part");
+            try {
+                java.net.HttpURLConnection c = null;
+                String u = url;
+                for (int hop = 0; hop < 6; hop++) {   // GitHub sends the file from another address
+                    c = (java.net.HttpURLConnection) new java.net.URL(u).openConnection();
+                    c.setInstanceFollowRedirects(false); c.setConnectTimeout(15000); c.setReadTimeout(30000);
+                    int code = c.getResponseCode();
+                    if (code >= 300 && code < 400 && c.getHeaderField("Location") != null) {
+                        u = new java.net.URL(new java.net.URL(u), c.getHeaderField("Location")).toString(); c.disconnect();
+                        if (!u.startsWith("https://")) throw new java.io.IOException("not https");
+                        continue;
+                    }
+                    if (code != 200) throw new java.io.IOException("HTTP " + code);
+                    break;
+                }
+                long total = c.getContentLengthLong(), got = 0; int last = -1;
+                try (java.io.InputStream in = c.getInputStream(); java.io.OutputStream os = new java.io.FileOutputStream(part)) {
+                    byte[] buf = new byte[64 * 1024]; int n;
+                    while ((n = in.read(buf)) > 0) {
+                        os.write(buf, 0, n); got += n;
+                        int pct = total > 0 ? (int) (got * 100 / total) : -1;
+                        if (pct != last && (pct % 5 == 0)) { last = pct; JSObject p = new JSObject(); p.put("pct", pct); notifyListeners("updateProgress", p); }
+                    }
+                }
+                c.disconnect();
+                android.content.pm.PackageInfo pi = getContext().getPackageManager().getPackageArchiveInfo(part.getPath(), 0);
+                long vc = pi == null ? 0 : (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ? pi.getLongVersionCode() : pi.versionCode);
+                if (pi == null || !getContext().getPackageName().equals(pi.packageName) || vc <= myVersion()) { part.delete(); throw new java.io.IOException("not a newer AyuBase6"); }
+                if (out.exists()) out.delete();
+                if (!part.renameTo(out)) throw new java.io.IOException("rename");
+                JSObject r = new JSObject(); r.put("ok", true); r.put("versionCode", vc); r.put("versionName", pi.versionName);
+                call.resolve(r);
+            } catch (Exception e) {
+                part.delete();
+                call.reject(e.getMessage() == null ? "failed" : e.getMessage());
+            } finally { downloading = false; }
+        }, "ayu-update").start();
+    }
+
+    /** Opens Android's install screen for the downloaded update; first asks to allow installing updates if needed. */
+    @PluginMethod
+    public void updateInstall(PluginCall call) {
+        java.io.File f = updateFile();
+        JSObject r = new JSObject();
+        if (!f.exists()) { call.reject("no file"); return; }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !getContext().getPackageManager().canRequestPackageInstalls()) {
+            try {
+                getContext().startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getContext().getPackageName())).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            } catch (Exception ignored) {}
+            r.put("needAllow", true); call.resolve(r); return;
+        }
+        try {
+            Uri uri = androidx.core.content.FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".fileprovider", f);
+            Intent i = new Intent(Intent.ACTION_VIEW).setDataAndType(uri, "application/vnd.android.package-archive")
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(i);
+            r.put("started", true); call.resolve(r);
+        } catch (Exception e) { call.reject("could not open the installer"); }
+    }
+
+    @PluginMethod
+    public void updateCanInstall(PluginCall call) {
+        JSObject r = new JSObject();
+        r.put("allowed", Build.VERSION.SDK_INT < Build.VERSION_CODES.O || getContext().getPackageManager().canRequestPackageInstalls());
+        r.put("ready", updateFile().exists());
+        call.resolve(r);
     }
 
     /** Opens a web address in the phone's browser (e.g. the new app version to download). Only https. */
