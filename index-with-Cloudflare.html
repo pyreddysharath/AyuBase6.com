@@ -16079,9 +16079,9 @@ html body #sec-help .footer-subtabs:has(#subtab-app) .footer-subtab{flex:1 1 aut
     var input=$('lab-pdf-input'), row=document.querySelector('#lab-insights-card .lab-actions-row');
     if(!input || !row || $('ayu-ocr-box')) return;
     input.setAttribute('accept','application/pdf,image/*'); input.multiple=true;
-    var lbl=document.querySelector('label.lab-upload-btn[for="lab-pdf-input"]'); if(lbl) lbl.textContent='Upload Report';
-    var hint=document.createElement('span'); hint.className='lab-upload-hint'; hint.id='lab-upload-hint'; hint.textContent='PDF or photo';
-    row.appendChild(hint);
+    var lbl=document.querySelector('label.lab-upload-btn[for="lab-pdf-input"]');
+    if(lbl) lbl.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M12 18v-6"/><path d="m9 15 3-3 3 3"/></svg><span class="lub-t"><span>Upload Report</span><span class="lub-s">PDF or Photo</span></span>';
+    var mb2=$('lab-manual-btn'); if(mb2 && !mb2.querySelector('svg')) mb2.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Manual</span>';
     var box=document.createElement('p'); box.id='ayu-ocr-box'; box.hidden=true; box.setAttribute('role','status');
     row.after(box);
     var info=$('lab-info-btn');
@@ -18040,6 +18040,13 @@ html body #calculator-panel .calc-page > .calc-card h2 .ayu-i{margin-left:6px !i
   var n=0,iv=setInterval(function(){ if(setup()||++n>60) clearInterval(iv); },250);
 })();
 </script>
+<style id="lab-upload-btn-20261105">
+/* Lab Insights: Upload Report with a report-and-arrow icon and "PDF or Photo" under it; Manual with a pencil */
+html body #lab-insights-card .lab-actions-row .lab-upload-btn:not(#ayu-x1){height:auto !important;min-height:50px !important;padding:7px 16px 7px 12px !important;align-items:center !important;gap:9px !important}
+html body #lab-insights-card .lab-actions-row .lab-upload-btn svg{flex:0 0 20px;width:20px;height:20px}
+html body #lab-insights-card .lab-actions-row .lub-t{display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.15;text-align:left}
+html body #lab-insights-card .lab-actions-row .lub-s{font-size:.72em;font-weight:500;opacity:.85}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
