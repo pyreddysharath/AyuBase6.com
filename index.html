@@ -8437,9 +8437,13 @@ const RECIPES_DATA = [
     Notifications need your permission first.</p>
     <p id="notif-status-text" class="feedback-note-small">Checking permission status…</p>
     <div class="feedback-form-section" style="flex-direction:row; gap:10px;">
-      <button id="notif-enable-btn" onclick="toggleMasterNotify()">Enable Notifications</button>
+      <button id="notif-enable-btn" onclick="ayuSysNotifBtn()">Enable Notifications</button>
     </div>
     <p class="feedback-note-small" style="margin-top:10px">Having trouble? <a href="#" onclick="showFooterSection('check');return false;" style="font-weight:700">Test notifications in Help</a></p>
+    <p class="feedback-note-small" id="notif-off-help" style="display:none;margin-top:8px">
+      A website can't turn off its own notification permission. To turn it off, open your browser's site settings
+      for this page (the icon next to the address) and set Notifications to Block. Your reminder switches stay as they are.
+    </p>
     <p class="feedback-note-small" id="notif-denied-help" style="display:none;margin-top:8px">
       Notifications are blocked in your browser. To turn them on, open your browser's site settings for this
       page and allow notifications, then reload.
@@ -12848,7 +12852,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     form.querySelector('.cancel-reminder').addEventListener('click',()=>{form.remove();if(existing){existing.classList.remove('open');const h=existing.querySelector('.cri-hdr');if(h)h.setAttribute('aria-expanded','false');startReminder(existing)}});
     // an open reminder: Save stays grey until something is changed
     const saveBtn=form.querySelector('.save-reminder');
-    (()=>{const snd=form.elements.sound&&form.elements.sound.closest('label');if(!snd||form.querySelector('.ayu-vib-fld'))return;const v=document.createElement('div');v.className='ayu-vib-fld ayu-vib-only';v.innerHTML='<span>Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" name="vibrate" aria-label="Vibrate"></label>';v.querySelector('input').checked=!(existing&&JSON.parse(existing.dataset.reminder||'{}').vibrate===false);snd.after(v)})();
+    (()=>{const snd=form.elements.sound&&form.elements.sound.closest('label');if(!snd||form.querySelector('.ayu-vib-fld'))return;const v=document.createElement('div');v.className='ayu-vib-fld ayu-vib-only';v.innerHTML='<span>Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" name="vibrate" aria-label="Vibrate"></label>';const sv=existing?JSON.parse(existing.dataset.reminder||'{}'):{};v.querySelector('input').checked=('vibrate' in sv)?sv.vibrate!==false:(typeof isMasterNotifyOn==='function'&&!!isMasterNotifyOn());snd.after(v)})();
     const stateNow=()=>JSON.stringify([String(form.elements.name.value).trim(),mode.value,mode.value==='regular'?duration:0,mode.value==='selected'?[...new Set(chosenTimes)].sort():[],form.elements.sound.value,[...days].sort((a,b)=>a-b),form.elements.vibrate?form.elements.vibrate.checked:true]);
     const stateStart=stateNow();
     const checkDirty=()=>{if(existing)saveBtn.disabled=stateNow()===stateStart};
@@ -16426,7 +16430,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     setOpen(sec,ok,openGet(ok,!!c.on),false);
     clickToOpen(sec,ok,sec&&sec.firstElementChild);
     sec.querySelector('.ayu-chev').addEventListener('click',function(e){ e.stopPropagation(); setOpen(sec,ok,sec.classList.contains('collapsed')||sec.classList.contains('ayu-closed'),true); });
-    on.addEventListener('change',function(){ var c=get(id); c.on=on.checked; put(id,c); if(c.on) setOpen(sec,ok,true,true); });
+    on.addEventListener('change',function(){ var c=get(id); c.on=on.checked; if(id!=='wake') c.vibrate=c.on; put(id,c); if(c.on) setOpen(sec,ok,true,true); });
     var ib=$(p+'-ibtn'); if(ib) ib.addEventListener('click',function(e){ e.stopPropagation(); var i=$(p+'-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); });   // only the text: the section stays as it is
     sel.value=c.tone; if(sel.value!==c.tone) sel.value='rise';
     var prev=sel.value;
@@ -16513,7 +16517,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     d.querySelector('.aal-stop').addEventListener('click',function(){ stopRing(); });
   }
   // Vibrate: Checks alarm follows My Day Plan → Vibrate; each Reminders alarm has its own switch
-  function vibOn(id){ return id==='wake' ? !(window.ayuVibrate && !window.ayuVibrate.chk()) : get(id).vibrate!==false; }
+  function vibOn(id){ if(id==='wake') return !(window.ayuVibrate && !window.ayuVibrate.chk()); var a=get(id); return ('vibrate' in a) ? a.vibrate!==false : !!a.on; }
   var vibTimer=null;
   function vibStart(id){ vibStop(); if(!vibOn(id) || typeof navigator.vibrate!=='function') return; try{ navigator.vibrate([700,700]); }catch(e){} vibTimer=setInterval(function(){ try{ navigator.vibrate([700,700]); }catch(e){} },1400); }
   function vibStop(){ if(vibTimer){ clearInterval(vibTimer); vibTimer=null; try{ navigator.vibrate(0); }catch(e){} } }
@@ -16580,7 +16584,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     var del=document.createElement('button'); del.type='button'; del.className='custom-reminder-delete'; del.textContent='×'; del.setAttribute('aria-label','Delete alarm'); del.title='Delete alarm';
     var h=window.ayuItemHead(item,clock(c.at),alarmSub(c),[sw,del],'Alarm '+clock(c.at));
     sw.addEventListener('click',function(e){ e.stopPropagation(); });
-    inp.addEventListener('change',function(){ var x=get(id); x.on=inp.checked; put(id,x); item.classList.toggle('ayu-off',!x.on); });
+    inp.addEventListener('change',function(){ var x=get(id); x.on=inp.checked; x.vibrate=x.on; put(id,x); item.classList.toggle('ayu-off',!x.on); });
     del.addEventListener('click',function(e){
       e.stopPropagation(); var l=remList(), idx=-1; l.forEach(function(x,i){ if(x.id===id) idx=i; }); if(idx<0) return;
       var saved=l.splice(idx,1)[0]; remSave(l); var list=item.parentNode; item.classList.remove('open'); item.querySelector('.cri-body').innerHTML='';
@@ -16601,7 +16605,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     closeForms();
     var list=$('rem-alarm-list'); if(!list) return;
     var isNew=!id, base=isNew ? {on:true,at:420,days:[0,1,2,3,4,5,6],tone:'rise',ring:2,snoozeMin:5,snoozeMax:3,keys:'snooze',name:'',vibrate:true} : get(id);
-    var c=JSON.parse(JSON.stringify(base)); if(!c.name) c.name=''; c.vibrate=c.vibrate!==false;
+    var c=JSON.parse(JSON.stringify(base)); if(!c.name) c.name=''; c.vibrate=('vibrate' in c) ? c.vibrate!==false : !!c.on;
     var f=document.createElement('div'); f.className='ayu-alarm-form ayu-al-body';
     f.innerHTML='<div class="ayu-al-row"><span class="ayu-al-lbl">Name</span><input type="text" class="ayu-al-name" maxlength="40" placeholder="Optional, e.g. Gym" aria-label="Alarm name"></div>'
       +'<div class="ayu-al-row"><span class="ayu-al-lbl">Time</span><button type="button" class="ayu-al-time" id="remf-al-time"></button></div><div class="otd-row" id="rem-alarm-days"></div>'
@@ -17497,9 +17501,13 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
   function load(){ try{ var o=JSON.parse(localStorage.getItem(K)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
   function save(o){ try{ localStorage.setItem(K,JSON.stringify(o)); }catch(e){} try{ document.dispatchEvent(new Event('ayu-alarm-changed')); }catch(e){} }
   function notifyOn(){ var t=document.getElementById('routines-master-toggle'); return !!(t && t.checked); }
-  function on(k){ var o=load(); if(k==='chk' && !(k in o)) return notifyOn(); return o[k]!==false; }
+  var MAIN={'break':'alert-break-notify',walk:'alert-walk-notify',drink:'alert-drink-notify',eyeex:'eye-ex-notify'};
+  function mainOn(k){ var t=document.getElementById(MAIN[k]); return !!(t && t.checked); }
+  function masterOn(){ try{ return typeof isMasterNotifyOn==='function' && !!isMasterNotifyOn(); }catch(e){ return false; } }
+  // not set yet: Vibrate follows the section's own switch (off until that is on), like Checks follows Notify Me
+  function on(k){ var o=load(); if(!(k in o)) return k==='chk' ? notifyOn() : (MAIN[k] ? mainOn(k) : false); return o[k]!==false; }
   function set(k,v){ var o=load(); o[k]=!!v; save(o); }
-  function customOn(id){ var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+String(id).replace(/"/g,'')+'"]'); if(!it) return true; try{ return JSON.parse(it.dataset.reminder||'{}').vibrate!==false; }catch(e){ return true; } }
+  function customOn(id){ var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+String(id).replace(/"/g,'')+'"]'); if(!it) return masterOn(); try{ var d=JSON.parse(it.dataset.reminder||'{}'); return ('vibrate' in d) ? d.vibrate!==false : masterOn(); }catch(e){ return masterOn(); } }
   // key of a notification: "break" "walk" "drink" "eyeex", "routine-…", "custom-<id>"
   window.ayuVibrate={
     can:CAN,
@@ -17564,7 +17572,17 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
     });
     return ok;
   }
-  var n=0,iv=setInterval(function(){ if(setup()||++n>40) clearInterval(iv); },250);
+  var last=null;
+  function follow(){
+    if(!last){ last={}; HB.forEach(function(k){ last[k]=mainOn(k); }); return; }
+    var o=load(), ch=false;
+    HB.forEach(function(k){ var v=mainOn(k); if(v!==last[k]){ last[k]=v; o[k]=v; ch=true; } });
+    if(ch){ save(o); paintHB(); }
+  }
+  function soon(){ [60,600,2600].forEach(function(t){ setTimeout(follow,t); }); }
+  document.addEventListener('change',function(e){ var t=e.target; if(t && t.closest && t.closest('#alerts-panel')) soon(); },true);
+  document.addEventListener('click',function(e){ var t=e.target; if(t && t.closest && t.closest('#alerts-panel')) soon(); },true);
+  var n=0,iv=setInterval(function(){ if(setup()||++n>40){ clearInterval(iv); setTimeout(function(){ follow(); paintHB(); },300); } },250);
 })();
 </script>
 <style id="downloads-20261105">
@@ -17864,6 +17882,40 @@ html body #lab-insights-card .lab-actions-row .lub-s{font-size:.72em;font-weight
 :is(#body-download-btn,#food-download-btn,#lab-download-btn,#tracker-card button[onclick*="downloadTrackerPDF"],.media-offline-btn,#sec-offline .off-btn[data-act="save"],#sec-app .app-get-sm,.ayu-appb .appb-get){display:inline-flex !important;align-items:center;justify-content:center}
 .media-offline-btn:disabled::before{opacity:.7}
 </style>
+<script id="sys-notif-btn-20261105">
+/* Settings → Notifications: Enable / Disable Notifications only asks for or changes the system permission; the app's own switches are left as they are. */
+(function(){
+  function perm(){ try{ return typeof Notification==='undefined' ? 'unsupported' : Notification.permission; }catch(e){ return 'unsupported'; } }
+  function app(){ var n=window.ayuNative; return !!(n && typeof n.openNotifSettings==='function'); }
+  function $(i){ return document.getElementById(i); }
+  window.ayuSysNotifBtn=function(){
+    var p=perm(), off=$('notif-off-help');
+    if(app() && p!=='default'){ window.ayuNative.openNotifSettings(); return; }   // the phone: its notification settings page turns it on or off
+    if(p==='granted'){ if(off) off.style.display = off.style.display==='block' ? 'none' : 'block'; return; }
+    if(off) off.style.display='none';
+    Promise.resolve(typeof requestNotificationPermission==='function' ? requestNotificationPermission() : Notification.requestPermission())
+      .catch(function(){}).then(function(){ try{ refreshNotifStatusUI(); }catch(e){} });
+  };
+  function paint(){
+    var b=$('notif-enable-btn'), s=$('notif-status-text'), p=perm(), off=$('notif-off-help'), dh=$('notif-denied-help');
+    if(!b || p==='unsupported') return;
+    if(b.style.display==='none' && !(app() && p==='denied')) { if(off) off.style.display='none'; return; }
+    b.style.display='inline-block';
+    b.textContent = p==='granted' ? 'Disable Notifications' : 'Enable Notifications';
+    if(p!=='granted' && off) off.style.display='none';
+    if(app() && dh) dh.style.display='none';
+    if(s) s.textContent = p==='granted' ? '✅ Notifications are allowed. Each reminder still has its own switch.'
+      : p==='denied' ? (app() ? '🚫 Notifications are turned off for this app.' : '🚫 Notifications are blocked for this site.')
+      : 'Notifications are not allowed yet.';
+  }
+  (function(){ var off=$('notif-off-help'), b=$('notif-enable-btn'); if(off && b && b.parentNode) b.parentNode.after(off); })();   // right under the button
+  var orig=window.refreshNotifStatusUI;
+  if(typeof orig==='function'){ window.refreshNotifStatusUI=function(){ var r=orig.apply(this,arguments); try{ paint(); }catch(e){} return r; }; }
+  try{ if(navigator.permissions && navigator.permissions.query) navigator.permissions.query({name:'notifications'}).then(function(st){ st.onchange=function(){ try{ refreshNotifStatusUI(); }catch(e){} }; }).catch(function(){}); }catch(e){}
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) setTimeout(function(){ try{ refreshNotifStatusUI(); }catch(e){} },400); });
+  paint();
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
