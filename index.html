@@ -17477,10 +17477,10 @@ html body #routines-vibrate-card.ayu-in-day::before, html body #routines-vibrate
 html body #routines-vibrate-card.ayu-in-day > .rout-card-hdr{display:flex !important;align-items:center !important;justify-content:flex-start !important;gap:8px;padding:0 !important;margin:0 !important;min-height:0 !important;background:none !important;border:0 !important}
 html body #routines-vibrate-card.ayu-in-day > .rout-card-hdr::before, html body #routines-vibrate-card.ayu-in-day > .rout-card-hdr::after{display:none !important}
 html body #routines-vibrate-card.ayu-in-day > .rout-card-hdr h2{display:flex !important;align-items:center;gap:8px;font-size:.9rem !important;font-weight:700 !important;color:var(--rout-2,#a75b12) !important;letter-spacing:0 !important;line-height:1.3 !important;margin:0 !important;padding:0 !important;border:0 !important;background:none !important}
-html body #routines-vibrate-card.ayu-in-day > .rout-card-hdr h2::before{content:'•';margin-right:-2px;color:var(--rout-2,#a75b12);font-weight:800}
+html body #routines-vibrate-card.ayu-in-day > .rout-card-hdr h2::before{content:'•';margin-right:6px;color:var(--rout-2,#a75b12);font-weight:800}
 html body #routines-vibrate-card.ayu-in-day > .rout-card-hdr h2::after{display:none !important}
 html body #routines-vibrate-card.ayu-in-day > .rout-card-hdr h2 svg{width:18px !important;height:18px !important}
-html body #routines-vibrate-card.ayu-in-day > .rout-card-hdr .master-switch{margin-left:auto !important;transform:scale(.9);transform-origin:right center}
+html body #routines-vibrate-card.ayu-in-day > .rout-card-hdr .master-switch{margin-left:auto !important;margin-right:30px !important;transform:scale(.9);transform-origin:right center}
 /* Alarm fields: the same room between them as in Personal Reminders */
 html body #alerts-panel #rem-alarm-list .ayu-alarm-form .ayu-al-row{margin:0 0 16px !important;min-height:38px}
 html body #alerts-panel #rem-alarm-list .ayu-alarm-form #rem-alarm-days{margin:0 0 16px !important}
@@ -17496,7 +17496,8 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
   var K='ayuBase6-vibrate', HB=['break','walk','drink','eyeex'];
   function load(){ try{ var o=JSON.parse(localStorage.getItem(K)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
   function save(o){ try{ localStorage.setItem(K,JSON.stringify(o)); }catch(e){} try{ document.dispatchEvent(new Event('ayu-alarm-changed')); }catch(e){} }
-  function on(k){ var o=load(); return o[k]!==false; }
+  function notifyOn(){ var t=document.getElementById('routines-master-toggle'); return !!(t && t.checked); }
+  function on(k){ var o=load(); if(k==='chk' && !(k in o)) return notifyOn(); return o[k]!==false; }
   function set(k,v){ var o=load(); o[k]=!!v; save(o); }
   function customOn(id){ var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+String(id).replace(/"/g,'')+'"]'); if(!it) return true; try{ return JSON.parse(it.dataset.reminder||'{}').vibrate!==false; }catch(e){ return true; } }
   // key of a notification: "break" "walk" "drink" "eyeex", "routine-…", "custom-<id>"
@@ -17532,11 +17533,17 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
       c.innerHTML='<div class="rout-card-hdr"><h2>'+'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3" width="8" height="18" rx="2"/><path d="M4 8v8M2 10v4M20 8v8M22 10v4"/></svg>'+' Vibrate</h2></div>';
       c.firstChild.appendChild(sw('routines-vibrate-toggle','Vibrate for My Day Plan alarm and notifications',on('chk'),function(v){ set('chk',v); }));
       var sw0=c.querySelector('.master-switch'); sw0.classList.add('rout-master-switch');
+      // follows Notify Me: turning it on turns Vibrate on, turning it off turns Vibrate off
+      var nt=document.getElementById('routines-master-toggle'), vt=c.querySelector('input');
+      if(nt && !nt._ayuVib){ nt._ayuVib=1; nt.addEventListener('change',function(){ setTimeout(function(){ set('chk',nt.checked); if(vt) vt.checked=nt.checked; },0); }); }
       nm.after(c);
       // Notify Me is moved into My Day Plan by another script: Vibrate follows it
       var keep=function(){ var v=document.getElementById('routines-vibrate-card'); if(v && nm.nextElementSibling!==v) nm.after(v); };
       new MutationObserver(keep).observe(document.getElementById('routines-panel')||document.body,{childList:true,subtree:true});
     } else if(!nm) ok=false;
+    var nb=document.querySelector('#routines-notify-card .rout-card-hdr h2 svg');
+    if(nb && !nb.dataset.ayuOutline){ var nw=document.createElementNS('http://www.w3.org/2000/svg','svg'); nw.setAttribute('viewBox','0 0 24 24'); nw.setAttribute('fill','none'); nw.setAttribute('stroke','currentColor'); nw.setAttribute('stroke-width','2'); nw.setAttribute('stroke-linecap','round'); nw.setAttribute('stroke-linejoin','round'); nw.setAttribute('aria-hidden','true'); nw.dataset.ayuOutline='1'; if(nb.getAttribute('class')) nw.setAttribute('class',nb.getAttribute('class'));
+      nw.innerHTML='<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>'; nb.replaceWith(nw); }
     // Health Breaks: after On these days, for all its sections
     var days=document.getElementById('rh-days');
     if(days && !document.getElementById('rh-vibrate')){
@@ -17626,7 +17633,7 @@ html body #calculator-panel .ayu-undo-row button{border:0;background:none;color:
   };
 
   // ── footer: Download app and Save offline move next to Backup & Restore ──
-  var TABS=[['app','Download app'],['offline','Save offline'],['bkp','Backup & Restore']];
+  var TABS=[['bkp','Backup & Restore'],['offline','Save offline'],['app','Download app']];
   function setupFooter(){
     var sec=$('sec-backup'); if(!sec) return false;
     if(sec.querySelector(':scope > .footer-subtabs')) return true;
@@ -17644,8 +17651,8 @@ html body #calculator-panel .ayu-undo-row button{border:0;background:none;color:
       b.setAttribute('onclick',"showFooterSub('backup','"+t[0]+"')"); bar.appendChild(b);
     });
     sec.appendChild(bar);
+    sec.appendChild(bkp); sec.appendChild(off);
     if(app){ app.style.display='none'; sec.appendChild(app); }
-    sec.appendChild(off); sec.appendChild(bkp);
     try{
       FOOTER_SUBS.backup=subs;
       FOOTER_SUBS.help=FOOTER_SUBS.help.filter(function(s){ return s!=='app'; });
@@ -17656,7 +17663,7 @@ html body #calculator-panel .ayu-undo-row button{border:0;background:none;color:
     if(typeof window.showFooterSection==='function' && !window.showFooterSection.__ayuBk){
       var orig=window.showFooterSection;
       window.showFooterSection=function(id){
-        if(id==='backup'){ try{ if(!footerSubNow.backup){ var tb=$('tab-backup'), due=tb && tb.classList.contains('needs-backup'); footerSubNow.backup=due?'bkp':FOOTER_SUBS.backup[0]; } }catch(e){} }
+        if(id==='backup'){ try{ if(!footerSubNow.backup) footerSubNow.backup=FOOTER_SUBS.backup[0]; }catch(e){} }
         return orig.apply(this,arguments);
       };
       window.showFooterSection.__ayuBk=true;
@@ -17673,10 +17680,10 @@ html body #calculator-panel .ayu-undo-row button{border:0;background:none;color:
     var sec=$('sec-backup'), bar=sec && sec.querySelector(':scope > .footer-subtabs'), app=$('sec-app'); if(!bar || !app) return false;
     if(app.parentNode!==sec){
       var b=$('subtab-app'); if(!b){ b=document.createElement('button'); b.type='button'; b.className='footer-subtab'; b.id='subtab-app'; b.setAttribute('role','tab'); b.innerHTML='Download app<i class="fs-dot"></i>'; }
-      b.setAttribute('onclick',"showFooterSub('backup','app')"); bar.insertBefore(b, bar.firstChild);
-      app.style.display='none'; bar.after(app);
+      b.setAttribute('onclick',"showFooterSub('backup','app')"); bar.appendChild(b);
+      app.style.display='none'; sec.appendChild(app);
       try{
-        if(FOOTER_SUBS.backup.indexOf('app')<0) FOOTER_SUBS.backup.unshift('app');
+        if(FOOTER_SUBS.backup.indexOf('app')<0) FOOTER_SUBS.backup.push('app');
         FOOTER_SUBS.help=FOOTER_SUBS.help.filter(function(s){ return s!=='app'; });
         if(footerSubNow.help==='app') delete footerSubNow.help;
         FOOTER_ALIAS.app=['backup','app']; FOOTER_ALIAS.download=['backup','app'];
