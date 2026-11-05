@@ -13820,6 +13820,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1']}
   ];
   var FP_KEY='ayu-backup-fingerprints', MAX_BYTES=2*1024*1024;
+  window.ayuBackupGroups=GROUPS;   // also used by the app's backup to the Google account
   if(typeof FOOTER_SECTIONS!=='undefined' && FOOTER_SECTIONS.indexOf('backup')<0) FOOTER_SECTIONS.push('backup');
 
   function group(id){ return GROUPS.filter(function(g){ return g.id===id; })[0]; }
@@ -13892,6 +13893,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     return {groups:out,savedAt:o.savedAt};
   }
 
+  window.ayuBackupValidate=function(t){ return validate(String(t||'')); };
   function restoreFrom(file){
     if(!file) return;
     var want=chosen(); if(!want.length){ status('Tick at least one section to restore.','err'); return; }
@@ -17914,6 +17916,130 @@ html body #lab-insights-card .lab-actions-row .lub-s{font-size:.72em;font-weight
   try{ if(navigator.permissions && navigator.permissions.query) navigator.permissions.query({name:'notifications'}).then(function(st){ st.onchange=function(){ try{ refreshNotifStatusUI(); }catch(e){} }; }).catch(function(){}); }catch(e){}
   document.addEventListener('visibilitychange',function(){ if(!document.hidden) setTimeout(function(){ try{ refreshNotifStatusUI(); }catch(e){} },400); });
   paint();
+})();
+</script>
+<style id="google-backup-20261105">
+/* Android app only: Backup & Restore → "Back up to your Google account automatically" */
+html body #sec-bkp .ayu-gb{margin:0 0 12px;padding:0 0 12px;border-bottom:1px solid color-mix(in srgb,var(--footer-accent,#255cc0) 18%,transparent)}
+html body #sec-bkp .ayu-gb-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+html body #sec-bkp .ayu-gb-t{font-weight:700;font-size:14px;line-height:1.35}
+html body #sec-bkp .ayu-gb-t .backup-info-btn{margin-left:6px;vertical-align:middle}
+html body #sec-bkp .ayu-gb-row .master-switch{flex:0 0 auto}
+html body #sec-bkp .ayu-gb-st{font-size:12.5px;opacity:.75;margin-top:4px}
+html body #sec-bkp .ayu-gb .backup-info{margin-top:8px}
+</style>
+<script id="google-backup-20261105-js">
+/* Android app only. Keeps a copy of the saved data (the same sections as Backup & Restore) for Android's backup to the
+   person's own Google account, a few seconds after a change. On a new install, Android brings the copy back and the
+   app restores it once. A switch in Backup & Restore turns it off (the copy is then emptied). */
+(function(){
+  if(!window.AYU_ANDROID) return;
+  var SW='ayuBase6-google-backup', CHK='ayu-gbackup-checked', FPK='ayu-gbackup-fp', ATK='ayu-gbackup-at';
+  function N(){ var n=window.ayuNative; return n && typeof n.backupSave==='function' && typeof n.backupLoad==='function' ? n : null; }
+  function get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function put(k,v){ try{ if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v); }catch(e){} }
+  function enabled(){ return get(SW)!=='off'; }
+  function groups(){ return window.ayuBackupGroups||[]; }
+  function keys(){ var k=[]; groups().forEach(function(g){ k=k.concat(g.keys); }); return k; }
+  function data(){ var d={}; keys().forEach(function(k){ var v=get(k); if(v!==null) d[k]=v; }); return d; }
+  function hash(s){ var h=5381; for(var i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0; return String(h); }
+  function when(t){ try{ var d=new Date(t); if(isNaN(d)) return ''; return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+', '+d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); }catch(e){ return ''; } }
+  var ready=false, timer=0;
+
+  function saveNow(){
+    clearTimeout(timer); timer=0;
+    var n=N(); if(!ready || !n || !enabled()) return;
+    var d=data(), s=JSON.stringify(d), h=hash(s); if(h===get(FPK)) return;
+    var p={app:'AyuBase6',version:2,savedAt:new Date().toISOString(),groups:groups().map(function(g){ return g.id; }),data:d};
+    n.backupSave(JSON.stringify(p)).then(function(r){ put(FPK,h); put(ATK,String((r&&r.at)||Date.now())); paint(); }).catch(function(){});
+  }
+  function soon(){ if(!ready) return; clearTimeout(timer); timer=setTimeout(saveNow,4000); }
+  window.ayuGoogleBackupNow=saveNow;
+
+  // Any change to a saved section schedules a copy.
+  try{
+    var SP=Storage.prototype, set0=SP.setItem, rem0=SP.removeItem;
+    SP.setItem=function(k,v){ var r=set0.apply(this,arguments); try{ if(this===window.localStorage && keys().indexOf(String(k))>=0) soon(); }catch(e){} return r; };
+    SP.removeItem=function(k){ var r=rem0.apply(this,arguments); try{ if(this===window.localStorage && keys().indexOf(String(k))>=0) soon(); }catch(e){} return r; };
+  }catch(e){}
+  document.addEventListener('visibilitychange',function(){ if(document.hidden && timer) saveNow(); });
+  window.addEventListener('pagehide',function(){ if(timer) saveNow(); });
+
+  // First start of this install: bring back the copy Android restored.
+  function start(){
+    var n=N(); if(!n) return false;
+    if(get(CHK)){ ready=true; saveNow(); return true; }
+    var pr; try{ pr=Promise.resolve(n.backupLoad()); }catch(e){ ready=true; return true; }
+    pr.then(function(r){
+      put(CHK,'1');
+      var v=(r && r.data && window.ayuBackupValidate) ? window.ayuBackupValidate(r.data) : null, o=null;
+      try{ o=JSON.parse(r && r.data || 'null'); }catch(e){}
+      if(v && !v.error && enabled()){
+        var ids=Object.keys(v.groups), has=keys().some(function(k){ return get(k)!==null && get(k)!==(o&&o.data&&o.data[k]); });
+        var w=when(v.savedAt);
+        if(!has || window.confirm('Restore your data from your Google account backup'+(w?' ('+w+')':'')+'? It replaces the data on this phone.')){
+          try{
+            ids.forEach(function(id){ var g=groups().filter(function(x){ return x.id===id; })[0]; g.keys.forEach(function(k){ localStorage.removeItem(k); }); Object.keys(v.groups[id]).forEach(function(k){ localStorage.setItem(k,v.groups[id][k]); }); });
+            try{ sessionStorage.setItem('ayu-restored',JSON.stringify({done:ids,skipped:[],google:1})); }catch(e){}
+            location.reload(); return;
+          }catch(e){}
+        }
+      }
+      ready=true; saveNow();
+    }).catch(function(){ ready=true; });
+    return true;
+  }
+
+  // Backup & Restore: the switch, its i and the last-copied time.
+  var INFO='Your data (the sections listed below) is copied to your own Google account, in a hidden area only this app uses. '+
+    'It is encrypted with your phone\'s screen lock, if you have one, and is not sent to us. Android usually backs it up within an hour or so of a change '+
+    '(sometimes up to a day), and brings it back when you install the app again. It needs Google backup to be on in your phone\'s settings. '+
+    'Turn this off to stop it; the copy in your Google account is then emptied at the next backup.';
+  function paint(){
+    var st=document.getElementById('ayu-gb-st'), i=document.getElementById('ayu-gb-on'); if(!st) return;
+    if(i) i.checked=enabled();
+    var at=+get(ATK)||0;
+    st.textContent = !enabled() ? 'Off. Nothing is backed up to your Google account.'
+      : at ? 'Last copied for backup: '+when(at) : 'Copies your data for backup a few seconds after each change.';
+  }
+  function build(){
+    var host=document.getElementById('sec-bkp'), pick=host && host.querySelector('.backup-pick'); if(!pick) return false;
+    if(document.getElementById('ayu-gb')) return true;
+    var box=document.createElement('div'); box.className='ayu-gb'; box.id='ayu-gb';
+    box.innerHTML='<div class="ayu-gb-row"><span class="ayu-gb-t">Back up to your Google account automatically'+
+      '<button type="button" class="backup-info-btn ayu-gb-i" aria-expanded="false" aria-controls="ayu-gb-info" title="About backup to your Google account">i</button></span>'+
+      '<label class="master-switch" title="Back up to your Google account automatically"><input type="checkbox" id="ayu-gb-on" aria-label="Back up to your Google account automatically"></label></div>'+
+      '<div class="ayu-gb-st" id="ayu-gb-st" role="status"></div><div class="backup-info" id="ayu-gb-info" hidden></div>';
+    box.querySelector('#ayu-gb-info').textContent=INFO;
+    pick.parentNode.insertBefore(box,pick);
+    var b=box.querySelector('.ayu-gb-i'), inf=box.querySelector('#ayu-gb-info');
+    b.addEventListener('click',function(){ inf.hidden=!inf.hidden; b.setAttribute('aria-expanded',String(!inf.hidden)); });
+    box.querySelector('#ayu-gb-on').addEventListener('change',function(e){
+      var n=N();
+      if(e.target.checked){ put(SW,null); put(FPK,null); ready=true; saveNow(); }
+      else { put(SW,'off'); put(FPK,null); put(ATK,null); clearTimeout(timer); if(n) n.backupClear().catch(function(){}); }
+      paint();
+    });
+    var bi=document.getElementById('backup-info');   // "kept only on this device" is no longer the whole story in the app
+    if(bi && bi.textContent.indexOf('kept only on this device')>=0) bi.textContent=bi.textContent.replace('are kept only on this device.','are kept on this device and, with the switch above on, in your Google account backup.');
+    paint(); return true;
+  }
+  function privacy(){
+    var sec=document.getElementById('sec-privacy'); if(!sec) return true; if(document.getElementById('ayu-gb-privacy')) return true;
+    var p=document.createElement('p'); p.id='ayu-gb-privacy';
+    p.innerHTML='<strong>Backup to your Google account (Android app):</strong> With <b>Back up to your Google account automatically</b> on in Backup &amp; Restore, '+
+      'Android\'s backup copies the app\'s saved data (your Body and Food choices, Checks, Reminders and the Vitals tracker) to your own Google account, so it can be '+
+      'restored when you install the app again. It is kept in a hidden area only this app uses, encrypted with your phone\'s screen lock if you have one, and is not '+
+      'sent to us. You can turn it off there at any time.';
+    var ads=[].slice.call(sec.querySelectorAll('p')).filter(function(x){ return /Advertising/.test(x.textContent); })[0];
+    if(ads) sec.insertBefore(p,ads); else sec.appendChild(p);
+    return true;
+  }
+  privacy();
+  var n1=0, iv1=setInterval(function(){ if(start() || ++n1>40) clearInterval(iv1); },150);
+  var n2=0, iv2=setInterval(function(){ if(build() || ++n2>80) clearInterval(iv2); },250);
+  var res=null; try{ res=JSON.parse(sessionStorage.getItem('ayu-restored')||'null'); }catch(e){}
+  if(res && res.google) setTimeout(function(){ var s=document.getElementById('backup-status'); if(s && /Restored/.test(s.textContent)) s.textContent=s.textContent.replace('✓ Restored','✓ Restored from your Google account backup:'); },1200);
 })();
 </script>
 </body>
