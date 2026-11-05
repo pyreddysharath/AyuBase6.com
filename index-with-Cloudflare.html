@@ -17966,6 +17966,20 @@ html body #alerts-panel .ayu-part-title > svg{width:22px;height:22px;flex:0 0 22
 html body #alerts-panel .ayu-part-title .ayu-i{margin-left:2px !important}
 html body #alerts-panel #custom-reminders-card > .ayu-part-title, html body #alerts-panel #rem-alarm-card > .ayu-part-title{margin-top:2px}
 html body #alerts-panel .ayu-part-info{margin:0 0 12px}
+/* tabs: no box; the selected icon darker, filled and a little larger, the others pale */
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs){gap:6px !important;background:none !important;padding:0 !important;border:0 !important;box-shadow:none !important}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button:not(#ayu-x1){background:none !important;box-shadow:none !important;border:0 !important;border-radius:10px !important;min-height:50px;padding:8px 4px !important}
+html body .ayu-rem-tabs button:not(#ayu-x1){color:color-mix(in srgb,#0f766e 38%,#fff) !important}
+html body .ayu-vit-tabs button:not(#ayu-x1){color:color-mix(in srgb,#0e7490 38%,#fff) !important}
+html body .ayu-rem-tabs button:not(#ayu-x1)[aria-selected="true"]{color:#0f766e !important}
+html body .ayu-vit-tabs button:not(#ayu-x1)[aria-selected="true"]{color:#0e7490 !important}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button:not(#ayu-x1) svg{width:24px !important;height:24px !important;transition:width .15s,height .15s}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button:not(#ayu-x1)[aria-selected="true"] svg{width:30px !important;height:30px !important}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button:not(#ayu-x1)[aria-selected="true"] svg[stroke]{fill:currentColor;fill-opacity:.28;stroke-width:2.6}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button .ayu-fill{opacity:0}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button[aria-selected="true"] .ayu-fill{opacity:.28}
+html body .ayu-rem-tabs button:not(#ayu-x1):not([aria-selected="true"]):hover{color:color-mix(in srgb,#0f766e 70%,#fff) !important}
+html body .ayu-vit-tabs button:not(#ayu-x1):not([aria-selected="true"]):hover{color:color-mix(in srgb,#0e7490 70%,#fff) !important}
 /* the title under the icons has no icon of its own (the selected icon is just above) */
 html body #alerts-panel .ayu-part-title > svg{display:none !important}
 html body #calculator-panel .calc-page > .calc-card h2 > .sec-logo{display:none !important}
@@ -17989,6 +18003,7 @@ html body #calculator-panel .calc-page > .calc-card h2 .ayu-i{margin-left:6px !i
   function setup(){
     var bar=document.querySelector('#alerts-panel .ayu-rem-tabs'), vbar=document.querySelector('#calculator-panel .ayu-vit-tabs');
     if(!bar || !vbar) return false;
+    var asvg=bar.querySelector('[data-t="alarm"] svg'); if(asvg && !asvg.querySelector('.ayu-fill')){ var ci=document.createElementNS('http://www.w3.org/2000/svg','circle'); ci.setAttribute('class','ayu-fill'); ci.setAttribute('cx','12'); ci.setAttribute('cy','13'); ci.setAttribute('r','7'); asvg.insertBefore(ci, asvg.firstChild); }
     // tooltips (useful on a computer) and names for screen readers
     [].forEach.call(document.querySelectorAll('.ayu-rem-tabs button, .ayu-vit-tabs button'),function(b){ var t=(b.querySelector('span')||{}).textContent||''; if(t){ b.title=t; b.setAttribute('aria-label',t); } });
     var B=function(t){ return bar.querySelector('[data-t="'+t+'"]'); };
