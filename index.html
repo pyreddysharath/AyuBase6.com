@@ -4274,11 +4274,11 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
         <ol><li>Rub your palms together briskly for 10–15 seconds, with firm but comfortable friction, until they feel warm.</li><li>Close your eyes and cup your warm palms over them. Your palms (not your fingers) cover the eyes, your fingers rest on your forehead, and the heels of your hands sit on your cheekbones.</li><li>Keep a small gap so nothing presses on the eyeballs.</li><li>Hold for 30–60 seconds, breathing slowly.</li></ol><p>The warmth and gentle cover relax the eye muscles and improve blood flow, easing your eyes into the day instead of going straight to bright light or a screen.</p>
       </div>
       <div class="rout-row">
-        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="water"> <span>Drink water <span class="rout-time" id="rt-water">(5:50 – 6:00 AM, 1–2 glasses)</span></span></label>
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="water"> <span>Drink water <span class="rout-time" id="rt-water">(5:50 – 6:00 AM, 1–2 glasses, 250–500 ml)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('water')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-water" style="display:none">
-        <p>Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.</p><strong>How to drink it</strong><ul><li>Take small sips instead of big gulps, and finish the 1–2 glasses over about 5–10 minutes.</li><li>Pause between sips.</li><li>Warm (not hot) water is a good choice in the morning. It is gentle on an empty stomach, and many people find it helps the bowels move. Plain room-temperature water hydrates just as well, and water that is too hot can scald your mouth and throat.</li></ul><strong>Why slowly</strong><ul><li>Your body takes in water gradually, so more of it is used instead of passing straight through.</li><li>You swallow less air, so there is less bloating and burping.</li><li>An empty stomach copes better with small amounts. Gulping can leave you feeling heavy or queasy.</li></ul>
+        <p>Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.</p><strong>How much</strong><ul><li>1–2 glasses: about 250–500 ml (one glass is about 250 ml). Have more on hot days or after sweating.</li></ul><strong>How to drink it</strong><ul><li>Take small sips instead of big gulps, and finish the 1–2 glasses over about 5–10 minutes.</li><li>Pause between sips.</li><li>Warm (not hot) water is a good choice in the morning. It is gentle on an empty stomach, and many people find it helps the bowels move. Plain room-temperature water hydrates just as well, and water that is too hot can scald your mouth and throat.</li></ul><strong>Why slowly</strong><ul><li>Your body takes in water gradually, so more of it is used instead of passing straight through.</li><li>You swallow less air, so there is less bloating and burping.</li><li>An empty stomach copes better with small amounts. Gulping can leave you feeling heavy or queasy.</li></ul>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="bathroom"> <span>Wait a while, then go to the bathroom <span class="rout-time" id="rt-bathroom">(6:00 – 6:15 AM)</span></span></label>
@@ -10213,11 +10213,11 @@ function updateWakeSchedule(){
     if(!el) return;
     const offsets=WAKE_OFFSETS[key];
     if(offsets.length===2){
-      const extra=(key==='water')?', 1–2 glasses':'';
+      const extra=(key==='water')?', 1–2 glasses, 250–500 ml':'';
       el.textContent=`(${minutesToClock(wake+offsets[0])} – ${minutesToClock(wake+offsets[1])}${extra})`;
     } else {
       let extra='';
-      if(key==='water') extra=', 1–2 glasses';
+      if(key==='water') extra=', 1–2 glasses, 250–500 ml';
       el.textContent=`(${minutesToClock(wake+offsets[0])}${extra})`;
     }
   });
@@ -17427,16 +17427,16 @@ html body #alerts-panel :is(#rem-alarm-card,#custom-reminders-card) > .alert-car
 })();
 </script>
 <style id="info-icons-20261105">
-/* Every i: the same icon as Our Other Sites (19px, the i leaning in an oval), in the section's colour, next to its title. */
-html body .ayu-i:not(#ayu-x1):not(#ayu-x2){width:19px !important;height:19px !important;min-width:19px !important;min-height:19px !important;max-width:19px !important;padding:0 !important;border:0 !important;border-radius:0 !important;background:none !important;background-color:transparent !important;box-shadow:none !important;outline-offset:2px;font-size:0 !important;line-height:0 !important;align-items:center;justify-content:center;flex:0 0 19px !important;vertical-align:middle;overflow:visible}
-html body .ayu-i:not(#ayu-x1):not(#ayu-x2):not(.othersites-info-btn)::before{content:"" !important;display:block !important;width:19px;height:19px;flex:0 0 19px;background:color-mix(in srgb,var(--ii-c,#0f766e) 62%,#fff) !important;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cg transform=%22skewX(-10) translate(2 0)%22%3E%3Cellipse cx=%2212%22 cy=%2212%22 rx=%228%22 ry=%229%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222.3%22/%3E%3C/g%3E%3Cg transform=%22skewX(-20) translate(4.6 0)%22%3E%3Crect x=%2210.7%22 y=%229.8%22 width=%222.6%22 height=%226.4%22 rx=%220.5%22/%3E%3Crect x=%229.1%22 y=%2215.3%22 width=%225.8%22 height=%221.7%22 rx=%220.4%22/%3E%3Ccircle cx=%2212.1%22 cy=%227.2%22 r=%221.45%22/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cg transform=%22skewX(-10) translate(2 0)%22%3E%3Cellipse cx=%2212%22 cy=%2212%22 rx=%228%22 ry=%229%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222.3%22/%3E%3C/g%3E%3Cg transform=%22skewX(-20) translate(4.6 0)%22%3E%3Crect x=%2210.7%22 y=%229.8%22 width=%222.6%22 height=%226.4%22 rx=%220.5%22/%3E%3Crect x=%229.1%22 y=%2215.3%22 width=%225.8%22 height=%221.7%22 rx=%220.4%22/%3E%3Ccircle cx=%2212.1%22 cy=%227.2%22 r=%221.45%22/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;border:0 !important;position:static !important;transform:none !important}
-html body .ayu-desc-btn:not(#ayu-x1):not(#ayu-x2)::after{content:none !important;display:none !important}
-/* shown or hidden as before: only the look changes */
+/* Every i: the earlier look (a bold italic serif i in a thin circle, in its section's colours), a little smaller (18px) */
+html body .ayu-i:not(#ayu-x1):not(#ayu-x2){width:18px !important;height:18px !important;min-width:18px !important;min-height:18px !important;max-width:18px !important;padding:0 !important;box-sizing:border-box !important;border-radius:50% !important;font-family:Georgia,"Times New Roman",serif !important;font-style:italic !important;font-weight:700 !important;font-size:10.5px !important;line-height:1 !important;align-items:center;justify-content:center;flex:0 0 18px !important;vertical-align:middle;text-align:center}
+html body .ayu-desc-btn.ayu-i:not(#ayu-x1)::after{font-size:10.5px !important;line-height:1 !important}
+/* Our Other Sites used a drawn icon: the same text i instead */
+html body .othersites-info-btn.ayu-i:not(#ayu-x1){border:1px solid color-mix(in srgb,var(--ii-c,#0e7490) 55%,#fff) !important;color:var(--ii-c,#0e7490) !important;background:transparent !important}
+html body .othersites-info-btn.ayu-i svg{display:none !important}
+html body .othersites-info-btn.ayu-i:not(#ayu-x1)::after{content:"i";font:italic 700 10.5px/1 Georgia,"Times New Roman",serif}
+/* shown or hidden as before */
 html body .ayu-i{display:inline-flex}
 html body .ayu-i[hidden]{display:none !important}
-html body .othersites-info-btn svg{width:19px !important;height:19px !important;color:color-mix(in srgb,var(--ii-c,currentColor) 62%,#fff)}
-html body .ayu-i:not(#ayu-x1):not(#ayu-x2):is(.active,[aria-expanded="true"])::before{opacity:.6}
-html body .ayu-i:not(#ayu-x1):not(#ayu-x2):hover::before{opacity:.75}
 /* right next to the section title */
 html body h2 .ayu-desc-btn, html body h2 + :is(.calc-info-btn,.alert-info-btn,.reminder-hours-info-btn){margin-left:6px !important}
 html body #alerts-panel .alert-card-hdr h2 .ayu-desc-btn:not(#ayu-x1){margin-left:-2px !important;margin-right:0 !important}
@@ -17460,9 +17460,6 @@ html body #alerts-panel .alert-card-hdr h2 .ayu-desc-btn:not(#ayu-x1){margin-lef
 html body #calculator-panel .calc-page > .calc-card, html[data-petal-card] body #calculator-panel .calc-page > .calc-card{border:0 !important;background:none !important;background-color:transparent !important;box-shadow:none !important;padding:4px 6px 6px !important}
 html body #calculator-panel .calc-page > .calc-card::after, html[data-petal-card] body #calculator-panel .calc-page > .calc-card::after,
 html body #calculator-panel .calc-page > .calc-card > .sec-lotus-layer{display:none !important}
-html body #calculator-panel .calc-page > .calc-card h2{position:absolute !important;width:1px !important;height:1px !important;overflow:hidden !important;clip:rect(0 0 0 0) !important;white-space:nowrap !important;margin:0 !important;padding:0 !important;border:0 !important}
-html body #calculator-panel .calc-page > .calc-card > .calc-card-hdr{background:none !important;border:0 !important;padding:0 !important;margin:0 0 8px !important;min-height:0 !important;display:flex !important;justify-content:flex-end !important;align-items:center !important;gap:10px !important}
-html body #calculator-panel .calc-page > .calc-card > .calc-card-hdr::after, html body #calculator-panel .calc-page > .calc-card > .calc-card-hdr::before{display:none !important}
 </style>
 <style id="vibrate-20261105">
 /* Vibrate switches: shown on phones that can vibrate (the Android app, or a phone browser with vibration). */
@@ -17730,6 +17727,67 @@ html body #calculator-panel .ayu-undo-row button{border:0;background:none;color:
     }
   });
   window.ayuPaintOffline=paintOffline;
+})();
+</script>
+<style id="tab-titles-20261105">
+/* Reminders and Vitals: the icons at the top show only the icon (the name is the tooltip);
+   the open part's title shows under them, with its i next to it. */
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button > span{display:none !important}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button{padding:10px 4px !important;flex-direction:row !important;justify-content:center !important}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button svg{width:26px !important;height:26px !important}
+html body #alerts-panel .ayu-part-title{display:flex;align-items:center;gap:8px;margin:2px 0 14px;padding:0 0 10px;font-size:1.12rem;font-weight:800;color:#0f766e;line-height:1.25;position:relative}
+html body #alerts-panel .ayu-part-title::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:2px;background:linear-gradient(90deg,#0f766e,rgba(15,118,110,0))}
+html body #alerts-panel .ayu-part-title > svg{width:22px;height:22px;flex:0 0 22px;fill:currentColor}
+html body #alerts-panel .ayu-part-title .ayu-i{margin-left:2px !important}
+html body #alerts-panel #custom-reminders-card > .ayu-part-title, html body #alerts-panel #rem-alarm-card > .ayu-part-title{margin-top:2px}
+html body #alerts-panel .ayu-part-info{margin:0 0 12px}
+/* Vitals: the section titles are back; the i sits right after the title */
+html body #calculator-panel .calc-page > .calc-card h2 .ayu-i{margin-left:6px !important}
+</style>
+<script id="tab-titles-20261105-js">
+(function(){
+  function $(id){ return document.getElementById(id); }
+  var PERSONAL_INFO='<ul><li>Add your own reminders with <b>+ Add a reminder</b>: a name, how often or at set times, the days and the sound.</li>'
+    +'<li>Tap a reminder to open and change it; × deletes it (Undo for 5 seconds).</li>'
+    +'<li>On the website they arrive while AyuBase6 is open; the Android app sends them even when it is closed.</li></ul>';
+  function title(host, tabBtn, name){
+    if(!host || host.querySelector(':scope > .ayu-part-title')) return host ? host.querySelector(':scope > .ayu-part-title') : null;
+    var h=document.createElement('h2'); h.className='ayu-part-title';
+    var ic=tabBtn && tabBtn.querySelector('svg'); if(ic) h.appendChild(ic.cloneNode(true));
+    var s=document.createElement('span'); s.textContent=name; h.appendChild(s);
+    host.insertBefore(h, host.firstChild);
+    return h;
+  }
+  function setup(){
+    var bar=document.querySelector('#alerts-panel .ayu-rem-tabs'), vbar=document.querySelector('#calculator-panel .ayu-vit-tabs');
+    if(!bar || !vbar) return false;
+    // tooltips (useful on a computer) and names for screen readers
+    [].forEach.call(document.querySelectorAll('.ayu-rem-tabs button, .ayu-vit-tabs button'),function(b){ var t=(b.querySelector('span')||{}).textContent||''; if(t){ b.title=t; b.setAttribute('aria-label',t); } });
+    var B=function(t){ return bar.querySelector('[data-t="'+t+'"]'); };
+    // Health Breaks: its i moves from the Turn on row to the title
+    var grp=document.querySelector('#alerts-panel .ayu-rem-group'), hb=title(grp, B('breaks'), 'Health Breaks');
+    var hi=$('reminder-hours-info-btn'); if(hb && hi && hi.parentNode!==hb) hb.appendChild(hi);
+    // Alarm: its i (and its text) move up next to the title
+    var al=$('rem-alarm-card'), at=title(al, B('alarm'), 'Alarm');
+    var ai=$('rem-al-ibtn'), ainfo=$('rem-al-info');
+    if(at && ai && ai.parentNode!==at){ at.appendChild(ai); if(ainfo){ ainfo.classList.add('ayu-part-info'); at.after(ainfo); } }
+    // Personal Reminders: a title and an i of its own
+    var pc=$('custom-reminders-card'), pt=title(pc, B('personal'), 'Personal Reminders');
+    if(pt && !$('custom-rem-info-btn')){
+      var ib=document.createElement('button'); ib.type='button'; ib.className='calc-info-btn ayu-i'; ib.id='custom-rem-info-btn'; ib.textContent='i';
+      ib.title='About Personal Reminders'; ib.setAttribute('aria-label','About Personal Reminders'); ib.setAttribute('aria-expanded','false'); ib.setAttribute('aria-controls','custom-rem-info');
+      ib.style.setProperty('--ii-c','rgb(15, 118, 110)');
+      var p=document.createElement('div'); p.className='calc-task ayu-part-info'; p.id='custom-rem-info'; p.hidden=true; p.innerHTML=PERSONAL_INFO;
+      ib.addEventListener('click',function(){ p.hidden=!p.hidden; ib.setAttribute('aria-expanded',String(!p.hidden)); });
+      pt.appendChild(ib); pt.after(p);
+    }
+    // Vitals: the i next to the title
+    [['lab-insights-card','lab-info-btn'],['tracker-card','tracker-info-btn']].forEach(function(x){
+      var c=$(x[0]), h=c && c.querySelector('.calc-card-hdr h2'), b=$(x[1]); if(h && b && b.parentNode!==h) h.appendChild(b);
+    });
+    return !!(hb && at && pt);
+  }
+  var n=0,iv=setInterval(function(){ if(setup()||++n>60) clearInterval(iv); },250);
 })();
 </script>
 </body>
@@ -20026,7 +20084,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       +'<li><b>To install:</b> see <b>Backup & Restore → Download app</b>.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li></ul>'; }
     var rp=$('rout-info-palms'); if(rp && rp.dataset.ux!=='1'){ rp.dataset.ux='1'; rp.innerHTML='<ol><li>Rub your palms together briskly for 10–15 seconds, with firm but comfortable friction, until they feel warm.</li><li>Close your eyes and cup your warm palms over them. Your palms (not your fingers) cover the eyes, your fingers rest on your forehead, and the heels of your hands sit on your cheekbones.</li><li>Keep a small gap so nothing presses on the eyeballs.</li><li>Hold for 30–60 seconds, breathing slowly.</li></ol><p>The warmth and gentle cover relax the eye muscles and improve blood flow, easing your eyes into the day instead of going straight to bright light or a screen.</p>'; }
-    var rwt=$('rout-info-water'); if(rwt && rwt.dataset.ux!=='1'){ rwt.dataset.ux='1'; rwt.innerHTML='<p>Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.</p><strong>How to drink it</strong><ul><li>Take small sips instead of big gulps, and finish the 1–2 glasses over about 5–10 minutes.</li><li>Pause between sips.</li><li>Warm (not hot) water is a good choice in the morning. It is gentle on an empty stomach, and many people find it helps the bowels move. Plain room-temperature water hydrates just as well, and water that is too hot can scald your mouth and throat.</li></ul><strong>Why slowly</strong><ul><li>Your body takes in water gradually, so more of it is used instead of passing straight through.</li><li>You swallow less air, so there is less bloating and burping.</li><li>An empty stomach copes better with small amounts. Gulping can leave you feeling heavy or queasy.</li></ul>'; }
+    var rwt=$('rout-info-water'); if(rwt && rwt.dataset.ux!=='1'){ rwt.dataset.ux='1'; rwt.innerHTML='<p>Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.</p><strong>How much</strong><ul><li>1–2 glasses: about 250–500 ml (one glass is about 250 ml). Have more on hot days or after sweating.</li></ul><strong>How to drink it</strong><ul><li>Take small sips instead of big gulps, and finish the 1–2 glasses over about 5–10 minutes.</li><li>Pause between sips.</li><li>Warm (not hot) water is a good choice in the morning. It is gentle on an empty stomach, and many people find it helps the bowels move. Plain room-temperature water hydrates just as well, and water that is too hot can scald your mouth and throat.</li></ul><strong>Why slowly</strong><ul><li>Your body takes in water gradually, so more of it is used instead of passing straight through.</li><li>You swallow less air, so there is less bloating and burping.</li><li>An empty stomach copes better with small amounts. Gulping can leave you feeling heavy or queasy.</li></ul>'; }
   }
   function go(){ rewrite(); placeAll(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
