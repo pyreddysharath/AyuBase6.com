@@ -277,14 +277,16 @@ public class AyuRemindersPlugin extends Plugin {
                 android.content.ContentValues v = new android.content.ContentValues();
                 v.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, name);
                 v.put(android.provider.MediaStore.MediaColumns.MIME_TYPE, mime);
-                v.put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_DOWNLOADS);
+                // Backup files go to their own folder, Download/AyuBase6, which also stays after the app is uninstalled.
+                boolean backup = name.startsWith("AyuBase6-backup");
+                v.put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_DOWNLOADS + (backup ? "/AyuBase6" : ""));
                 Uri uri = getContext().getContentResolver().insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
                 if (uri == null) throw new java.io.IOException("no uri");
                 try (java.io.OutputStream os = getContext().getContentResolver().openOutputStream(uri)) {
                     if (os == null) throw new java.io.IOException("no stream");
                     os.write(data);
                 }
-                r.put("where", "downloads");
+                r.put("where", backup ? "folder" : "downloads");
             } else {
                 java.io.File f = new java.io.File(getContext().getCacheDir(), name);
                 try (java.io.FileOutputStream os = new java.io.FileOutputStream(f)) { os.write(data); }

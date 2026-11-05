@@ -388,6 +388,7 @@
       return P.saveFile({ name:a.download, base64:v[1], mime:mime });
     }).then(function(r){
       if(r && r.where === 'downloads') toast('Saved to Downloads: ' + r.name);
+      else if(r && r.where === 'folder') toast('Saved to Download/AyuBase6: ' + r.name);
     }).catch(function(){ toast('The file could not be saved.'); });
     return true;
   }
