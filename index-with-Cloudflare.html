@@ -18232,6 +18232,17 @@ html body #sec-bkp .ayu-gb .backup-info{margin-top:8px}
   if(res && res.google) setTimeout(function(){ var s=document.getElementById('backup-status'); if(s && /Restored/.test(s.textContent)) s.textContent=s.textContent.replace('✓ Restored','✓ Restored from your Google account backup:'); },1200);
 })();
 </script>
+<script id="backup-info-below-20261105">
+/* Backup & Restore: the i text of "Include in Save and Restore" opens right below that title. */
+(function(){
+  var n=0, iv=setInterval(function(){
+    var inf=document.getElementById('backup-info'), t=document.querySelector('#sec-bkp .backup-pick-title') || document.querySelector('.backup-pick-title');
+    if(inf && t){ if(t.nextSibling!==inf) t.parentNode.insertBefore(inf,t.nextSibling); clearInterval(iv); }
+    else if(++n>80) clearInterval(iv);
+  },250);
+})();
+</script>
+<style id="backup-info-below-20261105-css">html body .backup-pick > .backup-info{margin:6px 0 10px}</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
