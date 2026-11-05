@@ -13816,7 +13816,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     {id:'body',label:'Body',keys:['ayuBase6-body-choices']},
     {id:'food',label:'Food',keys:['ayuBase6-food-choices']},
     {id:'checks',label:'Checks',keys:['ayuBase6WakeUpTime','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-muted','ayuBase6-routine-days','ayuBase6-routine-alarm']},
-    {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-rem-alarm','ayuBase6-rem-alarms']},
+    {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-rem-alarm','ayuBase6-rem-alarms','ayuBase6-timer','ayuBase6-world']},
     {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1']}
   ];
   var FP_KEY='ayu-backup-fingerprints', MAX_BYTES=2*1024*1024;
@@ -16276,6 +16276,15 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     }
     d.querySelector('.ck-h').addEventListener('click',function(){ stage='h'; draw(); });
     d.querySelector('.ck-m').addEventListener('click',function(){ stage='m'; draw(); });
+    if(step<5){   // any minute: drag (or tap) around the face; the numbers show every 5 minutes
+      var dragM=false; face.style.touchAction='none';
+      var fromPt=function(e){ var r=face.getBoundingClientRect(), x=e.clientX-r.left-r.width/2, y=e.clientY-r.top-r.height/2; if(Math.sqrt(x*x+y*y)<r.width*.12) return; var a=Math.atan2(y,x)*180/Math.PI+90; if(a<0) a+=360; var v=Math.round(a/6)%60; if(v!==mm){ mm=v; draw(); } };
+      face.addEventListener('pointerdown',function(e){ if(stage!=='m') return; dragM=true; try{ face.setPointerCapture(e.pointerId); }catch(_){} fromPt(e); e.preventDefault(); });
+      face.addEventListener('pointermove',function(e){ if(dragM) fromPt(e); });
+      face.addEventListener('pointerup',function(){ dragM=false; });
+      face.addEventListener('pointercancel',function(){ dragM=false; });
+      d.addEventListener('keydown',function(e){ if(stage!=='m') return; var k=e.key==='ArrowUp'||e.key==='ArrowRight'?1:e.key==='ArrowDown'||e.key==='ArrowLeft'?-1:0; if(k){ e.preventDefault(); mm=(mm+k+60)%60; draw(); } });
+    }
     d.querySelectorAll('.ck-ap button').forEach(function(b){ b.addEventListener('click',function(){ var pm=b.dataset.ap==='pm'; if(pm && h24<12) h24+=12; if(!pm && h24>=12) h24-=12; draw(); }); });
     var close=function(){ d.remove(); };
     d.querySelector('.ck-cancel').addEventListener('click',close);
@@ -16284,6 +16293,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     draw();
   }
   window.ayuPickTime=pickTime;
+  window.ayuTones={ options:function(){ return toneOptions(); }, start:function(t,l){ return startSound(t,l); }, stop:function(){ stopSound(); } };   // also used by Clock → Timer
 
   // ───────── alarms ─────────
   var TONES_CACHE='ayubase6-tones', OWN_URL='ayubase6-own-tone', K_OWN='ayuAlarmOwnName';
@@ -16451,7 +16461,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
       var tb=$(p+'-time');
       var paint=function(){ tb.innerHTML=clock(A.rem.time())+'<span>Change</span>'; };
       paint();
-      tb.addEventListener('click',function(){ pickTime(A.rem.time(),5,'#0f766e',function(v){ var c=get('rem'); c.at=v; put('rem',c); paint(); }); });
+      tb.addEventListener('click',function(){ pickTime(A.rem.time(),1,'#0f766e',function(v){ var c=get('rem'); c.at=v; put('rem',c); paint(); }); });
       buildDays();
     }
   }
@@ -16606,7 +16616,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   function openForm(id){
     closeForms();
     var list=$('rem-alarm-list'); if(!list) return;
-    var isNew=!id, base=isNew ? {on:true,at:420,days:[0,1,2,3,4,5,6],tone:'rise',ring:2,snoozeMin:5,snoozeMax:3,keys:'snooze',name:'',vibrate:true} : get(id);
+    var isNew=!id, base=isNew ? {on:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:2,snoozeMin:5,snoozeMax:3,keys:'snooze',name:'',vibrate:true} : get(id);
     var c=JSON.parse(JSON.stringify(base)); if(!c.name) c.name=''; c.vibrate=('vibrate' in c) ? c.vibrate!==false : !!c.on;
     var f=document.createElement('div'); f.className='ayu-alarm-form ayu-al-body';
     f.innerHTML='<div class="ayu-al-row"><span class="ayu-al-lbl">Name</span><input type="text" class="ayu-al-name" maxlength="40" placeholder="Optional, e.g. Gym" aria-label="Alarm name"></div>'
@@ -16626,7 +16636,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     function check(){ save.disabled=!isNew && state()===start; }
     var nm=q('.ayu-al-name'); nm.value=c.name; nm.addEventListener('input',function(){ c.name=nm.value; check(); });
     var tb=q('#remf-al-time'); function paintT(){ tb.innerHTML=clock(c.at)+'<span>Change</span>'; } paintT();
-    tb.addEventListener('click',function(){ pickTime(c.at,5,'#0f766e',function(v){ c.at=v; paintT(); check(); }); });
+    tb.addEventListener('click',function(){ pickTime(c.at,1,'#0f766e',function(v){ c.at=v; paintT(); check(); }); });
     // days
     var host=q('#rem-alarm-days'), ORDER=[1,2,3,4,5,6,0], L={1:'M',2:'T',3:'W',4:'T',5:'F',6:'S',0:'S'}, F={1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday',6:'Saturday',0:'Sunday'};
     host.innerHTML='<div class="otd-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Daily</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div>';
@@ -18061,9 +18071,378 @@ html body .ayu-rem-tabs button[aria-selected=true]>span:not(#ayu-x1):not(#ayu-x2
 </style>
 <script id="tab-labels-20261105-js">
 (function(){
-  var M={breaks:'Health Breaks',personal:'Personal',alarm:'Alarm',bmi:'BMI',lab:'Lab Insights',tracker:'Tracker'};
+  var M={breaks:'Health Breaks',personal:'Personal',alarm:'Clock',bmi:'BMI',lab:'Lab Insights',tracker:'Tracker'};
   function go(){ var b=document.querySelectorAll('.ayu-rem-tabs button[data-t],.ayu-vit-tabs button[data-t]'); [].forEach.call(b,function(x){ var s=x.querySelector('span'); if(s && M[x.dataset.t] && s.textContent!==M[x.dataset.t]) s.textContent=M[x.dataset.t]; }); return b.length>=6; }
   var n=0, iv=setInterval(function(){ if(go() || ++n>40) clearInterval(iv); },250);
+})();
+</script>
+<style id="clock-20261105">
+/* Reminders → Clock: Alarm, Timer, Stopwatch, World Clock (small tabs) */
+html body #rem-alarm-card .clk-pills{display:flex;gap:4px;margin:4px 0 14px;background:color-mix(in srgb,#0f766e 9%,transparent);padding:4px;border-radius:12px}
+html body #rem-alarm-card .clk-pills button{flex:1 1 0;min-width:0;border:0;background:transparent;font:inherit;font-size:13px;font-weight:600;color:#0f766e;opacity:.8;padding:8px 2px;border-radius:9px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body #rem-alarm-card .clk-pills button[aria-selected=true]{background:#0f766e;color:#fff;opacity:1;font-weight:700}
+html body #rem-alarm-card .clk-pills button:focus-visible{outline:2px solid #0f766e;outline-offset:2px}
+html body #rem-alarm-card.clk-other > :not(.ayu-part-title):not(.ayu-part-info):not(.clk-pills):not(.clk-part){display:none !important}
+html body #rem-alarm-card .clk-part{display:none}
+html body #rem-alarm-card .clk-part.on{display:block}
+html body #rem-alarm-card .clk-big{font-weight:800;font-size:46px;line-height:1.05;letter-spacing:.5px;color:#134e4a;text-align:center;margin:4px 0 4px;font-variant-numeric:tabular-nums}
+html body #rem-alarm-card .clk-cap{text-align:center;font-size:13px;color:#134e4a;opacity:.75;min-height:1.2em;margin-bottom:8px}
+html body #rem-alarm-card .clk-cap.up{color:#b45309;opacity:1;font-weight:700}
+html body #rem-alarm-card .clk-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:6px 0 14px}
+html body #rem-alarm-card .clk-btns button{min-width:92px;padding:9px 18px;border-radius:22px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;border:1.5px solid #0f766e;background:#0f766e;color:#fff}
+html body #rem-alarm-card .clk-btns button.alt{background:transparent;color:#0f766e}
+html body #rem-alarm-card .clk-btns button[hidden]{display:none}
+html body #rem-alarm-card .clk-fields .ayu-al-row{flex-wrap:wrap}
+html body #rem-alarm-card .clk-len{display:flex;align-items:center;gap:4px;flex:1 1 auto}
+html body #rem-alarm-card .clk-len input{width:52px;padding:7px 6px;border-radius:9px;border:1.5px solid color-mix(in srgb,#0f766e 45%,#fff);font:inherit;font-weight:700;text-align:center;background:#fff;color:#134e4a}
+html body #rem-alarm-card #clk-t-name{flex:1 1 160px;min-width:0;padding:8px 12px;border-radius:10px;border:1.5px solid color-mix(in srgb,#0f766e 45%,#fff);font:inherit;background:#fff;color:#134e4a;outline:none}
+html body #rem-alarm-card #clk-t-name:focus{border-color:#0f766e}
+html body #rem-alarm-card .clk-len span{font-size:13px;opacity:.75;margin-right:4px}
+html body #rem-alarm-card .clk-quick{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 10px}
+html body #rem-alarm-card .clk-quick button{border:1.5px solid color-mix(in srgb,#0f766e 40%,#fff);background:transparent;color:#0f766e;border-radius:16px;padding:5px 11px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+html body #rem-alarm-card .clk-quick button.on{background:#0f766e;color:#fff;border-color:#0f766e}
+html body #rem-alarm-card .clk-fields.locked .ayu-al-row,html body #rem-alarm-card .clk-fields.locked .clk-quick{opacity:.55}
+html body #rem-alarm-card .clk-note{font-size:12.5px;opacity:.7;margin:0 0 8px}
+html body #rem-alarm-card .clk-laps{list-style:none;margin:0;padding:0 2px}
+html body #rem-alarm-card .clk-laps li{display:grid;grid-template-columns:1fr auto auto;gap:4px 14px;padding:7px 4px;border-bottom:1px solid color-mix(in srgb,#0f766e 14%,transparent);font-size:14px;font-variant-numeric:tabular-nums;color:#134e4a}
+html body #rem-alarm-card .clk-laps li b{font-weight:700}
+html body #rem-alarm-card .clk-laps li .tag{font-size:11px;font-weight:700;margin-left:6px;padding:1px 6px;border-radius:8px}
+html body #rem-alarm-card .clk-laps li .tag.fast{background:#dcfce7;color:#166534}
+html body #rem-alarm-card .clk-laps li .tag.slow{background:#fee2e2;color:#991b1b}
+html body #rem-alarm-card .clk-laps li .tot{opacity:.65}
+html body #rem-alarm-card #clk-world-list .cri-main strong{font-size:1.35rem}
+html body #rem-alarm-card .clk-wadd{display:flex;gap:8px;margin:4px 0 6px}
+html body #rem-alarm-card .clk-wadd input{flex:1;min-width:0;padding:9px 12px;border-radius:10px;border:1.5px solid color-mix(in srgb,#0f766e 45%,#fff);font:inherit;background:#fff;color:#134e4a}
+html body #rem-alarm-card .clk-wres{display:flex;flex-direction:column;gap:2px;margin:0 0 8px}
+html body #rem-alarm-card .clk-wres button{text-align:left;border:0;background:color-mix(in srgb,#0f766e 7%,#fff);border-radius:9px;padding:9px 12px;font:inherit;font-size:14px;color:#134e4a;cursor:pointer}
+html body #rem-alarm-card .clk-wres button small{opacity:.65;margin-left:6px}
+html body #rem-alarm-card .clk-wmsg{font-size:13px;color:#b45309;margin:0 0 8px}
+html body #rem-alarm-card .clk-wmsg:empty{display:none}
+html body #rem-alarm-card .clk-lock{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;margin-top:8px;border-radius:14px;border:1.5px solid color-mix(in srgb,#0f766e 25%,#fff);background:color-mix(in srgb,#0f766e 5%,#fff)}
+html body #rem-alarm-card .clk-lock .t{font-weight:700;color:#134e4a}
+html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:12.5px;opacity:.7;margin-top:2px}
+#clk-ring{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:100000;display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:16px;background:#0f766e;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.25);font-weight:700;max-width:calc(100vw - 32px)}
+#clk-ring button{border:0;border-radius:18px;padding:8px 16px;background:#fff;color:#0f766e;font:inherit;font-weight:800;cursor:pointer}
+@media (max-width:380px){html body #rem-alarm-card .clk-pills button{font-size:12px}html body #rem-alarm-card .clk-big{font-size:40px}}
+</style>
+<script id="clock-20261105-js">
+/* Reminders → Clock: Alarm (the existing alarms), Timer, Stopwatch, World Clock, as small tabs.
+   One timer and one stopwatch, shown directly. State in localStorage; in the Android app the phone keeps a copy
+   (live notifications with buttons on the lock screen, the timer's alarm) and the newer copy wins ("v"). */
+(function(){
+  var APP=!!window.AYU_ANDROID;
+  var K_T='ayuBase6-timer', K_S='ayuBase6-stopwatch', K_W='ayuBase6-world', K_TAB='ayuClockTab', MAX_CITIES=5;
+  function $(i){ return document.getElementById(i); }
+  function ld(k,d){ try{ var o=JSON.parse(localStorage.getItem(k)||'null'); return (o && typeof o==='object') ? o : d; }catch(e){ return d; } }
+  function sv(k,o){ try{ localStorage.setItem(k,JSON.stringify(o)); }catch(e){} }
+  function N(){ var n=window.ayuNative; return APP && n && typeof n.clockSet==='function' ? n : null; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function pad(n){ return (n<10?'0':'')+n; }
+  function hms(ms){ var s=Math.max(0,Math.ceil(ms/1000)), h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60; return h ? h+':'+pad(m)+':'+pad(x) : pad(m)+':'+pad(x); }
+  function swFmt(ms){ ms=Math.max(0,ms); var cs=Math.floor(ms/10)%100, s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60; return (h?h+':'+pad(m):pad(m))+':'+pad(x)+'.'+pad(cs); }
+  function lenTxt(ms){ var s=Math.round(ms/1000), h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60, p=[]; if(h) p.push(h+' h'); if(m) p.push(m+' min'); if(x) p.push(x+' s'); return p.join(' ')||'0 s'; }
+  function clockTxt(d){ try{ return d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); }catch(e){ return d.getHours()+':'+pad(d.getMinutes()); } }
+
+  // ───── state (the same rules as the phone's ClockKit) ─────
+  var T=ld(K_T,null), S=ld(K_S,null), W=ld(K_W,null);
+  if(!T) T={name:'',ms:300000,times:1,tone:'rise',vibrate:true,run:'idle',round:0,endAt:0,left:300000,v:0};
+  if(!S) S={run:'idle',startAt:0,acc:0,laps:[],v:0};
+  if(!W) W={on:false,list:[],v:0};
+  function len(){ return Math.max(1000,+T.ms||300000); }
+  function times(){ return Math.max(0,+T.times||0); }
+  function tStart(now){ T.run='running'; T.round=1; T.endAt=now+len(); T.left=len(); T.v=now; }
+  function tPause(now){ if(T.run!=='running') return; T.left=Math.max(0,T.endAt-now); T.run='paused'; T.v=now; }
+  function tResume(now){ if(T.run!=='paused') return; T.endAt=now+Math.max(1000,T.left||len()); T.run='running'; T.v=now; }
+  function tReset(now){ T.run='idle'; T.round=0; T.endAt=0; T.left=len(); T.fired=0; T.v=now; }
+  function tAdd(now,ms){ if(T.run==='running') T.endAt+=ms; else if(T.run==='paused') T.left+=ms; else return; T.v=now; }
+  function tFire(now,keepV){
+    if(T.run!=='running' || now<T.endAt-1500) return false;
+    var n=times(), r=Math.max(1,T.round||1); T.fired=now; if(!keepV) T.v=now;
+    if(n===0 || r<n){ var nx=T.endAt+len(); while(nx<=now) nx+=len(); T.round=r+1; T.endAt=nx; }
+    else { T.run='idle'; T.round=0; T.endAt=0; T.left=len(); }
+    return true;
+  }
+  function sEl(now){ return S.run==='running' ? (S.acc||0)+Math.max(0,now-S.startAt) : (S.acc||0); }
+  function sStart(now){ if(S.run==='running') return; if(S.run==='idle'){ S.acc=0; S.laps=[]; } S.startAt=now; S.run='running'; S.v=now; }
+  function sPause(now){ if(S.run!=='running') return; S.acc=sEl(now); S.run='paused'; S.v=now; }
+  function sLap(now){ if(S.run!=='running' || (S.laps||[]).length>=99) return; S.laps=(S.laps||[]).concat([sEl(now)]); S.v=now; }
+  function sReset(now){ S.run='idle'; S.acc=0; S.startAt=0; S.laps=[]; S.v=now; }
+  function roundTxt(){ var n=times(), r=Math.max(1,T.round||1); return n===1 ? '' : (n===0 ? 'Alert '+r+' · repeats until stopped' : 'Alert '+r+' of '+n); }
+
+  function saveAll(push){ sv(K_T,T); sv(K_S,S); sv(K_W,W); if(push!==false) toPhone(); }
+  function toPhone(){ var n=N(); if(!n) return; try{ Promise.resolve(n.clockSet({timer:T,stopwatch:S,world:W})).then(adopt).catch(function(){}); }catch(e){} }
+  function adopt(r){
+    if(!r) return; var ch=false;
+    if(r.timer && +r.timer.v>+T.v){ T=r.timer; ch=true; }
+    if(r.stopwatch && +r.stopwatch.v>+S.v){ S=r.stopwatch; if(!Array.isArray(S.laps)) S.laps=[]; ch=true; }
+    if(r.world && +r.world.v>+W.v && Array.isArray(r.world.list)){ W=r.world; ch=true; }
+    if(ch){ saveAll(false); paintAll(); }
+  }
+  function fromPhone(){ var n=N(); if(!n) return; try{ Promise.resolve(n.clockGet()).then(adopt).catch(function(){}); }catch(e){} }
+
+  // ───── ringing on the website (the phone rings by itself in the app) ─────
+  var ringStop=0;
+  function ringWeb(){
+    var tn=window.ayuTones, more=T.run==='running', sec=more ? Math.max(5,Math.min(30,len()/3000)) : 60;
+    try{ if(tn) tn.start(T.tone||'rise',true); }catch(e){}
+    try{ if(T.vibrate!==false && navigator.vibrate && document.documentElement.classList.contains('ayu-can-vib')) navigator.vibrate([700,500,700,500,700]); }catch(e){}
+    var nm=(T.name||'').trim()||'Timer', body='Time’s up'+(more?' · next alert in '+hms(len()):'');
+    var b=$('clk-ring'); if(b) b.remove();
+    b=document.createElement('div'); b.id='clk-ring'; b.setAttribute('role','alert');
+    b.innerHTML='<span>⏱ '+esc(nm)+' · '+esc(body)+'</span><button type="button">Stop</button>';
+    document.body.appendChild(b);
+    b.querySelector('button').addEventListener('click',stopRing);
+    try{ if(document.hidden && typeof Notification!=='undefined' && Notification.permission==='granted') new Notification('⏱ '+nm,{body:body,tag:'ayu-timer'}); }catch(e){}
+    clearTimeout(ringStop); ringStop=setTimeout(stopRing,sec*1000);
+  }
+  function stopRing(){ clearTimeout(ringStop); try{ if(window.ayuTones) window.ayuTones.stop(); }catch(e){} try{ if(navigator.vibrate) navigator.vibrate(0); }catch(e){} var b=$('clk-ring'); if(b) b.remove(); }
+
+  // ───── building the tabs and parts ─────
+  var PARTS=[['alarm','Alarm'],['timer','Timer'],['stopwatch','Stopwatch'],['world','World Clock']];
+  var tab='alarm'; try{ var tb=localStorage.getItem(K_TAB); if(PARTS.some(function(p){ return p[0]===tb; })) tab=tb; }catch(e){}
+  function showTab(t){
+    tab=t; try{ localStorage.setItem(K_TAB,t); }catch(e){}
+    var card=$('rem-alarm-card'); if(!card) return;
+    card.classList.toggle('clk-other',t!=='alarm');
+    card.querySelectorAll('.clk-pills button').forEach(function(b){ var on=b.dataset.p===t; b.setAttribute('aria-selected',String(on)); b.tabIndex=on?0:-1; });
+    card.querySelectorAll('.clk-part').forEach(function(p){ p.classList.toggle('on',p.dataset.part===t); });
+    paintAll();
+  }
+  window.ayuClockTab=showTab;
+
+  var CITIES=null;   // filled below
+  function partTimer(){
+    var opts=''; try{ opts=(window.ayuTones? window.ayuTones.options() : '<option value="rise">Rising chime</option>').replace(/<option value="upload">[^<]*<\/option>/,''); }catch(e){}
+    var times=[[1,'Once'],[2,'2 times'],[3,'3 times'],[4,'4 times'],[5,'5 times'],[6,'6 times'],[8,'8 times'],[10,'10 times'],[12,'12 times'],[16,'16 times'],[24,'24 times'],[0,'Until I stop it']];
+    return '<div class="clk-big" id="clk-t-big" aria-live="off"></div><div class="clk-cap" id="clk-t-cap"></div>'
+      +'<div class="clk-btns"><button type="button" id="clk-t-start">Start</button><button type="button" id="clk-t-pause">Pause</button><button type="button" id="clk-t-resume">Resume</button>'
+      +'<button type="button" class="alt" id="clk-t-add">+1 min</button><button type="button" class="alt" id="clk-t-reset">Reset</button></div>'
+      +'<div class="ayu-al-body clk-fields" id="clk-t-fields"><p class="clk-note" id="clk-t-note" hidden>Reset the timer to change these.</p>'
+      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Name</span><input type="text" class="ayu-al-name" id="clk-t-name" maxlength="40" placeholder="Optional, e.g. Water break" aria-label="Timer name"></div>'
+      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Length</span><span class="clk-len"><input type="number" inputmode="numeric" id="clk-t-h" min="0" max="23" aria-label="Hours"><span>h</span><input type="number" inputmode="numeric" id="clk-t-m" min="0" max="59" aria-label="Minutes"><span>min</span><input type="number" inputmode="numeric" id="clk-t-s" min="0" max="59" aria-label="Seconds"><span>s</span></span></div>'
+      +'<div class="clk-quick" id="clk-t-quick">'+[[60,'1 min'],[300,'5 min'],[600,'10 min'],[900,'15 min'],[1800,'30 min'],[2700,'45 min'],[3600,'1 h']].map(function(q){ return '<button type="button" data-s="'+q[0]+'">'+q[1]+'</button>'; }).join('')+'</div>'
+      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Alerts</span><select id="clk-t-times" aria-label="How many alerts">'+times.map(function(o){ return '<option value="'+o[0]+'">'+o[1]+'</option>'; }).join('')+'</select></div>'
+      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Sound</span><select id="clk-t-tone" aria-label="Sound">'+opts+'</select><button type="button" class="ayu-al-play" id="clk-t-play" title="Preview" aria-label="Preview">▶</button></div>'
+      +'<div class="ayu-al-row ayu-vib-only"><span class="ayu-al-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" id="clk-t-vib" aria-label="Vibrate"></label></div>'
+      +'</div>';
+  }
+  function partStopwatch(){
+    return '<div class="clk-big" id="clk-s-big"></div><div class="clk-cap" id="clk-s-cap"></div>'
+      +'<div class="clk-btns"><button type="button" id="clk-s-start">Start</button><button type="button" id="clk-s-pause">Pause</button><button type="button" id="clk-s-resume">Resume</button>'
+      +'<button type="button" class="alt" id="clk-s-lap">Lap</button><button type="button" class="alt" id="clk-s-reset">Reset</button></div><ol class="clk-laps" id="clk-s-laps"></ol>';
+  }
+  function partWorld(){
+    return '<div id="clk-world-list" class="ayu-list"></div>'
+      +'<div class="ayu-add-row" id="clk-w-addrow"><button type="button" class="ayu-add-btn" id="clk-w-add"><span class="ayu-add-plus" aria-hidden="true">+</span><span>Add a city</span></button></div>'
+      +'<div id="clk-w-form" hidden><div class="clk-wadd"><input type="search" id="clk-w-q" placeholder="Search a city or country" aria-label="Search a city or country" autocomplete="off"><button type="button" class="cancel-reminder" id="clk-w-cancel">Cancel</button></div><div class="clk-wres" id="clk-w-res"></div></div>'
+      +'<p class="clk-wmsg" id="clk-w-msg" role="status"></p>'
+      +(APP?'<div class="clk-lock"><span class="t">Show on lock screen<span class="s">The times of these cities in a silent notification.</span></span><label class="master-switch" title="Show on lock screen"><input type="checkbox" id="clk-w-lock" aria-label="Show World Clock on the lock screen"></label></div>':'');
+  }
+
+  function infoMore(){
+    return '<strong>Timer</strong><ul><li>Set a <b>Length</b> (or tap a quick length) and how many <b>Alerts</b>: once, a number of times, or until you stop it. It alerts each time the length passes.</li>'
+      +'<li><b>Sound</b>'+(document.documentElement.classList.contains('ayu-can-vib')?' and <b>Vibrate</b>':'')+' for the alert. <b>Pause</b>, <b>+1 min</b> and <b>Reset</b> while it runs; reset it to change the settings.</li></ul>'
+      +'<strong>Stopwatch</strong><ul><li><b>Start</b>, <b>Pause</b>, <b>Lap</b> and <b>Reset</b>. The fastest and slowest laps are marked.</li></ul>'
+      +'<strong>World Clock</strong><ul><li>Add up to '+MAX_CITIES+' cities in different time zones: each shows its time and how far ahead or behind your time it is.</li></ul>'
+      +(APP?'A running timer and the stopwatch also show on the lock screen, with their buttons. World Clock can too: turn on <b>Show on lock screen</b>.'
+           :'Timer and Stopwatch keep going while AyuBase6 is closed and pick up when you open it again, but the timer alerts only while AyuBase6 is open. For alerts and the lock screen with the app closed, use the Android app.');
+  }
+
+  var built=false;
+  function build(){
+    var card=$('rem-alarm-card'); if(!card) return false;
+    var title=card.querySelector('.ayu-part-title'), info=$('rem-al-info'); if(!title || !info) return false;
+    if(built && card.querySelector('.clk-pills')) return true;
+    var sp=title.querySelector('span'); if(sp) sp.textContent='Clock';
+    var ib=$('rem-al-ibtn'); if(ib){ ib.title='About Clock'; ib.setAttribute('aria-label','About Clock'); }
+    if(!info.dataset.clk){ info.dataset.clk='1'; info.insertAdjacentHTML('beforeend',infoMore()); }
+    var pills=document.createElement('div'); pills.className='clk-pills'; pills.setAttribute('role','tablist'); pills.setAttribute('aria-label','Clock');
+    pills.innerHTML=PARTS.map(function(p){ return '<button type="button" role="tab" data-p="'+p[0]+'">'+p[1]+'</button>'; }).join('');
+    info.after(pills);
+    pills.addEventListener('click',function(e){ var b=e.target.closest('button[data-p]'); if(b) showTab(b.dataset.p); });
+    pills.addEventListener('keydown',function(e){ var d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0; if(!d) return; var i=PARTS.findIndex(function(p){ return p[0]===tab; }); var n=PARTS[(i+d+PARTS.length)%PARTS.length][0]; showTab(n); var b=pills.querySelector('[data-p="'+n+'"]'); if(b) b.focus(); e.preventDefault(); });
+    [['timer',partTimer()],['stopwatch',partStopwatch()],['world',partWorld()]].forEach(function(x){ var d=document.createElement('div'); d.className='clk-part'; d.dataset.part=x[0]; d.innerHTML=x[1]; card.appendChild(d); });
+    wireTimer(); wireStopwatch(); wireWorld();
+    var tbtn=document.querySelector('.ayu-rem-tabs button[data-t=alarm]'); if(tbtn){ tbtn.title='Clock'; tbtn.setAttribute('aria-label','Clock'); var s2=tbtn.querySelector('span'); if(s2) s2.textContent='Clock'; }
+    built=true; showTab(tab); return true;
+  }
+
+  // ───── timer ─────
+  function wireTimer(){
+    var q=function(i){ return $(i); };
+    function act(f){ var now=Date.now(); f(now); stopRing(); saveAll(); paintTimer(); }
+    q('clk-t-start').addEventListener('click',function(){ readLen(); if(len()<1000) return; act(tStart); });
+    q('clk-t-pause').addEventListener('click',function(){ act(tPause); });
+    q('clk-t-resume').addEventListener('click',function(){ act(tResume); });
+    q('clk-t-reset').addEventListener('click',function(){ act(tReset); });
+    q('clk-t-add').addEventListener('click',function(){ act(function(n){ tAdd(n,60000); }); });
+    function readLen(){ var h=Math.max(0,Math.min(23,+q('clk-t-h').value||0)), m=Math.max(0,Math.min(59,+q('clk-t-m').value||0)), s=Math.max(0,Math.min(59,+q('clk-t-s').value||0)); var ms=((h*60+m)*60+s)*1000; if(ms>=1000){ T.ms=ms; if(T.run==='idle') T.left=ms; } }
+    function edit(){ if(T.run!=='idle') return; T.v=Date.now(); saveAll(); paintTimer(); }
+    ['clk-t-h','clk-t-m','clk-t-s'].forEach(function(id){ q(id).addEventListener('change',function(){ readLen(); edit(); }); q(id).addEventListener('input',function(){ readLen(); if(T.run==='idle'){ sv(K_T,T); paintTimer(true); } }); });
+    q('clk-t-quick').addEventListener('click',function(e){ var b=e.target.closest('button[data-s]'); if(!b || T.run!=='idle') return; T.ms=+b.dataset.s*1000; T.left=T.ms; edit(); });
+    q('clk-t-name').addEventListener('input',function(){ T.name=this.value; T.v=Date.now(); sv(K_T,T); paintTimer(true); });
+    q('clk-t-name').addEventListener('change',function(){ T.name=this.value; edit(); toPhone(); });
+    q('clk-t-times').addEventListener('change',function(){ T.times=+this.value; edit(); });
+    q('clk-t-tone').addEventListener('change',function(){ T.tone=this.value; T.v=Date.now(); saveAll(); });
+    q('clk-t-vib').addEventListener('change',function(){ T.vibrate=this.checked; T.v=Date.now(); saveAll(); });
+    var playing=false;
+    q('clk-t-play').addEventListener('click',function(){ var tn=window.ayuTones; if(!tn) return; if(playing){ tn.stop(); playing=false; this.textContent='▶'; return; } tn.start(q('clk-t-tone').value||'rise',false); playing=true; var b=this; b.textContent='■'; setTimeout(function(){ playing=false; b.textContent='▶'; },3000); });
+  }
+  function paintTimer(keepFields){
+    var big=$('clk-t-big'); if(!big) return;
+    var now=Date.now(), run=T.run;
+    big.textContent = run==='running' ? hms(T.endAt-now) : run==='paused' ? hms(T.left) : hms(len());
+    var cap=$('clk-t-cap'), rt=roundTxt(), up=run==='idle' && T.fired && now-T.fired<10*60000;
+    cap.classList.toggle('up',!!up);
+    cap.textContent = run==='running' ? [rt, times()!==1?'every '+lenTxt(len()):'' ].filter(Boolean).join(' · ') || ((T.name||'').trim() ? T.name.trim() : 'Running')
+      : run==='paused' ? 'Paused'+(rt?' · '+rt:'')
+      : up ? 'Time’s up at '+clockTxt(new Date(T.fired))
+      : (times()===1 ? 'Alerts once' : times()===0 ? 'Alerts every '+lenTxt(len())+' until you stop it' : 'Alerts '+times()+' times, every '+lenTxt(len()));
+    $('clk-t-start').hidden=run!=='idle'; $('clk-t-pause').hidden=run!=='running'; $('clk-t-resume').hidden=run!=='paused';
+    $('clk-t-add').hidden=run==='idle'; $('clk-t-reset').hidden=run==='idle';
+    if(keepFields) return;
+    var f=$('clk-t-fields'), lock=run!=='idle'; f.classList.toggle('locked',lock); $('clk-t-note').hidden=!lock;
+    var s=Math.round(len()/1000), H=Math.floor(s/3600), M=Math.floor(s%3600/60), X=s%60;
+    var hI=$('clk-t-h'), mI=$('clk-t-m'), sI=$('clk-t-s');
+    if(document.activeElement!==hI) hI.value=H; if(document.activeElement!==mI) mI.value=M; if(document.activeElement!==sI) sI.value=X;
+    [hI,mI,sI,$('clk-t-times')].forEach(function(x){ x.disabled=lock; });
+    $('clk-t-quick').querySelectorAll('button').forEach(function(b){ b.disabled=lock; b.classList.toggle('on',+b.dataset.s*1000===len()); });
+    var nm=$('clk-t-name'); if(document.activeElement!==nm) nm.value=T.name||'';
+    $('clk-t-times').value=String(times()); if($('clk-t-times').value!==String(times())) $('clk-t-times').value='1';
+    var tn=$('clk-t-tone'); tn.value=T.tone||'rise'; if(tn.value!==(T.tone||'rise')) tn.value='rise';
+    $('clk-t-vib').checked=T.vibrate!==false;
+  }
+
+  // ───── stopwatch ─────
+  function wireStopwatch(){
+    function act(f){ f(Date.now()); saveAll(); paintStopwatch(); }
+    $('clk-s-start').addEventListener('click',function(){ act(sStart); });
+    $('clk-s-pause').addEventListener('click',function(){ act(sPause); });
+    $('clk-s-resume').addEventListener('click',function(){ act(sStart); });
+    $('clk-s-lap').addEventListener('click',function(){ act(sLap); });
+    $('clk-s-reset').addEventListener('click',function(){ act(sReset); });
+  }
+  var lapsDrawn='';
+  function paintStopwatch(){
+    var big=$('clk-s-big'); if(!big) return;
+    var now=Date.now(), run=S.run, laps=S.laps||[];
+    big.textContent=swFmt(sEl(now));
+    $('clk-s-cap').textContent = run==='paused' ? 'Paused' : '';
+    $('clk-s-start').hidden=run!=='idle'; $('clk-s-pause').hidden=run!=='running'; $('clk-s-resume').hidden=run!=='paused';
+    $('clk-s-lap').hidden=run!=='running'; $('clk-s-reset').hidden=run==='idle';
+    var key=laps.join(','); if(key===lapsDrawn) return; lapsDrawn=key;
+    var splits=laps.map(function(t,i){ return t-(i?laps[i-1]:0); }), fast=-1, slow=-1;
+    if(laps.length>=3){ fast=splits.indexOf(Math.min.apply(null,splits)); slow=splits.indexOf(Math.max.apply(null,splits)); }
+    var ol=$('clk-s-laps'), h='';
+    for(var i=laps.length-1;i>=0;i--) h+='<li><span>Lap '+(i+1)+(i===fast?'<span class="tag fast">Fastest</span>':i===slow?'<span class="tag slow">Slowest</span>':'')+'</span><b>'+swFmt(splits[i])+'</b><span class="tot">'+swFmt(laps[i])+'</span></li>';
+    ol.innerHTML=h;
+  }
+
+  // ───── world clock ─────
+  function parts(tz,d){
+    var o={}; try{ new Intl.DateTimeFormat('en-US',{timeZone:tz,year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',hourCycle:'h23'}).formatToParts(d).forEach(function(p){ o[p.type]=+p.value; }); }catch(e){ return null; }
+    return o;
+  }
+  function offsetMin(tz,d){ var p=parts(tz,d); if(!p) return 0; var asUtc=Date.UTC(p.year,p.month-1,p.day,p.hour%24,p.minute); return Math.round((asUtc-Math.floor(d.getTime()/60000)*60000)/60000); }
+  function diffTxt(tz,d){
+    var m=offsetMin(tz,d)-(-d.getTimezoneOffset()); if(!m) return 'Same time as you';
+    var a=Math.abs(m), h=Math.floor(a/60), mm=a%60;
+    return (h?h+' h':'')+(h&&mm?' ':'')+(mm?mm+' min':'')+(m>0?' ahead':' behind');
+  }
+  function dayTxt(tz,d){ var p=parts(tz,d); if(!p) return ''; var a=Date.UTC(p.year,p.month-1,p.day), b=Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()); return a>b?'Tomorrow':a<b?'Yesterday':''; }
+  function cityTime(tz,d){ try{ return d.toLocaleTimeString([], {timeZone:tz,hour:'numeric',minute:'2-digit'}); }catch(e){ return ''; } }
+  function sameAs(tz){ var d=new Date(), o=offsetMin(tz,d); return (W.list||[]).filter(function(x){ return x.tz===tz || offsetMin(x.tz,d)===o; })[0]||null; }   // one city per time zone
+  function validTz(tz){ try{ new Intl.DateTimeFormat('en-US',{timeZone:tz}); return true; }catch(e){ return false; } }
+  function wireWorld(){
+    var form=$('clk-w-form'), qI=$('clk-w-q'), res=$('clk-w-res'), msg=$('clk-w-msg');
+    $('clk-w-add').addEventListener('click',function(){
+      if((W.list||[]).length>=MAX_CITIES){ msg.textContent='You can add up to '+MAX_CITIES+' cities. Delete one to add another.'; return; }
+      msg.textContent=''; form.hidden=false; $('clk-w-addrow').hidden=true; qI.value=''; search(); qI.focus();
+    });
+    $('clk-w-cancel').addEventListener('click',close);
+    function close(){ form.hidden=true; $('clk-w-addrow').hidden=false; res.innerHTML=''; }
+    function search(){
+      var s=qI.value.trim().toLowerCase(), d=new Date();
+      var hits=CITIES.filter(function(c){ return validTz(c[2]) && (!s || (c[0]+' '+c[1]).toLowerCase().indexOf(s)>=0); }).slice(0,8);
+      res.innerHTML=hits.length ? hits.map(function(c,i){ var dup=sameAs(c[2]); return '<button type="button" data-i="'+CITIES.indexOf(c)+'"'+(dup?' aria-disabled="true"':'')+'>'+esc(c[0])+', '+esc(c[1])+'<small>'+esc(cityTime(c[2],d))+(dup?' · same time as '+esc(dup.city):'')+'</small></button>'; }).join('')
+        : '<p class="clk-note">No match. Try a bigger city nearby, or the country.</p>';
+    }
+    qI.addEventListener('input',search);
+    res.addEventListener('click',function(e){
+      var b=e.target.closest('button[data-i]'); if(!b) return; var c=CITIES[+b.dataset.i];
+      var dup=sameAs(c[2]);
+      if(dup){ msg.textContent=c[0]+' has the same time as '+dup.city+', which is already in your list.'; return; }
+      if((W.list||[]).length>=MAX_CITIES){ msg.textContent='You can add up to '+MAX_CITIES+' cities.'; return; }
+      W.list=(W.list||[]).concat([{city:c[0],country:c[1],tz:c[2]}]); W.v=Date.now(); msg.textContent=''; close(); saveAll(); paintWorld(true);
+    });
+    var lk=$('clk-w-lock'); if(lk) lk.addEventListener('change',function(){ W.on=lk.checked; W.v=Date.now(); saveAll(); });
+    $('clk-world-list').addEventListener('click',function(e){
+      var del=e.target.closest('.custom-reminder-delete'); if(!del) return;
+      var it=del.closest('[data-tz]'), tz=it.dataset.tz, idx=-1, saved=null;
+      (W.list||[]).forEach(function(c,i){ if(c.tz===tz){ idx=i; saved=c; } }); if(idx<0) return;
+      W.list.splice(idx,1); W.v=Date.now(); saveAll(); paintWorld(true); msg.textContent='';
+      if(window.ayuUndoAt) try{ window.ayuUndoAt($('clk-world-list').parentNode,$('clk-w-addrow'),saved.city+' removed',function(){ if(W.list.length<MAX_CITIES && !W.list.some(function(x){ return x.tz===saved.tz; })){ W.list.splice(Math.min(idx,W.list.length),0,saved); W.v=Date.now(); saveAll(); paintWorld(true); } }); }catch(e2){}
+    });
+  }
+  var worldDrawn='';
+  function paintWorld(force){
+    var list=$('clk-world-list'); if(!list) return;
+    var d=new Date(), L=W.list||[], key=JSON.stringify(L)+'|'+d.getHours()+':'+d.getMinutes();
+    var lk=$('clk-w-lock'); if(lk) lk.checked=!!W.on;
+    $('clk-w-add').querySelector('span:last-child').textContent = L.length>=MAX_CITIES ? 'Add a city (up to '+MAX_CITIES+')' : 'Add a city';
+    if(!force && key===worldDrawn) return; worldDrawn=key;
+    list.innerHTML=L.map(function(c){
+      var day=dayTxt(c.tz,d);
+      return '<div class="custom-reminder-item ayu-alarm-item" data-tz="'+esc(c.tz)+'"><div class="cri-hdr"><div class="cri-main"><strong>'+esc(cityTime(c.tz,d))+'</strong><div class="cri-sub">'+esc(c.city)+', '+esc(c.country)+' · '+esc(diffTxt(c.tz,d))+(day?' · '+day:'')+'</div></div>'
+        +'<button type="button" class="custom-reminder-delete" aria-label="Remove '+esc(c.city)+'" title="Remove">×</button></div></div>';
+    }).join('');
+    if(!L.length) list.innerHTML='<p class="clk-note">Add the cities you want to keep an eye on.</p>';
+    try{ if(window.ayuListColours) window.ayuListColours(list); }catch(e){}
+  }
+
+  function paintAll(){ paintTimer(); paintStopwatch(); paintWorld(true); }
+
+  // ───── ticking ─────
+  function catchUp(){   // timer ends that passed while the page was not looking
+    var now=Date.now(), rang=false;
+    while(T.run==='running' && now>=T.endAt-1500){
+      var late=now-T.endAt>5000;
+      if(!tFire(now,APP)) break;
+      if(!APP && !late) rang=true;
+    }
+    if(rang || T.fired===now){ if(!APP) saveAll(); else sv(K_T,T); }
+    if(rang) ringWeb();
+    if(T.fired===now) paintTimer();
+  }
+  setInterval(function(){
+    if(!built){ if(!build()) return; }
+    catchUp();
+    var card=$('rem-alarm-card'); if(!card || !card.offsetParent) return;
+    if(tab==='timer') paintTimer(true);
+    else if(tab==='stopwatch') paintStopwatch();
+    else if(tab==='world') paintWorld();
+  },200);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden){ fromPhone(); catchUp(); paintAll(); } });
+  window.addEventListener('ayu-clock-native',fromPhone);
+  window.addEventListener('storage',function(e){ if(e.key===K_T||e.key===K_S||e.key===K_W){ T=ld(K_T,T); S=ld(K_S,S); W=ld(K_W,W); paintAll(); } });
+  setTimeout(function(){ if(N()){ fromPhone(); setTimeout(toPhone,800); } },1500);
+
+  CITIES=[
+    ['Hyderabad','India','Asia/Kolkata'],['Kolkata','India','Asia/Kolkata'],['Mumbai','India','Asia/Kolkata'],['Delhi','India','Asia/Kolkata'],['Bengaluru','India','Asia/Kolkata'],['Chennai','India','Asia/Kolkata'],
+    ['Kathmandu','Nepal','Asia/Kathmandu'],['Dhaka','Bangladesh','Asia/Dhaka'],['Colombo','Sri Lanka','Asia/Colombo'],['Karachi','Pakistan','Asia/Karachi'],['Thimphu','Bhutan','Asia/Thimphu'],['Malé','Maldives','Indian/Maldives'],
+    ['Kabul','Afghanistan','Asia/Kabul'],['Tashkent','Uzbekistan','Asia/Tashkent'],['Almaty','Kazakhstan','Asia/Almaty'],['Yangon','Myanmar','Asia/Yangon'],
+    ['Dubai','United Arab Emirates','Asia/Dubai'],['Abu Dhabi','United Arab Emirates','Asia/Dubai'],['Muscat','Oman','Asia/Muscat'],['Doha','Qatar','Asia/Qatar'],['Riyadh','Saudi Arabia','Asia/Riyadh'],['Kuwait City','Kuwait','Asia/Kuwait'],['Manama','Bahrain','Asia/Bahrain'],['Tehran','Iran','Asia/Tehran'],['Baghdad','Iraq','Asia/Baghdad'],['Jerusalem','Israel','Asia/Jerusalem'],['Amman','Jordan','Asia/Amman'],['Beirut','Lebanon','Asia/Beirut'],['Istanbul','Türkiye','Europe/Istanbul'],
+    ['Singapore','Singapore','Asia/Singapore'],['Kuala Lumpur','Malaysia','Asia/Kuala_Lumpur'],['Bangkok','Thailand','Asia/Bangkok'],['Jakarta','Indonesia','Asia/Jakarta'],['Bali (Denpasar)','Indonesia','Asia/Makassar'],['Manila','Philippines','Asia/Manila'],['Ho Chi Minh City','Vietnam','Asia/Ho_Chi_Minh'],['Hanoi','Vietnam','Asia/Ho_Chi_Minh'],['Phnom Penh','Cambodia','Asia/Phnom_Penh'],
+    ['Hong Kong','China','Asia/Hong_Kong'],['Shanghai','China','Asia/Shanghai'],['Beijing','China','Asia/Shanghai'],['Taipei','Taiwan','Asia/Taipei'],['Seoul','South Korea','Asia/Seoul'],['Tokyo','Japan','Asia/Tokyo'],['Ulaanbaatar','Mongolia','Asia/Ulaanbaatar'],
+    ['Perth','Australia','Australia/Perth'],['Darwin','Australia','Australia/Darwin'],['Adelaide','Australia','Australia/Adelaide'],['Brisbane','Australia','Australia/Brisbane'],['Sydney','Australia','Australia/Sydney'],['Melbourne','Australia','Australia/Melbourne'],['Auckland','New Zealand','Pacific/Auckland'],['Suva','Fiji','Pacific/Fiji'],
+    ['London','United Kingdom','Europe/London'],['Dublin','Ireland','Europe/Dublin'],['Lisbon','Portugal','Europe/Lisbon'],['Paris','France','Europe/Paris'],['Berlin','Germany','Europe/Berlin'],['Frankfurt','Germany','Europe/Berlin'],['Amsterdam','Netherlands','Europe/Amsterdam'],['Brussels','Belgium','Europe/Brussels'],['Zurich','Switzerland','Europe/Zurich'],['Madrid','Spain','Europe/Madrid'],['Rome','Italy','Europe/Rome'],['Vienna','Austria','Europe/Vienna'],['Stockholm','Sweden','Europe/Stockholm'],['Oslo','Norway','Europe/Oslo'],['Copenhagen','Denmark','Europe/Copenhagen'],['Helsinki','Finland','Europe/Helsinki'],['Warsaw','Poland','Europe/Warsaw'],['Prague','Czechia','Europe/Prague'],['Athens','Greece','Europe/Athens'],['Bucharest','Romania','Europe/Bucharest'],['Kyiv','Ukraine','Europe/Kyiv'],['Moscow','Russia','Europe/Moscow'],
+    ['Cairo','Egypt','Africa/Cairo'],['Nairobi','Kenya','Africa/Nairobi'],['Addis Ababa','Ethiopia','Africa/Addis_Ababa'],['Lagos','Nigeria','Africa/Lagos'],['Accra','Ghana','Africa/Accra'],['Johannesburg','South Africa','Africa/Johannesburg'],['Cape Town','South Africa','Africa/Johannesburg'],['Casablanca','Morocco','Africa/Casablanca'],['Dar es Salaam','Tanzania','Africa/Dar_es_Salaam'],['Mauritius (Port Louis)','Mauritius','Indian/Mauritius'],
+    ['New York','United States','America/New_York'],['Washington, D.C.','United States','America/New_York'],['Chicago','United States','America/Chicago'],['Houston','United States','America/Chicago'],['Dallas','United States','America/Chicago'],['Denver','United States','America/Denver'],['Phoenix','United States','America/Phoenix'],['Los Angeles','United States','America/Los_Angeles'],['San Francisco','United States','America/Los_Angeles'],['Seattle','United States','America/Los_Angeles'],['Anchorage','United States','America/Anchorage'],['Honolulu','United States','Pacific/Honolulu'],
+    ['Toronto','Canada','America/Toronto'],['Vancouver','Canada','America/Vancouver'],['Calgary','Canada','America/Edmonton'],['Winnipeg','Canada','America/Winnipeg'],['Halifax','Canada','America/Halifax'],['St. John’s','Canada','America/St_Johns'],
+    ['Mexico City','Mexico','America/Mexico_City'],['Bogotá','Colombia','America/Bogota'],['Lima','Peru','America/Lima'],['Santiago','Chile','America/Santiago'],['Buenos Aires','Argentina','America/Argentina/Buenos_Aires'],['São Paulo','Brazil','America/Sao_Paulo'],['Rio de Janeiro','Brazil','America/Sao_Paulo'],['Caracas','Venezuela','America/Caracas'],['Port of Spain','Trinidad and Tobago','America/Port_of_Spain'],['Kingston','Jamaica','America/Jamaica'],
+    ['Reykjavík','Iceland','Atlantic/Reykjavik'],['UTC','Coordinated Universal Time','UTC']
+  ];
+  var n0=0, iv0=setInterval(function(){ if(build() || ++n0>80) clearInterval(iv0); },250);
 })();
 </script>
 </body>
