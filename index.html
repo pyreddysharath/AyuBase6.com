@@ -11200,14 +11200,14 @@ function buildWeekPlan(ag) {
       warmupContent += `
       <div class="warmup-subsection">
         <div class="warmup-subsection-label warmup-collapse-hdr" onclick="toggleWarmupCollapse(this)">🏋️ Exercise <span class="warmup-collapse-arrow" aria-hidden="true"><svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1.5l5 5 5-5"/></svg></span></div>
-        <div class="ex-grid2 warmup-collapse-body"><div class="media-offline" data-set="exercise" hidden><span class="media-offline-text"></span><button type="button" class="media-offline-btn" onclick="ayuSaveOffline('exercise')">Save for offline</button><span class="media-offline-warn" hidden></span></div>${exerciseCards}</div>
+        <div class="ex-grid2 warmup-collapse-body"><div class="media-offline" data-set="exercise" hidden><span class="media-offline-text"></span><button type="button" class="media-offline-btn" onclick="ayuAskOffline('exercise',this)">Save for offline</button><span class="media-offline-warn" hidden></span></div>${exerciseCards}</div>
       </div>`;
     }
     if (yogaChecked) {
       warmupContent += `
       <div class="warmup-subsection">
         <div class="yoga-section-label warmup-collapse-hdr" onclick="toggleWarmupCollapse(this)">🧘 Yoga <span class="warmup-collapse-arrow" aria-hidden="true"><svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1.5l5 5 5-5"/></svg></span></div>
-        <div class="yoga-grid warmup-collapse-body"><div class="media-offline" data-set="yoga" hidden><span class="media-offline-text"></span><button type="button" class="media-offline-btn" onclick="ayuSaveOffline('yoga')">Save for offline</button><span class="media-offline-warn" hidden></span></div>${yogaCards}</div>
+        <div class="yoga-grid warmup-collapse-body"><div class="media-offline" data-set="yoga" hidden><span class="media-offline-text"></span><button type="button" class="media-offline-btn" onclick="ayuAskOffline('yoga',this)">Save for offline</button><span class="media-offline-warn" hidden></span></div>${yogaCards}</div>
       </div>`;
     }
 
@@ -17562,8 +17562,24 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
 </script>
 <style id="downloads-20261105">
 /* Footer → Backup & Restore icon: three tabs (Download app, Save offline, Backup & Restore) */
-html body #sec-backup > .footer-subtabs{flex-wrap:nowrap !important;gap:6px !important}
-html body #sec-backup > .footer-subtabs .footer-subtab{flex:1 1 auto;min-width:0;padding-left:3px !important;padding-right:3px !important;font-size:clamp(.6rem,3.05vw,.82rem) !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* the same tabs as Help, Settings and Legal: light patches of the section colour; the open one filled and joined to the line */
+html body #sec-backup > .footer-subtabs{gap:4px !important;border-bottom:2px solid var(--footer-accent,#0d9488) !important;align-items:flex-end;flex-wrap:nowrap !important;margin:0 0 14px !important}
+html body #sec-backup > .footer-subtabs .footer-subtab{flex:1 1 auto;min-width:0;border:0 !important;border-radius:10px 10px 0 0 !important;margin:0 !important;padding:9px 4px 8px !important;
+  background:color-mix(in srgb, var(--footer-accent,#0d9488) 12%, #fff) !important;color:var(--footer-accent,#0d9488) !important;opacity:1 !important;font-weight:700 !important;border-bottom:0 !important;box-shadow:none !important;
+  font-size:clamp(.6rem,3.05vw,.82rem) !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body #sec-backup > .footer-subtabs .footer-subtab:hover{background:color-mix(in srgb, var(--footer-accent,#0d9488) 20%, #fff) !important}
+html body #sec-backup > .footer-subtabs .footer-subtab.active, html body #sec-backup > .footer-subtabs .footer-subtab.active:hover{background:var(--footer-accent,#0d9488) !important;color:#fff !important}
+html body #sec-backup > .footer-subtabs .footer-subtab .fs-dot{border-color:#fff}
+/* no repeated title under the tab: its i sits on the "Include in Save and Restore" heading */
+html body #sec-bkp > .backup-title{display:none !important}
+html body #sec-bkp .backup-pick-title .backup-info-btn{margin-left:6px !important;vertical-align:middle}
+/* Body → Save for offline: ask first, like Lab Insights */
+.media-offline-ask{flex:1 1 100%;margin:8px 0 2px;padding:10px 12px;border-radius:12px;background:#eff6ff;border:1px solid rgba(37,99,235,.25);font-size:.86rem;color:#1e3a8a}
+.media-offline-ask p{margin:0 0 8px}
+.media-offline-ask .oa-btns{display:flex;gap:8px;justify-content:center}
+.media-offline-ask button{border-radius:10px;padding:7px 16px;font:inherit;font-weight:700;cursor:pointer}
+.media-offline-ask .oa-yes{border:0;background:#2563eb;color:#fff}
+.media-offline-ask .oa-no{border:1.5px solid #2563eb;background:#fff;color:#2563eb}
 html body #sec-help .footer-subtabs .footer-subtab{flex:1 1 auto}
 #sec-offline .off-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(15,23,42,.08)}
 #sec-offline .off-row:last-of-type{border-bottom:0}
@@ -17727,6 +17743,24 @@ html body #calculator-panel .ayu-undo-row button{border:0;background:none;color:
     }
   });
   window.ayuPaintOffline=paintOffline;
+
+  // Backup & Restore: its i moves to the "Include in Save and Restore" heading (the title is the tab now)
+  (function(){ var t=0, iv2=setInterval(function(){ var b=$('backup-info-btn'), h=document.querySelector('#sec-bkp .backup-pick-title'); if(b && h){ if(b.parentNode!==h) h.appendChild(b); var p=$('backup-info'), pick=$('backup-pick'); if(p && pick && p.nextElementSibling!==pick) pick.before(p); clearInterval(iv2); } else if(++t>60) clearInterval(iv2); },250); })();
+  // Body → Exercise / Yoga "Save for offline": ask first, with what it is and its size
+  window.ayuAskOffline=async function(k, btn){
+    var box=btn && btn.closest('.media-offline'); if(!box || typeof MEDIA_SETS==='undefined' || !MEDIA_SETS[k]){ if(typeof ayuSaveOffline==='function') ayuSaveOffline(k); return; }
+    var ex=box.querySelector('.media-offline-ask'); if(ex){ ex.remove(); return; }
+    var set=MEDIA_SETS[k], vids=set.files.filter(function(f){ return f.video; }), left=0, cache=null;
+    try{ cache=await caches.open(typeof AYU_MEDIA_CACHE!=='undefined'?AYU_MEDIA_CACHE:'ayubase6-media-v2'); }catch(e){}
+    for(var i=0;i<set.files.length;i++){ var f=set.files[i], hit=null; try{ hit=cache && await cache.match(ayuMediaKey(f.url)); }catch(e){} if(!hit || (typeof ayuStale!=='undefined' && ayuStale[k] && ayuStale[k].has(f.url))) left+=f.bytes||0; }
+    var name=k==='yoga'?'yoga':'exercise';
+    var d=document.createElement('div'); d.className='media-offline-ask'; d.setAttribute('role','dialog'); d.setAttribute('aria-label','Save the '+name+' videos for offline?');
+    d.innerHTML='<p><b>Save the '+name+' videos for offline?</b></p><p>Lets you play the '+vids.length+' '+name+' videos without internet. They download once ('+mb(left||set.files.reduce(function(a,f){ return a+(f.bytes||0); },0))+') and stay on this device. Remove them any time in <b>Backup &amp; Restore → Save offline</b>.</p>'
+      +'<div class="oa-btns"><button type="button" class="oa-yes">Save</button><button type="button" class="oa-no">Cancel</button></div>';
+    box.appendChild(d);
+    d.querySelector('.oa-yes').addEventListener('click',function(){ d.remove(); ayuSaveOffline(k); });
+    d.querySelector('.oa-no').addEventListener('click',function(){ d.remove(); });
+  };
 })();
 </script>
 <style id="tab-titles-20261105">
