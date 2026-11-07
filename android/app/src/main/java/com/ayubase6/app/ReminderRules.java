@@ -23,7 +23,7 @@ final class ReminderRules {
             this.key = key; this.title = title; this.body = body; this.section = section;
         }
         String sound = "";        // a tone of the app (Checks → Notify Me → Sound); empty = the phone's notification sound
-        String say = "", voice = "";   // Speak: what to read out (empty = nothing) and the voice
+        String say = "", voice = "", lang = "";   // Speak: what to read out (empty = nothing), the voice and its language
         Due vib(JSONObject o) {
             if (o != null) {
                 vibrate = o.optBoolean("vibrate", true); String t = o.optString("sound", ""); sound = t.matches("^[a-z]{1,12}$") ? t : "";
@@ -31,7 +31,7 @@ final class ReminderRules {
                 if (sp != null && sp.optBoolean("on", false)) {
                     String tx = sp.optString("text", "").trim();
                     say = (tx.isEmpty() ? title : tx); if (say.length() > 160) say = say.substring(0, 160);
-                    voice = sp.optString("voice", "");
+                    voice = sp.optString("voice", ""); lang = sp.optString("lang", "");
                 }
             }
             return this;

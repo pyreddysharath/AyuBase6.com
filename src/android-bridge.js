@@ -289,7 +289,7 @@
   if(typeof P.ttsVoices === 'function'){
     state.tts = {
       voices: function(){ return P.ttsVoices().then(function(r){ return (r && r.voices) || []; }); },
-      say: function(text, voice){ return P.ttsSay({ text:String(text || ''), voice:String(voice || '') }); }
+      say: function(text, voice, lang){ return P.ttsSay({ text:String(text || ''), voice:String(voice || ''), lang:String(lang || '') }); }
     };
   }
   // Backup to the person's Google account (Android key/value backup of one data copy)

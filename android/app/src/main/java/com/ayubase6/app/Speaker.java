@@ -17,7 +17,10 @@ final class Speaker {
     private Speaker() {}
 
     /** Speaks and waits until done (at most about 12 s). Call off the main thread. */
-    static void say(Context c, String text, String voiceName) {
+    static void say(Context c, String text, String voiceName) { say(c, text, voiceName, ""); }
+
+    /** lang (e.g. "te"): used when the voice is not on the phone (or none was chosen). */
+    static void say(Context c, String text, String voiceName, String lang) {
         if (text == null || text.trim().isEmpty()) return;
         final CountDownLatch ready = new CountDownLatch(1), done = new CountDownLatch(1);
         final TextToSpeech[] t = new TextToSpeech[1];
@@ -29,7 +32,9 @@ final class Speaker {
             TextToSpeech tts = t[0];
             tts.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build());
-            pick(tts, voiceName);
+            if (!pick(tts, voiceName) && lang != null && !lang.isEmpty()) {
+                try { tts.setLanguage(Locale.forLanguageTag(lang)); } catch (Exception ignored) {}
+            }
             tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                 @Override public void onStart(String id) {}
                 @Override public void onDone(String id) { done.countDown(); }
@@ -42,11 +47,12 @@ final class Speaker {
         } finally { stop(main, t[0]); }
     }
 
-    private static void pick(TextToSpeech tts, String voiceName) {
+    private static boolean pick(TextToSpeech tts, String voiceName) {
         try {
             if (voiceName != null && !voiceName.isEmpty() && tts.getVoices() != null)
-                for (Voice v : tts.getVoices()) if (v.getName().equals(voiceName)) { tts.setVoice(v); return; }
+                for (Voice v : tts.getVoices()) if (v.getName().equals(voiceName)) { tts.setVoice(v); return true; }
         } catch (Exception ignored) {}
+        return false;
     }
 
     private static void stop(Handler main, TextToSpeech tts) { if (tts != null) main.post(() -> { try { tts.stop(); tts.shutdown(); } catch (Exception ignored) {} }); }
@@ -60,7 +66,8 @@ final class Speaker {
                 org.json.JSONArray out = new org.json.JSONArray();
                 try {
                     if (s == TextToSpeech.SUCCESS && t[0].getVoices() != null) for (Voice v : t[0].getVoices()) {
-                        if (v.isNetworkConnectionRequired() && v.getFeatures() != null && v.getFeatures().contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED)) continue;
+                        // only voices that can speak now: not "not installed" (speech data still to download)
+                        if (v.getFeatures() != null && v.getFeatures().contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED)) continue;
                         Locale l = v.getLocale(); String n = v.getName(), low = n.toLowerCase(Locale.US);
                         String g = low.contains("female") ? "Female" : low.contains("male") ? "Male" : "";
                         out.put(new org.json.JSONObject().put("name", n).put("lang", l.toLanguageTag())

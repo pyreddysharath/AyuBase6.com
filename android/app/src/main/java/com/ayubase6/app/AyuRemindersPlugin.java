@@ -388,8 +388,8 @@ public class AyuRemindersPlugin extends Plugin {
 
     @PluginMethod
     public void ttsSay(PluginCall call) {
-        String text = call.getString("text", ""), voice = call.getString("voice", "");
-        new Thread(() -> { Speaker.say(getContext(), text.length() > 200 ? text.substring(0, 200) : text, voice); call.resolve(); }, "ayu-say").start();
+        String text = call.getString("text", ""), voice = call.getString("voice", ""), lang = call.getString("lang", "");
+        new Thread(() -> { Speaker.say(getContext(), text.length() > 200 ? text.substring(0, 200) : text, voice, lang); call.resolve(); }, "ayu-say").start();
     }
 
     /** Opens a web address in the phone's browser (e.g. the new app version to download). Only https. */
