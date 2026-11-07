@@ -421,7 +421,9 @@
         + '<div class="ayu-ec-btns"><button type="button" class="ayu-ec-later">Later</button><button type="button" class="ayu-ec-allow">Update</button></div>';
       card.querySelector('.ayu-ec-allow').onclick = function(){
         card.remove(); state.updateStart();
-        try{ if(typeof window.showFooterSection === 'function'){ window.showFooterSection('backup'); if(typeof window.showFooterSub === 'function') window.showFooterSub('backup', 'app'); } }catch(e){}
+        setTimeout(function(){   // after this tap (the footer closes on taps outside it)
+          try{ if(typeof window.showFooterSection === 'function'){ window.showFooterSection('backup'); if(typeof window.showFooterSub === 'function') window.showFooterSub('backup', 'app'); var sa = document.getElementById('sec-app'); if(sa) sa.scrollIntoView({ block:'center', behavior:'smooth' }); } }catch(e){}
+        }, 60);
       };
       card.querySelector('.ayu-ec-later').onclick = function(){ ls(UPD_KEY, JSON.stringify({ v:String(cfg.versionCode), at:Date.now() })); card.remove(); };
       document.body.appendChild(card);
