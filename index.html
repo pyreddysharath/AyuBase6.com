@@ -19198,11 +19198,11 @@ html body #routines-panel #chk-speak-row .master-switch input:checked:not(#ayu-x
 </script>
 <style id="sec-onoff-20261108">
 /* A section's fields show only while its switch is on; the chevron (to fold it) only then too */
-html body #routines-panel .ayu-sec-off .ayu-chev:not(#ayu-x1){display:none !important}
+html body #routines-panel .ayu-sec-off .ayu-chev:not(#ayu-x1){display:inline-flex !important;visibility:hidden !important;pointer-events:none !important}   /* its place is kept: the switch does not move */
 html body #routines-panel #chk-alarm.ayu-sec-off #wake-al-body:not(#ayu-x1),
 html body #routines-panel #routines-notify-card.ayu-sec-off #routines-remind-panel:not(#ayu-x1),
 html body #routines-panel #routines-notify-card.ayu-sec-off .rout-card-foot:not(#ayu-x1){display:none !important}
-html body #alerts-panel .ayu-rem-group .alert-card:is(.alert-disabled,.ayu-sub-off) > .alert-card-hdr .alert-card-chev:not(#ayu-x1){display:none !important}
+html body #alerts-panel .ayu-rem-group .alert-card:is(.alert-disabled,.ayu-sub-off) > .alert-card-hdr .alert-card-chev:not(#ayu-x1){display:flex !important;visibility:hidden !important;pointer-events:none !important}
 html body #alerts-panel .ayu-rem-group .alert-card:is(.alert-disabled,.ayu-sub-off):not(#reminder-hours-card) > :not(.alert-card-hdr):not(.ayu-desc):not(.sec-lotus-layer):not(#ayu-x1){display:none !important}
 /* Health Breaks: its switch and chevron on the title row; no Turn on row */
 html body #alerts-panel #reminder-hours-card > .alert-card-hdr:not(#ayu-x1){display:none !important}
