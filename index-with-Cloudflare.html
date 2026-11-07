@@ -15828,7 +15828,8 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       if(ACC[tabName]) b.style.setProperty('--appb-c',ACC[tabName]);   // each tab's own colour, also before the first tab switch
       b.innerHTML='<div class="appb-tx"><span class="appb-t">Get the AyuBase6 app</span>'
         +'<span>Reminders arrive on time even when the app is closed.</span>'
-        +'<div class="appb-btns"><button type="button" class="appb-get">Download</button><button type="button" class="appb-later">Cancel</button></div></div>';
+        +'</div><button type="button" class="appb-get">Download</button>'
+        +'<button type="button" class="appb-x appb-later" aria-label="Close" title="Close">×</button>';
       var later=function(){
         ls(K_LATER,String(Date.now()));
         noteInPlace('You can download the app later from <svg class="appb-help-ic" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-label="Backup and Restore icon" role="img"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg> <b>(Backup &amp; Restore) → Download App</b>, at the bottom of the page.', 7000);
@@ -19132,6 +19133,14 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   var n=0, iv=setInterval(function(){ if(setup() || ++n>80) clearInterval(iv); },300);
 })();
 </script>
+<style id="appb-close-20261107">
+/* "Get the AyuBase6 app" banner: × at the top right, Download on the right of the text */
+html body .ayu-appb:not(.appb-note){align-items:center;padding:12px 46px 12px 14px}
+html body .ayu-appb > .appb-get{flex:0 0 auto;border:0;border-radius:10px;padding:9px 14px;font:inherit;font-weight:700;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center}
+html body .ayu-appb > .appb-x{position:absolute;top:8px;right:8px;width:26px;height:26px;line-height:26px;font-size:16px;text-align:center}
+html body .ayu-appb > .appb-x:hover{background:rgba(255,255,255,.35)}
+@media (max-width:370px){html body .ayu-appb:not(.appb-note){flex-wrap:wrap}html body .ayu-appb:not(.appb-note) > .appb-tx{flex:1 1 100%}html body .ayu-appb > .appb-get{margin-left:auto}}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
