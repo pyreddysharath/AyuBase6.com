@@ -19080,7 +19080,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   function of(list,l){ return list.filter(function(v){ return L2(v.lang)===l; }).sort(function(a,b){ return (/-IN$/i.test(b.lang)?1:0)-(/-IN$/i.test(a.lang)?1:0) || (a.net?1:0)-(b.net?1:0); }); }
   function langsOf(list){ return LANGS.filter(function(x){ return of(list,x[0]).length; }); }
   function pickLang(list,cur){ var have=langsOf(list).map(function(x){ return x[0]; }); if(!have.length) return '';
-    var c=cur?L2(cur):''; if(c && have.indexOf(c)>=0) return c; var d=L2(navigator.language); return have.indexOf(d)>=0 ? d : (have.indexOf('en')>=0 ? 'en' : have[0]); }
+    var c=cur?L2(cur):''; if(c && have.indexOf(c)>=0) return c; return have.indexOf('en')>=0 ? 'en' : have[0]; }
   function langOptions(list,cur){
     var L=langsOf(list);
     if(!L.length) return '<option value="">No voices on this device</option>';
@@ -19117,7 +19117,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   }
   window.ayuSay=say;
 
-  var INFO='<p>These are the languages this '+(APP?'phone':'device')+' has a voice for, and that AyuBase6 can say: English, Hindi, Telugu, Tamil, Kannada, Malayalam, Marathi, Bengali and Gujarati.</p>'
+  var INFO='<p>Read aloud says the reminder out loud. The languages are the ones this '+(APP?'phone':'device')+' has a voice for, and that AyuBase6 can say: English, Hindi, Telugu, Tamil, Kannada, Malayalam, Marathi, Bengali and Gujarati.</p>'
     +'<p>To get another one, add its voice in your '+(APP?'phone':'device')+' settings, then '+(APP?'close and reopen the app':'reload this page')+':</p><ul>'
     +'<li>Android: Settings → Text-to-speech → Preferred engine settings → Install voice data</li>'
     +(APP?'':'<li>Windows: Settings → Time &amp; language → Speech → Add voices</li><li>iPhone / Mac: Accessibility → Spoken Content → Voices</li>')
@@ -19126,10 +19126,10 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   // ── a Speak field: Speak (i), language, ▶, switch; the i text right below; Voice when the language has more than one ──
   function row(id,c,onChange,sample,names){
     var w=document.createElement('div'); w.className='ayu-speak-wrap'; if(id) w.id=id;
-    w.innerHTML='<div class="ayu-speak-row"><span class="ayu-speak-lbl">Speak<button type="button" class="calc-info-btn rout-info-btn ayu-speak-i" title="About Speak" aria-label="About Speak" aria-expanded="false">i</button></span>'
-      +'<label class="master-switch" title="Speak"><input type="checkbox" aria-label="Speak"></label></div>'
+    w.innerHTML='<div class="ayu-speak-row"><span class="ayu-speak-lbl">Read aloud<button type="button" class="calc-info-btn rout-info-btn ayu-speak-i" title="About Read aloud" aria-label="About Read aloud" aria-expanded="false">i</button></span>'
+      +'<label class="master-switch" title="Read aloud"><input type="checkbox" aria-label="Read aloud"></label></div>'
       +'<div class="calc-task ayu-al-info ayu-speak-info" hidden>'+INFO+'</div>'
-      +'<div class="ayu-speak-row ayu-speak-vrow" hidden><span class="ayu-speak-lbl">Voice</span><select class="ayu-speak-lang" aria-label="Voice language"></select>'
+      +'<div class="ayu-speak-row ayu-speak-vrow" hidden><span class="ayu-speak-lbl">Language</span><select class="ayu-speak-lang" aria-label="Language"></select>'
       +'<button type="button" class="ayu-speak-play alert-icon-btn" title="Preview" aria-label="Preview the voice">▶</button></div>';
     var ls=w.querySelector('.ayu-speak-lang'), vs={value:''}, vr=w.querySelector('.ayu-speak-vrow'),
         cb=w.querySelector('input'), pl=w.querySelector('.ayu-speak-play'), ib=w.querySelector('.ayu-speak-i'), info=w.querySelector('.ayu-speak-info');
@@ -19139,14 +19139,17 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
     function paint(){
       var l=pickLang(voices,cur.lang); none=!l;
       ls.innerHTML=langOptions(voices,l);
+      painting=true; try{ ls.dispatchEvent(new Event('change')); }catch(e){} painting=false;   // the styled drop-down shows it
       state();
     }
+    var painting=false;
+    w._set=function(c2){ cb.checked=!!c2.on; cur={lang:c2.lang, voice:''}; if(voices) paint(); else state(); };
     // the Voice row (languages + ▶) shows only while Speak is on
     function state(){ vr.hidden=!cb.checked; ls.disabled=none; pl.disabled=none; }
     function ch(){ cur={lang:ls.value, voice:vs.value}; state(); onChange({on:cb.checked, lang:ls.value, voice:vs.value}); }
     getVoices(function(){ paint(); ROWS.push(function(){ if(!w.isConnected) return false; paint(); return true; }); });
     cb.addEventListener('change',ch);
-    ls.addEventListener('change',function(){ cur={lang:ls.value, voice:''}; paint(); ch(); });
+    ls.addEventListener('change',function(){ if(painting) return; cur={lang:ls.value, voice:''}; paint(); ch(); });
     ib.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); info.hidden=!info.hidden; ib.setAttribute('aria-expanded',String(!info.hidden)); });
     pl.addEventListener('click',function(e){ e.preventDefault(); if(none) return; say(typeof sample==='function'?sample(ls.value):sample, vs.value, ls.value); });
     return w;
@@ -19160,6 +19163,17 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
       var r=row('chk-speak-row',cfg('chk'),function(c){ setCfg('chk',c); },function(l){ return actIn('Drink Water',l); });
       if(vr) vr.before(r); else snd.after(r);
     } else if(!vr && !snd) ok=false;
+    // Health Breaks: one Read aloud for all its sections (after On these days); each section can still change its own
+    var days=document.getElementById('rh-days');
+    if(days && !document.getElementById('rh-speak')){
+      var hb=load().hb, keys=CARDS.map(function(p){ return p[0]; });
+      if(!hb){ var cs=keys.map(cfg); hb={on:cs.every(function(x){ return x.on; }), lang:cs.every(function(x){ return L2(x.lang||'en')===L2(cs[0].lang||'en'); }) ? cs[0].lang : '', voice:''}; }
+      var m=row('rh-speak',hb,function(c){
+        var o=load(); o.hb=c; keys.forEach(function(k){ o[k]={on:c.on, lang:c.lang, voice:''}; }); save(o);
+        CARDS.forEach(function(p){ var w=document.querySelector('#'+p[1]+' .ayu-speak-wrap'); if(w && w._set) w._set(o[p[0]]); });
+      },function(l){ return sampleIn(l); });
+      days.after(m);
+    } else if(!days) ok=false;
     // Health Breaks: each section (above its Vibrate)
     CARDS.forEach(function(p){
       var card=document.getElementById(p[1]); if(!card){ ok=false; return; }
@@ -19308,8 +19322,18 @@ html body .ayu-speak-wrap .ayu-speak-row .ayu-speak-lbl:not(#ayu-x1){gap:0}
 html body .ayu-speak-wrap .ayu-speak-i:not(#ayu-x1){margin-left:6px}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-row.ayu-vib-fld:not(#ayu-x1){grid-template-columns:92px minmax(0,1fr)}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-row .master-switch:not(#ayu-x1){justify-self:start}
-html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-vrow.ayu-vib-fld:not(#ayu-x1){grid-template-columns:92px auto auto;justify-content:start}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-vrow.ayu-vib-fld:not(#ayu-x1){grid-template-columns:92px minmax(0,1fr) auto}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-vrow .reminder-custom-select-wrap:not(#ayu-x1){width:100% !important}html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-vrow .reminder-custom-select-trigger:not(#ayu-x1){width:100% !important}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-vrow .reminder-custom-select-wrap:not(#ayu-x1){max-width:100% !important}
+html body #alerts-panel .alert-card .ayu-speak-wrap .ayu-speak-row:not(#ayu-x1){padding-left:0}
+html body #alerts-panel .alert-card .ayu-speak-wrap .ayu-speak-lbl:not(#ayu-x1):before{display:inline-block;width:10px;margin-right:6px;font-size:16px;line-height:1}
+html body #alerts-panel .alert-card .ayu-speak-wrap .ayu-speak-vrow:not(#ayu-x1){flex-wrap:wrap;column-gap:8px;row-gap:6px}
+@media (max-width:649.98px){html body #alerts-panel .alert-card .ayu-speak-wrap .ayu-speak-vrow .ayu-speak-lbl:not(#ayu-x1){flex:0 0 100%}}
+html body #alerts-panel .alert-card .ayu-speak-wrap .ayu-speak-vrow .reminder-custom-select-wrap:not(#ayu-x1){flex:1 1 auto;width:auto !important;max-width:none !important}
+html body #alerts-panel .alert-card .ayu-speak-wrap .ayu-speak-vrow .reminder-custom-select-trigger:not(#ayu-x1){width:100% !important}
+html body #alerts-panel #rh-speak .ayu-speak-lbl:not(#ayu-x1):before{display:inline;width:auto;margin-right:7px;font-size:13px}
+html body #alerts-panel #rh-speak .ayu-speak-lbl:not(#ayu-x1){color:rgb(18,75,71)}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-lbl:not(#ayu-x1){white-space:nowrap}
 </style>
 </body>
 
