@@ -18632,7 +18632,10 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
 #tracker-card .trk-pick{position:relative;margin-top:4px;z-index:5;max-height:320px;overflow:auto;background:#fff;border-radius:12px;border:1.5px solid color-mix(in srgb,#0c7a8a 30%,#fff);box-shadow:0 10px 28px rgba(0,0,0,.15);padding:4px}
 #tracker-card .trk-pick[hidden]{display:none}
 #tracker-card .trk-pick .g{font-size:11.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#0c7a8a;opacity:.8;padding:8px 10px 4px}
-#tracker-card .trk-pick .o{display:block;width:100%;text-align:left;border:0;background:transparent;font:inherit;color:#0c3d4d;padding:9px 10px;border-radius:8px;cursor:pointer}
+#tracker-card .trk-pick .o{display:block;width:100%;text-align:left;border:0;background:transparent;font:inherit;color:#0c3d4d;padding:9px 10px 9px 30px;border-radius:8px;cursor:pointer;position:relative}
+#tracker-card .trk-pick .o.sel:before{content:'✓';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-weight:800;color:#0c7a8a}
+#tracker-card .trk-pick .o.sel{font-weight:700}
+#tracker-card .trk-pick .g{padding-left:10px}
 #tracker-card .trk-pick .o.act,#tracker-card .trk-pick .o:hover{background:color-mix(in srgb,#0c7a8a 12%,#fff)}
 #tracker-card .trk-pick .o mark{background:color-mix(in srgb,#f59e0b 35%,transparent);color:inherit;border-radius:3px}
 #tracker-card .trk-pick .none{padding:10px;font-size:13px;opacity:.7}
@@ -18659,10 +18662,10 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     items.forEach(function(o,i){
       if(o.g!==g){ g=o.g; if(g) h+='<div class="g">'+esc(g)+'</div>'; }
       var t=esc(o.t); if(q){ var k=o.t.toLowerCase().indexOf(q); if(k>=0) t=esc(o.t.slice(0,k))+'<mark>'+esc(o.t.slice(k,k+q.length))+'</mark>'+esc(o.t.slice(k+q.length)); }
-      h+='<button type="button" class="o" role="option" data-i="'+i+'" id="trk-o-'+i+'">'+t+'</button>';
+      var on=!!(cur && cur.value===o.v); h+='<button type="button" class="o'+(on?' sel':'')+'" role="option" aria-selected="'+on+'" data-i="'+i+'" id="trk-o-'+i+'">'+t+'</button>';
     });
     list.innerHTML=h||'<div class="none">No reading matches “'+esc(inp.value.trim())+'”.</div>';
-    act=items.length?0:-1; mark(); list.hidden=false; inp.setAttribute('aria-expanded','true');
+    var si=-1; items.forEach(function(o,i){ if(cur && cur.value===o.v) si=i; }); act=items.length?(si>=0 && !q ? si : 0):-1; mark(); list.hidden=false; inp.setAttribute('aria-expanded','true');
   }
   function hide(){ list.hidden=true; inp.setAttribute('aria-expanded','false'); }
   function mark(){ [].forEach.call(list.querySelectorAll('.o'),function(b,i){ b.classList.toggle('act',i===act); }); if(act>=0){ inp.setAttribute('aria-activedescendant','trk-o-'+act); var b=$('trk-o-'+act); if(b) b.scrollIntoView({block:'nearest'}); } else inp.removeAttribute('aria-activedescendant'); }
@@ -18679,14 +18682,14 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     c.innerHTML='<input type="text" id="trk-search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="trk-pick" aria-label="Reading to add" placeholder="Select or search a reading" autocomplete="off"><span class="trk-chev" aria-hidden="true"></span><div class="trk-pick" id="trk-pick" role="listbox" hidden></div>';
     wrap.appendChild(c); wrap.classList.add('trk-on');
     inp=c.querySelector('input'); list=c.querySelector('.trk-pick');
-    inp.addEventListener('focus',function(){ inp.select(); show(); });
+    inp.addEventListener('focus',function(){ inp.value=''; show(); });   // opened again: the hint, not the chosen reading
     inp.addEventListener('click',function(){ if(list.hidden) show(); });
     inp.addEventListener('input',show);
     inp.addEventListener('keydown',function(e){
       if(e.key==='ArrowDown'){ if(list.hidden) show(); else if(act<items.length-1){ act++; mark(); } e.preventDefault(); }
       else if(e.key==='ArrowUp'){ if(act>0){ act--; mark(); } e.preventDefault(); }
       else if(e.key==='Enter'){ if(!list.hidden && act>=0){ pick(act); e.preventDefault(); } }
-      else if(e.key==='Escape'){ hide(); sync(); }
+      else if(e.key==='Escape'){ hide(); inp.blur(); sync(); }
     });
     inp.addEventListener('blur',function(){ setTimeout(function(){ if(document.activeElement!==inp){ hide(); sync(); } },150); });
     list.addEventListener('mousedown',function(e){ e.preventDefault(); });
@@ -18990,7 +18993,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
     pl.addEventListener('click',function(e){ e.preventDefault(); if(none) return; say(typeof sample==='function'?sample(ls.value):sample, vs.value, ls.value); });
     // Language: a list you can type in to search (the drop-down above stays the value)
     var cmb=document.createElement('div'); cmb.className='ayu-lang-combo';
-    cmb.innerHTML='<input type="text" class="ayu-lang-q" aria-label="Language" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false">'
+    cmb.innerHTML='<input type="text" class="ayu-lang-q" aria-label="Language" placeholder="Select or search a language" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false">'
       +'<svg class="ayu-lang-chev" viewBox="0 0 12 8" width="12" height="8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"></path></svg>'
       +'<div class="ayu-lang-list" role="listbox" hidden></div>';
     pl.before(cmb);
@@ -18999,7 +19002,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
     function show(f){
       var t=String(f||'').trim().toLowerCase(), h='', g0='';
       [].forEach.call(ls.options,function(o){ if(!o.value || (t && o.textContent.toLowerCase().indexOf(t)<0)) return;
-        var g=o.getAttribute('data-g')||''; if(g && g!==g0){ g0=g; h+='<div class="ayu-lang-g">'+(g==='ready'?'Ready on this '+(APP?'phone':'device')+' (works offline)':'Needs internet')+'</div>'; }
+        var g=o.getAttribute('data-g')||''; if(g==='net' && g!==g0){ g0=g; h+='<div class="ayu-lang-g">Needs internet</div>'; }
         h+='<button type="button" role="option" data-v="'+esc(o.value)+'"'+(o.value===ls.value?' aria-selected="true"':'')+'>'+esc(o.textContent.replace(/ \(needs internet\)$/,''))+'</button>'; });   // the group title says it
       list.innerHTML=h||'<div class="ayu-lang-none">No match</div>';
       if(list.parentNode!==document.body){ document.body.appendChild(list); }   // above every card
@@ -19419,7 +19422,9 @@ html body .ayu-lang-list[hidden]{display:none}
 html body .ayu-lang-list button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:8px 10px;border-radius:8px;font:inherit;font-size:var(--ayu-lc-fs,14px);color:inherit;cursor:pointer}
 html body .ayu-lang-list button:hover,html body .ayu-lang-list button[aria-selected="true"]{background:color-mix(in srgb,var(--ayu-lc-a,#0d9488) 12%,#fff)}
 html body .ayu-lang-list button[aria-selected="true"]{font-weight:700}
-html body .ayu-lang-g{padding:8px 10px 4px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;opacity:.65}
+html body .ayu-lang-g{padding:8px 10px 4px;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--ayu-lc-a,#0d9488);opacity:.8}
+html body .ayu-lang-list button{position:relative;padding-left:30px !important}
+html body .ayu-lang-list button[aria-selected="true"]:before{content:'✓';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-weight:800;color:var(--ayu-lc-a,#0d9488)}
 html body .ayu-lang-none{padding:8px 10px;opacity:.7;font-size:13px}
 html body #routines-panel .ayu-speak-wrap{--ayu-lc-b:rgb(206,165,125);--ayu-lc-r:10px;--ayu-lc-a:rgb(167,91,18);--ayu-lc-fs:13px}
 html body #alerts-panel .ayu-speak-wrap{--ayu-lc-a:#0d9488}
