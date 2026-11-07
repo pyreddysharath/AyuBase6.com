@@ -19015,7 +19015,11 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
 
   // ── voices ──
   var voices=null, waiters=[];
-  function gender(name){ var l=String(name).toLowerCase(); return /\bfemale\b|woman/.test(l)?'Female':/\bmale\b|\bman\b/.test(l)?'Male':''; }
+  // male / female only where the voice's name says so (and for well-known Indian voice names)
+  var KNOWN={heera:'Female',neerja:'Female',swara:'Female',kalpana:'Female',shruti:'Female',pallavi:'Female',ananya:'Female',aashi:'Female',kavya:'Female',
+    ravi:'Male',prabhat:'Male',madhur:'Male',hemant:'Male',mohan:'Male',valluvar:'Male',aarav:'Male',kunal:'Male',rehaan:'Male'};
+  function gender(name){ var l=String(name).toLowerCase(); if(/\bfemale\b|woman/.test(l)) return 'Female'; if(/\bmale\b|\bman\b/.test(l)) return 'Male';
+    var w=l.match(/[a-z]+/g)||[]; for(var i=0;i<w.length;i++) if(KNOWN[w[i]]) return KNOWN[w[i]]; return ''; }
   function lang(){ return (navigator.language||'en').slice(0,2).toLowerCase(); }
   function getVoices(cb){
     if(voices){ cb(voices); return; }
@@ -19035,7 +19039,10 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
     var L=lang(), mine=list.filter(function(v){ return v.lang.toLowerCase().slice(0,2)===L; }), use=(mine.length?mine:list);
     if(use.length>60) use=use.slice(0,60);
     var seen={}, n=0;
-    return '<option value="">Default voice</option>'+use.map(function(v){
+    // Indian voices first (English (India), Hindi, Telugu, Tamil, …), then the rest of the same language
+    var IN=list.filter(function(v){ return /-IN$/i.test(v.lang) || /india|हिन्दी|hindi/i.test(v.label+' '+v.id); });
+    use=IN.concat(use.filter(function(v){ return IN.indexOf(v)<0; }));
+    return '<option value="">Default</option>'+use.map(function(v){
       var base=v.label+(v.lang && v.label.indexOf(v.lang)<0 && !APP ? '' : ''), tag=v.g ? ' – '+v.g : '';
       if(APP){ seen[base]=(seen[base]||0)+1; base=base+' · voice '+seen[base]; }
       return '<option value="'+String(v.id).replace(/"/g,'&quot;')+'"'+(v.id===cur?' selected':'')+'>'+base.replace(/</g,'&lt;')+tag+'</option>';
@@ -19057,7 +19064,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   // ── a Speak row: label, voice, ▶, switch ──
   function row(id,c,onChange,sample){
     var r=document.createElement('div'); r.className='ayu-speak-row'; if(id) r.id=id;
-    r.innerHTML='<span class="ayu-speak-lbl">Speak</span><select aria-label="Voice"><option value="">Default voice</option></select>'
+    r.innerHTML='<span class="ayu-speak-lbl">Speak</span><select aria-label="Voice"><option value="">Default</option></select>'
       +'<button type="button" class="ayu-speak-play" title="Preview" aria-label="Preview the voice">▶</button>'
       +'<label class="master-switch" title="Speak"><input type="checkbox" aria-label="Speak"></label>';
     var sel=r.querySelector('select'), cb=r.querySelector('input'), pl=r.querySelector('button');
@@ -19140,6 +19147,23 @@ html body .ayu-appb > .appb-get{flex:0 0 auto;border:0;border-radius:10px;paddin
 html body .ayu-appb > .appb-x{position:absolute;top:8px;right:8px;width:26px;height:26px;line-height:26px;font-size:16px;text-align:center}
 html body .ayu-appb > .appb-x:hover{background:rgba(255,255,255,.35)}
 @media (max-width:370px){html body .ayu-appb:not(.appb-note){flex-wrap:wrap}html body .ayu-appb:not(.appb-note) > .appb-tx{flex:1 1 100%}html body .ayu-appb > .appb-get{margin-left:auto}}
+</style>
+<style id="speak-look-20261107">
+/* Speak and Sound fields look like their neighbours; the switch stays on the Speak row */
+html body .ayu-speak-row{flex-wrap:nowrap}
+html body .ayu-speak-row select{flex:1 1 auto;min-width:0;max-width:190px}
+/* Health Breaks: like "Sound" and its drop-down */
+html body #alerts-panel .alert-card .ayu-speak-row .ayu-speak-lbl{font-size:13px;font-weight:600;color:#134e4a;min-width:0}
+html body #alerts-panel .alert-card .ayu-speak-row select{font-size:12.8px}
+/* Checks → Notify Me: Sound, Speak, Vibrate like "On these days" (13px bold), and their drop-downs at the same size */
+html body #routines-remind-panel .chk-row .chk-lbl,html body #routines-remind-panel .ayu-speak-row .ayu-speak-lbl{font-size:13px;font-weight:700;color:rgb(36,52,72);min-width:78px}
+html body #routines-remind-panel #chk-sound,html body #routines-remind-panel .ayu-speak-row select{font-size:13px;color:rgb(36,52,72);padding-left:10px !important;min-height:36px}
+html body #routines-remind-panel #chk-sound-row{border-bottom:0 !important}
+html body #routines-remind-panel #chk-sound-row{flex-wrap:nowrap}
+html body #routines-remind-panel #chk-sound-row select{flex:1 1 auto;min-width:0;max-width:190px}
+html body #alerts-panel .alert-card .ayu-speak-row{padding-left:4px}
+html body .ayu-speak-row select{min-width:88px}
+@media (max-width:380px){html body #routines-remind-panel .chk-row .chk-lbl,html body #routines-remind-panel .ayu-speak-row .ayu-speak-lbl{min-width:64px}html body .ayu-speak-row{gap:6px}}
 </style>
 </body>
 
