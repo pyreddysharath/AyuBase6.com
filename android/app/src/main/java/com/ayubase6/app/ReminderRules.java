@@ -36,6 +36,8 @@ final class ReminderRules {
             }
             return this;
         }
+        /** Speak in the voice's language: the page sends the activity's name in it ("say"). */
+        Due sayAs(String t) { if (!say.isEmpty() && t != null && !t.trim().isEmpty()) say = t.trim().length() > 160 ? t.trim().substring(0, 160) : t.trim(); return this; }
     }
 
     /** Local time of one minute: day as yyyy-mm-dd, minute of the day, day of week (0 = Sunday). */
@@ -141,10 +143,10 @@ final class ReminderRules {
                 Double at = num(it, "at"), end = num(it, "end");
                 if (at == null) continue;
                 String key = it.optString("key");
-                if (m == at) out.add(new Due("routine-" + key, str(it.opt("title"), 80), str(it.opt("body"), 200), "routines").vib(ck));
+                if (m == at) out.add(new Due("routine-" + key, str(it.opt("title"), 80), str(it.opt("body"), 200), "routines").vib(ck).sayAs(it.optString("say", "")));
                 if ("beforeend".equals(mode) && end != null && end - 15 > at && m == end - 15 && !hasStr(done, key)) {
                     out.add(new Due("routine-end-" + key, str(it.opt("title"), 70) + " · ending soon",
-                        "This window ends in 15 minutes (" + str(it.opt("window"), 40) + ").", "routines").vib(ck));
+                        "This window ends in 15 minutes (" + str(it.opt("window"), 40) + ").", "routines").vib(ck).sayAs(it.optString("sayEnd", "")));
                 }
             }
         }
