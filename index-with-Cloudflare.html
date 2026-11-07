@@ -15781,7 +15781,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   }
   function banner(){
     if(!ANDROID || !cfg) return;
-    var later=Number(ls(K_LATER))||0; if(Date.now()-later < LATER_DAYS*864e5) return;
+    if(ls(K_LATER)) return;   // Cancel or Download: never again (Backup & Restore → Download App has it)
     if(tourBusy()){ tourWait++; setTimeout(banner,1000); return; }
     document.querySelectorAll('.ayu-appb').forEach(function(e){ e.remove(); });
     document.querySelectorAll('.tab-panel').forEach(function(p){
@@ -15790,10 +15790,10 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       if(ACC[tabName]) b.style.setProperty('--appb-c',ACC[tabName]);   // each tab's own colour, also before the first tab switch
       b.innerHTML='<div class="appb-tx"><span class="appb-t">Get the AyuBase6 app</span>'
         +'<span>Reminders arrive on time even when the app is closed.</span>'
-        +'<div class="appb-btns"><button type="button" class="appb-get">Download</button><button type="button" class="appb-later">Not now</button></div></div>';
+        +'<div class="appb-btns"><button type="button" class="appb-get">Download</button><button type="button" class="appb-later">Cancel</button></div></div>';
       var later=function(){
         ls(K_LATER,String(Date.now()));
-        noteInPlace('You can download the app later from <b>Help</b> <svg class="appb-help-ic" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-label="Help icon" role="img"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg> <b>→ Download App</b>, at the bottom of the page.');
+        noteInPlace('You can download the app any time from <b>Backup &amp; Restore → Download App</b>, in the footer.', 7000);
       };
       // Download: first a short note (so it can be read), then the download starts and Backup & Restore → Download App → Android opens.
       b.querySelector('.appb-get').addEventListener('click',function(){
