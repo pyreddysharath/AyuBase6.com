@@ -18877,8 +18877,8 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   function N(){ var n=window.ayuNative; return APP && n && n.tts ? n : null; }
 
   // ── voices ──
-  var LANGS=[['en','English',''],['hi','Hindi','हिन्दी'],['te','Telugu','తెలుగు'],['ta','Tamil','தமிழ்'],['kn','Kannada','ಕನ್ನಡ'],
-    ['ml','Malayalam','മലയാളം'],['mr','Marathi','मराठी'],['bn','Bengali','বাংলা'],['gu','Gujarati','ગુજરાતી']];
+  var LANGS=[['bn','Bengali','বাংলা'],['en','English',''],['gu','Gujarati','ગુજરાતી'],['hi','Hindi','हिन्दी'],['kn','Kannada','ಕನ್ನಡ'],
+    ['ml','Malayalam','മലയാളം'],['mr','Marathi','मराठी'],['ta','Tamil','தமிழ்'],['te','Telugu','తెలుగు']];   // alphabetical
   var REG={IN:'India',US:'US',GB:'UK',AU:'Australia',CA:'Canada',IE:'Ireland',ZA:'South Africa',NZ:'New Zealand',SG:'Singapore',BD:'Bangladesh',LK:'Sri Lanka',MY:'Malaysia',PH:'Philippines',NG:'Nigeria',KE:'Kenya',PK:'Pakistan'};
   var voices=null, waiters=[], loading=false, ROWS=[];
   // male / female only where the voice's name says so (and for well-known Indian voice names)
@@ -18907,14 +18907,17 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   function reload(){ if(loading) return; readVoices(function(list){ if(JSON.stringify(list)===JSON.stringify(voices)) return; voices=list; ROWS=ROWS.filter(function(f){ return f(); }); }); }
   try{ if(!APP && 'speechSynthesis' in window) speechSynthesis.addEventListener('voiceschanged',reload); }catch(e){}
   document.addEventListener('visibilitychange',function(){ if(!document.hidden) reload(); });
-  function of(list,l){ return list.filter(function(v){ return L2(v.lang)===l; }).sort(function(a,b){ return (/-IN$/i.test(b.lang)?1:0)-(/-IN$/i.test(a.lang)?1:0) || (a.net?1:0)-(b.net?1:0); }); }
-  function langsOf(list){ return LANGS.filter(function(x){ return of(list,x[0]).length; }); }
+  function of(list,l){ return list.filter(function(v){ return L2(v.lang)===l; }).sort(function(a,b){ return (a.net?1:0)-(b.net?1:0) || (/-IN$/i.test(b.lang)?1:0)-(/-IN$/i.test(a.lang)?1:0); }); }   // offline voices first, then Indian ones
+  // ready = a voice that works offline on this device; the others speak only online
+  function ready(list,l){ return of(list,l).some(function(v){ return !v.net; }); }
+  function langsOf(list){ var L=LANGS.filter(function(x){ return of(list,x[0]).length; });
+    return L.filter(function(x){ return ready(list,x[0]); }).concat(L.filter(function(x){ return !ready(list,x[0]); })); }
   function pickLang(list,cur){ var have=langsOf(list).map(function(x){ return x[0]; }); if(!have.length) return '';
     var c=cur?L2(cur):''; if(c && have.indexOf(c)>=0) return c; return have.indexOf('en')>=0 ? 'en' : have[0]; }
   function langOptions(list,cur){
     var L=langsOf(list);
     if(!L.length) return '<option value="">No voices on this device</option>';
-    return L.map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===cur?' selected':'')+'>'+x[1]+(x[2]?' – '+x[2]:'')+'</option>'; }).join('');
+    return L.map(function(x){ var r=ready(list,x[0]); return '<option value="'+x[0]+'" data-g="'+(r?'ready':'net')+'"'+(x[0]===cur?' selected':'')+'>'+x[1]+(x[2]?' – '+x[2]:'')+(r?'':' (needs internet)')+'</option>'; }).join('');
   }
   function voiceLabel(v,k){
     var reg=REG[(String(v.lang).split(/[-_]/)[1]||'').toUpperCase()]||String(v.lang).split(/[-_]/)[1]||'';
@@ -18947,11 +18950,12 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   }
   window.ayuSay=say;
 
-  var INFO='<p>Read aloud says the reminder out loud. The languages are the ones this '+(APP?'phone':'device')+' has a voice for, and that AyuBase6 can say: English, Hindi, Telugu, Tamil, Kannada, Malayalam, Marathi, Bengali and Gujarati.</p>'
-    +'<p>To get another one, add its voice in your '+(APP?'phone':'device')+' settings, then '+(APP?'close and reopen the app':'reload this page')+':</p><ul>'
+  var INFO='<p>Read aloud says the reminder out loud, in a language this '+(APP?'phone':'device')+' has a voice for and AyuBase6 can say (English, Hindi, Telugu, Tamil, Kannada, Malayalam, Marathi, Bengali, Gujarati).</p>'
+    +'<p><b>Ready on this '+(APP?'phone':'device')+'</b>: its voice is downloaded, so it works offline. <b>Needs internet</b>: the '+(APP?'phone':'device')+' can say it only when online.'+(APP?'':' Some browsers do not say which voices are downloaded; then every language shows as ready.')+'</p>'
+    +'<p>To use a language offline, or to add one, download its voice, then '+(APP?'close and reopen the app':'reload this page')+':</p><ul>'
     +'<li>Android: Settings → Text-to-speech → Preferred engine settings → Install voice data</li>'
     +(APP?'':'<li>Windows: Settings → Time &amp; language → Speech → Add voices</li><li>iPhone / Mac: Accessibility → Spoken Content → Voices</li>')
-    +'</ul><p>Voices marked “needs internet” speak only when you are online.</p>';
+    +'</ul>';
 
   // ── a Speak field: Speak (i), language, ▶, switch; the i text right below; Voice when the language has more than one ──
   function row(id,c,onChange,sample,names){
@@ -18970,18 +18974,52 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
       var l=pickLang(voices,cur.lang); none=!l;
       ls.innerHTML=langOptions(voices,l);
       painting=true; try{ ls.dispatchEvent(new Event('change')); }catch(e){} painting=false;   // the styled drop-down shows it
+      syncQ();
       state();
     }
-    var painting=false;
+    var painting=false, q=null;
+    function syncQ(){ if(!q) return; if(document.activeElement!==q){ var o=ls.options[ls.selectedIndex]; q.value=o ? o.textContent : ''; } q.disabled=none; }
     w._set=function(c2){ cb.checked=!!c2.on; cur={lang:c2.lang, voice:''}; if(voices) paint(); else state(); };
     // the Voice row (languages + ▶) shows only while Speak is on
-    function state(){ vr.hidden=!cb.checked; ls.disabled=none; pl.disabled=none; }
+    function state(){ vr.hidden=!cb.checked; ls.disabled=none; pl.disabled=none; if(q) q.disabled=none; }
     function ch(){ cur={lang:ls.value, voice:vs.value}; state(); onChange({on:cb.checked, lang:ls.value, voice:vs.value}); }
     getVoices(function(){ paint(); ROWS.push(function(){ if(!w.isConnected) return false; paint(); return true; }); });
     cb.addEventListener('change',ch);
     ls.addEventListener('change',function(){ if(painting) return; cur={lang:ls.value, voice:''}; paint(); ch(); });
     ib.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); info.hidden=!info.hidden; ib.setAttribute('aria-expanded',String(!info.hidden)); });
     pl.addEventListener('click',function(e){ e.preventDefault(); if(none) return; say(typeof sample==='function'?sample(ls.value):sample, vs.value, ls.value); });
+    // Language: a list you can type in to search (the drop-down above stays the value)
+    var cmb=document.createElement('div'); cmb.className='ayu-lang-combo';
+    cmb.innerHTML='<input type="text" class="ayu-lang-q" aria-label="Language" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false">'
+      +'<svg class="ayu-lang-chev" viewBox="0 0 12 8" width="12" height="8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"></path></svg>'
+      +'<div class="ayu-lang-list" role="listbox" hidden></div>';
+    pl.before(cmb);
+    q=cmb.querySelector('input'); var list=cmb.querySelector('.ayu-lang-list');
+    function lbl(){ var o=ls.options[ls.selectedIndex]; return o ? o.textContent : ''; }
+    function show(f){
+      var t=String(f||'').trim().toLowerCase(), h='', g0='';
+      [].forEach.call(ls.options,function(o){ if(!o.value || (t && o.textContent.toLowerCase().indexOf(t)<0)) return;
+        var g=o.getAttribute('data-g')||''; if(g && g!==g0){ g0=g; h+='<div class="ayu-lang-g">'+(g==='ready'?'Ready on this '+(APP?'phone':'device')+' (works offline)':'Needs internet')+'</div>'; }
+        h+='<button type="button" role="option" data-v="'+esc(o.value)+'"'+(o.value===ls.value?' aria-selected="true"':'')+'>'+esc(o.textContent.replace(/ \(needs internet\)$/,''))+'</button>'; });   // the group title says it
+      list.innerHTML=h||'<div class="ayu-lang-none">No match</div>';
+      if(list.parentNode!==document.body){ document.body.appendChild(list); }   // above every card
+      var cs=getComputedStyle(w); ['--ayu-lc-b','--ayu-lc-a','--ayu-lc-fs'].forEach(function(v){ var x=cs.getPropertyValue(v); if(x) list.style.setProperty(v,x); });
+      list.hidden=false; q.setAttribute('aria-expanded','true'); place();
+    }
+    // the list floats over the page (cards around it do not cut it off)
+    function place(){ if(list.hidden) return; var r=q.getBoundingClientRect(), below=window.innerHeight-r.bottom, h=Math.min(240,list.scrollHeight+2);
+      list.style.left=Math.round(r.left)+'px'; list.style.width=Math.round(r.width)+'px';
+      if(below<h+8 && r.top>below){ list.style.top=''; list.style.bottom=Math.round(window.innerHeight-r.top+4)+'px'; } else { list.style.bottom=''; list.style.top=Math.round(r.bottom+4)+'px'; } }
+    window.addEventListener('scroll',place,true); window.addEventListener('resize',place);
+    function close(){ list.hidden=true; q.setAttribute('aria-expanded','false'); q.value=lbl(); if(!w.isConnected && list.parentNode) list.remove(); }
+    function pick(v){ if(v && v!==ls.value){ ls.value=v; ls.dispatchEvent(new Event('change',{bubbles:true})); } close(); q.blur(); }
+    q.addEventListener('focus',function(){ q.value=''; show(''); });
+    q.addEventListener('input',function(){ show(q.value); });
+    q.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); var f=list.querySelector('button'); if(f) pick(f.getAttribute('data-v')); } else if(e.key==='Escape'){ close(); q.blur(); } });
+    q.addEventListener('blur',function(){ setTimeout(close,150); });
+    list.addEventListener('mousedown',function(e){ e.preventDefault(); });
+    list.addEventListener('click',function(e){ var b=e.target.closest('button'); if(b) pick(b.getAttribute('data-v')); });
+    syncQ();
     return w;
   }
 
@@ -19366,6 +19404,64 @@ html body .ayu-appb.appb-note .appb-tx:not(#ayu-x1){padding-right:30px}
     if(again) scan();
   }).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','style'],attributeOldValue:true});
   scan(); var n=0, iv=setInterval(function(){ scan(); if(++n>20) clearInterval(iv); },500);
+})();
+</script>
+<style id="lang-combo-20261108">
+/* Language: searchable list in the place of the drop-down */
+html body .ayu-speak-wrap .ayu-speak-vrow > select:not(#ayu-x1):not(#ayu-x2),html body .ayu-speak-wrap .ayu-speak-vrow > .reminder-custom-select-wrap:not(#ayu-x1):not(#ayu-x2){display:none !important}
+html body .ayu-speak-wrap .ayu-lang-combo{position:relative;flex:1 1 0;width:auto;min-width:0}
+html body .ayu-speak-wrap .ayu-speak-vrow:not(.ayu-vib-fld):not(#ayu-x1):not(#ayu-x2){flex-wrap:nowrap !important}
+html body .ayu-speak-wrap .ayu-lang-q:not(#ayu-x1){width:100%;box-sizing:border-box;margin:0;padding:6px 30px 6px 12px;border:1px solid var(--ayu-lc-b,#cbd5e1);border-radius:var(--ayu-lc-r,12px);background:#fff;color:inherit;font:inherit;font-size:var(--ayu-lc-fs,14px);line-height:1.3;min-height:var(--ayu-lc-h,34px);height:var(--ayu-lc-h,auto);outline:none;cursor:pointer}
+html body .ayu-speak-wrap .ayu-lang-q:focus:not(#ayu-x1):not(#ayu-x2){cursor:text;border-color:var(--ayu-lc-a,#0d9488) !important;box-shadow:0 0 0 2px color-mix(in srgb,var(--ayu-lc-a,#0d9488) 20%,transparent) !important;outline:none !important}
+html body .ayu-speak-wrap .ayu-lang-chev{position:absolute;right:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--ayu-lc-c,currentColor)}
+html body .ayu-lang-list{position:fixed;z-index:2147482000;box-sizing:border-box;max-height:240px;overflow:auto;background:#fff;border:1px solid var(--ayu-lc-b,#cbd5e1);border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.14);padding:4px}
+html body .ayu-lang-list[hidden]{display:none}
+html body .ayu-lang-list button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:8px 10px;border-radius:8px;font:inherit;font-size:var(--ayu-lc-fs,14px);color:inherit;cursor:pointer}
+html body .ayu-lang-list button:hover,html body .ayu-lang-list button[aria-selected="true"]{background:color-mix(in srgb,var(--ayu-lc-a,#0d9488) 12%,#fff)}
+html body .ayu-lang-list button[aria-selected="true"]{font-weight:700}
+html body .ayu-lang-g{padding:8px 10px 4px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;opacity:.65}
+html body .ayu-lang-none{padding:8px 10px;opacity:.7;font-size:13px}
+html body #routines-panel .ayu-speak-wrap{--ayu-lc-b:rgb(206,165,125);--ayu-lc-r:10px;--ayu-lc-a:rgb(167,91,18);--ayu-lc-fs:13px}
+html body #alerts-panel .ayu-speak-wrap{--ayu-lc-a:#0d9488}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-vrow .ayu-lang-combo{width:100%}
+/* the toggles and chevrons of a section as far right as the card allows */
+html body .ayu-edge-r{position:relative}
+/* Reminders: a gap after On these days (not in Eyes (Exercise), whose next field has its own) */
+html body #alerts-panel .alert-card .ayu-hb-days:not(#days-eyeex):not(#ayu-x1){margin-bottom:16px !important}
+/* Wake-up Alarm: more room between its fields; its ▶ like the one in Notify Me → Sound */
+html body #routines-panel #wake-al-body > .ayu-al-row:not(#ayu-x1){margin-top:12px}
+html body #routines-panel #wake-al-body > .ayu-al-row:first-child:not(#ayu-x1){margin-top:6px}
+html body #routines-panel #wake-al-play.ayu-al-play:not(#ayu-x1):not(#ayu-x2){width:30px !important;height:30px !important;min-width:30px !important;flex:0 0 30px !important;padding:0 !important;border-radius:10px !important;border:1px solid color-mix(in srgb,rgb(167,91,18) 55%,#fff) !important;background:transparent !important;color:rgb(167,91,18) !important;box-shadow:none !important;display:inline-flex;align-items:center;justify-content:center;font-size:14px !important}
+</style>
+<script id="edge-right-20261108-js">
+(function(){
+  // the switch and chevron of each section: as far right as its card allows (8px from the edge)
+  function fit(){
+    var list=[];
+    document.querySelectorAll('#alerts-panel .ayu-rem-group .alert-card:not(#reminder-hours-card) > .alert-card-hdr').forEach(function(h){ list.push([h, h.closest('.alert-card'), h.querySelector('.alert-card-chev')]); });
+    ['chk-alarm','routines-notify-card'].forEach(function(id){ var s=document.getElementById(id), h=s && s.querySelector(':scope > .ayu-sec-hdr'); if(h) list.push([h, document.getElementById('start-my-day-card')||s, h.querySelector('.ayu-chev')]); });
+    list.forEach(function(x){
+      var h=x[0], card=x[1], ch=x[2]; if(!card || !ch || !h.offsetParent) return;
+      var cur=parseFloat(h.style.marginRight)||0, want=card.getBoundingClientRect().right-8, now=ch.getBoundingClientRect().right;
+      var m=Math.min(0, Math.round(cur-(want-now))); if(m!==cur) h.style.marginRight=m+'px';
+    });
+  }
+  window.addEventListener('resize',function(){ setTimeout(fit,50); });
+  document.addEventListener('click',function(){ [60,350,800].forEach(function(t){ setTimeout(fit,t); }); },true);
+  setInterval(fit,1000);   // cheap: a few headers
+  // skin the Language box like the Sound drop-down next to it
+  function skin(){
+    document.querySelectorAll('.ayu-speak-wrap').forEach(function(w){
+      var q=w.querySelector('.ayu-lang-q'); if(!q || q.dataset.skin) return;
+      var ref=w.closest('#routines-panel') ? document.getElementById('chk-sound') : (w.closest('.custom-reminder-form') ? w.closest('.custom-reminder-form').querySelector('[name=sound]') : null);
+      if(!ref){ var c=w.closest('.alert-card'); ref=c && c.querySelector('.alert-sound-row .reminder-custom-select-trigger'); }
+      if(!ref || !ref.offsetParent) return;
+      var cs=getComputedStyle(ref); q.dataset.skin='1';
+      w.style.setProperty('--ayu-lc-b',cs.borderTopColor); w.style.setProperty('--ayu-lc-r',cs.borderTopLeftRadius); w.style.setProperty('--ayu-lc-fs',cs.fontSize); w.style.setProperty('--ayu-lc-h',Math.round(ref.getBoundingClientRect().height)+'px');
+    });
+  }
+  document.addEventListener('click',function(){ setTimeout(skin,80); },true);
+  var k=0, iv2=setInterval(function(){ skin(); if(++k>30) clearInterval(iv2); },400);
 })();
 </script>
 </body>
