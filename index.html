@@ -4109,7 +4109,7 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
 
       <div class="alert-task" id="alert-break-ex-task">
         <p class="alert-card-sub">A guided exercise for your eye muscles.</p>
-        <strong>Follow the moving dot</strong> through seven patterns: zigzag, figure-8, loop, star, cross and row scan.
+        <strong>Follow the moving dot</strong> through patterns such as zigzag, figure-8, loop, star and cross.
         <ul>
           <li>Up to 2 sessions a day: morning and evening</li>
           <li>Each session lasts 2:15 — don't repeat it back-to-back</li>
@@ -12963,7 +12963,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   function saveHours(){
     try{
       const sections={};Object.keys(cards).forEach(k=>{sections[k]={start:cards[k].start,end:cards[k].end}});
-      localStorage.setItem(HOURS_KEY,JSON.stringify({top:{start:topState.start,end:topState.end},sections,days:(window.ayuDays?window.ayuDays.get('rem'):undefined)}));
+      localStorage.setItem(HOURS_KEY,JSON.stringify({top:{start:topState.start,end:topState.end},sections,days:(window.ayuDays?window.ayuDays.get('rem'):undefined),hbDays:(window.ayuDays&&window.ayuDays.all?window.ayuDays.all():undefined)}));
     }catch(e){}
   }
   function restoreHours(){
@@ -13115,7 +13115,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     const now=Date.now(),slot=latestSlot(key,now);
     if(slot===null||slot===lastSlot[key])return;
     lastSlot[key]=slot;
-    if(window.ayuDays&&!window.ayuDays.ok('rem'))return;   // not one of the chosen days
+    if(window.ayuDays&&!window.ayuDays.ok('rem-'+key))return;   // not one of this section's days
     // a reminder more than 5 minutes late (a phone that was asleep, a page just opened) is skipped, not fired stale
     if(now-slot<=GRACE&&typeof window.fireAlert==='function')window.fireAlert(key);
   }
@@ -13134,7 +13134,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   const oldCheck=window.checkEyeExTimes;
   window.checkEyeExTimes=function(){
     const w=cards['break-ex'];if(!w||!inWindow(w.start,w.end))return;
-    if(window.ayuDays&&!window.ayuDays.ok('rem'))return;
+    if(window.ayuDays&&!window.ayuDays.ok('rem-eyeex'))return;
     if(typeof oldCheck==='function')oldCheck();
   };
   const oldEyeCountChange=window.onEyeExCountChange;
@@ -14701,13 +14701,22 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
   var ALL=[0,1,2,3,4,5,6],ORDER=[1,2,3,4,5,6,0],L={1:'M',2:'T',3:'W',4:'T',5:'F',6:'S',0:'S'},F={1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday',6:'Saturday',0:'Sunday'};
   var cache={};
   function clean(a){ if(!Array.isArray(a))return ALL.slice(); a=a.filter(function(n){return n>=0&&n<=6}); return a.length?a:ALL.slice(); }
+  // Health Breaks sections each have their own days ("rem-break", "rem-walk", "rem-drink", "rem-eyeex"), kept with the hours
+  var EX_DEF=[1,2,4,5];   // Eyes (Exercise): Mon, Tue, Thu, Fri (recommended)
   function load(k){
-    try{ var v=JSON.parse(localStorage.getItem(KEYS[k])||'null'); return clean(k==='rem'?(v&&v.days):v); }catch(e){ return ALL.slice(); }
+    try{
+      if(/^rem-/.test(k)){ var h=JSON.parse(localStorage.getItem(KEYS.rem)||'null')||{}, s=k.slice(4);
+        if(h.hbDays && Array.isArray(h.hbDays[s]) && h.hbDays[s].length) return clean(h.hbDays[s]);
+        var g=clean(h.days); if(s==='eyeex'){ var x=EX_DEF.filter(function(d){ return g.indexOf(d)>=0; }); return x.length?x:EX_DEF.slice(); } return g; }
+      var v=JSON.parse(localStorage.getItem(KEYS[k])||'null'); return clean(k==='rem'?(v&&v.days):v);
+    }catch(e){ return /eyeex$/.test(k) ? EX_DEF.slice() : ALL.slice(); }
   }
+  function hbAll(){ var o={}; ['break','walk','drink','eyeex'].forEach(function(s){ o[s]=get('rem-'+s).slice(); }); return o; }
   function get(k){ if(!cache[k])cache[k]=load(k); return cache[k]; }
   function save(k){
     try{
       if(k==='chk') localStorage.setItem(KEYS.chk,JSON.stringify(cache.chk));
+      else if(/^rem-/.test(k)){ var w=JSON.parse(localStorage.getItem(KEYS.rem)||'null')||{}; w.hbDays=hbAll(); localStorage.setItem(KEYS.rem,JSON.stringify(w)); }
       else { var v=JSON.parse(localStorage.getItem(KEYS.rem)||'null')||{}; v.days=cache.rem; localStorage.setItem(KEYS.rem,JSON.stringify(v)); }
     }catch(e){}
     try{ document.dispatchEvent(new Event('ayu-reminders-changed')); }catch(e){}
@@ -14729,16 +14738,22 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
   window.ayuDays={
     get:function(k){return get(k)},
     ok:function(k,d){return get(k).indexOf((d||new Date()).getDay())>=0},
-    reset:function(k){cache[k]=ALL.slice();if(draws[k])draws[k]()},
+    reset:function(k){cache[k]=ALL.slice();if(draws[k])draws[k]();if(k==='rem')['break','walk','drink','eyeex'].forEach(function(s){cache['rem-'+s]=s==='eyeex'?EX_DEF.slice():ALL.slice();if(draws['rem-'+s])draws['rem-'+s]()});},
+    all:function(){return hbAll()},
     refresh:function(){cache={};Object.keys(draws).forEach(function(k){draws[k]()})}
   };
   function install(){
     var h=document.getElementById('rh-days');if(h&&!h.dataset.built){h.dataset.built='1';build(h,'rem')}
+    // each Health Breaks section: after From
+    [['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['eyeex','alert-card-break-ex']].forEach(function(p){
+      var c=document.getElementById(p[1]), fr=c&&c.querySelector('.per-reminder-schedule'); if(!fr||document.getElementById('days-'+p[0]))return;
+      var d=document.createElement('div');d.id='days-'+p[0];d.className='otd-row ayu-hb-days';d.setAttribute('role','group');fr.after(d);build(d,'rem-'+p[0]);
+    });
     var p=document.getElementById('routines-remind-panel');
     if(p&&!document.getElementById('chk-days')){var d=document.createElement('div');d.id='chk-days';d.className='otd-row';d.setAttribute('role','group');p.appendChild(d);build(d,'chk')}
   }
   install();
-  var n=0,t=setInterval(function(){install();if(++n>40||(document.getElementById('chk-days')&&document.getElementById('rh-days')&&document.getElementById('rh-days').dataset.built))clearInterval(t)},250);
+  var n=0,t=setInterval(function(){install();if(++n>40||(document.getElementById('chk-days')&&document.getElementById('rh-days')&&document.getElementById('rh-days').dataset.built&&document.getElementById('days-eyeex')))clearInterval(t)},250);
   window.addEventListener('ayu-restored',function(){window.ayuDays.refresh()});
 })();
 </script>
@@ -17565,7 +17580,7 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
   function masterOn(){ try{ return typeof isMasterNotifyOn==='function' && !!isMasterNotifyOn(); }catch(e){ return false; } }
   // not set yet: Vibrate follows the section's own switch (off until that is on), like Checks follows Notify Me
   function wakeOn(){ var t=document.getElementById('wake-al-on'); return !!(t && t.checked); }
-  function on(k){ var o=load(); if(!(k in o)) return (k==='chk' || k==='wake') ? false : (MAIN[k] ? mainOn(k) : false); return o[k]!==false; }   // Checks: Vibrate is off until it is turned on
+  function on(k){ var o=load(); if(!(k in o)) return false; return o[k]!==false; }   // Vibrate is off until it is turned on   // Checks: Vibrate is off until it is turned on
   function set(k,v){ var o=load(); o[k]=!!v; save(o); }
   function customOn(id){ var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+String(id).replace(/"/g,'')+'"]'); if(!it) return masterOn(); try{ var d=JSON.parse(it.dataset.reminder||'{}'); return ('vibrate' in d) ? d.vibrate!==false : masterOn(); }catch(e){ return masterOn(); } }
   // key of a notification: "break" "walk" "drink" "eyeex", "routine-…", "custom-<id>"
@@ -17638,9 +17653,8 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
   var last=null;
   function follow(){
     if(!last){ last={}; HB.forEach(function(k){ last[k]=mainOn(k); }); last.hbm=masterOn(); return; }
-    var mo=masterOn(); if(mo!==last.hbm){ last.hbm=mo; var o2=load(); o2.hbm=mo; save(o2); paintHB(); }
     var o=load(), ch=false;
-    HB.forEach(function(k){ var v=mainOn(k); if(v!==last[k]){ last[k]=v; o[k]=v; ch=true; } });
+    HB.forEach(function(k){ var v=mainOn(k); if(v!==last[k]){ last[k]=v; if(!v){ o[k]=false; ch=true; } } });   // a section switched off: its Vibrate off too
     if(ch){ save(o); paintHB(); }
   }
   function soon(){ [60,600,2600].forEach(function(t){ setTimeout(follow,t); }); }
@@ -19238,7 +19252,79 @@ html body #alerts-panel .ayu-part-title + #reminder-hours-info:not(#ayu-x1){marg
     ch.hidden=!on; ch.setAttribute('aria-expanded',String(on && !hbFold));
   }
   document.addEventListener('change',function(e){ if(e.target && e.target.id==='reminder-master-toggle'){ if(e.target.checked) hbFold=false; setTimeout(paint,0); setTimeout(paint,400); } },true);
-  var n=0, iv=setInterval(function(){ if(hb() && ++n>8) clearInterval(iv); else if(++n>80) clearInterval(iv); },300);
+})();
+</script>
+<style id="hb-solo-20261108">
+/* Health Breaks: no main switch or shared fields; each section has its own switch, hours and days */
+html body #alerts-panel #reminder-hours-card:not(#ayu-x1),html body #alerts-panel .ayu-part-title .ayu-hb-sw:not(#ayu-x1),html body #alerts-panel .ayu-part-title .ayu-hb-chev:not(#ayu-x1){display:none !important}
+html body #alerts-panel .alert-card .ayu-hb-days{margin:12px 0 4px !important}
+html body #alerts-panel .eye-ex-wrap > .ayu-speak-wrap,html body #alerts-panel .eye-ex-wrap > .ayu-hb-days{align-self:stretch;width:100%;text-align:left;box-sizing:border-box}
+html body #alerts-panel .eye-ex-wrap > .ayu-speak-wrap{padding-left:0}
+html body #alerts-panel .ayu-ex-dpw-off{display:none !important}
+html body #alerts-panel .alert-card .ayu-hb-days .otd-title:not(#ayu-x1){color:rgb(19,78,74)}
+html body #alerts-panel .alert-card .ayu-hb-days .otd-title:not(#ayu-x1):before{content:'•';display:inline-block;width:10px;margin-right:6px;font-size:16px;line-height:1;color:rgb(8,126,117)}
+</style>
+<script id="hb-solo-20261108-js">
+(function(){
+  var APP=!!window.AYU_ANDROID, M='ayubase6-notif-master-on', S='ayubase6_reminder_section_states_v1', V='ayuBase6-hb-v2', KEYS=['drink','walk','break','eyeex'];
+  function g(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function p(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  // once: the main switch goes away. New here: every section on. Had the main switch off: every section off. On: as they were.
+  if(g(V)!=='1'){
+    var m=g(M), st=null; try{ st=JSON.parse(g(S)||'null'); }catch(e){}
+    var has=st && KEYS.some(function(k){ return typeof st[k]==='boolean'; });
+    if(m===null && !has){ st={}; KEYS.forEach(function(k){ st[k]=true; }); p(S,JSON.stringify(st)); }
+    else if(m!=='1'){ st={}; KEYS.forEach(function(k){ st[k]=false; }); p(S,JSON.stringify(st)); }
+    p(M,'1'); p(V,'1');
+  }
+  // the old main switch is always on now; each section's own switch decides
+  window.isMasterNotifyOn=function(){ return true; };
+  var sm=window.setMasterNotifyFlag; window.setMasterNotifyFlag=function(){ if(typeof sm==='function') sm(true); };
+
+  // the first tap in Reminders asks for permission to notify (needed for notifications when a section is on)
+  var asked=false;
+  function wantAsk(){ return !asked && typeof Notification!=='undefined' && Notification.permission==='default'; }
+  function anyOn(){ return KEYS.some(function(k){ var e=document.getElementById(k==='eyeex'?'eye-ex-notify':'alert-'+k+'-notify'); return e && e.checked; }); }
+  function refreshNotify(){
+    var ok=typeof Notification!=='undefined' && Notification.permission==='granted';
+    try{ ['drink','walk','break'].forEach(function(k){ if(window.alertState && alertState[k]) alertState[k].notify=!!alertState[k].enabled && ok; }); }catch(e){}
+    try{ if(typeof eyeExState!=='undefined') eyeExState.notify=!!eyeExState.enabled && ok; }catch(e){}
+    try{ if(typeof refreshNotifStatusUI==='function') refreshNotifStatusUI(); }catch(e){}
+    try{ document.dispatchEvent(new Event('ayu-reminders-changed')); }catch(e){}
+  }
+  document.addEventListener('click',function(e){
+    if(!wantAsk() || !e.target || !e.target.closest || !e.target.closest('#alerts-panel')) return;
+    setTimeout(function(){
+      if(!wantAsk() || !anyOn()) return; asked=true;
+      try{ Promise.resolve(typeof requestNotificationPermission==='function' ? requestNotificationPermission() : Notification.requestPermission()).then(refreshNotify,refreshNotify); }catch(x){}
+    },50);
+  },true);
+  window.addEventListener('load',function(){ setTimeout(refreshNotify,800); });
+
+  // Eyes (Exercise): "On these days" replaces "Days per week" (Mon, Tue, Thu, Fri by default)
+  function exDays(){
+    var sel=document.getElementById('eye-ex-days'), row=sel && sel.closest('.alert-row'); if(row) row.classList.add('ayu-ex-dpw-off');
+    try{ if(window.ayuDays && typeof eyeExState!=='undefined') eyeExState.weekdays=window.ayuDays.get('rem-eyeex').slice(); }catch(e){}
+  }
+  document.addEventListener('ayu-reminders-changed',function(){ setTimeout(exDays,0); });
+  var n=0, iv=setInterval(function(){ exDays(); if(++n>30) clearInterval(iv); },300);
+
+  // the i texts: each section has its own switch, hours and days
+  var HB='<strong>Health Breaks</strong><p>Four short reminders for screen time: eye breaks, walking, water and eye exercise. Each one has its own switch, hours and days.</p>'
+    +'<strong>Each section</strong><ul><li>Turn its switch on to see and change its hours, days, sound, Read aloud and Vibrate. Turn it off to hide them.</li>'
+    +'<li>The chevron folds an open section.</li><li>The first time, your '+(APP?'phone':'browser')+' asks for permission to notify you.</li>'
+    +'<li>Reset (at the bottom) restores the defaults. To install AyuBase6, see <b>Backup &amp; Restore → Download App</b>.</li></ul>';
+  document.addEventListener('click',function(e){
+    if(!e.target || !e.target.closest || !e.target.closest('#reminder-hours-info-btn')) return;
+    setTimeout(function(){ var pn=document.getElementById('reminder-hours-info'); if(!pn) return; var h=pn.innerHTML, i=h.indexOf('<strong>On a computer</strong>'); if(i>0) pn.innerHTML=HB+h.slice(i); },0);
+  },true);
+  var NOTE='<strong class="section-notif-title">Notifications</strong><ul><li>Use this section’s switch to turn its reminder on or off; its fields show while it is on.</li><li>Set its own hours and days here.</li><li>Preview notification is only an example and changes no settings.</li>'
+    +'<li>'+(APP?'The app reminds you even when it is closed.':'On the website, reminders run while AyuBase6 is open in a browser tab or the installed app.')+'</li></ul>';
+  function notes(){
+    document.querySelectorAll('#alerts-panel .alert-card .ayu-desc .section-notif-note').forEach(function(d){ if(!d.dataset.ayuV2){ d.dataset.ayuV2='1'; d.innerHTML=NOTE; } });
+    document.querySelectorAll('#alert-card-break-ex-about li').forEach(function(li){ if(/^3–5 days a week/.test(li.textContent)) li.textContent='3–5 days a week (Mon, Tue, Thu, Fri by default); rest on the other days'; });
+  }
+  var k2=0, iv2=setInterval(function(){ notes(); if(++k2>20) clearInterval(iv2); },400);
 })();
 </script>
 </body>
@@ -21494,7 +21580,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     'break':'<p class="alert-card-sub">Give your eyes a break from screens.</p><strong>The 20-20-20 rule:</strong> every 20 minutes, look at something 20 feet (6 m) away for 20 seconds.<ul><li>Reduces eye strain and dryness</li><li>Fewer screen-related headaches</li><li>Encourages blinking, which re-moistens the eyes</li></ul>',
     'walk':'<p class="alert-card-sub">Short movement breaks to offset long sitting.</p>Stand, stretch or walk for 2–5 minutes at each reminder.<ul><li>Improves circulation and reduces stiffness</li><li>Eases posture strain</li><li>Gives a small energy and focus boost</li></ul>',
     'drink':'<p class="alert-card-sub">Drink steadily through the day, in small slow sips.</p><ul><li>Slow sipping is gentler on the stomach and may reduce bloating</li><li>Stop when comfortably hydrated; don’t force extra water</li><li>Drink more when it is hot or you are active, and follow any fluid limits your clinician advises</li></ul>',
-    'break-ex':'<p class="alert-card-sub">A guided exercise for your eye muscles.</p>Follow the moving dot through seven patterns, such as zigzag, figure-8, loop, star and cross.<ul><li>Up to 2 sessions a day: morning and evening</li><li>Each session lasts 2:15; don’t repeat it back-to-back</li><li>3–5 days a week; rest on the other days</li></ul>'
+    'break-ex':'<p class="alert-card-sub">A guided exercise for your eye muscles.</p>Follow the moving dot through patterns such as zigzag, figure-8, loop, star and cross.<ul><li>Up to 2 sessions a day: morning and evening</li><li>Each session lasts 2:15; don’t repeat it back-to-back</li><li>3–5 days a week; rest on the other days</li></ul>'
   };
   function rewrite(){
     Object.keys(ABOUT).forEach(function(k){
