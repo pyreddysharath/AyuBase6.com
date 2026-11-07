@@ -8386,7 +8386,7 @@ const RECIPES_DATA = [
   <div class="footer-tabs-row" id="footer-tabs-row">
     <div class="footer-copyright"><strong class="footer-copyright-strong">© <span id="footer-year"></span> AyuBase6.com</strong></div>
     <div class="footer-tabs-icons">
-      <div class="footer-tab-btn" id="tab-backup" title="Backup &amp; Restore, Download app, Save offline" onclick="showFooterSection('backup')">
+      <div class="footer-tab-btn" id="tab-backup" title="Backup &amp; Restore, Download App, Save Offline" onclick="showFooterSection('backup')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
       </div>
       <div class="footer-tab-btn" id="tab-settings" title="Settings: notifications and cookies (a dot means one is on)" onclick="showFooterSection('settings')">
@@ -13839,8 +13839,14 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     var m=stored();
     return GROUPS.filter(function(g){ return m[g.id] ? fp(g)!==m[g.id] : true; }).map(function(g){ return g.id; });   // never-saved sections always count
   }
-  function refreshDot(){ var c=changedGroups(), tab=document.getElementById('tab-backup'); if(tab) tab.classList.toggle('needs-backup',c.length>0); return c; }
+  function refreshDot(){
+    var c=changedGroups(), tab=document.getElementById('tab-backup'), on=c.length>0;
+    if(typeof window.ayuAppDot==='function'){ try{ on=!!window.ayuAppDot(c); }catch(e){} }   // the Android app: update waiting, or backup due
+    if(tab) tab.classList.toggle('needs-backup',on); return c;
+  }
+  window.ayuBackupRefreshDot=refreshDot; window.ayuChangedGroups=changedGroups;
   function showSectionNote(){
+    if(window.ayuGBackup && window.ayuGBackup.enabled()){ refreshDot(); var se=document.getElementById('backup-status'); if(se && /backup now\?/.test(se.textContent)) status(''); return; }   // the app's Google backup covers it
     var c=refreshDot(), m=stored();
     if(c.length){
       var never=GROUPS.filter(function(g){ return !m[g.id]; }).map(function(g){ return g.id; }), chg=c.filter(function(id){ return never.indexOf(id)<0; }), parts=[];
@@ -14070,7 +14076,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (a PDF or a photo) or type values in, to see what is in or out of range. The download button by the title (<b>Enable offline reading</b>) reads photos and scanned reports without internet.');
   sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
   // Footer
-  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save or restore your data. Amber dot: a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. Dot: one is on</span></li><li><span class="tf-ic has-dot-c"><svg class="ann-ic" viewBox="0 0 24 24" fill="currentColor"><g transform="translate(.35 -.9)"><path d="M2 10a2 2 0 012-2h3.5L17 3v18l-9.5-4.5H4a2 2 0 01-2-2v-4zM8.2 18.2h3.3l1 3.3a1 1 0 01-1 1.3H10a1 1 0 01-1-.8l-.8-3.8z"/><path d="M20 8.6a5 5 0 010 6.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g></svg></span><span><b>Announcements</b>: news from us. Dot: something new</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: Download app, Troubleshooting (notification test) and Feedback. Dot: a problem</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 7.83c.85-.3 1.53-.98 1.83-1.83H18l-3 7c0 1.66 1.57 3 3.5 3s3.5-1.34 3.5-3l-3-7h2V4h-6.17c-.41-1.17-1.52-2-2.83-2s-2.42.83-2.83 2H3v2h2l-3 7c0 1.66 1.57 3 3.5 3S9 14.66 9 13L6 6h3.17c.3.85.98 1.53 1.83 1.83V19H2v2h20v-2h-9V7.83zM20.37 13h-3.74l1.87-4.36L20.37 13zm-13 0H3.63L5.5 8.64 7.37 13zM12 6c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg></span><span><b>Legal</b>: disclaimer and privacy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
+  STEPS.push({tab:'activity',sel:'#footer-tabs-row',idx:0,c:'#2563eb',kind:'tab',pin:1,html:'<ul class="tf-list"><li><span class="tf-ic has-dot"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></span><span><b>Backup</b>: save or restore your data. Amber dot: a backup is due</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span><b>Settings</b>: notifications and cookies. Dot: one is on</span></li><li><span class="tf-ic has-dot-c"><svg class="ann-ic" viewBox="0 0 24 24" fill="currentColor"><g transform="translate(.35 -.9)"><path d="M2 10a2 2 0 012-2h3.5L17 3v18l-9.5-4.5H4a2 2 0 01-2-2v-4zM8.2 18.2h3.3l1 3.3a1 1 0 01-1 1.3H10a1 1 0 01-1-.8l-.8-3.8z"/><path d="M20 8.6a5 5 0 010 6.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g></svg></span><span><b>Announcements</b>: news from us. Dot: something new</span></li><li><span class="tf-ic has-dot-c"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span><b>Help</b>: Download App, Troubleshooting (notification test) and Feedback. Dot: a problem</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 7.83c.85-.3 1.53-.98 1.83-1.83H18l-3 7c0 1.66 1.57 3 3.5 3s3.5-1.34 3.5-3l-3-7h2V4h-6.17c-.41-1.17-1.52-2-2.83-2s-2.42.83-2.83 2H3v2h2l-3 7c0 1.66 1.57 3 3.5 3S9 14.66 9 13L6 6h3.17c.3.85.98 1.53 1.83 1.83V19H2v2h20v-2h-9V7.83zM20.37 13h-3.74l1.87-4.36L20.37 13zm-13 0H3.63L5.5 8.64 7.37 13zM12 6c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg></span><span><b>Legal</b>: disclaimer and privacy</span></li><li><span class="tf-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></span><span><b>Other sites</b>: more from us</span></li></ul>'});
 
   var root=document.getElementById('tour-root'), spot=document.getElementById('tour-spot'), txt=document.getElementById('tour-text'), bar=document.getElementById('tour-bar');
   var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0;
@@ -15470,7 +15476,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 #sec-help .footer-subtabs:has(#subtab-app) .footer-subtab{flex:1 1 auto;padding-left:3px;padding-right:3px;font-size:clamp(.66rem,2.85vw,.8rem)}
 </style>
 <script id="get-app-20261103-js">
-/* Backup & Restore → Download app (every device, not inside the Android app):
+/* Backup & Restore → Download App (every device, not inside the Android app):
    - Android phones: the Android app (config/android-app.json, written when a version is published), or "coming soon";
    - every device: install the web app (the browser's own install box, or the steps for this browser).
    Android phone browsers also get a one-time banner once an app version is published ("Not now" hides it for 30 days).
@@ -15527,7 +15533,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     if(st){ st.innerHTML=webSteps(); st.hidden=false; }
   };
 
-  // ---- Backup & Restore → Download app ----
+  // ---- Backup & Restore → Download App ----
   function androidHtml(){
     if(!ANDROID) return '';
     if(!cfg) return '<p>Coming soon: the same app, with reminders that arrive even when it is closed. Until then, use the Web App below.</p>';
@@ -15547,7 +15553,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       + '<p class="app-meta" id="app-web-steps"'+(deferred?' hidden':'')+'>'+(deferred?'':webSteps())+'</p>'
       + (IOS ? '<p class="app-note">There is no iPhone app yet.</p>' : '');
   }
-  // Download app: the Android app and the web app as two sections, closed until tapped (one alone stays open).
+  // Download App: the Android app and the web app as two sections, closed until tapped (one alone stays open).
   function part(id,title,html,only,btn){ return '<details class="app-part" data-part="'+id+'"'+(only?' open':'')+'><summary>'+title+(btn||'')+'</summary><div class="app-part-b">'+html+'</div></details>'; }
   // the main button sits on the section's title row, so it shows even while the section is closed
   function btnA(){ return cfg ? '<button type="button" class="app-get-sm" onclick="event.preventDefault();event.stopPropagation();ayuGetApp()">Download</button>' : ''; }
@@ -15569,7 +15575,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     try{ if(typeof FOOTER_ALIAS!=='undefined'){ FOOTER_ALIAS.app=['help','app']; FOOTER_ALIAS.download=['help','app']; } }catch(e){}
     var tabs=sec.querySelector('.footer-subtabs');
     if(tabs){ var b=document.createElement('button'); b.type='button'; b.className='footer-subtab'; b.id='subtab-app'; b.setAttribute('role','tab');
-      b.setAttribute('onclick',"showFooterSub('help','app')"); b.innerHTML='Download app<i class="fs-dot"></i>'; tabs.insertBefore(b,tabs.firstChild); }
+      b.setAttribute('onclick',"showFooterSub('help','app')"); b.innerHTML='Download App<i class="fs-dot"></i>'; tabs.insertBefore(b,tabs.firstChild); }
     var d=document.createElement('div'); d.className='footer-sub'; d.id='sec-app'; d.style.display='none'; d.innerHTML=helpHtml();
     var last=sec.querySelectorAll('.footer-sub'); (last.length?last[last.length-1]:tabs).after(d);
   }
@@ -15597,12 +15603,12 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
         +'<div class="appb-btns"><button type="button" class="appb-get">Download</button><button type="button" class="appb-later">Not now</button></div></div>';
       var later=function(){
         ls(K_LATER,String(Date.now()));
-        noteInPlace('You can download the app later from <b>Help</b> <svg class="appb-help-ic" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-label="Help icon" role="img"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg> <b>→ Download app</b>, at the bottom of the page.');
+        noteInPlace('You can download the app later from <b>Help</b> <svg class="appb-help-ic" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-label="Help icon" role="img"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg> <b>→ Download App</b>, at the bottom of the page.');
       };
-      // Download: first a short note (so it can be read), then the download starts and Backup & Restore → Download app → Android opens.
+      // Download: first a short note (so it can be read), then the download starts and Backup & Restore → Download App → Android opens.
       b.querySelector('.appb-get').addEventListener('click',function(){
         ls(K_LATER,String(Date.now()));
-        noteInPlace('Once it has downloaded, follow the steps in <b>Backup & Restore → Download app → Android</b> to install it.', 10000, function(){ download(true); });
+        noteInPlace('Once it has downloaded, follow the steps in <b>Backup & Restore → Download App → Android</b> to install it.', 10000, function(){ download(true); });
       });
       b.querySelector('.appb-later').addEventListener('click',later);
       var ann=p.querySelector(':scope > .ayu-ann');   // after an announcement banner, if one is showing
@@ -15872,7 +15878,7 @@ html body #sec-help .footer-subtabs:has(#subtab-app) .footer-subtab{flex:1 1 aut
     var ex=$('ayu-ocr-ask'); if(ex){ ex.remove(); return; }
     var row=document.querySelector('#lab-insights-card .lab-actions-row'); if(!row) return enable();
     var d=document.createElement('div'); d.id='ayu-ocr-ask'; d.setAttribute('role','dialog'); d.setAttribute('aria-label','Download the offline reader?');
-    d.innerHTML='<p><b>Download the offline reader?</b></p><p>Lets Lab Insights read photos and scanned reports without internet. It downloads once ('+mb(OCR_BYTES)+') and stays on this device. Text PDFs don’t need it. Remove it any time in <b>Backup &amp; Restore → Save offline</b>.</p>'
+    d.innerHTML='<p><b>Download the offline reader?</b></p><p>Lets Lab Insights read photos and scanned reports without internet. It downloads once ('+mb(OCR_BYTES)+') and stays on this device. Text PDFs don’t need it. Remove it any time in <b>Backup &amp; Restore → Save Offline</b>.</p>'
       +'<div class="oa-btns"><button type="button" class="oa-yes">Download</button><button type="button" class="oa-no">Cancel</button></div>';
     row.after(d);
     d.querySelector('.oa-yes').addEventListener('click',function(){ d.remove(); enable(); });
@@ -15978,7 +15984,7 @@ html body #sec-help .footer-subtabs:has(#subtab-app) .footer-subtab{flex:1 1 aut
 })();
 </script>
 <style id="checks-alarm-20261104">
-/* Installing lives in Backup & Restore → Download app: no Install buttons in Reminders and Checks. */
+/* Installing lives in Backup & Restore → Download App: no Install buttons in Reminders and Checks. */
 html body #install-row#install-row#install-row, html body #routines-install-row#routines-install-row#routines-install-row,
 html body #install-app-btn#install-app-btn#install-app-btn, html body #routines-install-app-btn#routines-install-app-btn#routines-install-app-btn{display:none !important}
 html body #routines-notify-card .rout-card-foot:not(:has(> :not(.routines-install-row))){display:none !important}
@@ -16386,7 +16392,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
       +'<li><b>Snooze for</b> / <b>Snooze up to</b>: how long each snooze lasts, and how many times you can snooze.</li>'
       +(APP?'<li><b>Volume buttons</b>: while the alarm screen is shown (on a locked phone), they snooze or stop it.</li>':'')
       +'</ul>'+(APP?'The phone rings it even when AyuBase6 is closed or the phone is locked. On Android 14 and later, allow <b>Full screen notifications</b> for AyuBase6 to see the alarm screen.'
-                    :'It rings while AyuBase6 is open (in any tab or window). For an alarm with the app closed, use the Android app (Backup & Restore → Download app).');
+                    :'It rings while AyuBase6 is open (in any tab or window). For an alarm with the app closed, use the Android app (Backup & Restore → Download App).');
   }
   function bodyHtml(id){
     var c=get(id), p=id+'-al';
@@ -16681,13 +16687,13 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
 })();
 </script>
 <script id="help-tabs-20261104-js">
-/* Help: Download app (website) | Troubleshooting | Feedback. The notification test is the first part of Troubleshooting. */
+/* Help: Download App (website) | Troubleshooting | Feedback. The notification test is the first part of Troubleshooting. */
 (function(){
   function $(id){ return document.getElementById(id); }
   function setup(){
     var tr=$('sec-trouble'), ck=$('sec-check'); if(!tr || !ck || tr.dataset.ayuMerged) return;
     tr.dataset.ayuMerged='1';
-    // Two closed sections, like Download app: Notifications (the test) and Common problems
+    // Two closed sections, like Download App: Notifications (the test) and Common problems
     function part(id,title){ var d=document.createElement('details'); d.className='app-part'; d.dataset.part=id; d.id='hlp-'+id;
       d.innerHTML='<summary>'+title+'</summary><div class="app-part-b"></div>'; return d; }
     var pN=part('notifications','Notifications'), pP=part('problems','Common problems'), sep=document.createElement('hr'); sep.className='app-sep';
@@ -17027,7 +17033,7 @@ html body #rem-alarm-card > .ayu-al-info{padding:12px 14px;border-radius:12px;ba
       +'<li>Rings at your wake-up time on the Notify Me days (every day if Notify Me is off). It works without Notify Me.</li>'
       +'<li>Choose a sound (▶ to hear it, or upload your own), how long it rings, and the snooze length and count.</li>'
       +(APP?'<li>Rings even when AyuBase6 is closed or the phone is locked. The volume buttons snooze or stop it.</li>'
-           :'<li>Rings while AyuBase6 is open. For an alarm with it closed, use the Android app (Backup & Restore → Download app).</li>')
+           :'<li>Rings while AyuBase6 is open. For an alarm with it closed, use the Android app (Backup & Restore → Download App).</li>')
       +'</ul></div>'
       +'<div class="mdp-sec"><b class="mdp-t">Notify Me</b><ul>'
       +'<li>Notifications for every check. <b>At start</b>: when it begins. <b>Start + before end</b>: also 15 minutes before it closes.</li>'
@@ -17121,7 +17127,7 @@ html body #reminder-hours-card .otd-title::before{content:'•';margin-right:7px
 /* Checks: Alarm and Notify Me titles in the same style as "Wake-up time" */
 html body #chk-alarm .ayu-sub-hdr h3, html body #routines-notify-card.ayu-in-day .rout-card-hdr h2{font-size:.9rem !important;font-weight:700 !important;color:var(--rout-2,#a75b12) !important;letter-spacing:0 !important;line-height:1.3 !important}
 html body #chk-alarm .ayu-sub-hdr h3 .ayu-al-ic, html body #routines-notify-card.ayu-in-day .rout-card-hdr h2 svg{width:18px !important;height:18px !important}
-/* Backup & Restore → Download app: the main button on each section's title row */
+/* Backup & Restore → Download App: the main button on each section's title row */
 html body #sec-app details.app-part > summary .app-get-sm{margin-left:auto;border:0;border-radius:999px;padding:6px 14px;font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;background:var(--footer-accent,#0d9488);color:#fff}
 html body #sec-app details.app-part > summary:has(.app-get-sm)::after{margin-left:12px !important}
 /* Checks: the Alarm switch in the Checks colour; Notify Me's options lined up with its title */
@@ -17598,7 +17604,7 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
 })();
 </script>
 <style id="downloads-20261105">
-/* Footer → Backup & Restore icon: three tabs (Download app, Save offline, Backup & Restore) */
+/* Footer → Backup & Restore icon: three tabs (Download App, Save Offline, Backup & Restore) */
 /* the same tabs as Help, Settings and Legal: light patches of the section colour; the open one filled and joined to the line */
 html body #sec-backup > .footer-subtabs{gap:4px !important;border-bottom:2px solid var(--footer-accent,#0d9488) !important;align-items:flex-end;flex-wrap:nowrap !important;margin:0 0 14px !important}
 html body #sec-backup > .footer-subtabs .footer-subtab{flex:1 1 auto;min-width:0;border:0 !important;border-radius:10px 10px 0 0 !important;margin:0 !important;padding:9px 4px 8px !important;
@@ -17662,12 +17668,12 @@ html body #calculator-panel .ayu-undo-row button{border:0;background:none;color:
     return row;
   };
 
-  // ── footer: Download app and Save offline move next to Backup & Restore ──
-  var TABS=[['bkp','Backup & Restore'],['offline','Save offline'],['app','Download app']];
+  // ── footer: Download App and Save Offline move next to Backup & Restore ──
+  var TABS=[['bkp','Backup & Restore'],['offline','Save Offline'],['app','Download App']];
   function setupFooter(){
     var sec=$('sec-backup'); if(!sec) return false;
     if(sec.querySelector(':scope > .footer-subtabs')) return true;
-    var app=$('sec-app');   // the Download app part (not in the phone app); it may arrive later, see adoptApp()
+    var app=$('sec-app');   // the Download App part (not in the phone app); it may arrive later, see adoptApp()
     var bkp=document.createElement('div'); bkp.className='footer-sub'; bkp.id='sec-bkp';
     [].slice.call(sec.childNodes).forEach(function(n){ bkp.appendChild(n); });
     var off=document.createElement('div'); off.className='footer-sub'; off.id='sec-offline'; off.style.display='none';
@@ -17705,11 +17711,11 @@ html body #calculator-panel .ayu-undo-row button{border:0;background:none;color:
     }
     return true;
   }
-  // Download app (made by the app-download script, at first under Help): move it here as the first tab
+  // Download App (made by the app-download script, at first under Help): move it here as the first tab
   function adoptApp(){
     var sec=$('sec-backup'), bar=sec && sec.querySelector(':scope > .footer-subtabs'), app=$('sec-app'); if(!bar || !app) return false;
     if(app.parentNode!==sec){
-      var b=$('subtab-app'); if(!b){ b=document.createElement('button'); b.type='button'; b.className='footer-subtab'; b.id='subtab-app'; b.setAttribute('role','tab'); b.innerHTML='Download app<i class="fs-dot"></i>'; }
+      var b=$('subtab-app'); if(!b){ b=document.createElement('button'); b.type='button'; b.className='footer-subtab'; b.id='subtab-app'; b.setAttribute('role','tab'); b.innerHTML='Download App<i class="fs-dot"></i>'; }
       b.setAttribute('onclick',"showFooterSub('backup','app')"); bar.appendChild(b);
       app.style.display='none'; sec.appendChild(app);
       try{
@@ -17723,7 +17729,7 @@ html body #calculator-panel .ayu-undo-row button{border:0;background:none;color:
   }
   var n=0,iv=setInterval(function(){ var a=setupFooter(); var b=adoptApp(); if((a&&b)||++n>120) clearInterval(iv); },250);
 
-  // ── Save offline: what is on this device, with Remove; or Save ──
+  // ── Save Offline: what is on this device, with Remove; or Save ──
   var asking=null;
   async function videoState(k){
     var set=(typeof MEDIA_SETS!=='undefined') && MEDIA_SETS[k]; if(!set) return null;
@@ -17793,7 +17799,7 @@ html body #calculator-panel .ayu-undo-row button{border:0;background:none;color:
     for(var i=0;i<set.files.length;i++){ var f=set.files[i], hit=null; try{ hit=cache && await cache.match(ayuMediaKey(f.url)); }catch(e){} if(!hit || (typeof ayuStale!=='undefined' && ayuStale[k] && ayuStale[k].has(f.url))) left+=f.bytes||0; }
     var name=k==='yoga'?'yoga':'exercise';
     var d=document.createElement('div'); d.className='media-offline-ask'; d.setAttribute('role','dialog'); d.setAttribute('aria-label','Save the '+name+' videos for offline?');
-    d.innerHTML='<p><b>Save the '+name+' videos for offline?</b></p><p>Lets you play the '+vids.length+' '+name+' videos without internet. They download once ('+mb(left||set.files.reduce(function(a,f){ return a+(f.bytes||0); },0))+') and stay on this device. Remove them any time in <b>Backup &amp; Restore → Save offline</b>.</p>'
+    d.innerHTML='<p><b>Save the '+name+' videos for offline?</b></p><p>Lets you play the '+vids.length+' '+name+' videos without internet. They download once ('+mb(left||set.files.reduce(function(a,f){ return a+(f.bytes||0); },0))+') and stay on this device. Remove them any time in <b>Backup &amp; Restore → Save Offline</b>.</p>'
       +'<div class="oa-btns"><button type="button" class="oa-yes">Save</button><button type="button" class="oa-no">Cancel</button></div>';
     box.appendChild(d);
     d.querySelector('.oa-yes').addEventListener('click',function(){ d.remove(); ayuSaveOffline(k); });
@@ -17888,7 +17894,7 @@ html body #lab-insights-card .lab-actions-row .lub-t{display:inline-flex;flex-di
 html body #lab-insights-card .lab-actions-row .lub-s{font-size:.72em;font-weight:500;opacity:.85}
 </style>
 <style id="dl-icons-20261105">
-/* Download PDF, Save for offline and Install (web app): an arrow into a tray; Download app: a phone with a down arrow (drawn before the text, so the buttons can change their text freely) */
+/* Download PDF, Save for offline and Install (web app): an arrow into a tray; Download App: a phone with a down arrow (drawn before the text, so the buttons can change their text freely) */
 :is(#body-download-btn,#food-download-btn,#lab-download-btn,#tracker-card button[onclick*="downloadTrackerPDF"],.media-offline-btn,#sec-offline .off-btn[data-act="save"],#sec-app .app-get-sm,.ayu-appb .appb-get)::before{content:"";display:inline-block;flex:0 0 auto;width:1.15em;height:1.15em;margin-right:.5em;vertical-align:-.2em;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222.3%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 4v11%22/%3E%3Cpath d=%22M7 10.5l5 5 5-5%22/%3E%3Cpath d=%22M5 20h14%22/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222.3%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 4v11%22/%3E%3Cpath d=%22M7 10.5l5 5 5-5%22/%3E%3Cpath d=%22M5 20h14%22/%3E%3C/svg%3E") center/contain no-repeat}
 #sec-app .app-get-sm[onclick*="ayuGetApp"]::before,.ayu-appb .appb-get:not(#ayu-x1)::before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222.3%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Crect x=%226%22 y=%222%22 width=%2212%22 height=%2220%22 rx=%222.5%22/%3E%3Cpath d=%22M12 7v7%22/%3E%3Cpath d=%22m9 11 3 3 3-3%22/%3E%3Cpath d=%22M10.5 18.5h3%22/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222.3%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Crect x=%226%22 y=%222%22 width=%2212%22 height=%2220%22 rx=%222.5%22/%3E%3Cpath d=%22M12 7v7%22/%3E%3Cpath d=%22m9 11 3 3 3-3%22/%3E%3Cpath d=%22M10.5 18.5h3%22/%3E%3C/svg%3E") center/contain no-repeat}
 :is(#body-download-btn,#food-download-btn,#lab-download-btn,#tracker-card button[onclick*="downloadTrackerPDF"],.media-offline-btn,#sec-offline .off-btn[data-act="save"],#sec-app .app-get-sm,.ayu-appb .appb-get){display:inline-flex !important;align-items:center;justify-content:center}
@@ -17936,6 +17942,7 @@ html body #sec-bkp .ayu-gb-t{font-weight:700;font-size:14px;line-height:1.35}
 html body #sec-bkp .ayu-gb-t .backup-info-btn{margin-left:6px;vertical-align:middle}
 html body #sec-bkp .ayu-gb-row .master-switch{flex:0 0 auto}
 html body #sec-bkp .ayu-gb-st{font-size:12.5px;opacity:.75;margin-top:4px}
+html body #sec-bkp .ayu-gb-st.warn{opacity:1;color:#b45309;font-weight:700}
 html body #sec-bkp .ayu-gb .backup-info{margin-top:8px}
 </style>
 <script id="google-backup-20261105-js">
@@ -17944,7 +17951,7 @@ html body #sec-bkp .ayu-gb .backup-info{margin-top:8px}
    app restores it once. A switch in Backup & Restore turns it off (the copy is then emptied). */
 (function(){
   if(!window.AYU_ANDROID) return;
-  var SW='ayuBase6-google-backup', CHK='ayu-gbackup-checked', FPK='ayu-gbackup-fp', ATK='ayu-gbackup-at';
+  var SW='ayuBase6-google-backup', CHK='ayu-gbackup-checked', FPK='ayu-gbackup-fp', ATK='ayu-gbackup-at', LAST='ayu-gbackup-last', PEND='ayu-gbackup-pend', DUE_MS=2*86400000;
   function N(){ var n=window.ayuNative; return n && typeof n.backupSave==='function' && typeof n.backupLoad==='function' ? n : null; }
   function get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   function put(k,v){ try{ if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v); }catch(e){} }
@@ -17961,9 +17968,19 @@ html body #sec-bkp .ayu-gb .backup-info{margin-top:8px}
     var n=N(); if(!ready || !n || !enabled()) return;
     var d=data(), s=JSON.stringify(d), h=hash(s); if(h===get(FPK)) return;
     var p={app:'AyuBase6',version:2,savedAt:new Date().toISOString(),groups:groups().map(function(g){ return g.id; }),data:d};
-    n.backupSave(JSON.stringify(p)).then(function(r){ put(FPK,h); put(ATK,String((r&&r.at)||Date.now())); paint(); }).catch(function(){});
+    n.backupSave(JSON.stringify(p)).then(function(r){ var at=String((r&&r.at)||Date.now()); put(FPK,h); put(ATK,at); if(!get(PEND)) put(PEND,at); paint(); }).catch(function(){});
   }
   function soon(){ if(!ready) return; clearTimeout(timer); timer=setTimeout(saveNow,4000); }
+  // When Android last took the backup (it tells the app each time). Changes waiting for 2 days = backup is probably off.
+  function syncLast(){
+    var n=N(); if(!n) return;
+    try{ Promise.resolve(n.backupLoad()).then(function(r){ var l=+(r&&r.lastBackup)||0; if(l) put(LAST,String(l)); if(l && l>=(+get(PEND)||0)) put(PEND,null); paint(); dots(); }).catch(function(){}); }catch(e){}
+  }
+  function warn(){ if(!enabled()) return false; var p=+get(PEND)||0, l=+get(LAST)||0; return !!p && l<p && Date.now()-p>DUE_MS; }
+  function dots(){ try{ paint(); }catch(e){} try{ if(window.ayuBackupRefreshDot) window.ayuBackupRefreshDot(); }catch(e){} try{ if(window.ayuAppDotsPaint) window.ayuAppDotsPaint(); }catch(e){} }
+  window.ayuGBackup={ enabled:enabled, warn:warn, refresh:function(){ dots(); } };
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) syncLast(); });
+  setInterval(dots,60000);
   window.ayuGoogleBackupNow=saveNow;
 
   // Any change to a saved section schedules a copy.
@@ -17978,7 +17995,7 @@ html body #sec-bkp .ayu-gb .backup-info{margin-top:8px}
   // First start of this install: bring back the copy Android restored.
   function start(){
     var n=N(); if(!n) return false;
-    if(get(CHK)){ ready=true; saveNow(); return true; }
+    if(get(CHK)){ ready=true; saveNow(); syncLast(); return true; }
     var pr; try{ pr=Promise.resolve(n.backupLoad()); }catch(e){ ready=true; return true; }
     pr.then(function(r){
       put(CHK,'1');
@@ -18008,9 +18025,13 @@ html body #sec-bkp .ayu-gb .backup-info{margin-top:8px}
   function paint(){
     var st=document.getElementById('ayu-gb-st'), i=document.getElementById('ayu-gb-on'); if(!st) return;
     if(i) i.checked=enabled();
-    var at=+get(ATK)||0;
+    var l=+get(LAST)||0, p=+get(PEND)||0, w=warn();
+    st.classList.toggle('warn',w);
     st.textContent = !enabled() ? 'Off. Nothing is backed up to your Google account.'
-      : at ? 'Last copied for backup: '+when(at) : 'Copies your data for backup a few seconds after each change.';
+      : w ? 'Not backed up for 2 days. Check that Google backup is on in your phone\u2019s settings, or save a file below.'
+      : l ? 'Last backed up: '+when(l)+(p>l?' · newer changes go with the next backup':'')
+      : p ? 'Waiting for Android to back up. It usually does within a day, while the phone charges on Wi-Fi.'
+      : 'Backs up your data a few seconds after each change.';
   }
   function build(){
     var host=document.getElementById('sec-bkp'), pick=host && host.querySelector('.backup-pick'); if(!pick) return false;
@@ -18027,8 +18048,8 @@ html body #sec-bkp .ayu-gb .backup-info{margin-top:8px}
     box.querySelector('#ayu-gb-on').addEventListener('change',function(e){
       var n=N();
       if(e.target.checked){ put(SW,null); put(FPK,null); ready=true; saveNow(); }
-      else { put(SW,'off'); put(FPK,null); put(ATK,null); clearTimeout(timer); if(n) n.backupClear().catch(function(){}); }
-      paint();
+      else { put(SW,'off'); put(FPK,null); put(ATK,null); put(PEND,null); clearTimeout(timer); if(n) n.backupClear().catch(function(){}); }
+      paint(); dots();
     });
     var bi=document.getElementById('backup-info');   // "kept only on this device" is no longer the whole story in the app
     if(bi && bi.textContent.indexOf('kept only on this device')>=0) bi.textContent=bi.textContent.replace('are kept only on this device.','are kept on this device and, with the switch above on, in your Google account backup.');
@@ -18443,6 +18464,97 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     ['Reykjavík','Iceland','Atlantic/Reykjavik'],['UTC','Coordinated Universal Time','UTC']
   ];
   var n0=0, iv0=setInterval(function(){ if(build() || ++n0>80) clearInterval(iv0); },250);
+})();
+</script>
+<style id="app-updates-20261105">
+/* Android app: Backup & Restore → App Updates */
+html body #sec-backup > .footer-subtabs #subtab-app .fs-dot,html body #sec-backup > .footer-subtabs #subtab-bkp .fs-dot{background:#f59e0b;top:5px;right:7px}
+html body #sec-app .au-card{margin:4px 0 10px;padding:14px 16px;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--footer-accent,#255cc0) 30%,#fff);background:color-mix(in srgb,var(--footer-accent,#255cc0) 6%,#fff)}
+html body #sec-app .au-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+html body #sec-app .au-ver{font-weight:800;font-size:15px}
+html body #sec-app .au-line{font-size:13px;margin-top:3px;font-weight:700}
+html body #sec-app .au-line.ok{color:#15803d}
+html body #sec-app .au-line.new{color:#b45309}
+html body #sec-app .au-line.err{color:#b45309;font-weight:600}
+html body #sec-app .au-line.busy{color:#475569}
+html body #sec-app .au-btn{white-space:nowrap;border-radius:10px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer;border:1.5px solid var(--footer-accent,#255cc0);background:var(--footer-accent,#255cc0);color:#fff}
+html body #sec-app .au-btn.alt{background:transparent;color:var(--footer-accent,#255cc0)}
+html body #sec-app .au-btn:disabled{opacity:.6;cursor:default}
+html body #sec-app .au-note{font-size:12.5px;opacity:.75;margin-top:6px}
+html body #sec-app .au-note:empty{display:none}
+html body #sec-app .au-bar{height:6px;border-radius:3px;background:color-mix(in srgb,var(--footer-accent,#255cc0) 18%,#fff);margin-top:10px;overflow:hidden}
+html body #sec-app .au-bar[hidden]{display:none}
+html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--footer-accent,#255cc0);transition:width .3s}
+</style>
+<script id="app-updates-20261105-js">
+/* Android app only: Backup & Restore → App Updates (the version, Check for update / Update), and the amber dots:
+   on the Backup & Restore icon only for a waiting update or a backup that is due (Google backup not done for 2 days,
+   or Google backup off and no file saved). */
+(function(){
+  if(!window.AYU_ANDROID) return;
+  function $(i){ return document.getElementById(i); }
+  function U(){ return (window.ayuNative && window.ayuNative.update) || null; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function when(t){ var d=new Date(t), n=new Date(), y=new Date(n.getTime()-86400000), tm=d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+    if(d.toDateString()===n.toDateString()) return 'today, '+tm; if(d.toDateString()===y.toDateString()) return 'yesterday, '+tm;
+    return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+', '+tm; }
+  function waiting(){ var u=U(); return !!(u && u.latest); }
+  function bkpDue(c){ var g=window.ayuGBackup; if(g && g.enabled()) return g.warn(); if(!c && window.ayuChangedGroups) c=window.ayuChangedGroups(); return !!(c && c.length); }
+  window.ayuAppDot=function(c){ return waiting() || bkpDue(c); };
+  window.ayuAppDotsPaint=function(){
+    var a=document.querySelector('#subtab-app .fs-dot'), b=document.querySelector('#subtab-bkp .fs-dot');
+    if(a) a.classList.toggle('on',waiting()); if(b) b.classList.toggle('on',bkpDue());
+    try{ if(window.ayuBackupRefreshDot) window.ayuBackupRefreshDot(); }catch(e){}
+  };
+
+  function ensure(){
+    var sec=$('sec-app');
+    if(!sec){
+      sec=document.createElement('div'); sec.className='footer-sub'; sec.id='sec-app'; sec.style.display='none';
+      sec.innerHTML='<div class="au-card"><div class="au-row"><div><div class="au-ver" id="au-ver">App version</div><div class="au-line" id="au-line"></div></div>'
+        +'<button type="button" class="au-btn alt" id="au-btn">Check for update</button></div><div class="au-bar" id="au-bar" hidden><i></i></div><div class="au-note" id="au-note"></div></div>';
+      (document.body).appendChild(sec);
+      $('au-btn').addEventListener('click',act);
+    }
+    var t=$('subtab-app');
+    if(t && t.firstChild && t.firstChild.nodeType===3 && t.firstChild.textContent!=='App Updates') t.firstChild.textContent='App Updates';
+    return !!t;
+  }
+  function act(){
+    var n=window.ayuNative, u=U(); if(!n || !u) return;
+    if(u.phase==='allow' || u.phase==='installing'){ if(n.updateInstall) n.updateInstall(); return; }
+    if(u.latest){ n.updateStart(); return; }
+    n.updateCheck();
+  }
+  function paint(){
+    if(!$('au-ver')) return;
+    var u=U()||{}, mine=u.mine, L=u.latest, ph=u.phase||'', btn=$('au-btn'), line=$('au-line'), note=$('au-note'), bar=$('au-bar');
+    $('au-ver').textContent='App version'+(mine&&mine.name?' '+mine.name:'');
+    var cls='', txt='', b='Check for update', alt=true, dis=false, nt='', pct=-1;
+    if(ph==='downloading'){ cls='busy'; txt='Downloading version '+((L&&L.versionName)||'')+'… '+(u.pct||0)+'%'; b='Downloading…'; dis=true; alt=false; pct=u.pct||0; nt='Keep the app open until it finishes.'; }
+    else if(ph==='allow'){ cls='new'; txt='Allow AyuBase6 to install updates'; b='Allow'; alt=false; nt='Turn on “Allow from this source”, then come back: the update continues by itself. Android asks only the first time.'; }
+    else if(ph==='installing'){ cls='new'; txt='Finish in Android’s screen: tap Update'; b='Update'; alt=false; nt='Your data stays.'; }
+    else if(ph==='checking'){ cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
+    else if(L){ cls='new'; txt='New version '+(L.versionName||'')+' is ready'; b='Update'; alt=false; nt='Tap Update; Android asks you to confirm, and your data stays.'; }
+    else if(u.error==='download'){ cls='err'; txt='The download didn’t finish. Check your internet and try again.'; b='Check for update'; }
+    else if(u.error==='install'){ cls='err'; txt='Android’s install screen didn’t open. Try again.'; }
+    else if(u.error==='offline'){ cls='err'; txt='Couldn’t check. Check your internet and try again.'; }
+    else if(u.checkedAt){ cls='ok'; txt='✓ Up to date'; nt='Last checked: '+when(u.checkedAt); }
+    else { cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
+    if(L && (u.error==='download'||u.error==='install')){ b='Update'; alt=false; }
+    line.className='au-line '+cls; line.textContent=txt; note.textContent=nt;
+    btn.textContent=b; btn.disabled=dis; btn.classList.toggle('alt',alt);
+    bar.hidden=pct<0; if(pct>=0) bar.firstChild.style.width=pct+'%';
+    window.ayuAppDotsPaint();
+  }
+  window.addEventListener('ayu-update-info',paint);
+  // opening the tab checks again when the last check is over 10 minutes old
+  if(typeof window.showFooterSub==='function' && !window.showFooterSub.__ayuAU){
+    var os=window.showFooterSub;
+    window.showFooterSub=function(p,s){ var r=os.apply(this,arguments); if(p==='backup' && s==='app'){ var u=U(); if(u && window.ayuNative.updateCheck && u.phase!=='downloading' && Date.now()-(u.checkedAt||0)>600000) window.ayuNative.updateCheck(); paint(); } return r; };
+    window.showFooterSub.__ayuAU=true;
+  }
+  var n=0, iv=setInterval(function(){ var ok=ensure(); paint(); if(ok || ++n>120) clearInterval(iv); },250);
 })();
 </script>
 </body>
@@ -20394,7 +20506,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
   var HOURS_INFO='<strong>Health Breaks</strong><p>Sets the same hours for every section below. You can still change the hours inside each section.</p>'
     +'<strong>Switch and reset</strong><ul>'
     +'<li>The switch at the top right turns every reminder on or off at once. The first time, your browser asks for permission to show notifications.</li>'
-    +'<li>To install AyuBase6, see <b>Backup & Restore → Download app</b>.</li>'
+    +'<li>To install AyuBase6, see <b>Backup & Restore → Download App</b>.</li>'
     +'<li>The reset icon puts every reminder back to its defaults.</li></ul>'
     +'<strong>Notification controls</strong><ul>'
     +'<li>Each section’s switch turns that reminder on or off.</li>'
@@ -20432,7 +20544,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     ['reminders-notif-error','install-help'].forEach(function(id){ var el=$(id); if(el && el.parentNode!==card) card.insertBefore(el,foot); });
     if(!$('reminders-install-nudge')){
       var nd=document.createElement('div'); nd.id='reminders-install-nudge'; nd.className='install-nudge'; nd.hidden=true;
-      nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. If the install box does not appear, see <b>Backup & Restore → Download app</b>.';
+      nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. If the install box does not appear, see <b>Backup & Restore → Download App</b>.';
       card.insertBefore(nd,foot);
     }
     (function(){ var hd=card.querySelector('.alert-card-hdr'); if(hd) ['reminders-install-nudge','reminders-notif-error','install-help'].reverse().forEach(function(id){ var el=$(id); if(el) hd.after(el); }); })();
@@ -20502,7 +20614,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     }
     if(!$('routines-install-nudge')){
       var nd=document.createElement('div'); nd.id='routines-install-nudge'; nd.className='install-nudge'; nd.hidden=true;
-      nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. If the install box does not appear, see <b>Backup & Restore → Download app</b>.';
+      nd.innerHTML='<b>Install AyuBase6</b> so reminders keep running in its own window. If the install box does not appear, see <b>Backup & Restore → Download App</b>.';
       card.insertBefore(nd,foot);
     }
     (function(){ var hd=$('routines-notify-row')||card.querySelector('.rout-card-hdr'); if(hd) ['routines-install-nudge','rout-notif-hint','routines-install-help','routines-remind-panel'].reverse().forEach(function(id){ var el=$(id); if(el) hd.after(el); }); })();
@@ -20683,9 +20795,9 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     var pnl=$('reminder-hours-info'), btn=$('reminder-hours-info-btn'); if(!pnl) return;
     pnl.innerHTML='<strong>Health Breaks</strong><p>Sets the hours for every section. You can still change them inside a section.</p>'
       +'<strong>Controls</strong><ul><li>The switch (top right) turns all reminders on or off. The first time, your browser asks for permission.</li>'
-      +'<li>The reset icon restores the defaults. To install AyuBase6, see <b>Backup & Restore → Download app</b>.</li></ul>'
+      +'<li>The reset icon restores the defaults. To install AyuBase6, see <b>Backup & Restore → Download App</b>.</li></ul>'
       +'<strong>On a computer</strong><ul><li>Reminders work whenever AyuBase6 is open in a browser tab or the app window. It does not need to be in front, so you can use other tabs and windows. They work without internet too. The computer must stay awake.</li></ul><strong>On a phone</strong><ul><li>Reminders come only from the open app, so keep it open, with or without internet. This can’t be guaranteed: a phone may pause a locked or background app.</li><li><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</li><li><b>iPhone:</b> open the app from its Home Screen icon. Check that Settings → Notifications → AyuBase6 is allowed. If reminders are late, turn off Low Power Mode and any Focus that silences the app.</li></ul><strong>Good to know</strong><ul>'
-      +'<li><b>To install:</b> see <b>Backup & Restore → Download app</b>.</li>'
+      +'<li><b>To install:</b> see <b>Backup & Restore → Download App</b>.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li>'
       +'<li><b>Next</b> under a section title is when that reminder will fire while AyuBase6 is open. After a locked or paused phone, it updates when you come back.</li>'
       +'<li>Each notification window can disable that reminder, disable all, or close.</li></ul>';
@@ -20736,7 +20848,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       +'<li><b>Start + before end:</b> also a reminder 15 minutes before its window closes (activities shorter than 15 minutes get only the start).</li>'
       +'<li>Each notification has <b>Done</b> (ticks it) and <b>Not yet</b>.</li></ul>'
       +'<strong>On a computer</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Notifications work whenever AyuBase6 is open in a browser tab or the app window. It does not need to be in front, so you can use other tabs and windows. They work without internet too. The computer must stay awake.</li></ul><strong>On a phone</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Notifications come only from the open app, so keep it open, with or without internet. This can’t be guaranteed: a phone may pause a locked or background app.</li><li><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</li><li><b>iPhone:</b> open the app from its Home Screen icon. Check that Settings → Notifications → AyuBase6 is allowed. If notifications are late, turn off Low Power Mode and any Focus that silences the app.</li></ul><strong>Good to know</strong><ul style="margin:4px 0 0 18px;padding:0">'
-      +'<li><b>To install:</b> see <b>Backup & Restore → Download app</b>.</li>'
+      +'<li><b>To install:</b> see <b>Backup & Restore → Download App</b>.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li></ul>'; }
     var rp=$('rout-info-palms'); if(rp && rp.dataset.ux!=='1'){ rp.dataset.ux='1'; rp.innerHTML='<ol><li>Rub your palms together briskly for 10–15 seconds, with firm but comfortable friction, until they feel warm.</li><li>Close your eyes and cup your warm palms over them. Your palms (not your fingers) cover the eyes, your fingers rest on your forehead, and the heels of your hands sit on your cheekbones.</li><li>Keep a small gap so nothing presses on the eyeballs.</li><li>Hold for 30–60 seconds, breathing slowly.</li></ol><p>The warmth and gentle cover relax the eye muscles and improve blood flow, easing your eyes into the day instead of going straight to bright light or a screen.</p>'; }
     var rwt=$('rout-info-water'); if(rwt && rwt.dataset.ux!=='1'){ rwt.dataset.ux='1'; rwt.innerHTML='<p>Rehydrates you after the overnight fast and kick-starts digestion. You lose water through breathing and sweat even while asleep.</p><strong>How much</strong><ul><li>1–2 glasses: about 250–500 ml (one glass is about 250 ml). Have more on hot days or after sweating.</li></ul><strong>How to drink it</strong><ul><li>Take small sips instead of big gulps, and finish the 1–2 glasses over about 5–10 minutes.</li><li>Pause between sips.</li><li>Warm (not hot) water is a good choice in the morning. It is gentle on an empty stomach, and many people find it helps the bowels move. Plain room-temperature water hydrates just as well, and water that is too hot can scald your mouth and throat.</li></ul><strong>Why slowly</strong><ul><li>Your body takes in water gradually, so more of it is used instead of passing straight through.</li><li>You swallow less air, so there is less bloating and burping.</li><li>An empty stomach copes better with small amounts. Gulping can leave you feeling heavy or queasy.</li></ul>'; }
