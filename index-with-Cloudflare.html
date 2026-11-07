@@ -4248,8 +4248,8 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
         orange zone.<br>
         Every activity below shifts automatically with whatever you pick here, and the Sleep time is always set
         to give at least 8 hours before the next wake-up.<br><br>
-        <strong>Remind me</strong> applies to every activity. <b>At start</b> sends one notification when an
-        activity begins. <b>Start + before end</b> adds a reminder 15 minutes before its time window closes
+        <strong>Remind me</strong> applies to every activity. <b>Start time</b> sends one notification when an
+        activity begins. <b>Start time + before end time</b> adds a reminder 15 minutes before its time window closes
         (activities shorter than 15 minutes get only the start). Each notification has <b>Done</b>, which ticks the
         activity, and <b>Not yet</b>.
       </div>
@@ -12815,7 +12815,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     const saved=existing?JSON.parse(existing.dataset.reminder||'{}'):{};
     const form=document.createElement('form');form.className='custom-reminder-form';
     form.innerHTML='<label class="wide">Reminder name<input name="name" required maxlength="80" placeholder="e.g. Medicines, school pickup"></label>'+ 
-      '<label class="wide">Frequency<select name="frequency-mode"><option value="regular">At regular times</option><option value="selected">At selected times</option></select></label>'+ 
+      '<label class="wide">Frequency<select name="frequency-mode"><option value="regular">At regular times</option><option value="selected">At selected times</option><option value="dates">On chosen dates</option></select></label>'+ 
       '<div class="wide reminder-frequency-fields"></div>'+ 
       '<div class="wide repeat-on"><div class="repeat-on-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Daily</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div></div>'+
       '<label>Sound<select name="sound"><option value="chime">Chime</option><option value="drop">Water drop</option><option value="drum">Drum</option><option value="none">Silent</option></select></label>'+ 
@@ -12836,14 +12836,34 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     }
     drawDays();
     form.querySelectorAll('.day-quick button').forEach(b=>b.addEventListener('click',()=>{days=b.dataset.q==='week'?[1,2,3,4,5]:b.dataset.q==='wkend'?[6,0]:[0,1,2,3,4,5,6];drawDays()}));
+    // On chosen dates: Only once (a date) · Weekly (the days) · Monthly (days of the month) · Yearly (a date)
+    const todayISO=()=>{const t=new Date();return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')};
+    let sched=['once','weekly','monthly','yearly'].indexOf(saved.sched)>=0?saved.sched:'once', onDay=saved.date||todayISO(), mdays=Array.isArray(saved.mdays)&&saved.mdays.length?saved.mdays.filter(n=>n>=1&&n<=31):[new Date().getDate()];
+    const repeatOn=form.querySelector('.repeat-on');
+    const schedHtml=()=>'<label>Schedule<select name="sched"><option value="once">Only once</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></label><div class="sched-extra"></div>';
+    function drawSched(){
+      const ex=fields.querySelector('.sched-extra'); if(!ex)return;
+      if(repeatOn)repeatOn.hidden=sched!=='weekly';
+      if(sched==='once'||sched==='yearly'){
+        ex.innerHTML='<div class="sched-date"><span>Date</span><input type="date" name="sdate" aria-label="Date"></div><p class="sched-note">'+(sched==='once'?'Reminds once, on this date.':'Reminds on this day every year. 29 February reminds on 28 February in other years.')+'</p>';
+        const di=ex.querySelector('input'); di.value=onDay; di.addEventListener('change',()=>{if(di.value)onDay=di.value});
+      } else if(sched==='monthly'){
+        ex.innerHTML='<div class="mday-grid" role="group" aria-label="Days of the month"></div><p class="sched-note">Reminds on these days every month. A day a month does not have (like the 31st) reminds on its last day.</p>';
+        const g=ex.querySelector('.mday-grid');
+        const draw=()=>{g.innerHTML='';for(let i=1;i<=31;i++){const b=document.createElement('button');b.type='button';b.textContent=i;b.setAttribute('aria-pressed',String(mdays.includes(i)));b.setAttribute('aria-label','Day '+i);b.addEventListener('click',()=>{if(mdays.includes(i)){if(mdays.length>1)mdays=mdays.filter(x=>x!==i)}else mdays=[...mdays,i].sort((a,b)=>a-b);draw()});g.append(b)}};
+        draw();
+      } else ex.innerHTML='<p class="sched-note">Reminds every week on the days below.</p>';
+    }
     function renderFrequency(){
+      if(repeatOn)repeatOn.hidden=mode.value==='dates'&&sched!=='weekly';
       if(mode.value==='regular'){
         fields.innerHTML='<label>Time <button type="button" class="duration-clock-trigger" aria-haspopup="dialog"></button></label>';
         const btn=fields.querySelector('.duration-clock-trigger');
         function showDuration(){btn.textContent=durationLabel(duration)} showDuration();
         btn.addEventListener('click',()=>openDurationPicker(duration,v=>{duration=v;showDuration()}));
       } else {
-        fields.innerHTML='<div class="selected-times-wrap"><div class="selected-times-list"></div><button type="button" class="add-selected-time">＋ Add time</button></div>';
+        fields.innerHTML=(mode.value==='dates'?schedHtml():'')+'<div class="selected-times-wrap"><div class="selected-times-list"></div><button type="button" class="add-selected-time">＋ Add time</button></div>';
+        if(mode.value==='dates'){const sc=fields.querySelector('[name="sched"]');sc.value=sched;sc.addEventListener('change',()=>{sched=sc.value;drawSched()});drawSched()}
         const timesList=fields.querySelector('.selected-times-list');
         function drawTimes(){timesList.innerHTML='';chosenTimes.forEach((t,i)=>{const row=document.createElement('div');row.className='selected-time-row';const b=document.createElement('button');b.type='button';b.className='duration-clock-trigger selected-time-btn';b.textContent=formatClock(t);b.addEventListener('click',()=>openTimePicker('custom',t,v=>{chosenTimes[i]=v;drawTimes()},'Select time'));const rm=document.createElement('button');rm.type='button';rm.className='remove-selected-time';rm.textContent='×';rm.setAttribute('aria-label','Remove time');rm.disabled=chosenTimes.length===1;rm.addEventListener('click',()=>{chosenTimes.splice(i,1);drawTimes()});row.append(b,rm);timesList.append(row)})}
         drawTimes();fields.querySelector('.add-selected-time').addEventListener('click',()=>{chosenTimes.push('09:00');drawTimes();const b=timesList.lastElementChild?.querySelector('button');if(b)b.click()});
@@ -12854,7 +12874,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     // an open reminder: Save stays grey until something is changed
     const saveBtn=form.querySelector('.save-reminder');
     (()=>{const snd=form.elements.sound&&form.elements.sound.closest('label');if(!snd||form.querySelector('.ayu-vib-fld'))return;const v=document.createElement('div');v.className='ayu-vib-fld ayu-vib-only';v.innerHTML='<span>Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" name="vibrate" aria-label="Vibrate"></label>';const sv=existing?JSON.parse(existing.dataset.reminder||'{}'):{};v.querySelector('input').checked=('vibrate' in sv)?sv.vibrate!==false:(typeof isMasterNotifyOn==='function'&&!!isMasterNotifyOn());snd.after(v)})();
-    const stateNow=()=>JSON.stringify([String(form.elements.name.value).trim(),mode.value,mode.value==='regular'?duration:0,mode.value==='selected'?[...new Set(chosenTimes)].sort():[],form.elements.sound.value,[...days].sort((a,b)=>a-b),form.elements.vibrate?form.elements.vibrate.checked:true]);
+    const stateNow=()=>JSON.stringify([form.elements.speak?[form.elements.speak.checked,form.elements.speak.checked?form.elements.voice.value:'']:[!!saved.speak,saved.speak?(saved.voice||''):''],mode.value==='dates'?[sched,onDay,mdays.join(',')]:0,String(form.elements.name.value).trim(),mode.value,mode.value==='regular'?duration:0,mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],form.elements.sound.value,[...days].sort((a,b)=>a-b),form.elements.vibrate?form.elements.vibrate.checked:true]);
     const stateStart=stateNow();
     const checkDirty=()=>{if(existing)saveBtn.disabled=stateNow()===stateStart};
     ['input','change','click'].forEach(ev=>form.addEventListener(ev,()=>setTimeout(checkDirty,0)));
@@ -12863,7 +12883,8 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     form.addEventListener('submit',function(e){
       e.preventDefault();const d=new FormData(form);const item=existing||document.createElement('div');if(!existing){item.className='custom-reminder-item';item.dataset.reminderId=String(++customReminderCounter)}
       stopReminderTimers(item);
-      const data={name:String(d.get('name')).trim(),mode:mode.value,duration:duration,times:mode.value==='selected'?[...new Set(chosenTimes)].sort():[],sound:d.get('sound'),days:[...days].sort((a,b)=>a-b),vibrate:form.elements.vibrate?form.elements.vibrate.checked:true};
+      const data={speak:form.elements.speak?form.elements.speak.checked:false,voice:form.elements.voice?form.elements.voice.value:'',name:String(d.get('name')).trim(),mode:mode.value,duration:duration,times:mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],sound:d.get('sound'),days:(mode.value==='dates'&&sched!=='weekly')?[0,1,2,3,4,5,6]:[...days].sort((a,b)=>a-b),vibrate:form.elements.vibrate?form.elements.vibrate.checked:true};
+      if(mode.value==='dates'){data.sched=sched;if(sched==='once'||sched==='yearly')data.date=onDay;if(sched==='monthly')data.mdays=mdays.slice().sort((a,b)=>a-b)}
       item.dataset.reminder=JSON.stringify(data);
       item.classList.remove('open');form.remove();window.ayuRemPaint(item,data);
       if(!existing)list.append(item);startReminder(item);
@@ -12907,6 +12928,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     item.dataset.startedAt=item.dataset.startedAt||String(Date.now());   // background alerts repeat from this moment
     const notify=()=>{try{if(Array.isArray(data.days)&&data.days.length&&!data.days.includes(new Date().getDay()))return;if(window.ayuLeader===false)return;if(window.ayuPush&&window.ayuPush.active&&document.hidden)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')(typeof showNudgeNotification==='function'?showNudgeNotification(data.name,'It is time for your reminder.',{key:'custom-'+item.dataset.reminderId}):new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()}))}catch(_){}};
     if(data.mode==='regular')item._reminderTimer=setInterval(notify,Math.max(1,Number(data.duration)||1)*60000);
+    else if(data.mode==='dates')item._reminderTimer=setInterval(()=>{const n=new Date(),hm=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');if(!(data.times||[]).includes(hm)||!window.ayuOnDate(data,n))return;const k=n.toDateString()+hm;if(item._lastFire===k)return;item._lastFire=k;notify()},15000);
     else {item._reminderTimeouts=[];item._reminderTimers=[];data.times.forEach(t=>{const [hh,mm]=t.split(':').map(Number),now=new Date(),next=new Date();next.setHours(hh,mm,0,0);if(next<=now)next.setDate(next.getDate()+1);const delay=next-now;item._reminderTimeouts.push(setTimeout(()=>{notify();item._reminderTimers.push(setInterval(notify,24*60*60*1000))},delay))})}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addSwitches);else addSwitches();
@@ -13812,7 +13834,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
         var it = ROUTINE_NOTIFY_ITEMS[key];
         items.push({ key:key, title:it.title, body:it.body, at:at, end:routineEndMinute(key), window:routineWindowText(key), muted:routineIsMuted(key) });
       });
-      rules.checks = { mode:routineRemindMode(), doneDay:localDay(), done:done, items:items }; var cd=window.ayuDays&&window.ayuDays.get('chk'); if(cd&&cd.length<7) rules.checks.days=cd.slice();
+      rules.checks = { mode:routineRemindMode(), doneDay:localDay(), done:done, items:items, sound:(window.ayuRoutineSound ? window.ayuRoutineSound() : '') }; var cd=window.ayuDays&&window.ayuDays.get('chk'); if(cd&&cd.length<7) rules.checks.days=cd.slice();
     }
     if(remOn) document.querySelectorAll('#custom-reminders-list .custom-reminder-item').forEach(function(item){
       try{
@@ -13820,7 +13842,8 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
         var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode };
         if(Array.isArray(d.days) && d.days.length && d.days.length<7) c.days = d.days.filter(function(n){ return n>=0 && n<=6; });
         if(d.mode==='regular'){ c.every = Math.max(1, Number(d.duration)||1); c.anchor = Number(item.dataset.startedAt)||Date.now(); }
-        else c.times = (d.times||[]).map(toMin).filter(function(m){ return m!==null; });
+        else if(d.mode==='dates'){ c.sched = d.sched||'once'; if(d.date) c.date = d.date; if(Array.isArray(d.mdays)) c.mdays = d.mdays.slice(); if(c.sched!=='weekly') delete c.days; c.times = (d.times||[]).map(toMin).filter(function(m){ return m!==null; }); }
+        else if(d.mode!=='dates') c.times = (d.times||[]).map(toMin).filter(function(m){ return m!==null; });
         rules.custom.push(c);
       }catch(e){}
     });
@@ -15724,8 +15747,23 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   };
 
   // ---- Backup & Restore → Download App ----
+  // On a computer: the Android app too, with a QR code to open the download on the phone
+  var APK_QR='<svg viewBox="0 0 41 41" width="168" height="168" role="img" aria-label="QR code to download the Android app" shape-rendering="crispEdges"><rect width="41" height="41" fill="#fff"/><path d="M2 2h7v1h-7zM11 2h1v1h-1zM16 2h8v1h-8zM25 2h1v1h-1zM28 2h1v1h-1zM30 2h1v1h-1zM32 2h7v1h-7zM2 3h1v1h-1zM8 3h1v1h-1zM11 3h1v1h-1zM15 3h3v1h-3zM19 3h1v1h-1zM23 3h2v1h-2zM26 3h2v1h-2zM29 3h2v1h-2zM32 3h1v1h-1zM38 3h1v1h-1zM2 4h1v1h-1zM4 4h3v1h-3zM8 4h1v1h-1zM10 4h1v1h-1zM12 4h2v1h-2zM15 4h1v1h-1zM21 4h1v1h-1zM23 4h1v1h-1zM25 4h1v1h-1zM28 4h2v1h-2zM32 4h1v1h-1zM34 4h3v1h-3zM38 4h1v1h-1zM2 5h1v1h-1zM4 5h3v1h-3zM8 5h1v1h-1zM10 5h1v1h-1zM12 5h2v1h-2zM16 5h2v1h-2zM24 5h6v1h-6zM32 5h1v1h-1zM34 5h3v1h-3zM38 5h1v1h-1zM2 6h1v1h-1zM4 6h3v1h-3zM8 6h1v1h-1zM10 6h2v1h-2zM13 6h3v1h-3zM20 6h2v1h-2zM24 6h2v1h-2zM30 6h1v1h-1zM32 6h1v1h-1zM34 6h3v1h-3zM38 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM16 7h2v1h-2zM20 7h1v1h-1zM23 7h2v1h-2zM26 7h1v1h-1zM28 7h2v1h-2zM32 7h1v1h-1zM38 7h1v1h-1zM2 8h7v1h-7zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM30 8h1v1h-1zM32 8h7v1h-7zM10 9h5v1h-5zM17 9h2v1h-2zM23 9h1v1h-1zM30 9h1v1h-1zM2 10h1v1h-1zM4 10h5v1h-5zM11 10h2v1h-2zM15 10h2v1h-2zM19 10h1v1h-1zM21 10h1v1h-1zM24 10h1v1h-1zM26 10h3v1h-3zM32 10h5v1h-5zM3 11h2v1h-2zM7 11h1v1h-1zM12 11h1v1h-1zM16 11h2v1h-2zM22 11h1v1h-1zM25 11h1v1h-1zM27 11h1v1h-1zM30 11h1v1h-1zM33 11h1v1h-1zM36 11h2v1h-2zM3 12h1v1h-1zM5 12h5v1h-5zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h2v1h-2zM20 12h1v1h-1zM22 12h2v1h-2zM27 12h3v1h-3zM31 12h3v1h-3zM36 12h3v1h-3zM2 13h1v1h-1zM4 13h1v1h-1zM10 13h1v1h-1zM12 13h1v1h-1zM22 13h4v1h-4zM28 13h4v1h-4zM33 13h1v1h-1zM38 13h1v1h-1zM6 14h1v1h-1zM8 14h3v1h-3zM16 14h1v1h-1zM18 14h2v1h-2zM24 14h1v1h-1zM26 14h3v1h-3zM31 14h2v1h-2zM34 14h5v1h-5zM4 15h1v1h-1zM7 15h1v1h-1zM11 15h1v1h-1zM13 15h1v1h-1zM15 15h2v1h-2zM21 15h2v1h-2zM24 15h2v1h-2zM33 15h1v1h-1zM3 16h2v1h-2zM8 16h2v1h-2zM11 16h2v1h-2zM16 16h5v1h-5zM24 16h1v1h-1zM28 16h2v1h-2zM32 16h4v1h-4zM37 16h2v1h-2zM2 17h1v1h-1zM7 17h1v1h-1zM9 17h1v1h-1zM13 17h1v1h-1zM15 17h4v1h-4zM22 17h3v1h-3zM28 17h1v1h-1zM31 17h4v1h-4zM37 17h1v1h-1zM5 18h1v1h-1zM7 18h2v1h-2zM10 18h3v1h-3zM14 18h1v1h-1zM17 18h1v1h-1zM19 18h1v1h-1zM22 18h1v1h-1zM24 18h1v1h-1zM27 18h3v1h-3zM31 18h2v1h-2zM34 18h1v1h-1zM36 18h1v1h-1zM38 18h1v1h-1zM2 19h4v1h-4zM9 19h1v1h-1zM14 19h1v1h-1zM18 19h6v1h-6zM25 19h1v1h-1zM27 19h2v1h-2zM30 19h2v1h-2zM33 19h1v1h-1zM36 19h2v1h-2zM3 20h2v1h-2zM6 20h1v1h-1zM8 20h2v1h-2zM11 20h2v1h-2zM15 20h3v1h-3zM20 20h1v1h-1zM22 20h1v1h-1zM28 20h3v1h-3zM37 20h2v1h-2zM2 21h1v1h-1zM4 21h1v1h-1zM6 21h1v1h-1zM10 21h1v1h-1zM13 21h2v1h-2zM17 21h1v1h-1zM23 21h3v1h-3zM28 21h1v1h-1zM30 21h6v1h-6zM38 21h1v1h-1zM8 22h1v1h-1zM10 22h3v1h-3zM17 22h1v1h-1zM19 22h1v1h-1zM21 22h2v1h-2zM24 22h4v1h-4zM31 22h2v1h-2zM34 22h3v1h-3zM3 23h1v1h-1zM5 23h3v1h-3zM9 23h1v1h-1zM12 23h2v1h-2zM18 23h1v1h-1zM21 23h3v1h-3zM25 23h1v1h-1zM30 23h2v1h-2zM35 23h1v1h-1zM3 24h2v1h-2zM7 24h5v1h-5zM14 24h1v1h-1zM17 24h2v1h-2zM22 24h2v1h-2zM26 24h2v1h-2zM29 24h2v1h-2zM32 24h4v1h-4zM37 24h2v1h-2zM6 25h1v1h-1zM9 25h3v1h-3zM15 25h1v1h-1zM23 25h4v1h-4zM28 25h4v1h-4zM33 25h2v1h-2zM3 26h1v1h-1zM6 26h1v1h-1zM8 26h1v1h-1zM10 26h1v1h-1zM12 26h2v1h-2zM16 26h5v1h-5zM22 26h1v1h-1zM24 26h1v1h-1zM26 26h4v1h-4zM31 26h2v1h-2zM34 26h1v1h-1zM36 26h2v1h-2zM2 27h3v1h-3zM6 27h1v1h-1zM9 27h1v1h-1zM12 27h1v1h-1zM18 27h1v1h-1zM21 27h2v1h-2zM25 27h1v1h-1zM27 27h2v1h-2zM33 27h1v1h-1zM36 27h1v1h-1zM2 28h1v1h-1zM6 28h1v1h-1zM8 28h2v1h-2zM11 28h1v1h-1zM17 28h2v1h-2zM22 28h2v1h-2zM26 28h8v1h-8zM36 28h3v1h-3zM2 29h1v1h-1zM4 29h4v1h-4zM9 29h2v1h-2zM14 29h1v1h-1zM17 29h1v1h-1zM23 29h1v1h-1zM28 29h1v1h-1zM32 29h2v1h-2zM38 29h1v1h-1zM2 30h1v1h-1zM4 30h2v1h-2zM7 30h3v1h-3zM11 30h3v1h-3zM16 30h3v1h-3zM24 30h1v1h-1zM27 30h8v1h-8zM36 30h3v1h-3zM10 31h2v1h-2zM16 31h1v1h-1zM18 31h1v1h-1zM20 31h4v1h-4zM25 31h1v1h-1zM28 31h1v1h-1zM30 31h1v1h-1zM34 31h2v1h-2zM2 32h7v1h-7zM11 32h2v1h-2zM15 32h5v1h-5zM23 32h2v1h-2zM28 32h1v1h-1zM30 32h1v1h-1zM32 32h1v1h-1zM34 32h1v1h-1zM36 32h1v1h-1zM38 32h1v1h-1zM2 33h1v1h-1zM8 33h1v1h-1zM10 33h1v1h-1zM12 33h2v1h-2zM17 33h1v1h-1zM20 33h2v1h-2zM23 33h1v1h-1zM26 33h1v1h-1zM30 33h1v1h-1zM34 33h2v1h-2zM2 34h1v1h-1zM4 34h3v1h-3zM8 34h1v1h-1zM10 34h2v1h-2zM13 34h1v1h-1zM16 34h2v1h-2zM19 34h2v1h-2zM25 34h3v1h-3zM29 34h6v1h-6zM36 34h3v1h-3zM2 35h1v1h-1zM4 35h3v1h-3zM8 35h1v1h-1zM10 35h3v1h-3zM16 35h1v1h-1zM18 35h1v1h-1zM20 35h1v1h-1zM22 35h2v1h-2zM25 35h1v1h-1zM29 35h1v1h-1zM31 35h2v1h-2zM34 35h2v1h-2zM37 35h2v1h-2zM2 36h1v1h-1zM4 36h3v1h-3zM8 36h1v1h-1zM10 36h1v1h-1zM13 36h5v1h-5zM19 36h2v1h-2zM22 36h2v1h-2zM29 36h2v1h-2zM35 36h4v1h-4zM2 37h1v1h-1zM8 37h1v1h-1zM11 37h2v1h-2zM14 37h3v1h-3zM18 37h1v1h-1zM20 37h6v1h-6zM30 37h3v1h-3zM34 37h1v1h-1zM38 37h1v1h-1zM2 38h7v1h-7zM10 38h2v1h-2zM13 38h1v1h-1zM15 38h2v1h-2zM19 38h1v1h-1zM21 38h2v1h-2zM24 38h2v1h-2zM27 38h2v1h-2zM31 38h2v1h-2zM34 38h5v1h-5z" fill="#111"/></svg>';
+  function desktopHtml(){
+    if(!cfg) return '<p>Coming soon: an Android app, with reminders that arrive even when it is closed.</p>';
+    var meta=['Version '+esc(cfg.versionName), mb(cfg.sizeBytes), 'Android '+esc(cfg.minAndroid||'8.0')+' or later'].filter(Boolean).join(' · ');
+    return '<p>An Android app is available: the same app, with reminders and alarms that arrive on time even when it is closed or the phone is locked.</p>'
+      + '<p class="app-meta">'+meta+'</p>'
+      + '<div class="app-qr">'+APK_QR+'<div><strong>On your Android phone</strong><ol><li>Open the camera and point it at this code.</li><li>Tap the link to download, then open the file and tap <b>Install</b>.</li></ol>'
+      + '<button type="button" class="app-get-sm app-copy" onclick="event.preventDefault();ayuCopyApk(this)">Copy link</button></div></div>'
+      + '<strong>Your data</strong><p><b>Backup → Save</b> here, then <b>Backup → Restore</b> in the app.</p>';
+  }
+  window.ayuCopyApk=function(b){
+    var u=(cfg&&cfg.url)||'', done=function(){ b.textContent='Copied'; setTimeout(function(){ b.textContent='Copy link'; },2000); };
+    try{ navigator.clipboard.writeText(u).then(done,function(){ prompt('Copy this link',u); }); }catch(e){ try{ prompt('Copy this link',u); }catch(_){} }
+  };
   function androidHtml(){
-    if(!ANDROID) return '';
+    if(!ANDROID) return IOS ? '' : desktopHtml();
     if(!cfg) return '<p>Coming soon: the same app, with reminders that arrive even when it is closed. Until then, use the Web App below.</p>';
     var meta=['Version '+esc(cfg.versionName), mb(cfg.sizeBytes), 'Android '+esc(cfg.minAndroid||'8.0')+' or later'].filter(Boolean).join(' · ');
     return '<p>The same app, with reminders and alarms that arrive on time even when it is closed or the phone is locked.</p>'
@@ -15746,7 +15784,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   // Download App: the Android app and the web app as two sections, closed until tapped (one alone stays open).
   function part(id,title,html,only,btn){ return '<details class="app-part" data-part="'+id+'"'+(only?' open':'')+'><summary>'+title+(btn||'')+'</summary><div class="app-part-b">'+html+'</div></details>'; }
   // the main button sits on the section's title row, so it shows even while the section is closed
-  function btnA(){ return cfg ? '<button type="button" class="app-get-sm" onclick="event.preventDefault();event.stopPropagation();ayuGetApp()">Download</button>' : ''; }
+  function btnA(){ return (cfg && ANDROID) ? '<button type="button" class="app-get-sm" onclick="event.preventDefault();event.stopPropagation();ayuGetApp()">Download</button>' : ''; }
   function btnW(){ return installed() ? '' : '<button type="button" class="app-get-sm" onclick="event.preventDefault();event.stopPropagation();var d=this.closest(\'details\');if(d)d.open=true;ayuInstallWeb()">Install</button>'; }
   function helpHtml(){
     var a=androidHtml(), w=webHtml().replace(/^<strong>(Or install the web app|Install the web app)<\/strong>/,'');
@@ -15793,12 +15831,12 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
         +'<div class="appb-btns"><button type="button" class="appb-get">Download</button><button type="button" class="appb-later">Cancel</button></div></div>';
       var later=function(){
         ls(K_LATER,String(Date.now()));
-        noteInPlace('You can download the app any time from <b>Backup &amp; Restore → Download App</b>, in the footer.', 7000);
+        noteInPlace('You can download the app later from <svg class="appb-help-ic" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-label="Backup and Restore icon" role="img"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg> <b>(Backup &amp; Restore) → Download App</b>, at the bottom of the page.', 7000);
       };
       // Download: first a short note (so it can be read), then the download starts and Backup & Restore → Download App → Android opens.
       b.querySelector('.appb-get').addEventListener('click',function(){
         ls(K_LATER,String(Date.now()));
-        noteInPlace('Once it has downloaded, follow the steps in <b>Backup & Restore → Download App → Android</b> to install it.', 10000, function(){ download(true); });
+        noteInPlace('Once it has downloaded, follow the steps in <svg class="appb-help-ic" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-label="Backup and Restore icon" role="img"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg> <b>(Backup &amp; Restore) → Download App → Android</b> to install it.', 10000, function(){ download(true); });
       });
       b.querySelector('.appb-later').addEventListener('click',later);
       var ann=p.querySelector(':scope > .ayu-ann');   // after an announcement banner, if one is showing
@@ -16725,7 +16763,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     d.querySelector('.aal-stop').addEventListener('click',function(){ stopRing(); });
   }
   // Vibrate: Checks alarm follows My Day Plan → Vibrate; each Reminders alarm has its own switch
-  function vibOn(id){ if(id==='wake') return !(window.ayuVibrate && !window.ayuVibrate.chk()); var a=get(id); return ('vibrate' in a) ? a.vibrate!==false : !!a.on; }
+  function vibOn(id){ if(id==='wake') return !(window.ayuVibrate && !window.ayuVibrate.wake()); var a=get(id); return ('vibrate' in a) ? a.vibrate!==false : !!a.on; }
   var vibTimer=null;
   function vibStart(id){ vibStop(); if(!vibOn(id) || typeof navigator.vibrate!=='function') return; try{ navigator.vibrate([700,700]); }catch(e){} vibTimer=setInterval(function(){ try{ navigator.vibrate([700,700]); }catch(e){} },1400); }
   function vibStop(){ if(vibTimer){ clearInterval(vibTimer); vibTimer=null; try{ navigator.vibrate(0); }catch(e){} } }
@@ -17219,14 +17257,14 @@ html body #rem-alarm-card > .ayu-al-info{padding:12px 14px;border-radius:12px;ba
       +'<li>No clock time is proven best: aim for 7+ hours of sleep, the same time every day and morning daylight.</li>'
       +'<li>Every check below follows it. Outside 4–10 AM it becomes a shift schedule.</li></ul>'
       +'<div class="mdp-src">Sources: AASM/SRS sleep consensus 2015; UK Biobank; Daghlas et al. 2021.</div></div>'
-      +'<div class="mdp-sec"><b class="mdp-t">Alarm</b><ul>'
+      +'<div class="mdp-sec"><b class="mdp-t">Wake-up Alarm</b><ul>'
       +'<li>Rings at your wake-up time on the Notify Me days (every day if Notify Me is off). It works without Notify Me.</li>'
       +'<li>Choose a sound (▶ to hear it, or upload your own), how long it rings, and the snooze length and count.</li>'
       +(APP?'<li>Rings even when AyuBase6 is closed or the phone is locked. The volume buttons snooze or stop it.</li>'
            :'<li>Rings while AyuBase6 is open. For an alarm with it closed, use the Android app (Backup & Restore → Download App).</li>')
       +'</ul></div>'
       +'<div class="mdp-sec"><b class="mdp-t">Notify Me</b><ul>'
-      +'<li>Notifications for every check. <b>At start</b>: when it begins. <b>Start + before end</b>: also 15 minutes before it closes.</li>'
+      +'<li>Notifications for every check. <b>Start time</b>: when it begins. <b>Start time + before end time</b>: also 15 minutes before it closes.</li><li><b>Sound</b> and <b>Vibrate</b> are for these notifications only; the Wake-up Alarm has its own.</li>'
       +'<li><b>On these days</b> picks the days. Each notification has <b>Done</b> and <b>Not yet</b>.</li>'
       +(APP?'<li>They arrive even when AyuBase6 is closed, with or without internet.</li>'
            :'<li>They arrive while AyuBase6 is open (any tab or the app window); the computer must stay awake.</li>')
@@ -17617,7 +17655,7 @@ html body #alerts-panel :is(#rem-alarm-card,#custom-reminders-card) > .alert-car
   function daysText(days){ var R=window.__ayuRem, t=R?R.daysLabel(days||[]):''; return t ? t.replace(/^ · /,'') : 'Daily'; }
   window.ayuRemPaint=function(item,data){
     var R=window.__ayuRem;
-    var sub=(data.mode==='regular'?'Every '+R.durationLabel(data.duration):'At '+(data.times||[]).map(R.formatClock).join(', '))+' · '+daysText(data.days);
+    var sub=data.mode==='dates' ? window.ayuDatesText(data,R) : (data.mode==='regular'?'Every '+R.durationLabel(data.duration):'At '+(data.times||[]).map(R.formatClock).join(', '))+' · '+daysText(data.days);
     var del=document.createElement('button'); del.type='button'; del.className='custom-reminder-delete'; del.textContent='×'; del.setAttribute('aria-label','Delete reminder'); del.title='Delete reminder';
     var h=window.ayuItemHead(item,data.name,sub,[del]);
     del.addEventListener('click',function(e){ e.stopPropagation(); var list=item.parentNode; R.stopReminderTimers(item); item.classList.remove('open');
@@ -17713,14 +17751,17 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
   function mainOn(k){ var t=document.getElementById(MAIN[k]); return !!(t && t.checked); }
   function masterOn(){ try{ return typeof isMasterNotifyOn==='function' && !!isMasterNotifyOn(); }catch(e){ return false; } }
   // not set yet: Vibrate follows the section's own switch (off until that is on), like Checks follows Notify Me
-  function on(k){ var o=load(); if(!(k in o)) return k==='chk' ? notifyOn() : (MAIN[k] ? mainOn(k) : false); return o[k]!==false; }
+  function wakeOn(){ var t=document.getElementById('wake-al-on'); return !!(t && t.checked); }
+  function on(k){ var o=load(); if(!(k in o)) return k==='chk' ? notifyOn() : k==='wake' ? wakeOn() : (MAIN[k] ? mainOn(k) : false); return o[k]!==false; }
   function set(k,v){ var o=load(); o[k]=!!v; save(o); }
   function customOn(id){ var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+String(id).replace(/"/g,'')+'"]'); if(!it) return masterOn(); try{ var d=JSON.parse(it.dataset.reminder||'{}'); return ('vibrate' in d) ? d.vibrate!==false : masterOn(); }catch(e){ return masterOn(); } }
   // key of a notification: "break" "walk" "drink" "eyeex", "routine-…", "custom-<id>"
   window.ayuVibrate={
     can:CAN,
     on:function(key){ key=String(key||''); if(/^routine/.test(key)) return on('chk'); if(HB.indexOf(key)>=0) return on(key); var m=key.match(/^custom-?(.+)$/); if(m) return customOn(m[1]); return true; },
-    chk:function(){ return on('chk'); }
+    chk:function(){ return on('chk'); },
+    wake:function(){ return on('wake'); },   // Checks → Wake-up Alarm: its own Vibrate
+    set:function(k,v){ set(String(k),v); }
   };
   // the phone app: the switches travel with the rules (only to the phone, not to the server)
   window.ayuVibrateApply=function(r){
@@ -17736,8 +17777,9 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
     l.innerHTML='<input type="checkbox"'+(id?' id="'+id+'"':'')+' aria-label="'+label+'">';
     var i=l.querySelector('input'); i.checked=checked; i.addEventListener('change',function(){ onChange(i.checked); }); return l;
   }
+  function mainVib(){ var o=load(); return ('hbm' in o) ? o.hbm!==false : masterOn(); }
   function paintHB(){
-    var all=HB.every(on), m=document.querySelector('#rh-vibrate input'); if(m) m.checked=all;
+    var m=document.querySelector('#rh-vibrate input'); if(m) m.checked=mainVib();   // its own switch: a section's Vibrate does not change it
     HB.forEach(function(k){ var e=document.querySelector('[data-vib-key="'+k+'"] input'); if(e) e.checked=on(k); });
   }
   function setup(){
@@ -17765,7 +17807,7 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
     if(days && !document.getElementById('rh-vibrate')){
       var r=document.createElement('div'); r.id='rh-vibrate'; r.className='ayu-vib-line ayu-vib-only';
       r.innerHTML='<span class="ayu-on-lbl">Vibrate</span>';
-      r.appendChild(sw('','Vibrate for all Health Breaks',HB.every(on),function(v){ var o=load(); HB.forEach(function(k){ o[k]=v; }); save(o); paintHB(); }));
+      r.appendChild(sw('','Vibrate for all Health Breaks',mainVib(),function(v){ var o=load(); o.hbm=!!v; HB.forEach(function(k){ o[k]=v; }); save(o); paintHB(); }));
       days.after(r);
     } else if(!days) ok=false;
     // each Health Breaks section: after Sound
@@ -17782,7 +17824,8 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
   }
   var last=null;
   function follow(){
-    if(!last){ last={}; HB.forEach(function(k){ last[k]=mainOn(k); }); return; }
+    if(!last){ last={}; HB.forEach(function(k){ last[k]=mainOn(k); }); last.hbm=masterOn(); return; }
+    var mo=masterOn(); if(mo!==last.hbm){ last.hbm=mo; var o2=load(); o2.hbm=mo; save(o2); paintHB(); }
     var o=load(), ch=false;
     HB.forEach(function(k){ var v=mainOn(k); if(v!==last[k]){ last[k]=v; o[k]=v; ch=true; } });
     if(ch){ save(o); paintHB(); }
@@ -18033,6 +18076,8 @@ html body #calculator-panel .calc-page > .calc-card h2 .ayu-i{margin-left:6px !i
 (function(){
   function $(id){ return document.getElementById(id); }
   var PERSONAL_INFO='<ul><li>Add your own reminders with <b>+ Add a reminder</b>: a name, how often or at set times, the days and the sound.</li>'
+    +'<li><b>Frequency</b>: <b>At regular times</b> (every few minutes or hours), <b>At selected times</b> (clock times each day) or <b>On chosen dates</b>.</li>'
+    +'<li><b>On chosen dates</b> has a <b>Schedule</b>: <b>Only once</b> (on one date), <b>Weekly</b> (every week on the days you pick), <b>Monthly</b> (on the days of the month you pick; a day the month does not have, like the 31st, reminds on its last day) or <b>Yearly</b> (the same day every year, today by default). Add one or more times for it.</li>'
     +'<li>Tap a reminder to open and change it; × deletes it (Undo for 5 seconds).</li>'
     +'<li>On the website they arrive while AyuBase6 is open; the Android app sends them even when it is closed.</li></ul>';
   function title(host, tabBtn, name){
@@ -18109,7 +18154,7 @@ html body #lab-insights-card .lab-actions-row .lub-s{font-size:.72em;font-weight
     if(!b || p==='unsupported') return;
     if(b.style.display==='none' && !(app() && p==='denied')) { if(off) off.style.display='none'; return; }
     b.style.display='inline-block';
-    b.textContent = p==='granted' ? 'Disable Notifications' : 'Enable Notifications';
+    b.textContent = p==='granted' ? (app() ? 'Disable Notifications' : 'How to turn off') : 'Enable Notifications';
     if(p!=='granted' && off) off.style.display='none';
     if(app() && dh) dh.style.display='none';
     if(s) s.textContent = p==='granted' ? '✅ Notifications are allowed. Each reminder still has its own switch.'
@@ -18745,6 +18790,346 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     window.showFooterSub.__ayuAU=true;
   }
   var n=0, iv=setInterval(function(){ var ok=ensure(); paint(); if(ok || ++n>120) clearInterval(iv); },250);
+})();
+</script>
+<style id="tracker-search-20261107">
+/* Vitals → Tracker: the reading picker can be searched */
+#tracker-card .trk-combo{position:relative;width:100%}
+#tracker-card .trk-combo input{width:100%;box-sizing:border-box;padding:11px 38px 11px 12px;border-radius:12px;border:1.5px solid color-mix(in srgb,#0c7a8a 40%,#fff);font:inherit;color:#0c3d4d;background:#fff}
+#tracker-card .trk-combo input:focus{outline:none;border-color:#0c7a8a;box-shadow:0 0 0 3px color-mix(in srgb,#0c7a8a 18%,transparent)}
+#tracker-card .trk-combo .trk-chev{position:absolute;right:12px;top:50%;width:9px;height:9px;border-right:2px solid #0c7a8a;border-bottom:2px solid #0c7a8a;transform:translateY(-70%) rotate(45deg);pointer-events:none}
+#tracker-card .trk-pick{position:relative;margin-top:4px;z-index:5;max-height:320px;overflow:auto;background:#fff;border-radius:12px;border:1.5px solid color-mix(in srgb,#0c7a8a 30%,#fff);box-shadow:0 10px 28px rgba(0,0,0,.15);padding:4px}
+#tracker-card .trk-pick[hidden]{display:none}
+#tracker-card .trk-pick .g{font-size:11.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#0c7a8a;opacity:.8;padding:8px 10px 4px}
+#tracker-card .trk-pick .o{display:block;width:100%;text-align:left;border:0;background:transparent;font:inherit;color:#0c3d4d;padding:9px 10px;border-radius:8px;cursor:pointer}
+#tracker-card .trk-pick .o.act,#tracker-card .trk-pick .o:hover{background:color-mix(in srgb,#0c7a8a 12%,#fff)}
+#tracker-card .trk-pick .o mark{background:color-mix(in srgb,#f59e0b 35%,transparent);color:inherit;border-radius:3px}
+#tracker-card .trk-pick .none{padding:10px;font-size:13px;opacity:.7}
+#tracker-card #tracker-select-wrap.trk-on > select,#tracker-card #tracker-select-wrap.trk-on > .tracker-select-placeholder{display:none !important}
+</style>
+<script id="tracker-search-20261107-js">
+(function(){
+  function $(i){ return document.getElementById(i); }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  var inp, list, act=-1, items=[];
+  function opts(){
+    var sel=$('tracker-select'), out=[]; if(!sel) return out;
+    [].forEach.call(sel.children,function(ch){
+      if(ch.tagName==='OPTGROUP') [].forEach.call(ch.children,function(o){ if(o.value) out.push({v:o.value,t:o.text,g:ch.label}); });
+      else if(ch.tagName==='OPTION' && ch.value) out.push({v:ch.value,t:ch.text,g:''});
+    });
+    return out;
+  }
+  function show(){
+    var q=inp.value.trim().toLowerCase(), sel=$('tracker-select'), cur=sel && sel.options[sel.selectedIndex];
+    if(cur && cur.value && inp.value===cur.text) q='';   // the chosen one is showing: list everything
+    items=opts().filter(function(o){ return !q || o.t.toLowerCase().indexOf(q)>=0 || o.g.toLowerCase().indexOf(q)>=0; });
+    var h='', g=null;
+    items.forEach(function(o,i){
+      if(o.g!==g){ g=o.g; if(g) h+='<div class="g">'+esc(g)+'</div>'; }
+      var t=esc(o.t); if(q){ var k=o.t.toLowerCase().indexOf(q); if(k>=0) t=esc(o.t.slice(0,k))+'<mark>'+esc(o.t.slice(k,k+q.length))+'</mark>'+esc(o.t.slice(k+q.length)); }
+      h+='<button type="button" class="o" role="option" data-i="'+i+'" id="trk-o-'+i+'">'+t+'</button>';
+    });
+    list.innerHTML=h||'<div class="none">No reading matches “'+esc(inp.value.trim())+'”.</div>';
+    act=items.length?0:-1; mark(); list.hidden=false; inp.setAttribute('aria-expanded','true');
+  }
+  function hide(){ list.hidden=true; inp.setAttribute('aria-expanded','false'); }
+  function mark(){ [].forEach.call(list.querySelectorAll('.o'),function(b,i){ b.classList.toggle('act',i===act); }); if(act>=0){ inp.setAttribute('aria-activedescendant','trk-o-'+act); var b=$('trk-o-'+act); if(b) b.scrollIntoView({block:'nearest'}); } else inp.removeAttribute('aria-activedescendant'); }
+  function pick(i){
+    var o=items[i], sel=$('tracker-select'); if(!o || !sel) return;
+    sel.value=o.v; sel.dispatchEvent(new Event('change',{bubbles:true}));
+    inp.value=o.t; hide(); inp.blur();
+  }
+  function sync(){ if(!inp) return; var sel=$('tracker-select'), o=sel && sel.options[sel.selectedIndex]; if(document.activeElement!==inp) inp.value=(o && o.value) ? o.text : ''; }
+  function build(){
+    var wrap=$('tracker-select-wrap'); if(!wrap || !$('tracker-select')) return false;
+    if(wrap.querySelector('.trk-combo')) return true;
+    var c=document.createElement('div'); c.className='trk-combo';
+    c.innerHTML='<input type="text" id="trk-search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="trk-pick" aria-label="Reading to add" placeholder="Select or search a reading" autocomplete="off"><span class="trk-chev" aria-hidden="true"></span><div class="trk-pick" id="trk-pick" role="listbox" hidden></div>';
+    wrap.appendChild(c); wrap.classList.add('trk-on');
+    inp=c.querySelector('input'); list=c.querySelector('.trk-pick');
+    inp.addEventListener('focus',function(){ inp.select(); show(); });
+    inp.addEventListener('click',function(){ if(list.hidden) show(); });
+    inp.addEventListener('input',show);
+    inp.addEventListener('keydown',function(e){
+      if(e.key==='ArrowDown'){ if(list.hidden) show(); else if(act<items.length-1){ act++; mark(); } e.preventDefault(); }
+      else if(e.key==='ArrowUp'){ if(act>0){ act--; mark(); } e.preventDefault(); }
+      else if(e.key==='Enter'){ if(!list.hidden && act>=0){ pick(act); e.preventDefault(); } }
+      else if(e.key==='Escape'){ hide(); sync(); }
+    });
+    inp.addEventListener('blur',function(){ setTimeout(function(){ if(document.activeElement!==inp){ hide(); sync(); } },150); });
+    list.addEventListener('mousedown',function(e){ e.preventDefault(); });
+    list.addEventListener('click',function(e){ var b=e.target.closest('.o'); if(b) pick(+b.dataset.i); });
+    var orig=window.syncTrackerSelectPlaceholder;
+    window.syncTrackerSelectPlaceholder=function(){ var r=orig && orig.apply(this,arguments); sync(); return r; };
+    sync(); return true;
+  }
+  var n=0, iv=setInterval(function(){ if(build() || ++n>80) clearInterval(iv); },250);
+})();
+</script>
+<style id="checks-fields-20261107">
+/* Checks → My Day Plan: Notify Me fields with dots (Remind me, On these days, Sound, Vibrate); Wake-up Alarm Vibrate */
+html body #routines-vibrate-card{display:none !important}
+html body #routines-remind-panel .chk-dot:before,html body #chk-alarm .chk-dot:before{content:'•';color:var(--rout-2,#b45309);margin-right:6px;font-weight:800}
+html body #routines-remind-panel .chk-lbl{font-weight:700;margin:2px 0 4px;color:inherit}
+html body #routines-remind-panel .chk-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+html body #routines-remind-panel .chk-row .chk-lbl{margin:0;min-width:90px}
+html body #routines-remind-panel .chk-row select{flex:1 1 140px;min-width:0}
+html body #routines-remind-panel .chk-row .master-switch{margin-left:auto}
+html body #routines-remind-panel .chk-play{border:0;background:transparent;color:var(--rout-2,#b45309);font-size:15px;cursor:pointer;padding:4px 8px}
+html body #routines-remind-panel #chk-days .otd-title{font-weight:700}
+html:not(.ayu-can-vib) .chk-vib-only{display:none !important}
+</style>
+<script id="checks-fields-20261107-js">
+(function(){
+  var K_SND='ayuBase6-routine-sound';
+  function $(i){ return document.getElementById(i); }
+  function sync(){ try{ document.dispatchEvent(new Event('ayu-alarm-changed')); }catch(e){} try{ if(window.ayuNative && window.ayuNative.sync) window.ayuNative.sync(); }catch(e){} }
+  function sound(){ try{ return localStorage.getItem(K_SND)||'chime'; }catch(e){ return 'chime'; } }
+  window.ayuRoutineSound=sound;
+  function sw(id,label,checked,onChange){
+    var l=document.createElement('label'); l.className='master-switch'; l.title=label;
+    l.innerHTML='<input type="checkbox"'+(id?' id="'+id+'"':'')+' aria-label="'+label+'">';
+    var i=l.firstChild; i.checked=!!checked; i.addEventListener('change',function(){ onChange(i.checked); });
+    return l;
+  }
+  function toneOptions(){
+    var seen={}, out='';
+    document.querySelectorAll('.alert-sound-select option').forEach(function(o){ if(!o.value || o.value==='none' || seen[o.value]) return; seen[o.value]=1; out+='<option value="'+o.value+'">'+o.textContent+'</option>'; });
+    return out || '<option value="chime">Chime</option>';
+  }
+  function notify(){
+    var p=$('routines-remind-panel'); if(!p) return false;
+    if(p.dataset.chkFields) return true;
+    // names
+    p.querySelectorAll('input[name=routines-remind]').forEach(function(r){ var s=r.nextElementSibling; if(!s) return; if(r.value==='start') s.textContent='Start time'; if(r.value==='beforeend') s.textContent='Start time + before end time'; });
+    // dots: Remind me, On these days, Sound, Vibrate
+    var first=p.querySelector('label'); if(!first) return false;
+    var t=document.createElement('div'); t.className='chk-lbl chk-dot'; t.textContent='Remind me'; p.insertBefore(t,first);
+    var days=$('chk-days'), ot=days && days.querySelector('.otd-title'); if(ot) ot.classList.add('chk-dot');
+    var s=document.createElement('div'); s.className='chk-row'; s.id='chk-sound-row';
+    s.innerHTML='<span class="chk-lbl chk-dot">Sound</span><select id="chk-sound" aria-label="Sound for Checks notifications">'+toneOptions()+'</select><button type="button" class="chk-play" id="chk-sound-play" title="Preview" aria-label="Preview">▶</button>';
+    var v=document.createElement('div'); v.className='chk-row chk-vib-only'; v.id='chk-vib-row';
+    v.innerHTML='<span class="chk-lbl chk-dot">Vibrate</span>';
+    v.appendChild(sw('chk-vibrate','Vibrate for Checks notifications',window.ayuVibrate ? window.ayuVibrate.chk() : false,function(x){ if(window.ayuVibrate && window.ayuVibrate.set) window.ayuVibrate.set('chk',x); }));
+    (days||p).after(s); s.after(v);
+    var sel=$('chk-sound'); sel.value=sound(); if(sel.value!==sound()) sel.selectedIndex=0;
+    sel.addEventListener('change',function(){ try{ localStorage.setItem(K_SND,sel.value); }catch(e){} sync(); });
+    $('chk-sound-play').addEventListener('click',function(){ try{ if(typeof playAlertPreset==='function') playAlertPreset(sel.value); }catch(e){} });
+    // Notify Me switch: Vibrate follows it (the user can still change it)
+    var nt=$('routines-master-toggle');
+    if(nt) nt.addEventListener('change',function(){ setTimeout(function(){ var c=$('chk-vibrate'); if(c && window.ayuVibrate) c.checked=window.ayuVibrate.chk(); },30); });
+    p.dataset.chkFields='1'; return true;
+  }
+  function alarm(){
+    var a=$('chk-alarm'), body=$('wake-al-body'); if(!a || !body) return false;
+    if(a.dataset.chkFields) return true;
+    var sp=a.querySelector('.ayu-sub-hdr h3 span'); if(sp) sp.textContent='Wake-up Alarm';
+    var ch=a.querySelector('.ayu-sub-hdr .ayu-chev'); if(ch) ch.setAttribute('aria-label','Open or close Wake-up Alarm');
+    var on=$('wake-al-on'); if(on){ on.title='Turn the wake-up alarm on or off'; on.setAttribute('aria-label','Turn the wake-up alarm on or off'); }
+    var r=document.createElement('div'); r.className='ayu-al-row chk-vib-only'; r.id='wake-al-vib-row';
+    r.innerHTML='<span class="ayu-al-lbl">Vibrate</span>';
+    r.appendChild(sw('wake-al-vib','Vibrate for the wake-up alarm',window.ayuVibrate ? window.ayuVibrate.wake() : true,function(x){ if(window.ayuVibrate) window.ayuVibrate.set('wake',x); sync(); }));
+    body.appendChild(r);
+    if(on) on.addEventListener('change',function(){ if(window.ayuVibrate) window.ayuVibrate.set('wake',on.checked); var c=$('wake-al-vib'); if(c) c.checked=on.checked; sync(); });
+    a.dataset.chkFields='1'; return true;
+  }
+  // the activity notifications play the Notify Me sound (on the website; the phone plays it with the notification)
+  if(typeof window.notifyRoutine==='function' && !window.AYU_ANDROID){
+    var nr=window.notifyRoutine;
+    window.notifyRoutine=function(){ var r=nr.apply(this,arguments); try{ if(r && typeof playAlertPreset==='function') playAlertPreset(sound()); }catch(e){} return r; };
+  }
+  var n=0, iv=setInterval(function(){ var a=notify(), b=alarm(); if((a&&b) || ++n>80) clearInterval(iv); },250);
+})();
+</script>
+<style id="rem-dates-20261107">
+/* Personal Reminders → Frequency: On chosen dates */
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .sched-extra{grid-column:1/-1;margin:2px 0 8px}
+html body #alerts-panel #custom-reminders-card .sched-extra .sched-note{font-size:12.5px;opacity:.75;margin:4px 0 0}
+html body #alerts-panel #custom-reminders-card .sched-extra input[type=date]{padding:8px 10px;border-radius:10px;border:1.5px solid color-mix(in srgb,var(--alert-2,#0d9488) 45%,#fff);font:inherit;background:#fff;color:inherit}
+html body #alerts-panel #custom-reminders-card .sched-extra .sched-date{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+html body #alerts-panel #custom-reminders-card .mday-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:330px}
+html body #alerts-panel #custom-reminders-card .mday-grid button{aspect-ratio:1;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--alert-2,#0d9488) 40%,#fff);background:transparent;color:var(--alert-1,#0f766e);font:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:0}
+html body #alerts-panel #custom-reminders-card .mday-grid button[aria-pressed=true]{background:var(--alert-2,#0d9488);border-color:var(--alert-2,#0d9488);color:#fff}
+html body #alerts-panel #custom-reminders-card .repeat-on[hidden]{display:none !important}
+</style>
+<script id="rem-dates-20261107-js">
+/* Personal Reminders "On chosen dates": is a date one of the reminder's days (same rules as the phone), and its summary line */
+(function(){
+  function last(y,m){ return new Date(y,m+1,0).getDate(); }
+  window.ayuOnDate=function(d,n){
+    var y=n.getFullYear(), m=n.getMonth(), day=n.getDate(), L=last(y,m), s=d.sched||'once';
+    if(s==='weekly') return !Array.isArray(d.days) || !d.days.length || d.days.indexOf(n.getDay())>=0;
+    if(s==='monthly') return (d.mdays||[]).some(function(v){ return Math.min(v,L)===day; });
+    var p=String(d.date||'').split('-').map(Number); if(p.length<3) return false;
+    if(s==='yearly') return p[1]-1===m && Math.min(p[2],L)===day;
+    return p[0]===y && p[1]-1===m && p[2]===day;
+  };
+  var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function dt(s,withYear){ var p=String(s||'').split('-').map(Number); if(p.length<3) return ''; return p[2]+' '+MON[p[1]-1]+(withYear?' '+p[0]:''); }
+  function ord(n){ var s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+  window.ayuDatesText=function(d,R){
+    var at=' at '+(d.times||[]).map(R.formatClock).join(', '), s=d.sched||'once';
+    if(s==='weekly') return 'Weekly'+at+(R.daysLabel ? R.daysLabel(d.days) : '');
+    if(s==='monthly') return 'Monthly on the '+(d.mdays||[]).map(ord).join(', ')+at;
+    if(s==='yearly') return 'Yearly on '+dt(d.date,false)+at;
+    return 'Once on '+dt(d.date,true)+at;
+  };
+})();
+</script>
+<style id="app-desktop-qr-20261107">
+html body #sec-app .app-qr{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:8px 0 12px}
+html body #sec-app .app-qr svg{flex:0 0 auto;border-radius:10px;border:1px solid rgba(0,0,0,.08);background:#fff;padding:6px}
+html body #sec-app .app-qr ol{margin:4px 0 8px 18px;padding:0}
+</style>
+<style id="tab-selected-box-20261107">
+/* Reminders and Vitals icon tabs: a small soft box behind the selected icon */
+html body .ayu-rem-tabs button[aria-selected=true] svg,html body .ayu-vit-tabs button[aria-selected=true] svg{background:color-mix(in srgb,currentColor 14%,transparent);border-radius:12px;padding:6px 12px;box-sizing:content-box}
+</style>
+<style id="speak-20261107">
+/* Speak: Checks → Notify Me, each Health Break, each Personal Reminder (above Vibrate) */
+html body .ayu-speak-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 2px}
+html body .ayu-speak-row .ayu-speak-lbl{font-weight:700;min-width:70px}
+html body .ayu-speak-row select{flex:1 1 150px;min-width:0;max-width:100%}
+html body .ayu-speak-row select:disabled{opacity:.5}
+html body .ayu-speak-row .ayu-speak-play{border:0;background:transparent;font-size:15px;cursor:pointer;padding:4px 8px;color:inherit}
+html body .ayu-speak-row .master-switch{margin-left:auto}
+html body #alerts-panel .ayu-speak-row .ayu-speak-lbl:before{content:'•';color:var(--alert-2);margin-right:6px}
+html body #routines-remind-panel .ayu-speak-row .ayu-speak-lbl:before{content:'•';color:var(--rout-2,#b45309);margin-right:6px;font-weight:800}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-row.ayu-vib-fld{grid-column:1/-1;display:grid;grid-template-columns:92px minmax(0,1fr) auto auto;gap:8px;margin:0}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-row.ayu-vib-fld .master-switch{margin-left:0}
+</style>
+<script id="speak-20261107-js">
+/* Speak: a short version of the reminder read out loud, with a voice of the device (preview ▶).
+   On the website: while AyuBase6 is open. In the Android app: the phone reads it, also with the app closed. */
+(function(){
+  var APP=!!window.AYU_ANDROID, K='ayuBase6-speak';
+  var SHORT={'break':'Time for an eye break. Look 20 feet away for 20 seconds.',walk:'Time for a short walk.',drink:'Time to drink some water.',eyeex:'Time for your eye exercise.'};
+  var CARDS=[['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['eyeex','alert-card-break-ex']];
+  function load(){ try{ var o=JSON.parse(localStorage.getItem(K)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
+  function save(o){ try{ localStorage.setItem(K,JSON.stringify(o)); }catch(e){} try{ document.dispatchEvent(new Event('ayu-alarm-changed')); }catch(e){} }
+  function cfg(k){ var o=load()[k]||{}; return {on:!!o.on, voice:String(o.voice||'')}; }
+  function setCfg(k,c){ var o=load(); o[k]=c; save(o); }
+  function N(){ var n=window.ayuNative; return APP && n && n.tts ? n : null; }
+
+  // ── voices ──
+  var voices=null, waiters=[];
+  function gender(name){ var l=String(name).toLowerCase(); return /\bfemale\b|woman/.test(l)?'Female':/\bmale\b|\bman\b/.test(l)?'Male':''; }
+  function lang(){ return (navigator.language||'en').slice(0,2).toLowerCase(); }
+  function getVoices(cb){
+    if(voices){ cb(voices); return; }
+    waiters.push(cb); if(waiters.length>1) return;
+    function done(list){ voices=list; var w=waiters; waiters=[]; w.forEach(function(f){ f(list); }); }
+    var n=N();
+    if(n){ n.tts.voices().then(function(l){ done(l.map(function(v){ return {id:v.name, lang:v.lang||'', label:(v.label||v.lang||'Voice'), g:v.gender||gender(v.name)}; })); }, function(){ done([]); }); return; }
+    if(!('speechSynthesis' in window)){ done([]); return; }
+    var tries=0;
+    (function poll(){
+      var l=[]; try{ l=speechSynthesis.getVoices()||[]; }catch(e){}
+      if(l.length || ++tries>20){ done(l.map(function(v){ return {id:v.name, lang:v.lang||'', label:v.name, g:gender(v.name)}; })); return; }
+      setTimeout(poll,250);
+    })();
+  }
+  function options(list,cur){
+    var L=lang(), mine=list.filter(function(v){ return v.lang.toLowerCase().slice(0,2)===L; }), use=(mine.length?mine:list);
+    if(use.length>60) use=use.slice(0,60);
+    var seen={}, n=0;
+    return '<option value="">Default voice</option>'+use.map(function(v){
+      var base=v.label+(v.lang && v.label.indexOf(v.lang)<0 && !APP ? '' : ''), tag=v.g ? ' – '+v.g : '';
+      if(APP){ seen[base]=(seen[base]||0)+1; base=base+' · voice '+seen[base]; }
+      return '<option value="'+String(v.id).replace(/"/g,'&quot;')+'"'+(v.id===cur?' selected':'')+'>'+base.replace(/</g,'&lt;')+tag+'</option>';
+    }).join('');
+  }
+  function say(text,voice){
+    var n=N();
+    if(n){ try{ n.tts.say(text,voice); }catch(e){} return; }
+    if(!('speechSynthesis' in window)) return;
+    try{
+      speechSynthesis.cancel();
+      var u=new SpeechSynthesisUtterance(text), v=(speechSynthesis.getVoices()||[]).filter(function(x){ return x.name===voice; })[0];
+      if(v){ u.voice=v; u.lang=v.lang; }
+      setTimeout(function(){ try{ speechSynthesis.speak(u); }catch(e){} },500);
+    }catch(e){}
+  }
+  window.ayuSay=say;
+
+  // ── a Speak row: label, voice, ▶, switch ──
+  function row(id,c,onChange,sample){
+    var r=document.createElement('div'); r.className='ayu-speak-row'; if(id) r.id=id;
+    r.innerHTML='<span class="ayu-speak-lbl">Speak</span><select aria-label="Voice"><option value="">Default voice</option></select>'
+      +'<button type="button" class="ayu-speak-play" title="Preview" aria-label="Preview the voice">▶</button>'
+      +'<label class="master-switch" title="Speak"><input type="checkbox" aria-label="Speak"></label>';
+    var sel=r.querySelector('select'), cb=r.querySelector('input'), pl=r.querySelector('button');
+    cb.checked=!!c.on; sel.disabled=!c.on;
+    getVoices(function(l){ sel.innerHTML=options(l,c.voice); if(!sel.value && c.voice) sel.value=''; });
+    function ch(){ sel.disabled=!cb.checked; onChange({on:cb.checked, voice:sel.value}); }
+    cb.addEventListener('change',ch); sel.addEventListener('change',ch);
+    pl.addEventListener('click',function(e){ e.preventDefault(); say(typeof sample==='function'?sample():sample, sel.value); });
+    return r;
+  }
+
+  function setup(){
+    var ok=true;
+    // Checks → Notify Me (above Vibrate)
+    var vr=document.getElementById('chk-vib-row'), snd=document.getElementById('chk-sound-row');
+    if((vr||snd) && !document.getElementById('chk-speak-row')){
+      var r=row('chk-speak-row',cfg('chk'),function(c){ setCfg('chk',c); },'Drink water. Time for your activity.');
+      if(vr) vr.before(r); else snd.after(r);
+    } else if(!vr && !snd) ok=false;
+    // Health Breaks: each section (above its Vibrate)
+    CARDS.forEach(function(p){
+      var card=document.getElementById(p[1]); if(!card){ ok=false; return; }
+      if(card.querySelector('.ayu-speak-row')) return;
+      var v=card.querySelector('[data-vib-key="'+p[0]+'"]'), s=card.querySelector('.alert-sound-line');
+      if(!v && !s){ ok=false; return; }
+      var r=row('', cfg(p[0]), function(c){ setCfg(p[0],c); }, SHORT[p[0]]);
+      if(v) v.before(r); else s.after(r);
+    });
+    return ok;
+  }
+  // Personal Reminders form: a Speak field above Vibrate
+  new MutationObserver(function(){
+    document.querySelectorAll('#custom-reminders-list .custom-reminder-form').forEach(function(f){
+      if(f.querySelector('.ayu-speak-row')) return;
+      var it=f.closest('.custom-reminder-item'), d={}; try{ d=it ? JSON.parse(it.dataset.reminder||'{}') : {}; }catch(e){}
+      var r=row('', {on:!!d.speak, voice:d.voice||''}, function(){}, function(){ var n=f.elements.name; return (n && n.value.trim()) || 'Your reminder'; });
+      r.querySelector('input').name='speak'; r.querySelector('select').name='voice';
+      r.className='ayu-vib-fld ayu-speak-row'; r.querySelector('.ayu-speak-lbl').className='';   // the form's own field look
+      var v=f.querySelector('.ayu-vib-fld'), snd=f.elements.sound && f.elements.sound.closest('label');
+      if(v) v.before(r); else if(snd) snd.after(r); else f.querySelector('.reminder-form-actions').before(r);
+    });
+  }).observe(document.body,{childList:true,subtree:true});
+
+  // the phone reads them out: add Speak to the rules it gets
+  var va=window.ayuVibrateApply;
+  window.ayuVibrateApply=function(r){
+    r=va ? va.apply(this,arguments) : r; if(!r) return r;
+    (r.reminders||[]).forEach(function(x){ var c=cfg(x.key); if(c.on) x.speak={on:true, voice:c.voice, text:SHORT[x.key]||x.title||''}; });
+    if(r.exercise){ var e=cfg('eyeex'); if(e.on) r.exercise.speak={on:true, voice:e.voice, text:SHORT.eyeex}; }
+    if(r.checks){ var k=cfg('chk'); if(k.on) r.checks.speak={on:true, voice:k.voice}; }
+    (r.custom||[]).forEach(function(x){
+      var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+String(x.id).replace(/"/g,'')+'"]'), d={};
+      try{ d=it ? JSON.parse(it.dataset.reminder||'{}') : {}; }catch(e){}
+      if(d.speak) x.speak={on:true, voice:d.voice||'', text:d.name||''};
+    });
+    return r;
+  };
+  // on the website: read out when the reminder appears (the app's phone does it itself)
+  if(!APP && typeof window.showNudgeNotification==='function'){
+    var sn=window.showNudgeNotification;
+    window.showNudgeNotification=function(title,body,o){
+      var r=sn.apply(this,arguments);
+      try{
+        var key=String((o&&o.key)||''), c=null, text='';
+        if(SHORT[key]){ c=cfg(key); text=SHORT[key]; }
+        else if(/^routine-/.test(key)){ c=cfg('chk'); text=String(title||'').replace(/\s*·\s*ending soon$/,' is ending soon'); }
+        else if(/^custom-/.test(key)){ var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+key.slice(7).replace(/"/g,'')+'"]'), d=it?JSON.parse(it.dataset.reminder||'{}'):{}; c={on:!!d.speak, voice:d.voice||''}; text=d.name||title; }
+        if(c && c.on && text) say(text,c.voice);
+      }catch(e){}
+      return r;
+    };
+  }
+  var n=0, iv=setInterval(function(){ if(setup() || ++n>80) clearInterval(iv); },300);
 })();
 </script>
 </body>
