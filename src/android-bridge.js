@@ -323,7 +323,7 @@
     card = document.createElement('div');
     card.id = 'ayu-blocked-card'; card.className = 'ayu-card'; card.setAttribute('role', 'dialog'); card.setAttribute('aria-label', 'Notifications are off');
     card.innerHTML = '<div class="ayu-ec-text"><b>Notifications are off</b><span>Turn on notifications for AyuBase6 to get your reminders. The app comes back here once they are on.</span></div>'
-      + '<div class="ayu-ec-btns"><button type="button" class="ayu-ec-later">Later</button><button type="button" class="ayu-ec-allow">Open settings</button></div>';
+      + '<button type="button" class="ayu-ec-later ayu-ec-x" aria-label="Close" title="Close">×</button><div class="ayu-ec-btns"><button type="button" class="ayu-ec-allow">Open settings</button></div>';
     card.querySelector('.ayu-ec-allow').onclick = function(){ P.openNotificationSettings().catch(noop); };
     card.querySelector('.ayu-ec-later').onclick = function(){ ls(BLOCK_KEY, String(Date.now())); card.remove(); };
     document.body.appendChild(card);
@@ -342,7 +342,7 @@
     card = document.createElement('div');
     card.id = 'ayu-exact-card'; card.setAttribute('role', 'dialog'); card.setAttribute('aria-label', 'Allow exact reminders');
     card.innerHTML = '<div class="ayu-ec-text"><b>Reminders on time</b><span>Allow “Alarms &amp; reminders” for AyuBase6 so reminders arrive at the exact minute.</span></div>'
-      + '<div class="ayu-ec-btns"><button type="button" class="ayu-ec-later">Later</button><button type="button" class="ayu-ec-allow">Allow</button></div>';
+      + '<button type="button" class="ayu-ec-later ayu-ec-x" aria-label="Close" title="Close">×</button><div class="ayu-ec-btns"><button type="button" class="ayu-ec-allow">Allow</button></div>';
     card.querySelector('.ayu-ec-allow').onclick = function(){ P.openExactAlarmSettings().catch(noop); };
     card.querySelector('.ayu-ec-later').onclick = function(){ ls(CARD_KEY, String(Date.now())); card.remove(); };
     document.body.appendChild(card);
@@ -357,6 +357,9 @@
       + '#ayu-exact-card button,.ayu-card button{border:0;border-radius:10px;padding:8px 16px;font:inherit;font-weight:600;cursor:pointer}'
       + '#ayu-exact-card .ayu-ec-allow,.ayu-card .ayu-ec-allow{background:var(--footer-accent,#0d9488);color:#fff}'
       + '#ayu-exact-card .ayu-ec-later,.ayu-card .ayu-ec-later{background:transparent;color:var(--footer-accent,#0d9488)}'
+      // × at the top right closes a card (the same as "Later" before)
+      + '#ayu-exact-card .ayu-ec-x,.ayu-card .ayu-ec-x{position:absolute;top:4px;right:6px;padding:2px 8px;border-radius:8px;font-size:22px;line-height:1;font-weight:400;color:#5b5847}'
+      + '#ayu-exact-card .ayu-ec-text,.ayu-card .ayu-ec-text{padding-right:26px}'
       + '#ayu-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:2147483001;background:#2d2b23;color:#fff;border-radius:12px;padding:10px 16px;font:inherit;font-size:.86rem;max-width:86vw;box-shadow:0 6px 18px rgba(0,0,0,.25)}'
       // the app is installed already: no install buttons or install tips
       + '#install-app-btn,#routines-install-app-btn,#install-help,#routines-install-help{display:none!important}';
@@ -426,7 +429,7 @@
       var card = document.createElement('div');
       card.id = 'ayu-update-card'; card.className = 'ayu-card'; card.setAttribute('role', 'dialog'); card.setAttribute('aria-label', 'Update available');
       card.innerHTML = '<div class="ayu-ec-text"><b>Update available</b><span>Version ' + String(cfg.versionName || '').replace(/[<>&"]/g, '') + ' of AyuBase6 is ready. Tap Update; your data stays.</span></div>'
-        + '<div class="ayu-ec-btns"><button type="button" class="ayu-ec-later">Cancel</button><button type="button" class="ayu-ec-allow">Update</button></div>';
+        + '<button type="button" class="ayu-ec-later ayu-ec-x" aria-label="Close" title="Close">×</button><div class="ayu-ec-btns"><button type="button" class="ayu-ec-allow">Update</button></div>';
       card.querySelector('.ayu-ec-allow').onclick = function(){
         card.remove(); state.updateStart();
         setTimeout(function(){   // after this tap (the footer closes on taps outside it)
