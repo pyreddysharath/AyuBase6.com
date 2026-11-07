@@ -12873,7 +12873,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     // an open reminder: Save stays grey until something is changed
     const saveBtn=form.querySelector('.save-reminder');
     (()=>{const snd=form.elements.sound&&form.elements.sound.closest('label');if(!snd||form.querySelector('.ayu-vib-fld'))return;const v=document.createElement('div');v.className='ayu-vib-fld ayu-vib-only';v.innerHTML='<span>Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" name="vibrate" aria-label="Vibrate"></label>';const sv=existing?JSON.parse(existing.dataset.reminder||'{}'):{};v.querySelector('input').checked=('vibrate' in sv)?sv.vibrate!==false:(typeof isMasterNotifyOn==='function'&&!!isMasterNotifyOn());snd.after(v)})();
-    const stateNow=()=>JSON.stringify([form.elements.speak?[form.elements.speak.checked,form.elements.speak.checked?form.elements.voice.value:'']:[!!saved.speak,saved.speak?(saved.voice||''):''],mode.value==='dates'?[sched,onDay,mdays.join(',')]:0,String(form.elements.name.value).trim(),mode.value,mode.value==='regular'?duration:0,mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],form.elements.sound.value,[...days].sort((a,b)=>a-b),form.elements.vibrate?form.elements.vibrate.checked:true]);
+    const stateNow=()=>JSON.stringify([form.elements.speak?[form.elements.speak.checked,form.elements.speak.checked?form.elements.voice.value:'',form.elements.speak.checked&&form.elements.speakLang?form.elements.speakLang.value:'']:[!!saved.speak,saved.speak?(saved.voice||''):'',saved.speak?(saved.speakLang||''):''],mode.value==='dates'?[sched,onDay,mdays.join(',')]:0,String(form.elements.name.value).trim(),mode.value,mode.value==='regular'?duration:0,mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],form.elements.sound.value,[...days].sort((a,b)=>a-b),form.elements.vibrate?form.elements.vibrate.checked:true]);
     const stateStart=stateNow();
     const checkDirty=()=>{if(existing)saveBtn.disabled=stateNow()===stateStart};
     ['input','change','click'].forEach(ev=>form.addEventListener(ev,()=>setTimeout(checkDirty,0)));
@@ -12882,7 +12882,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     form.addEventListener('submit',function(e){
       e.preventDefault();const d=new FormData(form);const item=existing||document.createElement('div');if(!existing){item.className='custom-reminder-item';item.dataset.reminderId=String(++customReminderCounter)}
       stopReminderTimers(item);
-      const data={speak:form.elements.speak?form.elements.speak.checked:false,voice:form.elements.voice?form.elements.voice.value:'',name:String(d.get('name')).trim(),mode:mode.value,duration:duration,times:mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],sound:d.get('sound'),days:(mode.value==='dates'&&sched!=='weekly')?[0,1,2,3,4,5,6]:[...days].sort((a,b)=>a-b),vibrate:form.elements.vibrate?form.elements.vibrate.checked:true};
+      const data={speak:form.elements.speak?form.elements.speak.checked:false,voice:form.elements.voice?form.elements.voice.value:'',speakLang:form.elements.speakLang?form.elements.speakLang.value:'',name:String(d.get('name')).trim(),mode:mode.value,duration:duration,times:mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],sound:d.get('sound'),days:(mode.value==='dates'&&sched!=='weekly')?[0,1,2,3,4,5,6]:[...days].sort((a,b)=>a-b),vibrate:form.elements.vibrate?form.elements.vibrate.checked:true};
       if(mode.value==='dates'){data.sched=sched;if(sched==='once'||sched==='yearly')data.date=onDay;if(sched==='monthly')data.mdays=mdays.slice().sort((a,b)=>a-b)}
       item.dataset.reminder=JSON.stringify(data);
       item.classList.remove('open');form.remove();window.ayuRemPaint(item,data);
@@ -18817,7 +18817,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
 (function(){
   var APP=!!window.AYU_ANDROID, K='ayuBase6-speak';
   var SHORT={'break':'Time for an eye break. Look 20 feet away for 20 seconds.',walk:'Time for a short walk.',drink:'Time to drink some water.',eyeex:'Time for your eye exercise.'};
-  // Spoken in the voice's language (Hindi, Telugu, Tamil, Kannada); other languages read the English text
+  // Spoken in the chosen language; only these languages are offered (and only when the device has a voice for them)
   var TR={
     hi:{'break':'आँखों को आराम देने का समय। 20 सेकंड के लिए 20 फ़ुट दूर देखें।',walk:'थोड़ी देर टहलने का समय।',drink:'पानी पीने का समय।',eyeex:'आँखों के व्यायाम का समय।',
         end:'जल्द समाप्त हो रहा है',sample:'आपके रिमाइंडर ऐसे सुनाई देंगे।',
@@ -18830,7 +18830,19 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
         a:{'Walk or Exercise':'நடை அல்லது உடற்பயிற்சி','Sit in the Sun':'வெயிலில் உட்காருங்கள்','Relax Your Eyes':'கண்களுக்கு ஓய்வு கொடுங்கள்','Drink Water':'தண்ணீர் குடியுங்கள்','Bathroom Break':'கழிவறை இடைவேளை','Breakfast':'காலை உணவு','Fruits':'பழங்கள்','Lunch':'மதிய உணவு','Snacks':'சிற்றுண்டி','Dinner':'இரவு உணவு','Screen Break':'திரையிலிருந்து இடைவேளை','Sleep':'தூங்கும் நேரம்'}},
     kn:{'break':'ಕಣ್ಣಿಗೆ ವಿರಾಮದ ಸಮಯ. 20 ಸೆಕೆಂಡುಗಳ ಕಾಲ 20 ಅಡಿ ದೂರ ನೋಡಿ.',walk:'ಸ್ವಲ್ಪ ನಡೆಯುವ ಸಮಯ.',drink:'ನೀರು ಕುಡಿಯುವ ಸಮಯ.',eyeex:'ಕಣ್ಣಿನ ವ್ಯಾಯಾಮದ ಸಮಯ.',
         end:'ಶೀಘ್ರದಲ್ಲೇ ಮುಗಿಯುತ್ತದೆ',sample:'ನಿಮ್ಮ ಜ್ಞಾಪನೆಗಳು ಹೀಗೆ ಕೇಳಿಸುತ್ತವೆ.',
-        a:{'Walk or Exercise':'ನಡಿಗೆ ಅಥವಾ ವ್ಯಾಯಾಮ','Sit in the Sun':'ಬಿಸಿಲಿನಲ್ಲಿ ಕುಳಿತುಕೊಳ್ಳಿ','Relax Your Eyes':'ಕಣ್ಣುಗಳಿಗೆ ವಿಶ್ರಾಂತಿ ನೀಡಿ','Drink Water':'ನೀರು ಕುಡಿಯಿರಿ','Bathroom Break':'ಶೌಚಾಲಯ ವಿರಾಮ','Breakfast':'ಬೆಳಗಿನ ಉಪಾಹಾರ','Fruits':'ಹಣ್ಣುಗಳು','Lunch':'ಮಧ್ಯಾಹ್ನದ ಊಟ','Snacks':'ಲಘು ಉಪಾಹಾರ','Dinner':'ರಾತ್ರಿ ಊಟ','Screen Break':'ಪರದೆಯಿಂದ ವಿರಾಮ','Sleep':'ನಿದ್ರೆಯ ಸಮಯ'}}
+        a:{'Walk or Exercise':'ನಡಿಗೆ ಅಥವಾ ವ್ಯಾಯಾಮ','Sit in the Sun':'ಬಿಸಿಲಿನಲ್ಲಿ ಕುಳಿತುಕೊಳ್ಳಿ','Relax Your Eyes':'ಕಣ್ಣುಗಳಿಗೆ ವಿಶ್ರಾಂತಿ ನೀಡಿ','Drink Water':'ನೀರು ಕುಡಿಯಿರಿ','Bathroom Break':'ಶೌಚಾಲಯ ವಿರಾಮ','Breakfast':'ಬೆಳಗಿನ ಉಪಾಹಾರ','Fruits':'ಹಣ್ಣುಗಳು','Lunch':'ಮಧ್ಯಾಹ್ನದ ಊಟ','Snacks':'ಲಘು ಉಪಾಹಾರ','Dinner':'ರಾತ್ರಿ ಊಟ','Screen Break':'ಪರದೆಯಿಂದ ವಿರಾಮ','Sleep':'ನಿದ್ರೆಯ ಸಮಯ'}},
+    ml:{'break':'കണ്ണുകൾക്ക് വിശ്രമിക്കാനുള്ള സമയം. 20 സെക്കൻഡ് നേരം 20 അടി ദൂരേക്ക് നോക്കുക.',walk:'അൽപനേരം നടക്കാനുള്ള സമയം.',drink:'വെള്ളം കുടിക്കാനുള്ള സമയം.',eyeex:'കണ്ണിന്റെ വ്യായാമത്തിനുള്ള സമയം.',
+        end:'ഉടൻ അവസാനിക്കും',sample:'നിങ്ങളുടെ ഓർമ്മപ്പെടുത്തലുകൾ ഇങ്ങനെ കേൾക്കാം.',
+        a:{'Walk or Exercise':'നടത്തം അല്ലെങ്കിൽ വ്യായാമം','Sit in the Sun':'വെയിലത്ത് ഇരിക്കുക','Relax Your Eyes':'കണ്ണുകൾക്ക് വിശ്രമം നൽകുക','Drink Water':'വെള്ളം കുടിക്കുക','Bathroom Break':'ശുചിമുറി ഇടവേള','Breakfast':'പ്രഭാതഭക്ഷണം','Fruits':'പഴങ്ങൾ','Lunch':'ഉച്ചഭക്ഷണം','Snacks':'ലഘുഭക്ഷണം','Dinner':'അത്താഴം','Screen Break':'സ്ക്രീനിൽ നിന്ന് ഇടവേള','Sleep':'ഉറങ്ങാനുള്ള സമയം'}},
+    mr:{'break':'डोळ्यांना विश्रांती देण्याची वेळ. 20 सेकंद 20 फूट दूर पहा.',walk:'थोडा वेळ चालण्याची वेळ.',drink:'पाणी पिण्याची वेळ.',eyeex:'डोळ्यांच्या व्यायामाची वेळ.',
+        end:'लवकरच संपत आहे',sample:'तुमची स्मरणपत्रे अशी ऐकू येतील.',
+        a:{'Walk or Exercise':'चाला किंवा व्यायाम करा','Sit in the Sun':'उन्हात बसा','Relax Your Eyes':'डोळ्यांना विश्रांती द्या','Drink Water':'पाणी प्या','Bathroom Break':'स्वच्छतागृह विश्रांती','Breakfast':'न्याहारी','Fruits':'फळे','Lunch':'दुपारचे जेवण','Snacks':'अल्पोपहार','Dinner':'रात्रीचे जेवण','Screen Break':'स्क्रीनपासून विश्रांती','Sleep':'झोपण्याची वेळ'}},
+    bn:{'break':'চোখের বিশ্রামের সময়। 20 সেকেন্ড 20 ফুট দূরে তাকান।',walk:'একটু হাঁটার সময়।',drink:'জল খাওয়ার সময়।',eyeex:'চোখের ব্যায়ামের সময়।',
+        end:'শীঘ্রই শেষ হচ্ছে',sample:'আপনার রিমাইন্ডারগুলি এভাবে শোনা যাবে।',
+        a:{'Walk or Exercise':'হাঁটুন বা ব্যায়াম করুন','Sit in the Sun':'রোদে বসুন','Relax Your Eyes':'চোখকে বিশ্রাম দিন','Drink Water':'জল পান করুন','Bathroom Break':'বাথরুম বিরতি','Breakfast':'সকালের জলখাবার','Fruits':'ফল','Lunch':'দুপুরের খাবার','Snacks':'হালকা খাবার','Dinner':'রাতের খাবার','Screen Break':'স্ক্রিন থেকে বিরতি','Sleep':'ঘুমের সময়'}},
+    gu:{'break':'આંખોને આરામ આપવાનો સમય. 20 સેકન્ડ માટે 20 ફૂટ દૂર જુઓ.',walk:'થોડું ચાલવાનો સમય.',drink:'પાણી પીવાનો સમય.',eyeex:'આંખોની કસરતનો સમય.',
+        end:'ટૂંક સમયમાં પૂરું થાય છે',sample:'તમારા રિમાઇન્ડર આ રીતે સંભળાશે.',
+        a:{'Walk or Exercise':'ચાલો અથવા કસરત કરો','Sit in the Sun':'તડકામાં બેસો','Relax Your Eyes':'આંખોને આરામ આપો','Drink Water':'પાણી પીઓ','Bathroom Break':'બાથરૂમ વિરામ','Breakfast':'નાસ્તો','Fruits':'ફળો','Lunch':'બપોરનું ભોજન','Snacks':'હળવો નાસ્તો','Dinner':'રાત્રિ ભોજન','Screen Break':'સ્ક્રીનથી વિરામ','Sleep':'ઊંઘનો સમય'}}
   };
   function L2(lang){ return String(lang||navigator.language||'en').slice(0,2).toLowerCase(); }
   function shortIn(key,lang){ var t=TR[L2(lang)]; return (t && t[key]) || SHORT[key] || ''; }
@@ -18846,67 +18858,112 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   function N(){ var n=window.ayuNative; return APP && n && n.tts ? n : null; }
 
   // ── voices ──
-  var voices=null, waiters=[];
+  var LANGS=[['en','English',''],['hi','Hindi','हिन्दी'],['te','Telugu','తెలుగు'],['ta','Tamil','தமிழ்'],['kn','Kannada','ಕನ್ನಡ'],
+    ['ml','Malayalam','മലയാളം'],['mr','Marathi','मराठी'],['bn','Bengali','বাংলা'],['gu','Gujarati','ગુજરાતી']];
+  var REG={IN:'India',US:'US',GB:'UK',AU:'Australia',CA:'Canada',IE:'Ireland',ZA:'South Africa',NZ:'New Zealand',SG:'Singapore',BD:'Bangladesh',LK:'Sri Lanka',MY:'Malaysia',PH:'Philippines',NG:'Nigeria',KE:'Kenya',PK:'Pakistan'};
+  var voices=null, waiters=[], loading=false, ROWS=[];
   // male / female only where the voice's name says so (and for well-known Indian voice names)
   var KNOWN={heera:'Female',neerja:'Female',swara:'Female',kalpana:'Female',shruti:'Female',pallavi:'Female',ananya:'Female',aashi:'Female',kavya:'Female',
     ravi:'Male',prabhat:'Male',madhur:'Male',hemant:'Male',mohan:'Male',valluvar:'Male',aarav:'Male',kunal:'Male',rehaan:'Male'};
   function gender(name){ var l=String(name).toLowerCase(); if(/\bfemale\b|woman/.test(l)) return 'Female'; if(/\bmale\b|\bman\b/.test(l)) return 'Male';
     var w=l.match(/[a-z]+/g)||[]; for(var i=0;i<w.length;i++) if(KNOWN[w[i]]) return KNOWN[w[i]]; return ''; }
-  function lang(){ return (navigator.language||'en').slice(0,2).toLowerCase(); }
-  function getVoices(cb){
-    if(voices){ cb(voices); return; }
-    waiters.push(cb); if(waiters.length>1) return;
-    function done(list){ voices=list; var w=waiters; waiters=[]; w.forEach(function(f){ f(list); }); }
+  function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+  function readVoices(cb){
     var n=N();
-    if(n){ n.tts.voices().then(function(l){ done(l.map(function(v){ return {id:v.name, lang:v.lang||'', label:(v.label||v.lang||'Voice'), g:v.gender||gender(v.name)}; })); }, function(){ done([]); }); return; }
-    if(!('speechSynthesis' in window)){ done([]); return; }
+    if(n){ n.tts.voices().then(function(l){ cb((l||[]).map(function(v){ return {id:v.name, lang:v.lang||'', name:'', g:v.gender||gender(v.name), net:!!v.net}; })); }, function(){ cb([]); }); return; }
+    if(!('speechSynthesis' in window)){ cb([]); return; }
     var tries=0;
     (function poll(){
       var l=[]; try{ l=speechSynthesis.getVoices()||[]; }catch(e){}
-      if(l.length || ++tries>20){ done(l.map(function(v){ return {id:v.name, lang:v.lang||'', label:v.name, g:gender(v.name)}; })); return; }
+      if(l.length || ++tries>20){ cb(l.map(function(v){ return {id:v.name, lang:v.lang||'', name:v.name, g:gender(v.name), net:v.localService===false}; })); return; }
       setTimeout(poll,250);
     })();
   }
-  function options(list,cur){
-    var L=lang(), mine=list.filter(function(v){ return v.lang.toLowerCase().slice(0,2)===L; }), use=(mine.length?mine:list);
-    if(use.length>60) use=use.slice(0,60);
-    var seen={}, n=0;
-    // Indian voices first (English (India), Hindi, Telugu, Tamil, …), then the rest of the same language
-    var IN=list.filter(function(v){ return /-IN$/i.test(v.lang) || /india|हिन्दी|hindi/i.test(v.label+' '+v.id); });
-    use=IN.concat(use.filter(function(v){ return IN.indexOf(v)<0; }));
-    return '<option value="">Default</option>'+use.map(function(v){
-      var base=v.label+(v.lang && v.label.indexOf(v.lang)<0 && !APP ? '' : ''), tag=v.g ? ' – '+v.g : '';
-      if(APP){ seen[base]=(seen[base]||0)+1; base=base+' · voice '+seen[base]; }
-      return '<option value="'+String(v.id).replace(/"/g,'&quot;')+'" data-lang="'+String(v.lang).replace(/"/g,'')+'"'+(v.id===cur?' selected':'')+'>'+base.replace(/</g,'&lt;')+tag+'</option>';
+  function getVoices(cb){
+    if(voices){ cb(voices); return; }
+    waiters.push(cb); if(loading) return; loading=true;
+    readVoices(function(list){ voices=list; loading=false; var w=waiters; waiters=[]; w.forEach(function(f){ f(list); }); });
+  }
+  // the device's voices changed (a voice was added, or the page came back): fill every Speak field again
+  function reload(){ if(loading) return; readVoices(function(list){ if(JSON.stringify(list)===JSON.stringify(voices)) return; voices=list; ROWS=ROWS.filter(function(f){ return f(); }); }); }
+  try{ if(!APP && 'speechSynthesis' in window) speechSynthesis.addEventListener('voiceschanged',reload); }catch(e){}
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) reload(); });
+  function of(list,l){ return list.filter(function(v){ return L2(v.lang)===l; }).sort(function(a,b){ return (/-IN$/i.test(b.lang)?1:0)-(/-IN$/i.test(a.lang)?1:0) || (a.net?1:0)-(b.net?1:0); }); }
+  function langsOf(list){ return LANGS.filter(function(x){ return of(list,x[0]).length; }); }
+  function pickLang(list,cur){ var have=langsOf(list).map(function(x){ return x[0]; }); if(!have.length) return '';
+    var c=cur?L2(cur):''; if(c && have.indexOf(c)>=0) return c; var d=L2(navigator.language); return have.indexOf(d)>=0 ? d : (have.indexOf('en')>=0 ? 'en' : have[0]); }
+  function langOptions(list,cur){
+    var L=langsOf(list);
+    if(!L.length) return '<option value="">No voices on this device</option>';
+    return L.map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===cur?' selected':'')+'>'+x[1]+(x[2]?' – '+x[2]:'')+'</option>'; }).join('');
+  }
+  function voiceLabel(v,k){
+    var reg=REG[(String(v.lang).split(/[-_]/)[1]||'').toUpperCase()]||String(v.lang).split(/[-_]/)[1]||'';
+    var t=v.name ? v.name.replace(/^(Microsoft|Google|Apple)\s+/i,'').replace(/\s+Online \(Natural\)/i,'') : (reg||'Voice')+' · voice '+k;
+    if(v.g && t.toLowerCase().indexOf(v.g.toLowerCase())<0) t+=' – '+v.g;
+    if(v.net) t+=' (needs internet)';
+    return t;
+  }
+  function voiceOptions(list,l,cur){
+    var seen={};
+    return '<option value="">Default</option>'+of(list,l).map(function(v){
+      var r=String(v.lang).split(/[-_]/)[1]||''; seen[r]=(seen[r]||0)+1;
+      return '<option value="'+esc(v.id)+'"'+(v.id===cur?' selected':'')+'>'+esc(voiceLabel(v,seen[r]))+'</option>';
     }).join('');
   }
-  function say(text,voice){
-    var n=N();
-    if(n){ try{ n.tts.say(text,voice); }catch(e){} return; }
+  // the language tag the phone / browser gets (e.g. te-IN), from the best voice of that language
+  function tagFor(l){ var v=voices ? of(voices,L2(l))[0] : null; return v ? v.lang : (l||''); }
+  function say(text,voice,lang){
+    var n=N(), l=L2(lang||'');
+    if(n){ try{ n.tts.say(text,voice,lang?tagFor(l):''); }catch(e){} return; }
     if(!('speechSynthesis' in window)) return;
     try{
       speechSynthesis.cancel();
-      var u=new SpeechSynthesisUtterance(text), v=(speechSynthesis.getVoices()||[]).filter(function(x){ return x.name===voice; })[0];
-      if(v){ u.lang=v.lang; try{ u.voice=v; }catch(e){} }
+      var all=speechSynthesis.getVoices()||[], u=new SpeechSynthesisUtterance(text),
+          v=all.filter(function(x){ return x.name===voice; })[0];
+      if(!v && lang){ var best=voices ? of(voices,l)[0] : null; v=best ? all.filter(function(x){ return x.name===best.id; })[0] : all.filter(function(x){ return L2(x.lang)===l; })[0]; }
+      if(v){ u.lang=v.lang; try{ u.voice=v; }catch(e){} } else if(lang) u.lang=tagFor(l);
       setTimeout(function(){ try{ speechSynthesis.speak(u); }catch(e){} },500);
     }catch(e){}
   }
   window.ayuSay=say;
 
-  // ── a Speak row: label, voice, ▶, switch ──
-  function row(id,c,onChange,sample){
-    var r=document.createElement('div'); r.className='ayu-speak-row'; if(id) r.id=id;
-    r.innerHTML='<span class="ayu-speak-lbl">Speak</span><select aria-label="Voice"><option value="">Default</option></select>'
+  var INFO='<p>These are the languages this '+(APP?'phone':'device')+' has a voice for, and that AyuBase6 can say: English, Hindi, Telugu, Tamil, Kannada, Malayalam, Marathi, Bengali and Gujarati.</p>'
+    +'<p>To get another one, add its voice in your '+(APP?'phone':'device')+' settings, then '+(APP?'close and reopen the app':'reload this page')+':</p><ul>'
+    +'<li>Android: Settings → Text-to-speech → Preferred engine settings → Install voice data</li>'
+    +(APP?'':'<li>Windows: Settings → Time &amp; language → Speech → Add voices</li><li>iPhone / Mac: Accessibility → Spoken Content → Voices</li>')
+    +'</ul><p>Voices marked “needs internet” speak only when you are online.</p>';
+
+  // ── a Speak field: Speak (i), language, ▶, switch; the i text right below; Voice when the language has more than one ──
+  function row(id,c,onChange,sample,names){
+    var w=document.createElement('div'); w.className='ayu-speak-wrap'; if(id) w.id=id;
+    w.innerHTML='<div class="ayu-speak-row"><span class="ayu-speak-lbl">Speak<button type="button" class="calc-info-btn rout-info-btn ayu-speak-i" title="About Speak" aria-label="About Speak" aria-expanded="false">i</button></span>'
+      +'<select class="ayu-speak-lang" aria-label="Language"></select>'
       +'<button type="button" class="ayu-speak-play alert-icon-btn" title="Preview" aria-label="Preview the voice">▶</button>'
-      +'<label class="master-switch" title="Speak"><input type="checkbox" aria-label="Speak"></label>';
-    var sel=r.querySelector('select'), cb=r.querySelector('input'), pl=r.querySelector('button');
-    cb.checked=!!c.on; sel.disabled=!c.on;
-    getVoices(function(l){ sel.innerHTML=options(l,c.voice); if(!sel.value && c.voice) sel.value=''; });
-    function lng(){ var o=sel.options[sel.selectedIndex]; return (o && o.getAttribute('data-lang')) || ''; }
-    function ch(){ sel.disabled=!cb.checked; onChange({on:cb.checked, voice:sel.value, lang:lng()}); }
-    cb.addEventListener('change',ch); sel.addEventListener('change',ch);
-    pl.addEventListener('click',function(e){ e.preventDefault(); say(typeof sample==='function'?sample(lng()):sample, sel.value); });
-    return r;
+      +'<label class="master-switch" title="Speak"><input type="checkbox" aria-label="Speak"></label></div>'
+      +'<div class="calc-task ayu-al-info ayu-speak-info" hidden>'+INFO+'</div>'
+      +'<div class="ayu-speak-row ayu-speak-vrow" hidden><span class="ayu-speak-lbl">Voice</span><select class="ayu-speak-voice" aria-label="Voice"><option value="">Default</option></select></div>';
+    var ls=w.querySelector('.ayu-speak-lang'), vs=w.querySelector('.ayu-speak-voice'), vr=w.querySelector('.ayu-speak-vrow'),
+        cb=w.querySelector('input'), pl=w.querySelector('.ayu-speak-play'), ib=w.querySelector('.ayu-speak-i'), info=w.querySelector('.ayu-speak-info');
+    if(names){ cb.name=names[0]; ls.name=names[1]; vs.name=names[2]; w.querySelectorAll('.ayu-speak-row').forEach(function(x){ x.classList.add('ayu-vib-fld'); }); }
+    cb.checked=!!c.on;
+    var cur={lang:c.lang, voice:c.voice}, none=false;
+    function paint(){
+      var l=pickLang(voices,cur.lang); none=!l;
+      ls.innerHTML=langOptions(voices,l); vs.innerHTML=voiceOptions(voices,l,cur.voice);
+      if(cur.voice && vs.value!==cur.voice) vs.value='';
+      vr.hidden=!l || of(voices,l).length<2;
+      state();
+    }
+    function state(){ ls.disabled=!cb.checked || none; vs.disabled=!cb.checked; pl.disabled=none; }
+    function ch(){ cur={lang:ls.value, voice:vs.value}; state(); onChange({on:cb.checked, lang:ls.value, voice:vs.value}); }
+    getVoices(function(){ paint(); ROWS.push(function(){ if(!w.isConnected) return false; paint(); return true; }); });
+    cb.addEventListener('change',ch);
+    ls.addEventListener('change',function(){ cur={lang:ls.value, voice:''}; paint(); ch(); });
+    vs.addEventListener('change',ch);
+    ib.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); info.hidden=!info.hidden; ib.setAttribute('aria-expanded',String(!info.hidden)); });
+    pl.addEventListener('click',function(e){ e.preventDefault(); if(none) return; say(typeof sample==='function'?sample(ls.value):sample, vs.value, ls.value); });
+    return w;
   }
 
   function setup(){
@@ -18920,7 +18977,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
     // Health Breaks: each section (above its Vibrate)
     CARDS.forEach(function(p){
       var card=document.getElementById(p[1]); if(!card){ ok=false; return; }
-      if(card.querySelector('.ayu-speak-row')) return;
+      if(card.querySelector('.ayu-speak-wrap')) return;
       var v=card.querySelector('[data-vib-key="'+p[0]+'"]'), s=card.querySelector('.alert-sound-line');
       if(!v && !s){ ok=false; return; }
       var r=row('', cfg(p[0]), function(c){ setCfg(p[0],c); }, function(l){ return shortIn(p[0],l); });
@@ -18931,11 +18988,9 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   // Personal Reminders form: a Speak field above Vibrate
   new MutationObserver(function(){
     document.querySelectorAll('#custom-reminders-list .custom-reminder-form').forEach(function(f){
-      if(f.querySelector('.ayu-speak-row')) return;
+      if(f.querySelector('.ayu-speak-wrap')) return;
       var it=f.closest('.custom-reminder-item'), d={}; try{ d=it ? JSON.parse(it.dataset.reminder||'{}') : {}; }catch(e){}
-      var r=row('', {on:!!d.speak, voice:d.voice||''}, function(){}, function(){ var n=f.elements.name; return (n && n.value.trim()) || 'Your reminder'; });
-      r.querySelector('input').name='speak'; r.querySelector('select').name='voice';
-      r.querySelector('select').addEventListener('change',function(){ var o=this.options[this.selectedIndex]; f.dataset.voiceLang=(o && o.getAttribute('data-lang'))||''; });
+      var r=row('', {on:!!d.speak, voice:d.voice||'', lang:d.speakLang||''}, function(){}, function(){ var n=f.elements.name; return (n && n.value.trim()) || 'Your reminder'; }, ['speak','speakLang','voice']);
       var v=f.querySelector('.ayu-vib-fld'), snd=f.elements.sound && f.elements.sound.closest('label');
       if(v) v.before(r); else if(snd) snd.after(r); else f.querySelector('.reminder-form-actions').before(r);
     });
@@ -18945,13 +19000,13 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   var va=window.ayuVibrateApply;
   window.ayuVibrateApply=function(r){
     r=va ? va.apply(this,arguments) : r; if(!r) return r;
-    (r.reminders||[]).forEach(function(x){ var c=cfg(x.key); if(c.on) x.speak={on:true, voice:c.voice, text:shortIn(x.key,c.lang)||x.title||''}; });
-    if(r.exercise){ var e=cfg('eyeex'); if(e.on) r.exercise.speak={on:true, voice:e.voice, text:shortIn('eyeex',e.lang)}; }
-    if(r.checks){ var k=cfg('chk'); if(k.on){ r.checks.speak={on:true, voice:k.voice}; (r.checks.items||[]).forEach(function(it){ it.say=actIn(it.title,k.lang); it.sayEnd=actIn(it.title+' · ending soon',k.lang); }); } }
+    (r.reminders||[]).forEach(function(x){ var c=cfg(x.key); if(c.on) x.speak={on:true, voice:c.voice, lang:tagFor(c.lang), text:shortIn(x.key,c.lang)||x.title||''}; });
+    if(r.exercise){ var e=cfg('eyeex'); if(e.on) r.exercise.speak={on:true, voice:e.voice, lang:tagFor(e.lang), text:shortIn('eyeex',e.lang)}; }
+    if(r.checks){ var k=cfg('chk'); if(k.on){ r.checks.speak={on:true, voice:k.voice, lang:tagFor(k.lang)}; (r.checks.items||[]).forEach(function(it){ it.say=actIn(it.title,k.lang); it.sayEnd=actIn(it.title+' · ending soon',k.lang); }); } }
     (r.custom||[]).forEach(function(x){
       var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+String(x.id).replace(/"/g,'')+'"]'), d={};
       try{ d=it ? JSON.parse(it.dataset.reminder||'{}') : {}; }catch(e){}
-      if(d.speak) x.speak={on:true, voice:d.voice||'', text:d.name||''};
+      if(d.speak) x.speak={on:true, voice:d.voice||'', lang:d.speakLang?tagFor(d.speakLang):'', text:d.name||''};
     });
     return r;
   };
@@ -18963,10 +19018,10 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
       var c=null, text='';
       if(SHORT[key]){ c=cfg(key); text=shortIn(key,c.lang); }
       else if(/^routine-/.test(key)){ c=cfg('chk'); text=actIn(title,c.lang); }
-      else if(/^custom-/.test(key)){ var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+key.slice(7).replace(/"/g,'')+'"]'), d=it?JSON.parse(it.dataset.reminder||'{}'):{}; c={on:!!d.speak, voice:d.voice||''}; text=d.name||title; }
+      else if(/^custom-/.test(key)){ var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+key.slice(7).replace(/"/g,'')+'"]'), d=it?JSON.parse(it.dataset.reminder||'{}'):{}; c={on:!!d.speak, voice:d.voice||'', lang:d.speakLang||''}; text=d.name||title; }
       if(!c || !c.on || !text) return;
       var now=Date.now(); if(lastSaid[key] && now-lastSaid[key]<4000) return; lastSaid[key]=now;
-      say(text,c.voice);
+      say(text,c.voice,c.lang);
     }catch(e){}
   }
   if(!APP && typeof window.openNudgePopup==='function'){
@@ -19034,6 +19089,37 @@ html body .ayu-appb > .appb-get{margin:8px 0 0 auto}
 </style>
 <style id="speak-play-size-20261107">
 html body .ayu-speak-row .ayu-speak-play.alert-icon-btn:not(#ayu-x1):not(#ayu-x2),html body #routines-remind-panel #chk-sound-play:not(#ayu-x1):not(#ayu-x2){width:30px !important;height:30px !important;min-width:30px !important;min-height:30px !important;max-height:30px !important;flex:0 0 30px !important;padding:0 !important;margin:0 !important;box-sizing:border-box !important;font-size:14.4px !important}
+</style>
+<style id="speak-v3-20261107">
+/* Speak: language + voice, i text right below, drop-downs next to their label */
+html body .ayu-speak-wrap{margin:10px 0 2px}
+html body .ayu-speak-wrap .ayu-speak-row{margin:0}
+html body .ayu-speak-wrap .ayu-speak-vrow{margin-top:8px}
+html body .ayu-speak-wrap .ayu-speak-row .ayu-speak-lbl:not(#ayu-x1){min-width:0;display:inline-flex;align-items:center;gap:6px}
+html body .ayu-speak-wrap .ayu-speak-row select:not(#ayu-x1){flex:0 1 auto;width:auto;max-width:220px}
+html body .ayu-speak-wrap .ayu-speak-vrow .ayu-speak-lbl:before{visibility:hidden}
+html body .ayu-speak-wrap .ayu-speak-i{margin:0;flex:0 0 auto}
+html body .ayu-speak-wrap .ayu-speak-info{margin:8px 0 0;font-size:12.5px;line-height:1.45}
+html body .ayu-speak-wrap .ayu-speak-info p{margin:0 0 6px}
+html body .ayu-speak-wrap .ayu-speak-info ul{margin:0 0 6px;padding-left:18px}
+html body .ayu-speak-wrap .ayu-speak-play:disabled{opacity:.4;cursor:default}
+html body #routines-remind-panel #chk-sound-row .chk-lbl:not(#ayu-x1){min-width:0}
+html body #routines-remind-panel #chk-sound-row select:not(#ayu-x1){flex:0 1 auto;width:auto;max-width:220px}
+html body #routines-remind-panel #chk-sound-row #chk-sound-play{margin-left:0}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap{grid-column:1/-1;margin:0}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-vrow{grid-template-columns:92px minmax(0,1fr);gap:8px}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap select:not(#ayu-x1){max-width:100%}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-lbl:before{content:none}
+html body #alerts-panel .ayu-speak-wrap .ayu-speak-i:not(#ayu-x1){color:var(--alert-2,#0d9488);border-color:currentColor}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-row:not(#ayu-x1){padding-left:0}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-wrap .ayu-speak-lbl:not(#ayu-x1){font-weight:400;font-size:inherit;color:inherit}
+html body .ayu-speak-wrap .ayu-speak-row .ayu-speak-lang:not(#ayu-x1){flex:0 0 auto;max-width:calc(100% - 150px)}
+html body #alerts-panel .alert-card .ayu-speak-wrap .ayu-speak-row:not(#ayu-x1){padding-left:5px}
+html body .ayu-speak-wrap .reminder-custom-select-wrap:not(#ayu-x1){width:auto !important;flex:0 0 auto;max-width:calc(100% - 150px) !important}
+html body .ayu-speak-wrap .ayu-speak-vrow .reminder-custom-select-wrap:not(#ayu-x1){max-width:calc(100% - 70px) !important}
+html body .ayu-speak-wrap .reminder-custom-select-trigger:not(#ayu-x1){white-space:nowrap}
+html body .ayu-speak-wrap .ayu-speak-row .ayu-speak-lbl:not(#ayu-x1){gap:0}
+html body .ayu-speak-wrap .ayu-speak-i:not(#ayu-x1){margin-left:6px}
 </style>
 </body>
 
