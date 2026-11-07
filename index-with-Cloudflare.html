@@ -15726,13 +15726,17 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 
   // The banner turns into a short note in the same place (same colour) for 6 seconds.
   function noteInPlace(html,ms,after){
-    document.querySelectorAll('.ayu-appb').forEach(function(b){
-      b.classList.add('appb-note'); b.innerHTML='<div class="appb-tx">'+html+'</div>';
-    });
-    setTimeout(function(){
+    var done=false;
+    function end(){
+      if(done) return; done=true;
       document.querySelectorAll('.ayu-appb.appb-note').forEach(function(b){ b.classList.add('out'); setTimeout(function(){ b.remove(); },400); });
       if(typeof after==='function') setTimeout(after,400);
-    },ms||10000);
+    }
+    document.querySelectorAll('.ayu-appb').forEach(function(b){
+      b.classList.add('appb-note'); b.innerHTML='<div class="appb-tx">'+html+'</div><button type="button" class="appb-x appb-note-x" aria-label="Close" title="Close">×</button>';
+      b.querySelector('.appb-note-x').addEventListener('click',end);   // × closes it now
+    });
+    setTimeout(end,ms||10000);
   }
   function download(fromBanner){
     if(!cfg) return;
@@ -19514,6 +19518,43 @@ html body #alerts-panel .alert-card .ayu-hb-days .otd-title:not(#ayu-x1):before{
     document.querySelectorAll('#alert-card-break-ex-about li').forEach(function(li){ if(/^3–5 days a week/.test(li.textContent)) li.textContent='3–5 days a week (Mon, Tue, Thu, Fri by default); rest on the other days'; });
   }
   var k2=0, iv2=setInterval(function(){ notes(); if(++k2>20) clearInterval(iv2); },400);
+})();
+</script>
+<style id="banner-x-20261108">
+/* × at the top right of the tips and warnings shown in a section */
+html body .ayu-tipx-host{position:relative;padding-right:34px !important}
+html body .ayu-tipx{position:absolute;top:4px;right:6px;width:26px;height:26px;padding:0;border:0;border-radius:8px;background:transparent;color:inherit;opacity:.75;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+html body .ayu-tipx:hover{opacity:1}
+html body .ayu-tipx-closed:not(#ayu-x1){display:none !important}
+html body .ayu-appb.appb-note .appb-tx:not(#ayu-x1){padding-right:30px}
+</style>
+<script id="banner-x-20261108-js">
+(function(){
+  var SEL='.install-nudge, .notif-blocked-hint';
+  function add(el){
+    if(el.querySelector(':scope > .ayu-tipx')) return;
+    var b=document.createElement('button'); b.type='button'; b.className='ayu-tipx'; b.setAttribute('aria-label','Close'); b.title='Close'; b.textContent='×';
+    b.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); el.classList.add('ayu-tipx-closed'); el.dataset.tipxText=el.textContent.replace(/×$/,''); });
+    el.classList.add('ayu-tipx-host'); el.appendChild(b);
+  }
+  function scan(){ document.querySelectorAll(SEL).forEach(add); }
+  // shown again later (a switch turned on again): it appears again, with its ×
+  new MutationObserver(function(list){
+    var again=false;
+    list.forEach(function(m){
+      var t=m.target;
+      if(m.type==='attributes' && t.matches && t.matches(SEL)){
+        var back=m.attributeName==='hidden' ? (m.oldValue!==null && !t.hidden) : (/display:\s*none/.test(m.oldValue||'') && t.style.display!=='none');
+        if(back) t.classList.remove('ayu-tipx-closed');
+      }
+      if(m.type==='childList'){
+        if(t.matches && t.matches(SEL) && !t.querySelector(':scope > .ayu-tipx')){ if(t.dataset.tipxText!==t.textContent) t.classList.remove('ayu-tipx-closed'); again=true; }   // a new message
+        else if(m.addedNodes.length) again=true;
+      }
+    });
+    if(again) scan();
+  }).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','style'],attributeOldValue:true});
+  scan(); var n=0, iv=setInterval(function(){ scan(); if(++n>20) clearInterval(iv); },500);
 })();
 </script>
 </body>
