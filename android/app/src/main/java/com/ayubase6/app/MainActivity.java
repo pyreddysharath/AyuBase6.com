@@ -21,5 +21,10 @@ public class MainActivity extends BridgeActivity {
             android.webkit.CookieManager.getInstance().setAcceptThirdPartyCookies(wv, true);
             try { com.google.android.gms.ads.MobileAds.registerWebView(wv); } catch (Throwable ignored) {}
         }
+        try { AnnouncementCheck.schedule(this); } catch (Exception ignored) {}
     }
+
+    // Announcements: no notification while the app is in use (the banner shows in the app)
+    @Override public void onResume() { super.onResume(); AnnouncementCheck.appVisible = true; }
+    @Override public void onPause() { AnnouncementCheck.appVisible = false; super.onPause(); }
 }

@@ -477,6 +477,10 @@
       try{ if(typeof switchTab === 'function') switchTab(section); }catch(e){}
       try{ if(typeof nudgeShowSection === 'function') nudgeShowSection(key); }catch(e){}
     }
+    if(section === 'announcements'){   // a new announcement, sent while the app was not in use
+      try{ if(typeof window.showFooterSection === 'function') setTimeout(function(){ window.showFooterSection('announcements'); }, 300); }catch(e){}
+      return;
+    }
     try{ if(key && typeof handleNudgeClick === 'function') handleNudgeClick(key, ''); }catch(e){}
   }
   try{ P.addListener('reminderTap', openTap); }catch(e){}
