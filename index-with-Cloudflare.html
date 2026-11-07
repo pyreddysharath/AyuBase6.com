@@ -19635,9 +19635,7 @@ html body #routines-panel #wake-al-play.ayu-al-play:not(#ayu-x1):not(#ayu-x2){wi
       var m=Math.min(0, Math.round(cur-(want-now))); if(m!==cur) h.style.marginRight=m+'px';
     });
   }
-  window.addEventListener('resize',function(){ setTimeout(fit,50); });
-  document.addEventListener('click',function(){ [60,350,800].forEach(function(t){ setTimeout(fit,t); }); },true);
-  setInterval(fit,1000);   // cheap: a few headers
+  // (done with fixed CSS below, so nothing shifts when a tab opens)
   // skin the Language box like the Sound drop-down next to it
   function skin(){
     document.querySelectorAll('.ayu-speak-wrap').forEach(function(w){
@@ -19653,6 +19651,14 @@ html body #routines-panel #wake-al-play.ayu-al-play:not(#ayu-x1):not(#ayu-x2){wi
   var k=0, iv2=setInterval(function(){ skin(); if(++k>30) clearInterval(iv2); },400);
 })();
 </script>
+<style id="edge-right-css-20261108">
+/* the switch and chevron of each section: 8px from the card's edge (the card's padding differs by screen width) */
+html body #alerts-panel .ayu-rem-group .alert-card:not(#reminder-hours-card) > .alert-card-hdr:not(#ayu-x1),
+html body #routines-panel #chk-alarm > .ayu-sec-hdr:not(#ayu-x1),html body #routines-panel #routines-notify-card > .ayu-sec-hdr:not(#ayu-x1){margin-right:-10px !important}
+@media (max-width:380px){ html body #alerts-panel .ayu-rem-group .alert-card:not(#reminder-hours-card) > .alert-card-hdr:not(#ayu-x1){margin-right:-3px !important} }
+@media (min-width:641px){ html body #alerts-panel .ayu-rem-group .alert-card:not(#reminder-hours-card) > .alert-card-hdr:not(#ayu-x1),
+  html body #routines-panel #chk-alarm > .ayu-sec-hdr:not(#ayu-x1),html body #routines-panel #routines-notify-card > .ayu-sec-hdr:not(#ayu-x1){margin-right:-19px !important} }
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
