@@ -137,6 +137,7 @@ final class ReminderScheduler {
                 boolean ring = d.key.startsWith("alarm-") && AlarmService.config(c, d.key) != null && now - dueAt.getOrDefault(d.key, 0L) <= 2;
                 if (ring && AlarmService.start(c, d.key, d.title, d.body, 0)) continue;
                 show(c, "nudge-" + d.key, d.title, d.body, false, NotificationArt.forSection(d.section), d.section, d.key, actionsFor(d.key), d.vibrate, d.sound);
+                if (!d.say.isEmpty() && NotificationManagerCompat.from(c).areNotificationsEnabled()) Speaker.say(c, d.say, d.voice);
             }
         }
         // "Not yet" reminders that are due now (or missed by less than an hour)

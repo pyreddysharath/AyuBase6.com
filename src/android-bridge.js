@@ -285,6 +285,13 @@
     state.clockGet = function(){ return P.clockGet(); };
     try{ P.addListener('clockChanged', function(){ try{ window.dispatchEvent(new Event('ayu-clock-native')); }catch(e){} }); }catch(e){}
   }
+  // Speak: the phone's own voices and a preview (reminders are read out by the phone, also with the app closed)
+  if(typeof P.ttsVoices === 'function'){
+    state.tts = {
+      voices: function(){ return P.ttsVoices().then(function(r){ return (r && r.voices) || []; }); },
+      say: function(text, voice){ return P.ttsSay({ text:String(text || ''), voice:String(voice || '') }); }
+    };
+  }
   // Backup to the person's Google account (Android key/value backup of one data copy)
   if(typeof P.backupSave === 'function' && typeof P.backupLoad === 'function'){   // only on an app build that has them
     state.backupSave = function(data){ return P.backupSave({ data:String(data) }); };
