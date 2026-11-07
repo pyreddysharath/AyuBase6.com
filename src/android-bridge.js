@@ -365,6 +365,7 @@
     var v = ls(UPD_KEY); if(!v) return false;
     var o = null; try{ o = JSON.parse(v); }catch(e){}
     if(!o || typeof o !== 'object'){ o = { v:String(v), at:Date.now() }; ls(UPD_KEY, JSON.stringify(o)); }   // older "Later": count from now
+    if(o.never) return true;   // Cancel: never again (App Updates in the footer still shows it)
     return String(o.v) === String(code) && Date.now() - (+o.at || 0) < LATER_MS;
   }
   state.updateCheck = function(){
@@ -418,23 +419,26 @@
       var card = document.createElement('div');
       card.id = 'ayu-update-card'; card.className = 'ayu-card'; card.setAttribute('role', 'dialog'); card.setAttribute('aria-label', 'Update available');
       card.innerHTML = '<div class="ayu-ec-text"><b>Update available</b><span>Version ' + String(cfg.versionName || '').replace(/[<>&"]/g, '') + ' of AyuBase6 is ready. Tap Update; your data stays.</span></div>'
-        + '<div class="ayu-ec-btns"><button type="button" class="ayu-ec-later">Later</button><button type="button" class="ayu-ec-allow">Update</button></div>';
+        + '<div class="ayu-ec-btns"><button type="button" class="ayu-ec-later">Cancel</button><button type="button" class="ayu-ec-allow">Update</button></div>';
       card.querySelector('.ayu-ec-allow').onclick = function(){
         card.remove(); state.updateStart();
         setTimeout(function(){   // after this tap (the footer closes on taps outside it)
           try{ if(typeof window.showFooterSection === 'function'){ window.showFooterSection('backup'); if(typeof window.showFooterSub === 'function') window.showFooterSub('backup', 'app'); var sa = document.getElementById('sec-app'); if(sa) sa.scrollIntoView({ block:'center', behavior:'smooth' }); } }catch(e){}
         }, 60);
       };
-      card.querySelector('.ayu-ec-later').onclick = function(){ ls(UPD_KEY, JSON.stringify({ v:String(cfg.versionCode), at:Date.now() })); card.remove(); };
+      card.querySelector('.ayu-ec-later').onclick = function(){
+        ls(UPD_KEY, JSON.stringify({ never:true, at:Date.now() })); card.remove();
+        toast('You can update any time from Backup & Restore → App Updates, in the footer.', 7000);
+      };
       document.body.appendChild(card);
     });
   }
 
   // ── Backup files: the web view cannot download the page's own files, so the phone saves them ──
-  function toast(text){
+  function toast(text, ms){
     var t = document.getElementById('ayu-toast'); if(t) t.remove();
     t = document.createElement('div'); t.id = 'ayu-toast'; t.setAttribute('role', 'status'); t.textContent = text;
-    document.body.appendChild(t); setTimeout(function(){ t.remove(); }, 4500);
+    document.body.appendChild(t); setTimeout(function(){ t.remove(); }, ms || 4500);
   }
   // Any file the page makes for you (the Backup file, the Body / Food / lab PDFs) is saved through the phone.
   function saveDownload(a){
