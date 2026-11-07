@@ -18817,10 +18817,31 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
 (function(){
   var APP=!!window.AYU_ANDROID, K='ayuBase6-speak';
   var SHORT={'break':'Time for an eye break. Look 20 feet away for 20 seconds.',walk:'Time for a short walk.',drink:'Time to drink some water.',eyeex:'Time for your eye exercise.'};
+  // Spoken in the voice's language (Hindi, Telugu, Tamil, Kannada); other languages read the English text
+  var TR={
+    hi:{'break':'आँखों को आराम देने का समय। 20 सेकंड के लिए 20 फ़ुट दूर देखें।',walk:'थोड़ी देर टहलने का समय।',drink:'पानी पीने का समय।',eyeex:'आँखों के व्यायाम का समय।',
+        end:'जल्द समाप्त हो रहा है',sample:'आपके रिमाइंडर ऐसे सुनाई देंगे।',
+        a:{'Walk or Exercise':'टहलें या व्यायाम करें','Sit in the Sun':'धूप में बैठें','Relax Your Eyes':'आँखों को आराम दें','Drink Water':'पानी पिएँ','Bathroom Break':'शौचालय जाने का समय','Breakfast':'नाश्ता','Fruits':'फल','Lunch':'दोपहर का खाना','Snacks':'हल्का नाश्ता','Dinner':'रात का खाना','Screen Break':'स्क्रीन से विराम','Sleep':'सोने का समय'}},
+    te:{'break':'కళ్ళకు విరామం సమయం. 20 సెకన్ల పాటు 20 అడుగుల దూరం చూడండి.',walk:'కొద్దిసేపు నడిచే సమయం.',drink:'నీళ్ళు తాగే సమయం.',eyeex:'కళ్ళ వ్యాయామం సమయం.',
+        end:'త్వరలో ముగుస్తుంది',sample:'మీ రిమైండర్లు ఇలా వినిపిస్తాయి.',
+        a:{'Walk or Exercise':'నడక లేదా వ్యాయామం','Sit in the Sun':'ఎండలో కూర్చోండి','Relax Your Eyes':'కళ్ళకు విశ్రాంతి ఇవ్వండి','Drink Water':'నీళ్ళు తాగండి','Bathroom Break':'బాత్‌రూమ్ విరామం','Breakfast':'అల్పాహారం','Fruits':'పండ్లు','Lunch':'మధ్యాహ్న భోజనం','Snacks':'చిరుతిండి','Dinner':'రాత్రి భోజనం','Screen Break':'స్క్రీన్ నుండి విరామం','Sleep':'నిద్ర సమయం'}},
+    ta:{'break':'கண்களுக்கு ஓய்வு நேரம். 20 விநாடிகள் 20 அடி தூரம் பாருங்கள்.',walk:'சிறிது நடக்கும் நேரம்.',drink:'தண்ணீர் குடிக்கும் நேரம்.',eyeex:'கண் பயிற்சி நேரம்.',
+        end:'விரைவில் முடிகிறது',sample:'உங்கள் நினைவூட்டல்கள் இப்படி ஒலிக்கும்.',
+        a:{'Walk or Exercise':'நடை அல்லது உடற்பயிற்சி','Sit in the Sun':'வெயிலில் உட்காருங்கள்','Relax Your Eyes':'கண்களுக்கு ஓய்வு கொடுங்கள்','Drink Water':'தண்ணீர் குடியுங்கள்','Bathroom Break':'கழிவறை இடைவேளை','Breakfast':'காலை உணவு','Fruits':'பழங்கள்','Lunch':'மதிய உணவு','Snacks':'சிற்றுண்டி','Dinner':'இரவு உணவு','Screen Break':'திரையிலிருந்து இடைவேளை','Sleep':'தூங்கும் நேரம்'}},
+    kn:{'break':'ಕಣ್ಣಿಗೆ ವಿರಾಮದ ಸಮಯ. 20 ಸೆಕೆಂಡುಗಳ ಕಾಲ 20 ಅಡಿ ದೂರ ನೋಡಿ.',walk:'ಸ್ವಲ್ಪ ನಡೆಯುವ ಸಮಯ.',drink:'ನೀರು ಕುಡಿಯುವ ಸಮಯ.',eyeex:'ಕಣ್ಣಿನ ವ್ಯಾಯಾಮದ ಸಮಯ.',
+        end:'ಶೀಘ್ರದಲ್ಲೇ ಮುಗಿಯುತ್ತದೆ',sample:'ನಿಮ್ಮ ಜ್ಞಾಪನೆಗಳು ಹೀಗೆ ಕೇಳಿಸುತ್ತವೆ.',
+        a:{'Walk or Exercise':'ನಡಿಗೆ ಅಥವಾ ವ್ಯಾಯಾಮ','Sit in the Sun':'ಬಿಸಿಲಿನಲ್ಲಿ ಕುಳಿತುಕೊಳ್ಳಿ','Relax Your Eyes':'ಕಣ್ಣುಗಳಿಗೆ ವಿಶ್ರಾಂತಿ ನೀಡಿ','Drink Water':'ನೀರು ಕುಡಿಯಿರಿ','Bathroom Break':'ಶೌಚಾಲಯ ವಿರಾಮ','Breakfast':'ಬೆಳಗಿನ ಉಪಾಹಾರ','Fruits':'ಹಣ್ಣುಗಳು','Lunch':'ಮಧ್ಯಾಹ್ನದ ಊಟ','Snacks':'ಲಘು ಉಪಾಹಾರ','Dinner':'ರಾತ್ರಿ ಊಟ','Screen Break':'ಪರದೆಯಿಂದ ವಿರಾಮ','Sleep':'ನಿದ್ರೆಯ ಸಮಯ'}}
+  };
+  function L2(lang){ return String(lang||navigator.language||'en').slice(0,2).toLowerCase(); }
+  function shortIn(key,lang){ var t=TR[L2(lang)]; return (t && t[key]) || SHORT[key] || ''; }
+  function actIn(title,lang){ var t=TR[L2(lang)], base=String(title||'').replace(/\s*·\s*ending soon$/,''), end=base!==String(title||'');
+    var name=(t && t.a[base]) || base; return end ? name+' '+((t && t.end) || 'is ending soon') : name; }
+  function sampleIn(lang){ var t=TR[L2(lang)]; return (t && t.sample) || 'This is how your reminders will sound.'; }
+  window.ayuSpeakText={ short:shortIn, act:actIn };
   var CARDS=[['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['eyeex','alert-card-break-ex']];
   function load(){ try{ var o=JSON.parse(localStorage.getItem(K)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
   function save(o){ try{ localStorage.setItem(K,JSON.stringify(o)); }catch(e){} try{ document.dispatchEvent(new Event('ayu-alarm-changed')); }catch(e){} }
-  function cfg(k){ var o=load()[k]||{}; return {on:!!o.on, voice:String(o.voice||'')}; }
+  function cfg(k){ var o=load()[k]||{}; return {on:!!o.on, voice:String(o.voice||''), lang:String(o.lang||'')}; }
   function setCfg(k,c){ var o=load(); o[k]=c; save(o); }
   function N(){ var n=window.ayuNative; return APP && n && n.tts ? n : null; }
 
@@ -18856,7 +18877,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
     return '<option value="">Default</option>'+use.map(function(v){
       var base=v.label+(v.lang && v.label.indexOf(v.lang)<0 && !APP ? '' : ''), tag=v.g ? ' – '+v.g : '';
       if(APP){ seen[base]=(seen[base]||0)+1; base=base+' · voice '+seen[base]; }
-      return '<option value="'+String(v.id).replace(/"/g,'&quot;')+'"'+(v.id===cur?' selected':'')+'>'+base.replace(/</g,'&lt;')+tag+'</option>';
+      return '<option value="'+String(v.id).replace(/"/g,'&quot;')+'" data-lang="'+String(v.lang).replace(/"/g,'')+'"'+(v.id===cur?' selected':'')+'>'+base.replace(/</g,'&lt;')+tag+'</option>';
     }).join('');
   }
   function say(text,voice){
@@ -18866,7 +18887,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
     try{
       speechSynthesis.cancel();
       var u=new SpeechSynthesisUtterance(text), v=(speechSynthesis.getVoices()||[]).filter(function(x){ return x.name===voice; })[0];
-      if(v){ u.voice=v; u.lang=v.lang; }
+      if(v){ u.lang=v.lang; try{ u.voice=v; }catch(e){} }
       setTimeout(function(){ try{ speechSynthesis.speak(u); }catch(e){} },500);
     }catch(e){}
   }
@@ -18876,14 +18897,15 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   function row(id,c,onChange,sample){
     var r=document.createElement('div'); r.className='ayu-speak-row'; if(id) r.id=id;
     r.innerHTML='<span class="ayu-speak-lbl">Speak</span><select aria-label="Voice"><option value="">Default</option></select>'
-      +'<button type="button" class="ayu-speak-play" title="Preview" aria-label="Preview the voice">▶</button>'
+      +'<button type="button" class="ayu-speak-play alert-icon-btn" title="Preview" aria-label="Preview the voice">▶</button>'
       +'<label class="master-switch" title="Speak"><input type="checkbox" aria-label="Speak"></label>';
     var sel=r.querySelector('select'), cb=r.querySelector('input'), pl=r.querySelector('button');
     cb.checked=!!c.on; sel.disabled=!c.on;
     getVoices(function(l){ sel.innerHTML=options(l,c.voice); if(!sel.value && c.voice) sel.value=''; });
-    function ch(){ sel.disabled=!cb.checked; onChange({on:cb.checked, voice:sel.value}); }
+    function lng(){ var o=sel.options[sel.selectedIndex]; return (o && o.getAttribute('data-lang')) || ''; }
+    function ch(){ sel.disabled=!cb.checked; onChange({on:cb.checked, voice:sel.value, lang:lng()}); }
     cb.addEventListener('change',ch); sel.addEventListener('change',ch);
-    pl.addEventListener('click',function(e){ e.preventDefault(); say(typeof sample==='function'?sample():sample, sel.value); });
+    pl.addEventListener('click',function(e){ e.preventDefault(); say(typeof sample==='function'?sample(lng()):sample, sel.value); });
     return r;
   }
 
@@ -18892,7 +18914,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
     // Checks → Notify Me (above Vibrate)
     var vr=document.getElementById('chk-vib-row'), snd=document.getElementById('chk-sound-row');
     if((vr||snd) && !document.getElementById('chk-speak-row')){
-      var r=row('chk-speak-row',cfg('chk'),function(c){ setCfg('chk',c); },'Drink water. Time for your activity.');
+      var r=row('chk-speak-row',cfg('chk'),function(c){ setCfg('chk',c); },function(l){ return actIn('Drink Water',l); });
       if(vr) vr.before(r); else snd.after(r);
     } else if(!vr && !snd) ok=false;
     // Health Breaks: each section (above its Vibrate)
@@ -18901,7 +18923,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
       if(card.querySelector('.ayu-speak-row')) return;
       var v=card.querySelector('[data-vib-key="'+p[0]+'"]'), s=card.querySelector('.alert-sound-line');
       if(!v && !s){ ok=false; return; }
-      var r=row('', cfg(p[0]), function(c){ setCfg(p[0],c); }, SHORT[p[0]]);
+      var r=row('', cfg(p[0]), function(c){ setCfg(p[0],c); }, function(l){ return shortIn(p[0],l); });
       if(v) v.before(r); else s.after(r);
     });
     return ok;
@@ -18913,7 +18935,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
       var it=f.closest('.custom-reminder-item'), d={}; try{ d=it ? JSON.parse(it.dataset.reminder||'{}') : {}; }catch(e){}
       var r=row('', {on:!!d.speak, voice:d.voice||''}, function(){}, function(){ var n=f.elements.name; return (n && n.value.trim()) || 'Your reminder'; });
       r.querySelector('input').name='speak'; r.querySelector('select').name='voice';
-      r.className='ayu-vib-fld ayu-speak-row'; r.querySelector('.ayu-speak-lbl').className='';   // the form's own field look
+      r.querySelector('select').addEventListener('change',function(){ var o=this.options[this.selectedIndex]; f.dataset.voiceLang=(o && o.getAttribute('data-lang'))||''; });
       var v=f.querySelector('.ayu-vib-fld'), snd=f.elements.sound && f.elements.sound.closest('label');
       if(v) v.before(r); else if(snd) snd.after(r); else f.querySelector('.reminder-form-actions').before(r);
     });
@@ -18923,9 +18945,9 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   var va=window.ayuVibrateApply;
   window.ayuVibrateApply=function(r){
     r=va ? va.apply(this,arguments) : r; if(!r) return r;
-    (r.reminders||[]).forEach(function(x){ var c=cfg(x.key); if(c.on) x.speak={on:true, voice:c.voice, text:SHORT[x.key]||x.title||''}; });
-    if(r.exercise){ var e=cfg('eyeex'); if(e.on) r.exercise.speak={on:true, voice:e.voice, text:SHORT.eyeex}; }
-    if(r.checks){ var k=cfg('chk'); if(k.on) r.checks.speak={on:true, voice:k.voice}; }
+    (r.reminders||[]).forEach(function(x){ var c=cfg(x.key); if(c.on) x.speak={on:true, voice:c.voice, text:shortIn(x.key,c.lang)||x.title||''}; });
+    if(r.exercise){ var e=cfg('eyeex'); if(e.on) r.exercise.speak={on:true, voice:e.voice, text:shortIn('eyeex',e.lang)}; }
+    if(r.checks){ var k=cfg('chk'); if(k.on){ r.checks.speak={on:true, voice:k.voice}; (r.checks.items||[]).forEach(function(it){ it.say=actIn(it.title,k.lang); it.sayEnd=actIn(it.title+' · ending soon',k.lang); }); } }
     (r.custom||[]).forEach(function(x){
       var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+String(x.id).replace(/"/g,'')+'"]'), d={};
       try{ d=it ? JSON.parse(it.dataset.reminder||'{}') : {}; }catch(e){}
@@ -18933,18 +18955,29 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
     });
     return r;
   };
-  // on the website: read out when the reminder appears (the app's phone does it itself)
+  // on the website: read out when the reminder appears (the app's phone does it itself);
+  // computers show a small window instead of a notification, so that is covered too (once per reminder)
+  var lastSaid={};
+  function sayFor(key,title){
+    try{
+      var c=null, text='';
+      if(SHORT[key]){ c=cfg(key); text=shortIn(key,c.lang); }
+      else if(/^routine-/.test(key)){ c=cfg('chk'); text=actIn(title,c.lang); }
+      else if(/^custom-/.test(key)){ var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+key.slice(7).replace(/"/g,'')+'"]'), d=it?JSON.parse(it.dataset.reminder||'{}'):{}; c={on:!!d.speak, voice:d.voice||''}; text=d.name||title; }
+      if(!c || !c.on || !text) return;
+      var now=Date.now(); if(lastSaid[key] && now-lastSaid[key]<4000) return; lastSaid[key]=now;
+      say(text,c.voice);
+    }catch(e){}
+  }
+  if(!APP && typeof window.openNudgePopup==='function'){
+    var op=window.openNudgePopup;
+    window.openNudgePopup=function(nk,title){ var r=op.apply(this,arguments); if(r) sayFor(String(nk||''),title); return r; };
+  }
   if(!APP && typeof window.showNudgeNotification==='function'){
     var sn=window.showNudgeNotification;
     window.showNudgeNotification=function(title,body,o){
       var r=sn.apply(this,arguments);
-      try{
-        var key=String((o&&o.key)||''), c=null, text='';
-        if(SHORT[key]){ c=cfg(key); text=SHORT[key]; }
-        else if(/^routine-/.test(key)){ c=cfg('chk'); text=String(title||'').replace(/\s*·\s*ending soon$/,' is ending soon'); }
-        else if(/^custom-/.test(key)){ var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+key.slice(7).replace(/"/g,'')+'"]'), d=it?JSON.parse(it.dataset.reminder||'{}'):{}; c={on:!!d.speak, voice:d.voice||''}; text=d.name||title; }
-        if(c && c.on && text) say(text,c.voice);
-      }catch(e){}
+      sayFor(String((o&&o.key)||''),title);
       return r;
     };
   }
@@ -18980,6 +19013,27 @@ html body .ayu-speak-row select{min-width:88px}
 /* Footer → Our Other Sites: the i follows the open section's colour, like the other footer i's */
 html body #sec-othersites .othersites-info-btn.ayu-i:not(#ayu-x1){--ii-c:var(--footer-accent,#2563eb) !important;color:var(--footer-accent,#2563eb) !important;border-color:currentColor !important}
 html body #sec-othersites .othersites-info-btn.ayu-i[aria-expanded=true]:not(#ayu-x1){background:var(--footer-accent,#2563eb) !important;color:#fff !important;border-color:var(--footer-accent,#2563eb) !important}
+</style>
+<style id="speak-look2-20261107">
+/* Checks: "Remind me" like "On these days"; Sound and Speak drop-downs as tall as their text; Speak ▶ like the Reminders Sound ▶ */
+html body #routines-remind-panel > .chk-lbl{font-size:13px;font-weight:700;color:rgb(36,52,72);margin:0 0 6px}
+html body #routines-remind-panel #chk-sound,html body .ayu-speak-row select{min-height:0 !important;height:auto !important;padding:4px 24px 4px 8px !important;line-height:1.3 !important}
+html body #alerts-panel .alert-card .ayu-speak-row select{padding:3px 22px 3px 7px !important}
+html body .ayu-speak-row .ayu-speak-play.alert-icon-btn,html body #routines-remind-panel #chk-sound-play{width:30px;height:30px;flex:0 0 30px;padding:0;border-radius:10px;border:1px solid color-mix(in srgb,currentColor 55%,#fff);background:transparent;font-size:14.4px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+html body #alerts-panel .ayu-speak-row .ayu-speak-play{color:rgb(8,126,117)}
+html body #routines-remind-panel .ayu-speak-row .ayu-speak-play,html body #routines-remind-panel #chk-sound-play{color:var(--rout-2,#b45309)}
+html body #alerts-panel #custom-reminders-card .ayu-speak-row .ayu-speak-play{color:var(--alert-2,#0d9488)}
+/* Our Other Sites: a smaller i */
+html body #sec-othersites .othersites-info-btn.ayu-i:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){width:13px !important;height:13px !important;min-width:13px !important;min-height:13px !important;font-size:9px !important;flex:0 0 13px !important}
+html body #sec-othersites .othersites-info-btn.ayu-i svg{width:12px;height:12px}
+/* "Get the app" banner: Download at the bottom right */
+html body .ayu-appb:not(.appb-note){flex-wrap:wrap;align-items:flex-start;padding-right:14px !important}
+html body .ayu-appb:not(.appb-note) .appb-t{padding-right:28px}
+html body .ayu-appb:not(.appb-note) > .appb-tx{flex:1 1 100%}
+html body .ayu-appb > .appb-get{margin:8px 0 0 auto}
+</style>
+<style id="speak-play-size-20261107">
+html body .ayu-speak-row .ayu-speak-play.alert-icon-btn:not(#ayu-x1):not(#ayu-x2),html body #routines-remind-panel #chk-sound-play:not(#ayu-x1):not(#ayu-x2){width:30px !important;height:30px !important;min-width:30px !important;min-height:30px !important;max-height:30px !important;flex:0 0 30px !important;padding:0 !important;margin:0 !important;box-sizing:border-box !important;font-size:14.4px !important}
 </style>
 </body>
 
