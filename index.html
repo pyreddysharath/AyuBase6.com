@@ -16282,6 +16282,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
       setOpen(nc,'notify',openGet('notify',on),false);
     }
     if(notifyLastOn===false && on) setOpen(nc,'notify',true,true);   // switched on: open it
+    if(notifyLastOn===true && !on) setOpen(nc,'notify',false,true);  // switched off: close it
     notifyLastOn=on;
   }
 
@@ -16488,7 +16489,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     setOpen(sec,ok,openGet(ok,!!c.on),false);
     clickToOpen(sec,ok,sec&&sec.firstElementChild);
     sec.querySelector('.ayu-chev').addEventListener('click',function(e){ e.stopPropagation(); setOpen(sec,ok,sec.classList.contains('collapsed')||sec.classList.contains('ayu-closed'),true); });
-    on.addEventListener('change',function(){ var c=get(id); c.on=on.checked; if(id!=='wake') c.vibrate=c.on; put(id,c); if(c.on) setOpen(sec,ok,true,true); });
+    on.addEventListener('change',function(){ var c=get(id); c.on=on.checked; if(id!=='wake') c.vibrate=c.on; put(id,c); if(c.on) setOpen(sec,ok,true,true); else if(id==='wake') setOpen(sec,ok,false,true); });
     var ib=$(p+'-ibtn'); if(ib) ib.addEventListener('click',function(e){ e.stopPropagation(); var i=$(p+'-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); });   // only the text: the section stays as it is
     sel.value=c.tone; if(sel.value!==c.tone) sel.value='rise';
     var prev=sel.value;
@@ -17564,7 +17565,7 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
   function masterOn(){ try{ return typeof isMasterNotifyOn==='function' && !!isMasterNotifyOn(); }catch(e){ return false; } }
   // not set yet: Vibrate follows the section's own switch (off until that is on), like Checks follows Notify Me
   function wakeOn(){ var t=document.getElementById('wake-al-on'); return !!(t && t.checked); }
-  function on(k){ var o=load(); if(!(k in o)) return k==='chk' ? notifyOn() : k==='wake' ? wakeOn() : (MAIN[k] ? mainOn(k) : false); return o[k]!==false; }
+  function on(k){ var o=load(); if(!(k in o)) return (k==='chk' || k==='wake') ? false : (MAIN[k] ? mainOn(k) : false); return o[k]!==false; }   // Checks: Vibrate is off until it is turned on
   function set(k,v){ var o=load(); o[k]=!!v; save(o); }
   function customOn(id){ var it=document.querySelector('#custom-reminders-list .custom-reminder-item[data-reminder-id="'+String(id).replace(/"/g,'')+'"]'); if(!it) return masterOn(); try{ var d=JSON.parse(it.dataset.reminder||'{}'); return ('vibrate' in d) ? d.vibrate!==false : masterOn(); }catch(e){ return masterOn(); } }
   // key of a notification: "break" "walk" "drink" "eyeex", "routine-…", "custom-<id>"
@@ -17605,7 +17606,7 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
       var sw0=c.querySelector('.master-switch'); sw0.classList.add('rout-master-switch');
       // follows Notify Me: turning it on turns Vibrate on, turning it off turns Vibrate off
       var nt=document.getElementById('routines-master-toggle'), vt=c.querySelector('input');
-      if(nt && !nt._ayuVib){ nt._ayuVib=1; nt.addEventListener('change',function(){ setTimeout(function(){ set('chk',nt.checked); if(vt) vt.checked=nt.checked; },0); }); }
+      if(nt && !nt._ayuVib){ nt._ayuVib=1; nt.addEventListener('change',function(){ setTimeout(function(){ if(nt.checked) return; set('chk',false); if(vt) vt.checked=false; },0); }); }
       nm.after(c);
       // Notify Me is moved into My Day Plan by another script: Vibrate follows it
       var keep=function(){ var v=document.getElementById('routines-vibrate-card'); if(v && nm.nextElementSibling!==v) nm.after(v); };
@@ -18743,7 +18744,7 @@ html:not(.ayu-can-vib) .chk-vib-only{display:none !important}
     r.innerHTML='<span class="ayu-al-lbl">Vibrate</span>';
     r.appendChild(sw('wake-al-vib','Vibrate for the wake-up alarm',window.ayuVibrate ? window.ayuVibrate.wake() : true,function(x){ if(window.ayuVibrate) window.ayuVibrate.set('wake',x); sync(); }));
     body.appendChild(r);
-    if(on) on.addEventListener('change',function(){ if(window.ayuVibrate) window.ayuVibrate.set('wake',on.checked); var c=$('wake-al-vib'); if(c) c.checked=on.checked; sync(); });
+    if(on) on.addEventListener('change',function(){ if(on.checked) return; if(window.ayuVibrate) window.ayuVibrate.set('wake',false); var c=$('wake-al-vib'); if(c) c.checked=false; sync(); });   // off: Vibrate off too
     a.dataset.chkFields='1'; return true;
   }
   // the activity notifications play the Notify Me sound (on the website; the phone plays it with the notification)
@@ -19153,6 +19154,34 @@ html body .ayu-speak-wrap .ayu-speak-vrow .reminder-custom-select-trigger:not(#a
 html body .ayu-speak-wrap .ayu-speak-vrow .ayu-speak-play:not(#ayu-x1){margin-left:auto}
 html body #alerts-panel .ayu-speak-wrap .ayu-speak-i:not(#ayu-x1):not(#ayu-x2){color:rgb(15,118,110);border-color:rgb(13,148,136);background:rgba(255,255,255,.75)}
 </style>
+<style id="checks-off-20261108">
+/* Checks: a section's chevron is grey while its switch is off; Read aloud and Vibrate switches in the section colour */
+html body #routines-panel .ayu-sec-off .ayu-chev:not(#ayu-x1){color:#94a3b8}
+html body #routines-panel #chk-speak-row .master-switch input:checked:not(#ayu-x1):not(#ayu-x2),html body #routines-panel #chk-vibrate:checked:not(#ayu-x1):not(#ayu-x2){background-color:rgb(167,91,18) !important;border-color:rgb(167,91,18) !important}
+</style>
+<script id="checks-off-20261108-js">
+(function(){
+  function $(i){ return document.getElementById(i); }
+  // Wake-up Alarm and Notify Me: grey chevron while off; Notify Me off also turns Read aloud off
+  function paint(){
+    [['wake-al-on','chk-alarm'],['routines-master-toggle','routines-notify-card']].forEach(function(p){
+      var t=$(p[0]), s=$(p[1]); if(t && s) s.classList.toggle('ayu-sec-off',!t.checked);
+    });
+  }
+  function speakOff(){
+    try{ var o=JSON.parse(localStorage.getItem('ayuBase6-speak')||'{}'); if(!o.chk || !o.chk.on) return; o.chk.on=false; localStorage.setItem('ayuBase6-speak',JSON.stringify(o)); document.dispatchEvent(new Event('ayu-alarm-changed'));
+      var w=$('chk-speak-row'); if(w && w._set) w._set(o.chk); }catch(e){}
+  }
+  document.addEventListener('change',function(e){
+    var id=e.target && e.target.id; if(id!=='wake-al-on' && id!=='routines-master-toggle') return;
+    setTimeout(function(){ paint(); if(id==='routines-master-toggle' && !e.target.checked) speakOff(); },0);
+  },true);
+  var n=0, iv=setInterval(function(){ paint(); if(++n>40) clearInterval(iv); },250);
+  // Health Breaks i: its text opens right below the title
+  function hbInfo(){ var p=$('reminder-hours-info'), h=document.querySelector('#reminder-hours-card > .alert-card-hdr'); if(p && h && h.nextElementSibling!==p) h.after(p); }
+  document.addEventListener('click',function(e){ if(e.target.closest && e.target.closest('#reminder-hours-info-btn')){ hbInfo(); setTimeout(hbInfo,0); } },true);
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
