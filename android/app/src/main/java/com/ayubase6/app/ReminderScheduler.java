@@ -136,7 +136,7 @@ final class ReminderScheduler {
                 // Checks → Alarm rings (only if it is due now, not hours late); everything else is a notification
                 boolean ring = d.key.startsWith("alarm-") && AlarmService.config(c, d.key) != null && now - dueAt.getOrDefault(d.key, 0L) <= 2;
                 if (ring && AlarmService.start(c, d.key, d.title, d.body, 0)) continue;
-                show(c, "nudge-" + d.key, d.title, d.body, false, NotificationArt.forSection(d.section), d.section, d.key, actionsFor(d.key), d.vibrate);
+                show(c, "nudge-" + d.key, d.title, d.body, false, NotificationArt.forSection(d.section), d.section, d.key, actionsFor(d.key), d.vibrate, d.sound);
             }
         }
         // "Not yet" reminders that are due now (or missed by less than an hour)
@@ -219,6 +219,27 @@ final class ReminderScheduler {
     }
 
     static void show(Context c, String tag, String title, String body, boolean silent, NotificationArt.Theme theme, String section, String tapKey, String[] actions, boolean vibrate) {
+        show(c, tag, title, body, silent, theme, section, tapKey, actions, vibrate, "");
+    }
+
+    /** A channel per app tone (Android keeps the sound per channel), with and without vibration. */
+    static String toneChannel(Context c, String tone, boolean vibrate) {
+        String id = "tone_" + tone + (vibrate ? "" : "_nv");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id;
+        NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (nm == null || nm.getNotificationChannel(id) != null) return id;
+        NotificationChannel ch = new NotificationChannel(id, "Checks · " + tone + (vibrate ? "" : " (no vibration)"), NotificationManager.IMPORTANCE_HIGH);
+        ch.setDescription("Checks notifications with this sound");
+        ch.setSound(AlarmService.rawTone(c, tone), new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
+        ch.enableVibration(vibrate);
+        ch.setVibrationPattern(vibrate ? new long[]{0, 200, 100, 200, 100, 200} : new long[]{0});
+        ch.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        nm.createNotificationChannel(ch);
+        return id;
+    }
+
+    static void show(Context c, String tag, String title, String body, boolean silent, NotificationArt.Theme theme, String section, String tapKey, String[] actions, boolean vibrate, String sound) {
         ensureChannels(c);
         NotificationManagerCompat nm = NotificationManagerCompat.from(c);
         if (!nm.areNotificationsEnabled()) return;
@@ -228,7 +249,8 @@ final class ReminderScheduler {
             .putExtra(EXTRA_SECTION, section == null ? "" : section);
         PendingIntent pi = PendingIntent.getActivity(c, idFor(tag), open, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         // Vibrate switch off: the same sound, without vibration (Android 8+ keeps vibration per channel)
-        NotificationCompat.Builder b = new NotificationCompat.Builder(c, silent ? CHANNEL_UPDATES : (vibrate ? CHANNEL_REMINDERS : CHANNEL_REMINDERS_QUIET))
+        String channel = silent ? CHANNEL_UPDATES : (sound != null && !sound.isEmpty()) ? toneChannel(c, sound, vibrate) : (vibrate ? CHANNEL_REMINDERS : CHANNEL_REMINDERS_QUIET);
+        NotificationCompat.Builder b = new NotificationCompat.Builder(c, channel)
             .setSmallIcon(R.drawable.ic_stat_lotus)
             .setContentTitle(title)
             .setContentText(body)

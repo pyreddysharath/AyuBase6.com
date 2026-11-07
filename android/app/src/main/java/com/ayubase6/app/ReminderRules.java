@@ -22,7 +22,11 @@ final class ReminderRules {
         Due(String key, String title, String body, String section) {
             this.key = key; this.title = title; this.body = body; this.section = section;
         }
-        Due vib(JSONObject o) { if (o != null) vibrate = o.optBoolean("vibrate", true); return this; }
+        String sound = "";        // a tone of the app (Checks → Notify Me → Sound); empty = the phone's notification sound
+        Due vib(JSONObject o) {
+            if (o != null) { vibrate = o.optBoolean("vibrate", true); String t = o.optString("sound", ""); sound = t.matches("^[a-z]{1,12}$") ? t : ""; }
+            return this;
+        }
     }
 
     /** Local time of one minute: day as yyyy-mm-dd, minute of the day, day of week (0 = Sunday). */
