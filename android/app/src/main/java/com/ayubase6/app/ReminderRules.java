@@ -151,6 +151,8 @@ final class ReminderRules {
                 long anchorMin = (long) Math.floor((anchor == null ? 0 : anchor) / 60000d);
                 long ev = every == null ? 0 : (long) Math.floor(every);
                 isDue = ev > 0 && epochMin > anchorMin && (epochMin - anchorMin) % ev == 0;
+            } else if ("dates".equals(c.optString("mode"))) {
+                isDue = hasInt(c.optJSONArray("times"), m) && onDate(c, local.day);
             } else {
                 isDue = hasInt(c.optJSONArray("times"), m);
             }
@@ -158,5 +160,31 @@ final class ReminderRules {
                 str(c.opt("name"), 80), "It is time for your reminder.", "alerts").vib(c));
         }
         return out;
+    }
+
+    /** Personal Reminders "On chosen dates": once (date), weekly (its days), monthly (days of the month), yearly (date).
+     *  A day the month does not have (31, or 29 Feb) is the month's last day. day is "yyyy-MM-dd". */
+    static boolean onDate(JSONObject c, String day) {
+        int y, mo, d;
+        try { y = Integer.parseInt(day.substring(0, 4)); mo = Integer.parseInt(day.substring(5, 7)); d = Integer.parseInt(day.substring(8, 10)); }
+        catch (Exception e) { return false; }
+        int last = java.time.YearMonth.of(y, mo).lengthOfMonth();
+        String sched = c.optString("sched", "once");
+        switch (sched) {
+            case "weekly": return true;   // the days are checked with "days"
+            case "monthly": {
+                JSONArray md = c.optJSONArray("mdays");
+                if (md == null) return false;
+                for (int i = 0; i < md.length(); i++) { int v = md.optInt(i, 0); if (v >= 1 && v <= 31 && Math.min(v, last) == d) return true; }
+                return false;
+            }
+            case "yearly": {
+                String dt = c.optString("date", "");
+                if (dt.length() < 10) return false;
+                try { int m2 = Integer.parseInt(dt.substring(5, 7)), d2 = Integer.parseInt(dt.substring(8, 10));
+                      return m2 == mo && Math.min(d2, last) == d; } catch (Exception e) { return false; }
+            }
+            default: return day.equals(c.optString("date", ""));   // once
+        }
     }
 }
