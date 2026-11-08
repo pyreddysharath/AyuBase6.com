@@ -19577,7 +19577,7 @@ html body #routines-panel #routines-remind-panel #chk-vib-row:not(#ayu-x1){borde
         open:!s.classList.contains('ayu-closed'), on:!!($(p[1])||{}).checked, chev:s.querySelector(':scope > .ayu-sec-hdr .ayu-chev') }; }).filter(Boolean); } }
   };
   function paint(k){
-    var g=GROUPS[k], b=g.btn; if(!b) return;
+    var g=GROUPS[k], b=g.btn; if(!b || Date.now()<(g.hold||0)) return;   // just clicked: the sections are still opening / closing
     var L=g.list(), anyOpen=L.some(function(x){ return x.open; }), anyOn=L.some(function(x){ return x.on; });
     var act=anyOpen ? 'collapse' : 'expand';
     b.dataset.act=act; b.disabled=!anyOpen && !anyOn;
@@ -19586,7 +19586,10 @@ html body #routines-panel #routines-remind-panel #chk-vib-row:not(#ayu-x1){borde
   function run(k){
     var g=GROUPS[k], L=g.list(), anyOpen=L.some(function(x){ return x.open; });
     L.forEach(function(x){ if(!x.chev) return; if(anyOpen ? x.open : (x.on && !x.open)) x.chev.click(); });
-    [80,400].forEach(function(t){ setTimeout(function(){ paint(k); },t); });
+    // the icon turns over at once (the sections take a moment)
+    var b=g.btn, act=anyOpen ? 'expand' : 'collapse', t=act==='collapse' ? 'Collapse all' : 'Expand the sections that are on';
+    b.dataset.act=act; b.disabled=false; b.title=t; b.setAttribute('aria-label',t);
+    g.hold=Date.now()+900; setTimeout(function(){ g.hold=0; paint(k); },950);
   }
   function setup(){
     var done=true;
