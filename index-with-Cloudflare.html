@@ -18918,7 +18918,7 @@ html:not(.ayu-can-vib) .chk-vib-only{display:none !important}
   }
   function toneOptions(){
     var seen={}, out='';
-    document.querySelectorAll('.alert-sound-select option').forEach(function(o){ if(!o.value || o.value==='none' || seen[o.value]) return; seen[o.value]=1; out+='<option value="'+o.value+'">'+o.textContent+'</option>'; });
+    document.querySelectorAll('select.alert-sound-select[id$="-sound"] option').forEach(function(o){ if(!o.value || o.value==='none' || seen[o.value]) return; seen[o.value]=1; out+='<option value="'+o.value+'">'+o.textContent+'</option>'; });
     return out || '<option value="chime">Chime</option>';
   }
   function notify(){
@@ -19663,6 +19663,29 @@ html body #routines-panel #chk-alarm > .ayu-sec-hdr:not(#ayu-x1),html body #rout
 @media (min-width:641px){ html body #alerts-panel .ayu-rem-group .alert-card:not(#reminder-hours-card) > .alert-card-hdr:not(#ayu-x1),
   html body #routines-panel #chk-alarm > .ayu-sec-hdr:not(#ayu-x1),html body #routines-panel #routines-notify-card > .ayu-sec-hdr:not(#ayu-x1){margin-right:-19px !important} }
 </style>
+<script id="sound-sort-20261108-js">
+(function(){
+  // every Sound drop-down: its sounds in alphabetical order ("Silent" and "Upload a sound…" stay last)
+  var SEL='select[id$="-sound"]:not(#eye-ex-count):not(#eye-ex-days), select[id$="-tone"], select[name="sound"], #chk-sound';
+  function last(o){ return /^(none|silent|upload)$/i.test(o.value) || /^(silent|upload a sound)/i.test(o.textContent.trim()); }
+  function key(o){ return o.textContent.trim().toLowerCase(); }
+  function sortIn(parent){
+    var os=[].filter.call(parent.children,function(c){ return c.tagName==='OPTION'; }); if(os.length<2) return false;
+    var want=os.slice().sort(function(a,b){ var la=last(a), lb=last(b); if(la!==lb) return la?1:-1; return key(a).localeCompare(key(b),undefined,{numeric:true}); });
+    if(want.every(function(o,i){ return o===os[i]; })) return false;
+    var at=os[os.length-1].nextSibling; want.forEach(function(o){ parent.insertBefore(o,at); }); return true;
+  }
+  function sortSel(s){
+    var v=s.value, ch=sortIn(s);
+    [].forEach.call(s.querySelectorAll('optgroup'),function(g){ if(sortIn(g)) ch=true; });
+    if(ch){ s.value=v; try{ s.dispatchEvent(new CustomEvent('ayu-options-sorted')); }catch(e){} }
+  }
+  function all(){ document.querySelectorAll(SEL).forEach(sortSel); }
+  var busy=false;
+  new MutationObserver(function(){ if(busy) return; busy=true; setTimeout(function(){ all(); busy=false; },60); }).observe(document.body,{subtree:true,childList:true});
+  all(); document.addEventListener('DOMContentLoaded',all); window.addEventListener('load',all);
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
