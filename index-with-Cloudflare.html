@@ -19814,6 +19814,64 @@ html body #routines-panel #routines-remind-panel #chk-vib-row:not(#ayu-x1){borde
   var n=0, iv=setInterval(function(){ if(setup() || ++n>40) clearInterval(iv); },300);
 })();
 </script>
+<style id="notif-why-20261108">
+/* the dots say why: Settings → Notifications lists what is on; Help's dot also marks Troubleshooting and its Notifications section */
+html body #sec-help .footer-subtab:not(#ayu-x1){overflow:visible}
+html body #sec-help .footer-subtab .fs-dot:not(#ayu-x1){top:-2px;right:-2px}
+html body #sec-trouble details.app-part > summary .app-part-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--footer-accent,#0d9488);box-shadow:0 0 0 1.5px #fff;margin-left:-2px;vertical-align:super;flex:0 0 auto}
+html body .ayu-why{margin:6px 0 10px;padding:8px 10px;border-radius:10px;font-size:.84rem;line-height:1.45;background:color-mix(in srgb,var(--footer-accent,#0d9488) 10%,#fff);border-left:3px solid var(--footer-accent,#0d9488)}
+html body .ayu-why[hidden]{display:none}
+</style>
+<script id="notif-why-20261108-js">
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function J(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } }
+  function clock(m){ m=+m||0; var h=Math.floor(m/60)%24, mm=m%60, ap=h<12?'AM':'PM', h12=h%12||12; return h12+':'+(mm<10?'0':'')+mm+' '+ap; }
+  // what is on that sends notifications (same things as the dots count)
+  function what(){
+    var out=[];
+    [['break','Eyes'],['walk','Walk'],['drink','Water'],['eyeex','Eyes (Exercise)']].forEach(function(x){ var e=$(x[0]==='eyeex'?'eye-ex-notify':'alert-'+x[0]+'-notify'); if(e && e.checked) out.push(x[1]); });
+    try{ if(typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()) out.push('Checks Notify Me'); }catch(e){}
+    var w=J('ayuBase6-routine-alarm'); if(w && w.on) out.push('Wake-up Alarm');
+    var l=J('ayuBase6-rem-alarms'); if(!Array.isArray(l)){ var o=J('ayuBase6-rem-alarm'); l=(o && typeof o==='object')?[o]:[]; }
+    l.forEach(function(a){ if(a && a.on) out.push('Alarm '+(a.name ? '"'+a.name+'"' : clock(a.at>=0 && a.at<1440 ? a.at : 420))); });
+    var n=[].filter.call(document.querySelectorAll('#custom-reminders-list .custom-reminder-item'),function(it){ try{ var d=JSON.parse(it.dataset.reminder||'{}'); return d.enabled!==false && d.on!==false; }catch(e){ return false; } }).length;
+    if(n) out.push(n+' Personal Reminder'+(n>1?'s':''));
+    return out;
+  }
+  window.ayuNotifWhat=what;
+  function box(parent,before,id){ var b=$(id); if(!b && parent){ b=document.createElement('p'); b.id=id; b.className='ayu-why'; b.hidden=true; parent.insertBefore(b,before||parent.firstChild); } return b; }
+  function paint(){
+    var list=what(), txt=list.join(' · ');
+    // Settings → Notifications: what is on
+    var sec=$('sec-notifications');
+    if(sec){ var t=sec.querySelector('.footer-sec-title'); var b=box(sec,t?t.nextSibling:null,'ayu-why-set'); if(b){ b.hidden=!list.length; if(list.length) b.innerHTML='<b>On:</b> '+txt; } }
+    // Help: the dot also on Troubleshooting and on its Notifications section, with the reason
+    var prob=!!($('tab-help') && $('tab-help').classList.contains('has-prob'));
+    var tb=$('subtab-trouble'); if(tb){ var d=tb.querySelector('.fs-dot'); if(!d){ d=document.createElement('i'); d.className='fs-dot'; tb.appendChild(d); } d.classList.toggle('on',prob); }
+    var hn=$('hlp-notifications');
+    if(hn){
+      var s=hn.querySelector('summary'), pd=s && s.querySelector('.app-part-dot');
+      if(prob && !hn._ayuOpened){ hn._ayuOpened=1; hn.open=true; }   // open the test once, as the Help dot asks
+      if(prob && s && !pd){ pd=document.createElement('i'); pd.className='app-part-dot'; pd.setAttribute('aria-hidden','true'); s.appendChild(pd); }
+      if(!prob && pd) pd.remove();
+      var body=hn.querySelector('.app-part-b'), r=box(body,body?body.firstChild:null,'ayu-why-help');
+      if(r){ r.hidden=!prob; if(prob){
+        var denied=(typeof Notification!=='undefined' && Notification.permission==='denied');
+        r.innerHTML=(denied ? (window.AYU_ANDROID ? 'Notifications are blocked in the phone settings' : 'Notifications are blocked by the browser') : 'Notifications are not reaching this phone')+(list.length ? ', while these are on: <b>'+txt+'</b>.' : '.');
+      } }
+    }
+  }
+  window.ayuNotifWhy=paint;
+  function soon(){ [100,1400].forEach(function(t){ setTimeout(function(){ try{ paint(); }catch(e){} },t); }); }
+  document.addEventListener('change',soon,true);
+  document.addEventListener('click',soon,true);
+  window.addEventListener('storage',soon);
+  window.addEventListener('load',function(){ setTimeout(paint,1700); setTimeout(paint,3500); });
+  var obs=new MutationObserver(function(){ try{ paint(); }catch(e){} });
+  var n=0, iv=setInterval(function(){ var h=$('tab-help'); if(h && !h._ayuWhy){ h._ayuWhy=1; obs.observe(h,{attributes:true,attributeFilter:['class']}); } if(++n>20) clearInterval(iv); },300);
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
