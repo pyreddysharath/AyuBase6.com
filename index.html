@@ -19247,8 +19247,8 @@ html body #routines-panel .ayu-sec-off .ayu-chev:not(#ayu-x1){display:inline-fle
 html body #routines-panel #chk-alarm.ayu-sec-off #wake-al-body:not(#ayu-x1),
 html body #routines-panel #routines-notify-card.ayu-sec-off #routines-remind-panel:not(#ayu-x1),
 html body #routines-panel #routines-notify-card.ayu-sec-off .rout-card-foot:not(#ayu-x1){display:none !important}
-html body #alerts-panel .ayu-rem-group .alert-card:is(.alert-disabled,.ayu-sub-off) > .alert-card-hdr .alert-card-chev:not(#ayu-x1){display:flex !important;visibility:hidden !important;pointer-events:none !important}
-html body #alerts-panel .ayu-rem-group .alert-card:is(.alert-disabled,.ayu-sub-off):not(#reminder-hours-card) > :not(.alert-card-hdr):not(.ayu-desc):not(.sec-lotus-layer):not(#ayu-x1){display:none !important}
+html body #alerts-panel .ayu-rem-group .alert-card.ayu-sub-off > .alert-card-hdr .alert-card-chev:not(#ayu-x1){display:flex !important;visibility:hidden !important;pointer-events:none !important}
+html body #alerts-panel .ayu-rem-group .alert-card.ayu-sub-off:not(#reminder-hours-card) > :not(.alert-card-hdr):not(.ayu-desc):not(.sec-lotus-layer):not(#ayu-x1){display:none !important}
 /* Health Breaks: its switch and chevron on the title row; no Turn on row */
 html body #alerts-panel #reminder-hours-card > .alert-card-hdr:not(#ayu-x1){display:none !important}
 html body #alerts-panel .ayu-part-title .ayu-hb-sw:not(#ayu-x1){margin-left:auto;flex:0 0 auto}
@@ -19265,12 +19265,12 @@ html body #alerts-panel .ayu-part-title + #reminder-hours-info:not(#ayu-x1){marg
   // a section that is off cannot be opened (its header does nothing except the switch and the i)
   document.addEventListener('click',function(e){
     var t=e.target; if(!t || !t.closest) return;
-    var hdr=t.closest('#routines-panel .ayu-sec-off > .ayu-sec-hdr, #alerts-panel .ayu-rem-group .alert-card:is(.alert-disabled,.ayu-sub-off):not(#reminder-hours-card) > .alert-card-hdr');
+    var hdr=t.closest('#routines-panel .ayu-sec-off > .ayu-sec-hdr, #alerts-panel .ayu-rem-group .alert-card.ayu-sub-off:not(#reminder-hours-card) > .alert-card-hdr');
     if(!hdr || t.closest('.master-switch, .alert-enabled-toggle, input, label, .ayu-i, .ayu-desc-btn, .calc-info-btn')) return;
     e.stopPropagation(); e.preventDefault();
   },true);
   // Health Breaks sections: off (own switch) → its fields hidden
-  function subs(){ document.querySelectorAll('#alerts-panel .ayu-rem-group .alert-card:not(#reminder-hours-card)').forEach(function(c){ var t=c.querySelector('.alert-enabled-toggle input'); if(t) c.classList.toggle('ayu-sub-off',!t.checked); }); }
+  function subs(){ document.querySelectorAll('#alerts-panel .ayu-rem-group .alert-card:not(#reminder-hours-card)').forEach(function(c){ var t=c.querySelector('.alert-enabled-toggle input'); if(t){ c.classList.toggle('ayu-sub-off',!t.checked); if(t.checked) c.classList.remove('alert-disabled'); } }); }   // "disabled" came from the old main switch
   setInterval(subs,700); document.addEventListener('change',function(){ setTimeout(subs,0); setTimeout(subs,300); },true);
   // Health Breaks sections: switched on → open
   document.addEventListener('change',function(e){
@@ -19497,6 +19497,12 @@ html body #routines-panel #chk-alarm > .ayu-sec-hdr:not(#ayu-x1),html body #rout
   all(); document.addEventListener('DOMContentLoaded',all); window.addEventListener('load',all);
 })();
 </script>
+<style id="hb-line-20261108">
+/* Health Breaks sections: the line under the title only while the section is on and open */
+html body #alerts-panel .ayu-rem-group .alert-card:is(.collapsed,.ayu-sub-off):not(#reminder-hours-card) > .alert-card-hdr:not(#ayu-x1){background-image:none !important}
+html body #alerts-panel .ayu-rem-group .alert-card:is(.collapsed,.ayu-sub-off):not(#reminder-hours-card) > .alert-card-hdr:not(#ayu-x1){padding-bottom:0 !important;margin-bottom:0 !important}
+html body #alerts-panel .ayu-rem-group .alert-card:is(.collapsed,.ayu-sub-off):not(#reminder-hours-card):not(#ayu-x1){padding-top:16px !important;padding-bottom:16px !important}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
