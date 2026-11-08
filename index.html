@@ -13868,13 +13868,11 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   }
   window.ayuBackupRefreshDot=refreshDot; window.ayuChangedGroups=changedGroups;
   function showSectionNote(){
-    if(window.ayuGBackup && window.ayuGBackup.enabled()){ refreshDot(); var se=document.getElementById('backup-status'); if(se && /backup now\?/.test(se.textContent)) status(''); return; }   // the app's Google backup covers it
+    if(window.ayuGBackup && window.ayuGBackup.enabled()){ refreshDot(); var se=document.getElementById('backup-status'); if(se && /backup now\?|No backup taken yet|Not backed up since/.test(se.textContent)) status(''); return; }   // the app's Google backup covers it
     var c=refreshDot(), m=stored();
     if(c.length){
       var never=GROUPS.filter(function(g){ return !m[g.id]; }).map(function(g){ return g.id; }), chg=c.filter(function(id){ return never.indexOf(id)<0; }), parts=[];
-      if(never.length) parts.push('Backup not taken yet for '+names(never)+'.');
-      if(chg.length) parts.push('Changed since your last backup: '+names(chg)+'.');
-      status(parts.join(' ')+' Want to take a backup now?','warn');
+      status(Object.keys(m).length ? 'Not backed up since your last changes.' : 'No backup taken yet.','warn');   // short: the button below takes it
     }
     else if(Object.keys(m).length) status('✓ Your latest data is saved in your file.');
     else status('');
@@ -15554,6 +15552,8 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     try{ var a=document.createElement('a'); a.href=cfg.url; a.rel='noopener'; a.style.display='none'; document.body.appendChild(a); a.click(); setTimeout(function(){ a.remove(); },1000); }
     catch(e){ location.href=cfg.url; }
     ls(K_LATER,String(Date.now()));   // no banner again soon after a download
+    if(cfg.versionCode) ls('ayuApkGot',String(cfg.versionCode));   // the version downloaded here: a newer one later shows the update dot
+    setTimeout(function(){ render(); if(window.ayuBackupRefreshDot) window.ayuBackupRefreshDot(); },0);
     if(fromBanner===true) return;   // the banner shows a note and the page stays where it is
     document.querySelectorAll('.ayu-appb').forEach(function(x){ x.remove(); });
     openHelp();
@@ -15596,7 +15596,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     if(!ANDROID) return IOS ? '' : desktopHtml();
     if(!cfg) return '<p>Coming soon: the same app, with reminders that arrive even when it is closed. Until then, use the Web App below.</p>';
     var meta=['Version '+esc(cfg.versionName), mb(cfg.sizeBytes), 'Android '+esc(cfg.minAndroid||'8.0')+' or later'].filter(Boolean).join(' · ');
-    return '<p>The same app, with reminders and alarms that arrive on time even when it is closed or the phone is locked.</p>'
+    return (upd()?'<p class="app-upd-note">Version '+esc(cfg.versionName)+' is available. Download it to update the app.</p>':'')+'<p>The same app, with reminders and alarms that arrive on time even when it is closed or the phone is locked.</p>'
       + '<p class="app-meta">'+meta+'</p>'
       + '<strong>Install</strong><ol>'
       + '<li>Open the downloaded file (Files → Downloads).</li>'
@@ -15612,7 +15612,11 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       + (IOS ? '<p class="app-note">There is no iPhone app yet.</p>' : '');
   }
   // Download App: the Android app and the web app as two sections, closed until tapped (one alone stays open).
-  function part(id,title,html,only,btn){ return '<details class="app-part" data-part="'+id+'"'+(only?' open':'')+'><summary>'+title+(btn||'')+'</summary><div class="app-part-b">'+html+'</div></details>'; }
+  // a newer Android app than the one downloaded from this browser
+  function upd(){ var g=+(ls('ayuApkGot')||0); return !!(ANDROID && cfg && cfg.versionCode && g && +cfg.versionCode>g); }
+  window.ayuWebAppUpdate=upd;
+  window.ayuAppDot=function(c){ if(!c && window.ayuChangedGroups) c=window.ayuChangedGroups(); return !!(c && c.length) || upd(); };
+  function part(id,title,html,only,btn){ return '<details class="app-part" data-part="'+id+'"'+(only?' open':'')+'><summary>'+title+(id==='android' && upd()?'<i class="app-part-dot" aria-label="Update available"></i>':'')+(btn||'')+'</summary><div class="app-part-b">'+html+'</div></details>'; }
   // the main button sits on the section's title row, so it shows even while the section is closed
   function btnA(){ return (cfg && ANDROID) ? '<button type="button" class="app-get-sm" onclick="event.preventDefault();event.stopPropagation();ayuGetApp()">Download</button>' : ''; }
   function btnW(){ return installed() ? '' : '<button type="button" class="app-get-sm" onclick="event.preventDefault();event.stopPropagation();var d=this.closest(\'details\');if(d)d.open=true;ayuInstallWeb()">Install</button>'; }
@@ -15681,7 +15685,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     addHelpTab();
     try{ var c=JSON.parse(ls(K_CFG)||'null'); if(valid(c)) apply(c); }catch(e){}
     fetch(CFG_URL,{cache:'no-cache'}).then(function(r){ return r.ok ? r.json() : null; }).then(function(c){
-      if(valid(c)){ ls(K_CFG,JSON.stringify(c)); if(!cfg) apply(c); else { cfg=c; render(); } }
+      if(valid(c)){ ls(K_CFG,JSON.stringify(c)); if(!cfg) apply(c); else { cfg=c; render(); } try{ if(window.ayuBackupRefreshDot) window.ayuBackupRefreshDot(); }catch(e){} }
     }).catch(function(){});
     setTimeout(render,1500);   // the installed check settles after start-up
   }
@@ -18875,7 +18879,11 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   var CARDS=[['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['eyeex','alert-card-break-ex']];
   function load(){ try{ var o=JSON.parse(localStorage.getItem(K)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
   function save(o){ try{ localStorage.setItem(K,JSON.stringify(o)); }catch(e){} try{ document.dispatchEvent(new Event('ayu-alarm-changed')); }catch(e){} }
-  function cfg(k){ var o=load()[k]||{}; return {on:!!o.on, voice:String(o.voice||''), lang:String(o.lang||'')}; }
+  function cfg(k){ var o=load()[k]||{}; return {on:!!o.on, voice:String(o.voice||''), lang:String(o.lang||''), picked:!!o.picked}; }
+  // the language picked last in any Read aloud: a Read aloud switched on later (language not picked there) starts with it
+  var LAST='ayuBase6-speak-last';
+  function lastLang(){ try{ return localStorage.getItem(LAST)||''; }catch(e){ return ''; } }
+  function setLast(l){ try{ if(l) localStorage.setItem(LAST,l); }catch(e){} }
   function setCfg(k,c){ var o=load(); o[k]=c; save(o); }
   function N(){ var n=window.ayuNative; return APP && n && n.tts ? n : null; }
 
@@ -18985,10 +18993,14 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
     w._set=function(c2){ cb.checked=!!c2.on; cur={lang:c2.lang, voice:''}; if(voices) paint(); else state(); };
     // the Voice row (languages + ▶) shows only while Speak is on
     function state(){ vr.hidden=!cb.checked; ls.disabled=none; pl.disabled=none; if(q) q.disabled=none; }
-    function ch(){ cur={lang:ls.value, voice:vs.value}; state(); onChange({on:cb.checked, lang:ls.value, voice:vs.value}); }
+    var picked=!!c.picked;
+    function ch(){ cur={lang:ls.value, voice:vs.value}; state(); onChange({on:cb.checked, lang:ls.value, voice:vs.value, picked:picked}); }
     getVoices(function(){ paint(); ROWS.push(function(){ if(!w.isConnected) return false; paint(); return true; }); });
-    cb.addEventListener('change',ch);
-    ls.addEventListener('change',function(){ if(painting) return; cur={lang:ls.value, voice:''}; paint(); ch(); });
+    cb.addEventListener('change',function(){
+      if(cb.checked && !picked){ var L=lastLang(); if(L && L!==ls.value && voices && langsOf(voices).some(function(x){ return x[0]===L; })){ cur={lang:L, voice:''}; paint(); } }
+      ch();
+    });
+    ls.addEventListener('change',function(){ if(painting) return; picked=true; setLast(ls.value); cur={lang:ls.value, voice:''}; paint(); ch(); });
     ib.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); info.hidden=!info.hidden; ib.setAttribute('aria-expanded',String(!info.hidden)); });
     pl.addEventListener('click',function(e){ e.preventDefault(); if(none) return; say(typeof sample==='function'?sample(ls.value):sample, vs.value, ls.value); });
     // Language: a list you can type in to search (the drop-down above stays the value)
@@ -19061,7 +19073,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
     document.querySelectorAll('#custom-reminders-list .custom-reminder-form').forEach(function(f){
       if(f.querySelector('.ayu-speak-wrap')) return;
       var it=f.closest('.custom-reminder-item'), d={}; try{ d=it ? JSON.parse(it.dataset.reminder||'{}') : {}; }catch(e){}
-      var r=row('', {on:!!d.speak, voice:d.voice||'', lang:d.speakLang||''}, function(){}, function(){ var n=f.elements.name; return (n && n.value.trim()) || 'Your reminder'; }, ['speak','speakLang','voice']);
+      var r=row('', {on:!!d.speak, voice:d.voice||'', lang:d.speakLang||'', picked:!!d.speakLang}, function(){}, function(){ var n=f.elements.name; return (n && n.value.trim()) || 'Your reminder'; }, ['speak','speakLang','voice']);
       var v=f.querySelector('.ayu-vib-fld'), snd=f.elements.sound && f.elements.sound.closest('label');
       if(v) v.before(r); else if(snd) snd.after(r); else f.querySelector('.reminder-form-actions').before(r);
     });
@@ -19503,6 +19515,30 @@ html body #alerts-panel .ayu-rem-group .alert-card:is(.collapsed,.ayu-sub-off):n
 html body #alerts-panel .ayu-rem-group .alert-card:is(.collapsed,.ayu-sub-off):not(#reminder-hours-card) > .alert-card-hdr:not(#ayu-x1){padding-bottom:0 !important;margin-bottom:0 !important}
 html body #alerts-panel .ayu-rem-group .alert-card:is(.collapsed,.ayu-sub-off):not(#reminder-hours-card):not(#ayu-x1){padding-top:16px !important;padding-bottom:16px !important}
 </style>
+<style id="sub-dots-20261108">
+/* the amber dot on the Backup & Restore icon also shows on the tab it is about, and on the Android section */
+html body #sec-backup > .footer-subtabs #subtab-bkp .fs-dot,html body #sec-backup > .footer-subtabs #subtab-app .fs-dot{background:#f59e0b;top:5px;right:7px}
+html body #sec-app details.app-part > summary .app-part-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 0 1.5px #fff;margin-left:6px;vertical-align:super;flex:0 0 auto}
+html body #sec-app .app-upd-note{color:#92400e;font-weight:600}
+</style>
+<script id="sub-dots-20261108-js">
+(function(){
+  if(window.AYU_ANDROID) return;   // the Android app paints its own
+  function paint(){
+    var t=document.getElementById('subtab-bkp'), a=document.getElementById('subtab-app');
+    if(t && !t.querySelector('.fs-dot')){ var i=document.createElement('i'); i.className='fs-dot'; t.appendChild(i); }
+    var c=[]; try{ c=window.ayuChangedGroups ? window.ayuChangedGroups() : []; }catch(e){}
+    if(t) t.querySelector('.fs-dot').classList.toggle('on',c.length>0);
+    var u=false; try{ u=!!(window.ayuWebAppUpdate && window.ayuWebAppUpdate()); }catch(e){}
+    if(a && a.querySelector('.fs-dot')) a.querySelector('.fs-dot').classList.toggle('on',u);
+  }
+  var rd=null;
+  function hook(){ if(window.ayuBackupRefreshDot && !window.ayuBackupRefreshDot.__sub){ rd=window.ayuBackupRefreshDot; window.ayuBackupRefreshDot=function(){ var r=rd.apply(this,arguments); try{ paint(); }catch(e){} return r; }; window.ayuBackupRefreshDot.__sub=true; } }
+  var n=0, iv=setInterval(function(){ hook(); paint(); try{ if(window.ayuBackupRefreshDot) window.ayuBackupRefreshDot(); }catch(e){} if(++n>20) clearInterval(iv); },500);
+  document.addEventListener('click',function(){ setTimeout(paint,100); },true);
+  window.addEventListener('storage',paint);
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
