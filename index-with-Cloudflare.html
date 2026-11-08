@@ -18518,18 +18518,15 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
       +'<button type="button" class="alt" id="clk-t-add">+1 min</button><button type="button" class="alt" id="clk-t-reset">Reset</button></div>'
       +'<div class="ayu-al-body clk-fields" id="clk-t-fields"><p class="clk-note" id="clk-t-note" hidden>Reset the timer to change these.</p>'
       +'<div class="ayu-al-row"><span class="ayu-al-lbl">Timer</span><button type="button" class="clk-pick" id="clk-t-len" aria-label="Timer length"><span></span>'+chev+'</button></div>'
-      +'<div class="ayu-al-row clk-al-row"><span class="ayu-al-lbl">Repeat<button type="button" class="calc-info-btn ayu-i clk-al-i" id="clk-t-al-i" title="About Repeat" aria-label="About Repeat" aria-expanded="false">i</button></span>'
+      +'<div class="ayu-al-row clk-al-row"><span class="ayu-al-lbl">Repeat</span>'
       +'<div class="clk-rep" role="radiogroup" aria-label="Repeat">'
       +'<div class="clk-rep-o"><label class="clk-radio"><input type="radio" name="clk-t-rep" value="times" id="clk-t-rep-times"><span>Times</span></label>'
       +'<span class="clk-step"><button type="button" id="clk-t-minus" aria-label="Fewer times">−</button><b id="clk-t-count">1</b><button type="button" id="clk-t-plus" aria-label="More times">+</button></span></div>'
       +'<div class="clk-rep-o"><label class="clk-radio"><input type="radio" name="clk-t-rep" value="for" id="clk-t-rep-for"><span>For</span></label>'
-      +'<button type="button" class="clk-pick" id="clk-t-total" aria-label="Repeat for how long"><span></span>'+chev+'</button><small class="clk-rep-n" id="clk-t-for-n"></small></div>'
-      +'<div class="clk-rep-o"><label class="clk-radio"><input type="radio" name="clk-t-rep" value="stop" id="clk-t-rep-stop"><span>Until I stop it</span></label><small class="clk-rep-n">up to 24 h</small></div>'
+      +'<button type="button" class="clk-pick" id="clk-t-total" aria-label="Repeat for how long"><span></span>'+chev+'</button></div>'
+      +'<div class="clk-rep-o"><label class="clk-radio"><input type="radio" name="clk-t-rep" value="stop" id="clk-t-rep-stop"><span>Until I stop it</span></label><small class="clk-rep-n">(up to 24 h)</small></div>'
       +'</div></div>'
-      +'<div class="calc-task ayu-al-info clk-al-info" id="clk-t-al-info" hidden><p>When the <b>Timer</b> ends it alerts and starts again by itself. <b>Repeat</b> says how long it keeps going:</p>'
-      +'<p><b>Times</b>: this many alerts (1 = a normal timer).<br><b>For</b>: until this much time has passed (from the Timer length up to 23 h 59 min).<br><b>Until I stop it</b>: until you tap Reset; it stops by itself after 24 hours. For longer, use Alarm.</p>'
-      +'<p>Example: walk 3 minutes normal and 3 minutes brisk, for 30 minutes. Set <b>Timer</b> to 3 minutes and <b>Repeat</b> to For 30 minutes: it alerts every 3 minutes, 10 times.</p></div>'
-      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Sound</span><select id="clk-t-tone" aria-label="Sound">'+opts+'</select><button type="button" class="ayu-al-play" id="clk-t-play" title="Preview" aria-label="Preview">▶</button></div>'
+            +'<div class="ayu-al-row"><span class="ayu-al-lbl">Sound</span><select id="clk-t-tone" aria-label="Sound">'+opts+'</select><button type="button" class="ayu-al-play" id="clk-t-play" title="Preview" aria-label="Preview">▶</button></div>'
       +'<div class="ayu-al-row ayu-vib-only"><span class="ayu-al-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" id="clk-t-vib" aria-label="Vibrate"></label></div>'
       +'</div>';
   }
@@ -18596,7 +18593,6 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     function step(d){ if(T.run!=='idle') return; T.rep='times'; T.count=Math.min(99,Math.max(1,(+T.count||1)+d)); edit(); }
     q('clk-t-minus').addEventListener('click',function(){ step(-1); });
     q('clk-t-plus').addEventListener('click',function(){ step(1); });
-    q('clk-t-al-i').addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); var i=q('clk-t-al-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); });
     q('clk-t-tone').addEventListener('change',function(){ T.tone=this.value; T.v=Date.now(); saveAll(); });
     q('clk-t-vib').addEventListener('change',function(){ T.vibrate=this.checked; T.v=Date.now(); saveAll(); });
     var playing=false;
@@ -18621,7 +18617,7 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     cap.textContent = run==='running' ? [rt, times()!==1?'every '+lenTxt(len()):'' ].filter(Boolean).join(' · ') || 'Running'
       : run==='paused' ? 'Paused'+(rt?' · '+rt:'')
       : up ? 'Time’s up at '+clockTxt(new Date(T.fired))
-      : (times()===1 ? 'Alerts once' : T.rep==='stop' ? 'Every '+lenTxt(len())+' until you stop it (stops by itself after 24 hours)' : T.rep==='for' ? 'Every '+lenTxt(len())+' for '+lenTxt(forMs())+' ('+times()+' times)' : 'Every '+lenTxt(len())+', '+times()+' times');
+      : (times()===1 ? 'Alerts once' : T.rep==='stop' ? 'Every '+lenTxt(len())+' until you stop it\nStops by itself after 24 hours' : T.rep==='for' ? 'Every '+lenTxt(len())+' for '+lenTxt(forMs())+' ('+times()+' times)' : 'Every '+lenTxt(len())+', '+times()+' times');
     $('clk-t-start').hidden=run!=='idle'; $('clk-t-pause').hidden=run!=='running'; $('clk-t-resume').hidden=run!=='paused';
     $('clk-t-add').hidden=run==='idle'; $('clk-t-reset').hidden=run==='idle';
     if(keepFields) return;
@@ -18631,7 +18627,6 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     var c=Math.min(99,Math.max(1,+T.count||1)); $('clk-t-count').textContent=c;
     $('clk-t-minus').disabled=lock||T.rep!=='times'||c<=1; $('clk-t-plus').disabled=lock||T.rep!=='times'||c>=99;
     $('clk-t-total').querySelector('span').textContent=lenTxt(forMs()); $('clk-t-total').disabled=lock||T.rep!=='for';
-    var k=Math.max(1,Math.floor(forMs()/len())); $('clk-t-for-n').textContent=T.rep==='for' ? k+' time'+(k>1?'s':'') : '';
     $('clk-t-len').disabled=lock;
     var tn=$('clk-t-tone'); tn.value=T.tone||'rise'; if(tn.value!==(T.tone||'rise')) tn.value='rise';
     $('clk-t-vib').checked=T.vibrate!==false;
@@ -19931,15 +19926,20 @@ html body #alerts-panel .custom-reminder-form .ayu-vib-fld input.ayu-lang-q:focu
 <style id="clock-repeat-20261108">
 /* Timer → Repeat: Times (− n +), For (clock, under 24 h), Until I stop it (24 h at most) */
 html body #rem-alarm-card .clk-rep{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px}
-html body #rem-alarm-card .clk-rep-o{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:34px}
-html body #rem-alarm-card .clk-rep-o .clk-radio{min-width:68px}
+html body #rem-alarm-card .clk-rep-o{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;min-height:34px}
+html body #rem-alarm-card #clk-t-cap{white-space:pre-line}
+html body #rem-alarm-card .clk-rep-o:last-child{flex-wrap:wrap;row-gap:0}
+html body #rem-alarm-card .clk-rep-n{white-space:nowrap}
+html body #rem-alarm-card #clk-t-fields .ayu-al-row:has(#clk-t-tone){flex-wrap:nowrap}
+html body #rem-alarm-card #clk-t-fields #clk-t-tone:not(#ayu-x1){min-width:0 !important;flex:1 1 0 !important;width:auto !important}
+html body #rem-alarm-card .clk-rep-o .clk-radio{min-width:66px;flex:0 0 auto}
 html body #rem-alarm-card .clk-rep-o:last-child .clk-radio{min-width:0}
 html body #rem-alarm-card .clk-rep-n{font-size:12px;color:#5b7f7b}
 html body #rem-alarm-card .clk-step{display:inline-flex;align-items:center;height:34px;border:1.5px solid color-mix(in srgb,#0f766e 45%,#fff);border-radius:10px;background:#fff;overflow:hidden}
 html body #rem-alarm-card .clk-step button{width:34px;height:100%;border:0;background:transparent;color:#0f766e;font-size:18px;font-weight:700;cursor:pointer;padding:0}
 html body #rem-alarm-card .clk-step button:disabled{opacity:.35;cursor:default}
 html body #rem-alarm-card .clk-step b{min-width:28px;text-align:center;font-size:14px;color:#134e4a}
-html body #rem-alarm-card #clk-t-total{flex:0 1 auto;min-width:118px}
+html body #rem-alarm-card #clk-t-total:not(#ayu-x1){flex:0 1 130px;min-width:86px;padding:0 10px}
 </style>
 </body>
 
