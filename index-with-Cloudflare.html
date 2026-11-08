@@ -19503,12 +19503,11 @@ html body #alerts-panel .alert-card .ayu-hb-days .otd-title:not(#ayu-x1):before{
   var APP=!!window.AYU_ANDROID, M='ayubase6-notif-master-on', S='ayubase6_reminder_section_states_v1', V='ayuBase6-hb-v2', KEYS=['drink','walk','break','eyeex'];
   function g(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   function p(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
-  // once: the main switch goes away. New here: every section on. Had the main switch off: every section off. On: as they were.
+  // once: the main switch goes away. New here or had the main switch off: every section off. On: as they were.
   if(g(V)!=='1'){
     var m=g(M), st=null; try{ st=JSON.parse(g(S)||'null'); }catch(e){}
     var has=st && KEYS.some(function(k){ return typeof st[k]==='boolean'; });
-    if(m===null && !has){ st={}; KEYS.forEach(function(k){ st[k]=true; }); p(S,JSON.stringify(st)); }
-    else if(m!=='1'){ st={}; KEYS.forEach(function(k){ st[k]=false; }); p(S,JSON.stringify(st)); }
+    if((m===null && !has) || m!=='1'){ st={}; KEYS.forEach(function(k){ st[k]=false; }); p(S,JSON.stringify(st)); }   // new here: every section off until turned on
     p(M,'1'); p(V,'1');
   }
   // the old main switch is always on now; each section's own switch decides
