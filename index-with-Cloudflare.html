@@ -16796,12 +16796,28 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   function ring(id,count){
     var c=get(id); if(!c.on) return;
     stopRing(true); ringing={id:id,count:count||0};
-    startSound(c.tone,true); vibStart(id); card(id,count||0);
+    startSound(c.tone,true); vibStart(id); card(id,count||0); sysNote(id,count||0);
     if(c.ring>0) ringStop=setTimeout(function(){ stopRing(true); }, c.ring*60000);   // the sound stops; the card stays until answered
   }
-  function stopRing(keepCard){ clearTimeout(ringStop); ringStop=null; stopSound(); vibStop(); ringing=null; if(!keepCard){ var d=$('ayu-alarm'); if(d) d.remove(); } }
+  function stopRing(keepCard){ clearTimeout(ringStop); ringStop=null; stopSound(); vibStop(); var r=ringing; ringing=null; if(!keepCard){ var d=$('ayu-alarm'); if(d) d.remove(); if(r) closeNote(r.id); } }
+  // the website also shows a notification (Snooze / Stop; tapping it opens the page): it is seen when the tab is in the background
+  function swReg(){ try{ return navigator.serviceWorker ? navigator.serviceWorker.getRegistration('./') : Promise.resolve(null); }catch(e){ return Promise.resolve(null); } }
+  function sysNote(id,count){
+    if(APP || typeof Notification==='undefined' || Notification.permission!=='granted') return;
+    var c=get(id), left=Math.max(0,c.snoozeMax-count), acts=[]; if(left>0) acts.push({action:'snooze',title:'Snooze '+c.snoozeMin+' min'}); acts.push({action:'stop',title:'Stop'});
+    swReg().then(function(reg){ if(!reg) return;
+      reg.showNotification(ent(id).title(),{ body:ent(id).body(), tag:'ayu-alarm-'+id, renotify:true, requireInteraction:true, icon:'./icons/icon-192.png', badge:'./icons/icon-192.png',
+        actions:acts, data:{ key:'alarm:'+id, section:id==='wake'?'routines':'alerts', url:'./' } });
+    }).catch(function(){});
+  }
+  function closeNote(id){ swReg().then(function(reg){ if(reg) reg.getNotifications({tag:'ayu-alarm-'+id}).then(function(l){ l.forEach(function(n){ n.close(); }); }); }).catch(function(){}); }
+  try{ if(!APP && navigator.serviceWorker) navigator.serviceWorker.addEventListener('message',function(ev){
+    var d=ev.data||{}; if(d.type!=='nudge-click' || !/^alarm:/.test(d.key||'')) return;
+    var id=d.key.slice(6); if(d.action==='snooze') snooze(id, ringing && ringing.id===id ? ringing.count : 0); else if(d.action==='stop') stopRing();
+  }); }catch(e){}
+  window.ayuAlarmsOn=function(){ try{ return alarmIds().some(function(id){ return !!get(id).on; }); }catch(e){ return false; } };
   function snooze(id,count){
-    var c=get(id); stopRing(); if(count>=c.snoozeMax) return;
+    var c=get(id); stopRing(); closeNote(id); if(count>=c.snoozeMax) return;
     clearTimeout(snoozeTimer[id]); snoozeTimer[id]=setTimeout(function(){ ring(id,count+1); }, c.snoozeMin*60000);
   }
   window.ayuAlarmRing=ring;
@@ -19525,17 +19541,18 @@ html body #alerts-panel .alert-card .ayu-hb-days .otd-title:not(#ayu-x1):before{
   }
   // the old main switch is always on now; each section's own switch decides
   window.isMasterNotifyOn=function(){ return true; };
-  // a reminder that is really on: a Health Breaks section, Checks → Notify Me, or a Personal Reminder (for the footer dots)
+  // a reminder that is really on: a Health Breaks section, Checks → Notify Me, an alarm, or a Personal Reminder (for the footer dots)
   window.ayuNotifWanted=function(){
     if(KEYS.some(function(k){ var e=document.getElementById(k==='eyeex'?'eye-ex-notify':'alert-'+k+'-notify'); return e && e.checked; })) return true;
     try{ if(typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()) return true; }catch(e){}
+    try{ if(window.ayuAlarmsOn && window.ayuAlarmsOn()) return true; }catch(e){}   // Wake-up Alarm and Reminders alarms (the website shows a notification too)
     return [].some.call(document.querySelectorAll('#custom-reminders-list .custom-reminder-item'),function(it){ try{ var d=JSON.parse(it.dataset.reminder||'{}'); return d.enabled!==false && d.on!==false; }catch(e){ return false; } });
   };
   document.addEventListener('change',function(){ [300,1200].forEach(function(t){ setTimeout(function(){ try{ if(window.ayuFooterDots) window.ayuFooterDots(); }catch(e){} },t); }); },true);
   window.addEventListener('load',function(){ setTimeout(function(){ try{ if(window.ayuFooterDots) window.ayuFooterDots(); }catch(e){} },1500); });
   var sm=window.setMasterNotifyFlag; window.setMasterNotifyFlag=function(){ if(typeof sm==='function') sm(true); };
 
-  // the first tap in Reminders asks for permission to notify (needed for notifications when a section is on)
+  // the first tap in Reminders or Checks with a reminder or alarm on asks for permission to notify
   var asked=false;
   function wantAsk(){ return !asked && typeof Notification!=='undefined' && Notification.permission==='default'; }
   function anyOn(){ return KEYS.some(function(k){ var e=document.getElementById(k==='eyeex'?'eye-ex-notify':'alert-'+k+'-notify'); return e && e.checked; }); }
@@ -19547,9 +19564,9 @@ html body #alerts-panel .alert-card .ayu-hb-days .otd-title:not(#ayu-x1):before{
     try{ document.dispatchEvent(new Event('ayu-reminders-changed')); }catch(e){}
   }
   document.addEventListener('click',function(e){
-    if(!wantAsk() || !e.target || !e.target.closest || !e.target.closest('#alerts-panel')) return;
+    if(!wantAsk() || !e.target || !e.target.closest || !e.target.closest('#alerts-panel, #routines-panel')) return;
     setTimeout(function(){
-      if(!wantAsk() || !anyOn()) return; asked=true;
+      if(!wantAsk() || !(anyOn() || (window.ayuAlarmsOn && window.ayuAlarmsOn()))) return; asked=true;   // a reminder or an alarm is on
       try{ Promise.resolve(typeof requestNotificationPermission==='function' ? requestNotificationPermission() : Notification.requestPermission()).then(refreshNotify,refreshNotify); }catch(x){}
     },50);
   },true);
