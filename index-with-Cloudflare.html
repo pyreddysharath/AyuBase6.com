@@ -12821,7 +12821,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       '<label>Sound<select name="sound"><option value="chime">Chime</option><option value="drop">Water drop</option><option value="drum">Drum</option><option value="none">Silent</option></select></label>'+ 
       '<div class="wide reminder-form-actions"><button class="save-reminder" type="submit">Save</button><button class="cancel-reminder" type="button">Cancel</button></div>';
     const mode=form.querySelector('[name="frequency-mode"]'), fields=form.querySelector('.reminder-frequency-fields');
-    form.elements.name.value=saved.name||''; form.elements.sound.value=saved.sound||'chime'; mode.value=saved.mode||'regular';
+    form.elements.name.value=saved.name||''; form.elements.sound.value=saved.sound||'chime'; mode.value=saved.mode||'selected';
     let chosenTimes=(saved.times||[]).slice(); if(!chosenTimes.length)chosenTimes=['09:00'];
     let duration=Number(saved.duration)||15;
     // Days of the week this reminder repeats on (0 = Sunday ... 6 = Saturday); every day unless the person changes it.
