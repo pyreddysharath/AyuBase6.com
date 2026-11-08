@@ -12892,7 +12892,8 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     if(existing){existing.classList.add('open');const h=existing.querySelector('.cri-hdr');if(h)h.setAttribute('aria-expanded','true');(existing.querySelector('.cri-body')||existing).append(form)} else {list.append(form);form.querySelector('input[name="name"]').focus()}
   };
   function durationLabel(total){total=Math.max(1,Math.min(1440,Number(total)||1));const h=Math.floor(total/60),m=total%60;return (h?h+' hour'+(h===1?'':'s'):'')+(h&&m?' ':'')+(m?m+' minute'+(m===1?'':'s'):'')}
-  function openDurationPicker(current,onSelect){
+  function openDurationPicker(current,onSelect,opt){
+    opt=opt||{};const MIN=Math.max(1,opt.min||1);
     const ov=document.createElement('div');ov.className='tp-overlay';
     ov.innerHTML='<div class="tp-dialog duration-clock-dialog" role="dialog" aria-modal="true" aria-label="Choose reminder interval"><div class="tp-title">Repeat every</div><div class="duration-dials"><section class="duration-dial-section"><div class="duration-dial-heading">Hours</div><div class="duration-dial duration-hour-dial" role="group" aria-label="Choose hours"><div class="duration-dial-hand"></div><div class="duration-dial-center"></div></div><div class="duration-dial-value duration-hour-value"></div></section><section class="duration-dial-section"><div class="duration-dial-heading">Minutes</div><div class="duration-dial duration-minute-dial" role="slider" aria-label="Choose minutes" aria-valuemin="0" aria-valuemax="59" tabindex="0"><div class="duration-dial-hand"></div><div class="duration-dial-center"></div></div><div class="duration-dial-value duration-minute-value"></div></section></div><div class="duration-clock-preview"></div><div class="tp-actions"><button type="button" class="tp-btn dur-cancel">Cancel</button><button type="button" class="tp-btn tp-ok dur-ok">OK</button></div></div>';document.body.append(ov);
     const hourDial=ov.querySelector('.duration-hour-dial'),minuteDial=ov.querySelector('.duration-minute-dial');
@@ -12918,10 +12919,11 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       ov.querySelector('.duration-hour-value').textContent=hours+' hour'+(hours===1?'':'s');
       ov.querySelector('.duration-minute-value').textContent=String(minutes).padStart(2,'0')+' minute'+(minutes===1?'':'s');
       minuteDial.setAttribute('aria-valuenow',minutes);
-      const n=Math.min(1440,Math.max(1,hours*60+minutes));ov.querySelector('.duration-clock-preview').textContent='Every '+durationLabel(n);
+      const n=Math.min(1440,Math.max(1,hours*60+minutes)),low=hours*60+minutes<MIN;ov.querySelector('.duration-clock-preview').textContent=low?'At least '+durationLabel(MIN):(opt.label?opt.label(n):'Every '+durationLabel(n));ov.querySelector('.dur-ok').disabled=low;
     }
-    const close=()=>ov.remove();ov.querySelector('.dur-cancel').onclick=close;ov.addEventListener('click',e=>{if(e.target===ov)close()});ov.querySelector('.dur-ok').onclick=()=>{let n=hours*60+minutes;if(n>1440)n=1440;if(!n)n=1;onSelect(n);close()};draw();
+    const close=()=>ov.remove();ov.querySelector('.dur-cancel').onclick=close;ov.addEventListener('click',e=>{if(e.target===ov)close()});ov.querySelector('.dur-ok').onclick=()=>{let n=hours*60+minutes;if(n>1440)n=1440;if(!n)n=1;if(n<MIN)return;onSelect(n);close()};if(opt.title){ov.querySelector('.tp-title').textContent=opt.title;ov.querySelector('.tp-dialog').setAttribute('aria-label',opt.title)}draw();
   }
+  window.ayuDurationPicker=openDurationPicker;
   function startReminder(item){
     const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name)return;
     const notify=()=>{try{if(Array.isArray(data.days)&&data.days.length&&!data.days.includes(new Date().getDay()))return;if(window.ayuLeader===false)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')(typeof showNudgeNotification==='function'?showNudgeNotification(data.name,'It is time for your reminder.',{key:'custom-'+item.dataset.reminderId}):new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()}))}catch(_){}};
@@ -18321,15 +18323,20 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
   var CITIES=null;   // filled below
   function partTimer(){
     var opts=''; try{ opts=(window.ayuTones? window.ayuTones.options() : '<option value="rise">Rising chime</option>').replace(/<option value="upload">[^<]*<\/option>/,''); }catch(e){}
-    var times=[[1,'Once'],[2,'2 times'],[3,'3 times'],[4,'4 times'],[5,'5 times'],[6,'6 times'],[8,'8 times'],[10,'10 times'],[12,'12 times'],[16,'16 times'],[24,'24 times'],[0,'Until I stop it']];
+    var chev='<svg viewBox="0 0 12 8" width="12" height="8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"></path></svg>';
     return '<div class="clk-big" id="clk-t-big" aria-live="off"></div><div class="clk-cap" id="clk-t-cap"></div>'
       +'<div class="clk-btns"><button type="button" id="clk-t-start">Start</button><button type="button" id="clk-t-pause">Pause</button><button type="button" id="clk-t-resume">Resume</button>'
       +'<button type="button" class="alt" id="clk-t-add">+1 min</button><button type="button" class="alt" id="clk-t-reset">Reset</button></div>'
       +'<div class="ayu-al-body clk-fields" id="clk-t-fields"><p class="clk-note" id="clk-t-note" hidden>Reset the timer to change these.</p>'
       +'<div class="ayu-al-row"><span class="ayu-al-lbl">Name</span><input type="text" class="ayu-al-name" id="clk-t-name" maxlength="40" placeholder="Optional, e.g. Water break" aria-label="Timer name"></div>'
-      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Length</span><span class="clk-len"><input type="number" inputmode="numeric" id="clk-t-h" min="0" max="23" aria-label="Hours"><span>h</span><input type="number" inputmode="numeric" id="clk-t-m" min="0" max="59" aria-label="Minutes"><span>min</span><input type="number" inputmode="numeric" id="clk-t-s" min="0" max="59" aria-label="Seconds"><span>s</span></span></div>'
-      +'<div class="clk-quick" id="clk-t-quick">'+[[60,'1 min'],[300,'5 min'],[600,'10 min'],[900,'15 min'],[1800,'30 min'],[2700,'45 min'],[3600,'1 h']].map(function(q){ return '<button type="button" data-s="'+q[0]+'">'+q[1]+'</button>'; }).join('')+'</div>'
-      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Alerts</span><select id="clk-t-times" aria-label="How many alerts">'+times.map(function(o){ return '<option value="'+o[0]+'">'+o[1]+'</option>'; }).join('')+'</select></div>'
+      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Timer</span><button type="button" class="clk-pick" id="clk-t-len" aria-label="Timer length"><span></span>'+chev+'</button></div>'
+      +'<div class="ayu-al-row clk-al-row"><span class="ayu-al-lbl">Alerts<button type="button" class="calc-info-btn ayu-i clk-al-i" id="clk-t-al-i" title="About Alerts" aria-label="About Alerts" aria-expanded="false">i</button></span>'
+      +'<div class="clk-al-opts" role="radiogroup" aria-label="Alerts"><label class="clk-radio"><input type="radio" name="clk-t-al" value="for" id="clk-t-al-for"><span>For</span></label>'
+      +'<button type="button" class="clk-pick" id="clk-t-total" aria-label="Alerts for how long"><span></span>'+chev+'</button>'
+      +'<label class="clk-radio"><input type="radio" name="clk-t-al" value="stop" id="clk-t-al-stop"><span>Until I stop it</span></label></div></div>'
+      +'<div class="calc-task ayu-al-info clk-al-info" id="clk-t-al-info" hidden><p>The timer alerts every <b>Timer</b> length: once it ends it starts again by itself.</p>'
+      +'<p><b>For</b>: it keeps going until this much time has passed (the same as the Timer or longer); <b>Until I stop it</b>: it keeps going until you tap Reset.</p>'
+      +'<p>Example: walk 3 minutes normal and 3 minutes brisk, for 30 minutes. Set <b>Timer</b> to 3 minutes and <b>Alerts</b> to For 30 minutes: it alerts every 3 minutes, 10 times.</p></div>'
       +'<div class="ayu-al-row"><span class="ayu-al-lbl">Sound</span><select id="clk-t-tone" aria-label="Sound">'+opts+'</select><button type="button" class="ayu-al-play" id="clk-t-play" title="Preview" aria-label="Preview">▶</button></div>'
       +'<div class="ayu-al-row ayu-vib-only"><span class="ayu-al-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" id="clk-t-vib" aria-label="Vibrate"></label></div>'
       +'</div>';
@@ -18348,7 +18355,7 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
   }
 
   function infoMore(){
-    return '<strong>Timer</strong><ul><li>Set a <b>Length</b> (or tap a quick length) and how many <b>Alerts</b>: once, a number of times, or until you stop it. It alerts each time the length passes.</li>'
+    return '<strong>Timer</strong><ul><li>Tap <b>Timer</b> to choose how long each round is (a clock). It alerts each time that passes, and starts again by itself.</li><li><b>Alerts</b>: <b>For</b> a total time (the same as the Timer or longer), or <b>Until I stop it</b>. Example: Timer 3 minutes, For 30 minutes = 10 alerts.</li>'
       +'<li><b>Sound</b>'+(document.documentElement.classList.contains('ayu-can-vib')?' and <b>Vibrate</b>':'')+' for the alert. <b>Pause</b>, <b>+1 min</b> and <b>Reset</b> while it runs; reset it to change the settings.</li></ul>'
       +'<strong>Stopwatch</strong><ul><li><b>Start</b>, <b>Pause</b>, <b>Lap</b> and <b>Reset</b>. The fastest and slowest laps are marked.</li></ul>'
       +'<strong>World Clock</strong><ul><li>Add up to '+MAX_CITIES+' cities in different time zones: each shows its time and how far ahead or behind your time it is.</li></ul>'
@@ -18379,23 +18386,32 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
   function wireTimer(){
     var q=function(i){ return $(i); };
     function act(f){ var now=Date.now(); f(now); stopRing(); saveAll(); paintTimer(); }
-    q('clk-t-start').addEventListener('click',function(){ readLen(); if(len()<1000) return; act(tStart); });
+    q('clk-t-start').addEventListener('click',function(){ if(len()<1000) return; act(tStart); });
     q('clk-t-pause').addEventListener('click',function(){ act(tPause); });
     q('clk-t-resume').addEventListener('click',function(){ act(tResume); });
     q('clk-t-reset').addEventListener('click',function(){ act(tReset); });
     q('clk-t-add').addEventListener('click',function(){ act(function(n){ tAdd(n,60000); }); });
-    function readLen(){ var h=Math.max(0,Math.min(23,+q('clk-t-h').value||0)), m=Math.max(0,Math.min(59,+q('clk-t-m').value||0)), s=Math.max(0,Math.min(59,+q('clk-t-s').value||0)); var ms=((h*60+m)*60+s)*1000; if(ms>=1000){ T.ms=ms; if(T.run==='idle') T.left=ms; } }
     function edit(){ if(T.run!=='idle') return; T.v=Date.now(); saveAll(); paintTimer(); }
-    ['clk-t-h','clk-t-m','clk-t-s'].forEach(function(id){ q(id).addEventListener('change',function(){ readLen(); edit(); }); q(id).addEventListener('input',function(){ readLen(); if(T.run==='idle'){ sv(K_T,T); paintTimer(true); } }); });
-    q('clk-t-quick').addEventListener('click',function(e){ var b=e.target.closest('button[data-s]'); if(!b || T.run!=='idle') return; T.ms=+b.dataset.s*1000; T.left=T.ms; edit(); });
+    function pick(cur,min,title,label,done){ var P=window.ayuDurationPicker; if(!P) return; P(Math.max(1,Math.round(cur/60000)),function(n){ done(n*60000); },{title:title,min:min,label:label}); }
+    // Timer: how long each round is (a clock pop-up)
+    q('clk-t-len').addEventListener('click',function(){ if(T.run!=='idle') return;
+      pick(len(),1,'Timer',function(n){ return 'Alerts every '+R().durationLabel(n); },function(ms){ var tot=total(); T.ms=ms; T.left=ms; if(times()===1) T.total=ms; else if(times()!==0){ T.total=Math.max(ms,tot); T.times=Math.max(1,Math.floor(T.total/ms)); } edit(); }); });
+    // Alerts: for this long (the same as the Timer or longer), or until stopped
+    q('clk-t-total').addEventListener('click',function(){ if(T.run!=='idle') return; var m=Math.max(1,Math.round(len()/60000));
+      pick(Math.max(total(),len()),m,'Alerts for',function(n){ var k=Math.max(1,Math.floor(n*60000/len())); return 'For '+R().durationLabel(n)+' · '+k+' alert'+(k>1?'s':''); },function(ms){ T.total=Math.max(len(),ms); T.times=Math.max(1,Math.floor(T.total/len())); edit(); }); });
+    q('clk-t-al-for').addEventListener('change',function(){ if(!this.checked) return; T.total=Math.max(len(),+T.total||len()); T.times=Math.max(1,Math.floor(T.total/len())); edit(); });
+    q('clk-t-al-stop').addEventListener('change',function(){ if(!this.checked) return; if(times()!==0) T.total=total(); T.times=0; edit(); });
+    q('clk-t-al-i').addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); var i=q('clk-t-al-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); });
     q('clk-t-name').addEventListener('input',function(){ T.name=this.value; T.v=Date.now(); sv(K_T,T); paintTimer(true); });
     q('clk-t-name').addEventListener('change',function(){ T.name=this.value; edit(); toPhone(); });
-    q('clk-t-times').addEventListener('change',function(){ T.times=+this.value; edit(); });
     q('clk-t-tone').addEventListener('change',function(){ T.tone=this.value; T.v=Date.now(); saveAll(); });
     q('clk-t-vib').addEventListener('change',function(){ T.vibrate=this.checked; T.v=Date.now(); saveAll(); });
     var playing=false;
     q('clk-t-play').addEventListener('click',function(){ var tn=window.ayuTones; if(!tn) return; if(playing){ tn.stop(); playing=false; this.textContent='▶'; return; } tn.start(q('clk-t-tone').value||'rise',false); playing=true; var b=this; b.textContent='■'; setTimeout(function(){ playing=false; b.textContent='▶'; },3000); });
   }
+  function R(){ return window.__ayuRem || {durationLabel:function(n){ return n+' min'; }}; }
+  // how long the alerts go on (Timer × Alerts); kept as "total" so it shows as chosen
+  function total(){ var n=times(); if(n===0) return Math.max(len(),+T.total||len()); var t=+T.total; return (t>=len() && Math.floor(t/len())===n) ? t : len()*n; }
   function paintTimer(keepFields){
     var big=$('clk-t-big'); if(!big) return;
     var now=Date.now(), run=T.run;
@@ -18405,18 +18421,17 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     cap.textContent = run==='running' ? [rt, times()!==1?'every '+lenTxt(len()):'' ].filter(Boolean).join(' · ') || ((T.name||'').trim() ? T.name.trim() : 'Running')
       : run==='paused' ? 'Paused'+(rt?' · '+rt:'')
       : up ? 'Time’s up at '+clockTxt(new Date(T.fired))
-      : (times()===1 ? 'Alerts once' : times()===0 ? 'Alerts every '+lenTxt(len())+' until you stop it' : 'Alerts '+times()+' times, every '+lenTxt(len()));
+      : (times()===1 ? 'Alerts once' : times()===0 ? 'Alerts every '+lenTxt(len())+' until you stop it' : 'Alerts every '+lenTxt(len())+' for '+lenTxt(total())+' ('+times()+' times)');
     $('clk-t-start').hidden=run!=='idle'; $('clk-t-pause').hidden=run!=='running'; $('clk-t-resume').hidden=run!=='paused';
     $('clk-t-add').hidden=run==='idle'; $('clk-t-reset').hidden=run==='idle';
     if(keepFields) return;
     var f=$('clk-t-fields'), lock=run!=='idle'; f.classList.toggle('locked',lock); $('clk-t-note').hidden=!lock;
-    var s=Math.round(len()/1000), H=Math.floor(s/3600), M=Math.floor(s%3600/60), X=s%60;
-    var hI=$('clk-t-h'), mI=$('clk-t-m'), sI=$('clk-t-s');
-    if(document.activeElement!==hI) hI.value=H; if(document.activeElement!==mI) mI.value=M; if(document.activeElement!==sI) sI.value=X;
-    [hI,mI,sI,$('clk-t-times')].forEach(function(x){ x.disabled=lock; });
-    $('clk-t-quick').querySelectorAll('button').forEach(function(b){ b.disabled=lock; b.classList.toggle('on',+b.dataset.s*1000===len()); });
+    $('clk-t-len').querySelector('span').textContent=lenTxt(len());
+    var stop=times()===0; $('clk-t-al-for').checked=!stop; $('clk-t-al-stop').checked=stop;
+    $('clk-t-total').querySelector('span').textContent=lenTxt(total());
+    $('clk-t-total').disabled=lock||stop;
+    [$('clk-t-len'),$('clk-t-al-for'),$('clk-t-al-stop')].forEach(function(x){ x.disabled=lock; });
     var nm=$('clk-t-name'); if(document.activeElement!==nm) nm.value=T.name||'';
-    $('clk-t-times').value=String(times()); if($('clk-t-times').value!==String(times())) $('clk-t-times').value='1';
     var tn=$('clk-t-tone'); tn.value=T.tone||'rise'; if(tn.value!==(T.tone||'rise')) tn.value='rise';
     $('clk-t-vib').checked=T.vibrate!==false;
   }
@@ -19683,6 +19698,35 @@ html body .ayu-why[hidden]{display:none}
   var n=0, iv=setInterval(function(){ var h=$('tab-help'); if(h && !h._ayuWhy){ h._ayuWhy=1; obs.observe(h,{attributes:true,attributeFilter:['class']}); } if(++n>20) clearInterval(iv); },300);
 })();
 </script>
+<style id="clock-timer-20261108">
+/* Reminders → Clock: tabs fit their names; Timer with a clock pop-up and Alerts For / Until I stop it; compact fields; ▶ like Health Breaks */
+html body #rem-alarm-card .clk-pills button:not(#ayu-x1){flex:1 1 0;min-width:max-content;padding:8px 6px;overflow:visible;text-overflow:clip}
+@media (max-width:400px){html body #rem-alarm-card .clk-pills button:not(#ayu-x1){font-size:12px;padding:7px 4px}html body #rem-alarm-card .clk-pills:not(#ayu-x1){gap:2px}}
+@media (max-width:340px){html body #rem-alarm-card .clk-pills button:not(#ayu-x1){font-size:11px;padding:7px 2px}}
+html body #rem-alarm-card .clk-pick{flex:1 1 auto;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:8px;height:34px;padding:0 12px;border-radius:10px;border:1.5px solid color-mix(in srgb,#0f766e 45%,#fff);background:#fff;color:#134e4a;font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-align:left}
+html body #rem-alarm-card .clk-pick:disabled{opacity:.5;cursor:default}
+html body #rem-alarm-card .clk-pick svg{flex:0 0 auto;color:#0f766e}
+html body #rem-alarm-card #clk-t-total{flex:0 1 auto;min-width:118px}
+html body #rem-alarm-card .clk-al-row{align-items:flex-start}
+html body #rem-alarm-card .clk-al-row .ayu-al-lbl{display:inline-flex;align-items:center;gap:6px;padding-top:7px}
+html body #rem-alarm-card .clk-al-opts{flex:1 1 0;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+html body #rem-alarm-card .clk-radio{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:#134e4a;cursor:pointer;min-height:34px}
+html body #rem-alarm-card .clk-radio input{width:18px;height:18px;margin:0;accent-color:#0f766e}
+html body #rem-alarm-card .clk-al-info{margin:-4px 0 10px}
+html body #rem-alarm-card .clk-al-info p{margin:0 0 6px}
+html body #rem-alarm-card .clk-al-info p:last-child{margin-bottom:0}
+html body .tp-dialog .dur-ok:disabled{opacity:.45;cursor:default}
+/* the fields only as tall as their text */
+html body #rem-alarm-card #clk-t-fields #clk-t-name:not(#ayu-x1),html body #rem-alarm-card #clk-t-fields select:not(#ayu-x1){height:34px !important;min-height:0 !important;padding:0 12px !important;font-size:14px !important;line-height:normal !important;border-radius:10px !important}
+html body #rem-alarm-card #clk-t-fields select:not(#ayu-x1){padding-right:32px !important}
+/* every ▶ in Clock: the Health Breaks look */
+html body #rem-alarm-card .ayu-al-play:not(#ayu-x1):not(#ayu-x2){width:30px !important;height:30px !important;min-width:30px !important;flex:0 0 30px !important;padding:0 !important;border-radius:10px !important;border:1px solid color-mix(in srgb,#0d9488 55%,#fff) !important;background:transparent !important;color:#087e75 !important;box-shadow:none !important;display:inline-flex;align-items:center;justify-content:center;font-size:14px !important;align-self:center}
+/* Personal Reminders → Read aloud → Language: a text box (not a switch), the list as in Health Breaks */
+html body #alerts-panel .custom-reminder-form .ayu-speak-vrow.ayu-vib-fld:not(#ayu-x1){grid-template-columns:92px minmax(0,1fr) auto;column-gap:8px}
+html body #alerts-panel .custom-reminder-form .ayu-vib-fld input.ayu-lang-q:not(#ayu-x1):not(#ayu-x2){appearance:none !important;-webkit-appearance:none !important;width:100% !important;height:var(--ayu-lc-h,40px) !important;min-height:0 !important;padding:6px 30px 6px 12px !important;border:1px solid var(--ayu-lc-b,#cbd5e1) !important;border-radius:var(--ayu-lc-r,12px) !important;background:#fff !important;color:#1e293b !important;cursor:pointer;font-size:var(--ayu-lc-fs,14px) !important}
+html body #alerts-panel .custom-reminder-form .ayu-vib-fld input.ayu-lang-q:not(#ayu-x1):not(#ayu-x2):checked{background:#fff !important}
+html body #alerts-panel .custom-reminder-form .ayu-vib-fld input.ayu-lang-q:focus:not(#ayu-x1):not(#ayu-x2){cursor:text;border-color:#0d9488 !important}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
