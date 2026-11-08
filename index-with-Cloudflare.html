@@ -15342,7 +15342,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   // Dots: Settings icon = notifications or advertising cookies on; Help icon = a notification problem was found.
   function update(){
     var n=false,c=false,prob=false;
-    try{ n=!!(typeof isMasterNotifyOn==='function' && isMasterNotifyOn()); }catch(e){}
+    try{ n=!!(window.ayuNotifWanted ? window.ayuNotifWanted() : (typeof isMasterNotifyOn==='function' && isMasterNotifyOn())); }catch(e){}   // a reminder that is really on
     try{ var cc=getCookieConsent(); c=!!(cc&&cc.advertising); }catch(e){}
     try{
       var want=n || (typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled());
@@ -15351,6 +15351,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
         else if(Notification.permission==='granted' && window.ayuPush && ayuPush.api && NUDGE_IS_PHONE && ayuPush.error) prob=true;
       }
     }catch(e){}
+    window.ayuFooterDots=update;
     var t=$('tab-settings'); if(t) t.classList.toggle('has-on',n||c);
     var h=$('tab-help'); if(h) h.classList.toggle('has-prob',prob);
     var a=document.querySelector('#subtab-notifications .fs-dot'), b=document.querySelector('#subtab-cookies .fs-dot');
@@ -18727,7 +18728,7 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
 </script>
 <style id="app-updates-20261105">
 /* Android app: Backup & Restore → App Updates */
-html body #sec-backup > .footer-subtabs #subtab-app .fs-dot,html body #sec-backup > .footer-subtabs #subtab-bkp .fs-dot{background:#f59e0b;top:5px;right:7px}
+html body #sec-backup > .footer-subtabs #subtab-app .fs-dot,html body #sec-backup > .footer-subtabs #subtab-bkp .fs-dot{background:#f59e0b}
 html body #sec-app .au-card{margin:4px 0 10px;padding:14px 16px;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--footer-accent,#255cc0) 30%,#fff);background:color-mix(in srgb,var(--footer-accent,#255cc0) 6%,#fff)}
 html body #sec-app .au-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 html body #sec-app .au-ver{font-weight:800;font-size:15px}
@@ -19524,6 +19525,14 @@ html body #alerts-panel .alert-card .ayu-hb-days .otd-title:not(#ayu-x1):before{
   }
   // the old main switch is always on now; each section's own switch decides
   window.isMasterNotifyOn=function(){ return true; };
+  // a reminder that is really on: a Health Breaks section, Checks → Notify Me, or a Personal Reminder (for the footer dots)
+  window.ayuNotifWanted=function(){
+    if(KEYS.some(function(k){ var e=document.getElementById(k==='eyeex'?'eye-ex-notify':'alert-'+k+'-notify'); return e && e.checked; })) return true;
+    try{ if(typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()) return true; }catch(e){}
+    return [].some.call(document.querySelectorAll('#custom-reminders-list .custom-reminder-item'),function(it){ try{ var d=JSON.parse(it.dataset.reminder||'{}'); return d.enabled!==false && d.on!==false; }catch(e){ return false; } });
+  };
+  document.addEventListener('change',function(){ [300,1200].forEach(function(t){ setTimeout(function(){ try{ if(window.ayuFooterDots) window.ayuFooterDots(); }catch(e){} },t); }); },true);
+  window.addEventListener('load',function(){ setTimeout(function(){ try{ if(window.ayuFooterDots) window.ayuFooterDots(); }catch(e){} },1500); });
   var sm=window.setMasterNotifyFlag; window.setMasterNotifyFlag=function(){ if(typeof sm==='function') sm(true); };
 
   // the first tap in Reminders asks for permission to notify (needed for notifications when a section is on)
@@ -19709,6 +19718,8 @@ html body #alerts-panel .ayu-rem-group .alert-card:is(.collapsed,.ayu-sub-off):n
 html body #sec-backup > .footer-subtabs #subtab-bkp .fs-dot,html body #sec-backup > .footer-subtabs #subtab-app .fs-dot{background:#f59e0b;top:5px;right:7px}
 html body #sec-app details.app-part > summary .app-part-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 0 1.5px #fff;margin-left:6px;vertical-align:super;flex:0 0 auto}
 html body #sec-app .app-upd-note{color:#92400e;font-weight:600}
+html body #sec-backup > .footer-subtabs #subtab-app .fs-dot:not(#ayu-x1),html body #sec-backup > .footer-subtabs #subtab-bkp .fs-dot:not(#ayu-x1){top:-2px;right:-2px}   /* the corner, as in Settings */
+html body #sec-backup > .footer-subtabs .footer-subtab:not(#ayu-x1){overflow:visible}
 </style>
 <script id="sub-dots-20261108-js">
 (function(){
@@ -19726,6 +19737,68 @@ html body #sec-app .app-upd-note{color:#92400e;font-weight:600}
   var n=0, iv=setInterval(function(){ hook(); paint(); try{ if(window.ayuBackupRefreshDot) window.ayuBackupRefreshDot(); }catch(e){} if(++n>20) clearInterval(iv); },500);
   document.addEventListener('click',function(){ setTimeout(paint,100); },true);
   window.addEventListener('storage',paint);
+})();
+</script>
+<style id="fold-sum-20261108">
+/* My Day Plan and Health Breaks: fold the whole card; folded, one line says what is on */
+html body .ayu-fold-chev{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;margin-left:auto;border:0;background:transparent;color:inherit;cursor:pointer;border-radius:8px;transition:transform .18s ease}
+html body .ayu-fold-chev[aria-expanded="true"]{transform:rotate(180deg)}
+html body .ayu-fold-sum{font-size:13.5px;font-weight:600;line-height:1.4;margin:6px 0 2px;opacity:.9}
+html body .ayu-fold-sum[hidden]{display:none !important}
+html body #routines-panel #start-my-day-card > .rout-card-hdr{display:flex;align-items:center}
+html body #routines-panel #start-my-day-card .ayu-fold-chev{color:rgb(167,91,18);margin-right:-10px}
+html body #routines-panel #start-my-day-card .ayu-fold-sum{color:rgb(120,66,14)}
+html body #routines-panel #start-my-day-card.ayu-folded > :not(.rout-card-hdr):not(.ayu-fold-sum):not(.sec-lotus-layer):not(#rout-info-wake):not(#ayu-x1){display:none !important}
+html body #alerts-panel .ayu-part-title .ayu-fold-chev{color:rgb(19,78,74)}
+html body #alerts-panel .ayu-rem-group > .ayu-fold-sum{color:rgb(19,78,74);margin:8px 2px 4px}
+html body #alerts-panel .ayu-rem-group.ayu-folded > .alert-card:not(#ayu-x1){display:none !important}
+@media (min-width:641px){ html body #routines-panel #start-my-day-card .ayu-fold-chev{margin-right:-19px} }
+</style>
+<script id="fold-sum-20261108-js">
+(function(){
+  var K='ayuBase6-fold', CHEV='<svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"></path></svg>';
+  function $(i){ return document.getElementById(i); }
+  function get(){ try{ return JSON.parse(localStorage.getItem(K)||'{}')||{}; }catch(e){ return {}; } }
+  function put(k,v){ var o=get(); o[k]=v; try{ localStorage.setItem(K,JSON.stringify(o)); }catch(e){} }
+  function on(id){ var e=$(id); return !!(e && e.checked); }
+  function mins(t){ var m=/(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(t||''); if(!m) return null; var h=+m[1]%12+(/p/i.test(m[3])?12:0); return h*60+(+m[2]); }
+  // ---- what the folded line says ----
+  function mdpText(){
+    var w=$('wake-time-val'), s=['Wake-up '+(w ? w.textContent.trim() : '')];
+    s.push('Alarm '+(on('wake-al-on')?'on':'off')); s.push('Notify Me '+(on('routines-master-toggle')?'on':'off'));
+    return s.join(' · ');
+  }
+  var HB=[['alert-card-break','Eyes (20-20-20)'],['alert-card-walk','Walk'],['alert-card-drink','Water'],['alert-card-break-ex','Eyes (Exercise)']];
+  function hbText(){
+    var names=[], best=null, bestT='', now=new Date(), nm=now.getHours()*60+now.getMinutes();
+    HB.forEach(function(p){
+      var c=$(p[0]), t=c && c.querySelector('.alert-enabled-toggle input'); if(!t || !t.checked) return; names.push(p[1]);
+      var h=c.querySelector('.alert-card-hdr'), m=h && /Next:\s*([^\n]+)/.exec(h.innerText||''); if(!m) return;
+      var v=mins(m[1]); if(v===null) return; var d=(v-nm+1440)%1440; if(best===null || d<best){ best=d; bestT=m[1].trim(); }
+    });
+    if(!names.length) return 'All off';
+    return (names.length===1 ? names[0] : names.slice(0,-1).join(', ')+' and '+names[names.length-1])+' on'+(bestT?' · Next: '+bestT:'');
+  }
+  // ---- a fold chevron on a title row, and the line under it ----
+  function setup(key,host,title,body,text){
+    if(!host || !title || title.querySelector('.ayu-fold-chev')) return !!(title && title.querySelector('.ayu-fold-chev'));
+    var b=document.createElement('button'); b.type='button'; b.className='ayu-fold-chev'; b.innerHTML=CHEV; b.setAttribute('aria-label','Open or close'); title.appendChild(b);
+    var sum=document.createElement('div'); sum.className='ayu-fold-sum'; sum.setAttribute('aria-live','polite'); title.after(sum);
+    function paint(){ var f=!!get()[key]; host.classList.toggle('ayu-folded',f); b.setAttribute('aria-expanded',String(!f)); sum.hidden=!f; if(f) sum.textContent=text(); }
+    b.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); put(key,!get()[key]); paint(); });
+    host._ayuFoldPaint=paint; paint(); return true;
+  }
+  function all(){
+    var a=setup('mdp',$('start-my-day-card'),document.querySelector('#start-my-day-card > .rout-card-hdr'),null,mdpText);
+    var rc=$('reminder-hours-card'), g=rc && rc.parentElement, t=rc && rc.previousElementSibling;
+    var h=setup('hb',g,(t && t.classList.contains('ayu-part-title'))?t:null,null,hbText);
+    return a && h;
+  }
+  function repaint(){ [$('start-my-day-card'), $('reminder-hours-card') && $('reminder-hours-card').parentElement].forEach(function(x){ if(x && x._ayuFoldPaint) x._ayuFoldPaint(); }); }
+  document.addEventListener('change',function(){ setTimeout(repaint,400); },true);
+  document.addEventListener('input',function(e){ if(e.target && e.target.id==='wake-time-slider') setTimeout(repaint,50); },true);
+  setInterval(repaint,30000);   // "Next" moves on
+  var n=0, iv=setInterval(function(){ if(all() || ++n>40) clearInterval(iv); },300);
 })();
 </script>
 </body>
