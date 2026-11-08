@@ -18255,21 +18255,22 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
 
   // ───── state (the same rules as the phone's ClockKit) ─────
   var T=ld(K_T,null), S=ld(K_S,null), W=ld(K_W,null);
-  if(!T) T={name:'',ms:300000,times:1,tone:'rise',vibrate:true,run:'idle',round:0,endAt:0,left:300000,v:0};
+  if(!T) T={name:'',ms:0,times:1,tone:'rise',vibrate:true,run:'idle',round:0,endAt:0,left:0,v:0,set:0};
   if(!S) S={run:'idle',startAt:0,acc:0,laps:[],v:0};
   if(!W) W={on:false,list:[],v:0};
-  function len(){ return Math.max(1000,+T.ms||300000); }
+  function len(){ return Math.max(1000,+T.ms||0); }
+  function unset(){ return !(+T.ms>0); }
   function times(){ return Math.max(0,+T.times||0); }
   function tStart(now){ T.run='running'; T.round=1; T.endAt=now+len(); T.left=len(); T.v=now; }
   function tPause(now){ if(T.run!=='running') return; T.left=Math.max(0,T.endAt-now); T.run='paused'; T.v=now; }
   function tResume(now){ if(T.run!=='paused') return; T.endAt=now+Math.max(1000,T.left||len()); T.run='running'; T.v=now; }
-  function tReset(now){ T.run='idle'; T.round=0; T.endAt=0; T.left=len(); T.fired=0; T.v=now; }
+  function tReset(now){ T.run='idle'; T.round=0; T.endAt=0; T.ms=0; T.left=0; T.fired=0; T.v=now; }
   function tAdd(now,ms){ if(T.run==='running') T.endAt+=ms; else if(T.run==='paused') T.left+=ms; else return; T.v=now; }
   function tFire(now,keepV){
     if(T.run!=='running' || now<T.endAt-1500) return false;
     var n=times(), r=Math.max(1,T.round||1); T.fired=now; if(!keepV) T.v=now;
     if(n===0 || r<n){ var nx=T.endAt+len(); while(nx<=now) nx+=len(); T.round=r+1; T.endAt=nx; }
-    else { T.run='idle'; T.round=0; T.endAt=0; T.left=len(); }
+    else { T.run='idle'; T.round=0; T.endAt=0; T.ms=0; T.left=0; }
     return true;
   }
   function sEl(now){ return S.run==='running' ? (S.acc||0)+Math.max(0,now-S.startAt) : (S.acc||0); }
@@ -18324,11 +18325,10 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
   function partTimer(){
     var opts=''; try{ opts=(window.ayuTones? window.ayuTones.options() : '<option value="rise">Rising chime</option>').replace(/<option value="upload">[^<]*<\/option>/,''); }catch(e){}
     var chev='<svg viewBox="0 0 12 8" width="12" height="8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"></path></svg>';
-    return '<div class="clk-big" id="clk-t-big" aria-live="off"></div><div class="clk-cap" id="clk-t-cap"></div>'
+    return '<div class="clk-big" id="clk-t-big" aria-live="off" role="button" tabindex="0" aria-label="Set the timer"></div><div class="clk-cap" id="clk-t-cap"></div>'
       +'<div class="clk-btns"><button type="button" id="clk-t-start">Start</button><button type="button" id="clk-t-pause">Pause</button><button type="button" id="clk-t-resume">Resume</button>'
       +'<button type="button" class="alt" id="clk-t-add">+1 min</button><button type="button" class="alt" id="clk-t-reset">Reset</button></div>'
       +'<div class="ayu-al-body clk-fields" id="clk-t-fields"><p class="clk-note" id="clk-t-note" hidden>Reset the timer to change these.</p>'
-      +'<div class="ayu-al-row"><span class="ayu-al-lbl">Timer</span><button type="button" class="clk-pick" id="clk-t-len" aria-label="Timer length"><span></span>'+chev+'</button></div>'
       +'<div class="ayu-al-row clk-al-row"><span class="ayu-al-lbl">Repeat</span>'
       +'<div class="clk-rep" role="radiogroup" aria-label="Repeat">'
       +'<div class="clk-rep-o"><label class="clk-radio"><input type="radio" name="clk-t-rep" value="times" id="clk-t-rep-times"><span>Times</span></label>'
@@ -18355,7 +18355,7 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
   }
 
   function infoMore(){
-    return '<strong>Timer</strong><ul><li>Tap <b>Timer</b> to choose how long each round is (a clock). It alerts each time that passes, and starts again by itself.</li><li><b>Repeat</b>: a number of <b>Times</b> (1 = a normal timer), <b>For</b> a total time under 24 hours, or <b>Until I stop it</b> (stops by itself after 24 hours). Example: Timer 3 minutes, For 30 minutes = 10 alerts.</li>'
+    return '<strong>Timer</strong><ul><li>Tap the <b>time</b> to set the timer (hours, minutes, seconds). It alerts each time that passes and starts again by itself; when it is done it goes back to 00:00.</li><li><b>Repeat</b>: a number of <b>Times</b> (1 = a normal timer), <b>For</b> a total time under 24 hours, or <b>Until I stop it</b> (stops by itself after 24 hours). Example: Timer 3 minutes, For 30 minutes = 10 alerts.</li>'
       +'<li><b>Sound</b>'+(document.documentElement.classList.contains('ayu-can-vib')?' and <b>Vibrate</b>':'')+' for the alert. <b>Pause</b>, <b>+1 min</b> and <b>Reset</b> while it runs; reset it to change the settings.</li></ul>'
       +'<strong>Stopwatch</strong><ul><li><b>Start</b>, <b>Pause</b>, <b>Lap</b> and <b>Reset</b>. The fastest and slowest laps are marked.</li></ul>'
       +'<strong>World Clock</strong><ul><li>Add up to '+MAX_CITIES+' cities in different time zones: each shows its time and how far ahead or behind your time it is.</li></ul>'
@@ -18387,18 +18387,19 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     var q=function(i){ return $(i); };
     norm();
     function act(f){ var now=Date.now(); norm(); f(now); stopRing(); saveAll(); paintTimer(); }
-    q('clk-t-start').addEventListener('click',function(){ if(len()<1000) return; act(tStart); });
+    q('clk-t-start').addEventListener('click',function(){ if(unset()) return; act(tStart); });
     q('clk-t-pause').addEventListener('click',function(){ act(tPause); });
     q('clk-t-resume').addEventListener('click',function(){ act(tResume); });
     q('clk-t-reset').addEventListener('click',function(){ act(tReset); });
     q('clk-t-add').addEventListener('click',function(){ act(function(n){ tAdd(n,60000); }); });
     function edit(){ if(T.run!=='idle') return; norm(); T.v=Date.now(); saveAll(); paintTimer(); }
     function pick(cur,min,title,label,done){ var P=window.ayuDurationPicker; if(!P) return; P(Math.max(1,Math.round(cur/60000)),function(n){ done(n*60000); },{title:title,min:min,label:label}); }
-    // Timer: how long each round is (a clock pop-up)
-    q('clk-t-len').addEventListener('click',function(){ if(T.run!=='idle') return;
-      pick(len(),1,'Timer',function(n){ return 'Alerts every '+R().durationLabel(n); },function(ms){ T.ms=ms; T.left=ms; edit(); }); });
+    // Timer: tap the time to choose hours, minutes and seconds
+    function setLen(){ if(T.run!=='idle') return; openHMS(unset()?0:len(),function(ms){ T.ms=ms; T.left=ms; T.set=Date.now(); T.fired=0; edit(); }); }
+    q('clk-t-big').addEventListener('click',setLen);
+    q('clk-t-big').addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); setLen(); } });
     // Repeat: Times (a count), For (a time under 24 hours, the Timer or longer), Until I stop it (24 hours at most)
-    q('clk-t-total').addEventListener('click',function(){ if(T.run!=='idle') return; var m=Math.max(1,Math.round(len()/60000));
+    q('clk-t-total').addEventListener('click',function(){ if(T.run!=='idle') return; var m=Math.max(1,Math.ceil(len()/60000));
       pick(forMs(),m,'Repeat for',function(n){ var k=Math.max(1,Math.floor(n*60000/len())); return 'For '+R().durationLabel(n)+' · '+k+' time'+(k>1?'s':''); },function(ms){ T.rep='for'; T.total=ms; edit(); }); });
     ['times','for','stop'].forEach(function(k){ q('clk-t-rep-'+k).addEventListener('change',function(){ if(this.checked){ T.rep=k; edit(); } }); });
     function step(d){ if(T.run!=='idle') return; T.rep='times'; T.count=Math.min(99,Math.max(1,(+T.count||1)+d)); edit(); }
@@ -18409,12 +18410,40 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     var playing=false;
     q('clk-t-play').addEventListener('click',function(){ var tn=window.ayuTones; if(!tn) return; if(playing){ tn.stop(); playing=false; this.textContent='▶'; return; } tn.start(q('clk-t-tone').value||'rise',false); playing=true; var b=this; b.textContent='■'; setTimeout(function(){ playing=false; b.textContent='▶'; },3000); });
   }
+  // the time picker for the Timer: hours, minutes and seconds wheels
+  function openHMS(ms,onOK){
+    ms=Math.max(0,Math.round((+ms||0)/1000)); var v=[Math.floor(ms/3600)%24,Math.floor(ms%3600/60),ms%60], IH=40;
+    var ov=document.createElement('div'); ov.className='tp-overlay clk-hms-ov';
+    function col(k,n,lbl){ var h='<div class="clk-hms-c"><div class="clk-hms-h">'+lbl+'</div><div class="clk-hms-w" tabindex="0" role="spinbutton" aria-label="'+lbl+'" aria-valuemin="0" aria-valuemax="'+(n-1)+'" data-k="'+k+'"><div class="clk-hms-pad"></div>'; for(var i=0;i<n;i++) h+='<div class="clk-hms-i" data-v="'+i+'">'+(i<10?'0':'')+i+'</div>'; return h+'<div class="clk-hms-pad"></div></div></div>'; }
+    ov.innerHTML='<div class="tp-dialog clk-hms" role="dialog" aria-modal="true" aria-label="Timer"><div class="tp-title">Timer</div><div class="clk-hms-cols"><div class="clk-hms-band" aria-hidden="true"></div>'+col(0,24,'Hours')+col(1,60,'Minutes')+col(2,60,'Seconds')+'</div><div class="duration-clock-preview clk-hms-p"></div><div class="tp-actions"><button type="button" class="tp-btn clk-hms-x">Cancel</button><button type="button" class="tp-btn tp-ok clk-hms-ok">OK</button></div></div>';
+    document.body.appendChild(ov);
+    var ws=[].slice.call(ov.querySelectorAll('.clk-hms-w')), ok=ov.querySelector('.clk-hms-ok');
+    function sum(){ return (v[0]*3600+v[1]*60+v[2])*1000; }
+    function draw(){ ws.forEach(function(w,k){ w.setAttribute('aria-valuenow',v[k]); [].forEach.call(w.querySelectorAll('.clk-hms-i'),function(it){ it.classList.toggle('on',+it.dataset.v===v[k]); }); });
+      var t=sum(); ov.querySelector('.clk-hms-p').textContent=t ? 'Alerts every '+lenTxt(t) : 'Choose a time'; ok.disabled=!t; }
+    function go(w,k,i,smooth){ v[k]=i; w.scrollTo({top:i*IH,behavior:smooth?'smooth':'auto'}); draw(); }
+    ws.forEach(function(w,k){
+      var tm=0, max=w.querySelectorAll('.clk-hms-i').length-1;
+      w.addEventListener('scroll',function(){ clearTimeout(tm); tm=setTimeout(function(){ var i=Math.max(0,Math.min(max,Math.round(w.scrollTop/IH))); if(i!==v[k]){ v[k]=i; draw(); } },80); });
+      w.addEventListener('click',function(e){ var it=e.target.closest('.clk-hms-i'); if(it) go(w,k,+it.dataset.v,true); });
+      w.addEventListener('keydown',function(e){ if(e.key==='ArrowUp'||e.key==='ArrowDown'){ e.preventDefault(); go(w,k,Math.max(0,Math.min(max,v[k]+(e.key==='ArrowUp'?-1:1))),true); } });
+    });
+    function close(){ ov.remove(); document.removeEventListener('keydown',esc,true); }
+    function esc(e){ if(e.key==='Escape'){ e.stopPropagation(); close(); } }
+    document.addEventListener('keydown',esc,true);
+    ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
+    ov.querySelector('.clk-hms-x').onclick=close;
+    ok.onclick=function(){ var t=sum(); if(!t) return; close(); onOK(t); };
+    requestAnimationFrame(function(){ ws.forEach(function(w,k){ w.scrollTop=v[k]*IH; }); draw(); ws[1].focus({preventScroll:true}); });
+  }
   function R(){ return window.__ayuRem || {durationLabel:function(n){ return n+' min'; }}; }
   var DAY=86400000, FOR_MAX=1439*60000;
   function forMs(){ return Math.min(FOR_MAX,Math.max(len(),+T.total||len())); }
   // Repeat → the number of alerts the timer (and the phone) counts; no name any more
   function norm(){
     if(T.name) T.name='';
+    if(T.set===undefined){ T.set=0; if(T.run==='idle'){ T.ms=0; T.left=0; } }   // starts at 00:00
+    if(T.run==='idle' && T.fired && +T.fired>=(+T.set||0) && +T.ms>0){ T.ms=0; T.left=0; }   // done (also when the phone finished it): back to 00:00
     if(T.rep!=='times' && T.rep!=='for' && T.rep!=='stop'){ T.rep = +T.times===0 ? 'stop' : 'times'; if(T.rep==='times') T.count=Math.min(99,Math.max(1,+T.times||1)); }
     if(T.run!=='idle') return;
     T.times = T.rep==='stop' ? Math.max(1,Math.floor(DAY/len())) : T.rep==='for' ? Math.max(1,Math.floor(forMs()/len())) : Math.min(99,Math.max(1,+T.count||1));
@@ -18422,23 +18451,25 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
   function paintTimer(keepFields){
     var big=$('clk-t-big'); if(!big) return;
     var now=Date.now(), run=T.run;
-    big.textContent = run==='running' ? hms(T.endAt-now) : run==='paused' ? hms(T.left) : hms(len());
+    if(run==='idle' && T.fired && +T.fired>=(+T.set||0) && +T.ms>0){ T.ms=0; T.left=0; sv(K_T,T); }
+    big.textContent = run==='running' ? hms(T.endAt-now) : run==='paused' ? hms(T.left) : (unset() ? hms(0) : hms(len()));
+    big.classList.toggle('clk-set',run==='idle'); big.setAttribute('aria-disabled',String(run!=='idle')); big.title=run==='idle'?'Tap to set the timer':'';
     var cap=$('clk-t-cap'), rt=roundTxt(), up=run==='idle' && T.fired && now-T.fired<10*60000;
     cap.classList.toggle('up',!!up);
     cap.textContent = run==='running' ? [rt, times()!==1?'every '+lenTxt(len()):'' ].filter(Boolean).join(' · ') || 'Running'
       : run==='paused' ? 'Paused'+(rt?' · '+rt:'')
       : up ? 'Time’s up at '+clockTxt(new Date(T.fired))
+      : unset() ? 'Tap the time to set the timer'
       : (times()===1 ? 'Alerts once' : T.rep==='stop' ? 'Every '+lenTxt(len())+' until you stop it\nStops by itself after 24 hours' : T.rep==='for' ? 'Every '+lenTxt(len())+' for '+lenTxt(forMs())+' ('+times()+' times)' : 'Every '+lenTxt(len())+', '+times()+' times');
     $('clk-t-start').hidden=run!=='idle'; $('clk-t-pause').hidden=run!=='running'; $('clk-t-resume').hidden=run!=='paused';
     $('clk-t-add').hidden=run==='idle'; $('clk-t-reset').hidden=run==='idle';
     if(keepFields) return;
     var f=$('clk-t-fields'), lock=run!=='idle'; f.classList.toggle('locked',lock); $('clk-t-note').hidden=!lock;
-    $('clk-t-len').querySelector('span').textContent=lenTxt(len());
+    $('clk-t-start').disabled=unset();
     ['times','for','stop'].forEach(function(k){ $('clk-t-rep-'+k).checked=T.rep===k; $('clk-t-rep-'+k).disabled=lock; });
     var c=Math.min(99,Math.max(1,+T.count||1)); $('clk-t-count').textContent=c;
     $('clk-t-minus').disabled=lock||T.rep!=='times'||c<=1; $('clk-t-plus').disabled=lock||T.rep!=='times'||c>=99;
     $('clk-t-total').querySelector('span').textContent=lenTxt(forMs()); $('clk-t-total').disabled=lock||T.rep!=='for';
-    $('clk-t-len').disabled=lock;
     var tn=$('clk-t-tone'); tn.value=T.tone||'rise'; if(tn.value!==(T.tone||'rise')) tn.value='rise';
     $('clk-t-vib').checked=T.vibrate!==false;
   }
@@ -19751,6 +19782,23 @@ html body #rem-alarm-card .clk-step button{width:34px;height:100%;border:0;backg
 html body #rem-alarm-card .clk-step button:disabled{opacity:.35;cursor:default}
 html body #rem-alarm-card .clk-step b{min-width:28px;text-align:center;font-size:14px;color:#134e4a}
 html body #rem-alarm-card #clk-t-total:not(#ayu-x1){flex:0 1 130px;min-width:86px;padding:0 10px}
+</style>
+<style id="clock-hms-20261108">
+/* Timer: tap the time to set it (hours, minutes, seconds); 00:00 until set and again when done */
+html body #rem-alarm-card #clk-t-big.clk-set{cursor:pointer;border-radius:14px;transition:background .15s}
+html body #rem-alarm-card #clk-t-big.clk-set:hover,html body #rem-alarm-card #clk-t-big.clk-set:focus-visible{background:color-mix(in srgb,#0d9488 9%,transparent);outline:none}
+html body #rem-alarm-card #clk-t-start:disabled{opacity:.45;cursor:default}
+.clk-hms .clk-hms-cols{position:relative;display:flex;gap:6px;justify-content:center}
+.clk-hms .clk-hms-c{flex:1 1 0;min-width:0;text-align:center}
+.clk-hms .clk-hms-h{font-size:12px;font-weight:700;color:#0f766e;margin-bottom:6px}
+.clk-hms .clk-hms-w{position:relative;z-index:1;height:200px;overflow-y:auto;scroll-snap-type:y mandatory;scroll-padding-top:80px;scrollbar-width:none;-webkit-mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);outline:none;border-radius:10px}
+.clk-hms .clk-hms-w::-webkit-scrollbar{display:none}
+.clk-hms .clk-hms-w:focus-visible{box-shadow:0 0 0 2px #0d9488 inset}
+.clk-hms .clk-hms-pad{height:80px}
+.clk-hms .clk-hms-i{height:40px;line-height:40px;scroll-snap-align:start;font-size:20px;color:#64748b;cursor:pointer;font-variant-numeric:tabular-nums}
+.clk-hms .clk-hms-i.on{color:#134e4a;font-weight:800;font-size:24px}
+.clk-hms .clk-hms-band{position:absolute;left:0;right:0;top:calc(18px + 6px + 80px);height:40px;border-radius:10px;background:color-mix(in srgb,#0d9488 14%,#fff);pointer-events:none}
+.clk-hms .clk-hms-ok:disabled{opacity:.45;cursor:default}
 </style>
 </body>
 
