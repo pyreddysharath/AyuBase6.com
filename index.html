@@ -12926,6 +12926,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   window.ayuDurationPicker=openDurationPicker;
   function startReminder(item){
     const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name)return;
+    item.dataset.startedAt=item.dataset.startedAt||String(Date.now());   // repeating reminders count from this moment (Android app)
     const notify=()=>{try{if(Array.isArray(data.days)&&data.days.length&&!data.days.includes(new Date().getDay()))return;if(window.ayuLeader===false)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')(typeof showNudgeNotification==='function'?showNudgeNotification(data.name,'It is time for your reminder.',{key:'custom-'+item.dataset.reminderId}):new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()}))}catch(_){}};
     if(data.mode==='regular')item._reminderTimer=setInterval(notify,Math.max(1,Number(data.duration)||1)*60000);
     else if(data.mode==='dates')item._reminderTimer=setInterval(()=>{const n=new Date(),hm=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');if(!(data.times||[]).includes(hm)||!window.ayuOnDate(data,n))return;const k=n.toDateString()+hm;if(item._lastFire===k)return;item._lastFire=k;notify()},15000);
@@ -13111,6 +13112,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     return null;
   }
   window.ayuReminderSlots={next:nextSlot,latest:latestSlot};
+  window.ayuReminderWindows=function(){return cards};   // read by the reminder rules (Android app)
   const lastSlot={},GRACE=5*60000;
   function tick(key){
     const st=typeof alertState!=='undefined'&&alertState[key];if(!st||!st.enabled)return;
@@ -19861,12 +19863,109 @@ html body #ayu-checklist > #routines-notify-card.ayu-in-day{margin-top:0 !import
 /* Checks: every title in capitals (Pascal case); a line more before the first part of the checklist; no line under the last check of a part;
    less space under Wake-up Alarm and under the last check */
 html body #routines-panel :is(h2,h3,.wake-bar-lbl,.ayu-al-lbl,.chk-lbl,.otd-title,.ayu-speak-lbl){text-transform:capitalize}
-html body #ayu-checklist > .ayu-cl-part:not(.ayu-cl-part ~ .ayu-cl-part){margin-top:42px !important}
 html body #ayu-checklist .ayu-cl-part > .rout-row:not(:has(~ .rout-row)){border-bottom:0 !important}
 html body #ayu-checklist > .ayu-cl-part:not(:has(~ .ayu-cl-part)) > .rout-row:not(:has(~ .rout-row)){padding-bottom:0 !important}
 html body #ayu-checklist:not(#ayu-x1){padding-bottom:18px !important}
 html body #start-my-day-card #chk-alarm.ayu-sub:not(#ayu-x1){margin-bottom:0 !important}
 </style>
+<script id="rules-20261110-js">
+/* The reminder rules the Android app hands to the phone (ayuPush.buildRules). The website sends them nowhere:
+   reminders on the website ring while it is open. ayuPush stays switched off (no server). */
+(function(){
+  function toMin(t){ var m=/^(\d{1,2}):(\d{2})$/.exec(t||''); return m ? (+m[1])*60+(+m[2]) : null; }
+  function localDay(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function buildRules(){
+    var remOn = typeof isMasterNotifyOn==='function' && isMasterNotifyOn();
+    var chkOn = typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled();
+    if(!remOn && !chkOn) return null;   // both switches off
+    if(typeof Notification==='undefined' || Notification.permission!=='granted') return null;
+    var rules = { v:1, tz:'UTC', phone: (typeof NUDGE_IS_PHONE!=='undefined' && !!NUDGE_IS_PHONE), reminders:[], exercise:null, checks:null, custom:[] };
+    try{ rules.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; }catch(e){}
+    var wins = (typeof window.ayuReminderWindows==='function') ? window.ayuReminderWindows() : {};
+    if(remOn) ['break','walk','drink'].forEach(function(key){
+      var st = typeof alertState!=='undefined' && alertState[key]; if(!st || !st.enabled || !(st.minutes>0)) return;
+      var w = wins[key] || {}, lab = ALERT_LABELS[key];
+      var rr={ key:key, title:lab.title, body:lab.msg, every:st.minutes, from:toMin(w.start), to:toMin(w.end) }; var rd=window.ayuDays&&window.ayuDays.get('rem-'+key); if(rd&&rd.length<7) rr.days=rd.slice(); rules.reminders.push(rr);
+    });
+    if(remOn && typeof eyeExState!=='undefined' && eyeExState.enabled && eyeExState.times && eyeExState.times.length){
+      var times = eyeExState.times.map(toMin).filter(function(m){ return m!==null; });
+      if(times.length) rules.exercise = { title:'Eye Exercise', body:'Time for your guided eye exercise — follow the dot for 30 seconds.', times:times, weekdays:(window.ayuDays ? window.ayuDays.get('rem-eyeex').slice() : eyeExState.weekdays) };
+    }
+    if(chkOn){
+      var items=[], done=[];
+      Object.keys(ROUTINE_NOTIFY_ITEMS).forEach(function(key){
+        var at = routineItemMinute(key); if(at===null) return;
+        var cb = routineCb(key); if(cb && cb.checked) done.push(key);
+        var it = ROUTINE_NOTIFY_ITEMS[key];
+        items.push({ key:key, title:it.title, body:it.body, at:at, end:routineEndMinute(key), window:routineWindowText(key), muted:routineIsMuted(key) });
+      });
+      rules.checks = { mode:routineRemindMode(), doneDay:localDay(), done:done, items:items, sound:(window.ayuRoutineSound ? window.ayuRoutineSound() : '') }; var cd=window.ayuDays&&window.ayuDays.get('chk'); if(cd&&cd.length<7) rules.checks.days=cd.slice();
+    }
+    if(remOn) document.querySelectorAll('#custom-reminders-list .custom-reminder-item').forEach(function(item){
+      try{
+        var d = JSON.parse(item.dataset.reminder||'{}'); if(!d.name || d.sound==='none') return;
+        var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode };
+        if(Array.isArray(d.days) && d.days.length && d.days.length<7) c.days = d.days.filter(function(n){ return n>=0 && n<=6; });
+        if(d.mode==='regular'){ c.every = Math.max(1, Number(d.duration)||1); c.anchor = Number(item.dataset.startedAt)||Date.now(); }
+        else if(d.mode==='dates'){ c.sched = d.sched||'once'; if(d.date) c.date = d.date; if(Array.isArray(d.mdays)) c.mdays = d.mdays.slice(); if(c.sched!=='weekly') delete c.days; c.times = (d.times||[]).map(toMin).filter(function(m){ return m!==null; }); }
+        else if(d.mode!=='dates') c.times = (d.times||[]).map(toMin).filter(function(m){ return m!==null; });
+        rules.custom.push(c);
+      }catch(e){}
+    });
+    return rules;
+  }
+  window.ayuPush = { active:false, api:'', error:'', buildRules:buildRules, sync:function(){}, repair:function(){ return Promise.resolve({ sub:false, server:false }); } };
+})();
+</script>
+<style id="checklist-switch-20261110">
+/* Daily Checklist: the Notify Me switch sits on the title (bell, switch, chevron); its settings show under the line only when it is on and open */
+html body #ayu-checklist > .ayu-cl-hdr{display:flex !important;align-items:center;gap:8px;cursor:default}
+html body #ayu-checklist.ayu-cl-on > .ayu-cl-hdr{cursor:pointer}
+html body #ayu-checklist > .ayu-cl-hdr h2{flex:1 1 auto;min-width:0}
+html body #ayu-checklist .ayu-cl-bell{display:inline-flex;color:var(--rout-2,#a75b12);flex:0 0 auto}
+html body #ayu-checklist .ayu-cl-sw{margin:0 !important;flex:0 0 auto;transform:scale(.9);transform-origin:right center}
+html body #ayu-checklist .ayu-cl-chev{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;margin-right:-8px;border:0;background:transparent;color:var(--rout-2,#a75b12);cursor:pointer;transition:transform .2s}
+html body #ayu-checklist:not(.ayu-cl-on) .ayu-cl-chev{visibility:hidden}
+html body #ayu-checklist.ayu-cl-on:not(.ayu-cl-closed) .ayu-cl-chev{transform:rotate(180deg)}
+html body #ayu-checklist #routines-notify-card > .rout-card-hdr{display:none !important}
+html body #ayu-checklist.ayu-cl-closed #routines-notify-card,html body #ayu-checklist:not(.ayu-cl-on) #routines-notify-card,html body #ayu-checklist.ayu-cl-closed #routines-vibrate-card,html body #ayu-checklist:not(.ayu-cl-on) #routines-vibrate-card{display:none !important}
+html body #ayu-checklist #routines-notify-card.ayu-in-day:not(#ayu-x1){padding-top:4px !important;margin-top:0 !important}
+html body #ayu-checklist > .ayu-cl-part:not(.ayu-cl-part ~ .ayu-cl-part){margin-top:22px !important}
+html body #ayu-checklist.ayu-cl-closed > .ayu-cl-part:not(.ayu-cl-part ~ .ayu-cl-part),html body #ayu-checklist:not(.ayu-cl-on) > .ayu-cl-part:not(.ayu-cl-part ~ .ayu-cl-part){margin-top:6px !important}
+</style>
+<script id="checklist-switch-20261110-js">
+(function(){
+  function $(i){ return document.getElementById(i); }
+  var BELL='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>';
+  var CHEV='<svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg>';
+  var mine=null;
+  function paint(){
+    var box=$('ayu-checklist'), nc=$('routines-notify-card'), t=$('routines-master-toggle'); if(!box || !nc || !t || !mine) return;
+    var on=!!t.checked, closed=nc.classList.contains('ayu-closed');
+    if(mine.checked!==on) mine.checked=on;
+    box.classList.toggle('ayu-cl-on',on); box.classList.toggle('ayu-cl-closed',on && closed);
+    var c=box.querySelector('.ayu-cl-chev'); if(c) c.setAttribute('aria-expanded',String(on && !closed));
+  }
+  function fold(){ var nc=$('routines-notify-card'), ch=nc && nc.querySelector(':scope > .rout-card-hdr .ayu-chev'); if(ch) ch.click(); setTimeout(paint,0); }
+  function build(){
+    var box=$('ayu-checklist'), nc=$('routines-notify-card'), t=$('routines-master-toggle'); if(!box || !nc || !t || nc.parentNode!==box) return false;
+    var hdr=box.querySelector(':scope > .ayu-cl-hdr'); if(!hdr) return false;
+    if(hdr.querySelector('.ayu-cl-sw')) return true;
+    // the original Notify Me switch and chevron stay (hidden) and do the work; these only pass the taps on
+    hdr.insertAdjacentHTML('beforeend','<span class="ayu-cl-bell" title="Notify me">'+BELL+'</span><label class="master-switch rout-master-switch ayu-cl-sw" title="Notify me"><input type="checkbox" aria-label="Notify me about the checklist"></label><button type="button" class="ayu-cl-chev" aria-label="Open or close the notification settings" aria-expanded="false">'+CHEV+'</button>');
+    mine=hdr.querySelector('.ayu-cl-sw input');
+    mine.addEventListener('change',function(){ if(t.checked!==mine.checked) t.click(); setTimeout(paint,0); setTimeout(paint,300); });
+    hdr.querySelector('.ayu-cl-chev').addEventListener('click',function(e){ e.stopPropagation(); fold(); });
+    hdr.addEventListener('click',function(e){ if(e.target.closest('.ayu-cl-sw, .ayu-cl-chev, input, label') || !box.classList.contains('ayu-cl-on')) return; fold(); });
+    new MutationObserver(paint).observe(nc,{attributes:true,attributeFilter:['class']});
+    t.addEventListener('change',function(){ setTimeout(paint,0); });
+    document.addEventListener('change',function(){ setTimeout(paint,50); },true);
+    paint(); return true;
+  }
+  var n=0, iv=setInterval(function(){ if(build() || ++n>120) clearInterval(iv); },250);
+  setInterval(paint,2000);   // also after a Reset or a change made elsewhere
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
