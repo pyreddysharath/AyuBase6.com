@@ -393,7 +393,7 @@
       updEvent(); return upd;
     }, function(){
       if(!upd.mine) P.getStatus().then(function(st){ upd.mine = { code:Number(st.versionCode) || 0, name:String(st.versionName || '') }; updEvent(); }).catch(noop);
-      upd.error = 'offline'; if(upd.phase === 'checking') upd.phase = ''; updEvent(); return upd;
+      upd.error = navigator.onLine === false ? 'offline' : 'failed'; if(upd.phase === 'checking') upd.phase = ''; updEvent(); return upd;
     });
   };
   // Update: download (progress), then Android's install screen. If installing updates is not allowed yet, Android's
