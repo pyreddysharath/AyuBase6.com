@@ -382,7 +382,8 @@
     upd.error = ''; upd.phase = upd.phase === 'downloading' ? upd.phase : 'checking'; updEvent();
     return Promise.all([
       P.getStatus().catch(function(){ return {}; }),
-      fetch('config/android-app.json', { cache:'no-cache' }).then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); })
+      fetch('config/android-app.json?t=' + Date.now(), { cache:'no-store' })   // the query skips the website's 10-minute cache
+     .then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); })
     ]).then(function(v){
       upd.mine = { code:Number(v[0] && v[0].versionCode) || 0, name:String((v[0] && v[0].versionName) || '') };
       var cfg = v[1];
