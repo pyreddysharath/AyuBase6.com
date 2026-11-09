@@ -18688,6 +18688,7 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
   function paint(){
     if(!$('au-ver')) return;
     var u=U()||{}, mine=u.mine, L=u.latest, ph=u.phase||'', btn=$('au-btn'), line=$('au-line'), note=$('au-note'), bar=$('au-bar');
+    var bg=ph==='checking' && !!u.checkedAt; if(bg) ph='';   // a new check runs in the background: the last result stays, only the button says Checking…
     $('au-ver').textContent='App version'+(mine&&mine.name?' '+mine.name:'');
     var cls='', txt='', b='Check for update', alt=true, dis=false, nt='', pct=-1;
     if(ph==='downloading'){ cls='busy'; txt='Downloading version '+((L&&L.versionName)||'')+'… '+(u.pct||0)+'%'; b='Downloading…'; dis=true; alt=false; pct=u.pct||0; nt='Keep the app open until it finishes.'; }
@@ -18701,6 +18702,7 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     else if(u.checkedAt){ cls='ok'; txt='✓ Up to date'; nt='Last checked: '+when(u.checkedAt); }
     else { cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
     if(L && (u.error==='download'||u.error==='install')){ b='Update'; alt=false; }
+    if(bg && !L){ b='Checking…'; dis=true; }
     line.className='au-line '+cls; line.textContent=txt; note.textContent=nt;
     btn.textContent=b; btn.disabled=dis; btn.classList.toggle('alt',alt);
     bar.hidden=pct<0; if(pct>=0) bar.firstChild.style.width=pct+'%';
