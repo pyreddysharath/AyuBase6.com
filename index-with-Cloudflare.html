@@ -18887,7 +18887,8 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     else if(L){ cls='new'; txt='New version '+(L.versionName||'')+' is ready'; b='Update'; alt=false; nt='Tap Update; Android asks you to confirm, and your data stays.'; }
     else if(u.error==='download'){ cls='err'; txt='The download didn’t finish. Check your internet and try again.'; b='Check for update'; }
     else if(u.error==='install'){ cls='err'; txt='Android’s install screen didn’t open. Try again.'; }
-    else if(u.error==='offline'){ cls='err'; txt='Couldn’t check. Check your internet and try again.'; }
+    else if(u.error==='offline'){ cls='err'; txt='You’re offline. Connect to the internet and try again.'; }
+    else if(u.error==='failed'){ cls='err'; txt='Couldn’t check for updates right now. Please try again later.'; }
     else if(u.checkedAt){ cls='ok'; txt='✓ Up to date'; nt='Last checked: '+when(u.checkedAt); }
     else { cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
     if(L && (u.error==='download'||u.error==='install')){ b='Update'; alt=false; }
@@ -20045,6 +20046,16 @@ html body #ayu-checklist > #routines-notify-card.ayu-in-day{margin-top:0 !import
   document.addEventListener('DOMContentLoaded',build);
 })();
 </script>
+<style id="checks-titles-20261110">
+/* Checks: every title in capitals (Pascal case); a line more before the first part of the checklist; no line under the last check of a part;
+   less space under Wake-up Alarm and under the last check */
+html body #routines-panel :is(h2,h3,.wake-bar-lbl,.ayu-al-lbl,.chk-lbl,.otd-title,.ayu-speak-lbl){text-transform:capitalize}
+html body #ayu-checklist > .ayu-cl-part:not(.ayu-cl-part ~ .ayu-cl-part){margin-top:42px !important}
+html body #ayu-checklist .ayu-cl-part > .rout-row:not(:has(~ .rout-row)){border-bottom:0 !important}
+html body #ayu-checklist > .ayu-cl-part:not(:has(~ .ayu-cl-part)) > .rout-row:not(:has(~ .rout-row)){padding-bottom:0 !important}
+html body #ayu-checklist:not(#ayu-x1){padding-bottom:18px !important}
+html body #start-my-day-card #chk-alarm.ayu-sub:not(#ayu-x1){margin-bottom:0 !important}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
