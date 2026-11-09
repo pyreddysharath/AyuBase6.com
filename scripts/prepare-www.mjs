@@ -16,9 +16,8 @@ if (!fs.existsSync(web)) {
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(path.join(out, 'config'), { recursive: true });
 
-// Base: the "with push" build (index-with-Cloudflare.html), because it builds the reminder rules (ayuPush.buildRules)
-// that the phone schedules. Push itself is switched off below (empty push.json). Older checkouts had it as index.html.
-const baseName = ['index-with-Cloudflare.html', 'index.html'].find(f => {
+// Base: the website's index.html, which builds the reminder rules (ayuPush.buildRules) that the phone schedules.
+const baseName = ['index.html'].find(f => {
   const p = path.join(web, f);
   return fs.existsSync(p) && fs.readFileSync(p, 'utf8').includes('function buildRules(');
 });
@@ -35,6 +34,9 @@ patch('<head>\n<meta charset="UTF-8">\n',
 patch("new URL('content/' + folder + '/media/' + file, document.baseURI)",
   "new URL('content/' + folder + '/media/' + file, window.AYU_LIVE_BASE || document.baseURI)",
   'live media');
+// The website's "reminders come only from the open app" note does not apply to the app (the phone delivers them).
+patch("function phone(){ return typeof NUDGE_IS_PHONE!=='undefined' && !!NUDGE_IS_PHONE; }",
+  "function phone(){ return false; }", 'keep-open note off');
 // Ads: the website's AdSense (after the person agrees to Advertising) also runs in the app, through Google's
 // WebView API for Ads (registered in MainActivity).
 // ── Texts that describe the website, said the way the Android app works (reminders arrive with the app closed) ──
@@ -91,8 +93,6 @@ for (const f of ['manifest.json', 'OurOtherSites.json']) {
   const src = path.join(web, 'config', f);
   if (fs.existsSync(src)) fs.copyFileSync(src, path.join(out, 'config', f));
 }
-// No web push in the app: an empty address turns it off. Reminders come from the phone itself.
-fs.writeFileSync(path.join(out, 'config', 'push.json'), '{ "api": "" }\n');
 fs.copyFileSync(path.join(root, 'src', 'android-bridge.js'), path.join(out, 'android-bridge.js'));
 
 const kb = Math.round(fs.statSync(path.join(out, 'index.html')).size / 1024);
