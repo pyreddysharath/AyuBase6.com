@@ -16393,9 +16393,12 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     return out;
   }
   function remSave(l){ try{ localStorage.setItem(K_REMS,JSON.stringify(l)); }catch(e){} changed(); }
+  function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function onceDayFor(at){ var n=new Date(), d=new Date(n.getFullYear(),n.getMonth(),n.getDate()); if(n.getHours()*60+n.getMinutes()>=at) d.setDate(d.getDate()+1); return ymd(d); }
+  function onceDow(c){ var p=String(c.onceDay||'').split('-'); return p.length===3 ? new Date(+p[0],+p[1]-1,+p[2]).getDay() : new Date().getDay(); }
   function ent(id){
     if(id==='wake') return A.wake;
-    return { colour:'#0f766e', section:'alerts', time:function(){ var c=get(id); return (c.at>=0 && c.at<1440) ? c.at : 420; }, days:function(){ return get(id).days; },
+    return { colour:'#0f766e', section:'alerts', time:function(){ var c=get(id); return (c.at>=0 && c.at<1440) ? c.at : 420; }, days:function(){ var c=get(id); return c.once ? [onceDow(c)] : c.days; },
              title:function(){ var c=get(id); return (c.name ? c.name : 'Alarm')+' · '+clock((c.at>=0 && c.at<1440) ? c.at : 420); }, body:function(){ return 'Your alarm.'; } };
   }
   function alarmIds(){ return ['wake'].concat(remList().map(function(x){ return x.id; })); }
@@ -16411,6 +16414,8 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     if(id==='remf') return;   // the open alarm form keeps its own copy until Save
     if(id==='wake'){ try{ localStorage.setItem(A.wake.store,JSON.stringify(c)); }catch(e){} changed(); return; }
     var l=remList(), o={}, i, found=false; for(var k in c) o[k]=c[k]; o.id=id;
+    if(o.once && o.on){ var pv=remList().filter(function(x){ return x.id===id; })[0]||{}; if(!pv.on || !pv.once || pv.at!==o.at || !o.onceDay) o.onceDay=onceDayFor((o.at>=0 && o.at<1440) ? o.at : 420); }
+    if(!o.once) delete o.onceDay;
     for(i=0;i<l.length;i++) if(l[i].id===id){ l[i]=o; found=true; }
     if(!found) l.push(o);
     remSave(l);
@@ -16421,7 +16426,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   window.ayuAlarmList=function(){
     return alarmIds().map(function(id){
       var c=get(id); if(!c.on) return null; var E=ent(id);
-      return { id:id, at:E.time(), days:E.days()||[0,1,2,3,4,5,6], title:E.title(), body:E.body(), section:E.section, vibrate:vibOn(id),
+      return { id:id, at:E.time(), days:E.days()||[0,1,2,3,4,5,6], once:(id!=='wake' && c.once && c.onceDay) ? c.onceDay : undefined, title:E.title(), body:E.body(), section:E.section, vibrate:vibOn(id),
                tone:c.tone, ring:+c.ring||0, snoozeMin:+c.snoozeMin||5, snoozeMax:+c.snoozeMax||0, keys:c.keys==='stop'?'stop':'snooze' };
     }).filter(Boolean);
   };
@@ -16607,7 +16612,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   function vibStart(id){ vibStop(); if(!vibOn(id) || typeof navigator.vibrate!=='function') return; try{ navigator.vibrate([700,700]); }catch(e){} vibTimer=setInterval(function(){ try{ navigator.vibrate([700,700]); }catch(e){} },1400); }
   function vibStop(){ if(vibTimer){ clearInterval(vibTimer); vibTimer=null; try{ navigator.vibrate(0); }catch(e){} } }
   function ring(id,count){
-    var c=get(id); if(!c.on) return;
+    var c=get(id); if(!c.on && !(count>0 && c.once)) return;   // a snoozed Only-once alarm still rings
     stopRing(true); ringing={id:id,count:count||0};
     startSound(c.tone,true); vibStart(id); card(id,count||0); sysNote(id,count||0);
     if(c.ring>0) ringStop=setTimeout(function(){ stopRing(true); }, c.ring*60000);   // the sound stops; the card stays until answered
@@ -16642,13 +16647,23 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     alarmIds().forEach(function(id){
       var c=get(id); if(!c.on) return;
       var days=ent(id).days(); if(days && days.length && days.indexOf(day)<0) return;
+      if(id!=='wake' && c.once && c.onceDay!==ymd(now)) return;
       var at=ent(id).time(), late=mins-at; if(late<0 || late>2) return;
       var tag=now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate()+'@'+at;
       if(last[id]===tag) return;
       last[id]=tag; try{ localStorage.setItem(K_LAST,JSON.stringify(last)); }catch(e){}
       ring(id,0);
+      if(id!=='wake' && c.once){ var x=get(id); x.on=false; put(id,x); try{ paintList(); }catch(e){} }   // Only once: off after it rings
     });
   }
+  // an "Only once" alarm whose time has passed (it rang, also on the phone) is switched off
+  function onceExpire(){
+    var now=Date.now(), any=false;
+    remList().forEach(function(r){ if(!r.once || !r.on || !r.onceDay) return; var p=r.onceDay.split('-'), at=(r.at>=0 && r.at<1440) ? r.at : 420;
+      var t=new Date(+p[0],+p[1]-1,+p[2],Math.floor(at/60),at%60).getTime(); if(now>t+3*60000){ var x=get(r.id); x.on=false; put(r.id,x); any=true; } });
+    if(any){ try{ paintList(); }catch(e){} }
+  }
+  setTimeout(onceExpire,1200); setInterval(onceExpire,60000); document.addEventListener('visibilitychange',function(){ if(!document.hidden) onceExpire(); });
   if(!APP){ setInterval(checkTime,15000); document.addEventListener('visibilitychange',function(){ if(!document.hidden) checkTime(); }); }
 
   // Reminders → Alarm, just before Personal Reminders
@@ -16666,12 +16681,17 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
       +'<div class="calc-task ayu-al-info" id="rem-al-info" hidden>'+infoHtml('rem')+'</div>';
     mr.parentNode.insertBefore(wrap, mr);
     $('rem-al-ibtn').addEventListener('click',function(){ var i=$('rem-al-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); });
-    $('rem-alarm-add').addEventListener('click',function(){ openForm(null); });
+    $('rem-alarm-add').addEventListener('click',function(){
+      closeForms(); var nid=newId();
+      put(nid,{on:true,once:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:2,snoozeMin:5,snoozeMax:3,keys:'snooze',name:'',vibrate:true});
+      paintList(); openForm(nid);
+      if('Notification' in window && Notification.permission==='default' && !APP){ try{ Notification.requestPermission().catch(function(){}); }catch(e){} }
+    });
     paintList();
   }
   // ids are "rem" + 8 letters: the phone app takes alarm ids of up to 12 lowercase letters
   function newId(){ var have=remList().map(function(x){ return x.id; }), id; do{ id='rem'; for(var i=0;i<8;i++) id+=String.fromCharCode(97+Math.floor(Math.random()*26)); }while(have.indexOf(id)>=0); return id; }
-  function alarmSub(c){ var R=window.__ayuRem, t=R?R.daysLabel(c.days||[]):''; t=t?t.replace(/^ · /,''):'Daily'; return (c.name?c.name+' · ':'')+t; }
+  function alarmSub(c){ var R=window.__ayuRem, t=R?R.daysLabel(c.days||[]):''; t=t?t.replace(/^ · /,''):'Daily'; if(c.once) t='Once'+(c.on && c.onceDay ? (c.onceDay===ymd(new Date()) ? ' · Today' : ' · Tomorrow') : ''); return (c.name?c.name+' · ':'')+t; }
   function paintList(){
     var list=$('rem-alarm-list'); if(!list) return;
     list.innerHTML='';
@@ -16699,45 +16719,53 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   }
   function closeForms(){
     stopPreview();
-    document.querySelectorAll('#rem-alarm-list .ayu-alarm-form').forEach(function(f){ f.remove(); });
+    document.querySelectorAll('#rem-alarm-list .ayu-alarm-form').forEach(function(f){ try{ if(f._ayuCommit) f._ayuCommit(); }catch(e){} f.remove(); });
     document.querySelectorAll('#rem-alarm-list .custom-reminder-item.open').forEach(function(it){ it.classList.remove('open'); var h=it.querySelector('.cri-hdr'); if(h) h.setAttribute('aria-expanded','false'); });
   }
   function openForm(id){
     closeForms();
     var list=$('rem-alarm-list'); if(!list) return;
-    var isNew=!id, base=isNew ? {on:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:2,snoozeMin:5,snoozeMax:3,keys:'snooze',name:'',vibrate:true} : get(id);
+    var isNew=!id, base=isNew ? {on:true,once:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:2,snoozeMin:5,snoozeMax:3,keys:'snooze',name:'',vibrate:true} : get(id);
     var c=JSON.parse(JSON.stringify(base)); if(!c.name) c.name=''; c.vibrate=('vibrate' in c) ? c.vibrate!==false : !!c.on;
     var f=document.createElement('div'); f.className='ayu-alarm-form ayu-al-body';
     f.innerHTML='<div class="ayu-al-row"><span class="ayu-al-lbl">Name</span><input type="text" class="ayu-al-name" maxlength="40" placeholder="Optional, e.g. Gym" aria-label="Alarm name"></div>'
       +'<div class="ayu-al-row"><span class="ayu-al-lbl">Time</span><button type="button" class="ayu-al-time" id="remf-al-time"></button></div><div class="otd-row" id="rem-alarm-days"></div>'
-      +bodyHtml('remf').replace(/^[\s\S]*?(<div class="ayu-al-row"><span class="ayu-al-lbl">Sound)/,'$1')
-      +'<div class="reminder-form-actions"><button type="button" class="save-reminder">Save</button><button type="button" class="cancel-reminder">Cancel</button></div>';
+      +bodyHtml('remf').replace(/^[\s\S]*?(<div class="ayu-al-row"><span class="ayu-al-lbl">Sound)/,'$1');
     var item=null;
     if(isNew) list.appendChild(f); else { item=list.querySelector('[data-id="'+id+'"]'); if(!item) return; item.classList.add('open'); item.querySelector('.cri-hdr').setAttribute('aria-expanded','true'); item.querySelector('.cri-body').appendChild(f); }
-    var q=function(s){ return f.querySelector(s); }, save=q('.save-reminder');
+    var q=function(s){ return f.querySelector(s); };
     // Vibrate, right after Sound
     var sndRow=f.querySelector('#remf-al-tone'); sndRow=sndRow && sndRow.closest('.ayu-al-row');
     if(sndRow){ var vr=document.createElement('div'); vr.className='ayu-al-row ayu-vib-only'; vr.innerHTML='<span class="ayu-al-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" id="remf-al-vib" aria-label="Vibrate"></label>';
       var nx=sndRow.nextElementSibling; while(nx && nx.classList.contains('ayu-al-msg')) nx=nx.nextElementSibling; sndRow.parentNode.insertBefore(vr, nx);
       var vi=vr.querySelector('input'); vi.checked=c.vibrate; vi.addEventListener('change',function(){ c.vibrate=vi.checked; check(); }); }
-    function state(){ return JSON.stringify([c.name.trim(),c.at,c.days.slice().sort(),c.tone,+c.ring,+c.snoozeMin,+c.snoozeMax,c.keys,c.vibrate]); }
-    var start=state();
-    function check(){ save.disabled=!isNew && state()===start; }
-    var nm=q('.ayu-al-name'); nm.value=c.name; nm.addEventListener('input',function(){ c.name=nm.value; check(); });
+    function state(){ return JSON.stringify([c.name.trim(),c.at,c.days.slice().sort(),!!c.once,c.tone,+c.ring,+c.snoozeMin,+c.snoozeMax,c.keys,c.vibrate]); }
+    // no Save / Cancel: every change is kept at once (the name a moment after typing stops)
+    var last=state(), nameT=0;
+    function commit(){
+      clearTimeout(nameT); var now=state(); if(now===last) return; last=now;
+      var cur=get(id), out={}; for(var k in c) out[k]=c[k]; out.name=c.name.trim().slice(0,40); out.id=id; out.on=cur.on; out.onceDay=cur.onceDay;
+      put(id,out);
+      if(item){ var x=get(id), st=item.querySelector('.cri-main strong'), sb=item.querySelector('.cri-sub'); if(st) st.textContent=clock(x.at); if(sb) sb.textContent=alarmSub(x); var h=item.querySelector('.cri-hdr'); if(h) h.setAttribute('aria-label','Alarm '+clock(x.at)+', '+alarmSub(x)); }
+    }
+    f._ayuCommit=commit;
+    function check(soon){ if(soon){ clearTimeout(nameT); nameT=setTimeout(commit,500); } else commit(); }
+    var nm=q('.ayu-al-name'); nm.value=c.name; nm.addEventListener('input',function(){ c.name=nm.value; check(true); }); nm.addEventListener('change',function(){ c.name=nm.value; check(); });
     var tb=q('#remf-al-time'); function paintT(){ tb.innerHTML=clock(c.at)+'<span>Change</span>'; } paintT();
     tb.addEventListener('click',function(){ pickTime(c.at,1,'#0f766e',function(v){ c.at=v; paintT(); check(); }); });
     // days
     var host=q('#rem-alarm-days'), ORDER=[1,2,3,4,5,6,0], L={1:'M',2:'T',3:'W',4:'T',5:'F',6:'S',0:'S'}, F={1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday',6:'Saturday',0:'Sunday'};
-    host.innerHTML='<div class="otd-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Daily</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div>';
+    host.innerHTML='<div class="otd-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="once">Once</button><button type="button" data-q="all">Daily</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div>';
     var box=host.querySelector('.day-chips');
     function drawDays(){
-      box.innerHTML='';
-      ORDER.forEach(function(d){ var b=document.createElement('button'); b.type='button'; b.className='day-chip'; b.textContent=L[d]; b.setAttribute('aria-label',F[d]); b.setAttribute('aria-pressed',String(c.days.indexOf(d)>=0));
-        b.addEventListener('click',function(){ if(c.days.indexOf(d)>=0){ if(c.days.length>1) c.days=c.days.filter(function(x){ return x!==d; }); } else c.days=c.days.concat([d]); drawDays(); check(); }); box.appendChild(b); });
+      box.innerHTML=''; box.classList.toggle('ayu-days-once',!!c.once); box.setAttribute('aria-disabled',String(!!c.once));
+      ORDER.forEach(function(d){ var b=document.createElement('button'); b.type='button'; b.className='day-chip'; b.textContent=L[d]; b.setAttribute('aria-label',F[d]); b.setAttribute('aria-pressed',String(!c.once && c.days.indexOf(d)>=0));
+        if(c.once){ b.disabled=true; b.title='Only once: tap Daily, Weekdays or Weekends to choose days'; }
+        b.addEventListener('click',function(){ if(c.once) return; if(c.days.indexOf(d)>=0){ if(c.days.length>1) c.days=c.days.filter(function(x){ return x!==d; }); } else c.days=c.days.concat([d]); drawDays(); check(); }); box.appendChild(b); });
       var s=c.days.slice().sort().join(',');
-      host.querySelectorAll('.day-quick button').forEach(function(b){ var want=b.dataset.q==='week'?'1,2,3,4,5':b.dataset.q==='wkend'?'0,6':'0,1,2,3,4,5,6'; b.classList.toggle('on',s===want); b.setAttribute('aria-pressed',String(s===want)); });
+      host.querySelectorAll('.day-quick button').forEach(function(b){ var on=b.dataset.q==='once' ? !!c.once : (!c.once && s===(b.dataset.q==='week'?'1,2,3,4,5':b.dataset.q==='wkend'?'0,6':'0,1,2,3,4,5,6')); b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); });
     }
-    host.querySelectorAll('.day-quick button').forEach(function(b){ b.addEventListener('click',function(){ c.days=b.dataset.q==='week'?[1,2,3,4,5]:b.dataset.q==='wkend'?[6,0]:[0,1,2,3,4,5,6]; drawDays(); check(); }); });
+    host.querySelectorAll('.day-quick button').forEach(function(b){ b.addEventListener('click',function(){ if(b.dataset.q==='once'){ c.once=true; } else { c.once=false; c.days=b.dataset.q==='week'?[1,2,3,4,5]:b.dataset.q==='wkend'?[6,0]:[0,1,2,3,4,5,6]; } drawDays(); check(); }); });
     drawDays();
     // ringtone (with preview and "Upload a sound…"), ring, snooze
     var sel=q('#remf-al-tone'); sel.value=c.tone; if(sel.value!==c.tone){ sel.value='rise'; c.tone='rise'; }
@@ -16747,15 +16775,6 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     q('#remf-al-play').addEventListener('click',function(){ previewing==='remf' ? stopPreview() : preview('remf'); });
     ['ring','smin','smax','keys'].forEach(function(k){ var e=q('#remf-al-'+k); if(!e) return; e.value=String(k==='ring'?c.ring:k==='smin'?c.snoozeMin:k==='smax'?c.snoozeMax:c.keys);
       e.addEventListener('change',function(){ if(k==='ring') c.ring=+e.value; else if(k==='smin') c.snoozeMin=+e.value; else if(k==='smax') c.snoozeMax=+e.value; else c.keys=e.value; check(); }); });
-    q('.cancel-reminder').addEventListener('click',function(){ closeForms(); });
-    save.addEventListener('click',function(){
-      if(save.disabled) return;
-      var nid=id || newId(); var out={}; for(var k in c) out[k]=c[k]; out.name=c.name.trim().slice(0,40); out.id=nid;
-      if(isNew) out.on=true;
-      put(nid,out); closeForms(); paintList();
-      if(isNew && 'Notification' in window && Notification.permission==='default' && !APP){ try{ Notification.requestPermission().catch(function(){}); }catch(e){} }
-    });
-    check();
     try{ f.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
   }
 
@@ -19799,6 +19818,10 @@ html body #rem-alarm-card #clk-t-start:disabled{opacity:.45;cursor:default}
 .clk-hms .clk-hms-i.on{color:#134e4a;font-weight:800;font-size:24px}
 .clk-hms .clk-hms-band{position:absolute;left:0;right:0;top:calc(18px + 6px + 80px);height:40px;border-radius:10px;background:color-mix(in srgb,#0d9488 14%,#fff);pointer-events:none}
 .clk-hms .clk-hms-ok:disabled{opacity:.45;cursor:default}
+</style>
+<style id="alarm-once-20261109">
+/* Clock → Alarm → On these days: Once (the default for a new alarm) greys the days */
+html body #rem-alarm-days .day-chips.ayu-days-once .day-chip{opacity:.38;cursor:default;pointer-events:none}
 </style>
 </body>
 
