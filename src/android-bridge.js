@@ -33,6 +33,7 @@
       if(r.ok && 'caches' in window){ var copy = r.clone(); caches.open(JSON_CACHE).then(function(c){ return c.put(url, copy); }).catch(noop); }
       return r;
     }).catch(function(err){
+      if(/^config\/android-app\.json/.test(rel)) throw err;   // the update check must say when it could not reach the site
       var fromCache = ('caches' in window) ? caches.open(JSON_CACHE).then(function(c){ return c.match(url); }).catch(function(){ return null; }) : Promise.resolve(null);
       return fromCache.then(function(hit){ return hit || origFetch.call(window, rel, init); });
     });
