@@ -25,6 +25,9 @@ public class MainActivity extends BridgeActivity {
     }
 
     // Announcements: no notification while the app is in use (the banner shows in the app)
-    @Override public void onResume() { super.onResume(); AnnouncementCheck.appVisible = true; }
+    @Override public void onResume() {
+        super.onResume(); AnnouncementCheck.appVisible = true;
+        try { ReminderScheduler.cancel(this, AyuRemindersPlugin.BACK_TAG); } catch (Exception ignored) {}   // back in the app: the "Tap to return" note goes
+    }
     @Override public void onPause() { AnnouncementCheck.appVisible = false; super.onPause(); }
 }

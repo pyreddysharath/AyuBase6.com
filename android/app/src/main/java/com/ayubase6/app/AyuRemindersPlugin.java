@@ -205,6 +205,7 @@ public class AyuRemindersPlugin extends Plugin {
 
     // ── Settings pages for a permission: as soon as it is allowed there, the app comes back by itself ──
     private static final int REQ_SETTINGS = 7101;
+    static final String BACK_TAG = "perm-back";
     private final android.os.Handler main = new android.os.Handler(android.os.Looper.getMainLooper());
     private Runnable watcher;
 
@@ -232,6 +233,16 @@ public class AyuRemindersPlugin extends Plugin {
                             }
                         } catch (Exception ignored) {}
                     }, 350);
+                    // Some phones (Xiaomi, Oppo, Vivo, Realme…) block apps from coming to the front by themselves:
+                    // then say so on the settings page and leave a notification that opens the app.
+                    main.postDelayed(() -> {
+                        try {
+                            if (getActivity().hasWindowFocus()) return;
+                            android.widget.Toast.makeText(getContext(), "Allowed ✓  Tap Back to return to AyuBase6", android.widget.Toast.LENGTH_LONG).show();
+                            if (NotificationManagerCompat.from(getContext()).areNotificationsEnabled())
+                                ReminderScheduler.show(getContext(), BACK_TAG, "Allowed ✓", "Tap to return to AyuBase6", true, NotificationArt.REMINDERS, "", "");
+                        } catch (Exception ignored) {}
+                    }, 1500);
                     new Thread(() -> ReminderScheduler.reschedule(getContext()), "ayu-perm").start();
                     notifyListeners("permissionsChanged", status());
                     return;
@@ -499,6 +510,6 @@ public class AyuRemindersPlugin extends Plugin {
 
     @PluginMethod
     public void openBatterySettings(PluginCall call) {
-        openSettings(call, new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
+        openAndReturn(call, new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS), this::batteryUnrestricted);
     }
 }
