@@ -128,6 +128,8 @@ final class ReminderRules {
             JSONObject al = alarms.optJSONObject(i);
             if (al == null || !al.optBoolean("on", true) || !ALARM_ID.matcher(al.optString("id")).matches()) continue;
             if (!dayAllowed(al, local.dow)) continue;
+            String once = al.optString("once", "");   // "Only once": rings on this date only (yyyy-mm-dd)
+            if (!once.isEmpty() && !once.equals(local.day)) continue;
             Double at = num(al, "at");
             if (at != null && at == m) out.add(new Due("alarm-" + al.optString("id"), str(al.opt("title"), 80), str(al.opt("body"), 200),
                 "alerts".equals(al.optString("section")) ? "alerts" : "routines").vib(al));

@@ -65,4 +65,11 @@ public class ReminderAlarmTest {
         assertTrue(at("{\"alarms\":[{\"id\":\"wake\",\"on\":false,\"at\":390}]}", 390, 1).isEmpty());
         assertTrue(at("{\"alarms\":[{\"id\":\"Wake-1\",\"at\":390}]}", 390, 1).isEmpty());
     }
+
+    @Test
+    public void onceAlarmRingsOnlyOnItsDate() throws Exception {
+        String r = "{\"alarms\":[{\"id\":\"remabcdefgh\",\"on\":true,\"at\":420,\"days\":[1],\"once\":\"2026-11-02\",\"section\":\"alerts\",\"title\":\"Alarm · 7:00 AM\",\"body\":\"x\"}]}";
+        assertEquals(1, at(r, 420, 1).size());
+        assertTrue(ReminderRules.due(new JSONObject(r), new ReminderRules.Local("2026-11-09", 420, 1), 0).isEmpty());   // a week later: not again
+    }
 }
