@@ -14069,12 +14069,12 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('nutrition','#sec-diet',0,C.food,'<b>Dietary Preference</b>: vegetarian, non-vegetarian or vegan. Your plan then appears below: Nutrients &amp; Food, Cart This Week and Recipes For You.');
   // Checks
   tab('routines','.tab-btn.routines',C.checks,'Your day, from morning to night.');
-  sec('routines','#routines-panel .rout-page > .rout-card',0,C.checks,'<b>My Day Plan</b>: set your wake-up time, any time in 24 hours: slide the bar, or tap the time under it for a clock. Every check below is timed from it. Outside 4–10 AM it becomes a shift schedule, with meals, light and sleep adjusted.');
+  sec('routines','#routines-panel .rout-page .rout-card:not(#routines-notify-card):not(#routines-vibrate-card):not(#ayu-checklist)',0,C.checks,'<b>My Day Plan</b>: set your wake-up time, any time in 24 hours: slide the bar, or tap the time under it for a clock. Every check below is timed from it. Outside 4–10 AM it becomes a shift schedule, with meals, light and sleep adjusted.');
   sec('routines','#chk-alarm',0,C.checks,'<b>Alarm</b>: switch it on to wake up at your wake-up time, with your choice of sound, ring length and snooze. Details are in the My Day Plan i.');
   sec('routines','#routines-notify-card',0,C.checks,'<b>Notify Me</b>: turn on notifications for your checks. Its settings open when it is on.');
-  sec('routines','#routines-panel .rout-page > .rout-card',1,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.');
-  sec('routines','#routines-panel .rout-page > .rout-card',2,C.checks,'<b>Afternoon</b>: the same ticks and info for the middle of the day.');
-  sec('routines','#routines-panel .rout-page > .rout-card',3,C.checks,'<b>Evening &amp; Night</b>: checks to wind down. Ticks start fresh each day.');
+  sec('routines','#routines-panel .rout-page .rout-card:not(#routines-notify-card):not(#routines-vibrate-card):not(#ayu-checklist)',1,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.');
+  sec('routines','#routines-panel .rout-page .rout-card:not(#routines-notify-card):not(#routines-vibrate-card):not(#ayu-checklist)',2,C.checks,'<b>Afternoon</b>: the same ticks and info for the middle of the day.');
+  sec('routines','#routines-panel .rout-page .rout-card:not(#routines-notify-card):not(#routines-vibrate-card):not(#ayu-checklist)',3,C.checks,'<b>Evening &amp; Night</b>: checks to wind down. Ticks start fresh each day.');
   // Reminders
   tab('alerts','.tab-btn.alerts',C.rem,'Gentle nudges through the day.');
   sec('alerts','.ayu-rem-tabs',0,C.rem,'<b>Three parts</b>: Health Breaks, Personal Reminders and Alarm. Tap an icon to open one.');
@@ -16282,7 +16282,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     var ctl=card.querySelector('.wake-control');
     if(!$('chk-alarm') && ctl){ var a=buildAlarm('wake'); ctl.after(a); }
     var nc=$('routines-notify-card');
-    if(nc && nc.parentNode!==card){ ($('chk-alarm')||ctl).after(nc); nc.classList.add('ayu-in-day'); }
+    if(nc && nc.parentNode!==card && !nc.closest('#ayu-checklist')){ ($('chk-alarm')||ctl).after(nc); nc.classList.add('ayu-in-day'); }
     // Reset, at the end of Start My Day
     if(!$('start-my-day-reset') && nc && nc.parentNode===card){
       var rr=document.createElement('div'); rr.id='start-my-day-reset'; rr.className='ayu-day-reset';
@@ -17245,7 +17245,7 @@ html body #chk-alarm > .ayu-al-body{margin-left:16px}
 
   // ── what each section clears ──
   function checksSections(){
-    var out=[], cards=[].slice.call(document.querySelectorAll('#routines-panel .rout-page > .rout-card'));
+    var out=[], cards=[].slice.call(document.querySelectorAll('#routines-panel .rout-page .rout-card:not(#routines-notify-card):not(#routines-vibrate-card):not(#ayu-checklist)'));
     cards.forEach(function(c,i){
       if(i===0) out.push({name:title(c)||'My Day Plan', clear:function(){
         ['ayuBase6WakeUpTime','ayuBase6-routine-alarm','ayuBase6-routine-days','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-enabled'].forEach(function(k){ ls(k,null); });
@@ -19555,7 +19555,7 @@ html body #routines-panel #wake-al-play.ayu-al-play:not(#ayu-x1):not(#ayu-x2){wi
   function fit(){
     var list=[];
     document.querySelectorAll('#alerts-panel .ayu-rem-group .alert-card:not(#reminder-hours-card) > .alert-card-hdr').forEach(function(h){ list.push([h, h.closest('.alert-card'), h.querySelector('.alert-card-chev')]); });
-    ['chk-alarm','routines-notify-card'].forEach(function(id){ var s=document.getElementById(id), h=s && s.querySelector(':scope > .ayu-sec-hdr'); if(h) list.push([h, document.getElementById('start-my-day-card')||s, h.querySelector('.ayu-chev')]); });
+    ['chk-alarm','routines-notify-card'].forEach(function(id){ var s=document.getElementById(id), h=s && s.querySelector(':scope > .ayu-sec-hdr'); if(h) list.push([h, (s.parentElement && s.parentElement.closest('.rout-card'))||s, h.querySelector('.ayu-chev')]); });
     list.forEach(function(x){
       var h=x[0], card=x[1], ch=x[2]; if(!card || !ch || !h.offsetParent) return;
       var cur=parseFloat(h.style.marginRight)||0, want=card.getBoundingClientRect().right-8, now=ch.getBoundingClientRect().right;
@@ -19664,7 +19664,7 @@ html body #routines-panel #routines-remind-panel #chk-vib-row:not(#ayu-x1){borde
       list:function(){ return ['alert-card-break','alert-card-walk','alert-card-drink','alert-card-break-ex'].map(function(id){ var c=$(id); return c && {
         open:!c.classList.contains('collapsed'), on:!!(c.querySelector('.alert-enabled-toggle input')||{}).checked, chev:c.querySelector('.alert-card-chev') }; }).filter(Boolean); } },
     mdp:{ title:function(){ return document.querySelector('#start-my-day-card > .rout-card-hdr'); },
-      list:function(){ return [['chk-alarm','wake-al-on'],['routines-notify-card','routines-master-toggle']].map(function(p){ var s=$(p[0]); return s && {
+      list:function(){ return [['chk-alarm','wake-al-on']].concat($('ayu-checklist') ? [] : [['routines-notify-card','routines-master-toggle']]).map(function(p){ var s=$(p[0]); return s && {
         open:!s.classList.contains('ayu-closed'), on:!!($(p[1])||{}).checked, chev:s.querySelector(':scope > .ayu-sec-hdr .ayu-chev') }; }).filter(Boolean); } }
   };
   function paint(k){
@@ -19825,6 +19825,37 @@ html body #rem-alarm-card #clk-t-start:disabled{opacity:.45;cursor:default}
 /* Clock → Alarm → On these days: Once (the default for a new alarm) greys the days */
 html body #rem-alarm-days .day-chips.ayu-days-once .day-chip{opacity:.38;cursor:default;pointer-events:none}
 </style>
+<style id="checklist-20261109">
+/* Checks: one "Daily Checklist" box — Notify Me first, then Morning / Afternoon / Evening & Night as parts (no boxes inside a box) */
+html body #ayu-checklist .ayu-cl-part{background:transparent !important;border:0 !important;box-shadow:none !important;border-radius:0 !important;padding:0 !important;margin:22px 0 0 !important;overflow:visible}
+html body #ayu-checklist .ayu-cl-part::before,html body #ayu-checklist .ayu-cl-part::after{display:none !important}
+html body #ayu-checklist .ayu-cl-part > .sec-lotus-layer{display:none !important}
+html body #ayu-checklist .ayu-cl-part > h2{font-size:1.02rem !important}
+html body #ayu-checklist > .ayu-cl-hdr{margin-bottom:12px}
+html body #ayu-checklist > #routines-notify-card.ayu-in-day{margin-top:0 !important}
+</style>
+<script id="checklist-20261109-js">
+(function(){
+  function $(i){ return document.getElementById(i); }
+  var ICON='<svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 2h6a1 1 0 011 1v1h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2V3a1 1 0 011-1zm1 2v1h4V4h-4zM6 6v14h12V6h-2v1a1 1 0 01-1 1H9a1 1 0 01-1-1V6H6zm9.3 4.3l1.4 1.4-5.2 5.2-3.2-3.2 1.4-1.4 1.8 1.8 3.8-3.8z"/></svg>';
+  function build(){
+    if($('ayu-checklist')) return true;
+    var page=document.querySelector('#routines-panel .rout-page'), day=$('start-my-day-card'), nc=$('routines-notify-card');
+    if(!page || !day || !nc || nc.parentNode!==day) return false;   // wait until Notify Me has its place in My Day Plan (and its Reset exists)
+    var parts=[].filter.call(page.children,function(c){ return c.classList.contains('rout-card') && c!==day; });
+    if(parts.length<3) return false;
+    var box=document.createElement('div'); box.id='ayu-checklist'; box.className='rout-card ayu-checklist';
+    box.innerHTML='<div class="rout-card-hdr ayu-cl-hdr"><h2>'+ICON+' Daily Checklist</h2></div>';
+    page.insertBefore(box,parts[0]);
+    box.appendChild(nc);
+    parts.forEach(function(p){ p.classList.add('ayu-cl-part'); box.appendChild(p); });
+    try{ window.dispatchEvent(new Event('resize')); }catch(e){}
+    return true;
+  }
+  var n=0, iv=setInterval(function(){ if(build() || ++n>80) clearInterval(iv); },250);
+  document.addEventListener('DOMContentLoaded',build);
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
