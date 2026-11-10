@@ -16440,7 +16440,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     }
   }catch(e){}
   var APP_TONES=[['rise','Rising chime'],['alarm','Classic alarm'],['bell','Soft Bell'],['chime','Chime'],['marimba','Marimba Pop'],['xylophone','Xylophone'],['ping','Ping'],['bubble','Bubble'],['drop','Water drop'],['drum','Drum']];
-  var DEF={on:false,tone:'rise',ring:1,snoozeMin:5,snoozeMax:3,keys:'stop',lock:'snooze'};
+  var DEF={on:false,tone:'rise',ring:1,snoozeMin:10,snoozeMax:3,keys:'stop',lock:'snooze'};
   var A={
     wake:{ store:'ayuBase6-routine-alarm', colour:'var(--rout-2,#a75b12)', section:'routines',
            time:function(){ return wake(); }, days:function(){ var c=get('wake'); if(c.once) return [onceDow(c)]; if(Array.isArray(c.days) && c.days.length) return c.days; try{ return window.ayuDays ? window.ayuDays.get('chk') : null; }catch(e){ return null; } },
@@ -16493,7 +16493,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     return alarmIds().map(function(id){
       var c=get(id); if(!c.on) return null; var E=ent(id);
       return { id:id, at:E.time(), days:E.days()||[0,1,2,3,4,5,6], once:(c.once && c.onceDay) ? c.onceDay : undefined, title:E.title(), body:E.body(), section:E.section, vibrate:vibOn(id),
-               tone:c.tone, ring:+c.ring||0, snoozeMin:+c.snoozeMin||5, snoozeMax:+c.snoozeMax||0, keys:c.keys==='snooze'?'snooze':'stop', lock:c.lock==='stop'?'stop':'snooze' };
+               tone:c.tone, ring:+c.ring||0, snoozeMin:+c.snoozeMin||10, snoozeMax:+c.snoozeMax||0, keys:c.keys==='snooze'?'snooze':'stop', lock:c.lock==='stop'?'stop':'snooze' };
     }).filter(Boolean);
   };
   window.ayuAlarmConfig=function(){ return get('wake'); };
@@ -16730,7 +16730,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   window.ayuAlarmPreview=function(id){
     var E=ent(id), c=get(id), N=window.ayuNative;
     if(N && typeof N.previewAlarm==='function'){
-      N.previewAlarm({ key:'alarm-'+id, title:E.title(), body:E.body(), cfg:{ section:id==='wake'?'routines':'alerts', snoozeMin:+c.snoozeMin||5, snoozeMax:+c.snoozeMax||0, keys:c.keys==='snooze'?'snooze':'stop', lock:c.lock==='stop'?'stop':'snooze', tone:c.tone||'rise', vibrate:vibOn(id) } }).catch(function(){ webPrev(); });
+      N.previewAlarm({ key:'alarm-'+id, title:E.title(), body:E.body(), cfg:{ section:id==='wake'?'routines':'alerts', snoozeMin:+c.snoozeMin||10, snoozeMax:+c.snoozeMax||0, keys:c.keys==='snooze'?'snooze':'stop', lock:c.lock==='stop'?'stop':'snooze', tone:c.tone||'rise', vibrate:vibOn(id) } }).catch(function(){ webPrev(); });
       return true;
     }
     return webPrev();
@@ -16794,7 +16794,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     $('rem-al-ibtn').addEventListener('click',function(){ var i=$('rem-al-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); });
     $('rem-alarm-add').addEventListener('click',function(){
       closeForms(); var nid=newId();
-      put(nid,{on:true,once:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:1,snoozeMin:5,snoozeMax:3,keys:'stop',lock:'snooze',name:'',vibrate:true});
+      put(nid,{on:true,once:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:1,snoozeMin:10,snoozeMax:3,keys:'stop',lock:'snooze',name:'',vibrate:true});
       paintList(); openForm(nid);
       if('Notification' in window && Notification.permission==='default' && !APP){ try{ Notification.requestPermission().catch(function(){}); }catch(e){} }
     });
@@ -16836,7 +16836,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   function openForm(id){
     closeForms();
     var list=$('rem-alarm-list'); if(!list) return;
-    var isNew=!id, base=isNew ? {on:true,once:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:1,snoozeMin:5,snoozeMax:3,keys:'stop',lock:'snooze',name:'',vibrate:true} : get(id);
+    var isNew=!id, base=isNew ? {on:true,once:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:1,snoozeMin:10,snoozeMax:3,keys:'stop',lock:'snooze',name:'',vibrate:true} : get(id);
     var c=JSON.parse(JSON.stringify(base)); if(!c.name) c.name=''; c.vibrate=('vibrate' in c) ? c.vibrate!==false : !!c.on;
     var f=document.createElement('div'); f.className='ayu-alarm-form ayu-al-body';
     f.innerHTML='<div class="ayu-al-row"><span class="ayu-al-lbl">Name</span><input type="text" class="ayu-al-name" maxlength="40" placeholder="Optional, e.g. Gym" aria-label="Alarm name"></div>'
@@ -17175,7 +17175,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-f
     try{
       var w=document.getElementById('wake-time-slider'); if(w && String(w.value)!=='390') return true;
       var a=JSON.parse(localStorage.getItem('ayuBase6-routine-alarm')||'null');
-      if(a && (a.on || (a.tone&&a.tone!=='rise') || (a.ring!=null&&+a.ring!==2) || (a.snoozeMin!=null&&+a.snoozeMin!==5) || (a.snoozeMax!=null&&+a.snoozeMax!==3) || (a.keys&&a.keys!=='snooze'))) return true;
+      if(a && (a.on || (a.tone&&a.tone!=='rise') || (a.ring!=null&&+a.ring!==1) || (a.snoozeMin!=null&&+a.snoozeMin!==10) || (a.snoozeMax!=null&&+a.snoozeMax!==3) || (a.keys&&a.keys!=='stop') || (a.lock&&a.lock!=='snooze') || a.once || (Array.isArray(a.days)&&a.days.length&&a.days.length!==7))) return true;
       if(typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()) return true;
       if(typeof routineRemindMode==='function' && routineRemindMode()!=='start') return true;
       if(window.ayuDays && window.ayuDays.get('chk').length!==7) return true;
