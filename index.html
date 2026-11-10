@@ -18739,9 +18739,10 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     if(!sec){
       sec=document.createElement('div'); sec.className='footer-sub'; sec.id='sec-app'; sec.style.display='none';
       sec.innerHTML='<div class="au-card"><div class="au-row"><div><div class="au-ver" id="au-ver">App version</div><div class="au-line" id="au-line"></div></div>'
-        +'<button type="button" class="au-btn alt" id="au-btn">Check for update</button></div><div class="au-bar" id="au-bar" hidden><i></i></div><div class="au-note" id="au-note"></div></div>';
+        +'<button type="button" class="au-btn alt" id="au-btn">Check for update</button></div><div class="au-barrow" id="au-barrow" hidden><div class="au-bar" id="au-bar"><i></i></div><button type="button" class="au-x" id="au-x" aria-label="Cancel the download" title="Cancel the download">×</button></div><div class="au-note" id="au-note"></div></div>';
       (document.body).appendChild(sec);
       $('au-btn').addEventListener('click',act);
+      $('au-x').addEventListener('click',function(){ var n=window.ayuNative; if(n && n.updateCancel) n.updateCancel(); });
       // background checks (between 9 AM and 9 PM), only in app versions that have them
       var N=window.ayuNative;
       if(N && typeof N.updateChecksGet==='function'){
@@ -18769,7 +18770,7 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     var bg=ph==='checking' && !!u.checkedAt; if(bg) ph='';   // a new check runs in the background: the last result stays, only the button says Checking…
     $('au-ver').textContent='App version'+(mine&&mine.name?' '+mine.name:'');
     var cls='', txt='', b='Check for update', alt=true, dis=false, nt='', pct=-1;
-    if(ph==='downloading'){ cls='busy'; txt='Downloading the update… '+(u.pct||0)+'%'; b='Downloading…'; dis=true; alt=false; pct=u.pct||0; nt='Keep the app open until it finishes.'; }
+    if(ph==='downloading'){ cls='busy'; txt='Downloading the update… '+(u.pct||0)+'%'; b='Downloading…'; dis=true; alt=false; pct=u.pct||0; }
     else if(ph==='allow'){ cls='new'; txt='Allow AyuBase6 to install updates'; b='Allow'; alt=false; nt='Turn on “Allow from this source”, then come back: the update continues by itself. Android asks only the first time.'; }
     else if(ph==='installing'){ cls='new'; txt='Finish in Android’s screen: tap Update'; b='Update'; alt=false; nt='Your data stays.'; }
     else if(ph==='checking'){ cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
@@ -18784,7 +18785,7 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     if(bg && !L){ b='Checking…'; dis=true; }
     line.className='au-line '+cls; line.textContent=txt; note.textContent=nt;
     btn.textContent=b; btn.disabled=dis; btn.classList.toggle('alt',alt);
-    bar.hidden=pct<0; if(pct>=0) bar.firstChild.style.width=pct+'%';
+    $('au-barrow').hidden=pct<0; $('au-x').hidden=!(window.ayuNative && window.ayuNative.updateCancel); if(pct>=0) bar.firstChild.style.width=pct+'%';
     window.ayuAppDotsPaint();
   }
   window.addEventListener('ayu-update-info',paint);
@@ -20139,7 +20140,7 @@ html body #sec-app .au-auto-row .master-switch input:checked:not(#ayu-x1){backgr
 html body #sec-app .au-card{display:flex;flex-direction:column}
 html body #sec-app .au-row{display:contents !important}
 html body #sec-app .au-row > div{order:1}
-html body #sec-app .au-bar{order:2}
+html body #sec-app .au-barrow{order:2}
 html body #sec-app .au-note{order:3}
 html body #sec-app #au-btn{order:4;margin-top:12px;width:100%;padding:10px 16px}
 html body #sec-app .au-auto-row{order:5}
@@ -20204,6 +20205,14 @@ html body #routines-panel #routines-remind-panel #chk-sound-row #chk-sound-play:
 html body #routines-panel #routines-remind-panel #chk-speak-row:not(#ayu-x1):not(#ayu-x2){border:0 !important;margin:12px 0 0 !important;padding:0 !important}
 html body #routines-panel #routines-remind-panel #chk-speak-row .ayu-speak-play:not(#ayu-x1):not(#ayu-x2){color:#a75b12 !important;border-color:rgba(167,91,18,.55) !important}
 html body #routines-panel #routines-remind-panel #chk-vib-row:not(#ayu-x1):not(#ayu-x2){border:0 !important}
+</style>
+<style id="au-cancel-20261110">
+/* App Updates: the progress bar with × at its end (cancels the download) */
+html body #sec-app .au-barrow{display:flex;align-items:center;gap:10px;margin-top:10px}
+html body #sec-app .au-barrow[hidden]{display:none !important}
+html body #sec-app .au-barrow .au-bar{flex:1 1 auto;margin-top:0}
+html body #sec-app .au-x{flex:0 0 30px;width:30px;height:30px;padding:0;border-radius:50%;border:1.5px solid var(--footer-accent,#255cc0);background:#fff;color:var(--footer-accent,#255cc0);font:inherit;font-size:18px;font-weight:700;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+html body #sec-app .au-x[hidden]{display:none}
 </style>
 </body>
 
