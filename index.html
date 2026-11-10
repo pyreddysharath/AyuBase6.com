@@ -19929,7 +19929,8 @@ html body #ayu-checklist:not(.ayu-cl-on) .ayu-cl-chev{visibility:hidden}
 html body #ayu-checklist.ayu-cl-on:not(.ayu-cl-closed) .ayu-cl-chev{transform:rotate(180deg)}
 html body #ayu-checklist #routines-notify-card > .rout-card-hdr{display:none !important}
 html body #ayu-checklist.ayu-cl-closed #routines-notify-card,html body #ayu-checklist:not(.ayu-cl-on) #routines-notify-card,html body #ayu-checklist.ayu-cl-closed #routines-vibrate-card,html body #ayu-checklist:not(.ayu-cl-on) #routines-vibrate-card{display:none !important}
-html body #ayu-checklist #routines-notify-card.ayu-in-day:not(#ayu-x1){padding-top:4px !important;margin-top:0 !important}
+html body #ayu-checklist #routines-notify-card.ayu-in-day:not(#ayu-x1){padding-top:0 !important;margin-top:0 !important}
+html body #ayu-checklist #routines-notify-card #routines-remind-panel:not(#ayu-x1){margin-top:0 !important}
 html body #ayu-checklist > .ayu-cl-part:not(.ayu-cl-part ~ .ayu-cl-part){margin-top:22px !important}
 html body #ayu-checklist.ayu-cl-closed > .ayu-cl-part:not(.ayu-cl-part ~ .ayu-cl-part),html body #ayu-checklist:not(.ayu-cl-on) > .ayu-cl-part:not(.ayu-cl-part ~ .ayu-cl-part){margin-top:6px !important}
 </style>
@@ -19964,6 +19965,17 @@ html body #ayu-checklist.ayu-cl-closed > .ayu-cl-part:not(.ayu-cl-part ~ .ayu-cl
   }
   var n=0, iv=setInterval(function(){ if(build() || ++n>120) clearInterval(iv); },250);
   setInterval(paint,2000);   // also after a Reset or a change made elsewhere
+})();
+</script>
+<script id="act-scroll-20261110-js">
+/* Body: on a phone, picking Exercise or Yoga brings Activity Type to the top of the screen (the plan shows below it) */
+(function(){
+  document.addEventListener('change',function(e){
+    var t=e.target; if(!e.isTrusted || !t || t.name!=='activity-type' || !t.checked) return;
+    if(!window.matchMedia('(max-width: 640px)').matches) return;
+    var sec=document.querySelector('.activity-type-section'); if(!sec) return;
+    setTimeout(function(){ var y=sec.getBoundingClientRect().top+window.scrollY-8; window.scrollTo({top:Math.max(0,y),behavior:'smooth'}); },250);
+  },true);
 })();
 </script>
 </body>
