@@ -18705,9 +18705,9 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
       if(N && typeof N.updateChecksGet==='function'){
         N.updateChecksGet().then(function(n){
           var card=sec.querySelector('.au-card'); if(!card || $('au-auto')) return;
-          card.insertAdjacentHTML('beforeend','<div class="au-auto-row"><label for="au-auto">Check automatically</label><select id="au-auto"><option value="0">Off</option><option value="1">Once a day (9 AM)</option><option value="2">Twice a day (9 AM, 9 PM)</option><option value="3">3 times a day (9 AM, 3 PM, 9 PM)</option><option value="4">4 times a day (9 AM, 1, 5, 9 PM)</option></select></div><div class="au-note au-auto-note">Only 9 AM – 9 PM, with a quiet notification.</div>');
-          var sel=$('au-auto'); sel.value=String(isNaN(n)?2:n);
-          sel.addEventListener('change',function(){ N.updateChecksSet(+sel.value).catch(function(){}); });
+          card.insertAdjacentHTML('beforeend','<div class="au-auto-row"><span class="au-auto-l">Check automatically</span><label class="master-switch" title="Check automatically"><input type="checkbox" id="au-auto" aria-label="Check for updates automatically"></label></div><div class="au-note au-auto-note">At 9 AM and 9 PM, with a quiet notification.</div>');
+          var sw=$('au-auto'); sw.checked=(isNaN(n)?2:n)>0;
+          sw.addEventListener('change',function(){ N.updateChecksSet(sw.checked?2:0).catch(function(){}); });
         }).catch(function(){});
       }
     }
@@ -20086,8 +20086,10 @@ html body #ayu-checklist #ayu-cl-prev{margin:12px 0 0 16px}
 </script>
 <style id="update-auto-20261110">
 html body #sec-app .au-auto-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid color-mix(in srgb,var(--footer-accent,#0d9488) 20%,#fff)}
-html body #sec-app .au-auto-row label{font-weight:700;font-size:.9rem;color:#1e293b}
-html body #sec-app .au-auto-row select{flex:1 1 180px;min-width:0;height:36px;padding:0 10px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-size:.88rem}
+html body #sec-app .au-auto-row{justify-content:space-between;flex-wrap:nowrap}
+html body #sec-app .au-auto-l{font-weight:700;font-size:.9rem;color:#1e293b}
+html body #sec-app .au-auto-row .master-switch{flex:0 0 auto}
+html body #sec-app .au-auto-row .master-switch input:checked:not(#ayu-x1){background:var(--footer-accent,#255cc0) !important}
 </style>
 <style id="au-layout-20261110">
 /* App Updates: text first (full width), the button at the bottom, full width; "New version … is ready" in the section colour */
