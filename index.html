@@ -18684,6 +18684,16 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
         +'<button type="button" class="au-btn alt" id="au-btn">Check for update</button></div><div class="au-bar" id="au-bar" hidden><i></i></div><div class="au-note" id="au-note"></div></div>';
       (document.body).appendChild(sec);
       $('au-btn').addEventListener('click',act);
+      // background checks (between 9 AM and 9 PM), only in app versions that have them
+      var N=window.ayuNative;
+      if(N && typeof N.updateChecksGet==='function'){
+        N.updateChecksGet().then(function(n){
+          var card=sec.querySelector('.au-card'); if(!card || $('au-auto')) return;
+          card.insertAdjacentHTML('beforeend','<div class="au-auto-row"><label for="au-auto">Check automatically</label><select id="au-auto"><option value="0">Off</option><option value="1">Once a day (9 AM)</option><option value="2">Twice a day (9 AM, 9 PM)</option><option value="3">3 times a day (9 AM, 3 PM, 9 PM)</option><option value="4">4 times a day (9 AM, 1, 5, 9 PM)</option></select></div><div class="au-note au-auto-note">Only between 9 AM and 9 PM. A new version shows as a quiet notification.</div>');
+          var sel=$('au-auto'); sel.value=String(isNaN(n)?2:n);
+          sel.addEventListener('change',function(){ N.updateChecksSet(+sel.value).catch(function(){}); });
+        }).catch(function(){});
+      }
     }
     var t=$('subtab-app');
     if(t && t.firstChild && t.firstChild.nodeType===3 && t.firstChild.textContent!=='App Updates') t.firstChild.textContent='App Updates';
@@ -20058,6 +20068,11 @@ html body #ayu-checklist #ayu-cl-prev{margin:12px 0 0 16px}
   var n=0, iv=setInterval(function(){ build(); if(++n>60) clearInterval(iv); },500);
 })();
 </script>
+<style id="update-auto-20261110">
+html body #sec-app .au-auto-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid color-mix(in srgb,var(--footer-accent,#0d9488) 20%,#fff)}
+html body #sec-app .au-auto-row label{font-weight:700;font-size:.9rem;color:#1e293b}
+html body #sec-app .au-auto-row select{flex:1 1 180px;min-width:0;height:36px;padding:0 10px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-size:.88rem}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
