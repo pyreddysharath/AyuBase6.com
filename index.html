@@ -16630,6 +16630,10 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
         actions:acts, data:{ key:'alarm:'+id, section:id==='wake'?'routines':'alerts', url:'./' } });
     }).catch(function(){});
   }
+  window.ayuAlarmPreview=function(id){
+    var E=ent(id);
+    return window.ayuPreviewNote(E.title(), E.body(), id==='wake' ? 'routines' : 'reminders', id==='wake' ? 'routine-x-alarm' : 'alarm-preview');
+  };
   function closeNote(id){ swReg().then(function(reg){ if(reg) reg.getNotifications({tag:'ayu-alarm-'+id}).then(function(l){ l.forEach(function(n){ n.close(); }); }); }).catch(function(){}); }
   try{ if(!APP && navigator.serviceWorker) navigator.serviceWorker.addEventListener('message',function(ev){
     var d=ev.data||{}; if(d.type!=='nudge-click' || !/^alarm:/.test(d.key||'')) return;
@@ -16751,6 +16755,8 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
       if(item){ var x=get(id), st=item.querySelector('.cri-main strong'), sb=item.querySelector('.cri-sub'); if(st) st.textContent=clock(x.at); if(sb) sb.textContent=alarmSub(x); var h=item.querySelector('.cri-hdr'); if(h) h.setAttribute('aria-label','Alarm '+clock(x.at)+', '+alarmSub(x)); }
     }
     f._ayuCommit=commit;
+    f.insertAdjacentHTML('beforeend','<div class="ayu-prev-row"><span class="row-dot" aria-hidden="true">•</span><button type="button" class="alert-preview-btn ayu-prev-btn">Preview notification</button><span class="ayu-prev-msg" hidden></span></div>');
+    f.querySelector('.ayu-prev-btn').addEventListener('click',function(){ commit(); window.ayuAlarmPreview(id); });
     function check(soon){ if(soon){ clearTimeout(nameT); nameT=setTimeout(commit,500); } else commit(); }
     var nm=q('.ayu-al-name'); nm.value=c.name; nm.addEventListener('input',function(){ c.name=nm.value; check(true); }); nm.addEventListener('change',function(){ c.name=nm.value; check(); });
     var tb=q('#remf-al-time'); function paintT(){ tb.innerHTML=clock(c.at)+'<span>Change</span>'; } paintT();
@@ -18360,6 +18366,7 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
       +'</div></div>'
             +'<div class="ayu-al-row"><span class="ayu-al-lbl">Sound</span><select id="clk-t-tone" aria-label="Sound">'+opts+'</select><button type="button" class="ayu-al-play" id="clk-t-play" title="Preview" aria-label="Preview">▶</button></div>'
       +'<div class="ayu-al-row ayu-vib-only"><span class="ayu-al-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" id="clk-t-vib" aria-label="Vibrate"></label></div>'
+      +'<div class="ayu-prev-row"><span class="row-dot" aria-hidden="true">•</span><button type="button" class="alert-preview-btn ayu-prev-btn" id="clk-t-prev">Preview notification</button><span class="ayu-prev-msg" hidden></span></div>'
       +'</div>';
   }
   function partStopwatch(){
@@ -18427,6 +18434,7 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     q('clk-t-minus').addEventListener('click',function(){ step(-1); });
     q('clk-t-plus').addEventListener('click',function(){ step(1); });
     q('clk-t-tone').addEventListener('change',function(){ T.tone=this.value; T.v=Date.now(); saveAll(); });
+    q('clk-t-prev').addEventListener('click',function(){ var n=times(); window.ayuPreviewNote('Timer', n>1 ? 'Time’s up · next alert in '+lenTxt(unset()?60000:len()) : 'Time’s up', 'reminders', 'timer-preview'); });
     q('clk-t-vib').addEventListener('change',function(){ T.vibrate=this.checked; T.v=Date.now(); saveAll(); });
     var playing=false;
     q('clk-t-play').addEventListener('click',function(){ var tn=window.ayuTones; if(!tn) return; if(playing){ tn.stop(); playing=false; this.textContent='▶'; return; } tn.start(q('clk-t-tone').value||'rise',false); playing=true; var b=this; b.textContent='■'; setTimeout(function(){ playing=false; b.textContent='▶'; },3000); });
@@ -19995,6 +20003,59 @@ html body #ayu-checklist .ayu-cl-part > h2::after,html body #ayu-checklist .ayu-
     // Body
     if(t.name==='activity-type' || t.id==='body-age-slider'){ if(checked('activity-type')) top(document.querySelector('.activity-type-section'),3000); }
   },true);
+})();
+</script>
+<style id="preview-20261110">
+/* Preview notification in Checks (Alarm, Daily Checklist notifications) and Clock (each alarm, Timer), like Health Breaks */
+html body .ayu-prev-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;margin:12px 0 4px}
+html body .ayu-prev-row .row-dot{color:var(--ayu-prev,#0d9488);font-weight:800}
+html body .ayu-prev-row .ayu-prev-btn{border-style:solid;border-color:color-mix(in srgb,var(--ayu-prev,#0d9488) 55%,#fff);color:var(--ayu-prev-t,#087e75)}
+html body .ayu-prev-row .ayu-prev-msg{flex-basis:100%;font-size:.8rem;color:#92400e}
+html body #routines-panel .ayu-prev-row{--ayu-prev:#d97706;--ayu-prev-t:#a75b12}
+html body #ayu-checklist.ayu-cl-closed #ayu-cl-prev,html body #ayu-checklist:not(.ayu-cl-on) #ayu-cl-prev{display:none !important}
+html body #ayu-checklist #ayu-cl-prev{margin:12px 0 0 16px}
+</style>
+<script id="preview-20261110-js">
+(function(){
+  function $(i){ return document.getElementById(i); }
+  // shows a sample notification; asks for permission first if needed, and says so when notifications are blocked
+  window.ayuPreviewNote=function(title,body,theme,key,actions,btn){
+    var msg=btn && btn.parentNode && btn.parentNode.querySelector('.ayu-prev-msg');
+    function say(t){ if(!msg) return; msg.textContent=t; msg.hidden=!t; if(t) setTimeout(function(){ msg.hidden=true; },6000); }
+    function show(){ say(''); var ok=false; try{ ok=showNudgeNotification(title,body,{key:key,theme:theme,actions:actions}); }catch(e){} if(!ok) say('Couldn’t show the preview. Allow notifications for AyuBase6 and try again.'); }
+    if(typeof Notification==='undefined'){ say('This browser can’t show notifications.'); return false; }
+    if(Notification.permission==='granted'){ show(); return true; }
+    if(Notification.permission==='denied'){ say('Notifications are blocked. Allow them for AyuBase6 to see the preview.'); return false; }
+    try{ Promise.resolve(Notification.requestPermission()).then(function(p){ if(p==='granted') show(); else say('Allow notifications to see the preview.'); }); }catch(e){}
+    return false;
+  };
+  document.addEventListener('click',function(e){ var b=e.target.closest && e.target.closest('.ayu-prev-btn'); if(b) window.__ayuPrevBtn=b; },true);
+  var orig=window.ayuPreviewNote;
+  window.ayuPreviewNote=function(t,b,th,k,a){ var btn=window.__ayuPrevBtn; window.__ayuPrevBtn=null; return orig(t,b,th,k,a,btn); };
+  function row(id){ return '<div class="ayu-prev-row" id="'+id+'"><span class="row-dot" aria-hidden="true">•</span><button type="button" class="alert-preview-btn ayu-prev-btn">Preview notification</button><span class="ayu-prev-msg" hidden></span></div>'; }
+  function build(){
+    var done=0;
+    // Checks → Wake-Up Alarm: at the end of its settings
+    var wb=$('wake-al-body');
+    if(wb && !$('ayu-wake-prev')){ wb.insertAdjacentHTML('beforeend',row('ayu-wake-prev')); $('ayu-wake-prev').querySelector('button').addEventListener('click',function(){ if(window.ayuAlarmPreview) window.ayuAlarmPreview('wake'); }); }
+    if($('ayu-wake-prev')) done++;
+    // Checks → Daily Checklist notifications: after the last setting (Vibrate on phones)
+    var box=$('ayu-checklist'), nc=$('routines-notify-card');
+    if(box && nc && nc.parentNode===box && !$('ayu-cl-prev')){
+      var vc=$('routines-vibrate-card'), after=(vc && vc.parentNode===box) ? vc : nc;
+      after.insertAdjacentHTML('afterend',row('ayu-cl-prev'));
+      $('ayu-cl-prev').querySelector('button').addEventListener('click',function(){
+        var I=(typeof ROUTINE_NOTIFY_ITEMS!=='undefined' && ROUTINE_NOTIFY_ITEMS) || {}, it=I.water || I[Object.keys(I)[0]] || {title:'Drink Water',body:'Time for a glass of water.'};
+        try{ var sel=nc.querySelector('select[id$="sound"]'); if(sel && sel.value && sel.value!=='none' && typeof playAlertPreset==='function') playAlertPreset(sel.value); }catch(e){}
+        window.ayuPreviewNote(it.title, it.body, 'routines', 'routine-x-preview');
+      });
+    }
+    if($('ayu-cl-prev')) done++;
+    // keep the checklist row after Vibrate when Vibrate moves in later
+    var vc2=$('routines-vibrate-card'), pr=$('ayu-cl-prev'); if(vc2 && pr && vc2.parentNode===pr.parentNode && (vc2.compareDocumentPosition(pr) & Node.DOCUMENT_POSITION_PRECEDING)) vc2.after(pr);
+    return done===2;
+  }
+  var n=0, iv=setInterval(function(){ build(); if(++n>60) clearInterval(iv); },500);
 })();
 </script>
 </body>
