@@ -19967,14 +19967,33 @@ html body #ayu-checklist.ayu-cl-closed > .ayu-cl-part:not(.ayu-cl-part ~ .ayu-cl
   setInterval(paint,2000);   // also after a Reset or a change made elsewhere
 })();
 </script>
-<script id="act-scroll-20261110-js">
-/* Body: on a phone, picking Exercise or Yoga brings Activity Type to the top of the screen (the plan shows below it) */
+<style id="checklist-bands-20261110">
+/* Daily Checklist: Morning / Afternoon / Evening & Night (and the shift titles) on a light band, so they read as parts of the box, not as its title */
+html body #ayu-checklist .ayu-cl-part > h2:not(#ayu-x1){background:color-mix(in srgb,#d97706 13%,#fff) !important;background-image:none !important;border:0 !important;border-radius:10px;padding:7px 12px !important;margin-bottom:6px !important;font-size:.98rem !important}
+html body #ayu-checklist .ayu-cl-part > h2::after,html body #ayu-checklist .ayu-cl-part > h2::before{display:none}
+</style>
+<script id="auto-scroll-20261110-js">
+/* Phones: bring the next part to the top as choices are made.
+   Food: Gender once age and gender are set; BMI once height and weight are both set; Dietary Preference 3 s after a choice.
+   Body: Activity Type 3 s after age and activity type are both set. A scroll or touch by the person cancels a waiting move. */
 (function(){
+  function phone(){ return window.matchMedia('(max-width: 640px)').matches; }
+  var tm=0;
+  function top(el,delay){
+    if(!el || !phone()) return; clearTimeout(tm);
+    tm=setTimeout(function(){ var y=el.getBoundingClientRect().top+window.scrollY-8; window.scrollTo({top:Math.max(0,y),behavior:'smooth'}); },delay||200);
+  }
+  ['touchmove','wheel'].forEach(function(t){ window.addEventListener(t,function(){ clearTimeout(tm); },{passive:true}); });
+  function $(i){ return document.getElementById(i); }
+  function checked(n){ return !!document.querySelector('input[name="'+n+'"]:checked'); }
   document.addEventListener('change',function(e){
-    var t=e.target; if(!e.isTrusted || !t || t.name!=='activity-type' || !t.checked) return;
-    if(!window.matchMedia('(max-width: 640px)').matches) return;
-    var sec=document.querySelector('.activity-type-section'); if(!sec) return;
-    setTimeout(function(){ var y=sec.getBoundingClientRect().top+window.scrollY-8; window.scrollTo({top:Math.max(0,y),behavior:'smooth'}); },250);
+    var t=e.target; if(!e.isTrusted || !t) return;
+    // Food
+    if(t.name==='food-gender' || t.id==='food-age-slider'){ if(checked('food-gender')) top($('sec-gender')); return; }
+    if(t.id==='height-slider' || t.id==='weight-slider'){ var w=$('bmi-wrap'); if(w && w.style.display!=='none') top($('sec-physical')); return; }
+    if(t.closest && t.closest('#sec-diet .dpill')){ top($('sec-diet'),3000); return; }
+    // Body
+    if(t.name==='activity-type' || t.id==='body-age-slider'){ if(checked('activity-type')) top(document.querySelector('.activity-type-section'),3000); }
   },true);
 })();
 </script>
