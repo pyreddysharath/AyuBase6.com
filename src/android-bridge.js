@@ -379,6 +379,8 @@
     if(o.never) return true;   // Cancel: never again (App Updates in the footer still shows it)
     return String(o.v) === String(code) && Date.now() - (+o.at || 0) < LATER_MS;
   }
+  state.updateChecksGet = function(){ return typeof P.updateChecksGet === 'function' ? P.updateChecksGet().then(function(r){ return +(r && r.times); }) : Promise.reject(); };
+  state.updateChecksSet = function(n){ return P.updateChecksSet({ times:+n }); };
   state.updateCheck = function(){
     upd.error = ''; upd.phase = upd.phase === 'downloading' ? upd.phase : 'checking'; updEvent();
     return Promise.all([
@@ -488,6 +490,10 @@
     if(section === 'alerts' || section === 'routines'){
       try{ if(typeof switchTab === 'function') switchTab(section); }catch(e){}
       try{ if(typeof nudgeShowSection === 'function') nudgeShowSection(key); }catch(e){}
+    }
+    if(section === 'update'){   // a new version, found by the background check
+      try{ setTimeout(function(){ if(typeof window.showFooterSection === 'function') window.showFooterSection('backup'); if(typeof window.showFooterSub === 'function') window.showFooterSub('backup','app'); }, 300); }catch(e){}
+      return;
     }
     if(section === 'announcements'){   // a new announcement, sent while the app was not in use
       try{ if(typeof window.showFooterSection === 'function') setTimeout(function(){ window.showFooterSection('announcements'); }, 300); }catch(e){}
