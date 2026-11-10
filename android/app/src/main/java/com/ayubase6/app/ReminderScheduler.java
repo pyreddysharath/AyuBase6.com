@@ -255,8 +255,9 @@ final class ReminderScheduler {
             .setSmallIcon(R.drawable.ic_stat_lotus)
             .setContentTitle(title)
             .setContentText(body)
-            .setCustomContentView(cardView(c, R.layout.notif_card_small, theme, title, body, 720, 150))
-            .setCustomBigContentView(cardView(c, R.layout.notif_card_big, theme, title, body, 720, 300))
+            // Standard Android look (Android 12+ always frames a custom picture): the section logo on the right, the section colour for the app name and buttons
+            .setLargeIcon(art("logo" + theme.key(), () -> NotificationArt.logo(theme)))
+            .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
             .setColor(theme.deep)
             .setContentIntent(pi)
             .setAutoCancel(true)
@@ -266,9 +267,6 @@ final class ReminderScheduler {
             .setPriority(silent ? NotificationCompat.PRIORITY_LOW : NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         if (!silent && !vibrate) b.setVibrate(new long[]{0});   // Android 7 and older
-        // Android 12+ always keeps its own top line (app name, time) and fills the rest with our colour.
-        // Android 8-11 show the coloured view across the whole notification, so no system frame is added there.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) b.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
         for (String a : actions) {
             Intent ai = new Intent(c, ActionReceiver.class).setAction("com.ayubase6.app.ACTION." + a)
                 .putExtra(EXTRA_KEY, tapKey).putExtra(ActionReceiver.EXTRA_ACTION, a).putExtra(ActionReceiver.EXTRA_TAG, tag)

@@ -236,6 +236,8 @@ public class AlarmService extends Service {
             .setContentText(body)
             .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
             .setColor(theme().deep)
+            .setColorized(true)   // a ringing alarm (foreground service) may fill the whole card with its section colour
+            .setLargeIcon(NotificationArt.logo(theme()))
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
