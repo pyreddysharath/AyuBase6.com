@@ -18760,6 +18760,7 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
   }
   function act(){
     var n=window.ayuNative, u=U(); if(!n || !u) return;
+    if(u.store==='play'){ n.updateStart(); return; }   // opens AyuBase6 on Google Play
     if(u.phase==='allow' || u.phase==='installing'){ if(n.updateInstall) n.updateInstall(); return; }
     if(u.latest){ n.updateStart(); return; }
     n.updateCheck();
@@ -18770,7 +18771,8 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     var bg=ph==='checking' && !!u.checkedAt; if(bg) ph='';   // a new check runs in the background: the last result stays, only the button says Checking…
     $('au-ver').textContent='App version'+(mine&&mine.name?' '+mine.name:'');
     var cls='', txt='', b='Check for update', alt=true, dis=false, nt='', pct=-1;
-    if(ph==='downloading'){ cls='busy'; txt='Downloading the update… '+(u.pct||0)+'%'; b='Downloading…'; dis=true; alt=false; pct=u.pct||0; }
+    if(u.store==='play'){ cls='ok'; txt='Google Play keeps AyuBase6 up to date.'; b='Open Google Play'; alt=true; dis=false; }   // the Google Play version
+    else if(ph==='downloading'){ cls='busy'; txt='Downloading the update… '+(u.pct||0)+'%'; b='Downloading…'; dis=true; alt=false; pct=u.pct||0; }
     else if(ph==='allow'){ cls='new'; txt='Allow AyuBase6 to install updates'; b='Allow'; alt=false; nt='Turn on “Allow from this source”, then come back: the update continues by itself. Android asks only the first time.'; }
     else if(ph==='installing'){ cls='new'; txt='Finish in Android’s screen: tap Update'; b='Update'; alt=false; nt='Your data stays.'; }
     else if(ph==='checking'){ cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
@@ -18782,7 +18784,8 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     else if(u.checkedAt){ cls='ok'; txt='✓ Up to date'; nt='Last checked: '+when(u.checkedAt); }
     else { cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
     if(L && (u.error==='download'||u.error==='install')){ b='Update'; alt=false; }
-    if(bg && !L){ b='Checking…'; dis=true; }
+    if(bg && !L && u.store!=='play'){ b='Checking…'; dis=true; }
+    var ar=document.querySelector('#sec-app .au-auto-row'); if(ar) ar.hidden=u.store==='play';   // Google Play checks by itself
     line.className='au-line '+cls; line.textContent=txt; note.textContent=nt;
     btn.textContent=b; btn.disabled=dis; btn.classList.toggle('alt',alt);
     $('au-barrow').hidden=pct<0; $('au-x').hidden=!(window.ayuNative && window.ayuNative.updateCancel); if(pct>=0) bar.firstChild.style.width=pct+'%';
@@ -20252,6 +20255,7 @@ html body #sec-app .au-x[hidden]{display:none}
   if(document.body) upd(); else document.addEventListener('DOMContentLoaded',upd);
 })();
 </script>
+<style id="au-play-20261110">html body #sec-app .au-auto-row[hidden]{display:none !important}</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
