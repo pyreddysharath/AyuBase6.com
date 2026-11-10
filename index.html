@@ -16482,6 +16482,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     var l=remList(), o={}, i, found=false; for(var k in c) o[k]=c[k]; o.id=id;
     if(o.once && o.on){ var pv=remList().filter(function(x){ return x.id===id; })[0]||{}; if(!pv.on || !pv.once || pv.at!==o.at || !o.onceDay) o.onceDay=onceDayFor((o.at>=0 && o.at<1440) ? o.at : 420); }
     if(!o.once) delete o.onceDay;
+    if(o.on) delete o.expired;   // switched on again: no longer expired
     for(i=0;i<l.length;i++) if(l[i].id===id){ l[i]=o; found=true; }
     if(!found) l.push(o);
     remSave(l);
@@ -16778,14 +16779,14 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
       if(last[id]===tag) return;
       last[id]=tag; try{ localStorage.setItem(K_LAST,JSON.stringify(last)); }catch(e){}
       ring(id,0);
-      if(c.once){ var x=get(id); x.on=false; put(id,x); try{ paintList(); }catch(e){} try{ if(id==='wake'){ var wo=$('wake-al-on'); if(wo) wo.checked=false; } }catch(e){} }   // Only once: off after it rings
+      if(c.once){ var x=get(id); x.on=false; if(id!=='wake') x.expired=true; put(id,x); try{ paintList(); }catch(e){} try{ if(id==='wake'){ var wo=$('wake-al-on'); if(wo) wo.checked=false; } }catch(e){} }   // Only once: off after it rings
     });
   }
   // an "Only once" alarm whose time has passed (it rang, also on the phone) is switched off
   function onceExpire(){
     var now=Date.now(), any=false;
     remList().forEach(function(r){ if(!r.once || !r.on || !r.onceDay) return; var p=r.onceDay.split('-'), at=(r.at>=0 && r.at<1440) ? r.at : 420;
-      var t=new Date(+p[0],+p[1]-1,+p[2],Math.floor(at/60),at%60).getTime(); if(now>t+3*60000){ var x=get(r.id); x.on=false; put(r.id,x); any=true; } });
+      var t=new Date(+p[0],+p[1]-1,+p[2],Math.floor(at/60),at%60).getTime(); if(now>t+3*60000){ var x=get(r.id); x.on=false; x.expired=true; put(r.id,x); any=true; } });
     var w=get('wake'); if(w.once && w.on && w.onceDay){ var pw=w.onceDay.split('-'), aw=wake(); if(now>new Date(+pw[0],+pw[1]-1,+pw[2],Math.floor(aw/60),aw%60).getTime()+3*60000){ w.on=false; put('wake',w); var wo=$('wake-al-on'); if(wo) wo.checked=false; } }
     if(any){ try{ paintList(); }catch(e){} }
   }
@@ -16801,12 +16802,18 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     var mr=$('custom-reminders-card'); if(!mr || $('rem-alarm-card')) return;
     var wrap=document.createElement('div'); wrap.id='rem-alarm-card'; wrap.className='alert-card';
     wrap.innerHTML='<div class="alert-card-hdr"><h2><span class="section-title-text">Alarm</span></h2></div>'
+      +(APP?'<div class="ayu-tap-row" id="rem-tap-row"><span class="ayu-tap-l">Tapping the phone’s time opens</span><span class="ayu-seg" role="radiogroup" aria-label="Tapping the phone’s time opens"><button type="button" role="radio" data-v="app">AyuBase6</button><button type="button" role="radio" data-v="clock">Phone’s Clock</button></span></div>':'')
       +'<div id="rem-alarm-list" class="ayu-list"></div>'
       +'<div class="ayu-add-row"><button type="button" class="ayu-add-btn" id="rem-alarm-add"><span class="ayu-add-plus" aria-hidden="true">+</span><span>Add an alarm</span></button>'
       +'<button type="button" class="calc-info-btn rout-info-btn ayu-al-ibtn" id="rem-al-ibtn" title="About alarms" aria-label="About alarms" aria-expanded="false">i</button></div>'
       +'<div class="calc-task ayu-al-info" id="rem-al-info" hidden>'+infoHtml('rem')+'</div>';
     mr.parentNode.insertBefore(wrap, mr);
     try{ var l0=remList(), l1=l0.filter(function(x){ return !x.draft; }); if(l1.length!==l0.length) remSave(l1); }catch(e){}   // a new alarm never saved
+    (function(){ var row=$('rem-tap-row'); if(!row) return;
+      function cur(){ try{ return localStorage.getItem('ayuAlarmTap')==='clock' ? 'clock' : 'app'; }catch(e){ return 'app'; } }
+      function paint(){ var v=cur(); row.querySelectorAll('button').forEach(function(b){ var on=b.dataset.v===v; b.classList.toggle('on',on); b.setAttribute('aria-checked',String(on)); }); }
+      row.querySelectorAll('button').forEach(function(b){ b.addEventListener('click',function(){ try{ localStorage.setItem('ayuAlarmTap',b.dataset.v); }catch(e){} paint(); changed(); }); });
+      paint(); })();
     $('rem-al-ibtn').addEventListener('click',function(){ var i=$('rem-al-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); });
     $('rem-alarm-add').addEventListener('click',function(){
       closeForms(); var nid=newId();
@@ -16822,18 +16829,19 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   function paintList(){
     var list=$('rem-alarm-list'); if(!list) return;
     list.innerHTML='';
-    remList().slice().sort(function(x,y){ var ax=(x.at>=0&&x.at<1440)?x.at:420, ay=(y.at>=0&&y.at<1440)?y.at:420; return ax-ay; })   // in time order
+    remList().slice().sort(function(x,y){ var ex=(x.expired&&!x.on)?0:1, ey=(y.expired&&!y.on)?0:1; if(ex!==ey) return ex-ey;   // expired ones first, then in time order
+        var ax=(x.at>=0&&x.at<1440)?x.at:420, ay=(y.at>=0&&y.at<1440)?y.at:420; return ax-ay; })
       .forEach(function(raw){ list.appendChild(alarmItem(raw.id)); });
     if(window.ayuListColours) window.ayuListColours(list);
   }
   function alarmItem(id){
-    var c=get(id), item=document.createElement('div'); item.className='custom-reminder-item ayu-alarm-item'+(c.on?'':' ayu-off'); item.dataset.id=id;
+    var c=get(id), exp=!!(c.expired && !c.on), item=document.createElement('div'); item.className='custom-reminder-item ayu-alarm-item'+(c.on?'':' ayu-off')+(exp?' ayu-expired':''); item.dataset.id=id;
     var sw=document.createElement('label'); sw.className='master-switch'; sw.title='Turn this alarm on or off'; sw.innerHTML='<input type="checkbox" aria-label="Turn this alarm on or off">';
     var inp=sw.querySelector('input'); inp.checked=!!c.on;
     var del=document.createElement('button'); del.type='button'; del.className='custom-reminder-delete'; del.textContent='×'; del.setAttribute('aria-label','Delete alarm'); del.title='Delete alarm';
-    var h=window.ayuItemHead(item,clock(c.at),alarmSub(c),[sw,del],'Alarm '+clock(c.at));
+    var h=window.ayuItemHead(item,clock(c.at),(exp?'Expired · ':'')+alarmSub(c),[sw,del],'Alarm '+clock(c.at)+(exp?', expired':''));
     sw.addEventListener('click',function(e){ e.stopPropagation(); });
-    inp.addEventListener('change',function(){ var x=get(id); x.on=inp.checked; x.vibrate=x.on; delete x.draft; put(id,x); item.classList.toggle('ayu-off',!x.on); });
+    inp.addEventListener('change',function(){ var x=get(id); x.on=inp.checked; x.vibrate=x.on; delete x.draft; put(id,x); item.classList.toggle('ayu-off',!x.on); if(exp && x.on) setTimeout(paintList,250); });
     del.addEventListener('click',function(e){
       e.stopPropagation(); var l=remList(), idx=-1; l.forEach(function(x,i){ if(x.id===id) idx=i; }); if(idx<0) return;
       var saved=l.splice(idx,1)[0]; remSave(l); var list=item.parentNode; item.classList.remove('open'); item.querySelector('.cri-body').innerHTML='';
@@ -20540,6 +20548,15 @@ html body #rem-alarm-card .clk-now .cn-d{font-size:.9rem;font-weight:600;color:#
 })();
 </script>
 <style id="al-actions-20261110">html body #alerts-panel #rem-alarm-list .ayu-al-actions:not(#ayu-x1){margin-top:14px}html body #alerts-panel #rem-alarm-list .ayu-al-actions button:not(#ayu-x1):not(#ayu-x2){height:auto !important;min-height:0 !important;padding:7px 20px !important;line-height:1.3 !important;font-size:.9rem !important}</style>
+<style id="alarm-tap-expired-20261110">
+html body #alerts-panel #rem-alarm-card .ayu-tap-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 2px 12px;font-size:.86rem;color:#134e4a}
+html body #alerts-panel #rem-alarm-card .ayu-seg{display:inline-flex;flex:0 0 auto;border:1.5px solid #0f766e;border-radius:10px;overflow:hidden}
+html body #alerts-panel #rem-alarm-card .ayu-seg button{border:0;background:#fff;color:#0f766e;font:inherit;font-size:.78rem;font-weight:700;padding:5px 9px;cursor:pointer;margin:0;border-radius:0;min-height:0;height:auto}
+html body #alerts-panel #rem-alarm-card .ayu-seg button.on{background:#0f766e;color:#fff}
+/* an Only-once alarm that already rang: amber, first in the list */
+html body #alerts-panel #rem-alarm-list .ayu-alarm-item.ayu-expired:not(#ayu-x1){background:#fff7ed !important;border-color:#fdba74 !important}
+html body #alerts-panel #rem-alarm-list .ayu-alarm-item.ayu-expired .cri-sub:not(#ayu-x1){color:#b45309 !important;font-weight:600}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
