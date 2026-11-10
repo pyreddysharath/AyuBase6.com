@@ -1,20 +1,18 @@
-name: Android debug APK
+name: Android app
 
-# Builds an installable debug APK from this repository plus the web app (pyreddysharath/AyuBase6.com).
-# The APK is attached to this run and published as the "debug-latest" pre-release (Releases page).
-# Run it by hand with "publish" ticked to also build the signed release APK and put it on the website:
-# a release in AyuBase6.com (download link .../releases/latest/download/AyuBase6.apk) and config/android-app.json,
-# which the website's "Get the app" and the app's update notice read.
-# Needs repository secrets: RELEASE_KEYSTORE_B64, RELEASE_KEYSTORE_PASSWORD, RELEASE_KEY_ALIAS, RELEASE_KEY_PASSWORD,
-# and WEB_DEPLOY_TOKEN (fine-grained token, AyuBase6.com, Contents: read and write).
+# Builds the Android app (android-app/) with the website (index.html at the root of this repository).
+# A push that changes android-app/ builds a debug APK (artifact + "debug-latest" pre-release).
+# Run it by hand with "publish" ticked to build the signed release APK and publish it:
+# a release here (download link .../releases/latest/download/AyuBase6.apk) and config/android-app.json,
+# which the website's Download app and the app's update check read.
+# Needs repository secrets: RELEASE_KEYSTORE_B64, RELEASE_KEYSTORE_PASSWORD, RELEASE_KEY_ALIAS, RELEASE_KEY_PASSWORD
+# (optional: DEBUG_KEYSTORE_B64).
 on:
   push:
     branches: [main]
+    paths: ['android-app/**', '.github/workflows/android-app.yml']
   workflow_dispatch:
     inputs:
-      web_ref:
-        description: Web app branch, tag or commit to bundle
-        default: main
       publish:
         description: Also build the signed release APK and publish it on ayubase6.com
         type: boolean
@@ -24,30 +22,28 @@ permissions:
   contents: write
 
 concurrency:
-  group: android-debug
+  group: android-app
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      VERSION_CODE: ${{ github.run_number }}
+    defaults:
+      run:
+        working-directory: android-app
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check out the web app
-        uses: actions/checkout@v4
-        with:
-          repository: pyreddysharath/AyuBase6.com
-          ref: ${{ github.event.inputs.web_ref || 'main' }}
-          path: web
-          lfs: false
+      # Version code: one more than the published version (continues the numbers of the old AyuBase6-Android builds)
+      - name: Version number
+        run: echo "VERSION_CODE=$(( $(jq -r '.versionCode // 0' ../config/android-app.json) + 1 ))" >> "$GITHUB_ENV"
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: android-app/package-lock.json
 
       - uses: actions/setup-java@v4
         with:
@@ -78,16 +74,16 @@ jobs:
 
       - name: Bundle the web app
         run: |
-          WEB_DIR=web npm run prepare-www
+          WEB_DIR=.. npm run prepare-www
           npx cap sync android
-          echo "WEB_SHA=$(git -C web rev-parse --short HEAD)" >> "$GITHUB_ENV"
+          echo "WEB_SHA=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
 
       - name: Unit tests (reminder rules match the push server)
-        working-directory: android
+        working-directory: android-app/android
         run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
 
       - name: Build debug APK
-        working-directory: android
+        working-directory: android-app/android
         run: ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Name the APK
@@ -99,7 +95,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: AyuBase6-debug-${{ github.run_number }}
-          path: out/*.apk
+          path: android-app/out/*.apk
 
       - name: Build signed release APK
         if: github.event.inputs.publish == 'true'
@@ -127,23 +123,23 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: AyuBase6-play-bundle-${{ github.run_number }}
-          path: play-out/*.aab
+          path: android-app/play-out/*.aab
 
       - name: Publish the release APK on ayubase6.com
         if: github.event.inputs.publish == 'true'
         env:
-          GH_TOKEN: ${{ secrets.WEB_DEPLOY_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if [ -z "$GH_TOKEN" ]; then echo "::error::Secret WEB_DEPLOY_TOKEN is missing."; exit 1; fi
-          REPO=pyreddysharath/AyuBase6.com
+          REPO=${{ github.repository }}
           NAME="0.1.${VERSION_CODE}"
           SIZE=$(stat -c %s out/AyuBase6.apk)
           gh release create "app-v${VERSION_CODE}" out/AyuBase6.apk -R "$REPO" --latest \
             --title "AyuBase6 for Android ${NAME}" \
             --notes "Android app ${NAME}. Download: https://github.com/${REPO}/releases/latest/download/AyuBase6.apk"
-          # The version file the website and the app read (small; committed to the website's main branch).
-          git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" site
-          cat > site/config/android-app.json <<JSON
+          # The version file the website and the app read, committed to main (newest main, in case it moved on)
+          cd ..
+          git fetch -q origin main && git checkout -q -B pub origin/main
+          cat > config/android-app.json <<JSON
           {
             "versionCode": ${VERSION_CODE},
             "versionName": "${NAME}",
@@ -153,14 +149,13 @@ jobs:
             "minAndroid": "8.0"
           }
           JSON
-          cd site
           git config user.name "AyuBase6 build"
           git config user.email "noreply@github.com"
           git add config/android-app.json
           git commit -m "Android app ${NAME} published" && git push origin HEAD:main
 
       - name: Publish as the "debug-latest" pre-release
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

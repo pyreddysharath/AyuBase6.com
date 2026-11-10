@@ -1,0 +1,5 @@
+# GitHub Pages: publish only the website; the Android project (android-app/) is not part of the site.
+exclude:
+  - android-app
+  - LICENSE
+  - README.txt

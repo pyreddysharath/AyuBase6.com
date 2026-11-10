@@ -1,0 +1,11 @@
+Copyright © 2026 AyuBase6.com. All rights reserved.
+
+The source code, design, text, images and other content in this repository
+(the AyuBase6 website and the AyuBase6 Android app) may be viewed here, but no
+permission is given to copy, modify, publish, distribute or reuse any of it,
+in whole or in part, without written permission from the owner of AyuBase6.com.
+
+Third-party libraries in lib/ (pdf.js, jsPDF, tesseract.js) and the Android
+libraries the app is built with keep their own licences, included with them.
+
+Contact: through the Feedback tab at https://ayubase6.com

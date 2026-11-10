@@ -1,11 +1,11 @@
 // Builds www/ (the files bundled into the Android app) from a checkout of the AyuBase6 web app.
-// Web app folder: env WEB_DIR, else ./web (GitHub Actions checks the website repository out there).
+// Web app folder: env WEB_DIR, else the repository root (the website sits one level above android-app/).
 // The web app itself is not changed; the Android copy gets a few exact-count patches (each must match once).
 import fs from 'node:fs';
 import path from 'node:path';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-const web = path.resolve(root, process.env.WEB_DIR || 'web');
+const web = path.resolve(root, process.env.WEB_DIR || '..');
 const out = path.join(root, 'www');
 const LIVE = 'https://ayubase6.com/';
 
