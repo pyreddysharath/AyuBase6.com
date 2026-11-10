@@ -18159,12 +18159,28 @@ html body #lab-insights-card .lab-actions-row .lub-s{font-size:.72em;font-weight
   function $(i){ return document.getElementById(i); }
   window.ayuSysNotifBtn=function(){
     var p=perm(), off=$('notif-off-help');
+    if(app() && p==='granted' && typeof window.ayuNative.disableNotifs==='function'){ askOff(); return; }   // the phone: AyuBase6 gives up the permission
     if(app() && p!=='default'){ window.ayuNative.openNotifSettings(); return; }   // the phone: its notification settings page turns it on or off
     if(p==='granted'){ if(off) off.style.display = off.style.display==='block' ? 'none' : 'block'; return; }
     if(off) off.style.display='none';
     Promise.resolve(typeof requestNotificationPermission==='function' ? requestNotificationPermission() : Notification.requestPermission())
       .catch(function(){}).then(function(){ try{ refreshNotifStatusUI(); }catch(e){} });
   };
+  // In the app: a short confirmation under the button, then AyuBase6 turns its notifications off
+  function askOff(){
+    var b=$('notif-enable-btn'); if(!b) return;
+    var box=$('notif-off-ask');
+    if(box){ box.remove(); return; }
+    box=document.createElement('div'); box.id='notif-off-ask'; box.className='notif-off-ask';
+    box.innerHTML='<p>Turn off notifications for AyuBase6? Reminders and alarms stop until you tap <b>Enable Notifications</b> again. AyuBase6 closes to finish this.</p>'
+      +'<div class="noa-btns"><button type="button" class="noa-yes">Turn off</button><button type="button" class="noa-no">Cancel</button></div>';
+    (b.parentNode.nextSibling ? b.parentNode.parentNode.insertBefore(box,b.parentNode.nextSibling) : b.parentNode.parentNode.appendChild(box));
+    box.querySelector('.noa-no').addEventListener('click',function(){ box.remove(); });
+    box.querySelector('.noa-yes').addEventListener('click',function(){
+      box.querySelector('p').textContent='Turning off notifications…';
+      window.ayuNative.disableNotifs().then(function(r){ if(!(r && r.closing)) box.remove(); }).catch(function(){ box.remove(); window.ayuNative.openNotifSettings(); });
+    });
+  }
   function paint(){
     var b=$('notif-enable-btn'), s=$('notif-status-text'), p=perm(), off=$('notif-off-help'), dh=$('notif-denied-help');
     if(!b || p==='unsupported') return;
@@ -20556,6 +20572,14 @@ html body #alerts-panel #rem-alarm-card .ayu-seg button.on{background:#0f766e;co
 /* an Only-once alarm that already rang: amber, first in the list */
 html body #alerts-panel #rem-alarm-list .ayu-alarm-item.ayu-expired:not(#ayu-x1){background:#fff7ed !important;border-color:#fdba74 !important}
 html body #alerts-panel #rem-alarm-list .ayu-alarm-item.ayu-expired .cri-sub:not(#ayu-x1){color:#b45309 !important;font-weight:600}
+</style>
+<style id="notif-off-ask-20261110">
+html body .notif-off-ask{margin:10px 0 0;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--footer-accent,#0d9488) 8%,#fff);border:1px solid color-mix(in srgb,var(--footer-accent,#0d9488) 30%,#fff);font-size:.88rem;line-height:1.45}
+html body .notif-off-ask p{margin:0 0 8px}
+html body .notif-off-ask .noa-btns{display:flex;gap:8px}
+html body .notif-off-ask button{border-radius:10px;padding:7px 16px;font:inherit;font-weight:700;cursor:pointer;border:1.5px solid var(--footer-accent,#0d9488)}
+html body .notif-off-ask .noa-yes{background:var(--footer-accent,#0d9488);color:#fff}
+html body .notif-off-ask .noa-no{background:#fff;color:var(--footer-accent,#0d9488)}
 </style>
 </body>
 
