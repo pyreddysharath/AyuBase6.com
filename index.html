@@ -18727,11 +18727,11 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     var bg=ph==='checking' && !!u.checkedAt; if(bg) ph='';   // a new check runs in the background: the last result stays, only the button says Checking…
     $('au-ver').textContent='App version'+(mine&&mine.name?' '+mine.name:'');
     var cls='', txt='', b='Check for update', alt=true, dis=false, nt='', pct=-1;
-    if(ph==='downloading'){ cls='busy'; txt='Downloading version '+((L&&L.versionName)||'')+'… '+(u.pct||0)+'%'; b='Downloading…'; dis=true; alt=false; pct=u.pct||0; nt='Keep the app open until it finishes.'; }
+    if(ph==='downloading'){ cls='busy'; txt='Downloading the update… '+(u.pct||0)+'%'; b='Downloading…'; dis=true; alt=false; pct=u.pct||0; nt='Keep the app open until it finishes.'; }
     else if(ph==='allow'){ cls='new'; txt='Allow AyuBase6 to install updates'; b='Allow'; alt=false; nt='Turn on “Allow from this source”, then come back: the update continues by itself. Android asks only the first time.'; }
     else if(ph==='installing'){ cls='new'; txt='Finish in Android’s screen: tap Update'; b='Update'; alt=false; nt='Your data stays.'; }
     else if(ph==='checking'){ cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
-    else if(L){ cls='new'; txt='New version '+(L.versionName||'')+' is ready'; b='Update'; alt=false; nt='Android asks you to confirm; your data stays.'; }
+    else if(L){ cls='new'; txt='A new version is ready'; b='Update'; alt=false; nt='Android asks you to confirm; your data stays.'; }
     else if(u.error==='download'){ cls='err'; txt='The download didn’t finish. Check your internet and try again.'; b='Check for update'; }
     else if(u.error==='install'){ cls='err'; txt='Android’s install screen didn’t open. Try again.'; }
     else if(u.error==='offline'){ cls='err'; txt='You’re offline. Connect to the internet and try again.'; }
