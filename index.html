@@ -8436,7 +8436,10 @@ const RECIPES_DATA = [
     <div class="feedback-form-section" style="flex-direction:row; gap:10px;">
       <button id="notif-enable-btn" onclick="ayuSysNotifBtn()">Enable Notifications</button>
     </div>
-    <p class="feedback-note-small" style="margin-top:10px">Having trouble? <a href="#" onclick="showFooterSection('check');return false;" style="font-weight:700">Test notifications in Help</a></p>
+    <button type="button" class="notif-help-card" onclick="showFooterSection('check')">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/><path d="M10.6 8.3a1.5 1.5 0 0 1 2.9.5c0 1-1.5 1.4-1.5 2.2"/><path d="M12 13.2h.01"/></svg>
+      <span class="nhc-t"><b>Not getting notifications?</b><span>Run a quick check of sound, volume and alarms</span></span><span class="nhc-go" aria-hidden="true">›</span>
+    </button>
     <p class="feedback-note-small" id="notif-off-help" style="display:none;margin-top:8px">
       Browsers don't let a website remove its own permission. To remove it, open the site settings for this page
       (the icon next to the address) and set Notifications to <b>Block</b>.
@@ -20672,6 +20675,15 @@ html body #sec-notifications .feedback-form-section:has(#notif-enable-btn):not(#
 html body #sec-notifications #notif-off-help:not(#ayu-x1),html body #sec-notifications #notif-denied-help:not(#ayu-x1){text-align:center}
 html body #sec-notifications .notif-off-ask .noa-btns{justify-content:center}
 html body #sec-notifications .notif-off-ask p{text-align:center}
+</style>
+<style id="notif-help-card-20261110">
+html body #sec-notifications .notif-help-card{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;margin:16px 0 4px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--footer-accent,#0d9488) 30%,#fff);background:color-mix(in srgb,var(--footer-accent,#0d9488) 7%,#fff);border-radius:12px;font:inherit;text-align:left;color:inherit;cursor:pointer}
+html body #sec-notifications .notif-help-card svg{flex:0 0 26px;color:var(--footer-accent,#0d9488)}
+html body #sec-notifications .notif-help-card .nhc-t{flex:1 1 auto;min-width:0}
+html body #sec-notifications .notif-help-card .nhc-t b{display:block;font-size:.9rem}
+html body #sec-notifications .notif-help-card .nhc-t span{display:block;font-size:.8rem;opacity:.75}
+html body #sec-notifications .notif-help-card .nhc-go{font-size:1.4rem;line-height:1;color:var(--footer-accent,#0d9488)}
+html body #sec-notifications .notif-help-card:focus-visible{outline:2px solid var(--footer-accent,#0d9488);outline-offset:2px}
 </style>
 </body>
 
