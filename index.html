@@ -18077,6 +18077,7 @@ html body #sec-bkp .ayu-gb-row .master-switch{flex:0 0 auto}
 html body #sec-bkp .ayu-gb-st{font-size:12.5px;opacity:.75;margin-top:4px}
 html body #sec-bkp .ayu-gb-st.warn{opacity:1;color:#b45309;font-weight:700}
 html body #sec-bkp .ayu-gb .backup-info{margin-top:8px}
+html body #sec-bkp .ayu-gb .master-switch input:checked:not(#ayu-x1){background:var(--footer-accent,#255cc0) !important}   /* the open section's colour */
 </style>
 <script id="google-backup-20261105-js">
 /* Android app only. Keeps a copy of the saved data (the same sections as Backup & Restore) for Android's backup to the
@@ -18151,10 +18152,8 @@ html body #sec-bkp .ayu-gb .backup-info{margin-top:8px}
   }
 
   // Backup & Restore: the switch, its i and the last-copied time.
-  var INFO='Your data (the sections listed below) is copied to your own Google account, in a hidden area only this app uses. '+
-    'It is encrypted with your phone\'s screen lock, if you have one, and is not sent to us. Android usually backs it up within an hour or so of a change '+
-    '(sometimes up to a day), and brings it back when you install the app again. It needs Google backup to be on in your phone\'s settings. '+
-    'Turn this off to stop it; the copy in your Google account is then emptied at the next backup.';
+  var INFO='Copies your data (the sections below) to your own Google account, privately and encrypted; nothing is sent to us. '+
+    'It is restored when you install the app again. Needs Google backup on in the phone\'s settings. Off: the copy is removed.';
   function paint(){
     var st=document.getElementById('ayu-gb-st'), i=document.getElementById('ayu-gb-on'); if(!st) return;
     if(i) i.checked=enabled();
