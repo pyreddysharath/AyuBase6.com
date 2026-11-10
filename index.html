@@ -20214,6 +20214,44 @@ html body #sec-app .au-barrow .au-bar{flex:1 1 auto;margin-top:0}
 html body #sec-app .au-x{flex:0 0 30px;width:30px;height:30px;padding:0;border-radius:50%;border:1.5px solid var(--footer-accent,#255cc0);background:#fff;color:var(--footer-accent,#255cc0);font:inherit;font-size:18px;font-weight:700;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
 html body #sec-app .au-x[hidden]{display:none}
 </style>
+<style id="to-top-20261110">
+/* Body and Food: round ↑ (back to the top) and ↓ (down to the footer icons) in the section colour */
+.ayu-jump{position:fixed;right:16px;bottom:24px;z-index:900;width:46px;height:46px;border-radius:50%;border:0;padding:0;color:#fff;background:var(--totop,#2563eb);box-shadow:0 4px 14px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .2s,transform .2s,bottom .2s}
+.ayu-jump.on{opacity:1;transform:none;pointer-events:auto}
+.ayu-jump svg{width:22px;height:22px}
+.ayu-jump:focus-visible{outline:3px solid color-mix(in srgb,var(--totop,#2563eb) 45%,#fff);outline-offset:2px}
+@media print{.ayu-jump{display:none !important}}
+</style>
+<script id="to-top-20261110-js">
+(function(){
+  var COL={activity:'#2563eb',nutrition:'#16a34a'}, GAP=10, SIZE=46;
+  function mk(id,label,path){ var b=document.createElement('button'); b.type='button'; b.id=id; b.className='ayu-jump'; b.setAttribute('aria-label',label); b.title=label;
+    b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+path+'"/></svg>'; return b; }
+  var up=mk('ayu-totop','Back to top','M12 19V5M5 12l7-7 7 7'), down=mk('ayu-tobottom','Go to the bottom','M12 5v14M5 12l7 7 7-7');
+  function go(y){ try{ window.scrollTo({top:y,behavior:'smooth'}); }catch(e){ window.scrollTo(0,y); } }
+  up.addEventListener('click',function(){ go(0); up.blur(); });
+  down.addEventListener('click',function(){ go(document.documentElement.scrollHeight); down.blur(); });
+  function tab(){ for(var k in COL){ var p=document.getElementById(k+'-panel'); if(p && getComputedStyle(p).display!=='none') return k; } return ''; }
+  function show(b,on){ b.classList.toggle('on',on); b.tabIndex=on?0:-1; b.setAttribute('aria-hidden',on?'false':'true'); }
+  var raf=0;
+  function upd(){
+    raf=0; if(!up.isConnected){ document.body.appendChild(down); document.body.appendChild(up); }
+    var H=window.innerHeight, y=window.scrollY, t=tab(), f=document.querySelector('footer'), lift=24, footIn=false, side=false;
+    if(f){ var r=f.getBoundingClientRect(); side=r.height<20;   // wide screens: the footer icons sit in the side menu, always in view
+      if(!side && r.top<H){ footIn=true; lift=Math.max(24,H-r.top+12); } }   // stay above the footer when it is in view
+    var room=lift<H-90;   // hidden when the open footer fills the screen
+    var onUp=!!t && room && y>H, onDown=!!t && !side && !footIn && document.documentElement.scrollHeight-(y+H)>H*0.5;
+    if(t){ up.style.setProperty('--totop',COL[t]); down.style.setProperty('--totop',COL[t]); }
+    down.style.bottom=lift+'px';
+    up.style.bottom=(onDown ? lift+SIZE+GAP : lift)+'px';
+    show(up,onUp); show(down,onDown);
+  }
+  function soon(){ if(!raf) raf=requestAnimationFrame(upd); }
+  window.addEventListener('scroll',soon,{passive:true}); window.addEventListener('resize',soon);
+  document.addEventListener('click',function(){ setTimeout(soon,60); setTimeout(soon,600); },true);
+  if(document.body) upd(); else document.addEventListener('DOMContentLoaded',upd);
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
