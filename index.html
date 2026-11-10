@@ -18689,7 +18689,7 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
       if(N && typeof N.updateChecksGet==='function'){
         N.updateChecksGet().then(function(n){
           var card=sec.querySelector('.au-card'); if(!card || $('au-auto')) return;
-          card.insertAdjacentHTML('beforeend','<div class="au-auto-row"><label for="au-auto">Check automatically</label><select id="au-auto"><option value="0">Off</option><option value="1">Once a day (9 AM)</option><option value="2">Twice a day (9 AM, 9 PM)</option><option value="3">3 times a day (9 AM, 3 PM, 9 PM)</option><option value="4">4 times a day (9 AM, 1, 5, 9 PM)</option></select></div><div class="au-note au-auto-note">Only between 9 AM and 9 PM. A new version shows as a quiet notification.</div>');
+          card.insertAdjacentHTML('beforeend','<div class="au-auto-row"><label for="au-auto">Check automatically</label><select id="au-auto"><option value="0">Off</option><option value="1">Once a day (9 AM)</option><option value="2">Twice a day (9 AM, 9 PM)</option><option value="3">3 times a day (9 AM, 3 PM, 9 PM)</option><option value="4">4 times a day (9 AM, 1, 5, 9 PM)</option></select></div><div class="au-note au-auto-note">Only 9 AM – 9 PM, with a quiet notification.</div>');
           var sel=$('au-auto'); sel.value=String(isNaN(n)?2:n);
           sel.addEventListener('change',function(){ N.updateChecksSet(+sel.value).catch(function(){}); });
         }).catch(function(){});
@@ -18715,7 +18715,7 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     else if(ph==='allow'){ cls='new'; txt='Allow AyuBase6 to install updates'; b='Allow'; alt=false; nt='Turn on “Allow from this source”, then come back: the update continues by itself. Android asks only the first time.'; }
     else if(ph==='installing'){ cls='new'; txt='Finish in Android’s screen: tap Update'; b='Update'; alt=false; nt='Your data stays.'; }
     else if(ph==='checking'){ cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
-    else if(L){ cls='new'; txt='New version '+(L.versionName||'')+' is ready'; b='Update'; alt=false; nt='Tap Update; Android asks you to confirm, and your data stays.'; }
+    else if(L){ cls='new'; txt='New version '+(L.versionName||'')+' is ready'; b='Update'; alt=false; nt='Android asks you to confirm; your data stays.'; }
     else if(u.error==='download'){ cls='err'; txt='The download didn’t finish. Check your internet and try again.'; b='Check for update'; }
     else if(u.error==='install'){ cls='err'; txt='Android’s install screen didn’t open. Try again.'; }
     else if(u.error==='offline'){ cls='err'; txt='You’re offline. Connect to the internet and try again.'; }
@@ -20072,6 +20072,19 @@ html body #ayu-checklist #ayu-cl-prev{margin:12px 0 0 16px}
 html body #sec-app .au-auto-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid color-mix(in srgb,var(--footer-accent,#0d9488) 20%,#fff)}
 html body #sec-app .au-auto-row label{font-weight:700;font-size:.9rem;color:#1e293b}
 html body #sec-app .au-auto-row select{flex:1 1 180px;min-width:0;height:36px;padding:0 10px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-size:.88rem}
+</style>
+<style id="au-layout-20261110">
+/* App Updates: text first (full width), the button at the bottom, full width; "New version … is ready" in the section colour */
+html body #sec-app .au-card{display:flex;flex-direction:column}
+html body #sec-app .au-row{display:contents !important}
+html body #sec-app .au-row > div{order:1}
+html body #sec-app .au-bar{order:2}
+html body #sec-app .au-note{order:3}
+html body #sec-app #au-btn{order:4;margin-top:12px;width:100%;padding:10px 16px}
+html body #sec-app .au-auto-row{order:5}
+html body #sec-app .au-auto-note{order:6}
+html body #sec-app .au-line.new{color:var(--footer-accent,#2563eb) !important}
+@media (max-width:340px){html body #sec-app .au-card{padding:12px}html body #sec-app #au-note,html body #sec-app .au-auto-note{font-size:11px}}
 </style>
 </body>
 
