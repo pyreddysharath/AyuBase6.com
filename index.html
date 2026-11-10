@@ -15565,7 +15565,8 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     document.querySelectorAll('.ayu-appb').forEach(function(x){ x.remove(); });
     openHelp();
   }
-  window.ayuGetApp=download;
+  // window.ayuGetApp=download;   // Direct APK downloads are switched off for now: the app is sent on request (app-request-20261110).
+  window.ayuGetApp=function(){ document.querySelectorAll('.ayu-appb').forEach(function(x){ x.remove(); }); setTimeout(openHelp,60); setTimeout(function(){ var d=document.querySelector('#sec-app details[data-part="android"]'); if(d) d.open=true; var n=document.querySelector('#sec-app .app-req input[name="name"]'); if(n){ n.scrollIntoView({block:'center',behavior:'smooth'}); try{ n.focus({preventScroll:true}); }catch(e){} } },350); };
   function openHelp(){
     try{ if(typeof showFooterSection==='function') showFooterSection('backup'); if(typeof showFooterSub==='function') showFooterSub('backup','app'); }catch(e){}
   }
@@ -15591,8 +15592,11 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     var meta=[cfg.versionName?'Version '+esc(cfg.versionName):'', mb(cfg.sizeBytes), 'Android '+esc(cfg.minAndroid||'8.0')+' or later'].filter(Boolean).join(' · ');
     return '<p>An Android app is available: the same app, with reminders and alarms that arrive on time even when it is closed or the phone is locked.</p>'
       + '<p class="app-meta">'+meta+'</p>'
+      /* QR code and Copy link: switched off for now (the app is sent on request)
       + '<div class="app-qr">'+APK_QR+'<div><strong>On your Android phone</strong><ol><li>Open the camera and point it at this code.</li><li>Tap the link to download, then open the file and tap <b>Install</b>.</li></ol>'
       + '<button type="button" class="app-get-sm app-copy" onclick="event.preventDefault();ayuCopyApk(this)">Copy link</button></div></div>'
+      */
+      + window.ayuAppReqForm()
       + '<strong>Your data</strong><p><b>Backup → Save</b> here, then <b>Backup → Restore</b> in the app.</p>';
   }
   window.ayuCopyApk=function(b){
@@ -15603,6 +15607,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     if(!ANDROID) return IOS ? '' : desktopHtml();
     if(!cfg) return '<p>Coming soon: the same app, with reminders that arrive even when it is closed. Until then, use the Web App below.</p>';
     var meta=[cfg.versionName?'Version '+esc(cfg.versionName):'', mb(cfg.sizeBytes), 'Android '+esc(cfg.minAndroid||'8.0')+' or later'].filter(Boolean).join(' · ');
+    /* Download and install steps: switched off for now (the app is sent on request).
     return (upd()?'<p class="app-upd-note">Version '+esc(cfg.versionName)+' is available. Download it to update the app.</p>':'')+'<p>The same app, with reminders and alarms that arrive on time even when it is closed or the phone is locked.</p>'
       + '<p class="app-meta">'+meta+'</p>'
       + '<strong>Install</strong><ol>'
@@ -15610,6 +15615,9 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       + '<li>Allow installing from this browser if asked, then tap <b>Install</b>. If Play Protect warns, tap <b>More details → Install anyway</b> (not on Google Play yet).</li>'
       + '<li>Open it and allow notifications and <b>Alarms &amp; reminders</b>.</li></ol>'
       + '<strong>Your data</strong><p><b>Backup → Save</b> here, then <b>Backup → Restore</b> in the app. The app tells you when an update is ready.</p>';
+    */
+    return '<p>The same app, with reminders and alarms that arrive on time even when it is closed or the phone is locked.</p>'
+      + '<p class="app-meta">'+meta+'</p>' + window.ayuAppReqForm();
   }
   function webHtml(){
     var head = (ANDROID && cfg) ? '<strong>Or install the web app</strong>' : '<strong>Install the web app</strong>';
@@ -15625,7 +15633,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   window.ayuAppDot=function(c){ if(!c && window.ayuChangedGroups) c=window.ayuChangedGroups(); return !!(c && c.length) || upd(); };
   function part(id,title,html,only,btn){ return '<details class="app-part" data-part="'+id+'"'+(only?' open':'')+'><summary>'+title+(id==='android' && upd()?'<i class="app-part-dot" aria-label="Update available"></i>':'')+(btn||'')+'</summary><div class="app-part-b">'+html+'</div></details>'; }
   // the main button sits on the section's title row, so it shows even while the section is closed
-  function btnA(){ return (cfg && ANDROID) ? '<button type="button" class="app-get-sm" onclick="event.preventDefault();event.stopPropagation();ayuGetApp()">Download</button>' : ''; }
+  function btnA(){ return (cfg && ANDROID) ? '<button type="button" class="app-get-sm" onclick="event.preventDefault();event.stopPropagation();ayuGetApp()">Request</button>' : ''; }
   function btnW(){ return installed() ? '' : '<button type="button" class="app-get-sm" onclick="event.preventDefault();event.stopPropagation();var d=this.closest(\'details\');if(d)d.open=true;ayuInstallWeb()">Install</button>'; }
   function helpHtml(){
     var a=androidHtml(), w=webHtml().replace(/^<strong>(Or install the web app|Install the web app)<\/strong>/,'');
@@ -15669,17 +15677,15 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
       if(ACC[tabName]) b.style.setProperty('--appb-c',ACC[tabName]);   // each tab's own colour, also before the first tab switch
       b.innerHTML='<div class="appb-tx"><span class="appb-t">Get the AyuBase6 app</span>'
         +'<span>Reminders arrive on time even when the app is closed.</span>'
-        +'</div><button type="button" class="appb-get">Download</button>'
+        +'</div><button type="button" class="appb-get">Request</button>'
         +'<button type="button" class="appb-x appb-later" aria-label="Close" title="Close">×</button>';
       var later=function(){
         ls(K_LATER,String(Date.now()));
         noteInPlace('You can download the app later from <svg class="appb-help-ic" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-label="Backup and Restore icon" role="img"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg> <b>(Backup &amp; Restore) → Download App</b>, at the bottom of the page.', 7000);
       };
       // Download: first a short note (so it can be read), then the download starts and Backup & Restore → Download App → Android opens.
-      b.querySelector('.appb-get').addEventListener('click',function(){
-        ls(K_LATER,String(Date.now()));
-        noteInPlace('Once it has downloaded, follow the steps in <svg class="appb-help-ic" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-label="Backup and Restore icon" role="img"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg> <b>(Backup &amp; Restore) → Download App → Android</b> to install it.', 10000, function(){ download(true); });
-      });
+      // Request: opens Backup & Restore → Download App with the request form (direct downloads are off for now)
+      b.querySelector('.appb-get').addEventListener('click',function(){ ls(K_LATER,String(Date.now())); window.ayuGetApp(); });
       b.querySelector('.appb-later').addEventListener('click',later);
       var ann=p.querySelector(':scope > .ayu-ann');   // after an announcement banner, if one is showing
       if(ann) ann.after(b); else p.insertBefore(b,p.firstChild);
@@ -20088,6 +20094,50 @@ html body #sec-app .au-auto-note{order:6}
 html body #sec-app .au-line.new{color:var(--footer-accent,#2563eb) !important}
 @media (max-width:340px){html body #sec-app .au-card{padding:12px}html body #sec-app #au-note,html body #sec-app .au-auto-note{font-size:11px}}
 </style>
+<style id="app-request-20261110">
+/* Download App: request the Android app (name + email); sent like Feedback, marked "App install request" */
+html body #sec-app .app-req{display:flex;flex-direction:column;gap:8px;margin:10px 0 12px}
+html body #sec-app .app-req input{height:38px;padding:0 12px;border-radius:10px;border:1px solid #cbd5e1;font:inherit;font-size:.92rem;background:#fff}
+html body #sec-app .app-req input:focus{outline:none;border-color:var(--footer-accent,#0d9488)}
+html body #sec-app .app-req .app-req-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+html body #sec-app .app-req button{height:40px;border:0;border-radius:10px;background:var(--footer-accent,#0d9488);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+html body #sec-app .app-req button:disabled{opacity:.6;cursor:default}
+html body #sec-app .app-req-note{font-size:.8rem;opacity:.75;margin:0}
+html body #sec-app .app-req-msg{font-size:.85rem;font-weight:700;color:#b45309;margin:0}
+html body #sec-app .app-req-done{font-weight:700;color:var(--footer-accent,#0d9488);margin:10px 0}
+</style>
+<script id="app-request-20261110-js">
+(function(){
+  var K='ayuAppRequested';
+  function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){} return null; }
+  window.ayuAppReqForm=function(){
+    if(ls(K)) return '<p class="app-req-done">✓ Request sent. We’ll email you a download link.</p>';
+    return '<form class="app-req" onsubmit="return ayuAppRequest(this)" novalidate>'
+      + '<strong>Request the app</strong>'
+      + '<input name="name" type="text" placeholder="Your name" maxlength="80" autocomplete="name" required>'
+      + '<input name="email" type="email" placeholder="Your email" maxlength="120" autocomplete="email" required>'
+      + '<input class="app-req-hp" name="website_url" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">'
+      + '<button type="submit">Request the app</button>'
+      + '<p class="app-req-msg" hidden></p>'
+      + '<p class="app-req-note">Your email is used only to send you the app.</p></form>';
+  };
+  window.ayuAppRequest=function(f){
+    var name=f.name.value.trim(), email=f.email.value.trim(), msg=f.querySelector('.app-req-msg'), btn=f.querySelector('button');
+    function say(t){ msg.textContent=t; msg.hidden=!t; }
+    if(f.website_url.value) return false;   // filled only by bots
+    if(!name){ say('Please enter your name.'); f.name.focus(); return false; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ say('Please enter a valid email.'); f.email.focus(); return false; }
+    say(''); btn.disabled=true; btn.textContent='Sending…';
+    var entry={ Date:(typeof formatFeedbackTimestamp==='function'?formatFeedbackTimestamp(new Date()):new Date().toISOString()), Website:'AyuBase6.com - App install request', Name:name, Message:email, Status:'Open' };
+    var send=(typeof submitFeedbackToSheet==='function') ? submitFeedbackToSheet(entry) : Promise.resolve();
+    send.then(function(){
+      ls(K,String(Date.now()));
+      f.outerHTML='<p class="app-req-done">✓ Thanks! We’ll email you a download link.</p>';
+    }).catch(function(){ btn.disabled=false; btn.textContent='Request the app'; say('Couldn’t send. Check your internet and try again.'); });
+    return false;
+  };
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
