@@ -8432,9 +8432,6 @@ const RECIPES_DATA = [
     <div class="footer-subtabs" role="tablist"><button type="button" class="footer-subtab" id="subtab-notifications" role="tab" onclick="showFooterSub('settings','notifications')">Notifications<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-cookies" role="tab" onclick="showFooterSub('settings','cookies')">Cookies<i class="fs-dot"></i></button></div>
     <div class="footer-sub" id="sec-notifications" style="display:none">
     <div class="footer-sec-title">Notification Settings</div>
-    <p>The Reminders tab (Eyes, Walk, Water, Eye Exercise and Personal Reminders) can send you a notification when it's time —
-    a popup on a computer, or a system notification on a phone. Checks has its own <b>Notify Me</b> switch.
-    Notifications need your permission first.</p>
     <p id="notif-status-text" class="feedback-note-small">Checking permission status…</p>
     <div class="feedback-form-section" style="flex-direction:row; gap:10px;">
       <button id="notif-enable-btn" onclick="ayuSysNotifBtn()">Enable Notifications</button>
@@ -20581,6 +20578,91 @@ html body .notif-off-ask button{border-radius:10px;padding:7px 16px;font:inherit
 html body .notif-off-ask .noa-yes{background:var(--footer-accent,#0d9488);color:#fff}
 html body .notif-off-ask .noa-no{background:#fff;color:var(--footer-accent,#0d9488)}
 </style>
+<style id="notif-all-20261110">
+/* Settings → Notifications: every reminder and alarm with its own switch (the same switch as in its section) */
+html body #sec-notifications .na-wrap{margin:14px 0 4px}
+html body #sec-notifications .na-g{font-size:.78rem;font-weight:800;letter-spacing:.02em;color:var(--footer-accent,#0d9488);border-left:4px solid var(--footer-accent,#0d9488);padding:1px 0 1px 8px;margin:14px 0 4px}
+html body #sec-notifications .na-g:first-child{margin-top:0}
+html body #sec-notifications .na-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 2px;border-bottom:1px solid color-mix(in srgb,var(--footer-accent,#0d9488) 14%,transparent)}
+html body #sec-notifications .na-row:last-child{border-bottom:0}
+html body #sec-notifications .na-n{border:0;background:none;padding:0;margin:0;font:inherit;font-size:.92rem;color:inherit;text-align:left;cursor:pointer;min-width:0;flex:1 1 auto}
+html body #sec-notifications .na-n small{display:block;font-size:.76rem;opacity:.7}
+html body #sec-notifications .na-n:hover{text-decoration:underline}
+html body #sec-notifications .na-row .master-switch{flex:0 0 auto;margin:0}
+html body #sec-notifications .na-row .master-switch input:checked:not(#ayu-x1){background:var(--footer-accent,#0d9488) !important;border-color:var(--footer-accent,#0d9488) !important}
+html body #sec-notifications .na-none{font-size:.85rem;opacity:.7;margin:4px 0}
+html body #sec-notifications .na-all{margin:12px 0 4px;border:1.5px solid var(--footer-accent,#0d9488);background:#fff;color:var(--footer-accent,#0d9488);border-radius:10px;padding:7px 16px;font:inherit;font-weight:700;cursor:pointer}
+html body #sec-notifications .na-all:disabled{opacity:.45;cursor:default}
+html body #sec-notifications .na-all.sure{background:var(--footer-accent,#0d9488);color:#fff}
+html body #sec-notifications > .ayu-why{display:none !important}   /* the list says what is on */
+</style>
+<script id="notif-all-20261110-js">
+(function(){
+  function $(i){ return document.getElementById(i); }
+  function J(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } }
+  function clock(m){ m=(+m>=0 && +m<1440)?+m:420; var h=Math.floor(m/60), mm=m%60; return (h%12||12)+':'+(mm<10?'0':'')+mm+' '+(h>=12?'PM':'AM'); }
+  function closeFooter(){ try{ if(typeof closeAllFooterSections==='function') closeAllFooterSections(); }catch(e){} }
+  function goHB(card){ return function(){ closeFooter(); if(typeof switchTab==='function') switchTab('alerts'); if(window.ayuRemTab) window.ayuRemTab('breaks');
+    setTimeout(function(){ var c=$(card); if(!c) return; c.classList.remove('collapsed'); try{ c.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },150); }; }
+  // [group, name, note, the section's own switch (getter), open the section]
+  function items(){
+    var out=[];
+    [['break','Eyes (20-20-20)','alert-card-break'],['walk','Walk','alert-card-walk'],['drink','Water','alert-card-drink'],['eyeex','Eye Exercise','alert-card-break-ex']].forEach(function(x){
+      var sw=function(){ var c=$(x[2]); return c && (c.querySelector('.alert-enabled-toggle input') || $(x[0]==='eyeex'?'eye-ex-notify':'alert-'+x[0]+'-notify')); };
+      if(sw()) out.push(['Health Breaks', x[1], '', sw, goHB(x[2])]);
+    });
+    [].forEach.call(document.querySelectorAll('#custom-reminders-list .custom-reminder-item'),function(it){
+      var d={}; try{ d=JSON.parse(it.dataset.reminder||'{}'); }catch(e){}
+      var sw=function(){ return it.querySelector('.cri-hdr .master-switch input, .master-switch input'); };
+      if(sw()) out.push(['Personal Reminders', d.name||'Reminder', '', sw, function(){ closeFooter(); if(typeof switchTab==='function') switchTab('alerts'); if(window.ayuRemTab) window.ayuRemTab('personal'); setTimeout(function(){ try{ it.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} },150); }]);
+    });
+    var cl=function(){ return $('routines-master-toggle'); };
+    if(cl()) out.push(['Checks', $('ayu-checklist') ? 'Daily Checklist' : 'Notify Me', '', cl, function(){ closeFooter(); if(typeof switchTab==='function') switchTab('routines'); setTimeout(function(){ var b=$('ayu-checklist')||$('routines-notify-card'); try{ b.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },150); }]);
+    var wk=function(){ return $('wake-al-on'); };
+    if(wk()) out.push(['Checks', 'Wake-up Alarm', '', wk, function(){ closeFooter(); if(window.ayuShowAlarm) window.ayuShowAlarm('wake'); }]);
+    var l=J('ayuBase6-rem-alarms'); if(!Array.isArray(l)) l=[];
+    l.filter(function(a){ return a && a.id && !a.draft; }).sort(function(a,b){ return (+a.at||0)-(+b.at||0); }).forEach(function(a){
+      var sw=function(){ var it=document.querySelector('#rem-alarm-list [data-id="'+a.id+'"]'); return it && it.querySelector('.master-switch input'); };
+      out.push(['Clock alarms', clock(a.at)+(a.name?' · '+a.name:''), a.expired&&!a.on?'Expired':'', sw, function(){ closeFooter(); if(window.ayuShowAlarm) window.ayuShowAlarm(a.id); }]);
+    });
+    return out;
+  }
+  var wrap=null, list=[], sure=0;
+  function build(){
+    var sec=$('sec-notifications'); if(!sec) return;
+    if(!wrap){ wrap=document.createElement('div'); wrap.className='na-wrap'; wrap.id='notif-all';
+      var st=$('notif-status-text'); sec.insertBefore(wrap, st && st.parentNode===sec ? st : sec.children[1] || null); }
+    list=items(); var g='', h='';
+    if(!list.length) h='<p class="na-none">No reminders or alarms yet.</p>';
+    list.forEach(function(x,i){
+      if(x[0]!==g){ g=x[0]; h+='<div class="na-g">'+g+'</div>'; }
+      h+='<div class="na-row"><button type="button" class="na-n" data-i="'+i+'" title="Open">'+esc(x[1])+(x[2]?'<small>'+x[2]+'</small>':'')+'</button>'
+        +'<label class="master-switch" title="'+esc(x[1])+' on or off"><input type="checkbox" data-i="'+i+'" aria-label="'+esc(x[1])+' on or off"></label></div>';
+    });
+    h+='<button type="button" class="na-all" id="na-all">Turn all off</button>';
+    wrap.innerHTML=h;
+    wrap.querySelectorAll('.na-n').forEach(function(b){ b.addEventListener('click',function(){ list[+b.dataset.i][4](); }); });
+    wrap.querySelectorAll('input[data-i]').forEach(function(inp){ inp.addEventListener('change',function(){ var o=list[+inp.dataset.i][3](); if(o && o.checked!==inp.checked) o.click(); setTimeout(paint,80); setTimeout(paint,600); }); });
+    $('na-all').addEventListener('click',function(){
+      var b=this;
+      if(!sure){ sure=1; b.classList.add('sure'); b.textContent='Tap again to turn all off'; setTimeout(function(){ sure=0; b.classList.remove('sure'); b.textContent='Turn all off'; },3500); return; }
+      sure=0; list.forEach(function(x){ var o=x[3](); if(o && o.checked) o.click(); }); setTimeout(build,150); setTimeout(paint,700);
+    });
+    paint();
+  }
+  function esc(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function paint(){
+    if(!wrap) return; var any=false;
+    wrap.querySelectorAll('input[data-i]').forEach(function(inp){ var x=list[+inp.dataset.i], o=x && x[3](); var on=!!(o && o.checked); if(inp.checked!==on) inp.checked=on; if(on) any=true; });
+    var a=$('na-all'); if(a && !sure) a.disabled=!any;
+  }
+  function visible(){ var s=$('sec-notifications'); return s && s.offsetParent!==null; }
+  // fresh whenever Notifications is opened, and kept in step while it is open
+  var was=false;
+  setInterval(function(){ var v=visible(); if(v && !was) build(); else if(v) paint(); was=v; },700);
+  document.addEventListener('change',function(e){ if(visible() && !(wrap && wrap.contains(e.target))) setTimeout(paint,60); },true);
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
