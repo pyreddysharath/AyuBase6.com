@@ -1,0 +1,170 @@
+name: Android debug APK
+
+# Builds an installable debug APK from this repository plus the web app (pyreddysharath/AyuBase6.com).
+# The APK is attached to this run and published as the "debug-latest" pre-release (Releases page).
+# Run it by hand with "publish" ticked to also build the signed release APK and put it on the website:
+# a release in AyuBase6.com (download link .../releases/latest/download/AyuBase6.apk) and config/android-app.json,
+# which the website's "Get the app" and the app's update notice read.
+# Needs repository secrets: RELEASE_KEYSTORE_B64, RELEASE_KEYSTORE_PASSWORD, RELEASE_KEY_ALIAS, RELEASE_KEY_PASSWORD,
+# and WEB_DEPLOY_TOKEN (fine-grained token, AyuBase6.com, Contents: read and write).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      web_ref:
+        description: Web app branch, tag or commit to bundle
+        default: main
+      publish:
+        description: Also build the signed release APK and publish it on ayubase6.com
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-debug
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VERSION_CODE: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out the web app
+        uses: actions/checkout@v4
+        with:
+          repository: pyreddysharath/AyuBase6.com
+          ref: ${{ github.event.inputs.web_ref || 'main' }}
+          path: web
+          lfs: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      # The same debug signing key on every build, so a new APK installs over the old one and keeps the app's data.
+      # Optional secret DEBUG_KEYSTORE_B64 (base64 of a debug.keystore) makes it permanent; otherwise it is kept in the cache.
+      - name: Restore debug signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: debug-keystore-v1
+      - name: Use debug signing key from secret (if set)
+        env:
+          DEBUG_KEYSTORE_B64: ${{ secrets.DEBUG_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$DEBUG_KEYSTORE_B64" ]; then mkdir -p ~/.android; echo "$DEBUG_KEYSTORE_B64" | base64 -d > ~/.android/debug.keystore; fi
+          if [ ! -f ~/.android/debug.keystore ]; then
+            mkdir -p ~/.android
+            keytool -genkeypair -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android \
+              -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Install
+        run: npm ci
+
+      - name: Bundle the web app
+        run: |
+          WEB_DIR=web npm run prepare-www
+          npx cap sync android
+          echo "WEB_SHA=$(git -C web rev-parse --short HEAD)" >> "$GITHUB_ENV"
+
+      - name: Unit tests (reminder rules match the push server)
+        working-directory: android
+        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Name the APK
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk "out/AyuBase6-debug-${VERSION_CODE}.apk"
+          ls -la out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AyuBase6-debug-${{ github.run_number }}
+          path: out/*.apk
+
+      - name: Build signed release APK
+        if: github.event.inputs.publish == 'true'
+        env:
+          RELEASE_KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          if [ -z "$RELEASE_KEYSTORE_B64" ] || [ -z "$RELEASE_KEYSTORE_PASSWORD" ] || [ -z "$RELEASE_KEY_ALIAS" ]; then
+            echo "::error::Release signing secrets are missing (see the top of this workflow)."; exit 1
+          fi
+          echo "$RELEASE_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          export RELEASE_KEYSTORE="$RUNNER_TEMP/release.jks"
+          export RELEASE_KEY_PASSWORD="${RELEASE_KEY_PASSWORD:-$RELEASE_KEYSTORE_PASSWORD}"
+          # APK for the website, and the app bundle (.aab) that Google Play asks for, both signed with the same key
+          (cd android && ./gradlew assembleRelease bundleRelease --no-daemon --stacktrace)
+          rm -f "$RUNNER_TEMP/release.jks"
+          cp android/app/build/outputs/apk/release/app-release.apk out/AyuBase6.apk
+          mkdir -p play-out && cp android/app/build/outputs/bundle/release/app-release.aab "play-out/AyuBase6-${VERSION_CODE}.aab"
+          ls -la out play-out
+
+      - name: Keep the Google Play bundle with this run
+        if: github.event.inputs.publish == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: AyuBase6-play-bundle-${{ github.run_number }}
+          path: play-out/*.aab
+
+      - name: Publish the release APK on ayubase6.com
+        if: github.event.inputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.WEB_DEPLOY_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then echo "::error::Secret WEB_DEPLOY_TOKEN is missing."; exit 1; fi
+          REPO=pyreddysharath/AyuBase6.com
+          NAME="0.1.${VERSION_CODE}"
+          SIZE=$(stat -c %s out/AyuBase6.apk)
+          gh release create "app-v${VERSION_CODE}" out/AyuBase6.apk -R "$REPO" --latest \
+            --title "AyuBase6 for Android ${NAME}" \
+            --notes "Android app ${NAME}. Download: https://github.com/${REPO}/releases/latest/download/AyuBase6.apk"
+          # The version file the website and the app read (small; committed to the website's main branch).
+          git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" site
+          cat > site/config/android-app.json <<JSON
+          {
+            "versionCode": ${VERSION_CODE},
+            "versionName": "${NAME}",
+            "url": "https://github.com/${REPO}/releases/latest/download/AyuBase6.apk",
+            "sizeBytes": ${SIZE},
+            "date": "$(date -u +%d-%b-%Y)",
+            "minAndroid": "8.0"
+          }
+          JSON
+          cd site
+          git config user.name "AyuBase6 build"
+          git config user.email "noreply@github.com"
+          git add config/android-app.json
+          git commit -m "Android app ${NAME} published" && git push origin HEAD:main
+
+      - name: Publish as the "debug-latest" pre-release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete debug-latest --yes --cleanup-tag || true
+          gh release create debug-latest out/AyuBase6-debug-*.apk --prerelease --target "$GITHUB_SHA" \
+            --title "Debug build ${VERSION_CODE}" \
+            --notes "Debug APK for testing. App ${GITHUB_SHA::7}, web app ${WEB_SHA}. Install on the phone and allow notifications."

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- World Clock notification: up to 5 cities; the times are live clocks, so the app never needs to update it. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+    <LinearLayout android:id="@+id/w1" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="2dp" android:paddingBottom="2dp">
+        <TextView android:id="@+id/w1_city" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:singleLine="true" android:ellipsize="end" android:textAppearance="@style/TextAppearance.Compat.Notification.Info" />
+        <TextClock android:id="@+id/w1_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:textStyle="bold" android:textAppearance="@style/TextAppearance.Compat.Notification.Title" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/w2" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="2dp" android:paddingBottom="2dp">
+        <TextView android:id="@+id/w2_city" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:singleLine="true" android:ellipsize="end" android:textAppearance="@style/TextAppearance.Compat.Notification.Info" />
+        <TextClock android:id="@+id/w2_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:textStyle="bold" android:textAppearance="@style/TextAppearance.Compat.Notification.Title" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/w3" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="2dp" android:paddingBottom="2dp">
+        <TextView android:id="@+id/w3_city" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:singleLine="true" android:ellipsize="end" android:textAppearance="@style/TextAppearance.Compat.Notification.Info" />
+        <TextClock android:id="@+id/w3_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:textStyle="bold" android:textAppearance="@style/TextAppearance.Compat.Notification.Title" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/w4" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="2dp" android:paddingBottom="2dp">
+        <TextView android:id="@+id/w4_city" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:singleLine="true" android:ellipsize="end" android:textAppearance="@style/TextAppearance.Compat.Notification.Info" />
+        <TextClock android:id="@+id/w4_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:textStyle="bold" android:textAppearance="@style/TextAppearance.Compat.Notification.Title" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/w5" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="2dp" android:paddingBottom="2dp">
+        <TextView android:id="@+id/w5_city" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:singleLine="true" android:ellipsize="end" android:textAppearance="@style/TextAppearance.Compat.Notification.Info" />
+        <TextClock android:id="@+id/w5_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:textStyle="bold" android:textAppearance="@style/TextAppearance.Compat.Notification.Title" />
+    </LinearLayout>
+</LinearLayout>

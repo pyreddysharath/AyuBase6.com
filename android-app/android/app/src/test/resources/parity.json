@@ -1,0 +1,4088 @@
+{
+ "rules": {
+  "v": 1,
+  "tz": "UTC",
+  "phone": true,
+  "reminders": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "every": 20,
+    "from": 540,
+    "to": 1080
+   },
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "every": 45,
+    "from": 1320,
+    "to": 120,
+    "days": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "every": 60,
+    "from": null,
+    "to": null
+   }
+  ],
+  "exercise": {
+   "title": "Eye Exercise",
+   "body": "Follow the dot",
+   "times": [
+    600,
+    900
+   ],
+   "weekdays": [
+    0,
+    2,
+    4
+   ]
+  },
+  "checks": {
+   "mode": "beforeend",
+   "doneDay": "2026-11-02",
+   "done": [
+    "sun"
+   ],
+   "days": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    {
+     "key": "sun",
+     "title": "Sit in the Sun",
+     "body": "Morning sun",
+     "at": 420,
+     "end": 540,
+     "window": "7:00–9:00 AM",
+     "muted": false
+    },
+    {
+     "key": "walkex",
+     "title": "Walk or Exercise",
+     "body": "Walk now",
+     "at": 1080,
+     "end": 1110,
+     "window": "6:00–6:30 PM",
+     "muted": false
+    },
+    {
+     "key": "palms",
+     "title": "Palms",
+     "body": "muted one",
+     "at": 500,
+     "end": 600,
+     "window": "x",
+     "muted": true
+    }
+   ]
+  },
+  "custom": [
+   {
+    "id": "r1x",
+    "name": "Medicine",
+    "mode": "times",
+    "times": [
+     480,
+     1260
+    ],
+    "days": [
+     0,
+     6
+    ]
+   },
+   {
+    "id": "r-2",
+    "name": "Stretch",
+    "mode": "regular",
+    "every": 95,
+    "anchor": 1793492232345
+   }
+  ]
+ },
+ "start": 29891520,
+ "minutes": 10080,
+ "expected": {
+  "29891520": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29891580": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29891632": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29891640": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29891700": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29891727": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29891760": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29891820": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29891822": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29891880": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29891917": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29891940": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892000": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "customr1x",
+    "title": "Medicine",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892012": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892060": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892080": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892100": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892107": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892120": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "eyeex",
+    "title": "Eye Exercise",
+    "body": "Follow the dot",
+    "section": "alerts"
+   }
+  ],
+  "29892140": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892160": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892180": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892200": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892202": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892220": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892240": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892260": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892280": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892297": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892300": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892320": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892340": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892360": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892380": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892392": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892400": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892420": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "eyeex",
+    "title": "Eye Exercise",
+    "body": "Follow the dot",
+    "section": "alerts"
+   }
+  ],
+  "29892440": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892460": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892480": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892487": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892500": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892520": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892540": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892560": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892580": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29892582": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892600": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892660": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892677": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892720": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892772": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892780": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "customr1x",
+    "title": "Medicine",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892840": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892867": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892900": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892960": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29892962": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29892975": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29893020": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893057": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29893065": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29893080": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893140": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893152": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29893200": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893247": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29893260": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893320": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893342": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29893380": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "routine-sun",
+    "title": "Sit in the Sun",
+    "body": "Morning sun",
+    "section": "routines"
+   }
+  ],
+  "29893437": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29893440": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893500": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893520": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893532": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29893540": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893560": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893580": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893600": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893620": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893627": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29893640": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893660": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893680": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893700": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893720": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893722": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29893740": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893760": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893780": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893800": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893817": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29893820": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893840": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893860": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893880": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893900": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893912": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29893920": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29893940": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893960": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29893980": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894000": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29894007": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29894020": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29894040": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "routine-walkex",
+    "title": "Walk or Exercise",
+    "body": "Walk now",
+    "section": "routines"
+   }
+  ],
+  "29894055": [
+   {
+    "key": "routine-end-walkex",
+    "title": "Walk or Exercise · ending soon",
+    "body": "This window ends in 15 minutes (6:00–6:30 PM).",
+    "section": "routines"
+   }
+  ],
+  "29894100": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894102": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29894160": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894197": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29894220": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894280": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894292": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29894325": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29894340": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894370": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29894387": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29894400": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894415": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29894460": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894482": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29894505": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29894520": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894577": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29894580": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894640": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894672": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29894700": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894760": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894767": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29894820": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "routine-sun",
+    "title": "Sit in the Sun",
+    "body": "Morning sun",
+    "section": "routines"
+   }
+  ],
+  "29894862": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29894880": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894925": [
+   {
+    "key": "routine-end-sun",
+    "title": "Sit in the Sun · ending soon",
+    "body": "This window ends in 15 minutes (7:00–9:00 AM).",
+    "section": "routines"
+   }
+  ],
+  "29894940": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29894957": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29894960": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29894980": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895000": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "eyeex",
+    "title": "Eye Exercise",
+    "body": "Follow the dot",
+    "section": "alerts"
+   }
+  ],
+  "29895020": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895040": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895052": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29895060": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895080": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895100": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895120": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895140": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895147": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29895160": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895180": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895200": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895220": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895240": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895242": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29895260": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895280": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895300": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "eyeex",
+    "title": "Eye Exercise",
+    "body": "Follow the dot",
+    "section": "alerts"
+   }
+  ],
+  "29895320": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895337": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29895340": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895360": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895380": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895400": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895420": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895432": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29895440": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895460": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29895480": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "routine-walkex",
+    "title": "Walk or Exercise",
+    "body": "Walk now",
+    "section": "routines"
+   }
+  ],
+  "29895495": [
+   {
+    "key": "routine-end-walkex",
+    "title": "Walk or Exercise · ending soon",
+    "body": "This window ends in 15 minutes (6:00–6:30 PM).",
+    "section": "routines"
+   }
+  ],
+  "29895527": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29895540": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895600": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895622": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29895660": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895717": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29895720": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895765": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29895780": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895810": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29895812": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29895840": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895855": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29895900": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29895907": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29895945": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29895960": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896002": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29896020": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896080": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896097": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29896140": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896192": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29896200": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896260": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "routine-sun",
+    "title": "Sit in the Sun",
+    "body": "Morning sun",
+    "section": "routines"
+   }
+  ],
+  "29896287": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29896320": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896365": [
+   {
+    "key": "routine-end-sun",
+    "title": "Sit in the Sun · ending soon",
+    "body": "This window ends in 15 minutes (7:00–9:00 AM).",
+    "section": "routines"
+   }
+  ],
+  "29896380": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896382": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29896400": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896420": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896440": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896460": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896477": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29896480": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896500": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896520": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896540": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896560": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896572": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29896580": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896600": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896620": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896640": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896660": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896667": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29896680": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896700": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896720": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896740": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896760": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896762": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29896780": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896800": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896820": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896840": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896857": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29896860": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29896880": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896900": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29896920": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "routine-walkex",
+    "title": "Walk or Exercise",
+    "body": "Walk now",
+    "section": "routines"
+   }
+  ],
+  "29896935": [
+   {
+    "key": "routine-end-walkex",
+    "title": "Walk or Exercise · ending soon",
+    "body": "This window ends in 15 minutes (6:00–6:30 PM).",
+    "section": "routines"
+   }
+  ],
+  "29896952": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29896980": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897040": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897047": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29897100": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897142": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29897160": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897205": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29897220": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897237": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29897250": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29897280": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897295": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29897332": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29897340": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897385": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29897400": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897427": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29897460": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897520": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897522": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29897580": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897617": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29897640": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897700": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897712": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29897760": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897807": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29897820": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897840": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29897860": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29897880": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "eyeex",
+    "title": "Eye Exercise",
+    "body": "Follow the dot",
+    "section": "alerts"
+   }
+  ],
+  "29897900": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29897902": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29897920": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29897940": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29897960": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29897980": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29897997": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29898000": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898020": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29898040": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29898060": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898080": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29898092": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29898100": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29898120": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898140": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29898160": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29898180": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "eyeex",
+    "title": "Eye Exercise",
+    "body": "Follow the dot",
+    "section": "alerts"
+   }
+  ],
+  "29898187": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29898200": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29898220": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29898240": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898260": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29898280": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29898282": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29898300": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898320": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29898340": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29898360": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898377": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29898420": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898472": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29898480": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898540": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898567": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29898600": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898645": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29898660": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898662": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29898690": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29898720": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898735": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29898757": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29898780": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898825": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29898840": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898852": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29898900": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29898947": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29898960": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899020": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899042": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29899080": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899137": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29899140": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899200": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899232": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29899260": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899280": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899300": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899320": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899327": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29899340": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899360": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899380": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899400": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899420": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899422": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29899440": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899460": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899480": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899500": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899517": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29899520": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899540": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899560": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899580": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899600": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899612": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29899620": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899640": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899660": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899680": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899700": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899707": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29899720": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899740": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899760": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899780": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29899800": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899802": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29899860": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899897": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29899920": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899980": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29899992": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29900040": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900085": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29900087": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29900100": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900130": [
+   {
+    "key": "walk",
+    "title": "Walk",
+    "body": "Time for a walk",
+    "section": "alerts"
+   }
+  ],
+  "29900160": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900182": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29900220": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900277": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29900280": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900340": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900372": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29900400": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900460": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900467": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29900520": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900562": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29900580": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900640": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "customr1x",
+    "title": "Medicine",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29900657": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29900700": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900720": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29900740": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29900752": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29900760": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900780": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29900800": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29900820": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900840": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29900847": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29900860": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29900880": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900900": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29900920": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29900940": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29900942": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29900960": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29900980": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29901000": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29901020": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29901037": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29901040": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29901060": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29901080": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29901100": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29901120": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29901132": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29901140": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29901160": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29901180": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29901200": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29901220": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   }
+  ],
+  "29901227": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29901240": [
+   {
+    "key": "break",
+    "title": "Eyes",
+    "body": "Look 20 feet away",
+    "section": "alerts"
+   },
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29901300": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29901322": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29901360": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29901417": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29901420": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   },
+   {
+    "key": "customr1x",
+    "title": "Medicine",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29901480": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ],
+  "29901512": [
+   {
+    "key": "customr2",
+    "title": "Stretch",
+    "body": "It is time for your reminder.",
+    "section": "alerts"
+   }
+  ],
+  "29901540": [
+   {
+    "key": "drink",
+    "title": "Water",
+    "body": "Drink a glass of water",
+    "section": "alerts"
+   }
+  ]
+ }
+}
