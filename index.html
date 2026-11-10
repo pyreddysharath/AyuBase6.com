@@ -18980,6 +18980,16 @@ html:not(.ayu-can-vib) .chk-vib-only{display:none !important}
     var sel=$('chk-sound'); sel.value=sound(); if(sel.value!==sound()) sel.selectedIndex=0;
     sel.addEventListener('change',function(){ try{ localStorage.setItem(K_SND,sel.value); }catch(e){} sync(); });
     $('chk-sound-play').addEventListener('click',function(){ try{ if(typeof playAlertPreset==='function') playAlertPreset(sel.value); }catch(e){} });
+    // Mute (like Eyes): no sound, vibrate only; tapping again brings back the sound chosen before
+    var mb=document.createElement('button'); mb.type='button'; mb.className='chk-play'; mb.id='chk-sound-mute';
+    function paintMute(){ var m=sel.value==='none'; mb.textContent=m?'🔇':'🔊'; mb.title=m?'Unmute':'Mute'; mb.setAttribute('aria-label',mb.title); mb.classList.toggle('muted',m); }
+    mb.addEventListener('click',function(){
+      if(sel.value==='none'){ var pv='chime'; try{ pv=localStorage.getItem(K_SND+'-prev')||'chime'; }catch(e){} sel.value=pv; if(sel.value!==pv) sel.selectedIndex=1; }
+      else { try{ localStorage.setItem(K_SND+'-prev',sel.value); }catch(e){} sel.value='none'; }
+      try{ localStorage.setItem(K_SND,sel.value); }catch(e){} paintMute(); sync();
+    });
+    sel.addEventListener('change',paintMute);
+    $('chk-sound-play').after(mb); paintMute();
     // Notify Me switch: Vibrate follows it (the user can still change it)
     var nt=$('routines-master-toggle');
     if(nt) nt.addEventListener('change',function(){ setTimeout(function(){ var c=$('chk-vibrate'); if(c && window.ayuVibrate) c.checked=window.ayuVibrate.chk(); },30); });
@@ -18991,11 +19001,7 @@ html:not(.ayu-can-vib) .chk-vib-only{display:none !important}
     var sp=a.querySelector('.ayu-sub-hdr h3 span'); if(sp) sp.textContent='Wake-up Alarm';
     var ch=a.querySelector('.ayu-sub-hdr .ayu-chev'); if(ch) ch.setAttribute('aria-label','Open or close Wake-up Alarm');
     var on=$('wake-al-on'); if(on){ on.title='Turn the wake-up alarm on or off'; on.setAttribute('aria-label','Turn the wake-up alarm on or off'); }
-    var r=document.createElement('div'); r.className='ayu-al-row chk-vib-only'; r.id='wake-al-vib-row';
-    r.innerHTML='<span class="ayu-al-lbl">Vibrate</span>';
-    r.appendChild(sw('wake-al-vib','Vibrate for the wake-up alarm',window.ayuVibrate ? window.ayuVibrate.wake() : true,function(x){ if(window.ayuVibrate) window.ayuVibrate.set('wake',x); sync(); }));
-    body.appendChild(r);
-    if(on) on.addEventListener('change',function(){ if(on.checked) return; if(window.ayuVibrate) window.ayuVibrate.set('wake',false); var c=$('wake-al-vib'); if(c) c.checked=false; sync(); });   // off: Vibrate off too
+    // Vibrate: its own switch right after Sound (wakeVibrate in the alarms block)
     a.dataset.chkFields='1'; return true;
   }
   // the activity notifications play the Notify Me sound (on the website; the phone plays it with the notification)
@@ -20310,7 +20316,7 @@ html body #sec-app .au-x[hidden]{display:none}
 <style id="au-play-20261110">html body #sec-app .au-auto-row[hidden]{display:none !important}</style>
 <style id="kb-time-20261110">
 /* Time pickers: a keyboard icon types the time instead of using the clock or wheels */
-.ayu-kb-btn{margin-right:auto !important;width:40px;height:38px;padding:0 !important;border-radius:10px !important;border:1.5px solid color-mix(in srgb,var(--ayu-kb-c,#0d9488) 45%,#fff) !important;background:#fff !important;color:var(--ayu-kb-c,#0d9488) !important;display:inline-flex !important;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
+.ayu-kb-btn{margin-right:auto !important;width:40px;height:38px;padding:0 !important;border-radius:10px !important;border:0 !important;background:transparent !important;box-shadow:none !important;color:var(--ayu-kb-c,#0d9488) !important;display:inline-flex !important;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
 .ayu-kb-btn svg{width:22px;height:22px}
 .ayu-kb-panel{display:none;align-items:flex-end;justify-content:center;gap:8px;margin:14px 0 6px}
 .ayu-kb-on .ayu-kb-panel{display:flex}
@@ -20358,8 +20364,16 @@ html body #sec-app .au-x[hidden]{display:none}
       x.addEventListener('blur',function(){ var max=+x.max, min=(K.kind==='clock'&&i===0)?1:0, n=parseInt(x.value,10); if(isNaN(n)) n=min; n=Math.max(min,Math.min(max,n)); x.value=(i>0||K.kind==='hms')?p2(n):n; });
       x.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); apply(); if(ok && !ok.disabled) ok.click(); } });
     });
+    function mode(on){
+      if(on){ var v=K.get(); if(K.kind==='clock'){ ins[0].value=(v[0]%12)||12; ins[1].value=p2(v[1]); } else { ins.forEach(function(x,i){ x.value=i?p2(v[i]):v[i]; }); } }
+      dlg.classList.toggle('ayu-kb-on',on); card.classList.toggle('ayu-kb-on',on);
+      b.innerHTML=on?CLK:KB; b.title=on?'Use the clock':'Type the time'; b.setAttribute('aria-label',b.title);
+    }
+    var KEEP='ayuTimeTyped';   // the last choice (keyboard or clock) is used for every time picker
+    try{ if(localStorage.getItem(KEEP)==='1'){ mode(true); setTimeout(function(){ try{ ins[0].focus(); }catch(e){} },60); } }catch(e){}
     b.addEventListener('click',function(){
       var on=!dlg.classList.contains('ayu-kb-on');
+      try{ localStorage.setItem(KEEP,on?'1':'0'); }catch(e){}
       if(on){ var v=K.get(); if(K.kind==='clock'){ ins[0].value=(v[0]%12)||12; ins[1].value=p2(v[1]); } else { ins.forEach(function(x,i){ x.value=i?p2(v[i]):v[i]; }); } }
       dlg.classList.toggle('ayu-kb-on',on); card.classList.toggle('ayu-kb-on',on);
       b.innerHTML=on?CLK:KB; b.title=on?'Use the clock':'Type the time'; b.setAttribute('aria-label',b.title);
@@ -20371,20 +20385,25 @@ html body #sec-app .au-x[hidden]{display:none}
 })();
 </script>
 <style id="low-vol-20261110">
-.ayu-lowvol{display:flex;gap:8px;align-items:flex-start;margin:6px 0 12px;padding:9px 12px;border-radius:12px;background:#fff7ed;border:1px solid #fdba74;color:#9a3412;font-size:.85rem;line-height:1.4}
+.ayu-lowvol{position:relative;display:flex;gap:8px;align-items:flex-start;margin:6px 0 12px;padding:9px 34px 9px 12px;border-radius:12px;background:#fff7ed;border:1px solid #fdba74;color:#9a3412;font-size:.85rem;line-height:1.4}
 .ayu-lowvol b{font-weight:700}
+.ayu-lowvol .lv-x{position:absolute;top:4px;right:4px;width:28px;height:28px;border:0;background:transparent;color:#9a3412;font-size:20px;line-height:1;cursor:pointer;border-radius:8px;padding:0}
+#routines-panel #lv-checks{margin-bottom:4px}
 </style>
 <script id="low-vol-20261110-js">
 /* In the app: when an alarm or reminder with sound is on but the phone's volume for it is low, say so in that section. */
 (function(){
   function $(i){ return document.getElementById(i); }
   function N(){ return window.ayuNative && typeof window.ayuNative.soundCheck==='function' ? window.ayuNative : null; }
-  var busy=false, again=false, tm=0;
+  var busy=false, again=false, tm=0, closed={}, shown=false;
   function note(id, anchor, where, html){
     var el=$(id);
-    if(!html || !anchor){ if(el) el.remove(); return; }
+    if(!html){ delete closed[id]; }   // the volume is fine again: a later low volume shows the note again
+    if(!html || !anchor || closed[id]){ if(el) el.remove(); return; }
+    shown=true;
     if(!el){ el=document.createElement('div'); el.id=id; el.className='ayu-lowvol'; el.setAttribute('role','status'); }
-    if(el.innerHTML!==html) el.innerHTML=html;
+    if(el.dataset.h!==html){ el.dataset.h=html; el.innerHTML=html+'<button type="button" class="lv-x" aria-label="Close" title="Close">×</button>';
+      el.querySelector('.lv-x').addEventListener('click',function(){ closed[id]=true; el.remove(); }); }
     if(where==='before'){ if(anchor.previousElementSibling!==el) anchor.parentNode.insertBefore(el,anchor); }
     else if(anchor.firstElementChild!==el) anchor.insertBefore(el,anchor.firstElementChild);
   }
@@ -20403,7 +20422,7 @@ html body #sec-app .au-x[hidden]{display:none}
     var n=N(); if(!n) return;
     if(busy){ again=true; return; } busy=true;
     n.soundCheck().then(function(r){
-      r=r||{}; var A=alarmMsg(r), M=notifMsg(r), list=[]; try{ list=window.ayuAlarmList ? window.ayuAlarmList() : []; }catch(e){}
+      r=r||{}; shown=false; var A=alarmMsg(r), M=notifMsg(r), list=[]; try{ list=window.ayuAlarmList ? window.ayuAlarmList() : []; }catch(e){}
       var withSound=function(id){ return list.some(function(a){ return (id==='wake' ? a.id==='wake' : a.id!=='wake') && a.tone!=='none'; }); };
       // Checks → Wake-up Alarm
       var wb=$('wake-al-body'); note('lv-wake', wb, 'top', withSound('wake') ? A : '');
@@ -20425,7 +20444,10 @@ html body #sec-app .au-x[hidden]{display:none}
   document.addEventListener('ayu-alarm-changed',soon);
   document.addEventListener('visibilitychange',function(){ if(!document.hidden) soon(); });
   window.addEventListener('focus',soon);
-  setTimeout(start,2500); setInterval(function(){ if(!document.hidden) start(); },30000);
+  setTimeout(start,2500);
+  // while a note is shown, look again every 3 seconds so it goes away as soon as the volume is turned up
+  setInterval(function(){ if(!document.hidden && shown) start(); },3000);
+  setInterval(function(){ if(!document.hidden && !shown) start(); },30000);
 })();
 </script>
 <style id="alarm-layout-20261110">
@@ -20440,6 +20462,27 @@ html body #routines-panel #chk-alarm #wake-alarm-days .day-chips:not(#ayu-x1):no
 html body #routines-panel #chk-alarm #wake-alarm-days .day-chip:not(#ayu-x1):not(#ayu-x2){flex:1 1 0;min-width:0;max-width:38px;width:auto !important;height:auto !important;aspect-ratio:1/1;padding:0;font-size:.8rem}
 html body #routines-panel #chk-alarm #wake-alarm-days .day-quick:not(#ayu-x1):not(#ayu-x2){grid-column:1 / -1;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin:0 !important}
 html body #routines-panel #chk-alarm #wake-alarm-days .day-chips.ayu-days-once .day-chip:not(#ayu-x1):not(#ayu-x2){opacity:.38;cursor:default;pointer-events:none}
+</style>
+<style id="preview-center-20261110">
+/* Preview notification: no dot, centred, no extra space under it */
+html body .ayu-prev-row:not(#ayu-x1):not(#ayu-x2),html body .alert-preview-row:not(#ayu-x1):not(#ayu-x2){justify-content:center !important;margin-bottom:0 !important;padding-left:0 !important;padding-bottom:0 !important}
+html body .ayu-prev-row .row-dot:not(#ayu-x1):not(#ayu-x2),html body .alert-preview-row .row-dot:not(#ayu-x1):not(#ayu-x2),html body .ayu-prev-row > .ayu-al-lbl:not(#ayu-x1):not(#ayu-x2){display:none !important}
+html body .ayu-prev-row .ayu-prev-btn:not(#ayu-x1):not(#ayu-x2),html body .alert-preview-row .alert-preview-btn:not(#ayu-x1):not(#ayu-x2){margin-left:0 !important;margin-right:0 !important}
+html body #alerts-panel #rem-alarm-list .ayu-alarm-form .ayu-prev-row:not(#ayu-x1):not(#ayu-x2){margin:14px 0 0 !important}
+html body #alerts-panel #rem-alarm-list .ayu-alarm-item > .cri-body:not(#ayu-x1):not(#ayu-x2){padding-bottom:12px !important}
+html body #routines-panel #ayu-wake-prev:not(#ayu-x1):not(#ayu-x2){margin:14px 0 0 !important}
+html body #routines-panel #wake-al-body:not(#ayu-x1):not(#ayu-x2){padding-bottom:0 !important;margin-bottom:0 !important}
+/* Daily Checklist: a gap and a line under Preview notification, so Morning starts its own part */
+html body #routines-panel #ayu-checklist #ayu-cl-prev:not(#ayu-x1):not(#ayu-x2){margin:14px 0 16px !important;padding-bottom:16px !important;border-bottom:1.5px solid rgba(167,91,18,.28) !important}
+</style>
+<style id="checklist-eyes-20261110">
+/* Daily Checklist fields spaced like Eyes (20-20-20): labels from the left edge, mute after ▶, no lines between */
+html body #routines-panel #routines-remind-panel:not(#ayu-x1):not(#ayu-x2){padding-left:0 !important;padding-right:0 !important}
+html body #routines-panel #routines-remind-panel #chk-sound-mute:not(#ayu-x1):not(#ayu-x2){width:30px !important;height:30px !important;min-width:30px !important;min-height:30px !important;max-height:30px !important;flex:0 0 30px;padding:0 !important;border-radius:10px !important;border:1px solid rgba(167,91,18,.55) !important;background:transparent !important;font-size:14.4px;line-height:1;display:inline-flex !important;align-items:center;justify-content:center;margin:0 !important}
+html body #routines-panel #routines-remind-panel #chk-sound-mute.muted:not(#ayu-x1):not(#ayu-x2){background:rgba(167,91,18,.1) !important}
+html body #routines-panel #routines-remind-panel #chk-sound-row:not(#ayu-x1):not(#ayu-x2),html body #routines-panel #routines-remind-panel #chk-speak-row:not(#ayu-x1):not(#ayu-x2),html body #routines-panel #routines-remind-panel #chk-vib-row:not(#ayu-x1):not(#ayu-x2),html body #routines-panel #routines-remind-panel #chk-days:not(#ayu-x1):not(#ayu-x2){border-top:0 !important;border-bottom:0 !important;box-shadow:none !important}
+html body #routines-panel #routines-remind-panel #chk-speak-row:not(#ayu-x1):not(#ayu-x2){margin-top:10px !important}
+html body #routines-panel #routines-remind-panel #chk-vib-row:not(#ayu-x1):not(#ayu-x2){margin-top:6px !important;padding-top:0 !important;padding-bottom:0 !important}
 </style>
 </body>
 
