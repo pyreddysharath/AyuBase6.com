@@ -16822,7 +16822,8 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   function paintList(){
     var list=$('rem-alarm-list'); if(!list) return;
     list.innerHTML='';
-    remList().forEach(function(raw){ list.appendChild(alarmItem(raw.id)); });
+    remList().slice().sort(function(x,y){ var ax=(x.at>=0&&x.at<1440)?x.at:420, ay=(y.at>=0&&y.at<1440)?y.at:420; return ax-ay; })   // in time order
+      .forEach(function(raw){ list.appendChild(alarmItem(raw.id)); });
     if(window.ayuListColours) window.ayuListColours(list);
   }
   function alarmItem(id){
@@ -16879,7 +16880,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     function cancel(){ if(done) return false; done=true; if(draft){ var l=remList().filter(function(x){ return x.id!==id; }); remSave(l); return true; } return false; }
     f._ayuCancel=cancel;
     f.insertAdjacentHTML('beforeend','<div class="ayu-al-row ayu-prev-row"><span class="ayu-al-lbl" aria-hidden="true"></span><button type="button" class="alert-preview-btn ayu-prev-btn">Preview notification</button><span class="ayu-prev-msg" hidden></span></div>'
-      +'<div class="reminder-form-actions ayu-al-actions"><button type="button" class="cancel-reminder">Cancel</button><button type="button" class="save-reminder">Save</button></div>');
+      +'<div class="reminder-form-actions ayu-al-actions"><button type="button" class="save-reminder">Save</button><button type="button" class="cancel-reminder">Cancel</button></div>');
     f.querySelector('.ayu-prev-btn').addEventListener('click',function(){ var d={}; for(var k in c) d[k]=c[k]; window.ayuAlarmPreview(id,d); });   // tries what is on screen, before Save
     f.querySelector('.save-reminder').addEventListener('click',save);
     f.querySelector('.cancel-reminder').addEventListener('click',function(){ var g=cancel(); stopPreview(); f.remove(); if(item){ item.classList.remove('open'); var hh=item.querySelector('.cri-hdr'); if(hh) hh.setAttribute('aria-expanded','false'); } if(g) paintList(); });
@@ -20514,6 +20515,31 @@ html body #rem-al-info strong:first-child:not(#ayu-x1){margin-top:2px}
 html body #rem-al-info ul:not(#ayu-x1){margin:2px 0 4px 13px;padding-left:16px}
 html body #rem-al-info .clk-i-note{margin:10px 0 0;font-size:.92em;opacity:.85}
 </style>
+<style id="clock-now-20261110">
+/* Clock: the current time and date, above the tabs */
+html body #alerts-panel #rem-alarm-card > .clk-now{text-align:center;margin:2px 0 14px;color:#134e4a}
+html body #rem-alarm-card .clk-now .cn-t{font-size:2.6rem;font-weight:800;letter-spacing:.5px;line-height:1.1;font-variant-numeric:tabular-nums}
+html body #rem-alarm-card .clk-now .cn-ap{font-size:1.05rem;font-weight:800;margin-left:6px}
+html body #rem-alarm-card .clk-now .cn-d{font-size:.9rem;font-weight:600;color:#0f766e;margin-top:2px}
+</style>
+<script id="clock-now-20261110-js">
+(function(){
+  var DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'], MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function paint(){
+    var card=document.getElementById('rem-alarm-card'), pills=card && card.querySelector(':scope > .clk-pills'); if(!pills) return;
+    var el=card.querySelector(':scope > .clk-now');
+    if(!el){ el=document.createElement('div'); el.className='ayu-part-info clk-now'; el.setAttribute('aria-live','off');
+      el.innerHTML='<div class="cn-t"><span class="cn-hm"></span><span class="cn-ap"></span></div><div class="cn-d"></div>'; pills.parentNode.insertBefore(el,pills); }
+    var n=new Date(), h=n.getHours(), hm=(h%12||12)+':'+(n.getMinutes()<10?'0':'')+n.getMinutes(), ap=h>=12?'PM':'AM', d=DAYS[n.getDay()]+', '+n.getDate()+' '+MON[n.getMonth()];
+    var a=el.querySelector('.cn-hm'), b=el.querySelector('.cn-ap'), c=el.querySelector('.cn-d');
+    if(a.textContent!==hm) a.textContent=hm; if(b.textContent!==ap) b.textContent=ap; if(c.textContent!==d) c.textContent=d;
+  }
+  setInterval(function(){ if(!document.hidden) paint(); },1000);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) paint(); });
+  setTimeout(paint,500); setTimeout(paint,2000);
+})();
+</script>
+<style id="al-actions-20261110">html body #alerts-panel #rem-alarm-list .ayu-al-actions:not(#ayu-x1){margin-top:14px}html body #alerts-panel #rem-alarm-list .ayu-al-actions button:not(#ayu-x1):not(#ayu-x2){height:auto !important;min-height:0 !important;padding:7px 20px !important;line-height:1.3 !important;font-size:.9rem !important}</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
