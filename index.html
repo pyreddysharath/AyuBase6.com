@@ -15567,7 +15567,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   }
   // config/app-download.json → "android": "download" (direct APK), "request" (name + email form) or "none" (no Android app offer)
   var MODE='request';
-  function openRequest(){ document.querySelectorAll('.ayu-appb').forEach(function(x){ x.remove(); }); setTimeout(openHelp,60); setTimeout(function(){ var d=document.querySelector('#sec-app details[data-part="android"]'); if(d) d.open=true; var n=document.querySelector('#sec-app .app-req input[name="name"]'); if(n){ n.scrollIntoView({block:'center',behavior:'smooth'}); try{ n.focus({preventScroll:true}); }catch(e){} } },350); }
+  function openRequest(){ document.querySelectorAll('.ayu-appb').forEach(function(x){ x.remove(); }); var sa=$('sec-app'); if(!(sa && sa.offsetParent)) setTimeout(openHelp,60);   /* already open (the Request button beside Android): don't reopen, which would close it */ setTimeout(function(){ var d=document.querySelector('#sec-app details[data-part="android"]'); if(d) d.open=true; var n=document.querySelector('#sec-app .app-req input[name="name"]'); if(n){ n.scrollIntoView({block:'center',behavior:'smooth'}); try{ n.focus({preventScroll:true}); }catch(e){} } },350); }
   window.ayuGetApp=function(fromBanner){ if(MODE==='download') return download(fromBanner); if(MODE==='request') return openRequest(); };
   function openHelp(){
     try{ if(typeof showFooterSection==='function') showFooterSection('backup'); if(typeof showFooterSub==='function') showFooterSub('backup','app'); }catch(e){}
