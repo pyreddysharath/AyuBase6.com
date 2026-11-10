@@ -18186,7 +18186,7 @@ html body #lab-insights-card .lab-actions-row .lub-s{font-size:.72em;font-weight
     b.textContent = p==='granted' ? (app() ? 'Disable Notifications' : 'How to turn off') : 'Enable Notifications';
     if(p!=='granted' && off) off.style.display='none';
     if(app() && dh) dh.style.display='none';
-    if(s) s.textContent = p==='granted' ? '✅ Notifications are allowed. Each reminder still has its own switch.'
+    if(s) s.innerHTML = p==='granted' ? '<span class="nt-ok">✓</span> Notifications are allowed.'
       : p==='denied' ? (app() ? '🚫 Notifications are turned off for this app.' : '🚫 Notifications are blocked for this site.')
       : 'Notifications are not allowed yet.';
   }
@@ -20591,10 +20591,11 @@ html body #sec-notifications .na-n:hover{text-decoration:underline}
 html body #sec-notifications .na-row .master-switch{flex:0 0 auto;margin:0}
 html body #sec-notifications .na-row .master-switch input:checked:not(#ayu-x1){background:var(--footer-accent,#0d9488) !important;border-color:var(--footer-accent,#0d9488) !important}
 html body #sec-notifications .na-none{font-size:.85rem;opacity:.7;margin:4px 0}
-html body #sec-notifications .na-all{margin:12px 0 4px;border:1.5px solid var(--footer-accent,#0d9488);background:#fff;color:var(--footer-accent,#0d9488);border-radius:10px;padding:7px 16px;font:inherit;font-weight:700;cursor:pointer}
+html body #sec-notifications .na-all{display:block;margin:14px auto 0;border:1.5px solid var(--footer-accent,#0d9488);background:#fff;color:var(--footer-accent,#0d9488);border-radius:10px;padding:7px 16px;font:inherit;font-weight:700;cursor:pointer}
 html body #sec-notifications .na-all:disabled{opacity:.45;cursor:default}
 html body #sec-notifications .na-all.sure{background:var(--footer-accent,#0d9488);color:#fff}
 html body #sec-notifications > .ayu-why{display:none !important}   /* the list says what is on */
+html body #sec-notifications .na-sep{border:0;border-top:3px solid color-mix(in srgb,var(--footer-accent,#0d9488) 45%,transparent);border-radius:2px;margin:18px 0 14px}
 </style>
 <script id="notif-all-20261110-js">
 (function(){
@@ -20639,7 +20640,7 @@ html body #sec-notifications > .ayu-why{display:none !important}   /* the list s
       h+='<div class="na-row"><button type="button" class="na-n" data-i="'+i+'" title="Open">'+esc(x[1])+(x[2]?'<small>'+x[2]+'</small>':'')+'</button>'
         +'<label class="master-switch" title="'+esc(x[1])+' on or off"><input type="checkbox" data-i="'+i+'" aria-label="'+esc(x[1])+' on or off"></label></div>';
     });
-    h+='<button type="button" class="na-all" id="na-all">Turn all off</button>';
+    h+='<button type="button" class="na-all" id="na-all">Turn all off</button><hr class="na-sep">';
     wrap.innerHTML=h;
     wrap.querySelectorAll('.na-n').forEach(function(b){ b.addEventListener('click',function(){ list[+b.dataset.i][4](); }); });
     wrap.querySelectorAll('input[data-i]').forEach(function(inp){ inp.addEventListener('change',function(){ var o=list[+inp.dataset.i][3](); if(o && o.checked!==inp.checked) o.click(); setTimeout(paint,80); setTimeout(paint,600); }); });
