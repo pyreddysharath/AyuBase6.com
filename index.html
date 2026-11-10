@@ -15528,7 +15528,9 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   var CFG_URL='config/android-app.json', K_LATER='ayuAppBannerLater', K_CFG='ayuAppCfg', LATER_DAYS=30;
   var ANDROID=/Android/i.test(navigator.userAgent||'');
   var IOS=/iPhone|iPad|iPod/i.test(navigator.userAgent||'') || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-  var cfg=null, deferred=null;
+  // the published app is always at this link; used until config/android-app.json has been read (or if it can't be)
+  var FALLBACK={url:'https://github.com/pyreddysharath/AyuBase6.com/releases/latest/download/AyuBase6.apk', versionName:'', minAndroid:'8.0', fallback:true};
+  var cfg=FALLBACK, deferred=null;
   window.addEventListener('beforeinstallprompt',function(e){ deferred=e; render(); });
   window.addEventListener('appinstalled',function(){ deferred=null; render(); });
   function $(id){ return document.getElementById(id); }
@@ -15586,7 +15588,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   var APK_QR='<svg viewBox="0 0 41 41" width="168" height="168" role="img" aria-label="QR code to download the Android app" shape-rendering="crispEdges"><rect width="41" height="41" fill="#fff"/><path d="M2 2h7v1h-7zM11 2h1v1h-1zM16 2h8v1h-8zM25 2h1v1h-1zM28 2h1v1h-1zM30 2h1v1h-1zM32 2h7v1h-7zM2 3h1v1h-1zM8 3h1v1h-1zM11 3h1v1h-1zM15 3h3v1h-3zM19 3h1v1h-1zM23 3h2v1h-2zM26 3h2v1h-2zM29 3h2v1h-2zM32 3h1v1h-1zM38 3h1v1h-1zM2 4h1v1h-1zM4 4h3v1h-3zM8 4h1v1h-1zM10 4h1v1h-1zM12 4h2v1h-2zM15 4h1v1h-1zM21 4h1v1h-1zM23 4h1v1h-1zM25 4h1v1h-1zM28 4h2v1h-2zM32 4h1v1h-1zM34 4h3v1h-3zM38 4h1v1h-1zM2 5h1v1h-1zM4 5h3v1h-3zM8 5h1v1h-1zM10 5h1v1h-1zM12 5h2v1h-2zM16 5h2v1h-2zM24 5h6v1h-6zM32 5h1v1h-1zM34 5h3v1h-3zM38 5h1v1h-1zM2 6h1v1h-1zM4 6h3v1h-3zM8 6h1v1h-1zM10 6h2v1h-2zM13 6h3v1h-3zM20 6h2v1h-2zM24 6h2v1h-2zM30 6h1v1h-1zM32 6h1v1h-1zM34 6h3v1h-3zM38 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM16 7h2v1h-2zM20 7h1v1h-1zM23 7h2v1h-2zM26 7h1v1h-1zM28 7h2v1h-2zM32 7h1v1h-1zM38 7h1v1h-1zM2 8h7v1h-7zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM30 8h1v1h-1zM32 8h7v1h-7zM10 9h5v1h-5zM17 9h2v1h-2zM23 9h1v1h-1zM30 9h1v1h-1zM2 10h1v1h-1zM4 10h5v1h-5zM11 10h2v1h-2zM15 10h2v1h-2zM19 10h1v1h-1zM21 10h1v1h-1zM24 10h1v1h-1zM26 10h3v1h-3zM32 10h5v1h-5zM3 11h2v1h-2zM7 11h1v1h-1zM12 11h1v1h-1zM16 11h2v1h-2zM22 11h1v1h-1zM25 11h1v1h-1zM27 11h1v1h-1zM30 11h1v1h-1zM33 11h1v1h-1zM36 11h2v1h-2zM3 12h1v1h-1zM5 12h5v1h-5zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h2v1h-2zM20 12h1v1h-1zM22 12h2v1h-2zM27 12h3v1h-3zM31 12h3v1h-3zM36 12h3v1h-3zM2 13h1v1h-1zM4 13h1v1h-1zM10 13h1v1h-1zM12 13h1v1h-1zM22 13h4v1h-4zM28 13h4v1h-4zM33 13h1v1h-1zM38 13h1v1h-1zM6 14h1v1h-1zM8 14h3v1h-3zM16 14h1v1h-1zM18 14h2v1h-2zM24 14h1v1h-1zM26 14h3v1h-3zM31 14h2v1h-2zM34 14h5v1h-5zM4 15h1v1h-1zM7 15h1v1h-1zM11 15h1v1h-1zM13 15h1v1h-1zM15 15h2v1h-2zM21 15h2v1h-2zM24 15h2v1h-2zM33 15h1v1h-1zM3 16h2v1h-2zM8 16h2v1h-2zM11 16h2v1h-2zM16 16h5v1h-5zM24 16h1v1h-1zM28 16h2v1h-2zM32 16h4v1h-4zM37 16h2v1h-2zM2 17h1v1h-1zM7 17h1v1h-1zM9 17h1v1h-1zM13 17h1v1h-1zM15 17h4v1h-4zM22 17h3v1h-3zM28 17h1v1h-1zM31 17h4v1h-4zM37 17h1v1h-1zM5 18h1v1h-1zM7 18h2v1h-2zM10 18h3v1h-3zM14 18h1v1h-1zM17 18h1v1h-1zM19 18h1v1h-1zM22 18h1v1h-1zM24 18h1v1h-1zM27 18h3v1h-3zM31 18h2v1h-2zM34 18h1v1h-1zM36 18h1v1h-1zM38 18h1v1h-1zM2 19h4v1h-4zM9 19h1v1h-1zM14 19h1v1h-1zM18 19h6v1h-6zM25 19h1v1h-1zM27 19h2v1h-2zM30 19h2v1h-2zM33 19h1v1h-1zM36 19h2v1h-2zM3 20h2v1h-2zM6 20h1v1h-1zM8 20h2v1h-2zM11 20h2v1h-2zM15 20h3v1h-3zM20 20h1v1h-1zM22 20h1v1h-1zM28 20h3v1h-3zM37 20h2v1h-2zM2 21h1v1h-1zM4 21h1v1h-1zM6 21h1v1h-1zM10 21h1v1h-1zM13 21h2v1h-2zM17 21h1v1h-1zM23 21h3v1h-3zM28 21h1v1h-1zM30 21h6v1h-6zM38 21h1v1h-1zM8 22h1v1h-1zM10 22h3v1h-3zM17 22h1v1h-1zM19 22h1v1h-1zM21 22h2v1h-2zM24 22h4v1h-4zM31 22h2v1h-2zM34 22h3v1h-3zM3 23h1v1h-1zM5 23h3v1h-3zM9 23h1v1h-1zM12 23h2v1h-2zM18 23h1v1h-1zM21 23h3v1h-3zM25 23h1v1h-1zM30 23h2v1h-2zM35 23h1v1h-1zM3 24h2v1h-2zM7 24h5v1h-5zM14 24h1v1h-1zM17 24h2v1h-2zM22 24h2v1h-2zM26 24h2v1h-2zM29 24h2v1h-2zM32 24h4v1h-4zM37 24h2v1h-2zM6 25h1v1h-1zM9 25h3v1h-3zM15 25h1v1h-1zM23 25h4v1h-4zM28 25h4v1h-4zM33 25h2v1h-2zM3 26h1v1h-1zM6 26h1v1h-1zM8 26h1v1h-1zM10 26h1v1h-1zM12 26h2v1h-2zM16 26h5v1h-5zM22 26h1v1h-1zM24 26h1v1h-1zM26 26h4v1h-4zM31 26h2v1h-2zM34 26h1v1h-1zM36 26h2v1h-2zM2 27h3v1h-3zM6 27h1v1h-1zM9 27h1v1h-1zM12 27h1v1h-1zM18 27h1v1h-1zM21 27h2v1h-2zM25 27h1v1h-1zM27 27h2v1h-2zM33 27h1v1h-1zM36 27h1v1h-1zM2 28h1v1h-1zM6 28h1v1h-1zM8 28h2v1h-2zM11 28h1v1h-1zM17 28h2v1h-2zM22 28h2v1h-2zM26 28h8v1h-8zM36 28h3v1h-3zM2 29h1v1h-1zM4 29h4v1h-4zM9 29h2v1h-2zM14 29h1v1h-1zM17 29h1v1h-1zM23 29h1v1h-1zM28 29h1v1h-1zM32 29h2v1h-2zM38 29h1v1h-1zM2 30h1v1h-1zM4 30h2v1h-2zM7 30h3v1h-3zM11 30h3v1h-3zM16 30h3v1h-3zM24 30h1v1h-1zM27 30h8v1h-8zM36 30h3v1h-3zM10 31h2v1h-2zM16 31h1v1h-1zM18 31h1v1h-1zM20 31h4v1h-4zM25 31h1v1h-1zM28 31h1v1h-1zM30 31h1v1h-1zM34 31h2v1h-2zM2 32h7v1h-7zM11 32h2v1h-2zM15 32h5v1h-5zM23 32h2v1h-2zM28 32h1v1h-1zM30 32h1v1h-1zM32 32h1v1h-1zM34 32h1v1h-1zM36 32h1v1h-1zM38 32h1v1h-1zM2 33h1v1h-1zM8 33h1v1h-1zM10 33h1v1h-1zM12 33h2v1h-2zM17 33h1v1h-1zM20 33h2v1h-2zM23 33h1v1h-1zM26 33h1v1h-1zM30 33h1v1h-1zM34 33h2v1h-2zM2 34h1v1h-1zM4 34h3v1h-3zM8 34h1v1h-1zM10 34h2v1h-2zM13 34h1v1h-1zM16 34h2v1h-2zM19 34h2v1h-2zM25 34h3v1h-3zM29 34h6v1h-6zM36 34h3v1h-3zM2 35h1v1h-1zM4 35h3v1h-3zM8 35h1v1h-1zM10 35h3v1h-3zM16 35h1v1h-1zM18 35h1v1h-1zM20 35h1v1h-1zM22 35h2v1h-2zM25 35h1v1h-1zM29 35h1v1h-1zM31 35h2v1h-2zM34 35h2v1h-2zM37 35h2v1h-2zM2 36h1v1h-1zM4 36h3v1h-3zM8 36h1v1h-1zM10 36h1v1h-1zM13 36h5v1h-5zM19 36h2v1h-2zM22 36h2v1h-2zM29 36h2v1h-2zM35 36h4v1h-4zM2 37h1v1h-1zM8 37h1v1h-1zM11 37h2v1h-2zM14 37h3v1h-3zM18 37h1v1h-1zM20 37h6v1h-6zM30 37h3v1h-3zM34 37h1v1h-1zM38 37h1v1h-1zM2 38h7v1h-7zM10 38h2v1h-2zM13 38h1v1h-1zM15 38h2v1h-2zM19 38h1v1h-1zM21 38h2v1h-2zM24 38h2v1h-2zM27 38h2v1h-2zM31 38h2v1h-2zM34 38h5v1h-5z" fill="#111"/></svg>';
   function desktopHtml(){
     if(!cfg) return '<p>Coming soon: an Android app, with reminders that arrive even when it is closed.</p>';
-    var meta=['Version '+esc(cfg.versionName), mb(cfg.sizeBytes), 'Android '+esc(cfg.minAndroid||'8.0')+' or later'].filter(Boolean).join(' · ');
+    var meta=[cfg.versionName?'Version '+esc(cfg.versionName):'', mb(cfg.sizeBytes), 'Android '+esc(cfg.minAndroid||'8.0')+' or later'].filter(Boolean).join(' · ');
     return '<p>An Android app is available: the same app, with reminders and alarms that arrive on time even when it is closed or the phone is locked.</p>'
       + '<p class="app-meta">'+meta+'</p>'
       + '<div class="app-qr">'+APK_QR+'<div><strong>On your Android phone</strong><ol><li>Open the camera and point it at this code.</li><li>Tap the link to download, then open the file and tap <b>Install</b>.</li></ol>'
@@ -15600,7 +15602,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
   function androidHtml(){
     if(!ANDROID) return IOS ? '' : desktopHtml();
     if(!cfg) return '<p>Coming soon: the same app, with reminders that arrive even when it is closed. Until then, use the Web App below.</p>';
-    var meta=['Version '+esc(cfg.versionName), mb(cfg.sizeBytes), 'Android '+esc(cfg.minAndroid||'8.0')+' or later'].filter(Boolean).join(' · ');
+    var meta=[cfg.versionName?'Version '+esc(cfg.versionName):'', mb(cfg.sizeBytes), 'Android '+esc(cfg.minAndroid||'8.0')+' or later'].filter(Boolean).join(' · ');
     return (upd()?'<p class="app-upd-note">Version '+esc(cfg.versionName)+' is available. Download it to update the app.</p>':'')+'<p>The same app, with reminders and alarms that arrive on time even when it is closed or the phone is locked.</p>'
       + '<p class="app-meta">'+meta+'</p>'
       + '<strong>Install</strong><ol>'
@@ -15657,7 +15659,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     return !seen && tourWait<60;   // not opened yet (up to a minute)
   }
   function banner(){
-    if(!ANDROID || !cfg) return;
+    if(!ANDROID || !cfg || cfg.fallback) return;
     if(ls(K_LATER)) return;   // Cancel or Download: never again (Backup & Restore → Download App has it)
     if(tourBusy()){ tourWait++; setTimeout(banner,1000); return; }
     document.querySelectorAll('.ayu-appb').forEach(function(e){ e.remove(); });
@@ -15690,7 +15692,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     addHelpTab();
     try{ var c=JSON.parse(ls(K_CFG)||'null'); if(valid(c)) apply(c); }catch(e){}
     fetch(CFG_URL,{cache:'no-cache'}).then(function(r){ return r.ok ? r.json() : null; }).then(function(c){
-      if(valid(c)){ ls(K_CFG,JSON.stringify(c)); if(!cfg) apply(c); else { cfg=c; render(); } try{ if(window.ayuBackupRefreshDot) window.ayuBackupRefreshDot(); }catch(e){} }
+      if(valid(c)){ ls(K_CFG,JSON.stringify(c)); if(!cfg || cfg.fallback) apply(c); else { cfg=c; render(); } try{ if(window.ayuBackupRefreshDot) window.ayuBackupRefreshDot(); }catch(e){} }
     }).catch(function(){});
     setTimeout(render,1500);   // the installed check settles after start-up
   }
