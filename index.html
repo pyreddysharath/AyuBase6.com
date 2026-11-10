@@ -16522,6 +16522,12 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     return h;
   }
   function infoHtml(id){
+    if(id==='rem') return '<strong>Alarm</strong><ul>'
+      +'<li><b>Add an alarm</b>, set it, then <b>Save</b>. Its switch turns it on or off; × deletes it.</li>'
+      +'<li><b>Time</b>: tap to pick, or the keyboard icon to type. <b>On these days</b>: the days it rings; <b>Once</b> rings one time.</li>'
+      +'<li><b>Sound</b> (or No sound), <b>Vibrate</b>, how long it <b>rings</b> and how <b>snooze</b> works.</li>'
+      +(APP?'<li><b>Lock screen button</b> and <b>Volume buttons</b>: snooze or stop it while it rings.</li><li>It rings even when AyuBase6 is closed.</li>':'<li>It rings only while AyuBase6 is open. For alarms with the app closed, use the Android app.</li>')
+      +'</ul>';
     var when = id==='wake'
       ? '<li><b>Time</b> is always your <b>My Day Plan</b> wake-up time. <b>On these days</b> picks the days it rings; <b>Once</b> rings only the next time.</li>'
       : '<li><b>Add an alarm</b> for each time you need. Tap an alarm to change it; its switch turns it on or off, and × deletes it (Undo for 5 seconds).</li><li><b>Time</b>: tap it and pick the hour, then the minutes, on the clock (any time of day). <b>On these days</b> picks the days it rings.</li>';
@@ -16727,10 +16733,19 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
         actions:acts, data:{ key:'alarm:'+id, section:id==='wake'?'routines':'alerts', url:'./' } });
     }).catch(function(){});
   }
-  window.ayuAlarmPreview=function(id){
-    var E=ent(id), c=get(id), N=window.ayuNative;
+  window.ayuShowAlarm=function(id){
+    try{
+      if(id==='wake'){ if(typeof switchTab==='function') switchTab('routines'); var sec=$('chk-alarm'); if(sec){ setOpen(sec,'wake-alarm',true,true); setTimeout(function(){ try{ sec.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },150); } return; }
+      if(typeof switchTab==='function') switchTab('alerts'); if(window.ayuRemTab) window.ayuRemTab('alarm'); if(window.ayuClockTab) window.ayuClockTab('alarm');
+      setTimeout(function(){ var it=document.querySelector('#rem-alarm-list [data-id="'+id+'"]'); if(!it) return; if(!it.classList.contains('open')) openForm(id); try{ it.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },200);
+    }catch(e){}
+  };
+  window.ayuAlarmPreview=function(id,draft){
+    var E=ent(id), c=draft||get(id), N=window.ayuNative;
+    if(draft){ var dt=(draft.name ? draft.name : 'Alarm')+' · '+clock((draft.at>=0 && draft.at<1440) ? draft.at : 420); E={ title:function(){ return dt; }, body:E.body, section:E.section }; }
+    var vib=draft ? draft.vibrate!==false : vibOn(id);
     if(N && typeof N.previewAlarm==='function'){
-      N.previewAlarm({ key:'alarm-'+id, title:E.title(), body:E.body(), cfg:{ section:id==='wake'?'routines':'alerts', snoozeMin:+c.snoozeMin||10, snoozeMax:+c.snoozeMax||0, keys:c.keys==='snooze'?'snooze':'stop', lock:c.lock==='stop'?'stop':'snooze', tone:c.tone||'rise', vibrate:vibOn(id) } }).catch(function(){ webPrev(); });
+      N.previewAlarm({ key:'alarm-'+id, title:E.title(), body:E.body(), cfg:{ section:id==='wake'?'routines':'alerts', snoozeMin:+c.snoozeMin||10, snoozeMax:+c.snoozeMax||0, keys:c.keys==='snooze'?'snooze':'stop', lock:c.lock==='stop'?'stop':'snooze', tone:c.tone||'rise', vibrate:vib } }).catch(function(){ webPrev(); });
       return true;
     }
     return webPrev();
@@ -16791,10 +16806,11 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
       +'<button type="button" class="calc-info-btn rout-info-btn ayu-al-ibtn" id="rem-al-ibtn" title="About alarms" aria-label="About alarms" aria-expanded="false">i</button></div>'
       +'<div class="calc-task ayu-al-info" id="rem-al-info" hidden>'+infoHtml('rem')+'</div>';
     mr.parentNode.insertBefore(wrap, mr);
+    try{ var l0=remList(), l1=l0.filter(function(x){ return !x.draft; }); if(l1.length!==l0.length) remSave(l1); }catch(e){}   // a new alarm never saved
     $('rem-al-ibtn').addEventListener('click',function(){ var i=$('rem-al-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); });
     $('rem-alarm-add').addEventListener('click',function(){
       closeForms(); var nid=newId();
-      put(nid,{on:true,once:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:1,snoozeMin:10,snoozeMax:3,keys:'stop',lock:'snooze',name:'',vibrate:true});
+      put(nid,{on:false,draft:true,once:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:1,snoozeMin:10,snoozeMax:3,keys:'stop',lock:'snooze',name:'',vibrate:true});
       paintList(); openForm(nid);
       if('Notification' in window && Notification.permission==='default' && !APP){ try{ Notification.requestPermission().catch(function(){}); }catch(e){} }
     });
@@ -16816,7 +16832,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     var del=document.createElement('button'); del.type='button'; del.className='custom-reminder-delete'; del.textContent='×'; del.setAttribute('aria-label','Delete alarm'); del.title='Delete alarm';
     var h=window.ayuItemHead(item,clock(c.at),alarmSub(c),[sw,del],'Alarm '+clock(c.at));
     sw.addEventListener('click',function(e){ e.stopPropagation(); });
-    inp.addEventListener('change',function(){ var x=get(id); x.on=inp.checked; x.vibrate=x.on; put(id,x); item.classList.toggle('ayu-off',!x.on); });
+    inp.addEventListener('change',function(){ var x=get(id); x.on=inp.checked; x.vibrate=x.on; delete x.draft; put(id,x); item.classList.toggle('ayu-off',!x.on); });
     del.addEventListener('click',function(e){
       e.stopPropagation(); var l=remList(), idx=-1; l.forEach(function(x,i){ if(x.id===id) idx=i; }); if(idx<0) return;
       var saved=l.splice(idx,1)[0]; remSave(l); var list=item.parentNode; item.classList.remove('open'); item.querySelector('.cri-body').innerHTML='';
@@ -16830,7 +16846,9 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   }
   function closeForms(){
     stopPreview();
-    document.querySelectorAll('#rem-alarm-list .ayu-alarm-form').forEach(function(f){ try{ if(f._ayuCommit) f._ayuCommit(); }catch(e){} f.remove(); });
+    var gone=false;
+    document.querySelectorAll('#rem-alarm-list .ayu-alarm-form').forEach(function(f){ try{ if(f._ayuCancel && f._ayuCancel()) gone=true; }catch(e){} f.remove(); });
+    if(gone) paintList();
     document.querySelectorAll('#rem-alarm-list .custom-reminder-item.open').forEach(function(it){ it.classList.remove('open'); var h=it.querySelector('.cri-hdr'); if(h) h.setAttribute('aria-expanded','false'); });
   }
   function openForm(id){
@@ -16851,18 +16869,21 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
       var nx=sndRow.nextElementSibling; while(nx && nx.classList.contains('ayu-al-msg')) nx=nx.nextElementSibling; sndRow.parentNode.insertBefore(vr, nx);
       var vi=vr.querySelector('input'); vi.checked=c.vibrate; vi.addEventListener('change',function(){ c.vibrate=vi.checked; check(); }); }
     function state(){ return JSON.stringify([c.name.trim(),c.at,c.days.slice().sort(),!!c.once,c.tone,+c.ring,+c.snoozeMin,+c.snoozeMax,c.keys,c.lock,c.vibrate]); }
-    // no Save / Cancel: every change is kept at once (the name a moment after typing stops)
-    var last=state(), nameT=0;
-    function commit(){
-      clearTimeout(nameT); var now=state(); if(now===last) return; last=now;
-      var cur=get(id), out={}; for(var k in c) out[k]=c[k]; out.name=c.name.trim().slice(0,40); out.id=id; out.on=cur.on; out.onceDay=cur.onceDay;
-      put(id,out);
-      if(item){ var x=get(id), st=item.querySelector('.cri-main strong'), sb=item.querySelector('.cri-sub'); if(st) st.textContent=clock(x.at); if(sb) sb.textContent=alarmSub(x); var h=item.querySelector('.cri-hdr'); if(h) h.setAttribute('aria-label','Alarm '+clock(x.at)+', '+alarmSub(x)); }
+    // Save keeps the changes and switches the alarm on; Cancel (or closing it) keeps it as it was, and a new alarm goes away
+    var draft=!!get(id).draft, done=false;
+    function save(){
+      var cur=get(id), out={}; for(var k in c) out[k]=c[k]; out.name=c.name.trim().slice(0,40); out.id=id; out.on=true; delete out.draft;
+      if(!(cur.on && cur.once && cur.at===out.at)) delete out.onceDay; else out.onceDay=cur.onceDay;
+      done=true; put(id,out); stopPreview(); f.remove(); paintList();
     }
-    f._ayuCommit=commit;
-    f.insertAdjacentHTML('beforeend','<div class="ayu-al-row ayu-prev-row"><span class="ayu-al-lbl" aria-hidden="true"></span><button type="button" class="alert-preview-btn ayu-prev-btn">Preview notification</button><span class="ayu-prev-msg" hidden></span></div>');
-    f.querySelector('.ayu-prev-btn').addEventListener('click',function(){ commit(); window.ayuAlarmPreview(id); });
-    function check(soon){ if(soon){ clearTimeout(nameT); nameT=setTimeout(commit,500); } else commit(); }
+    function cancel(){ if(done) return false; done=true; if(draft){ var l=remList().filter(function(x){ return x.id!==id; }); remSave(l); return true; } return false; }
+    f._ayuCancel=cancel;
+    f.insertAdjacentHTML('beforeend','<div class="ayu-al-row ayu-prev-row"><span class="ayu-al-lbl" aria-hidden="true"></span><button type="button" class="alert-preview-btn ayu-prev-btn">Preview notification</button><span class="ayu-prev-msg" hidden></span></div>'
+      +'<div class="reminder-form-actions ayu-al-actions"><button type="button" class="cancel-reminder">Cancel</button><button type="button" class="save-reminder">Save</button></div>');
+    f.querySelector('.ayu-prev-btn').addEventListener('click',function(){ var d={}; for(var k in c) d[k]=c[k]; window.ayuAlarmPreview(id,d); });   // tries what is on screen, before Save
+    f.querySelector('.save-reminder').addEventListener('click',save);
+    f.querySelector('.cancel-reminder').addEventListener('click',function(){ var g=cancel(); stopPreview(); f.remove(); if(item){ item.classList.remove('open'); var hh=item.querySelector('.cri-hdr'); if(hh) hh.setAttribute('aria-expanded','false'); } if(g) paintList(); });
+    function check(){}
     var nm=q('.ayu-al-name'); nm.value=c.name; nm.addEventListener('input',function(){ c.name=nm.value; check(true); }); nm.addEventListener('change',function(){ c.name=nm.value; check(); });
     var tb=q('#remf-al-time'); function paintT(){ tb.innerHTML=clock(c.at)+'<span>Change</span>'; } paintT();
     tb.addEventListener('click',function(){ pickTime(c.at,1,'#0f766e',function(v){ c.at=v; paintT(); check(); }); });
@@ -18487,12 +18508,12 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
   }
 
   function infoMore(){
-    return '<strong>Timer</strong><ul><li>Tap the <b>time</b> to set the timer (hours, minutes, seconds). It alerts each time that passes and starts again by itself; when it is done it goes back to 00:00.</li><li><b>Repeat</b>: a number of <b>Times</b> (1 = a normal timer), <b>For</b> a total time under 24 hours, or <b>Until I stop it</b> (stops by itself after 24 hours). Example: Timer 3 minutes, For 30 minutes = 10 alerts.</li>'
-      +'<li><b>Sound</b>'+(document.documentElement.classList.contains('ayu-can-vib')?' and <b>Vibrate</b>':'')+' for the alert. <b>Pause</b>, <b>+1 min</b> and <b>Reset</b> while it runs; reset it to change the settings.</li></ul>'
-      +'<strong>Stopwatch</strong><ul><li><b>Start</b>, <b>Pause</b>, <b>Lap</b> and <b>Reset</b>. The fastest and slowest laps are marked.</li></ul>'
-      +'<strong>World Clock</strong><ul><li>Add up to '+MAX_CITIES+' cities in different time zones: each shows its time and how far ahead or behind your time it is.</li></ul>'
-      +(APP?'A running timer and the stopwatch also show on the lock screen, with their buttons. World Clock can too: turn on <b>Show on lock screen</b>.'
-           :'Timer and Stopwatch keep going while AyuBase6 is closed and pick up when you open it again, but the timer alerts only while AyuBase6 is open. For alerts and the lock screen with the app closed, use the Android app.');
+    return '<strong>Timer</strong><ul><li>Tap the <b>time</b> to set it. <b>Repeat</b>: a number of <b>Times</b>, <b>For</b> a total time, or <b>Until I stop it</b> (24 hours at most).</li>'
+      +'<li><b>Sound</b>'+(document.documentElement.classList.contains('ayu-can-vib')?' and <b>Vibrate</b>':'')+' for the alert; <b>Pause</b>, <b>+1 min</b> and <b>Reset</b> while it runs.</li></ul>'
+      +'<strong>Stopwatch</strong><ul><li><b>Start</b>, <b>Pause</b>, <b>Lap</b> and <b>Reset</b>; the fastest and slowest laps are marked.</li></ul>'
+      +'<strong>World Clock</strong><ul><li>Up to '+MAX_CITIES+' cities, each with its time and how far ahead or behind you it is.</li></ul>'
+      +(APP?'<p class="clk-i-note">A running timer, the stopwatch and (if you turn it on) World Clock also show on the lock screen.</p>'
+           :'<p class="clk-i-note">The timer alerts only while AyuBase6 is open; the Android app alerts with it closed.</p>');
   }
 
   var built=false;
@@ -20486,6 +20507,13 @@ html body #routines-panel #routines-remind-panel #chk-speak-row:not(#ayu-x1):not
 html body #routines-panel #routines-remind-panel #chk-vib-row:not(#ayu-x1):not(#ayu-x2){margin-top:6px !important;padding-top:0 !important;padding-bottom:0 !important}
 </style>
 <style id="al-name-bg-20261110">html body #alerts-panel #rem-alarm-list .ayu-alarm-form input.ayu-al-name:not(#ayu-x1):not(#ayu-x2){background:#fff !important;background-color:#fff !important}</style>
+<style id="clock-info-20261110">
+/* Clock → i: each tab's part with a bar in the section colour */
+html body #rem-al-info strong:not(#ayu-x1){display:block;border-left:4px solid #0f766e;padding:1px 0 1px 9px;margin:12px 0 4px;font-weight:800}
+html body #rem-al-info strong:first-child:not(#ayu-x1){margin-top:2px}
+html body #rem-al-info ul:not(#ayu-x1){margin:2px 0 4px 13px;padding-left:16px}
+html body #rem-al-info .clk-i-note{margin:10px 0 0;font-size:.92em;opacity:.85}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
