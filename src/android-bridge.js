@@ -442,10 +442,29 @@
       };
       card.querySelector('.ayu-ec-later').onclick = function(){
         ls(UPD_KEY, JSON.stringify({ never:true, at:Date.now() })); card.remove();
-        toast('You can update any time from Backup & Restore → App Updates, in the footer.', 7000);
+        noteBanner('You can update any time from <b>Backup &amp; Restore → App Updates</b>, in the footer.', 10000);
       };
       document.body.appendChild(card);
     });
+  }
+
+  // A short note as a banner at the top of each tab, in that tab's colour (the website's "Get the app" banner style), with ×
+  function noteBanner(html, ms){
+    document.querySelectorAll('.ayu-appb.ayu-upd-note').forEach(function(b){ b.remove(); });
+    var ACC = { activity:'#2563eb', nutrition:'#16a34a', calculator:'var(--calc-2)', alerts:'var(--alert-2)', routines:'var(--rout-2)', mind:'var(--mind-2)' };
+    var all = [];
+    document.querySelectorAll('.tab-panel').forEach(function(p){
+      var b = document.createElement('div'); b.className = 'ayu-appb appb-note ayu-upd-note'; b.setAttribute('role', 'status');
+      var tab = (p.id || '').replace(/-panel$/, ''); if(ACC[tab]) b.style.setProperty('--appb-c', ACC[tab]);
+      b.innerHTML = '<div class="appb-tx">' + html + '</div><button type="button" class="appb-x appb-note-x" aria-label="Close" title="Close">×</button>';
+      b.querySelector('.appb-note-x').addEventListener('click', end);
+      var ann = p.querySelector(':scope > .ayu-ann'); if(ann) ann.after(b); else p.insertBefore(b, p.firstChild);
+      all.push(b);
+    });
+    var done = false;
+    function end(){ if(done) return; done = true; all.forEach(function(b){ b.classList.add('out'); setTimeout(function(){ b.remove(); }, 400); }); }
+    setTimeout(end, ms || 10000);
+    try{ var vis = all.filter(function(b){ return b.offsetParent; })[0]; if(vis && vis.getBoundingClientRect().top < 0) vis.scrollIntoView({ block:'nearest', behavior:'smooth' }); }catch(e){}
   }
 
   // ── Backup files: the web view cannot download the page's own files, so the phone saves them ──
