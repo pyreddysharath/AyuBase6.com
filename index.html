@@ -15225,6 +15225,36 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
         if(!rep||rep.error==='off') return skip('Needs the steps above');
         return rep.server ? ok() : bad('The server did not accept it','The reminder server did not accept this phone'+(rep.error?' ('+rep.error+')':'')+'. Check your internet connection and tap Test again. If it keeps failing, tell us in Feedback.'); }}
     );
+    // In the app: what on the phone can silence reminders or stop alarms (one call, read by both steps)
+    var SC=null; function soundCheck(){ if(!SC) SC=window.ayuNative.soundCheck().catch(function(){ return null; }); return SC; }
+    if(window.ayuNative && typeof window.ayuNative.soundCheck==='function') steps.push(
+      {k:'snd',label:'Sound and volume',fn:async function(){
+        var r=await soundCheck(); if(!r) return skip('Could not read the phone\'s sound settings');
+        var p=[];
+        if(r.ringer==='silent') p.push(['The phone is on <b>silent</b>','Turn the ringer on (volume button, or the sound icon in quick settings).']);
+        else if(r.ringer==='vibrate') p.push(['The phone is on <b>vibrate</b>','Reminders vibrate but make no sound. Turn the ringer on.']);
+        else if(r.notifMax && !r.notifVol) p.push(['<b>Notification volume</b> is at 0','Phone <b>Settings → Sound</b>: turn up Notification volume.']);
+        if(r.dnd && r.dnd!=='off') p.push(['<b>Do Not Disturb</b> is on','Reminders stay quiet while it is on. Turn it off in quick settings, or allow AyuBase6 in its exceptions.']);
+        (r.channels||[]).forEach(function(c){
+          if(c.id==='alarms') return;   // the alarm plays its own sound
+          if(c.importance===0) p.push(['<b>'+c.name+'</b> notifications are turned off','<b>Settings → Apps → AyuBase6 → Notifications → '+c.name+'</b>: turn it on.']);
+          else if(c.importance<3 || !c.sound) p.push(['<b>'+c.name+'</b> notifications are silent','<b>Settings → Apps → AyuBase6 → Notifications → '+c.name+'</b>: choose <b>Alert / Make sound</b>.']);
+        });
+        if(!p.length) return ok('Ringer on, volume up, Do Not Disturb off');
+        return bad(p.length===1 ? p[0][0].replace(/<[^>]+>/g,'') : p.length+' things keep reminders quiet','<ul style="margin:0;padding-left:18px">'+p.map(function(x){ return '<li>'+x[0]+'. '+x[1]+'</li>'; }).join('')+'</ul>'); }},
+      {k:'alm',label:'Alarms ring with the app closed',fn:async function(){
+        var r=await soundCheck(); if(!r) return skip('Could not read the phone\'s settings');
+        var p=[], tip='';
+        if(r.alarmMax && !r.alarmVol) p.push(['<b>Alarm volume</b> is at 0','Phone <b>Settings → Sound</b>: turn up Alarm volume. Alarms and the timer use it.']);
+        if(r.exact===false) p.push(['<b>Alarms &amp; reminders</b> is not allowed','<b>Settings → Apps → AyuBase6 → Alarms &amp; reminders</b>: allow it, so alarms ring on time.']);
+        if(r.bgRestricted) p.push(['<b>Background use</b> is restricted','<b>Settings → Apps → AyuBase6 → Battery</b>: choose <b>Unrestricted</b>.']);
+        if(r.forceStoppedAt) p.push(['The phone <b>force-stopped</b> AyuBase6 when it was last closed ('+new Date(r.forceStoppedAt).toLocaleString([], {day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})+')','That cancels alarms and reminders until the app is opened again. '+(/xiaomi|redmi|poco/i.test(r.manufacturer||'')?'Turn on <b>Autostart</b> for AyuBase6 (Settings → Apps → AyuBase6) and set Battery saver to <b>No restrictions</b>. ':'')+'Set <b>Battery</b> to <b>Unrestricted</b>, lock AyuBase6 in the recent apps (long-press its card → Lock), and close it with Back instead of swiping it away. Also don\'t use "Force stop" or "Clear all" in the recent apps.']);
+        if(r.dnd==='none') p.push(['<b>Do Not Disturb</b> silences alarms too','Turn it off, or allow alarms in its settings.']);
+        if(r.fullScreen===false) tip='Full-screen alarms are off, so alarms show as a notification';
+        else if(!r.batteryUnrestricted) tip='Tip: Battery “Unrestricted” makes alarms most reliable';
+        if(!p.length) return ok(tip||'Alarm volume up, on time, not restricted');
+        return bad(p.length===1 ? p[0][0].replace(/<[^>]+>/g,'').replace(/ \(.*\)$/,'') : p.length+' things can stop alarms','<ul style="margin:0;padding-left:18px">'+p.map(function(x){ return '<li>'+x[0]+'. '+x[1]+'</li>'; }).join('')+'</ul>'); }}
+    );
     steps.push({k:'test',label:'Test notification and sound',human:true,fn:async function(){
       if(!granted()) return skip('Needs notifications allowed');
       try{ if(!alertState.break.muted) playAlertPreset(alertState.break.sound); }catch(e){}
@@ -16650,11 +16680,12 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   window.ayuAlarmPreview=function(id){
     var E=ent(id), c=get(id), N=window.ayuNative;
     if(N && typeof N.previewAlarm==='function'){
-      N.previewAlarm({ key:'alarm-'+id, title:E.title(), body:E.body(), cfg:{ section:id==='wake'?'routines':'alerts', snoozeMin:+c.snoozeMin||5, snoozeMax:+c.snoozeMax||0, keys:c.keys||'snooze', tone:c.tone||'rise' } }).catch(function(){ webPrev(); });
+      N.previewAlarm({ key:'alarm-'+id, title:E.title(), body:E.body(), cfg:{ section:id==='wake'?'routines':'alerts', snoozeMin:+c.snoozeMin||5, snoozeMax:+c.snoozeMax||0, keys:c.keys||'snooze', tone:c.tone||'rise', vibrate:c.vibrate!==false } }).catch(function(){ webPrev(); });
       return true;
     }
     return webPrev();
     function webPrev(){ var acts=[]; if(+c.snoozeMax>0) acts.push({action:'snooze',title:'Snooze'}); acts.push({action:'stop',title:'Stop'});
+    try{ if(window.ayuTones) window.ayuTones.start(c.tone||'rise',false); }catch(e){}   // its sound, once
     return window.ayuPreviewNote(E.title(), E.body(), id==='wake' ? 'routines' : 'reminders', id==='wake' ? 'routine-x-alarm' : 'alarm-preview', acts); }
   };
   function closeNote(id){ swReg().then(function(reg){ if(reg) reg.getNotifications({tag:'ayu-alarm-'+id}).then(function(l){ l.forEach(function(n){ n.close(); }); }); }).catch(function(){}); }
@@ -18458,9 +18489,9 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     q('clk-t-tone').addEventListener('change',function(){ T.tone=this.value; T.v=Date.now(); saveAll(); });
     q('clk-t-prev').addEventListener('click',function(){
       var n=times(), body=n>1 ? 'Time’s up · next alert in '+lenTxt(unset()?60000:len()) : 'Time’s up', N=window.ayuNative;
-      if(N && typeof N.previewAlarm==='function'){ N.previewAlarm({ key:'timer-preview', title:'Timer', body:body.replace('’','\''), cfg:{ section:'alerts', snoozeMax:0, keys:'stop' } }).catch(webPrev); return; }
+      if(N && typeof N.previewAlarm==='function'){ N.previewAlarm({ key:'timer-preview', title:'Timer', body:body.replace('’','\''), cfg:{ section:'alerts', snoozeMax:0, keys:'stop', tone:T.tone||'rise', vibrate:T.vibrate!==false } }).catch(webPrev); return; }
       webPrev();
-      function webPrev(){ window.ayuPreviewNote('Timer', body, 'reminders', 'timer-preview', [{action:'stop',title:'Stop'}]); }
+      function webPrev(){ try{ if(window.ayuTones) window.ayuTones.start(T.tone||'rise',false); }catch(e){} window.ayuPreviewNote('Timer', body, 'reminders', 'timer-preview', [{action:'stop',title:'Stop'}]); }
     });
     q('clk-t-vib').addEventListener('change',function(){ T.vibrate=this.checked; T.v=Date.now(); saveAll(); });
     var playing=false;
@@ -20161,6 +20192,19 @@ html body #sec-app .app-req-done{font-weight:700;color:var(--footer-accent,#0d94
 })();
 </script>
 <style id="add-underline-20261110">@media (hover:none){html body #alerts-panel .ayu-add-btn:hover:not(#ayu-x1),html body #alerts-panel #custom-reminders-card #custom-reminder-add:hover:not(#ayu-x1){text-decoration:none !important}}</style>
+<style id="checklist-fields-20261110">
+/* Daily Checklist notification fields: the same layout as Eyes (20-20-20), in the Checks colours */
+html body #routines-panel #routines-remind-panel .chk-lbl:not(#ayu-x1):not(#ayu-x2),html body #routines-panel #routines-remind-panel .otd-title:not(#ayu-x1):not(#ayu-x2),html body #routines-panel #routines-remind-panel .ayu-speak-lbl:not(#ayu-x1):not(#ayu-x2){font-size:13px !important;font-weight:600 !important;color:#78350f !important;text-transform:none !important;letter-spacing:normal !important}
+html body #routines-panel #routines-remind-panel .chk-dot:not(#ayu-x1):not(#ayu-x2)::before,html body #routines-panel #routines-remind-panel .ayu-speak-row .ayu-speak-lbl:not(#ayu-x1):not(#ayu-x2)::before{content:"•" !important;display:inline-block;width:10px;text-align:center;font-size:16px !important;font-weight:800 !important;line-height:1;color:#a75b12 !important;margin-right:6px !important;vertical-align:baseline}
+html body #routines-panel #routines-remind-panel .ayu-speak-vrow .ayu-speak-lbl:not(#ayu-x1):not(#ayu-x2)::before{visibility:hidden}
+html body #routines-panel #routines-remind-panel #chk-sound-row:not(#ayu-x1):not(#ayu-x2){display:flex !important;flex-wrap:wrap !important;align-items:center;gap:8px !important;border:0 !important;padding:0 !important;margin:14px 0 0 !important}
+html body #routines-panel #routines-remind-panel #chk-sound-row .chk-lbl:not(#ayu-x1):not(#ayu-x2){flex:0 0 100% !important;min-width:0 !important;margin:0 !important}
+html body #routines-panel #routines-remind-panel #chk-sound-row select#chk-sound:not(#ayu-x1):not(#ayu-x2){flex:1 1 auto !important;width:auto !important;max-width:420px !important;min-width:0 !important;height:auto !important;min-height:0 !important;padding:7px 30px 7px 12px !important;line-height:1.3 !important;font-size:14px !important;border-radius:10px !important}
+html body #routines-panel #routines-remind-panel #chk-sound-row #chk-sound-play:not(#ayu-x1):not(#ayu-x2){margin-left:0 !important;color:#a75b12 !important;border-color:rgba(167,91,18,.55) !important}
+html body #routines-panel #routines-remind-panel #chk-speak-row:not(#ayu-x1):not(#ayu-x2){border:0 !important;margin:12px 0 0 !important;padding:0 !important}
+html body #routines-panel #routines-remind-panel #chk-speak-row .ayu-speak-play:not(#ayu-x1):not(#ayu-x2){color:#a75b12 !important;border-color:rgba(167,91,18,.55) !important}
+html body #routines-panel #routines-remind-panel #chk-vib-row:not(#ayu-x1):not(#ayu-x2){border:0 !important}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
