@@ -8438,8 +8438,8 @@ const RECIPES_DATA = [
     </div>
     <p class="feedback-note-small" style="margin-top:10px">Having trouble? <a href="#" onclick="showFooterSection('check');return false;" style="font-weight:700">Test notifications in Help</a></p>
     <p class="feedback-note-small" id="notif-off-help" style="display:none;margin-top:8px">
-      A website can't turn off its own notification permission. To turn it off, open your browser's site settings
-      for this page (the icon next to the address) and set Notifications to Block. Your reminder switches stay as they are.
+      Browsers don't let a website remove its own permission. To remove it, open the site settings for this page
+      (the icon next to the address) and set Notifications to <b>Block</b>.
     </p>
     <p class="feedback-note-small" id="notif-denied-help" style="display:none;margin-top:8px">
       Notifications are blocked in your browser. To turn them on, open your browser's site settings for this
@@ -18169,8 +18169,8 @@ html body #lab-insights-card .lab-actions-row .lub-s{font-size:.72em;font-weight
     var box=$('notif-off-ask');
     if(box){ box.remove(); return; }
     box=document.createElement('div'); box.id='notif-off-ask'; box.className='notif-off-ask';
-    box.innerHTML='<p>Turn off notifications for AyuBase6? Reminders and alarms stop until you tap <b>Enable Notifications</b> again. AyuBase6 closes to finish this.</p>'
-      +'<div class="noa-btns"><button type="button" class="noa-yes">Turn off</button><button type="button" class="noa-no">Cancel</button></div>';
+    box.innerHTML='<p>Remove the notification permission for AyuBase6? Reminders and alarms stop until you tap <b>Enable Notifications</b> again. AyuBase6 closes to finish this.</p>'
+      +'<div class="noa-btns"><button type="button" class="noa-yes">Remove</button><button type="button" class="noa-no">Cancel</button></div>';
     (b.parentNode.nextSibling ? b.parentNode.parentNode.insertBefore(box,b.parentNode.nextSibling) : b.parentNode.parentNode.appendChild(box));
     box.querySelector('.noa-no').addEventListener('click',function(){ box.remove(); });
     box.querySelector('.noa-yes').addEventListener('click',function(){
@@ -18183,7 +18183,7 @@ html body #lab-insights-card .lab-actions-row .lub-s{font-size:.72em;font-weight
     if(!b || p==='unsupported') return;
     if(b.style.display==='none' && !(app() && p==='denied')) { if(off) off.style.display='none'; return; }
     b.style.display='inline-block';
-    b.textContent = p==='granted' ? (app() ? 'Disable Notifications' : 'How to turn off') : 'Enable Notifications';
+    b.textContent = p==='granted' ? 'Remove permission' : 'Enable Notifications';   // the app removes it; a website can only show how
     if(p!=='granted' && off) off.style.display='none';
     if(app() && dh) dh.style.display='none';
     if(s) s.innerHTML = p==='granted' ? '<span class="nt-ok">✓</span> Notifications are allowed.'
@@ -20664,6 +20664,15 @@ html body #sec-notifications .na-sep{border:0;border-top:3px solid color-mix(in 
   document.addEventListener('change',function(e){ if(visible() && !(wrap && wrap.contains(e.target))) setTimeout(paint,60); },true);
 })();
 </script>
+<style id="notif-center-20261110">
+/* Settings → Notifications: the permission part centred, like Turn all off */
+html body #sec-notifications #notif-status-text:not(#ayu-x1){text-align:center}
+html body #sec-notifications #notif-enable-btn:not(#ayu-x1){margin-left:auto;margin-right:auto}
+html body #sec-notifications .feedback-form-section:has(#notif-enable-btn):not(#ayu-x1){justify-content:center !important}
+html body #sec-notifications #notif-off-help:not(#ayu-x1),html body #sec-notifications #notif-denied-help:not(#ayu-x1){text-align:center}
+html body #sec-notifications .notif-off-ask .noa-btns{justify-content:center}
+html body #sec-notifications .notif-off-ask p{text-align:center}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
