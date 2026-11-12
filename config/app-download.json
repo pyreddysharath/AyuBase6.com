@@ -1,5 +1,5 @@
 {
-  "android": "request",
+  "android": "download",
   "_allowed_android": ["download", "request", "none"],
   "_help": "android: download = direct APK download link; request = name + email request form; none = no Android app offer on the website. Anything else is treated as request."
 }
