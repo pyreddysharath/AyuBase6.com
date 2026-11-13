@@ -11601,6 +11601,7 @@ function showFooterSection(id){
 // so a draft name/message is still there when Feedback is reopened.
 document.addEventListener('click', function(e){
   if (!document.contains(e.target)) return;   // the tapped button removed itself (a Cancel inside the footer)
+  if (e.target.closest('#ayu-pop, [role="dialog"], [aria-modal="true"]')) return;   // OK on a pop-up opened from the footer keeps the section open
   if (!e.target.closest('.app-footer') && !e.target.closest('#footer-tabs-row')) {
     closeAllFooterSections();
   }
@@ -15338,7 +15339,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
           var at=+lastSet.m.split(':')[1], gone=Date.now()>at+3*60000, ev=after.map(function(x){ return x.m.split(':')[0]; });
           if(gone && ev.indexOf('ringing')<0){
             var why=ev.indexOf('blocked')>=0||ev.indexOf('startfail')>=0||ev.indexOf('refused')>=0 ? 'Android did not let AyuBase6 start ringing.' : ev.indexOf('late')>=0 ? 'The phone woke AyuBase6 too late, so it showed a notification instead of ringing.' : 'The phone never woke AyuBase6 at that time. This usually means the app was stopped or put to sleep by battery saving.';
-            p.unshift(['The last alarm (<b>'+fmt(at)+'</b>) did not ring', why+' Check the steps below, then set an alarm a few minutes ahead and run this test again after it should ring.']);
+            p.unshift(['The last alarm (<b>'+fmt(at)+'</b>) did not ring', why+'<ol style="margin:6px 0 0;padding-left:18px"><li>Phone <b>Settings → Apps → AyuBase6 → Battery</b>: choose <b>Unrestricted</b>.</li><li>If your phone has <b>Auto-launch</b> or <b>Autostart</b> for apps, allow it for AyuBase6.</li><li>In the recent apps, <b>lock</b> AyuBase6 (long-press its card → Lock), and close the app with Back instead of swiping it away.</li><li><b>Settings → Apps → AyuBase6 → Alarms &amp; reminders</b>: allowed.</li><li>Set an alarm a few minutes ahead, close the app, and run this test again after it should ring.</li></ol>']);
           } else if(gone){ tip='Last alarm rang: '+fmt(at); }
         }
         if(r.fullScreen===false) tip='Full-screen alarms are off, so alarms show as a notification';
@@ -21539,6 +21540,15 @@ html body .ayu-age-sw svg{width:18px;height:18px}
 html body #sec-backup [id^="subtab-"]:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){display:flex !important;align-items:center !important;justify-content:center !important;gap:5px !important;flex:1 1 0 !important;min-width:0 !important;padding:6px 6px !important;white-space:normal !important;line-height:1.15 !important;font-size:11.5px !important;text-align:left !important;overflow:visible !important;align-self:stretch !important;height:auto !important}
 html body #sec-backup [id^="subtab-"] .fst-ic:not(#ayu-x1){flex:0 0 14px;width:14px;height:14px;margin:0 !important}
 </style>
+<script id="reset-same-tab-20261113-js">
+// After a page Reset the app reloads: it comes back on the same tab at once (no moment on Body first)
+(function(){
+  var a=null; try{ a=JSON.parse(sessionStorage.getItem('ayuAfterReset')||'null'); }catch(e){}
+  if(!a || !a.tab) return;
+  function go(){ try{ if(typeof switchTab==='function' && (typeof currentActiveTab==='undefined' || currentActiveTab!==a.tab)) switchTab(a.tab); }catch(e){} }
+  go(); document.addEventListener('DOMContentLoaded',go); window.addEventListener('load',go); [50,150,300].forEach(function(ms){ setTimeout(go,ms); });
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
