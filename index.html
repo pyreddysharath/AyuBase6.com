@@ -18528,7 +18528,15 @@ html body #rem-alarm-card .clk-wprev .wp-r{display:flex;justify-content:space-be
 html body #rem-alarm-card .clk-wprev .wp-r b{font-size:.98rem;white-space:nowrap}
 html body #rem-alarm-card .clk-wres button{text-align:left;border:0;background:color-mix(in srgb,#0f766e 7%,#fff);border-radius:9px;padding:9px 12px;font:inherit;font-size:14px;color:#134e4a;cursor:pointer}
 html body #rem-alarm-card .clk-wres button small{opacity:.65;margin-left:6px}
-html body #rem-alarm-card .clk-wmsg{font-size:13px;color:#b45309;margin:0 0 8px}
+html body #rem-alarm-card .clk-wmsg{font-size:13px;color:#0f766e;font-weight:600;margin:0 0 8px}
+html body #rem-alarm-card #clk-w-cancel:not(#ayu-x1):not(#ayu-x2){background:#0f766e !important;color:#fff !important;border:1.5px solid #0f766e !important;border-radius:10px !important;padding:8px 16px !important;font-weight:700 !important;box-shadow:none !important}
+html body #rem-alarm-card .custom-reminder-item > .clk-wlook{margin:0 12px 12px;background:#fff}
+html body #rem-alarm-card .clk-wprev.analog{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-around}
+html body #rem-alarm-card .clk-wprev.analog .wp-h{flex:0 0 100%}
+html body #rem-alarm-card .clk-wprev .wp-a{text-align:center;font-size:.76rem}
+html body #rem-alarm-card .clk-wprev .wp-f{display:block;position:relative;width:46px;height:46px;border:2px solid #fff;border-radius:50%;margin:0 auto 4px}
+html body #rem-alarm-card .clk-wprev .wp-f u, html body #rem-alarm-card .clk-wprev .wp-f s{position:absolute;left:50%;bottom:50%;width:2px;margin-left:-1px;background:#fff;transform-origin:50% 100%;border-radius:1px;text-decoration:none}
+html body #rem-alarm-card .clk-wprev .wp-f u{height:12px}html body #rem-alarm-card .clk-wprev .wp-f s{height:18px;background:#5eead4}
 html body #rem-alarm-card .clk-wmsg:empty{display:none}
 html body #rem-alarm-card .clk-lock{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;margin-top:8px;border-radius:14px;border:1.5px solid color-mix(in srgb,#0f766e 25%,#fff);background:color-mix(in srgb,#0f766e 5%,#fff)}
 html body #rem-alarm-card .clk-lock .t{font-weight:700;color:#134e4a}
@@ -18658,6 +18666,7 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
         +'<div class="ayu-al-row"><span class="ayu-al-lbl">Time format</span><select id="clk-w-fmt" aria-label="Time format"><option value="phone">As on the phone</option><option value="12">12-hour (2:30 PM)</option><option value="24">24-hour (14:30)</option></select></div>'
         +'<div class="ayu-al-row"><span class="ayu-al-lbl">Show</span><select id="clk-w-place" aria-label="Show the city, the country or both"><option value="both">City and country</option><option value="city">City</option><option value="country">Country</option></select></div>'
         +'<div class="ayu-al-row"><span class="ayu-al-lbl">Time zone</span><select id="clk-w-zone" aria-label="Show the time zone"><option value="0">Hidden</option><option value="1">Shown (GMT+5:30)</option></select></div>'
+        +'<div class="ayu-al-row"><span class="ayu-al-lbl">Clock style</span><select id="clk-w-style" aria-label="Clock style"><option value="digital">Digital</option><option value="analog">Clock faces (Android 12+)</option></select></div>'
         +'<div class="clk-wprev" id="clk-w-prev" aria-label="How it looks on the lock screen"></div></div>':'');
   }
 
@@ -18848,10 +18857,9 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
       var dup=sameAs(c[2]);
       if(dup){ msg.textContent=c[0]+' has the same time as '+dup.city+', which is already in your list.'; return; }
       if((W.list||[]).length>=MAX_CITIES){ msg.textContent='You can add up to '+MAX_CITIES+' cities.'; return; }
-      W.list=(W.list||[]).concat([{city:c[0],country:c[1],tz:c[2],lock:false}]); W.v=Date.now(); msg.textContent=c[0]+' added.'; saveAll(); paintWorld(true);
-      if(W.list.length>=MAX_CITIES) close(); else search();   // the list stays open: add several cities, then Done
+      W.list=(W.list||[]).concat([{city:c[0],country:c[1],tz:c[2],lock:APP}]); if(APP){ W.on=true; worldOpen=c[2]; } W.v=Date.now(); msg.textContent=c[0]+' added.'; close(); saveAll(); paintWorld(true);   // the search list closes; the new city opens with its lock-screen settings
     });
-    ['fmt','place','zone'].forEach(function(k){ var e=$('clk-w-'+k); if(!e) return; e.addEventListener('change',function(){ W[k]=k==='zone' ? e.value==='1' : e.value; W.v=Date.now(); saveAll(); paintWorld(true); }); });
+    ['fmt','place','zone','style'].forEach(function(k){ var e=$('clk-w-'+k); if(!e) return; e.addEventListener('change',function(){ W[k]=k==='zone' ? e.value==='1' : e.value; W.v=Date.now(); saveAll(); paintWorld(true); }); });
     $('clk-world-list').addEventListener('change',function(e){
       var inp=e.target.closest('input[data-lock]'); if(!inp) return;
       (W.list||[]).forEach(function(c){ if(c.tz===inp.dataset.lock) c.lock=inp.checked; });
@@ -18870,19 +18878,23 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
   var worldDrawn='', worldOpen='';
   function paintWorld(force){
     var list=$('clk-world-list'); if(!list) return;
-    var d=new Date(), L=W.list||[], key=JSON.stringify(L)+'|'+d.getHours()+':'+d.getMinutes()+'|'+worldOpen+'|'+[W.fmt,W.place,W.zone].join();
+    var d=new Date(), L=W.list||[], key=JSON.stringify(L)+'|'+d.getHours()+':'+d.getMinutes()+'|'+worldOpen+'|'+[W.fmt,W.place,W.zone,W.style].join();
     L.forEach(function(c){ if(typeof c.lock!=='boolean') c.lock=!!W.on; });   // an older list: the one switch becomes each city's own
     var look=$('clk-w-look');
-    if(look){ var shown=L.filter(function(c){ return c.lock; }); look.hidden=!shown.length;
+    if(look){ var shown=L.filter(function(c){ return c.lock; }); $('clk-w-style').value=W.style==='analog' ? 'analog' : 'digital';
       $('clk-w-fmt').value=/^(12|24)$/.test(W.fmt||'') ? W.fmt : 'phone'; $('clk-w-place').value=/^(city|country)$/.test(W.place||'') ? W.place : 'both'; $('clk-w-zone').value=W.zone ? '1' : '0';
       $('clk-w-prev').innerHTML='<div class="wp-h">AyuBase6 · World Clock</div>'+shown.map(function(c){
         var nm=W.place==='city' ? c.city : W.place==='country' ? c.country : c.city+', '+c.country, tm='', z='';
         try{ var o={hour:'numeric',minute:'2-digit',timeZone:c.tz}; if(W.fmt==='12') o.hour12=true; else if(W.fmt==='24'){ o.hour12=false; o.hour='2-digit'; } tm=d.toLocaleTimeString([],o); }catch(e){ tm=cityTime(c.tz,d); }
         if(W.zone){ try{ z=(new Intl.DateTimeFormat('en-US',{timeZone:c.tz,timeZoneName:'shortOffset'}).formatToParts(d).filter(function(x){ return x.type==='timeZoneName'; })[0]||{}).value||''; }catch(e){} }
+        if(W.style==='analog'){ var hh=0, mm=0; try{ var pp=new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:c.tz}).formatToParts(d); pp.forEach(function(x){ if(x.type==='hour') hh=+x.value%12; if(x.type==='minute') mm=+x.value; }); }catch(e){}
+          return '<div class="wp-a"><i class="wp-f"><u style="transform:rotate('+((hh+mm/60)*30)+'deg)"></u><s style="transform:rotate('+(mm*6)+'deg)"></s></i><span>'+esc(nm)+(z?' · '+esc(z):'')+'</span></div>'; }
         return '<div class="wp-r"><span>'+esc(nm)+(z?' · '+esc(z):'')+'</span><b>'+esc(tm)+'</b></div>'; }).join('');
+      $('clk-w-prev').classList.toggle('analog',W.style==='analog');
     }
     $('clk-w-add').querySelector('span:last-child').textContent = L.length>=MAX_CITIES ? 'Add a city (up to '+MAX_CITIES+')' : 'Add a city';
     if(!force && key===worldDrawn) return; worldDrawn=key;
+    if(look && list.contains(look)) list.parentNode.appendChild(look);   // kept while the list is redrawn
     list.innerHTML=L.map(function(c){
       var day=dayTxt(c.tz,d);
       var op=APP && worldOpen===c.tz;
@@ -18891,6 +18903,10 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
         +(op?'<div class="clk-w-body"><span>Show on lock screen</span><label class="master-switch" title="Show on lock screen"><input type="checkbox" data-lock="'+esc(c.tz)+'"'+(c.lock?' checked':'')+' aria-label="Show '+esc(c.city)+' on the lock screen"></label></div>':'')+'</div>';
     }).join('');
     if(!L.length) list.innerHTML='<p class="clk-note">Add the cities you want to keep an eye on.</p>';
+    if(look){   // the lock-screen settings sit right under the open city's switch, while that switch is on
+      var oc=L.filter(function(c){ return c.tz===worldOpen && c.lock; })[0], it=oc && list.querySelector('.custom-reminder-item.open');
+      if(it){ it.appendChild(look); look.hidden=false; } else look.hidden=true;
+    }
     try{ if(window.ayuListColours) window.ayuListColours(list); }catch(e){}
   }
 
@@ -21342,13 +21358,13 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
 /* My Day Plan: a gap between Wake-up Alarm and Notify Me */
 html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day:not(#ayu-x1){margin-top:18px !important}
 /* Notify Me fields laid out like the Wake-up Alarm rows: plain label on the left, its control beside it, no dots */
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .chk-dot:not(#ayu-x1):not(#ayu-x2)::before,
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-row .ayu-speak-lbl:not(#ayu-x1):not(#ayu-x2)::before{content:none !important;display:none !important}
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day:not(#ayu-x1):not(#ayu-x2){padding-bottom:0 !important}
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .chk-lbl:not(.chk-dot):not(#ayu-x1):not(#ayu-x2)::before{content:"•";display:inline-block;width:10px;text-align:center;font-size:16px;font-weight:800;line-height:1;margin-right:6px;color:#a75b12}
 html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .chk-lbl:not(#ayu-x1):not(#ayu-x2),
 html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .otd-title:not(#ayu-x1):not(#ayu-x2),
 html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-lbl:not(#ayu-x1):not(#ayu-x2){font-size:13px !important;font-weight:400 !important;color:rgb(120,53,15) !important;letter-spacing:0 !important}
 html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-sound-row:not(#ayu-x1):not(#ayu-x2){flex-wrap:nowrap !important;margin-top:12px !important}
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-sound-row .chk-lbl:not(#ayu-x1):not(#ayu-x2){flex:0 0 92px !important}
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-sound-row .chk-lbl:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto !important;min-width:92px !important;white-space:nowrap !important}
 html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-row:not(#ayu-x1):not(#ayu-x2),
 html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-vib-row:not(#ayu-x1):not(#ayu-x2){display:flex !important;align-items:center !important;justify-content:flex-start !important;gap:8px !important;margin-top:12px !important}
 html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-row > .ayu-speak-lbl:not(#ayu-x1):not(#ayu-x2),
@@ -21375,6 +21391,28 @@ html body .ayu-wheel .aw-list:focus-visible{box-shadow:0 0 0 2px var(--wc)}
 html body .ayu-wheel .aw-i{height:32px;line-height:32px;text-align:center;scroll-snap-align:center;font-weight:700;font-size:.92rem;color:#94a3b8;font-variant-numeric:tabular-nums;cursor:pointer;user-select:none}
 html body .ayu-wheel .aw-i.on{color:var(--wc);font-size:1.35rem}
 html body .ayu-wheel .aw-u{font-size:.86rem;font-weight:700;color:var(--wc);min-width:24px}
+/* Height and Weight: tape and scale */
+html body .ayu-hw{display:flex;gap:16px;align-items:center;margin:10px 0 4px;position:relative;z-index:1}
+html body .ayu-hw > .calc-row-stacked:first-child{flex:0 0 108px;min-width:0;margin:0 !important}
+html body .ayu-hw > .calc-row-stacked:last-child{flex:1 1 auto;min-width:0;margin:0 !important}
+html body .ayu-hw input.ayu-scale-src:not(#ayu-x1){display:none !important}
+html body .ayu-scale{position:relative;margin-top:8px;border-radius:12px;overflow:hidden;background:color-mix(in srgb,var(--wc) 7%,#fff);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--wc) 28%,#fff)}
+html body .ayu-scale .as-track{scrollbar-width:none;overscroll-behavior:contain;outline:0;touch-action:none}
+html body .ayu-scale .as-track::-webkit-scrollbar{display:none}
+html body .ayu-scale .as-in{position:relative}
+html body .ayu-scale .as-in b{position:absolute;font-size:10.5px;font-weight:600;color:color-mix(in srgb,var(--wc) 60%,#334155);font-variant-numeric:tabular-nums}
+html body .ayu-scale .as-mid{position:absolute;background:var(--wc);pointer-events:none;border-radius:2px}
+html body .ayu-scale.v{width:64px;height:170px}
+html body .ayu-scale.v .as-track{height:170px;overflow-y:auto;padding:85px 0;box-sizing:border-box;touch-action:pan-y}
+html body .ayu-scale.v .as-in{width:100%;background:repeating-linear-gradient(180deg,color-mix(in srgb,var(--wc) 55%,#94a3b8) 0 1.500px,transparent 1.500px 10px) right top/12px 100% no-repeat,repeating-linear-gradient(180deg,color-mix(in srgb,var(--wc) 75%,#475569) 0 2px,transparent 2px 50px) right top/22px 100% no-repeat}
+html body .ayu-scale.v .as-in b{left:6px;transform:translateY(-50%)}
+html body .ayu-scale.v .as-mid{left:0;right:0;top:84px;height:3px}
+html body .ayu-scale.h{height:54px}
+html body .ayu-scale.h .as-track{overflow-x:auto;overflow-y:hidden;padding:0 50%;height:54px;touch-action:pan-x}
+html body .ayu-scale.h .as-in{height:54px;background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--wc) 55%,#94a3b8) 0 1.500px,transparent 1.500px 10px) left bottom/100% 11px no-repeat,repeating-linear-gradient(90deg,color-mix(in srgb,var(--wc) 75%,#475569) 0 2px,transparent 2px 50px) left bottom/100% 20px no-repeat}
+html body .ayu-scale.h .as-in b{top:6px;transform:translateX(-50%)}
+html body .ayu-scale.h .as-mid{top:0;bottom:0;left:50%;width:3px;margin-left:-1.500px}
+html body .ayu-scale .as-track:focus-visible{box-shadow:inset 0 0 0 2px var(--wc)}
 /* Age: bar view or wheel view (icon at the bottom right) */
 html body .ayu-age-box{position:relative}
 html body .ayu-age-box:not(.ayu-age-wheel) .ayu-wheel, html body .ayu-age-box:not(.ayu-age-wheel) .ayu-age-chips{display:none !important}
@@ -21392,7 +21430,7 @@ html body .ayu-age-sw svg{width:18px;height:18px}
 <script id="fixes-20261113b-js">
 (function(){
   function $(i){ return document.getElementById(i); }
-  var W=[['body-age-slider','yrs','#2563eb','Age'],['food-age-slider','yrs','#16a34a','Age'],['height-slider','cm','#16a34a','Height'],['weight-slider','kg','#16a34a','Weight'],['calc-height-slider','cm','#0e7490','Height'],['calc-weight-slider','kg','#0e7490','Weight']], H=32;
+  var W=[['body-age-slider','yrs','#2563eb','Age'],['food-age-slider','yrs','#16a34a','Age']], H=32;
   function wheel(x){
     var s=$(x[0]); if(!s) return;
     var old=s.nextElementSibling; if(old && old.classList.contains('ayu-num')) old.remove();
@@ -21438,7 +21476,35 @@ html body .ayu-age-sw svg{width:18px;height:18px}
     sw.addEventListener('click',function(e){ e.stopPropagation(); try{ localStorage.setItem(KV,view()==='wheel'?'bar':'wheel'); }catch(e2){} paintViews(); });
     box.appendChild(sw); paintViews();
   }
-  function run(){ W.forEach(wheel);
+  // Height: an upright tape (drag up or down); Weight: a scale (drag sideways). The fixed line marks the value.
+  var HW=[['height-slider','weight-slider','#16a34a'],['calc-height-slider','calc-weight-slider','#0e7490']], ST=10;
+  function scale(id,vert,name,unit){
+    var s=$(id); if(!s || s.dataset.ayuScale) return null; s.dataset.ayuScale='1';
+    var old=s.nextElementSibling; if(old && old.classList.contains('ayu-wheel')) old.remove();
+    var mn=Math.round(+s.min||0), mx=Math.round(+s.max||100), n=mx-mn, labs='';
+    for(var v=mn;v<=mx;v+=5){ var at=(vert ? (mx-v) : (v-mn))*ST; labs+='<b style="'+(vert?'top':'left')+':'+at+'px">'+v+'</b>'; }
+    var w=document.createElement('div'); w.className='ayu-scale '+(vert?'v':'h');
+    w.innerHTML='<div class="as-track" tabindex="0" role="slider" aria-orientation="'+(vert?'vertical':'horizontal')+'" aria-label="'+name+' in '+unit+': drag to set" aria-valuemin="'+mn+'" aria-valuemax="'+mx+'"><div class="as-in" style="'+(vert?'height':'width')+':'+(n*ST)+'px">'+labs+'</div></div><i class="as-mid" aria-hidden="true"></i>';
+    s.classList.add('ayu-scale-src'); s.after(w);
+    var tr=w.firstChild, lock=0, last=0, t=null;
+    function pos(){ return vert ? tr.scrollTop : tr.scrollLeft; }
+    function put(x){ if(vert) tr.scrollTop=x; else tr.scrollLeft=x; }
+    function valAt(){ var i=Math.max(0,Math.min(n,Math.round(pos()/ST))); return vert ? mx-i : mn+i; }
+    function setVal(v){ v=Math.max(mn,Math.min(mx,v)); if(v===Math.round(+s.value)) return; s.value=String(v); s.dispatchEvent(new Event('input',{bubbles:true})); s.dispatchEvent(new Event('change',{bubbles:true})); }
+    function toScale(){ if(!tr.offsetParent) return; var v=Math.round(+s.value), x=(vert ? mx-v : v-mn)*ST; if(Math.abs(pos()-x)>1){ lock=Date.now()+300; put(x); } tr.setAttribute('aria-valuenow',String(v)); }
+    tr.addEventListener('scroll',function(){ if(Date.now()<lock) return; last=Date.now(); setVal(valAt()); clearTimeout(t); t=setTimeout(function(){ last=0; toScale(); },260); });   // settles on a whole number
+    tr.addEventListener('keydown',function(e){ var d=(e.key==='ArrowUp'||e.key==='ArrowRight')?1:(e.key==='ArrowDown'||e.key==='ArrowLeft')?-1:0; if(!d) return; e.preventDefault(); setVal(Math.round(+s.value)+d); toScale(); });
+    s.addEventListener('input',function(){ if(Date.now()-last>300) toScale(); });
+    setInterval(function(){ if(Date.now()-last>700) toScale(); },600);
+    toScale(); return w;
+  }
+  function hw(x){
+    var h=$(x[0]), wt=$(x[1]); if(!h || !wt) return;
+    var rh=h.closest('.calc-row-stacked'), rw=wt.closest('.calc-row-stacked'); if(!rh || !rw) return;
+    if(!rh.parentNode.classList.contains('ayu-hw')){ var box=document.createElement('div'); box.className='ayu-hw'; box.style.setProperty('--wc',x[2]); rh.parentNode.insertBefore(box,rh); box.appendChild(rh); box.appendChild(rw); }
+    scale(x[0],true,'Height','cm'); scale(x[1],false,'Weight','kg');
+  }
+  function run(){ W.forEach(wheel); HW.forEach(hw);
     age('body-age-slider','#2563eb',function(){ return BODY_AGE_GROUPS; },'.body-age-section');
     age('food-age-slider','#16a34a',function(){ return FOOD_AGE_BRACKETS; },'#sec-age'); }
   run(); var n=0, iv=setInterval(function(){ run(); if(++n>30) clearInterval(iv); },500);
