@@ -18516,7 +18516,16 @@ html body #rem-alarm-card .clk-laps li .tot{opacity:.65}
 html body #rem-alarm-card #clk-world-list .cri-main strong{font-size:1.35rem}
 html body #rem-alarm-card .clk-wadd{display:flex;gap:8px;margin:4px 0 6px}
 html body #rem-alarm-card .clk-wadd input{flex:1;min-width:0;padding:9px 12px;border-radius:10px;border:1.5px solid color-mix(in srgb,#0f766e 45%,#fff);font:inherit;background:#fff;color:#134e4a}
-html body #rem-alarm-card .clk-wres{display:flex;flex-direction:column;gap:2px;margin:0 0 8px}
+html body #rem-alarm-card .clk-wres{display:flex;flex-direction:column;gap:2px;margin:0 0 8px;max-height:280px;overflow-y:auto;border-radius:10px}
+html body #rem-alarm-card .clk-wres button[aria-disabled=true]{opacity:.5}
+html body #rem-alarm-card .clk-w-chev{flex:0 0 auto;color:#0f766e;font-size:.9rem;margin-left:4px}
+html body #rem-alarm-card .clk-w-body{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 14px 12px;font-size:.88rem;color:#134e4a}
+html body #rem-alarm-card .clk-wlook{margin:14px 0 0;padding:12px;border-radius:12px;background:color-mix(in srgb,#0f766e 6%,#fff);border:1px solid color-mix(in srgb,#0f766e 22%,#fff)}
+html body #rem-alarm-card .clk-wlook-t{font-weight:800;color:#0f766e;margin:0 0 8px;font-size:.92rem}
+html body #rem-alarm-card .clk-wprev{margin-top:10px;padding:10px 12px;border-radius:14px;background:#1f2937;color:#fff;font-size:.84rem}
+html body #rem-alarm-card .clk-wprev .wp-h{font-size:.7rem;opacity:.7;margin-bottom:4px}
+html body #rem-alarm-card .clk-wprev .wp-r{display:flex;justify-content:space-between;gap:10px;padding:2px 0}
+html body #rem-alarm-card .clk-wprev .wp-r b{font-size:.98rem;white-space:nowrap}
 html body #rem-alarm-card .clk-wres button{text-align:left;border:0;background:color-mix(in srgb,#0f766e 7%,#fff);border-radius:9px;padding:9px 12px;font:inherit;font-size:14px;color:#134e4a;cursor:pointer}
 html body #rem-alarm-card .clk-wres button small{opacity:.65;margin-left:6px}
 html body #rem-alarm-card .clk-wmsg{font-size:13px;color:#b45309;margin:0 0 8px}
@@ -18643,9 +18652,13 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
   function partWorld(){
     return '<div id="clk-world-list" class="ayu-list"></div>'
       +'<div class="ayu-add-row" id="clk-w-addrow"><button type="button" class="ayu-add-btn" id="clk-w-add"><span class="ayu-add-plus" aria-hidden="true">+</span><span>Add a city</span></button></div>'
-      +'<div id="clk-w-form" hidden><div class="clk-wadd"><input type="search" id="clk-w-q" placeholder="Search a city or country" aria-label="Search a city or country" autocomplete="off"><button type="button" class="cancel-reminder" id="clk-w-cancel">Cancel</button></div><div class="clk-wres" id="clk-w-res"></div></div>'
+      +'<div id="clk-w-form" hidden><div class="clk-wadd"><input type="search" id="clk-w-q" placeholder="Search a city or country" aria-label="Search a city or country" autocomplete="off"><button type="button" class="cancel-reminder" id="clk-w-cancel">Done</button></div><div class="clk-wres" id="clk-w-res"></div></div>'
       +'<p class="clk-wmsg" id="clk-w-msg" role="status"></p>'
-      +(APP?'<div class="clk-lock"><span class="t">Show on lock screen<span class="s">The times of these cities in a silent notification.</span></span><label class="master-switch" title="Show on lock screen"><input type="checkbox" id="clk-w-lock" aria-label="Show World Clock on the lock screen"></label></div>':'');
+      +(APP?'<div class="clk-wlook" id="clk-w-look" hidden><div class="clk-wlook-t">On the lock screen</div>'
+        +'<div class="ayu-al-row"><span class="ayu-al-lbl">Time format</span><select id="clk-w-fmt" aria-label="Time format"><option value="phone">As on the phone</option><option value="12">12-hour (2:30 PM)</option><option value="24">24-hour (14:30)</option></select></div>'
+        +'<div class="ayu-al-row"><span class="ayu-al-lbl">Show</span><select id="clk-w-place" aria-label="Show the city, the country or both"><option value="both">City and country</option><option value="city">City</option><option value="country">Country</option></select></div>'
+        +'<div class="ayu-al-row"><span class="ayu-al-lbl">Time zone</span><select id="clk-w-zone" aria-label="Show the time zone"><option value="0">Hidden</option><option value="1">Shown (GMT+5:30)</option></select></div>'
+        +'<div class="clk-wprev" id="clk-w-prev" aria-label="How it looks on the lock screen"></div></div>':'');
   }
 
   function infoMore(){
@@ -18825,7 +18838,7 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     function close(){ form.hidden=true; $('clk-w-addrow').hidden=false; res.innerHTML=''; }
     function search(){
       var s=qI.value.trim().toLowerCase(), d=new Date();
-      var hits=CITIES.filter(function(c){ return validTz(c[2]) && (!s || (c[0]+' '+c[1]).toLowerCase().indexOf(s)>=0); }).slice(0,8);
+      var hits=CITIES.filter(function(c){ return validTz(c[2]) && (!s || (c[0]+' '+c[1]).toLowerCase().indexOf(s)>=0); }).sort(function(a,b){ return (a[0]+a[1]).localeCompare(b[0]+b[1]); });   // every city, A to Z
       res.innerHTML=hits.length ? hits.map(function(c,i){ var dup=sameAs(c[2]); return '<button type="button" data-i="'+CITIES.indexOf(c)+'"'+(dup?' aria-disabled="true"':'')+'>'+esc(c[0])+', '+esc(c[1])+'<small>'+esc(cityTime(c[2],d))+(dup?' · same time as '+esc(dup.city):'')+'</small></button>'; }).join('')
         : '<p class="clk-note">No match. Try a bigger city nearby, or the country.</p>';
     }
@@ -18835,28 +18848,47 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
       var dup=sameAs(c[2]);
       if(dup){ msg.textContent=c[0]+' has the same time as '+dup.city+', which is already in your list.'; return; }
       if((W.list||[]).length>=MAX_CITIES){ msg.textContent='You can add up to '+MAX_CITIES+' cities.'; return; }
-      W.list=(W.list||[]).concat([{city:c[0],country:c[1],tz:c[2]}]); W.v=Date.now(); msg.textContent=''; close(); saveAll(); paintWorld(true);
+      W.list=(W.list||[]).concat([{city:c[0],country:c[1],tz:c[2],lock:false}]); W.v=Date.now(); msg.textContent=c[0]+' added.'; saveAll(); paintWorld(true);
+      if(W.list.length>=MAX_CITIES) close(); else search();   // the list stays open: add several cities, then Done
     });
-    var lk=$('clk-w-lock'); if(lk) lk.addEventListener('change',function(){ W.on=lk.checked; W.v=Date.now(); saveAll(); });
+    ['fmt','place','zone'].forEach(function(k){ var e=$('clk-w-'+k); if(!e) return; e.addEventListener('change',function(){ W[k]=k==='zone' ? e.value==='1' : e.value; W.v=Date.now(); saveAll(); paintWorld(true); }); });
+    $('clk-world-list').addEventListener('change',function(e){
+      var inp=e.target.closest('input[data-lock]'); if(!inp) return;
+      (W.list||[]).forEach(function(c){ if(c.tz===inp.dataset.lock) c.lock=inp.checked; });
+      W.on=(W.list||[]).some(function(c){ return c.lock; }); W.v=Date.now(); saveAll(); paintWorld(true);
+    });
     $('clk-world-list').addEventListener('click',function(e){
+      var hd=e.target.closest('.cri-hdr');
+      if(hd && APP && !e.target.closest('.custom-reminder-delete, .master-switch')){ var tzo=hd.parentNode.dataset.tz; worldOpen=worldOpen===tzo ? '' : tzo; paintWorld(true); return; }
       var del=e.target.closest('.custom-reminder-delete'); if(!del) return;
       var it=del.closest('[data-tz]'), tz=it.dataset.tz, idx=-1, saved=null;
       (W.list||[]).forEach(function(c,i){ if(c.tz===tz){ idx=i; saved=c; } }); if(idx<0) return;
-      W.list.splice(idx,1); W.v=Date.now(); saveAll(); paintWorld(true); msg.textContent='';
+      W.list.splice(idx,1); W.on=W.list.some(function(c){ return c.lock; }); W.v=Date.now(); saveAll(); paintWorld(true); msg.textContent='';
       if(window.ayuUndoAt) try{ window.ayuUndoAt($('clk-world-list').parentNode,$('clk-w-addrow'),saved.city+' removed',function(){ if(W.list.length<MAX_CITIES && !W.list.some(function(x){ return x.tz===saved.tz; })){ W.list.splice(Math.min(idx,W.list.length),0,saved); W.v=Date.now(); saveAll(); paintWorld(true); } }); }catch(e2){}
     });
   }
-  var worldDrawn='';
+  var worldDrawn='', worldOpen='';
   function paintWorld(force){
     var list=$('clk-world-list'); if(!list) return;
-    var d=new Date(), L=W.list||[], key=JSON.stringify(L)+'|'+d.getHours()+':'+d.getMinutes();
-    var lk=$('clk-w-lock'); if(lk) lk.checked=!!W.on;
+    var d=new Date(), L=W.list||[], key=JSON.stringify(L)+'|'+d.getHours()+':'+d.getMinutes()+'|'+worldOpen+'|'+[W.fmt,W.place,W.zone].join();
+    L.forEach(function(c){ if(typeof c.lock!=='boolean') c.lock=!!W.on; });   // an older list: the one switch becomes each city's own
+    var look=$('clk-w-look');
+    if(look){ var shown=L.filter(function(c){ return c.lock; }); look.hidden=!shown.length;
+      $('clk-w-fmt').value=/^(12|24)$/.test(W.fmt||'') ? W.fmt : 'phone'; $('clk-w-place').value=/^(city|country)$/.test(W.place||'') ? W.place : 'both'; $('clk-w-zone').value=W.zone ? '1' : '0';
+      $('clk-w-prev').innerHTML='<div class="wp-h">AyuBase6 · World Clock</div>'+shown.map(function(c){
+        var nm=W.place==='city' ? c.city : W.place==='country' ? c.country : c.city+', '+c.country, tm='', z='';
+        try{ var o={hour:'numeric',minute:'2-digit',timeZone:c.tz}; if(W.fmt==='12') o.hour12=true; else if(W.fmt==='24'){ o.hour12=false; o.hour='2-digit'; } tm=d.toLocaleTimeString([],o); }catch(e){ tm=cityTime(c.tz,d); }
+        if(W.zone){ try{ z=(new Intl.DateTimeFormat('en-US',{timeZone:c.tz,timeZoneName:'shortOffset'}).formatToParts(d).filter(function(x){ return x.type==='timeZoneName'; })[0]||{}).value||''; }catch(e){} }
+        return '<div class="wp-r"><span>'+esc(nm)+(z?' · '+esc(z):'')+'</span><b>'+esc(tm)+'</b></div>'; }).join('');
+    }
     $('clk-w-add').querySelector('span:last-child').textContent = L.length>=MAX_CITIES ? 'Add a city (up to '+MAX_CITIES+')' : 'Add a city';
     if(!force && key===worldDrawn) return; worldDrawn=key;
     list.innerHTML=L.map(function(c){
       var day=dayTxt(c.tz,d);
-      return '<div class="custom-reminder-item ayu-alarm-item" data-tz="'+esc(c.tz)+'"><div class="cri-hdr"><div class="cri-main"><strong>'+esc(cityTime(c.tz,d))+'</strong><div class="cri-sub">'+esc(c.city)+', '+esc(c.country)+' · '+esc(diffTxt(c.tz,d))+(day?' · '+day:'')+'</div></div>'
-        +'<button type="button" class="custom-reminder-delete" aria-label="Remove '+esc(c.city)+'" title="Remove">×</button></div></div>';
+      var op=APP && worldOpen===c.tz;
+      return '<div class="custom-reminder-item ayu-alarm-item'+(op?' open':'')+'" data-tz="'+esc(c.tz)+'"><div class="cri-hdr"'+(APP?' role="button" tabindex="0" aria-expanded="'+op+'"':'')+'><div class="cri-main"><strong>'+esc(cityTime(c.tz,d))+'</strong><div class="cri-sub">'+esc(c.city)+', '+esc(c.country)+' · '+esc(diffTxt(c.tz,d))+(day?' · '+day:'')+(APP && c.lock?' · on lock screen':'')+'</div></div>'
+        +'<button type="button" class="custom-reminder-delete" aria-label="Remove '+esc(c.city)+'" title="Remove">×</button>'+(APP?'<span class="clk-w-chev" aria-hidden="true">'+(op?'▴':'▾')+'</span>':'')+'</div>'
+        +(op?'<div class="clk-w-body"><span>Show on lock screen</span><label class="master-switch" title="Show on lock screen"><input type="checkbox" data-lock="'+esc(c.tz)+'"'+(c.lock?' checked':'')+' aria-label="Show '+esc(c.city)+' on the lock screen"></label></div>':'')+'</div>';
     }).join('');
     if(!L.length) list.innerHTML='<p class="clk-note">Add the cities you want to keep an eye on.</p>';
     try{ if(window.ayuListColours) window.ayuListColours(list); }catch(e){}
