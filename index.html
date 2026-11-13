@@ -20395,9 +20395,11 @@ html body #ayu-checklist #ayu-cl-prev{margin:12px 0 0 16px}
     if($('ayu-wake-prev')) done++;
     // Checks → Daily Checklist notifications: after the last setting (Vibrate on phones)
     var box=$('ayu-checklist'), nc=$('routines-notify-card');
-    if(box && nc && nc.parentNode===box && !$('ayu-cl-prev')){
+    var rp=$('routines-remind-panel');
+    if(box && nc && (nc.parentNode===box || rp) && !$('ayu-cl-prev')){
       var vc=$('routines-vibrate-card'), after=(vc && vc.parentNode===box) ? vc : nc;
-      after.insertAdjacentHTML('afterend',row('ayu-cl-prev'));
+      if(nc.parentNode===box) after.insertAdjacentHTML('afterend',row('ayu-cl-prev'));
+      else rp.insertAdjacentHTML('beforeend',row('ayu-cl-prev'));   // Notify Me now lives in My Day Plan: the button is the last thing in its settings
       $('ayu-cl-prev').querySelector('button').addEventListener('click',function(){
         var I=(typeof ROUTINE_NOTIFY_ITEMS!=='undefined' && ROUTINE_NOTIFY_ITEMS) || {}, it=I.water || I[Object.keys(I)[0]] || {title:'Drink Water',body:'Time for a glass of water.'};
         try{ var sel=nc.querySelector('select[id$="sound"]'); if(sel && sel.value && sel.value!=='none' && typeof playAlertPreset==='function') playAlertPreset(sel.value); }catch(e){}
@@ -20407,6 +20409,7 @@ html body #ayu-checklist #ayu-cl-prev{margin:12px 0 0 16px}
     if($('ayu-cl-prev')) done++;
     // keep the checklist row after Vibrate when Vibrate moves in later
     var vc2=$('routines-vibrate-card'), pr=$('ayu-cl-prev'); if(vc2 && pr && vc2.parentNode===pr.parentNode && (vc2.compareDocumentPosition(pr) & Node.DOCUMENT_POSITION_PRECEDING)) vc2.after(pr);
+    if(pr && pr.parentNode && pr.parentNode.id==='routines-remind-panel' && pr.parentNode.lastElementChild!==pr) pr.parentNode.appendChild(pr);   // stays last (Vibrate and Read aloud are added later)
     return done===2;
   }
   var n=0, iv=setInterval(function(){ build(); if(++n>60) clearInterval(iv); },500);
@@ -21370,20 +21373,11 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
 <style id="fixes-20261113b">
 /* My Day Plan: a gap between Wake-up Alarm and Notify Me */
 html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day:not(#ayu-x1){margin-top:18px !important}
-/* Notify Me fields laid out like the Wake-up Alarm rows: plain label on the left, its control beside it, no dots */
+/* Notify Me: its fields keep the Health Breaks look (as in Water); no extra space under the section; the mute icon in the Checks colour */
 html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day:not(#ayu-x1):not(#ayu-x2){padding-bottom:0 !important}
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .chk-lbl:not(.chk-dot):not(#ayu-x1):not(#ayu-x2)::before{content:"•";display:inline-block;width:10px;text-align:center;font-size:16px;font-weight:800;line-height:1;margin-right:6px;color:#a75b12}
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .chk-lbl:not(#ayu-x1):not(#ayu-x2),
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .otd-title:not(#ayu-x1):not(#ayu-x2),
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-lbl:not(#ayu-x1):not(#ayu-x2){font-size:13px !important;font-weight:400 !important;color:rgb(120,53,15) !important;letter-spacing:0 !important}
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-sound-row:not(#ayu-x1):not(#ayu-x2){flex-wrap:nowrap !important;margin-top:12px !important}
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-sound-row .chk-lbl:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto !important;min-width:92px !important;white-space:nowrap !important}
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-row:not(#ayu-x1):not(#ayu-x2),
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-vib-row:not(#ayu-x1):not(#ayu-x2){display:flex !important;align-items:center !important;justify-content:flex-start !important;gap:8px !important;margin-top:12px !important}
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-row > .ayu-speak-lbl:not(#ayu-x1):not(#ayu-x2),
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-vib-row > :first-child:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto !important;min-width:92px !important;margin:0 !important;white-space:nowrap !important}
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-row > .master-switch:not(#ayu-x1):not(#ayu-x2),
-html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-vib-row > .master-switch:not(#ayu-x1):not(#ayu-x2){margin-left:0 !important}
+html body #routines-panel #routines-remind-panel #ayu-cl-prev:not(#ayu-x1):not(#ayu-x2){display:flex !important;justify-content:center !important;margin:14px 0 0 !important;padding:0 !important;border:0 !important}
+html body #routines-panel #routines-remind-panel #ayu-cl-prev .row-dot{display:none}
+html body #routines-panel #chk-sound-mute:not(#ayu-x1):not(#ayu-x2){color:transparent !important;text-shadow:0 0 0 rgb(167,91,18) !important}
 /* Notes in Reminders take the Reminders colours (in Checks they keep the Checks colours) */
 html body #alerts-panel .ayu-lowvol:not(#ayu-x1){background:#f0fdfa;border-color:#5eead4;color:#134e4a}
 html body #alerts-panel .ayu-lowvol .lv-x:not(#ayu-x1){color:#0f766e}
