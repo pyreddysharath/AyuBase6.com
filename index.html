@@ -14168,7 +14168,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   QUICK[QUICK.length-1].html+='<div class="tour-choose one"><button type="button" class="q" data-m="full">▶ Full tour<small>'+fullLabel()+'</small></button></div>';
 
   var root=document.getElementById('tour-root'), spot=document.getElementById('tour-spot'), txt=document.getElementById('tour-text'), bar=document.getElementById('tour-bar');
-  var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0, choosing=false;
+  var cur=0, origTab=null, open=false, raf=0, auto=true, grp=null, gt0=0, frozen=0, choosing=false, openY=0;
   function mark(){ try{ localStorage.setItem(SEEN,'1'); }catch(e){} }
   function seen(){ try{ return !!localStorage.getItem(SEEN); }catch(e){ return true; } }
   function target(s){ var l=document.querySelectorAll(s.sel); return l[s.idx||0]||null; }
@@ -14323,7 +14323,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   // The start screen: Quick tour or Full tour, in the open section's colour
   function openTour(){
     if(open) return;
-    open=true; choosing=true; grp=null; mark();
+    openY=window.scrollY||0; open=true; choosing=true; grp=null; mark();
     try{ origTab=(typeof currentActiveTab!=='undefined')?currentActiveTab:null; }catch(e){ origTab=null; }
     try{ if(typeof closeAllFooterSections==='function') closeAllFooterSections(); }catch(e){}
     root.style.setProperty('--tc',FC); spot.style.display='none'; var fi=document.getElementById('tour-ficons'); if(fi) fi.style.display='none';
@@ -14338,8 +14338,9 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   }
   txt.addEventListener('click',function(e){ var b=e.target.closest && e.target.closest('button[data-m]'); if(!b || !open) return; e.stopPropagation(); start(b.dataset.m); });
   function close(){
-    if(!open) return; open=false; choosing=false; grp=null; STEPS=FULL; document.body.style.paddingBottom=''; root.classList.remove('on','choose'); spot.style.display='none'; mark();
+    if(!open) return; var wasChoosing=choosing; open=false; choosing=false; grp=null; STEPS=FULL; document.body.style.paddingBottom=''; root.classList.remove('on','choose'); spot.style.display='none'; mark();
     try{ if(typeof closeAllFooterSections==='function') closeAllFooterSections(); }catch(e){}
+    if(wasChoosing){ window.scrollTo(0,openY); return; }   // closed on the start screen (Not now): the page stays where it was
     try{ if(origTab && typeof switchTab==='function') switchTab(origTab); }catch(e){}
     window.scrollTo(0,0);
   }
@@ -20835,7 +20836,7 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
     $('na-all').addEventListener('click',function(){
       var old=$('na-ask'); if(old){ old.remove(); return; }
       var box=document.createElement('div'); box.id='na-ask'; box.className='notif-off-ask';
-      box.innerHTML='<p class="noa-q"><b>Turn off every reminder and alarm?</b></p><ul class="noa-list"><li>Their settings stay as they are.</li><li><b>Turn back on</b> brings these back.</li></ul><div class="noa-btns"><button type="button" class="noa-yes">Turn off</button><button type="button" class="noa-no">Cancel</button></div>';
+      box.innerHTML='<p class="noa-q"><b>Turn off every reminder and alarm?</b></p><ul class="noa-list"><li>Their settings stay as they are.</li></ul><div class="noa-btns"><button type="button" class="noa-yes">Turn off</button><button type="button" class="noa-no">Cancel</button></div>';
       this.after(box); setTimeout(function(){ try{ box.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} },60);
       box.querySelector('.noa-no').addEventListener('click',function(){ box.remove(); });
       box.querySelector('.noa-yes').addEventListener('click',function(){
@@ -20843,8 +20844,6 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
         box.remove(); setTimeout(build,150); setTimeout(paint,700);
       });
     });
-    if(lastOff.length){ var bk=document.createElement('button'); bk.type='button'; bk.className='na-all na-back'; bk.id='na-back'; bk.textContent='Turn back on ('+lastOff.length+')'; $('na-all').after(bk);
-      bk.addEventListener('click',function(){ list.forEach(function(x){ if(lastOff.indexOf(x[0]+'|'+x[1])<0) return; var o=x[3](); if(o && !o.checked) o.click(); }); lastOff=[]; setTimeout(build,150); setTimeout(paint,700); }); }
     paint();
   }
   function esc(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
