@@ -20977,7 +20977,7 @@ html body .ayu-num .ayu-num-u{font-size:.82rem;font-weight:700;opacity:.75;min-w
       b.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); set(+s.value+d); } });
     });
   }
-  function run(){ subIcons(); NUM.forEach(function(x){ addNum(x[0],x[1]); }); }
+  function run(){ subIcons(); }   // Age, Height and Weight now have a scroll wheel (fixes-20261113b)
   run(); var n=0, iv=setInterval(function(){ run(); if(++n>20) clearInterval(iv); },500);
 })();
 </script>
@@ -21336,6 +21336,72 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
   var n=0, iv=setInterval(function(){ var ok=start(); if(++n>40 || (ok && n>6)) clearInterval(iv); },400);
   // a changed text is kept even when another part of the page re-labels the list (shift schedule names)
   setInterval(function(){ var l=list(); if(!l || !start.done) return; var o=ed(); Object.keys(o.txt).forEach(function(k){ var cb=l.querySelector('.rout-cb[data-key="'+k+'"]'), tn=cb && textNode(cb); if(tn && tn.textContent!==o.txt[k]+' ') tn.textContent=o.txt[k]+' '; }); },2000);
+})();
+</script>
+<style id="fixes-20261113b">
+/* My Day Plan: a gap between Wake-up Alarm and Notify Me */
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day:not(#ayu-x1){margin-top:18px !important}
+/* Notify Me fields laid out like the Wake-up Alarm rows: plain label on the left, its control beside it, no dots */
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .chk-dot:not(#ayu-x1):not(#ayu-x2)::before,
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-row .ayu-speak-lbl:not(#ayu-x1):not(#ayu-x2)::before{content:none !important;display:none !important}
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .chk-lbl:not(#ayu-x1):not(#ayu-x2),
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .otd-title:not(#ayu-x1):not(#ayu-x2),
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-lbl:not(#ayu-x1):not(#ayu-x2){font-size:13px !important;font-weight:400 !important;color:rgb(120,53,15) !important;letter-spacing:0 !important}
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-sound-row:not(#ayu-x1):not(#ayu-x2){flex-wrap:nowrap !important;margin-top:12px !important}
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-sound-row .chk-lbl:not(#ayu-x1):not(#ayu-x2){flex:0 0 92px !important}
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-row:not(#ayu-x1):not(#ayu-x2),
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-vib-row:not(#ayu-x1):not(#ayu-x2){display:flex !important;align-items:center !important;justify-content:flex-start !important;gap:8px !important;margin-top:12px !important}
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-row > .ayu-speak-lbl:not(#ayu-x1):not(#ayu-x2),
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-vib-row > :first-child:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto !important;min-width:92px !important;margin:0 !important;white-space:nowrap !important}
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel .ayu-speak-row > .master-switch:not(#ayu-x1):not(#ayu-x2),
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-in-day #routines-remind-panel #chk-vib-row > .master-switch:not(#ayu-x1):not(#ayu-x2){margin-left:0 !important}
+/* Notes in Reminders take the Reminders colours (in Checks they keep the Checks colours) */
+html body #alerts-panel .ayu-lowvol:not(#ayu-x1){background:#f0fdfa;border-color:#5eead4;color:#134e4a}
+html body #alerts-panel .ayu-lowvol .lv-x:not(#ayu-x1){color:#0f766e}
+html body #alerts-panel .ayu-bgchk:not(#ayu-x1){background:#f0fdfa;border-color:#5eead4;color:#134e4a}
+html body #alerts-panel .ayu-bgchk .bg-btns button:not(#ayu-x1){border-color:#0f766e;color:#0f766e}
+html body #alerts-panel .ayu-bgchk .bg-x:not(#ayu-x1){color:#0f766e}
+/* Reminders: no expand / collapse-all chevron above the sections */
+html body #alerts-panel .ayu-rem-group > .ayu-part-title:not(#ayu-x1):not(#ayu-x2){display:none !important}
+/* Reminders and Vitals bar: the whole name shows (on two lines if needed); no patch behind the selected icon */
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button>span:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4):not(#ayu-x5){white-space:normal !important;overflow:visible !important;text-overflow:clip !important;line-height:1.15 !important;text-align:left}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button[aria-selected=true] svg:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){background:none !important;padding:0 !important;border-radius:0 !important;box-sizing:border-box !important}
+/* Age, Height, Weight: a scroll wheel under the slider */
+html body .ayu-wheel{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 2px;--wc:var(--footer-accent,#2563eb)}
+html body .ayu-wheel .aw-list{height:96px;width:96px;box-sizing:border-box;padding:32px 0;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain;border-radius:12px;outline:0;
+  background:linear-gradient(var(--wc),var(--wc)) 0 31px/100% 2px no-repeat,linear-gradient(var(--wc),var(--wc)) 0 63px/100% 2px no-repeat,color-mix(in srgb,var(--wc) 5%,#fff)}
+html body .ayu-wheel .aw-list::-webkit-scrollbar{display:none}
+html body .ayu-wheel .aw-list:focus-visible{box-shadow:0 0 0 2px var(--wc)}
+html body .ayu-wheel .aw-i{height:32px;line-height:32px;text-align:center;scroll-snap-align:center;font-weight:700;font-size:.92rem;color:#94a3b8;font-variant-numeric:tabular-nums;cursor:pointer;user-select:none}
+html body .ayu-wheel .aw-i.on{color:var(--wc);font-size:1.35rem}
+html body .ayu-wheel .aw-u{font-size:.86rem;font-weight:700;color:var(--wc);min-width:24px}
+</style>
+<script id="fixes-20261113b-js">
+(function(){
+  function $(i){ return document.getElementById(i); }
+  var W=[['body-age-slider','yrs','#2563eb','Age'],['food-age-slider','yrs','#16a34a','Age'],['height-slider','cm','#16a34a','Height'],['weight-slider','kg','#16a34a','Weight'],['calc-height-slider','cm','#0e7490','Height'],['calc-weight-slider','kg','#0e7490','Weight']], H=32;
+  function wheel(x){
+    var s=$(x[0]); if(!s) return;
+    var old=s.nextElementSibling; if(old && old.classList.contains('ayu-num')) old.remove();
+    if(s.dataset.ayuWheel) return; s.dataset.ayuWheel='1';
+    var mn=Math.round(+s.min||0), mx=Math.round(+s.max||100), h='';
+    for(var v=mn;v<=mx;v++) h+='<div class="aw-i">'+v+'</div>';
+    var w=document.createElement('div'); w.className='ayu-wheel'; w.style.setProperty('--wc',x[2]);
+    w.innerHTML='<div class="aw-list" tabindex="0" role="spinbutton" aria-label="'+x[3]+' in '+x[1]+': scroll to set" aria-valuemin="'+mn+'" aria-valuemax="'+mx+'">'+h+'</div><span class="aw-u">'+x[1]+'</span>';
+    s.after(w);
+    var list=w.firstChild, lock=0, last=0, t=null, on=null;
+    function mark(){ var i=Math.max(0,Math.min(mx-mn,Math.round(list.scrollTop/H))), el=list.children[i]; if(on!==el){ if(on) on.classList.remove('on'); if(el) el.classList.add('on'); on=el; } list.setAttribute('aria-valuenow',String(mn+i)); }
+    function setVal(v){ v=Math.max(mn,Math.min(mx,v)); if(v===Math.round(+s.value)) return; s.value=String(v); s.dispatchEvent(new Event('input',{bubbles:true})); s.dispatchEvent(new Event('change',{bubbles:true})); }
+    function toWheel(){ if(!list.offsetParent) return; var top=(Math.round(+s.value)-mn)*H; if(Math.abs(list.scrollTop-top)>1){ lock=Date.now()+300; list.scrollTop=top; } mark(); }
+    list.addEventListener('scroll',function(){ mark(); if(Date.now()<lock) return; last=Date.now(); clearTimeout(t); t=setTimeout(function(){ setVal(mn+Math.round(list.scrollTop/H)); },110); });
+    list.addEventListener('click',function(e){ var it=e.target.closest('.aw-i'); if(!it) return; list.scrollTo({top:[].indexOf.call(list.children,it)*H,behavior:'smooth'}); });
+    list.addEventListener('keydown',function(e){ var d=e.key==='ArrowUp'?-1:e.key==='ArrowDown'?1:0; if(!d) return; e.preventDefault(); setVal(Math.round(+s.value)+d); toWheel(); });
+    s.addEventListener('input',function(){ if(Date.now()-last>250) toWheel(); });
+    setInterval(function(){ if(Date.now()-last>700) toWheel(); },600);
+    toWheel();
+  }
+  function run(){ W.forEach(wheel); }
+  run(); var n=0, iv=setInterval(function(){ run(); if(++n>30) clearInterval(iv); },500);
 })();
 </script>
 </body>
