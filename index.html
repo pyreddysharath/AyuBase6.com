@@ -10,15 +10,15 @@ if(/[?&]ayu-popup=1(&|$)/.test(location.search)){try{window.stop()}catch(e){}try
 <title>AyuBase6 - Life Basics</title>
 
 <!-- Favicon and install icons: exact filled lotus SVG from #app-logo-mark, transparent outside the petals -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSI4IDEwIDQ4IDQ4Ij48cGF0aCBkPSJNIDAgLTEgQyAtMy4wMSAtNS4wMCwgLTkuNDAgLTEwLjUwLCAwLjAwIC0yMS4wMCBDIDkuNDAgLTEwLjUwLCAzLjAxIC01LjAwLCAwIC0xIFoiIGZpbGw9IiM2MGE1ZmEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMyIDM0KSByb3RhdGUoLTc1KSIvPgo8cGF0aCBkPSJNIDAgLTEgQyAtMy4wMSAtNS4wMCwgLTkuNDAgLTEwLjUwLCAwLjAwIC0yMS4wMCBDIDkuNDAgLTEwLjUwLCAzLjAxIC01LjAwLCAwIC0xIFoiIGZpbGw9IiM4NmVmYWMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMyIDM0KSByb3RhdGUoLTQ1KSIvPgo8cGF0aCBkPSJNIDAgLTEgQyAtMy4wMSAtNS4wMCwgLTkuNDAgLTEwLjUwLCAwLjAwIC0yMS4wMCBDIDkuNDAgLTEwLjUwLCAzLjAxIC01LjAwLCAwIC0xIFoiIGZpbGw9IiNmY2QzNGQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMyIDM0KSByb3RhdGUoLTE1KSIvPgo8cGF0aCBkPSJNIDAgLTEgQyAtMy4wMSAtNS4wMCwgLTkuNDAgLTEwLjUwLCAwLjAwIC0yMS4wMCBDIDkuNDAgLTEwLjUwLCAzLjAxIC01LjAwLCAwIC0xIFoiIGZpbGw9IiM1ZWVhZDQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMyIDM0KSByb3RhdGUoMTUpIi8+CjxwYXRoIGQ9Ik0gMCAtMSBDIC0zLjAxIC01LjAwLCAtOS40MCAtMTAuNTAsIDAuMDAgLTIxLjAwIEMgOS40MCAtMTAuNTAsIDMuMDEgLTUuMDAsIDAgLTEgWiIgZmlsbD0iI2E1YjRmYyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzIgMzQpIHJvdGF0ZSg0NSkiLz4KPHBhdGggZD0iTSAwIC0xIEMgLTMuMDEgLTUuMDAsIC05LjQwIC0xMC41MCwgMC4wMCAtMjEuMDAgQyA5LjQwIC0xMC41MCwgMy4wMSAtNS4wMCwgMCAtMSBaIiBmaWxsPSIjNjdlOGY5IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzMiAzNCkgcm90YXRlKDc1KSIvPjwvc3ZnPg==">
-<link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
-<link rel="icon" type="image/png" sizes="48x48" href="icons/icon-48.png">
-<link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSI4IDEwIDQ4IDQ4Ij48cGF0aCBkPSJNIDAgLTEgQyAtMy4wMSAtNS4wMCwgLTkuNDAgLTEwLjUwLCAwLjAwIC0yMS4wMCBDIDkuNDAgLTEwLjUwLCAzLjAxIC01LjAwLCAwIC0xIFoiIGZpbGw9IiM2MGE1ZmEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMyIDM0KSByb3RhdGUoLTc1KSIvPgo8cGF0aCBkPSJNIDAgLTEgQyAtMy4wMSAtNS4wMCwgLTkuNDAgLTEwLjUwLCAwLjAwIC0yMS4wMCBDIDkuNDAgLTEwLjUwLCAzLjAxIC01LjAwLCAwIC0xIFoiIGZpbGw9IiM4NmVmYWMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMyIDM0KSByb3RhdGUoLTQ1KSIvPgo8cGF0aCBkPSJNIDAgLTEgQyAtMy4wMSAtNS4wMCwgLTkuNDAgLTEwLjUwLCAwLjAwIC0yMS4wMCBDIDkuNDAgLTEwLjUwLCAzLjAxIC01LjAwLCAwIC0xIFoiIGZpbGw9IiNhNWI0ZmMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMyIDM0KSByb3RhdGUoLTE1KSIvPgo8cGF0aCBkPSJNIDAgLTEgQyAtMy4wMSAtNS4wMCwgLTkuNDAgLTEwLjUwLCAwLjAwIC0yMS4wMCBDIDkuNDAgLTEwLjUwLCAzLjAxIC01LjAwLCAwIC0xIFoiIGZpbGw9IiM2N2U4ZjkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMyIDM0KSByb3RhdGUoMTUpIi8+CjxwYXRoIGQ9Ik0gMCAtMSBDIC0zLjAxIC01LjAwLCAtOS40MCAtMTAuNTAsIDAuMDAgLTIxLjAwIEMgOS40MCAtMTAuNTAsIDMuMDEgLTUuMDAsIDAgLTEgWiIgZmlsbD0iI2ZjZDM0ZCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzIgMzQpIHJvdGF0ZSg0NSkiLz4KPHBhdGggZD0iTSAwIC0xIEMgLTMuMDEgLTUuMDAsIC05LjQwIC0xMC41MCwgMC4wMCAtMjEuMDAgQyA5LjQwIC0xMC41MCwgMy4wMSAtNS4wMCwgMCAtMSBaIiBmaWxsPSIjNWVlYWQ0IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzMiAzNCkgcm90YXRlKDc1KSIvPjwvc3ZnPg==">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png?v=2">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/icon-48.png?v=2">
+<link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png?v=2">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png?v=2">
 <link rel="manifest" href="config/manifest.json">
-<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=2">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AyuBase6">
@@ -128,7 +128,7 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 }
 #app-logo-mark{ width: var(--logo-w, clamp(73px, 12.5vw, 119px)); height: auto; flex: 0 0 auto; display: block; }
 /* Each petal is one section's own "Base6" wordmark colour — Body, Food,
-   Routines, Nudges, Mind, Vitals, left to right in the same order as the
+   Mind, Vitals, Checks, Reminders, left to right in the same order as the
    tab row below — so the mark stays fixed rather than swapping with the
    active tab. */
 #app-logo {
@@ -3699,10 +3699,10 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
   <div id="app-logo-wrap">
     <svg id="app-logo-mark" viewBox="9.5 11.5 45 27" aria-hidden="true"><path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#60a5fa" transform="translate(32 34) rotate(-75)"/>
 <path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#86efac" transform="translate(32 34) rotate(-45)"/>
-<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#fcd34d" transform="translate(32 34) rotate(-15)"/>
-<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#5eead4" transform="translate(32 34) rotate(15)"/>
-<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#a5b4fc" transform="translate(32 34) rotate(45)"/>
-<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#67e8f9" transform="translate(32 34) rotate(75)"/></svg>
+<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#a5b4fc" transform="translate(32 34) rotate(-15)"/>
+<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#67e8f9" transform="translate(32 34) rotate(15)"/>
+<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#fcd34d" transform="translate(32 34) rotate(45)"/>
+<path d="M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z" fill="#5eead4" transform="translate(32 34) rotate(75)"/></svg>
     <div id="app-logo">
       <span id="logo-heal">Ayu</span> <span id="logo-thee">Base6</span>
     </div>
@@ -13851,9 +13851,9 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   var GROUPS=[
     {id:'body',label:'Body',keys:['ayuBase6-body-choices']},
     {id:'food',label:'Food',keys:['ayuBase6-food-choices']},
+    {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1']},
     {id:'checks',label:'Checks',keys:['ayuBase6WakeUpTime','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-muted','ayuBase6-routine-days','ayuBase6-routine-alarm','ayuBase6-routine-edits']},
-    {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-rem-alarm','ayuBase6-rem-alarms','ayuBase6-timer','ayuBase6-world']},
-    {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1']}
+    {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-rem-alarm','ayuBase6-rem-alarms','ayuBase6-timer','ayuBase6-world']}
   ];
   var FP_KEY='ayu-backup-fingerprints', MAX_BYTES=2*1024*1024;
   window.ayuBackupGroups=GROUPS;   // also used by the app's backup to the Google account
@@ -14150,7 +14150,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   fsec('othersites',null,'<b>Our Other Sites</b>: tap one to open it.');
   STEPS.push({tab:null,sel:'#tour-again',idx:0,c:FC,kind:'tab',html:'<p><b>How it works</b>: tap it any time to see this tour again.</p>'});
   // Quick tour: one step per tab, the footer icons, and an end step that offers the full tour
-  var RANK={activity:0,nutrition:1,mind:2,routines:3,alerts:4,calculator:5};
+  var RANK={activity:0,nutrition:1,mind:2,calculator:3,routines:4,alerts:5};
   function inOrder(l){ var a=l.filter(function(s){ return s.tab!==null; }).map(function(s,i){ return [s,i]; }).sort(function(x,y){ return (RANK[x[0].tab]-RANK[y[0].tab]) || (x[1]-y[1]); }).map(function(x){ return x[0]; }), b=l.filter(function(s){ return s.tab===null; }); l.length=0; a.concat(b).forEach(function(s){ l.push(s); }); }
   inOrder(STEPS);
   var FULL=STEPS, QUICK=[];
@@ -18675,8 +18675,8 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
       +'<div class="ayu-add-row" id="clk-w-addrow"><button type="button" class="ayu-add-btn" id="clk-w-add"><span class="ayu-add-plus" aria-hidden="true">+</span><span>Add a city</span></button></div>'
       +'<div id="clk-w-form" hidden><div class="clk-wadd"><input type="search" id="clk-w-q" placeholder="Search a city or country" aria-label="Search a city or country" autocomplete="off"><button type="button" class="cancel-reminder" id="clk-w-cancel">Done</button></div><div class="clk-wres" id="clk-w-res"></div></div>'
       +'<p class="clk-wmsg" id="clk-w-msg" role="status"></p>'
+      +'<div class="wc-row" id="clk-w-fmtrow" hidden><span class="wc-l">Time format</span><select id="clk-w-fmt" aria-label="Time format"><option value="phone">'+(APP?'As on the phone':'As on this device')+'</option><option value="12">12-hour (2:30 PM)</option><option value="24">24-hour (14:30)</option></select></div>'
       +(APP?'<div class="clk-wlook" id="clk-w-look" hidden><div class="clk-wlook-t">On the lock screen</div>'
-        +'<div class="ayu-al-row"><span class="ayu-al-lbl">Time format</span><select id="clk-w-fmt" aria-label="Time format"><option value="phone">As on the phone</option><option value="12">12-hour (2:30 PM)</option><option value="24">24-hour (14:30)</option></select></div>'
         +'<div class="ayu-al-row"><span class="ayu-al-lbl">Show</span><select id="clk-w-place" aria-label="Show the city, the country or both"><option value="both">City and country</option><option value="city">City</option><option value="country">Country</option></select></div>'
         +'<div class="ayu-al-row"><span class="ayu-al-lbl">Time zone</span><select id="clk-w-zone" aria-label="Show the time zone"><option value="0">Hidden</option><option value="1">Shown (GMT+5:30)</option></select></div>'
         +'<div class="ayu-al-row"><span class="ayu-al-lbl">Clock style</span><select id="clk-w-style" aria-label="Clock style"><optgroup label="Digital"><option value="d1">Regular</option><option value="d2">Large and light</option><option value="d3">Bold</option><option value="d4">Display digits</option></optgroup><optgroup label="Clock faces (Android 12+)"><option value="f1">Face and name</option><option value="f2">Face, name and time</option><option value="f3">Face and bold name</option><option value="f4">Face beside the text</option></optgroup></select></div>'
@@ -18847,17 +18847,21 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     return (h?h+' h':'')+(h&&mm?' ':'')+(mm?mm+' min':'')+(m>0?' ahead':' behind');
   }
   function dayTxt(tz,d){ var p=parts(tz,d); if(!p) return ''; var a=Date.UTC(p.year,p.month-1,p.day), b=Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()); return a>b?'Tomorrow':a<b?'Yesterday':''; }
-  function cityTime(tz,d){ try{ return d.toLocaleTimeString([], {timeZone:tz,hour:'numeric',minute:'2-digit'}); }catch(e){ return ''; } }
-  function sameAs(tz){ var d=new Date(), o=offsetMin(tz,d); return (W.list||[]).filter(function(x){ return x.tz===tz || offsetMin(x.tz,d)===o; })[0]||null; }   // one city per time zone
+  function cityTime(tz,d){ try{ var o={timeZone:tz,hour:'numeric',minute:'2-digit'}; if(W.fmt==='12') o.hour12=true; else if(W.fmt==='24'){ o.hour12=false; o.hour='2-digit'; } return d.toLocaleTimeString([],o); }catch(e){ return ''; } }   // in the Time format chosen for World Clock
+  function gmtTxt(tz,d){ try{ return (new Intl.DateTimeFormat('en-US',{timeZone:tz,timeZoneName:'shortOffset'}).formatToParts(d).filter(function(x){ return x.type==='timeZoneName'; })[0]||{}).value||''; }catch(e){ return ''; } }
+  function sameAs(tz){ var d=new Date(), o=offsetMin(tz,d); return (W.list||[]).filter(function(x){ return x.tz!==replacing && (x.tz===tz || offsetMin(x.tz,d)===o); })[0]||null; }   // one city per time zone
   function validTz(tz){ try{ new Intl.DateTimeFormat('en-US',{timeZone:tz}); return true; }catch(e){ return false; } }
   function wireWorld(){
     var form=$('clk-w-form'), qI=$('clk-w-q'), res=$('clk-w-res'), msg=$('clk-w-msg');
     $('clk-w-add').addEventListener('click',function(){
       if((W.list||[]).length>=MAX_CITIES){ msg.textContent='You can add up to '+MAX_CITIES+' cities. Delete one to add another.'; return; }
-      msg.textContent=''; form.hidden=false; $('clk-w-addrow').hidden=true; qI.value=''; search(); qI.focus();
+      replacing=''; formHome(); msg.textContent=''; form.hidden=false; $('clk-w-addrow').hidden=true; qI.value=''; search(); qI.focus();
     });
-    $('clk-w-cancel').addEventListener('click',close);
-    function close(){ form.hidden=true; $('clk-w-addrow').hidden=false; res.innerHTML=''; }
+    $('clk-w-cancel').addEventListener('click',function(){ var was=replacing; close(); if(was) paintWorld(true); });
+    function close(){ replacing=''; formHome(); form.hidden=true; $('clk-w-addrow').hidden=false; res.innerHTML=''; }
+    wireWorld.change=function(tz){   // pick another city or time zone for this entry
+      replacing=tz; msg.textContent=''; form.hidden=false; $('clk-w-addrow').hidden=false; qI.value=''; paintWorld(true); search(); try{ qI.focus({preventScroll:true}); }catch(e){ qI.focus(); }
+    };
     function search(){
       var s=qI.value.trim().toLowerCase(), d=new Date();
       var hits=CITIES.filter(function(c){ return validTz(c[2]) && (!s || (c[0]+' '+c[1]).toLowerCase().indexOf(s)>=0); }).sort(function(a,b){ return (a[0]+a[1]).localeCompare(b[0]+b[1]); });   // every city, A to Z
@@ -18869,6 +18873,9 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
       var b=e.target.closest('button[data-i]'); if(!b) return; var c=CITIES[+b.dataset.i];
       var dup=sameAs(c[2]);
       if(dup){ msg.textContent=c[0]+' has the same time as '+dup.city+', which is already in your list.'; return; }
+      if(replacing){ var old=(W.list||[]).filter(function(x){ return x.tz===replacing; })[0];
+        if(old){ old.city=c[0]; old.country=c[1]; old.tz=c[2]; delete old.label; worldOpen=c[2]; W.v=Date.now(); msg.textContent='Changed to '+c[0]+'.'; }
+        close(); saveAll(); paintWorld(true); return; }
       if((W.list||[]).length>=MAX_CITIES){ msg.textContent='You can add up to '+MAX_CITIES+' cities.'; return; }
       W.list=(W.list||[]).concat([{city:c[0],country:c[1],tz:c[2],lock:APP}]); if(APP){ W.on=true; worldOpen=c[2]; } W.v=Date.now(); msg.textContent=c[0]+' added.'; close(); saveAll(); paintWorld(true);   // the search list closes; the new city opens with its lock-screen settings
     });
@@ -18880,28 +18887,33 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
       (W.list||[]).forEach(function(c){ if(c.tz===inp.dataset.lock) c.lock=inp.checked; });
       W.on=(W.list||[]).some(function(c){ return c.lock; }); W.v=Date.now(); saveAll(); paintWorld(true);
     });
+    $('clk-world-list').addEventListener('keydown',function(e){ var hd=e.target.closest && e.target.closest('.cri-hdr'); if(hd && e.target===hd && (e.key==='Enter' || e.key===' ')){ e.preventDefault(); hd.click(); } });
     $('clk-world-list').addEventListener('click',function(e){
       var hd=e.target.closest('.cri-hdr');
-      if(hd && APP && !e.target.closest('.custom-reminder-delete, .master-switch')){ var tzo=hd.parentNode.dataset.tz; worldOpen=worldOpen===tzo ? '' : tzo; paintWorld(true); return; }
-      var del=e.target.closest('.custom-reminder-delete'); if(!del) return;
+      if(hd){ var tzo=hd.parentNode.dataset.tz; if(replacing) close(); worldOpen=worldOpen===tzo ? '' : tzo; paintWorld(true); return; }
+      var chg=e.target.closest('.wc-change'); if(chg){ if(replacing) { close(); paintWorld(true); } else wireWorld.change(chg.closest('[data-tz]').dataset.tz); return; }
+      var del=e.target.closest('.wc-remove'); if(!del) return;
+      if(replacing) close();
       var it=del.closest('[data-tz]'), tz=it.dataset.tz, idx=-1, saved=null;
       (W.list||[]).forEach(function(c,i){ if(c.tz===tz){ idx=i; saved=c; } }); if(idx<0) return;
       W.list.splice(idx,1); W.on=W.list.some(function(c){ return c.lock; }); W.v=Date.now(); saveAll(); paintWorld(true); msg.textContent='';
       if(window.ayuUndoAt) try{ window.ayuUndoAt($('clk-world-list').parentNode,$('clk-w-addrow'),saved.city+' removed',function(){ if(W.list.length<MAX_CITIES && !W.list.some(function(x){ return x.tz===saved.tz; })){ W.list.splice(Math.min(idx,W.list.length),0,saved); W.v=Date.now(); saveAll(); paintWorld(true); } }); }catch(e2){}
     });
   }
-  var worldDrawn='', worldOpen='';
+  var worldDrawn='', worldOpen='', replacing='';
+  function formHome(){ var f=$('clk-w-form'), m=$('clk-w-msg'); if(f && m && f.nextElementSibling!==m) m.parentNode.insertBefore(f,m); }
   function paintWorld(force){
     var list=$('clk-world-list'); if(!list) return;
-    var d=new Date(), L=W.list||[], key=JSON.stringify(L)+'|'+d.getHours()+':'+d.getMinutes()+'|'+worldOpen+'|'+[W.fmt,W.place,W.zone,W.style].join();
+    var d=new Date(), L=W.list||[], key=JSON.stringify(L)+'|'+d.getHours()+':'+d.getMinutes()+'|'+worldOpen+'|'+replacing+'|'+[W.fmt,W.place,W.zone,W.style].join();
     L.forEach(function(c){ if(typeof c.lock!=='boolean') c.lock=!!W.on; });   // an older list: the one switch becomes each city's own
-    var look=$('clk-w-look');
+    var look=$('clk-w-look'), fmtRow=$('clk-w-fmtrow'), form=$('clk-w-form');
+    if($('clk-w-fmt')) $('clk-w-fmt').value=/^(12|24)$/.test(W.fmt||'') ? W.fmt : 'phone';
     if(look){ var shown=L.filter(function(c){ return c.lock; }); var stl=/^[df][1-4]$/.test(W.style||'') ? W.style : (W.style==='analog' ? 'f1' : 'd1'); $('clk-w-style').value=stl;
-      $('clk-w-fmt').value=/^(12|24)$/.test(W.fmt||'') ? W.fmt : 'phone'; $('clk-w-place').value=/^(city|country)$/.test(W.place||'') ? W.place : 'both'; $('clk-w-zone').value=W.zone ? '1' : '0';
+      $('clk-w-place').value=/^(city|country)$/.test(W.place||'') ? W.place : 'both'; $('clk-w-zone').value=W.zone ? '1' : '0';
       $('clk-w-prev').innerHTML='<div class="wp-h">AyuBase6 · World Clock</div>'+shown.map(function(c){
         var nm=c.label ? c.label : W.place==='city' ? c.city : W.place==='country' ? c.country : c.city+', '+c.country, tm='', z='';
         try{ var o={hour:'numeric',minute:'2-digit',timeZone:c.tz}; if(W.fmt==='12') o.hour12=true; else if(W.fmt==='24'){ o.hour12=false; o.hour='2-digit'; } tm=d.toLocaleTimeString([],o); }catch(e){ tm=cityTime(c.tz,d); }
-        if(W.zone){ try{ z=(new Intl.DateTimeFormat('en-US',{timeZone:c.tz,timeZoneName:'shortOffset'}).formatToParts(d).filter(function(x){ return x.type==='timeZoneName'; })[0]||{}).value||''; }catch(e){} }
+        if(W.zone) z=gmtTxt(c.tz,d);
         if(stl.charAt(0)==='f'){ var hh=0, mm=0; try{ var pp=new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:c.tz}).formatToParts(d); pp.forEach(function(x){ if(x.type==='hour') hh=+x.value%12; if(x.type==='minute') mm=+x.value; }); }catch(e){}
           return '<div class="wp-a"><i class="wp-f"><u style="transform:rotate('+((hh+mm/60)*30)+'deg)"></u><s style="transform:rotate('+(mm*6)+'deg)"></s></i><span class="wp-n"><span>'+esc(nm)+(z?' · '+esc(z):'')+'</span>'+((stl==='f2'||stl==='f4')?'<b>'+esc(tm)+'</b>':'')+'</span></div>'; }
         return '<div class="wp-r"><span>'+esc(nm)+(z?' · '+esc(z):'')+'</span><b>'+esc(tm)+'</b></div>'; }).join('');
@@ -18909,20 +18921,31 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     }
     $('clk-w-add').querySelector('span:last-child').textContent = L.length>=MAX_CITIES ? 'Add a city (up to '+MAX_CITIES+')' : 'Add a city';
     if(!force && key===worldDrawn) return; worldDrawn=key;
-    if(look && list.contains(look)) list.parentNode.appendChild(look);   // kept while the list is redrawn
+    // the pieces that live inside the open entry are kept while the list is redrawn
+    var focused=document.activeElement && form && form.contains(document.activeElement) ? document.activeElement : null;
+    if(look && list.contains(look)){ look.hidden=true; list.parentNode.appendChild(look); }
+    if(fmtRow && list.contains(fmtRow)){ fmtRow.hidden=true; list.parentNode.appendChild(fmtRow); }
+    if(form && list.contains(form)) formHome();
+    var CHEV='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.500l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    var LOCK='<svg class="wc-lock" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2Zm-7-2a2 2 0 0 1 4 0v2h-4V7Z"/></svg>';
     list.innerHTML=L.map(function(c){
-      var day=dayTxt(c.tz,d);
-      var op=APP && worldOpen===c.tz;
-      return '<div class="custom-reminder-item ayu-alarm-item'+(op?' open':'')+'" data-tz="'+esc(c.tz)+'"><div class="cri-hdr"'+(APP?' role="button" tabindex="0" aria-expanded="'+op+'"':'')+'><div class="cri-main"><strong>'+esc(cityTime(c.tz,d))+'</strong><div class="cri-sub">'+esc(c.city)+', '+esc(c.country)+' · '+esc(diffTxt(c.tz,d))+(day?' · '+day:'')+(APP && c.lock?' · on lock screen':'')+'</div></div>'
-        +'<button type="button" class="custom-reminder-delete" aria-label="Remove '+esc(c.city)+'" title="Remove">×</button>'+(APP?'<span class="clk-w-chev" aria-hidden="true">'+(op?'▴':'▾')+'</span>':'')+'</div>'
-        +(op?'<div class="clk-w-body"><span>Show on lock screen</span><label class="master-switch" title="Show on lock screen"><input type="checkbox" data-lock="'+esc(c.tz)+'"'+(c.lock?' checked':'')+' aria-label="Show '+esc(c.city)+' on the lock screen"></label></div>'
-          +(c.lock?'<div class="clk-w-body clk-w-name"><span>Name on lock screen</span><input type="text" maxlength="24" data-name="'+esc(c.tz)+'" value="'+esc(c.label||'')+'" placeholder="'+esc(c.city)+'" aria-label="Your own name for '+esc(c.city)+' on the lock screen"></div>':''):'')+'</div>';
+      var day=dayTxt(c.tz,d), op=worldOpen===c.tz, t=cityTime(c.tz,d), m=/^(.*?)\s*([AaPp]\.?[Mm]\.?)$/.exec(t);
+      return '<div class="custom-reminder-item ayu-alarm-item clk-wc'+(op?' open':'')+'" data-tz="'+esc(c.tz)+'"><div class="cri-hdr" role="button" tabindex="0" aria-expanded="'+op+'" aria-label="'+esc(c.city)+', '+esc(t)+'. '+(op?'Close':'Open')+' the settings"><div class="cri-main"><div class="wc-name"><span>'+esc(c.city)+'</span>'+(APP && c.lock?'<span class="wc-badge" title="On the lock screen">'+LOCK+'</span>':'')+'</div>'
+        +'<div class="cri-sub">'+esc(c.country)+' · '+esc(diffTxt(c.tz,d))+(day?' · '+day:'')+'</div></div>'
+        +'<strong class="wc-time">'+(m?esc(m[1])+'<small>'+esc(m[2].toUpperCase())+'</small>':esc(t))+'</strong><span class="clk-w-chev" aria-hidden="true">'+CHEV+'</span></div>'
+        +(op?'<div class="wc-body">'
+          +'<div class="wc-row"><span class="wc-l">Time zone</span><span class="wc-v">'+esc(gmtTxt(c.tz,d))+'</span><button type="button" class="wc-change" aria-label="Change the city or time zone of this entry">'+(replacing===c.tz?'Cancel':'Change')+'</button></div>'
+          +'<div class="wc-slot" data-slot="form"></div><div class="wc-slot" data-slot="fmt"></div>'
+          +(APP?'<div class="wc-row"><span class="wc-l">Show on lock screen</span><label class="master-switch" title="Show on lock screen"><input type="checkbox" data-lock="'+esc(c.tz)+'"'+(c.lock?' checked':'')+' aria-label="Show '+esc(c.city)+' on the lock screen"></label></div>'
+            +(c.lock?'<div class="wc-row clk-w-name"><span class="wc-l">Name on lock screen</span><input type="text" maxlength="24" data-name="'+esc(c.tz)+'" value="'+esc(c.label||'')+'" placeholder="'+esc(c.city)+'" aria-label="Your own name for '+esc(c.city)+' on the lock screen"></div><div class="wc-slot" data-slot="look"></div>':''):'')
+          +'<div class="wc-foot"><button type="button" class="wc-remove" aria-label="Remove '+esc(c.city)+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 3h6l1 2h4v2H4V5h4l1-2Zm-3 6h12l-1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 9Z"/></svg>Remove</button></div></div>':'')+'</div>';
     }).join('');
     if(!L.length) list.innerHTML='<p class="clk-note">Add the cities you want to keep an eye on.</p>';
-    if(look){   // the lock-screen settings sit right under the open city's switch, while that switch is on
-      var oc=L.filter(function(c){ return c.tz===worldOpen && c.lock; })[0], it=oc && list.querySelector('.custom-reminder-item.open');
-      if(it){ it.appendChild(look); look.hidden=false; } else look.hidden=true;
-    }
+    var it=list.querySelector('.clk-wc.open');
+    function slot(n){ return it && it.querySelector('.wc-slot[data-slot="'+n+'"]'); }
+    if(fmtRow){ if(slot('fmt')){ slot('fmt').appendChild(fmtRow); fmtRow.hidden=false; } else fmtRow.hidden=true; }
+    if(look){ if(slot('look')){ slot('look').appendChild(look); look.hidden=false; } else look.hidden=true; }   // the lock-screen settings sit right under the open city's switch, while that switch is on
+    if(form && replacing){ if(slot('form') && it.dataset.tz===replacing){ slot('form').appendChild(form); if(focused) try{ focused.focus({preventScroll:true}); }catch(e){} } else { replacing=''; form.hidden=true; $('clk-w-addrow').hidden=false; } }
     try{ if(window.ayuListColours) window.ayuListColours(list); }catch(e){}
   }
 
@@ -19021,12 +19044,12 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
       (document.body).appendChild(sec);
       $('au-btn').addEventListener('click',act);
       $('au-x').addEventListener('click',function(){ var n=window.ayuNative; if(n && n.updateCancel) n.updateCancel(); });
-      // background checks (between 9 AM and 9 PM), only in app versions that have them
+      // background checks (every 2 hours, 10 AM to 8 PM), only in app versions that have them
       var N=window.ayuNative;
       if(N && typeof N.updateChecksGet==='function'){
         N.updateChecksGet().then(function(n){
           var card=sec.querySelector('.au-card'); if(!card || $('au-auto')) return;
-          card.insertAdjacentHTML('afterend','<div class="au-auto-row"><span class="au-auto-l">Check automatically</span><label class="master-switch" title="Check automatically"><input type="checkbox" id="au-auto" aria-label="Check for updates automatically"></label></div><div class="au-note au-auto-note">At 9 AM and 9 PM, with a quiet notification.</div>');
+          card.insertAdjacentHTML('afterend','<div class="au-auto-row"><span class="au-auto-l">Check automatically</span><label class="master-switch" title="Check automatically"><input type="checkbox" id="au-auto" aria-label="Check for updates automatically"></label></div><div class="au-note au-auto-note">Every 2 hours from 10 AM to 8 PM, with a quiet notification.</div>');
           var sw=$('au-auto'); sw.checked=(isNaN(n)?2:n)>0;
           sw.addEventListener('change',function(){ N.updateChecksSet(sw.checked?2:0).catch(function(){}); });
         }).catch(function(){});
@@ -20959,8 +20982,8 @@ html body #sec-notifications .na-back{margin-top:8px}
 html body #sec-cookies #cookies-accept-btn:not(#ayu-x1){background:var(--footer-accent,#0d9488) !important;color:#fff !important;border:1.5px solid var(--footer-accent,#0d9488) !important}
 html body #sec-cookies #cookies-decline-btn:not(#ayu-x1){background:#fff !important;color:var(--footer-accent,#0d9488) !important;border:1.5px solid var(--footer-accent,#0d9488) !important}
 html body #sec-cookies #cookies-save-btn:not(#ayu-x1){background:color-mix(in srgb,var(--footer-accent,#0d9488) 12%,#fff) !important;color:color-mix(in srgb,var(--footer-accent,#0d9488) 85%,#000) !important;border:1.5px solid color-mix(in srgb,var(--footer-accent,#0d9488) 35%,#fff) !important}
-/* Tabs: Body, Food, Mind, Checks, Reminders, Vitals */
-html body .tab-btn.activity{order:1}html body .tab-btn.nutrition{order:2}html body .tab-btn.mind{order:3}html body .tab-btn.routines{order:4}html body .tab-btn.alerts{order:5}html body .tab-btn.calculator{order:6}
+/* Tabs: Body, Food, Mind, Vitals, Checks, Reminders */
+html body .tab-btn.activity{order:1}html body .tab-btn.nutrition{order:2}html body .tab-btn.mind{order:3}html body .tab-btn.calculator{order:4}html body .tab-btn.routines{order:5}html body .tab-btn.alerts{order:6}
 /* Reminders and Vitals: one toggle bar (icon and name), the selected part filled */
 html body .ayu-rem-tabs{--tb:#0f766e}html body .ayu-vit-tabs{--tb:#0e7490}
 html body .ayu-rem-tabs button:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):first-child,html body .ayu-vit-tabs button:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):nth-child(2){flex:1.45 1 0 !important}
@@ -21581,6 +21604,38 @@ html body #sec-backup [id^="subtab-"] .fst-ic:not(#ayu-x1){flex:0 0 14px;width:1
   setInterval(enforce,1500); setTimeout(enforce,700);
 })();
 </script>
+<style id="world-entries-20261114">
+/* World Clock entries: city on the left, time on the right, a chevron to open the settings */
+html body #rem-alarm-card #clk-world-list{display:flex;flex-direction:column;gap:10px}
+html body #rem-alarm-card #clk-world-list .clk-wc:not(#ayu-x1):not(#ayu-x2){margin:0 !important;padding:0 !important;border-radius:16px !important;overflow:hidden;display:block !important}
+html body #rem-alarm-card #clk-world-list .clk-wc > .cri-hdr:not(#ayu-x1):not(#ayu-x2){display:flex !important;align-items:center !important;gap:10px !important;padding:13px 12px 13px 16px !important;cursor:pointer;min-height:0 !important}
+html body #rem-alarm-card #clk-world-list .clk-wc .cri-main:not(#ayu-x1):not(#ayu-x2){flex:1 1 auto !important;min-width:0 !important;display:block !important}
+html body #rem-alarm-card #clk-world-list .clk-wc .wc-name{display:flex;align-items:center;gap:6px;font-size:1.08rem;font-weight:800;color:#134e4a;line-height:1.25}
+html body #rem-alarm-card #clk-world-list .clk-wc .wc-name > span:first-child{min-width:0;overflow-wrap:anywhere}
+html body #rem-alarm-card #clk-world-list .clk-wc .wc-badge{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:color-mix(in srgb,#0f766e 14%,#fff);color:#0f766e}
+html body #rem-alarm-card #clk-world-list .clk-wc .wc-lock{width:12px;height:12px}
+html body #rem-alarm-card #clk-world-list .clk-wc .cri-sub:not(#ayu-x1):not(#ayu-x2){margin:3px 0 0 !important;font-size:.8rem !important;line-height:1.35 !important;color:#134e4a !important;opacity:.78;white-space:normal !important;overflow:visible !important;text-overflow:clip !important}
+html body #rem-alarm-card #clk-world-list .clk-wc .wc-time:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto;font-size:1.55rem !important;font-weight:800;letter-spacing:-.01em;color:#0f766e;white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1}
+html body #rem-alarm-card #clk-world-list .clk-wc .wc-time small{font-size:.5em;font-weight:800;margin-left:3px;opacity:.85}
+html body #rem-alarm-card #clk-world-list .clk-wc .clk-w-chev:not(#ayu-x1):not(#ayu-x2){flex:0 0 30px;width:30px;height:30px;margin:0 !important;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:color-mix(in srgb,#0f766e 12%,#fff);color:#0f766e;transition:transform .2s}
+html body #rem-alarm-card #clk-world-list .clk-wc .clk-w-chev svg{width:18px;height:18px;display:block}
+html body #rem-alarm-card #clk-world-list .clk-wc.open .clk-w-chev{transform:rotate(180deg)}
+html body #rem-alarm-card #clk-world-list .clk-wc > .cri-hdr:focus-visible{outline:2px solid #0f766e;outline-offset:-2px;border-radius:16px}
+html body #rem-alarm-card #clk-world-list .wc-body{margin:0 10px 10px;padding:2px 12px;border-radius:12px;background:#fff;border:1px solid color-mix(in srgb,#0f766e 18%,#fff)}
+html body #rem-alarm-card #clk-world-list .wc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:50px;padding:7px 0;border-bottom:1px solid color-mix(in srgb,#0f766e 12%,#fff);font-size:.88rem;color:#134e4a}
+html body #rem-alarm-card #clk-world-list .wc-l{flex:0 0 auto;font-weight:700}
+html body #rem-alarm-card #clk-world-list .wc-v{flex:1 1 auto;min-width:0;text-align:right;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body #rem-alarm-card #clk-world-list .wc-row select:not(#ayu-x1):not(#ayu-x2){flex:0 1 215px;min-width:0;width:auto !important;margin:0 !important}
+html body #rem-alarm-card #clk-world-list .wc-change:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto;border:1.5px solid #0f766e !important;background:#fff !important;color:#0f766e !important;border-radius:10px !important;padding:6px 12px !important;font:inherit;font-size:.82rem !important;font-weight:700 !important;cursor:pointer;box-shadow:none !important;min-height:0 !important}
+html body #rem-alarm-card #clk-world-list .wc-slot:empty{display:none}
+html body #rem-alarm-card #clk-world-list .wc-slot[data-slot=form]{padding:10px 0 4px;border-bottom:1px solid color-mix(in srgb,#0f766e 12%,#fff)}
+html body #rem-alarm-card #clk-world-list .clk-w-name input:not(#ayu-x1){flex:0 1 190px}
+html body #rem-alarm-card #clk-world-list .wc-slot > .clk-wlook:not(#ayu-x1):not(#ayu-x2){margin:10px 0 !important;background:color-mix(in srgb,#0f766e 5%,#fff) !important}
+html body #rem-alarm-card #clk-world-list .wc-foot{display:flex;justify-content:flex-end;padding:9px 0}
+html body #rem-alarm-card #clk-world-list .wc-remove:not(#ayu-x1):not(#ayu-x2){display:inline-flex;align-items:center;gap:6px;border:1.5px solid #dc2626 !important;background:#fff !important;color:#b91c1c !important;border-radius:10px !important;padding:6px 12px !important;font:inherit;font-size:.82rem !important;font-weight:700 !important;cursor:pointer;box-shadow:none !important;min-height:0 !important}
+html body #rem-alarm-card #clk-world-list .wc-remove svg{width:15px;height:15px}
+@media (max-width:380px){ html body #rem-alarm-card #clk-world-list .clk-wc .wc-time:not(#ayu-x1):not(#ayu-x2){font-size:1.35rem !important} }
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">

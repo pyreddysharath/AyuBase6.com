@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'ayubase6-pwa-v9';   // v9: PDF tools and OCR loader served from lib/ on this site
+const CACHE_NAME = 'ayubase6-pwa-v10';   // v10: lotus petals in the new tab order (icons refreshed)
 // Videos and preview images from content/ are kept here the first time they are used.
 // Separate from CACHE_NAME so an app update does not throw the videos away.
 const MEDIA_CACHE = 'ayubase6-media-v2';
