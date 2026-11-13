@@ -8395,7 +8395,7 @@ const RECIPES_DATA = [
     <div class="footer-copyright"><strong class="footer-copyright-strong">© <span id="footer-year"></span> AyuBase6.com · All rights reserved</strong></div>
     <div class="footer-tabs-icons">
       <div class="footer-tab-btn" id="tab-backup" title="Backup &amp; Restore, Download App, Save Offline" onclick="showFooterSection('backup')">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
       </div>
       <div class="footer-tab-btn" id="tab-settings" title="Settings: notifications and cookies (a dot means one is on)" onclick="showFooterSection('settings')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.61-.22l-2.39.96a7 7 0 00-1.62-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 00-.61.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58c-.04.31-.07.63-.07.94s.03.63.07.94l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32c.13.22.39.31.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.48 0 .61-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg>
@@ -8939,7 +8939,7 @@ function nudgeOpenFromWindow(win, key){
 }
 // Phones: Reminders notifications carry two text buttons (Android shows them; iPhone does not).
 function nudgeDisableActions(){
-  return NUDGE_IS_PHONE ? [ {action:'disable-this', title:'Turn off this'}, {action:'disable-all', title:'Turn off all'} ] : undefined;
+  return NUDGE_IS_PHONE ? [ {action:'disable-this', title:'Turn off this'} ] : undefined;
 }
 function handleNudgeClick(key, action){
   if((action==='disable-this'||action==='disable-all') && /^(break|walk|drink|eyeex)$/.test(String(key))){
@@ -14093,7 +14093,8 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   tab('routines','.tab-btn.routines',C.checks,'Your day, from morning to night.');
   sec('routines','#start-my-day-card',0,C.checks,'<b>My Day Plan</b>: set your wake-up time, any time in 24 hours: slide the bar, or tap the time under it for a clock. Every check below is timed from it. Outside 4–10 AM it becomes a shift schedule, with meals, light and sleep adjusted.');
   sec('routines','#chk-alarm',0,C.checks,'<b>Wake-up Alarm</b>: rings at your wake-up time on the days you choose (or Once), with its sound, vibrate, ring time and snooze. <b>Preview notification</b> shows exactly how it rings.');
-  sec('routines','#ayu-checklist',0,C.checks,'<b>Daily Checklist</b>: the bell switch turns on reminders for each check: when to remind you, on which days, the sound (or mute), Read aloud and Vibrate.');
+  sec('routines','#routines-notify-card',0,C.checks,'<b>Notify Me</b>: reminders for each check: when to remind you, on which days, the sound (or mute), Read aloud and Vibrate.');
+  sec('routines','#ayu-checklist',0,C.checks,'<b>Daily Checklist</b>: your checks for the day, in three parts.');
   sec('routines','#ayu-checklist .ayu-cl-part',0,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.');
   sec('routines','#ayu-checklist .ayu-cl-part',1,C.checks,'<b>Afternoon</b>: the same ticks and tips for the middle of the day.');
   sec('routines','#ayu-checklist .ayu-cl-part',2,C.checks,'<b>Evening &amp; Night</b>: checks to wind down. Ticks start fresh each day.');
@@ -14146,6 +14147,9 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   fsec('othersites',null,'<b>Our Other Sites</b>: tap one to open it.');
   STEPS.push({tab:null,sel:'#tour-again',idx:0,c:FC,kind:'tab',html:'<p><b>How it works</b>: tap it any time to see this tour again.</p>'});
   // Quick tour: one step per tab, the footer icons, and an end step that offers the full tour
+  var RANK={activity:0,nutrition:1,mind:2,routines:3,alerts:4,calculator:5};
+  function inOrder(l){ var a=l.filter(function(s){ return s.tab!==null; }).map(function(s,i){ return [s,i]; }).sort(function(x,y){ return (RANK[x[0].tab]-RANK[y[0].tab]) || (x[1]-y[1]); }).map(function(x){ return x[0]; }), b=l.filter(function(s){ return s.tab===null; }); l.length=0; a.concat(b).forEach(function(s){ l.push(s); }); }
+  inOrder(STEPS);
   var FULL=STEPS, QUICK=[];
   function q(tab,sel,c,text,extra){ var s={tab:tab,sel:sel,idx:0,c:c,html:'<p>'+text+'</p>',kind:'tab',ms:3600}; if(extra) for(var k in extra) s[k]=extra[k]; QUICK.push(s); }
   q('activity','.tab-btn.activity',C.body,'<b>Body</b>: a weekly exercise or yoga plan for your age.');
@@ -14155,6 +14159,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   q('mind','.tab-btn.mind',C.mind,'<b>Mind</b>: short thoughts for a calmer day.');
   q('calculator','.tab-btn.calculator',C.vit,'<b>Vitals</b>: BMI, lab report insights and a tracker for your readings.');
   q(null,'.footer-tabs-icons',FC,'<b>At the bottom</b>: Backup &amp; Restore, Settings, Announcements, Help, Legal and Other sites.');
+  inOrder(QUICK);
   function mins(list){ var t=0; list.forEach(function(s){ t+=stepMs(s); }); return t; }
   function fullLabel(){ return 'about '+Math.max(1,Math.round(mins(FULL)/60000))+' min'; }
   q(null,'#tour-again',FC,'<b>That’s the quick tour.</b> Tap <b>How it works</b> any time to see it again.',{hold:true,ms:4000});
@@ -16590,13 +16595,15 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
 
   function opts(list,v){ return list.map(function(o){ return '<option value="'+o[0]+'"'+(String(o[0])===String(v)?' selected':'')+'>'+o[1]+'</option>'; }).join(''); }
   function toneOptions(){
-    var h=APP ? '<optgroup label="Phone"><option value="phone">Phone’s default alarm</option></optgroup>' : '';
+    var pt=[]; try{ pt=JSON.parse(localStorage.getItem('ayuPhoneTones')||'[]'); if(!Array.isArray(pt)) pt=[]; }catch(e){ pt=[]; }
+    var h=APP ? '<optgroup label="Phone"><option value="phone">Phone’s default alarm</option>'+pt.map(function(t){ return '<option value="'+esc(t.uri)+'">'+esc(t.title)+'</option>'; }).join('')+'</optgroup>' : '';
     h+='<optgroup label="AyuBase6 tones">'+APP_TONES.map(function(t){ return '<option value="'+t[0]+'">'+t[1]+'</option>'; }).join('')+'</optgroup>';
     var nm=ownName();
     h+='<optgroup label="Your own">'+(nm?'<option value="own">'+esc(nm)+'</option>':'')+'<option value="upload">Upload a sound…</option></optgroup>';
     h+='<option value="none">No sound (vibrate only)</option>';
     return h;
   }
+  window.ayuToneOptions=toneOptions;
   function infoHtml(id){
     if(id==='rem') return '<strong>Alarm</strong><ul>'
       +'<li><b>Add an alarm</b>, set it, then <b>Save</b>. Its switch turns it on or off; × deletes it.</li>'
@@ -20743,7 +20750,7 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
     });
     return out;
   }
-  var wrap=null, list=[], sure=0;
+  var wrap=null, list=[], sure=0, lastOff=[];
   function build(){
     var sec=$('sec-notifications'); if(!sec) return;
     if(!wrap){ wrap=document.createElement('div'); wrap.className='na-wrap'; wrap.id='notif-all';
@@ -20762,10 +20769,18 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
     wrap.querySelectorAll('.na-n').forEach(function(b){ b.addEventListener('click',function(){ list[+b.dataset.i][4](); }); });
     wrap.querySelectorAll('input[data-i]').forEach(function(inp){ inp.addEventListener('change',function(){ var o=list[+inp.dataset.i][3](); if(o && o.checked!==inp.checked) o.click(); setTimeout(paint,80); setTimeout(paint,600); }); });
     $('na-all').addEventListener('click',function(){
-      var b=this;
-      if(!sure){ sure=1; b.classList.add('sure'); b.textContent='Tap again to turn all off'; setTimeout(function(){ sure=0; b.classList.remove('sure'); b.textContent='Turn all off'; },3500); return; }
-      sure=0; list.forEach(function(x){ var o=x[3](); if(o && o.checked) o.click(); }); setTimeout(build,150); setTimeout(paint,700);
+      var old=$('na-ask'); if(old){ old.remove(); return; }
+      var box=document.createElement('div'); box.id='na-ask'; box.className='notif-off-ask';
+      box.innerHTML='<p class="noa-q"><b>Turn off every reminder and alarm?</b></p><ul class="noa-list"><li>Their settings stay as they are.</li><li><b>Turn back on</b> brings these back.</li></ul><div class="noa-btns"><button type="button" class="noa-yes">Turn off</button><button type="button" class="noa-no">Cancel</button></div>';
+      this.after(box); setTimeout(function(){ try{ box.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} },60);
+      box.querySelector('.noa-no').addEventListener('click',function(){ box.remove(); });
+      box.querySelector('.noa-yes').addEventListener('click',function(){
+        lastOff=[]; list.forEach(function(x){ var o=x[3](); if(o && o.checked){ lastOff.push(x[0]+'|'+x[1]); o.click(); } });
+        box.remove(); setTimeout(build,150); setTimeout(paint,700);
+      });
     });
+    if(lastOff.length){ var bk=document.createElement('button'); bk.type='button'; bk.className='na-all na-back'; bk.id='na-back'; bk.textContent='Turn back on ('+lastOff.length+')'; $('na-all').after(bk);
+      bk.addEventListener('click',function(){ list.forEach(function(x){ if(lastOff.indexOf(x[0]+'|'+x[1])<0) return; var o=x[3](); if(o && !o.checked) o.click(); }); lastOff=[]; setTimeout(build,150); setTimeout(paint,700); }); }
     paint();
   }
   function esc(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
@@ -20863,6 +20878,157 @@ html body .app-footer > .footer-copyright:not(#ayu-x1){display:block;text-align:
     }catch(e){}
     return r;
   };
+})();
+</script>
+<style id="looks-20261113">
+/* Settings buttons, three strengths in the open section's colour: solid (main), outline (second), tinted (help) */
+html body #sec-notifications .notif-help-card:not(#ayu-x1){display:flex;width:auto;max-width:100%;margin:14px auto 4px;padding:7px 16px;gap:8px;justify-content:center;border-radius:10px;font-weight:700;font-size:.9rem;
+  border:1.5px solid color-mix(in srgb,var(--footer-accent,#0d9488) 35%,#fff);background:color-mix(in srgb,var(--footer-accent,#0d9488) 12%,#fff);color:color-mix(in srgb,var(--footer-accent,#0d9488) 85%,#000)}
+html body #sec-notifications .notif-help-card .nhc-t{flex:0 1 auto}
+html body #sec-notifications .notif-help-card .nhc-t b{font-size:inherit}
+html body #sec-notifications .notif-help-card .nhc-t span,html body #sec-notifications .notif-help-card .nhc-go{display:none}
+html body #sec-notifications .notif-help-card svg{flex:0 0 18px;width:18px;height:18px;color:inherit}
+html body #sec-notifications .na-back{margin-top:8px}
+html body #sec-cookies #cookies-accept-btn:not(#ayu-x1){background:var(--footer-accent,#0d9488) !important;color:#fff !important;border:1.5px solid var(--footer-accent,#0d9488) !important}
+html body #sec-cookies #cookies-decline-btn:not(#ayu-x1){background:#fff !important;color:var(--footer-accent,#0d9488) !important;border:1.5px solid var(--footer-accent,#0d9488) !important}
+html body #sec-cookies #cookies-save-btn:not(#ayu-x1){background:color-mix(in srgb,var(--footer-accent,#0d9488) 12%,#fff) !important;color:color-mix(in srgb,var(--footer-accent,#0d9488) 85%,#000) !important;border:1.5px solid color-mix(in srgb,var(--footer-accent,#0d9488) 35%,#fff) !important}
+/* Tabs: Body, Food, Mind, Checks, Reminders, Vitals */
+html body .tab-btn.activity{order:1}html body .tab-btn.nutrition{order:2}html body .tab-btn.mind{order:3}html body .tab-btn.routines{order:4}html body .tab-btn.alerts{order:5}html body .tab-btn.calculator{order:6}
+/* Reminders and Vitals: one toggle bar (icon and name), the selected part filled */
+html body .ayu-rem-tabs{--tb:#0f766e}html body .ayu-vit-tabs{--tb:#0e7490}
+html body .ayu-rem-tabs button:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):first-child,html body .ayu-vit-tabs button:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):nth-child(2){flex:1.45 1 0 !important}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs):not(#ayu-x1):not(#ayu-x2){display:flex !important;gap:0 !important;border:2px solid var(--tb) !important;border-radius:12px !important;overflow:hidden;padding:0 !important;margin:0 0 12px !important;background:#fff !important}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){flex:1 1 0 !important;min-width:0;flex-direction:row !important;gap:5px !important;align-items:center !important;justify-content:center !important;min-height:40px !important;padding:6px 4px !important;border-radius:0 !important;border:0 !important;border-left:2px solid var(--tb) !important;background:#fff !important;color:var(--tb) !important;box-shadow:none !important}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):first-child{border-left:0 !important}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button[aria-selected=true]:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){background:var(--tb) !important;color:#fff !important}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button:not(#ayu-x1):not(#ayu-x2) svg:not(#ayu-x3){width:18px !important;height:18px !important;flex:0 0 18px}
+html body :is(.ayu-rem-tabs,.ayu-vit-tabs) button>span:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){display:block !important;font-size:12px !important;font-weight:700 !important;color:inherit !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Footer tabs under Backup & Restore: an icon before each name */
+html body .footer-subtab .fs-ic{width:15px;height:15px;vertical-align:-2px;margin-right:5px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Age, Height, Weight: − / + and a number to type, under the slider */
+html body .ayu-num{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin:8px 0 2px;--nc:var(--footer-accent,#2563eb)}
+html body .ayu-num button{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--nc);background:#fff;color:var(--nc);font:inherit;font-size:1.2rem;font-weight:800;line-height:1;cursor:pointer;padding:0;touch-action:manipulation}
+html body .ayu-num input{width:64px;height:34px;border-radius:10px;border:1.5px solid var(--nc);background:#fff;color:inherit;font:inherit;font-weight:700;text-align:center;padding:0 4px;-moz-appearance:textfield}
+html body .ayu-num input::-webkit-outer-spin-button,html body .ayu-num input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+html body .ayu-num .ayu-num-u{font-size:.82rem;font-weight:700;opacity:.75;min-width:22px}
+</style>
+<script id="looks-20261113-js">
+(function(){
+  function $(i){ return document.getElementById(i); }
+  // icons on the three tabs under Backup & Restore
+  var IC={ bkp:'<path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.500M20 4v4.500h-4.500M20 12a8 8 0 0 1-13.700 5.600L4 15.500M4 20v-4.500h4.500"/>',
+           offline:'<path d="M12 4v11M7.500 10.500 12 15l4.500-4.500M5 20h14"/>',
+           app:'<rect x="7" y="2.500" width="10" height="19" rx="2.200"/><path d="M12 14.500v-6M9.800 10.700 12 8.500l2.200 2.200M11 18.200h2"/>' };
+  function subIcons(){ Object.keys(IC).forEach(function(k){ var t=$('subtab-'+k); if(!t || t.querySelector('.fs-ic')) return; t.insertAdjacentHTML('afterbegin','<svg class="fs-ic" viewBox="0 0 24 24" aria-hidden="true">'+IC[k]+'</svg>'); }); }
+  // Age, Height, Weight: − / + and a number to type
+  var NUM=[['body-age-slider','yrs'],['food-age-slider','yrs'],['height-slider','cm'],['weight-slider','kg'],['calc-height-slider','cm'],['calc-weight-slider','kg']];
+  function addNum(id,unit){
+    var s=$(id); if(!s || s.dataset.ayuNum) return; s.dataset.ayuNum='1';
+    var row=document.createElement('div'); row.className='ayu-num';
+    row.innerHTML='<button type="button" data-d="-1" aria-label="Less">−</button><input type="number" inputmode="numeric" aria-label="'+(s.getAttribute('aria-label')||unit)+'"><span class="ayu-num-u">'+unit+'</span><button type="button" data-d="1" aria-label="More">+</button>';
+    s.after(row);
+    var inp=row.querySelector('input');
+    function lim(v){ var mn=+s.min||0, mx=+s.max||100; return Math.max(mn,Math.min(mx,Math.round(v))); }
+    function set(v){ if(isNaN(v)) { inp.value=s.value; return; } v=lim(v); inp.value=v; if(+s.value===v) return; s.value=v; s.dispatchEvent(new Event('input',{bubbles:true})); s.dispatchEvent(new Event('change',{bubbles:true})); }
+    function sync(){ if(document.activeElement!==inp && inp.value!==String(s.value)) inp.value=s.value; inp.min=s.min; inp.max=s.max; }
+    s.addEventListener('input',sync); setInterval(sync,700); sync();
+    inp.addEventListener('change',function(){ set(parseFloat(inp.value)); });
+    inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); inp.blur(); } });
+    inp.addEventListener('focus',function(){ try{ inp.select(); }catch(e){} });
+    row.querySelectorAll('button').forEach(function(b){
+      var d=+b.dataset.d, t=null, iv=null;
+      function stop(){ clearTimeout(t); clearInterval(iv); t=iv=null; }
+      b.addEventListener('pointerdown',function(e){ e.preventDefault(); set(+s.value+d); stop(); t=setTimeout(function(){ iv=setInterval(function(){ set(+s.value+d); },90); },450); });
+      ['pointerup','pointerleave','pointercancel'].forEach(function(n){ b.addEventListener(n,stop); });
+      b.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); set(+s.value+d); } });
+    });
+  }
+  function run(){ subIcons(); NUM.forEach(function(x){ addNum(x[0],x[1]); }); }
+  run(); var n=0, iv=setInterval(function(){ run(); if(++n>20) clearInterval(iv); },500);
+})();
+</script>
+<style id="checks-layout-20261113">
+/* Checks: Notify Me sits in My Day Plan, under Wake-up Alarm; Daily Checklist is only the list */
+html body #ayu-checklist .ayu-cl-bell:not(#ayu-x1),html body #ayu-checklist .ayu-cl-sw:not(#ayu-x1),html body #ayu-checklist .ayu-cl-chev:not(#ayu-x1){display:none !important}
+html body #ayu-checklist > .ayu-cl-hdr:not(#ayu-x1){cursor:default !important}
+html body #ayu-checklist > .ayu-cl-part:not(.ayu-cl-part ~ .ayu-cl-part):not(#ayu-x1){margin-top:6px !important}
+html body #routines-panel #start-my-day-card .ayu-fold-all:not(#ayu-x1){display:none !important}
+html body #routines-panel #start-my-day-card #routines-notify-card #ayu-cl-prev:not(#ayu-x1){margin:12px 0 0 !important;padding:0 !important;border:0 !important}
+</style>
+<script id="checks-layout-20261113-js">
+(function(){
+  function $(i){ return document.getElementById(i); }
+  function move(){
+    var box=$('ayu-checklist'), nc=$('routines-notify-card'), card=$('start-my-day-card'), al=$('chk-alarm'); if(!box || !nc || !card || !al) return false;
+    if(!box.querySelector('.ayu-cl-sw')) return false;   // the checklist has finished building
+    if(nc.parentNode!==card){ al.after(nc); nc.classList.add('ayu-in-day'); }
+    var vc=$('routines-vibrate-card'); if(vc && vc.parentNode===box) nc.after(vc);
+    var pv=$('ayu-cl-prev'), pn=$('routines-remind-panel'); if(pv && pn && pv.parentNode!==pn) pn.appendChild(pv);
+    return true;
+  }
+  var n=0, iv=setInterval(function(){ move(); if(++n>200) clearInterval(iv); },300);
+})();
+</script>
+<style id="sound-list-20261113">
+/* Sound: the app's own list (categories in their own colours) instead of the phone's pop-up */
+html body select.ayu-own-list{pointer-events:none}
+#ayu-snd{position:fixed;inset:0;z-index:2147483600;background:rgba(15,23,42,.55);display:flex;align-items:flex-end;justify-content:center}
+#ayu-snd .as-box{background:#fff;color:#1f2937;width:min(440px,100%);max-height:78vh;border-radius:18px 18px 0 0;display:flex;flex-direction:column;box-shadow:0 -8px 30px rgba(0,0,0,.25);font-size:.95rem}
+@media (min-width:700px){#ayu-snd{align-items:center}#ayu-snd .as-box{border-radius:18px}}
+#ayu-snd .as-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;font-weight:800;font-size:1.05rem;color:var(--as-c,#0f766e)}
+#ayu-snd .as-x{border:0;background:none;font-size:26px;line-height:1;color:#64748b;cursor:pointer;padding:0 4px}
+#ayu-snd .as-list{overflow:auto;padding:0 10px 12px;overscroll-behavior:contain}
+#ayu-snd .as-g{margin:10px 0 4px;padding:5px 10px;border-radius:8px;font-size:.76rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#fff;background:var(--g,#0f766e)}
+#ayu-snd .as-o{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;font:inherit;color:inherit;text-align:left;padding:10px 10px;border-radius:10px;cursor:pointer;border-left:4px solid color-mix(in srgb,var(--g,#0f766e) 35%,#fff);margin:2px 0}
+#ayu-snd .as-o.on{background:color-mix(in srgb,var(--g,#0f766e) 12%,#fff);font-weight:700;border-left-color:var(--g,#0f766e)}
+#ayu-snd .as-o i{flex:0 0 18px;width:18px;height:18px;border-radius:50%;border:2px solid var(--g,#0f766e);display:inline-block;box-sizing:border-box}
+#ayu-snd .as-o.on i{background:radial-gradient(circle,var(--g,#0f766e) 0 45%,transparent 50%)}
+</style>
+<script id="sound-list-20261113-js">
+(function(){
+  var SEL='select[id$="-sound"]:not(#eye-ex-count):not(#eye-ex-days), select[id$="-tone"], select[name="sound"], #chk-sound';
+  var GC={ 'phone':'#475569', 'your own':'#7c3aed' };
+  function accent(sel){ try{ var c=getComputedStyle(sel).borderTopColor; if(c && !/rgba?\(0, 0, 0(, 0)?\)|transparent/.test(c)) return c; }catch(e){} return '#0f766e'; }
+  function mark(){ document.querySelectorAll(SEL).forEach(function(s){ if(!s.classList.contains('ayu-own-list')) s.classList.add('ayu-own-list'); }); }
+  function close(){ var d=document.getElementById('ayu-snd'); if(d) d.remove(); }
+  function open(sel){
+    close();
+    var ac=accent(sel), d=document.createElement('div'); d.id='ayu-snd'; d.setAttribute('role','dialog'); d.setAttribute('aria-label','Sound'); d.style.setProperty('--as-c',ac);
+    var h='<div class="as-box"><div class="as-hd"><span>Sound</span><button type="button" class="as-x" aria-label="Close">×</button></div><div class="as-list">';
+    function opt(o,g){ return '<button type="button" class="as-o'+(o.value===sel.value?' on':'')+'" style="--g:'+g+'" data-v="'+o.value.replace(/"/g,'&quot;')+'"><i></i><span>'+o.textContent.replace(/</g,'&lt;')+'</span></button>'; }
+    [].forEach.call(sel.children,function(c){
+      if(c.tagName==='OPTGROUP'){ var g=GC[String(c.label).toLowerCase()]||ac; h+='<div class="as-g" style="--g:'+g+'">'+c.label+'</div>'; [].forEach.call(c.children,function(o){ h+=opt(o,g); }); }
+      else if(c.tagName==='OPTION') h+=opt(c, sel.querySelector('optgroup') ? '#64748b' : ac);
+    });
+    d.innerHTML=h+'</div></div>'; document.body.appendChild(d);
+    var on=d.querySelector('.as-o.on'); if(on) on.scrollIntoView({block:'center'});
+    d.addEventListener('click',function(e){
+      e.stopPropagation();
+      var b=e.target.closest('.as-o');
+      if(b){ var v=b.dataset.v; close(); if(sel.value!==v){ sel.value=v; sel.dispatchEvent(new Event('change',{bubbles:true})); } return; }
+      if(e.target===d || e.target.closest('.as-x')) close();
+    });
+  }
+  // the lists cannot be tapped themselves (so the phone's pop-up never opens): a tap on their place opens the app's list
+  document.addEventListener('click',function(e){
+    if(document.getElementById('ayu-snd') || e.clientX===undefined) return;
+    var hit=null; document.querySelectorAll('select.ayu-own-list').forEach(function(s){ if(hit || s.disabled || s.offsetParent===null) return; var r=s.getBoundingClientRect(); if(e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top && e.clientY<=r.bottom) hit=s; });
+    if(!hit) return;
+    var top=document.elementFromPoint(e.clientX,e.clientY); if(top && top.closest && top.closest('button, a, input')) return;   // something else is on top of it
+    e.preventDefault(); e.stopPropagation(); open(hit);
+  },true);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+  mark(); setInterval(mark,800);
+  // the phone's own alarm sounds and ringtones, for the alarm lists
+  function phoneTones(){
+    var n=window.ayuNative; if(!n || typeof n.listTones!=='function') return;
+    n.listTones().then(function(l){
+      if(!Array.isArray(l)) return; var s=JSON.stringify(l); try{ if(localStorage.getItem('ayuPhoneTones')===s) return; localStorage.setItem('ayuPhoneTones',s); }catch(e){ return; }
+      if(typeof window.ayuToneOptions!=='function') return;
+      ['wake-al-tone','rem-al-tone','remf-al-tone'].forEach(function(id){ var el=document.getElementById(id); if(!el) return; var v=el.value; el.innerHTML=window.ayuToneOptions(); el.value=v; });
+    }).catch(function(){});
+  }
+  setTimeout(phoneTones,2500);
 })();
 </script>
 </body>
