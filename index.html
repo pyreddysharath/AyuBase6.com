@@ -21375,6 +21375,19 @@ html body .ayu-wheel .aw-list:focus-visible{box-shadow:0 0 0 2px var(--wc)}
 html body .ayu-wheel .aw-i{height:32px;line-height:32px;text-align:center;scroll-snap-align:center;font-weight:700;font-size:.92rem;color:#94a3b8;font-variant-numeric:tabular-nums;cursor:pointer;user-select:none}
 html body .ayu-wheel .aw-i.on{color:var(--wc);font-size:1.35rem}
 html body .ayu-wheel .aw-u{font-size:.86rem;font-weight:700;color:var(--wc);min-width:24px}
+/* Age: bar view or wheel view (icon at the bottom right) */
+html body .ayu-age-box{position:relative}
+html body .ayu-age-box:not(.ayu-age-wheel) .ayu-wheel, html body .ayu-age-box:not(.ayu-age-wheel) .ayu-age-chips{display:none !important}
+html body .ayu-age-box.ayu-age-wheel input[type=range]:not(#ayu-x1){display:none !important}
+html body .ayu-age-box .ayu-wheel .aw-list{width:112px;border-radius:16px;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--wc) 25%,#fff);
+  background:linear-gradient(var(--wc),var(--wc)) 0 31px/100% 2px no-repeat,linear-gradient(var(--wc),var(--wc)) 0 63px/100% 2px no-repeat,
+  linear-gradient(color-mix(in srgb,var(--wc) 16%,#fff),#fff 34%,color-mix(in srgb,var(--wc) 9%,#fff) 34%,color-mix(in srgb,var(--wc) 9%,#fff) 66%,#fff 66%,color-mix(in srgb,var(--wc) 16%,#fff))}
+html body .ayu-age-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 44px 2px;position:relative;z-index:1}
+html body .ayu-age-chips button{border:1.5px solid var(--wc);background:#fff;color:var(--wc);border-radius:999px;padding:4px 10px;font:inherit;font-size:.76rem;font-weight:700;line-height:1.2;cursor:pointer;min-height:0;height:auto}
+html body .ayu-age-chips button.on{background:var(--wc);color:#fff}
+html body .ayu-age-box > .ayu-age-sw:not(#ayu-x1):not(#ayu-x2){position:absolute !important;left:auto !important;right:12px !important;bottom:12px !important;top:auto !important;margin:0 !important}
+html body .ayu-age-sw{position:absolute;right:10px;bottom:10px;z-index:2;width:34px;height:34px;padding:0;border-radius:10px;border:1.5px solid var(--wc);background:#fff;color:var(--wc);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+html body .ayu-age-sw svg{width:18px;height:18px}
 </style>
 <script id="fixes-20261113b-js">
 (function(){
@@ -21398,9 +21411,36 @@ html body .ayu-wheel .aw-u{font-size:.86rem;font-weight:700;color:var(--wc);min-
     list.addEventListener('keydown',function(e){ var d=e.key==='ArrowUp'?-1:e.key==='ArrowDown'?1:0; if(!d) return; e.preventDefault(); setVal(Math.round(+s.value)+d); toWheel(); });
     s.addEventListener('input',function(){ if(Date.now()-last>250) toWheel(); });
     setInterval(function(){ if(Date.now()-last>700) toWheel(); },600);
-    toWheel();
+    toWheel(); w._sync=toWheel; w._set=function(v){ setVal(v); toWheel(); };
+    return w;
   }
-  function run(){ W.forEach(wheel); }
+  // Age: the bar, or (icon at the bottom right) a wheel with the age groups under it; the choice is remembered
+  var KV='ayuAgeView';
+  var BAR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 12h16"/><circle cx="9" cy="12" r="3" fill="#fff"/></svg>';
+  var WHL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l4-4 4 4M8 17l4 4 4-4M12 3v18"/></svg>';
+  function view(){ try{ return localStorage.getItem(KV)==='wheel' ? 'wheel' : 'bar'; }catch(e){ return 'bar'; } }
+  function paintViews(){ document.querySelectorAll('.ayu-age-box').forEach(function(box){ var wv=view()==='wheel'; box.classList.toggle('ayu-age-wheel',wv);
+    var b=box.querySelector('.ayu-age-sw'); if(b){ b.innerHTML=wv?BAR:WHL; b.title=wv?'Show the bar':'Show the scroll wheel'; b.setAttribute('aria-label',b.title); }
+    var w=box.querySelector('.ayu-wheel'); if(w && w._sync) setTimeout(w._sync,30); }); }
+  function age(id,col,groups,boxSel){
+    var s=$(id); if(!s) return; var box=s.closest(boxSel); if(!box) return;
+    var w=s.nextElementSibling && s.nextElementSibling.classList.contains('ayu-wheel') ? s.nextElementSibling : null;
+    if(!w) return; if(box.classList.contains('ayu-age-box')) return;
+    box.classList.add('ayu-age-box'); box.style.setProperty('--wc',col);
+    var G=[]; try{ G=groups()||[]; }catch(e){}
+    var ch=document.createElement('div'); ch.className='ayu-age-chips'; ch.setAttribute('role','group'); ch.setAttribute('aria-label','Age group');
+    ch.innerHTML=G.map(function(g,i){ return '<button type="button" data-i="'+i+'">'+(g.max>=150 ? g.min+'+' : g.min+'–'+g.max)+'</button>'; }).join('');
+    w.after(ch);
+    function mark(){ var v=Math.round(+s.value); [].forEach.call(ch.children,function(b,i){ var on=v>=G[i].min && v<=G[i].max; b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on)); }); }
+    ch.addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; var g=G[+b.dataset.i], v=Math.round(+s.value); if(v>=g.min && v<=g.max) return; w._set(g.min); mark(); });
+    s.addEventListener('input',mark); setInterval(mark,800); mark();
+    var sw=document.createElement('button'); sw.type='button'; sw.className='ayu-age-sw';
+    sw.addEventListener('click',function(e){ e.stopPropagation(); try{ localStorage.setItem(KV,view()==='wheel'?'bar':'wheel'); }catch(e2){} paintViews(); });
+    box.appendChild(sw); paintViews();
+  }
+  function run(){ W.forEach(wheel);
+    age('body-age-slider','#2563eb',function(){ return BODY_AGE_GROUPS; },'.body-age-section');
+    age('food-age-slider','#16a34a',function(){ return FOOD_AGE_BRACKETS; },'#sec-age'); }
   run(); var n=0, iv=setInterval(function(){ run(); if(++n>30) clearInterval(iv); },500);
 })();
 </script>
