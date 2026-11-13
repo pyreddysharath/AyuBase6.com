@@ -21392,10 +21392,13 @@ html body .ayu-wheel .aw-i{height:32px;line-height:32px;text-align:center;scroll
 html body .ayu-wheel .aw-i.on{color:var(--wc);font-size:1.35rem}
 html body .ayu-wheel .aw-u{font-size:.86rem;font-weight:700;color:var(--wc);min-width:24px}
 /* Height and Weight: tape and scale */
-html body .ayu-hw{display:flex;gap:16px;align-items:center;margin:10px 0 4px;position:relative;z-index:1}
-html body .ayu-hw > .calc-row-stacked:first-child{flex:0 0 108px;min-width:0;margin:0 !important}
-html body .ayu-hw > .calc-row-stacked:last-child{flex:1 1 auto;min-width:0;margin:0 !important}
-html body .ayu-hw input.ayu-scale-src:not(#ayu-x1){display:none !important}
+html body .ayu-hw{position:relative;z-index:1;padding-bottom:46px}
+html body .ayu-hw:not(.ayu-hw-tape) .ayu-scale{display:none !important}
+html body .ayu-hw.ayu-hw-tape{display:flex;gap:16px;align-items:center;margin:10px 0 4px;padding-bottom:0}
+html body .ayu-hw.ayu-hw-tape > .calc-row-stacked:first-child{flex:0 0 108px;min-width:0;margin:0 !important}
+html body .ayu-hw.ayu-hw-tape > .calc-row-stacked:nth-child(2){flex:1 1 auto;min-width:0;margin:0 !important}
+html body .ayu-hw.ayu-hw-tape input.ayu-scale-src:not(#ayu-x1){display:none !important}
+html body .ayu-hw > .ayu-hw-sw:not(#ayu-x1):not(#ayu-x2){position:absolute !important;left:auto !important;top:auto !important;right:0 !important;bottom:0 !important;margin:0 !important}
 html body .ayu-scale{position:relative;margin-top:8px;border-radius:12px;overflow:hidden;background:color-mix(in srgb,var(--wc) 7%,#fff);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--wc) 28%,#fff)}
 html body .ayu-scale .as-track{scrollbar-width:none;overscroll-behavior:contain;outline:0;touch-action:none}
 html body .ayu-scale .as-track::-webkit-scrollbar{display:none}
@@ -21503,7 +21506,15 @@ html body .ayu-age-sw svg{width:18px;height:18px}
     var rh=h.closest('.calc-row-stacked'), rw=wt.closest('.calc-row-stacked'); if(!rh || !rw) return;
     if(!rh.parentNode.classList.contains('ayu-hw')){ var box=document.createElement('div'); box.className='ayu-hw'; box.style.setProperty('--wc',x[2]); rh.parentNode.insertBefore(box,rh); box.appendChild(rh); box.appendChild(rw); }
     scale(x[0],true,'Height','cm'); scale(x[1],false,'Weight','kg');
+    var box=rh.parentNode;
+    if(!box.querySelector('.ayu-age-sw')){ var sw=document.createElement('button'); sw.type='button'; sw.className='ayu-age-sw ayu-hw-sw';
+      sw.addEventListener('click',function(e){ e.stopPropagation(); try{ localStorage.setItem(KB,bmiView()==='tape'?'bar':'tape'); }catch(e2){} paintBmi(); });
+      box.appendChild(sw); paintBmi(); }
   }
+  var KB='ayuBmiView';
+  function bmiView(){ try{ return localStorage.getItem(KB)==='tape' ? 'tape' : 'bar'; }catch(e){ return 'bar'; } }
+  function paintBmi(){ document.querySelectorAll('.ayu-hw').forEach(function(box){ var tp=bmiView()==='tape'; box.classList.toggle('ayu-hw-tape',tp);
+    var b=box.querySelector('.ayu-hw-sw'); if(b){ b.innerHTML=tp?BAR:WHL; b.title=tp?'Show the bars':'Show the tape and scale'; b.setAttribute('aria-label',b.title); } }); }
   function run(){ W.forEach(wheel); HW.forEach(hw);
     age('body-age-slider','#2563eb',function(){ return BODY_AGE_GROUPS; },'.body-age-section');
     age('food-age-slider','#16a34a',function(){ return FOOD_AGE_BRACKETS; },'#sec-age'); }
