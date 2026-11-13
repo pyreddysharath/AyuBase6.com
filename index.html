@@ -18537,6 +18537,15 @@ html body #rem-alarm-card .clk-wprev.analog .wp-h{flex:0 0 100%}
 html body #rem-alarm-card .clk-wprev .wp-a{text-align:center;font-size:.76rem}
 html body #rem-alarm-card .clk-wprev .wp-f{display:block;position:relative;width:46px;height:46px;border:2px solid #fff;border-radius:50%;margin:0 auto 4px}
 html body #rem-alarm-card .clk-wprev .wp-f u, html body #rem-alarm-card .clk-wprev .wp-f s{position:absolute;left:50%;bottom:50%;width:2px;margin-left:-1px;background:#fff;transform-origin:50% 100%;border-radius:1px;text-decoration:none}
+html body #rem-alarm-card .clk-wprev.d2 .wp-r b{font-size:1.55rem;font-weight:300}
+html body #rem-alarm-card .clk-wprev.d3 .wp-r b{font-size:1.25rem;font-weight:800}
+html body #rem-alarm-card .clk-wprev.d4 .wp-r b{font-size:1.2rem;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:1px}
+html body #rem-alarm-card .clk-wprev .wp-n{display:block}html body #rem-alarm-card .clk-wprev .wp-n b{display:block;font-size:.86rem}
+html body #rem-alarm-card .clk-wprev.f3 .wp-n span{font-size:.92rem;font-weight:800}
+html body #rem-alarm-card .clk-wprev.f4{display:block}
+html body #rem-alarm-card .clk-wprev.f4 .wp-a{display:flex;align-items:center;gap:10px;text-align:left;margin-top:6px}
+html body #rem-alarm-card .clk-wprev.f4 .wp-f{margin:0;width:38px;height:38px;flex:0 0 38px}
+html body #rem-alarm-card .clk-wprev.f4 .wp-n span{opacity:.8}html body #rem-alarm-card .clk-wprev.f4 .wp-n b{font-size:.98rem}
 html body #rem-alarm-card .clk-wprev .wp-f u{height:12px}html body #rem-alarm-card .clk-wprev .wp-f s{height:18px;background:#5eead4}
 html body #rem-alarm-card .clk-wmsg:empty{display:none}
 html body #rem-alarm-card .clk-lock{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;margin-top:8px;border-radius:14px;border:1.5px solid color-mix(in srgb,#0f766e 25%,#fff);background:color-mix(in srgb,#0f766e 5%,#fff)}
@@ -18667,7 +18676,7 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
         +'<div class="ayu-al-row"><span class="ayu-al-lbl">Time format</span><select id="clk-w-fmt" aria-label="Time format"><option value="phone">As on the phone</option><option value="12">12-hour (2:30 PM)</option><option value="24">24-hour (14:30)</option></select></div>'
         +'<div class="ayu-al-row"><span class="ayu-al-lbl">Show</span><select id="clk-w-place" aria-label="Show the city, the country or both"><option value="both">City and country</option><option value="city">City</option><option value="country">Country</option></select></div>'
         +'<div class="ayu-al-row"><span class="ayu-al-lbl">Time zone</span><select id="clk-w-zone" aria-label="Show the time zone"><option value="0">Hidden</option><option value="1">Shown (GMT+5:30)</option></select></div>'
-        +'<div class="ayu-al-row"><span class="ayu-al-lbl">Clock style</span><select id="clk-w-style" aria-label="Clock style"><option value="digital">Digital</option><option value="analog">Clock faces (Android 12+)</option></select></div>'
+        +'<div class="ayu-al-row"><span class="ayu-al-lbl">Clock style</span><select id="clk-w-style" aria-label="Clock style"><optgroup label="Digital"><option value="d1">Regular</option><option value="d2">Large and light</option><option value="d3">Bold</option><option value="d4">Display digits</option></optgroup><optgroup label="Clock faces (Android 12+)"><option value="f1">Face and name</option><option value="f2">Face, name and time</option><option value="f3">Face and bold name</option><option value="f4">Face beside the text</option></optgroup></select></div>'
         +'<div class="clk-wprev" id="clk-w-prev" aria-label="How it looks on the lock screen"></div></div>':'');
   }
 
@@ -18884,16 +18893,16 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     var d=new Date(), L=W.list||[], key=JSON.stringify(L)+'|'+d.getHours()+':'+d.getMinutes()+'|'+worldOpen+'|'+[W.fmt,W.place,W.zone,W.style].join();
     L.forEach(function(c){ if(typeof c.lock!=='boolean') c.lock=!!W.on; });   // an older list: the one switch becomes each city's own
     var look=$('clk-w-look');
-    if(look){ var shown=L.filter(function(c){ return c.lock; }); $('clk-w-style').value=W.style==='analog' ? 'analog' : 'digital';
+    if(look){ var shown=L.filter(function(c){ return c.lock; }); var stl=/^[df][1-4]$/.test(W.style||'') ? W.style : (W.style==='analog' ? 'f1' : 'd1'); $('clk-w-style').value=stl;
       $('clk-w-fmt').value=/^(12|24)$/.test(W.fmt||'') ? W.fmt : 'phone'; $('clk-w-place').value=/^(city|country)$/.test(W.place||'') ? W.place : 'both'; $('clk-w-zone').value=W.zone ? '1' : '0';
       $('clk-w-prev').innerHTML='<div class="wp-h">AyuBase6 · World Clock</div>'+shown.map(function(c){
         var nm=c.label ? c.label : W.place==='city' ? c.city : W.place==='country' ? c.country : c.city+', '+c.country, tm='', z='';
         try{ var o={hour:'numeric',minute:'2-digit',timeZone:c.tz}; if(W.fmt==='12') o.hour12=true; else if(W.fmt==='24'){ o.hour12=false; o.hour='2-digit'; } tm=d.toLocaleTimeString([],o); }catch(e){ tm=cityTime(c.tz,d); }
         if(W.zone){ try{ z=(new Intl.DateTimeFormat('en-US',{timeZone:c.tz,timeZoneName:'shortOffset'}).formatToParts(d).filter(function(x){ return x.type==='timeZoneName'; })[0]||{}).value||''; }catch(e){} }
-        if(W.style==='analog'){ var hh=0, mm=0; try{ var pp=new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:c.tz}).formatToParts(d); pp.forEach(function(x){ if(x.type==='hour') hh=+x.value%12; if(x.type==='minute') mm=+x.value; }); }catch(e){}
-          return '<div class="wp-a"><i class="wp-f"><u style="transform:rotate('+((hh+mm/60)*30)+'deg)"></u><s style="transform:rotate('+(mm*6)+'deg)"></s></i><span>'+esc(nm)+(z?' · '+esc(z):'')+'</span></div>'; }
+        if(stl.charAt(0)==='f'){ var hh=0, mm=0; try{ var pp=new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:c.tz}).formatToParts(d); pp.forEach(function(x){ if(x.type==='hour') hh=+x.value%12; if(x.type==='minute') mm=+x.value; }); }catch(e){}
+          return '<div class="wp-a"><i class="wp-f"><u style="transform:rotate('+((hh+mm/60)*30)+'deg)"></u><s style="transform:rotate('+(mm*6)+'deg)"></s></i><span class="wp-n"><span>'+esc(nm)+(z?' · '+esc(z):'')+'</span>'+((stl==='f2'||stl==='f4')?'<b>'+esc(tm)+'</b>':'')+'</span></div>'; }
         return '<div class="wp-r"><span>'+esc(nm)+(z?' · '+esc(z):'')+'</span><b>'+esc(tm)+'</b></div>'; }).join('');
-      $('clk-w-prev').classList.toggle('analog',W.style==='analog');
+      $('clk-w-prev').className='clk-wprev '+stl+(stl.charAt(0)==='f'?' analog':'');
     }
     $('clk-w-add').querySelector('span:last-child').textContent = L.length>=MAX_CITIES ? 'Add a city (up to '+MAX_CITIES+')' : 'Add a city';
     if(!force && key===worldDrawn) return; worldDrawn=key;
