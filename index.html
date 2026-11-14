@@ -1883,6 +1883,10 @@ h2{font-size:1.18rem;color:var(--g1);margin-bottom:14px;
 .rec-meal-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:#4a6151;flex:0 0 auto}
 .rec-meal-name{font-size:.84rem;color:#243b2b;font-weight:700;text-align:right}
 .rec-meal-detail{display:none;margin:-2px 0 10px}
+.rec-alts{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:-2px 0 8px 12px}
+.rec-alt-l{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:#4a6151}
+.rec-alt{font:inherit;font-size:.76rem;font-weight:600;color:#166534;background:#fff;border:1.5px solid var(--g5);border-radius:999px;padding:3px 10px;cursor:pointer}
+.rec-alt:hover{background:var(--g7)}
 .rec-meal-detail.open{display:block}
 
 .rcard{border-radius:9px;border:1.5px solid var(--g5);padding:13px 15px;
@@ -6566,10 +6570,24 @@ function buildRecipes(diets){
   let list=RECIPES_DATA.filter(r=>r.diet.some(d=>diets.includes(d)));
   if(!diets.includes('non-veg')) list=list.filter(r=>!r.diet.every(d=>d==='non-veg'));
 
-  const breakfastPool=list.filter(r=>r.category==='breakfast');
-  const mainPool=list.filter(r=>r.category==='veg'||r.category==='non-veg');
-  const snackPool=list.filter(r=>r.category==='snack'||r.category==='drinks');
-  const MEALS=[['Breakfast',breakfastPool,0],['Lunch',mainPool,0],['Snacks',snackPool,0],['Dinner',mainPool,1]];
+  // Each recipe says which meals it suits (meals:[...]); dinner takes only light dishes.
+  const inMeal=(r,m)=>Array.isArray(r.meals) && r.meals.indexOf(m)>=0;
+  const breakfastPool=list.filter(r=>inMeal(r,'breakfast'));
+  const lunchPool=list.filter(r=>inMeal(r,'lunch'));
+  const dinnerPool=list.filter(r=>inMeal(r,'dinner'));
+  const snackPool=list.filter(r=>inMeal(r,'snack'));
+  const MEALS=[['Breakfast',breakfastPool,0],['Lunch',lunchPool,0],['Snacks',snackPool,0],['Dinner',dinnerPool,1]];
+  const gcd=(a,b)=>b?gcd(b,a%b):a;
+  // the planned dish and two alternatives of the same kind
+  function pickOptions(pool,di,k,avoid){
+    const n=pool.length, step=[5,7,3,11,13,1].find(x=>gcd(x,n)===1);
+    let i=(di*step+k*Math.ceil(n/2))%n;
+    if(avoid && pool[i].id===avoid) i=(i+1)%n;
+    const out=[pool[i]], gap=Math.max(1,Math.floor(n/3));
+    for(let a=1;out.length<3 && a<=n;a++){ const c=pool[(i+gap*a)%n]; if(!out.includes(c) && c.id!==avoid) out.push(c); }
+    for(let a=1;out.length<3 && a<n;a++){ const c=pool[(i+a)%n]; if(!out.includes(c)) out.push(c); }
+    return out;
+  }
 
   const sec=document.createElement('div'); sec.className='rec-section';
   sec.innerHTML=`<div class="advisory-hdr" id="rec-advisory-hdr">
@@ -6607,6 +6625,7 @@ function buildRecipes(diets){
     nav.appendChild(tab);
 
     const panel=document.createElement('div'); panel.className='rec-day-panel'+(di===todayRec?' active':'');
+    let lunchId='';
     MEALS.forEach(([label,pool,offset])=>{
       const mealRow=document.createElement('div'); mealRow.className='rec-meal-row';
       if(!pool.length){
@@ -6614,16 +6633,26 @@ function buildRecipes(diets){
         panel.appendChild(mealRow);
         return;
       }
-      const idx=(di+offset*Math.ceil(pool.length/2))%pool.length;
-      const r=pool[idx];
-      mealRow.innerHTML=`<span class="rec-meal-label">${label}</span><span class="rec-meal-name">${r.name}</span>`;
+      const cur=pickOptions(pool,di,offset,label==='Dinner'?lunchId:'');
+      if(label==='Lunch') lunchId=cur[0].id;
       const detail=document.createElement('div'); detail.className='rcard rec-meal-detail';
-      detail.innerHTML=buildRecipeCardHtml(r);
+      const altRow=document.createElement('div'); altRow.className='rec-alts';
+      function paint(){
+        mealRow.innerHTML=`<span class="rec-meal-label">${label}</span><span class="rec-meal-name">${cur[0].name}</span>`;
+        detail.innerHTML=buildRecipeCardHtml(cur[0]);
+        altRow.innerHTML=cur.length>1?`<span class="rec-alt-l">Or</span>`+cur.slice(1).map((a,i)=>`<button type="button" class="rec-alt" data-i="${i+1}">${a.name}</button>`).join(''):'';
+      }
+      paint();
+      altRow.addEventListener('click',e=>{
+        const b=e.target.closest('.rec-alt'); if(!b) return;
+        const i=+b.dataset.i; const t=cur[0]; cur[0]=cur[i]; cur[i]=t; paint();
+      });
       mealRow.addEventListener('click',()=>{
         const open=detail.classList.toggle('open');
         keepHeaderInView(mealRow);
       });
       panel.appendChild(mealRow);
+      panel.appendChild(altRow);
       panel.appendChild(detail);
     });
     panels.appendChild(panel);
@@ -6940,6 +6969,66 @@ const VEGETABLES_DATA = [
   { id:"v50", name:"Sweet Potato", hindi:"Shakarkandi", season:"Winter", emoji:"🍠",
     per100g:{ calories:86, protein:1.6, carbs:20, fat:0.1, fiber:3.0, vitC:2.4, vitA:709, potassium:337, calcium:30, iron:0.6, magnesium:25 },
     serving:{ amount:150, unit:"g" } },
+  { id:"v51", name:"Cucumber", hindi:"Kheera", season:"Summer", emoji:"🥒", noDefault:true,
+    per100g:{ calories:15, protein:0.7, carbs:3.6, fat:0.1, fiber:0.5, vitC:3, vitA:5, potassium:147, calcium:16, iron:0.3, magnesium:13 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v52", name:"Apple Gourd", hindi:"Tinda", season:"Summer", emoji:"🥬", noDefault:true,
+    per100g:{ calories:21, protein:1.4, carbs:3.4, fat:0.2, fiber:1, vitC:18, vitA:3, potassium:200, calcium:25, iron:0.9, magnesium:17 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v53", name:"Turnip", hindi:"Shalgam", season:"Winter", emoji:"🥔", noDefault:true,
+    per100g:{ calories:28, protein:0.9, carbs:6.4, fat:0.1, fiber:1.8, vitC:21, vitA:0, potassium:191, calcium:30, iron:0.3, magnesium:11 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v54", name:"Raw Mango", hindi:"Kachha Aam", season:"Summer", emoji:"🥭", noDefault:true,
+    per100g:{ calories:66, protein:0.7, carbs:15, fat:0.4, fiber:1.8, vitC:16, vitA:5, potassium:168, calcium:10, iron:0.2, magnesium:10 },
+    serving:{ amount:60, unit:"g" } },
+  { id:"v55", name:"Raw Papaya", hindi:"Kaccha Papita", season:"All year", emoji:"🍈", noDefault:true,
+    per100g:{ calories:27, protein:0.7, carbs:6.5, fat:0.1, fiber:1.8, vitC:35, vitA:10, potassium:182, calcium:24, iron:0.3, magnesium:10 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v56", name:"Banana Flower", hindi:"Kela Phool", season:"All year", emoji:"🌸", noDefault:true,
+    per100g:{ calories:51, protein:1.6, carbs:9.9, fat:0.6, fiber:5.7, vitC:10, vitA:3, potassium:553, calcium:56, iron:1.6, magnesium:48 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v57", name:"Lotus Stem", hindi:"Kamal Kakdi", season:"All year", emoji:"🥬", noDefault:true,
+    per100g:{ calories:74, protein:2.6, carbs:17, fat:0.1, fiber:4.9, vitC:44, vitA:0, potassium:556, calcium:45, iron:1.2, magnesium:23 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v58", name:"Chayote (Chow Chow)", hindi:"Chow Chow", season:"All year", emoji:"🥒", noDefault:true,
+    per100g:{ calories:19, protein:0.8, carbs:4.5, fat:0.1, fiber:1.7, vitC:8, vitA:1, potassium:125, calcium:17, iron:0.3, magnesium:12 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v59", name:"Sweet Corn", hindi:"Bhutta", season:"Monsoon", emoji:"🌽", noDefault:true,
+    per100g:{ calories:86, protein:3.3, carbs:19, fat:1.4, fiber:2, vitC:7, vitA:9, potassium:270, calcium:2, iron:0.5, magnesium:37 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v60", name:"Spring Onion", hindi:"Hari Pyaaz", season:"Winter", emoji:"🧅", noDefault:true,
+    per100g:{ calories:32, protein:1.8, carbs:7.3, fat:0.2, fiber:2.6, vitC:19, vitA:50, potassium:276, calcium:72, iron:1.5, magnesium:20 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"v61", name:"Garlic", hindi:"Lahsun", season:"All year", emoji:"🧄", noDefault:true,
+    per100g:{ calories:149, protein:6.4, carbs:33, fat:0.5, fiber:2.1, vitC:31, vitA:0, potassium:401, calcium:181, iron:1.7, magnesium:25 },
+    serving:{ amount:10, unit:"g" } },
+  { id:"v62", name:"Ginger", hindi:"Adrak", season:"All year", emoji:"🫚", noDefault:true,
+    per100g:{ calories:80, protein:1.8, carbs:18, fat:0.8, fiber:2, vitC:5, vitA:0, potassium:415, calcium:16, iron:0.6, magnesium:43 },
+    serving:{ amount:10, unit:"g" } },
+  { id:"v63", name:"Green Chilli", hindi:"Hari Mirch", season:"All year", emoji:"🌶️", noDefault:true,
+    per100g:{ calories:40, protein:2, carbs:9, fat:0.2, fiber:1.5, vitC:144, vitA:48, potassium:322, calcium:18, iron:1, magnesium:23 },
+    serving:{ amount:10, unit:"g" } },
+  { id:"v64", name:"Sword Beans", hindi:"Sem / Papdi", season:"Winter", emoji:"🫛", noDefault:true,
+    per100g:{ calories:44, protein:3.8, carbs:7, fat:0.3, fiber:3, vitC:8, vitA:10, potassium:200, calcium:60, iron:1.3, magnesium:40 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v65", name:"Raw Jackfruit", hindi:"Kathal", season:"Summer", emoji:"🥬", noDefault:true,
+    per100g:{ calories:51, protein:2.6, carbs:9, fat:0.3, fiber:3, vitC:13, vitA:6, potassium:300, calcium:30, iron:1, magnesium:30 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v66", name:"Spine Gourd", hindi:"Kantola / Kakrol", season:"Monsoon", emoji:"🥒", noDefault:true,
+    per100g:{ calories:17, protein:3.1, carbs:3.1, fat:0.3, fiber:3, vitC:60, vitA:5, potassium:250, calcium:33, iron:2, magnesium:25 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v67", name:"Banana Stem", hindi:"Kela Thanda", season:"All year", emoji:"🥬", noDefault:true,
+    per100g:{ calories:25, protein:0.5, carbs:5.6, fat:0.1, fiber:2.4, vitC:5, vitA:0, potassium:300, calcium:12, iron:0.6, magnesium:10 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v68", name:"Water Chestnut", hindi:"Singhara", season:"Winter", emoji:"🥔", noDefault:true,
+    per100g:{ calories:97, protein:1.4, carbs:23.9, fat:0.1, fiber:3, vitC:4, vitA:0, potassium:584, calcium:11, iron:0.1, magnesium:22 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v69", name:"Bamboo Shoot", hindi:"Bans Kari", season:"Monsoon", emoji:"🎍", noDefault:true,
+    per100g:{ calories:27, protein:2.6, carbs:5.2, fat:0.3, fiber:2.2, vitC:4, vitA:0, potassium:533, calcium:13, iron:0.5, magnesium:3 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"v70", name:"Lemon", hindi:"Nimbu", season:"All year", emoji:"🍋", noDefault:true,
+    per100g:{ calories:29, protein:1.1, carbs:9.3, fat:0.3, fiber:2.8, vitC:53, vitA:1, potassium:138, calcium:26, iron:0.6, magnesium:8 },
+    serving:{ amount:20, unit:"g" } }
 ];
 
 const LEAFY_DATA = [
@@ -7021,6 +7110,12 @@ const LEAFY_DATA = [
   { id:"l26", name:"Drumstick Leaves", hindi:"Sahjan Patta/Moringa", season:"All year", emoji:"🥬",
     per100g:{ calories:64, protein:9.4, carbs:8.3, fat:1.4, fiber:2.0, vitC:51, vitA:378, potassium:337, calcium:185, iron:4.0, magnesium:147 },
     serving:{ amount:60, unit:"g" } },
+  { id:"l27", name:"Gongura (Roselle Leaves)", hindi:"Gongura / Pundi", season:"All year", emoji:"🌿", noDefault:true,
+    per100g:{ calories:56, protein:1.7, carbs:10, fat:1.1, fiber:3.4, vitC:12, vitA:70, potassium:350, calcium:172, iron:2.3, magnesium:50 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"l28", name:"Chickpea Leaves", hindi:"Chane ka Saag", season:"Winter", emoji:"🌿", noDefault:true,
+    per100g:{ calories:97, protein:7, carbs:13, fat:1.4, fiber:5, vitC:61, vitA:100, potassium:380, calcium:340, iron:6, magnesium:50 },
+    serving:{ amount:50, unit:"g" } }
 ];
 
 const LENTILS_DATA = [
@@ -7096,6 +7191,9 @@ const LENTILS_DATA = [
   { id:"p24", name:"Val Dal (Field Beans)", hindi:"Val Dal", season:"Winter", emoji:"🫘",
     per100g:{ calories:341, protein:24.9, carbs:60, fat:1.0, fiber:6.2, vitC:0, vitA:0, potassium:1196, calcium:78, iron:6.7, magnesium:129 },
     serving:{ amount:40, unit:"g" } },
+  { id:"p25", name:"Brown Lentils (Whole Masoor)", hindi:"Sabut Masoor", season:"All year", emoji:"🫘", noDefault:true,
+    per100g:{ calories:343, protein:25, carbs:59, fat:0.7, fiber:11, vitC:0, vitA:3, potassium:677, calcium:68, iron:7, magnesium:120 },
+    serving:{ amount:40, unit:"g" } }
 ];
 
 const RICE_DATA = [
@@ -7180,6 +7278,45 @@ const RICE_DATA = [
   { id:"r27", name:"Puffed Rice", hindi:"Murmura/Mamra", season:"All year", emoji:"🍚",
     per100g:{ calories:325, protein:7.5, carbs:80, fat:0.5, fiber:1.5, vitC:0, vitA:0, potassium:105, calcium:12, iron:0.6, magnesium:20 },
     serving:{ amount:60, unit:"g" } },
+  { id:"r28", name:"Foxtail Millet", hindi:"Kangni / Thinai", season:"All year", emoji:"🌾", noDefault:true,
+    per100g:{ calories:331, protein:12.3, carbs:60.9, fat:4.3, fiber:8, vitC:0, vitA:0, potassium:250, calcium:31, iron:2.8, magnesium:81 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"r29", name:"Little Millet", hindi:"Kutki / Samai", season:"All year", emoji:"🌾", noDefault:true,
+    per100g:{ calories:341, protein:7.7, carbs:67, fat:4.7, fiber:7.6, vitC:0, vitA:0, potassium:130, calcium:17, iron:9.3, magnesium:133 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"r30", name:"Kodo Millet", hindi:"Kodra / Varagu", season:"All year", emoji:"🌾", noDefault:true,
+    per100g:{ calories:309, protein:8.3, carbs:65.9, fat:1.4, fiber:9, vitC:0, vitA:0, potassium:144, calcium:27, iron:0.5, magnesium:147 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"r31", name:"Barnyard Millet", hindi:"Sanwa / Kuthiraivali", season:"All year", emoji:"🌾", noDefault:true,
+    per100g:{ calories:307, protein:6.2, carbs:65.5, fat:2.2, fiber:10, vitC:0, vitA:0, potassium:130, calcium:20, iron:5, magnesium:82 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"r32", name:"Proso Millet", hindi:"Chena / Panivaragu", season:"All year", emoji:"🌾", noDefault:true,
+    per100g:{ calories:341, protein:12.5, carbs:70.4, fat:1.1, fiber:2.2, vitC:0, vitA:0, potassium:113, calcium:14, iron:0.8, magnesium:153 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"r33", name:"Pearl Millet (Whole Bajra)", hindi:"Bajra", season:"Winter", emoji:"🌾", noDefault:true,
+    per100g:{ calories:361, protein:11.6, carbs:67.5, fat:5, fiber:11.3, vitC:0, vitA:0, potassium:307, calcium:42, iron:8, magnesium:137 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"r34", name:"Sorghum (Whole Jowar)", hindi:"Jowar", season:"All year", emoji:"🌾", noDefault:true,
+    per100g:{ calories:349, protein:10.4, carbs:72.6, fat:1.9, fiber:9.7, vitC:0, vitA:0, potassium:131, calcium:25, iron:4.1, magnesium:171 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"r35", name:"Finger Millet (Whole Ragi)", hindi:"Ragi / Nachni", season:"All year", emoji:"🌾", noDefault:true,
+    per100g:{ calories:328, protein:7.3, carbs:72, fat:1.3, fiber:11.5, vitC:0, vitA:0, potassium:408, calcium:344, iron:3.9, magnesium:137 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"r36", name:"Broken Wheat", hindi:"Dalia", season:"All year", emoji:"🌾", noDefault:true,
+    per100g:{ calories:342, protein:11.5, carbs:69, fat:1.5, fiber:12, vitC:0, vitA:0, potassium:360, calcium:41, iron:3.9, magnesium:126 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"r37", name:"Vermicelli", hindi:"Semiya", season:"All year", emoji:"🍜", noDefault:true,
+    per100g:{ calories:352, protein:10, carbs:73, fat:1, fiber:3, vitC:0, vitA:0, potassium:160, calcium:20, iron:1.5, magnesium:40 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"r38", name:"Sago Pearls", hindi:"Sabudana", season:"All year", emoji:"⚪", noDefault:true,
+    per100g:{ calories:358, protein:0.2, carbs:88.7, fat:0, fiber:0.9, vitC:0, vitA:0, potassium:11, calcium:20, iron:1.2, magnesium:1 },
+    serving:{ amount:40, unit:"g" } },
+  { id:"r39", name:"Rolled Oats", hindi:"Jai", season:"All year", emoji:"🌾", noDefault:true,
+    per100g:{ calories:389, protein:16.9, carbs:66, fat:6.9, fiber:10.6, vitC:0, vitA:0, potassium:429, calcium:54, iron:4.7, magnesium:177 },
+    serving:{ amount:40, unit:"g" } },
+  { id:"r40", name:"Barley", hindi:"Jau", season:"Winter", emoji:"🌾", noDefault:true,
+    per100g:{ calories:354, protein:12.5, carbs:73.5, fat:2.3, fiber:17.3, vitC:0, vitA:0, potassium:452, calcium:33, iron:3.6, magnesium:133 },
+    serving:{ amount:50, unit:"g" } }
 ];
 
 const FLOURS_DATA = [
@@ -7366,6 +7503,33 @@ const FRUITS_DATA = [
   { id:"u39", name:"Plum", hindi:"Aloo Bukhara", season:"Summer", emoji:"🍑",
     per100g:{ calories:46, protein:0.7, carbs:11.4, fat:0.3, fiber:1.4, vitC:9.5, vitA:17, potassium:157, calcium:6, iron:0.2, magnesium:7 },
     serving:{ amount:130, unit:"g" } },
+  { id:"u40", name:"Kinnow / Mandarin", hindi:"Kinnow", season:"Winter", emoji:"🍊", noDefault:true,
+    per100g:{ calories:53, protein:0.8, carbs:13.3, fat:0.3, fiber:1.8, vitC:27, vitA:34, potassium:166, calcium:37, iron:0.2, magnesium:12 },
+    serving:{ amount:130, unit:"g" } },
+  { id:"u41", name:"Kiwi", hindi:"Kiwi", season:"Winter", emoji:"🥝", noDefault:true,
+    per100g:{ calories:61, protein:1.1, carbs:15, fat:0.5, fiber:3, vitC:93, vitA:4, potassium:312, calcium:34, iron:0.3, magnesium:17 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"u42", name:"Pomelo", hindi:"Chakotra", season:"Winter", emoji:"🍊", noDefault:true,
+    per100g:{ calories:38, protein:0.8, carbs:9.6, fat:0, fiber:1, vitC:61, vitA:0, potassium:216, calcium:4, iron:0.1, magnesium:6 },
+    serving:{ amount:150, unit:"g" } },
+  { id:"u43", name:"Bael", hindi:"Bael", season:"Summer", emoji:"🍈", noDefault:true,
+    per100g:{ calories:137, protein:1.8, carbs:32, fat:0.3, fiber:2.9, vitC:8, vitA:55, potassium:600, calcium:85, iron:0.6, magnesium:25 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"u44", name:"Ber (Indian Jujube)", hindi:"Ber", season:"Winter", emoji:"🍎", noDefault:true,
+    per100g:{ calories:74, protein:0.8, carbs:17, fat:0.3, fiber:1.2, vitC:76, vitA:3, potassium:250, calcium:21, iron:0.8, magnesium:10 },
+    serving:{ amount:80, unit:"g" } },
+  { id:"u45", name:"Phalsa", hindi:"Phalsa", season:"Summer", emoji:"🍇", noDefault:true,
+    per100g:{ calories:72, protein:1.3, carbs:16, fat:0.9, fiber:5, vitC:22, vitA:5, potassium:372, calcium:136, iron:3.1, magnesium:40 },
+    serving:{ amount:80, unit:"g" } },
+  { id:"u46", name:"Water Apple", hindi:"Jamrul", season:"Summer", emoji:"🍐", noDefault:true,
+    per100g:{ calories:25, protein:0.6, carbs:5.7, fat:0.2, fiber:1, vitC:22, vitA:0, potassium:123, calcium:29, iron:0.1, magnesium:5 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"u47", name:"Avocado", hindi:"Makhanphal", season:"All year", emoji:"🥑", noDefault:true,
+    per100g:{ calories:160, protein:2, carbs:8.5, fat:14.7, fiber:6.7, vitC:10, vitA:7, potassium:485, calcium:12, iron:0.6, magnesium:29 },
+    serving:{ amount:70, unit:"g" } },
+  { id:"u48", name:"Dragon Fruit", hindi:"Kamalam", season:"Summer", emoji:"🐉", noDefault:true,
+    per100g:{ calories:60, protein:1.2, carbs:13, fat:0, fiber:3, vitC:3, vitA:0, potassium:270, calcium:8, iron:0.7, magnesium:40 },
+    serving:{ amount:100, unit:"g" } }
 ];
 
 const SNACKS_DATA = [
@@ -7606,6 +7770,39 @@ const NONVEG_DATA = [
   { id:"n32", name:"Crab", hindi:"Kekda", season:"All year", emoji:"🦀",
     per100g:{ calories:97, protein:19.4, carbs:0, fat:1.5, fiber:0, vitC:0, vitA:0, potassium:329, calcium:89, iron:0.7, magnesium:43 },
     serving:{ amount:150, unit:"g" } },
+  { id:"n33", name:"Country Chicken", hindi:"Desi Murgi", season:"All year", emoji:"🍗", noDefault:true,
+    per100g:{ calories:150, protein:25, carbs:0, fat:5, fiber:0, vitC:0, vitA:15, potassium:250, calcium:15, iron:1.2, magnesium:26 },
+    serving:{ amount:150, unit:"g" } },
+  { id:"n34", name:"Chicken Liver", hindi:"Murgi ka Kaleji", season:"All year", emoji:"🍗", noDefault:true,
+    per100g:{ calories:119, protein:17, carbs:0.7, fat:4.8, fiber:0, vitC:17, vitA:3290, potassium:230, calcium:8, iron:9, magnesium:19 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"n35", name:"Goat Liver", hindi:"Bakre ka Kaleji", season:"All year", emoji:"🍖", noDefault:true,
+    per100g:{ calories:134, protein:20, carbs:3, fat:4, fiber:0, vitC:20, vitA:4000, potassium:350, calcium:10, iron:6, magnesium:19 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"n36", name:"Bombay Duck", hindi:"Bombil / Bummalo", season:"Monsoon", emoji:"🐟", noDefault:true,
+    per100g:{ calories:71, protein:15, carbs:0, fat:0.9, fiber:0, vitC:0, vitA:20, potassium:300, calcium:60, iron:1, magnesium:30 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"n37", name:"Indian Salmon", hindi:"Rawas / Kalaa", season:"All year", emoji:"🐟", noDefault:true,
+    per100g:{ calories:110, protein:20, carbs:0, fat:3, fiber:0, vitC:0, vitA:30, potassium:350, calcium:20, iron:0.6, magnesium:30 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"n38", name:"Mrigal Fish", hindi:"Mrigal / Naini", season:"All year", emoji:"🐟", noDefault:true,
+    per100g:{ calories:110, protein:17, carbs:0, fat:3, fiber:0, vitC:0, vitA:15, potassium:300, calcium:160, iron:1, magnesium:30 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"n39", name:"Anchovies", hindi:"Nethili / Kolatti", season:"All year", emoji:"🐟", noDefault:true,
+    per100g:{ calories:131, protein:20, carbs:0, fat:4.8, fiber:0, vitC:0, vitA:15, potassium:383, calcium:147, iron:3.3, magnesium:41 },
+    serving:{ amount:80, unit:"g" } },
+  { id:"n40", name:"Tuna", hindi:"Choora / Kera", season:"All year", emoji:"🐟", noDefault:true,
+    per100g:{ calories:116, protein:24, carbs:0, fat:1.5, fiber:0, vitC:0, vitA:18, potassium:252, calcium:10, iron:1, magnesium:35 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"n41", name:"Snakehead Murrel", hindi:"Viral / Shol", season:"All year", emoji:"🐟", noDefault:true,
+    per100g:{ calories:97, protein:19, carbs:0, fat:1.8, fiber:0, vitC:0, vitA:10, potassium:290, calcium:40, iron:1.5, magnesium:30 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"n42", name:"Tilapia", hindi:"Tilapia", season:"All year", emoji:"🐟", noDefault:true,
+    per100g:{ calories:96, protein:20, carbs:0, fat:1.7, fiber:0, vitC:0, vitA:0, potassium:302, calcium:10, iron:0.6, magnesium:27 },
+    serving:{ amount:100, unit:"g" } },
+  { id:"n43", name:"Pearl Spot", hindi:"Karimeen", season:"All year", emoji:"🐟", noDefault:true,
+    per100g:{ calories:112, protein:19, carbs:0, fat:3, fiber:0, vitC:0, vitA:20, potassium:300, calcium:50, iron:1, magnesium:30 },
+    serving:{ amount:100, unit:"g" } }
 ];
 
 const SPROUTS_DATA = [
@@ -7678,11 +7875,26 @@ const DAIRY_DATA = [
   { id:"d11", name:"Khoya", hindi:"Khoya/Mawa", season:"All year", emoji:"🥛",
     per100g:{ calories:421, protein:14.6, carbs:27, fat:29.6, fiber:0, vitC:0, vitA:280, potassium:300, calcium:650, iron:0.6, magnesium:30 },
     serving:{ amount:30, unit:"g" } },
+  { id:"d12", name:"Hung Curd", hindi:"Chakka", season:"All year", emoji:"🥣", noDefault:true,
+    per100g:{ calories:98, protein:8, carbs:4, fat:5.5, fiber:0, vitC:0, vitA:40, potassium:120, calcium:140, iron:0.1, magnesium:12 },
+    serving:{ amount:60, unit:"g" } },
+  { id:"d13", name:"Chhena", hindi:"Chhena", season:"All year", emoji:"🧀", noDefault:true,
+    per100g:{ calories:265, protein:18, carbs:3, fat:20, fiber:0, vitC:0, vitA:150, potassium:100, calcium:480, iron:0.8, magnesium:20 },
+    serving:{ amount:50, unit:"g" } },
+  { id:"d14", name:"Butter", hindi:"Makhan", season:"All year", emoji:"🧈", noDefault:true,
+    per100g:{ calories:717, protein:0.9, carbs:0.1, fat:81, fiber:0, vitC:0, vitA:684, potassium:24, calcium:24, iron:0, magnesium:2 },
+    serving:{ amount:10, unit:"g" } },
+  { id:"d15", name:"Cream", hindi:"Malai", season:"All year", emoji:"🥛", noDefault:true,
+    per100g:{ calories:292, protein:2.2, carbs:3, fat:30, fiber:0, vitC:0, vitA:300, potassium:95, calcium:65, iron:0.03, magnesium:9 },
+    serving:{ amount:20, unit:"g" } },
+  { id:"d16", name:"Lassi (Sweet)", hindi:"Meethi Lassi", season:"All year", emoji:"🥤", noDefault:true,
+    per100g:{ calories:70, protein:3, carbs:11, fat:1.5, fiber:0, vitC:0, vitA:15, potassium:130, calcium:100, iron:0.1, magnesium:10 },
+    serving:{ amount:200, unit:"ml" } }
 ];
 
 const RECIPES_DATA = [
   // ─── VEGETARIAN ───
-  { id:"r1", name:"Palak Paneer", category:"veg", diet:["veg"],
+  { id:"r1", name:"Palak Paneer", category:"veg", diet:["veg"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"l1", name:"Spinach", amount:200, unit:"g" },
       { name:"Paneer", amount:100, unit:"g" },
@@ -7694,7 +7906,7 @@ const RECIPES_DATA = [
     method:"Blanch spinach, blend smooth. Sauté onion, garlic, spices, add spinach purée, fold in paneer cubes. Finish with cream.",
     time:25, serves:2, emoji:"🥬" },
 
-  { id:"r2", name:"Methi Thepla", category:"veg", diet:["veg"],
+  { id:"r2", name:"Methi Thepla", category:"veg", diet:["veg"], meals:["breakfast","dinner"],
     ingredients:[
       { ref:"l2", name:"Fenugreek Leaves", amount:100, unit:"g" },
       { ref:"g2", name:"Wheat Flour", amount:100, unit:"g" },
@@ -7705,7 +7917,7 @@ const RECIPES_DATA = [
     method:"Mix methi with atta, curd, spices. Knead dough, roll into thin flatbreads. Cook on tawa with oil.",
     time:20, serves:4, emoji:"🌿" },
 
-  { id:"r3", name:"Sambar", category:"veg", diet:["veg","vegan"],
+  { id:"r3", name:"Sambar", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"g3", name:"Toor Dal", amount:80, unit:"g" },
       { ref:"v5", name:"Brinjal", amount:100, unit:"g" },
@@ -7717,7 +7929,7 @@ const RECIPES_DATA = [
     method:"Cook toor dal till soft. Add vegetables, tamarind water, sambar powder. Simmer 15 min. Temper with mustard, curry leaves.",
     time:35, serves:4, emoji:"🍲" },
 
-  { id:"r4", name:"Aloo Gobi", category:"veg", diet:["veg","vegan"],
+  { id:"r4", name:"Aloo Gobi", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v2", name:"Potato", amount:200, unit:"g" },
       { ref:"v7", name:"Cauliflower", amount:200, unit:"g" },
@@ -7728,7 +7940,7 @@ const RECIPES_DATA = [
     method:"Sauté onion, ginger, garlic. Add potatoes, cauliflower and spices. Cover and cook on low heat till tender.",
     time:25, serves:3, emoji:"🥔" },
 
-  { id:"r5", name:"Rajma Chawal", category:"veg", diet:["veg","vegan"],
+  { id:"r5", name:"Rajma Chawal", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { ref:"g8", name:"Rajma", amount:100, unit:"g" },
       { ref:"g1", name:"Brown Rice", amount:100, unit:"g" },
@@ -7739,7 +7951,7 @@ const RECIPES_DATA = [
     method:"Soak rajma overnight, pressure cook. Make tomato-onion gravy, add cooked rajma. Simmer thick. Serve with rice.",
     time:50, serves:3, emoji:"🫘" },
 
-  { id:"r6", name:"Dal Tadka", category:"veg", diet:["veg","vegan"],
+  { id:"r6", name:"Dal Tadka", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"g6", name:"Masoor Dal", amount:80, unit:"g" },
       { ref:"v3", name:"Onion", amount:60, unit:"g" },
@@ -7750,7 +7962,7 @@ const RECIPES_DATA = [
     method:"Boil dal with turmeric. Make onion-tomato masala, add dal, simmer. Finish with ghee tadka of cumin, hing, chilli.",
     time:25, serves:3, emoji:"🍛" },
 
-  { id:"r7", name:"Moong Dal Khichdi", category:"veg", diet:["veg","vegan"],
+  { id:"r7", name:"Moong Dal Khichdi", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"g5", name:"Moong Dal", amount:60, unit:"g" },
       { ref:"g1", name:"Brown Rice", amount:80, unit:"g" },
@@ -7761,7 +7973,7 @@ const RECIPES_DATA = [
     method:"Wash dal and rice. Pressure cook with vegetables, turmeric, salt, water (3:1). Temper with ghee, cumin.",
     time:20, serves:2, emoji:"🍚" },
 
-  { id:"r8", name:"Baingan Bharta", category:"veg", diet:["veg","vegan"],
+  { id:"r8", name:"Baingan Bharta", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v5", name:"Brinjal", amount:300, unit:"g" },
       { ref:"v3", name:"Onion", amount:100, unit:"g" },
@@ -7772,7 +7984,7 @@ const RECIPES_DATA = [
     method:"Roast whole brinjal on flame till charred. Peel, mash pulp. Sauté onion, add tomato, spices, fold in bharta.",
     time:30, serves:2, emoji:"🍆" },
 
-  { id:"r9", name:"Vegetable Upma", category:"veg", diet:["veg","vegan"],
+  { id:"r9", name:"Vegetable Upma", category:"veg", diet:["veg","vegan"], meals:["breakfast"],
     ingredients:[
       { name:"Semolina (Rava)", amount:100, unit:"g" },
       { ref:"v4", name:"Carrot", amount:50, unit:"g" },
@@ -7783,7 +7995,7 @@ const RECIPES_DATA = [
     method:"Dry roast rava. Sauté mustard seeds, curry leaves, onions, vegetables. Add water, salt. Pour rava stirring continuously.",
     time:20, serves:2, emoji:"🥣" },
 
-  { id:"r10", name:"Paneer Bhurji", category:"veg", diet:["veg"],
+  { id:"r10", name:"Paneer Bhurji", category:"veg", diet:["veg"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Paneer", amount:200, unit:"g" },
       { ref:"v6", name:"Capsicum", amount:80, unit:"g" },
@@ -7794,7 +8006,7 @@ const RECIPES_DATA = [
     method:"Crumble paneer. Sauté onion, capsicum, tomato with spices. Add crumbled paneer, toss on high flame.",
     time:15, serves:2, emoji:"🧀" },
 
-  { id:"r11", name:"Chole Masala", category:"veg", diet:["veg","vegan"],
+  { id:"r11", name:"Chole Masala", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { ref:"g7", name:"Chickpeas", amount:120, unit:"g" },
       { ref:"v1", name:"Tomato", amount:100, unit:"g" },
@@ -7805,7 +8017,7 @@ const RECIPES_DATA = [
     method:"Soak and pressure cook chickpeas. Prepare spiced tomato-onion base, add chickpeas, simmer till thick.",
     time:45, serves:3, emoji:"🫘" },
 
-  { id:"r12", name:"Aloo Methi", category:"veg", diet:["veg","vegan"],
+  { id:"r12", name:"Aloo Methi", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v2", name:"Potato", amount:200, unit:"g" },
       { ref:"l2", name:"Fenugreek Leaves", amount:100, unit:"g" },
@@ -7816,7 +8028,7 @@ const RECIPES_DATA = [
     method:"Sauté onion, add cubed potatoes, cook half done. Add washed methi leaves, spices, cook till dry.",
     time:25, serves:2, emoji:"🌿" },
 
-  { id:"r13", name:"Sarson Ka Saag", category:"veg", diet:["veg","vegan"],
+  { id:"r13", name:"Sarson Ka Saag", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { ref:"l7", name:"Mustard Leaves", amount:200, unit:"g" },
       { ref:"l1", name:"Spinach", amount:100, unit:"g" },
@@ -7827,7 +8039,7 @@ const RECIPES_DATA = [
     method:"Pressure cook both greens. Blend coarsely, add cornmeal, cook on low. Serve with makki ki roti and butter.",
     time:40, serves:3, emoji:"🌿" },
 
-  { id:"r14", name:"Chaulai Saag", category:"veg", diet:["veg","vegan"],
+  { id:"r14", name:"Chaulai Saag", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"l3", name:"Amaranth Leaves", amount:200, unit:"g" },
       { ref:"v3", name:"Onion", amount:50, unit:"g" },
@@ -7837,7 +8049,7 @@ const RECIPES_DATA = [
     method:"Blanch amaranth leaves briefly. Sauté garlic and onion, add leaves, cook on high flame with salt and cumin.",
     time:15, serves:2, emoji:"🥬" },
 
-  { id:"r15", name:"Moringa Dal", category:"veg", diet:["veg","vegan"],
+  { id:"r15", name:"Moringa Dal", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"l4", name:"Drumstick Leaves", amount:80, unit:"g" },
       { ref:"g3", name:"Toor Dal", amount:80, unit:"g" },
@@ -7848,7 +8060,7 @@ const RECIPES_DATA = [
     method:"Cook toor dal. Prepare tomato-spice base, add drumstick leaves, pour over dal, simmer 10 min.",
     time:30, serves:3, emoji:"🌱" },
 
-  { id:"r16", name:"Stuffed Capsicum", category:"veg", diet:["veg"],
+  { id:"r16", name:"Stuffed Capsicum", category:"veg", diet:["veg"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v6", name:"Capsicum", amount:200, unit:"g" },
       { name:"Paneer", amount:100, unit:"g" },
@@ -7859,7 +8071,7 @@ const RECIPES_DATA = [
     method:"Hollow capsicums. Fill with mashed paneer-potato-spice mixture. Pan fry or bake at 180°C for 20 min.",
     time:30, serves:2, emoji:"🫑" },
 
-  { id:"r17", name:"Bhindi Masala", category:"veg", diet:["veg","vegan"],
+  { id:"r17", name:"Bhindi Masala", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v15", name:"Okra", amount:200, unit:"g" },
       { ref:"v3", name:"Onion", amount:80, unit:"g" },
@@ -7870,7 +8082,7 @@ const RECIPES_DATA = [
     method:"Slit okra, fry till crisp. Sauté onion-tomato masala, add fried okra, toss with dry spices.",
     time:25, serves:2, emoji:"🥬" },
 
-  { id:"r18", name:"Vegetable Biryani", category:"veg", diet:["veg","vegan"],
+  { id:"r18", name:"Vegetable Biryani", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { ref:"g1", name:"Brown Rice", amount:150, unit:"g" },
       { ref:"v4", name:"Carrot", amount:80, unit:"g" },
@@ -7882,7 +8094,7 @@ const RECIPES_DATA = [
     method:"Par-cook rice. Layer with sautéed spiced vegetables, fried onions, saffron milk. Dum cook covered 20 min.",
     time:50, serves:4, emoji:"🍚" },
 
-  { id:"r19", name:"Moong Dal Chilla", category:"veg", diet:["veg","vegan"],
+  { id:"r19", name:"Moong Dal Chilla", category:"veg", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { ref:"g5", name:"Moong Dal", amount:100, unit:"g" },
       { ref:"v6", name:"Capsicum", amount:50, unit:"g" },
@@ -7893,7 +8105,7 @@ const RECIPES_DATA = [
     method:"Soak moong dal 2 hrs, blend to batter. Mix in chopped veggies. Spread on hot tawa like dosa. Cook crisp.",
     time:30, serves:3, emoji:"🫓" },
 
-  { id:"r20", name:"Gajar Halwa", category:"veg", diet:["veg"],
+  { id:"r20", name:"Gajar Halwa", category:"veg", diet:["veg"], meals:["snack"],
     ingredients:[
       { ref:"v4", name:"Carrot", amount:400, unit:"g" },
       { name:"Milk", amount:200, unit:"ml" },
@@ -7905,7 +8117,7 @@ const RECIPES_DATA = [
     time:40, serves:4, emoji:"🥕" },
 
   // ─── NON-VEG ───
-  { id:"r21", name:"Chicken Curry", category:"non-veg", diet:["non-veg"],
+  { id:"r21", name:"Chicken Curry", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { ref:"n1", name:"Chicken Breast", amount:250, unit:"g" },
       { ref:"v3", name:"Onion", amount:100, unit:"g" },
@@ -7916,7 +8128,7 @@ const RECIPES_DATA = [
     method:"Marinate chicken in yoghurt-spice. Brown onions, add tomato masala. Cook chicken till done. Simmer thick gravy.",
     time:40, serves:3, emoji:"🍗" },
 
-  { id:"r22", name:"Egg Bhurji", category:"non-veg", diet:["non-veg"],
+  { id:"r22", name:"Egg Bhurji", category:"non-veg", diet:["non-veg"], meals:["breakfast","lunch","dinner"],
     ingredients:[
       { ref:"n2", name:"Egg", amount:180, unit:"g" },
       { ref:"v3", name:"Onion", amount:80, unit:"g" },
@@ -7927,7 +8139,7 @@ const RECIPES_DATA = [
     method:"Sauté onion, capsicum, tomato with spices. Pour beaten eggs, scramble on medium heat. Garnish with coriander.",
     time:15, serves:2, emoji:"🥚" },
 
-  { id:"r23", name:"Fish Curry (South Indian)", category:"non-veg", diet:["non-veg"],
+  { id:"r23", name:"Fish Curry (South Indian)", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"n3", name:"Rohu Fish", amount:300, unit:"g" },
       { ref:"v1", name:"Tomato", amount:100, unit:"g" },
@@ -7938,7 +8150,7 @@ const RECIPES_DATA = [
     method:"Fry fish pieces briefly. Prepare tamarind-tomato gravy with coconut milk and fish masala. Add fish, simmer gently.",
     time:30, serves:3, emoji:"🐟" },
 
-  { id:"r24", name:"Mutton Rogan Josh", category:"non-veg", diet:["non-veg"],
+  { id:"r24", name:"Mutton Rogan Josh", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { ref:"n5", name:"Mutton", amount:300, unit:"g" },
       { ref:"v3", name:"Onion", amount:100, unit:"g" },
@@ -7949,7 +8161,7 @@ const RECIPES_DATA = [
     method:"Slow cook mutton in Kashmiri whole spices and onion. Add whisked yoghurt, pressure cook till tender.",
     time:60, serves:3, emoji:"🥩" },
 
-  { id:"r25", name:"Prawn Masala", category:"non-veg", diet:["non-veg"],
+  { id:"r25", name:"Prawn Masala", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"n6", name:"Prawn", amount:250, unit:"g" },
       { ref:"v1", name:"Tomato", amount:100, unit:"g" },
@@ -7960,7 +8172,7 @@ const RECIPES_DATA = [
     method:"Marinate prawns with turmeric, salt. Sauté onion, tomato, coconut paste with spices. Add prawns, cook 8 min.",
     time:25, serves:2, emoji:"🦐" },
 
-  { id:"r26", name:"Egg Curry", category:"non-veg", diet:["non-veg"],
+  { id:"r26", name:"Egg Curry", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"n2", name:"Egg", amount:240, unit:"g" },
       { ref:"v1", name:"Tomato", amount:120, unit:"g" },
@@ -7971,7 +8183,7 @@ const RECIPES_DATA = [
     method:"Hard boil eggs, halve. Make spiced onion-tomato gravy. Add eggs, simmer 10 min. Temper with mustard seeds.",
     time:25, serves:3, emoji:"🥚" },
 
-  { id:"r27", name:"Chicken Biryani", category:"non-veg", diet:["non-veg"],
+  { id:"r27", name:"Chicken Biryani", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { ref:"n1", name:"Chicken Breast", amount:300, unit:"g" },
       { ref:"g1", name:"Brown Rice", amount:150, unit:"g" },
@@ -7982,7 +8194,7 @@ const RECIPES_DATA = [
     method:"Marinate chicken in yoghurt-spice. Par-cook rice separately. Layer chicken and rice. Dum cook 25 min.",
     time:60, serves:4, emoji:"🍚" },
 
-  { id:"r28", name:"Keema Matar", category:"non-veg", diet:["non-veg"],
+  { id:"r28", name:"Keema Matar", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { ref:"n5", name:"Mutton (minced)", amount:200, unit:"g" },
       { ref:"v8", name:"Green Peas", amount:100, unit:"g" },
@@ -7994,7 +8206,7 @@ const RECIPES_DATA = [
     time:30, serves:3, emoji:"🫛" },
 
   // ─── SNACKS & LIGHT MEALS ───
-  { id:"r29", name:"Roasted Makhana", category:"snack", diet:["veg","vegan"],
+  { id:"r29", name:"Roasted Makhana", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"s10", name:"Fox Nuts (Makhana)", amount:50, unit:"g" },
       { name:"Ghee", amount:10, unit:"g" },
@@ -8004,7 +8216,7 @@ const RECIPES_DATA = [
     method:"Heat ghee in pan. Add makhana, roast on low flame 8–10 min stirring. Add spices off heat. Serve warm.",
     time:12, serves:2, emoji:"⚪" },
 
-  { id:"r30", name:"Almond Date Ladoo", category:"snack", diet:["veg","vegan"],
+  { id:"r30", name:"Almond Date Ladoo", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"s1", name:"Almonds", amount:60, unit:"g" },
       { ref:"s11", name:"Dates", amount:80, unit:"g" },
@@ -8014,7 +8226,7 @@ const RECIPES_DATA = [
     method:"Blend almonds coarse. Remove date seeds, blend dates. Mix both, shape into balls. Refrigerate 30 min.",
     time:20, serves:8, emoji:"🟤" },
 
-  { id:"r31", name:"Pumpkin Seed Trail Mix", category:"snack", diet:["veg","vegan"],
+  { id:"r31", name:"Pumpkin Seed Trail Mix", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"s6", name:"Pumpkin Seeds", amount:30, unit:"g" },
       { ref:"s7", name:"Sunflower Seeds", amount:20, unit:"g" },
@@ -8025,7 +8237,7 @@ const RECIPES_DATA = [
     method:"Lightly toast seeds in dry pan. Cool completely. Mix with pistachios and dry fruit. Store in airtight jar.",
     time:10, serves:3, emoji:"🌱" },
 
-  { id:"r32", name:"Sprouts Chaat", category:"veg", diet:["veg","vegan"],
+  { id:"r32", name:"Sprouts Chaat", category:"veg", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"g5", name:"Moong Sprouts", amount:150, unit:"g" },
       { ref:"v1", name:"Tomato", amount:80, unit:"g" },
@@ -8036,7 +8248,7 @@ const RECIPES_DATA = [
     method:"Steam sprouts 5 min. Mix with chopped veggies, guava. Toss with chaat masala, lemon juice, coriander.",
     time:15, serves:2, emoji:"🥗" },
 
-  { id:"r33", name:"Chia Pudding with Mango", category:"snack", diet:["veg","vegan"],
+  { id:"r33", name:"Chia Pudding with Mango", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"s8", name:"Chia Seeds", amount:30, unit:"g" },
       { name:"Coconut Milk", amount:200, unit:"ml" },
@@ -8047,7 +8259,7 @@ const RECIPES_DATA = [
     time:10, serves:2, emoji:"🥭" },
 
   // ─── BREAKFAST ───
-  { id:"r34", name:"Ragi Dosa", category:"breakfast", diet:["veg","vegan"],
+  { id:"r34", name:"Ragi Dosa", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { ref:"g14", name:"Ragi", amount:80, unit:"g" },
       { name:"Urad Dal", amount:40, unit:"g" },
@@ -8057,7 +8269,7 @@ const RECIPES_DATA = [
     method:"Soak ragi and urad dal overnight, blend batter, ferment 8 hrs. Spread thin on hot tawa. Cook crisp.",
     time:15, serves:4, emoji:"🫓" },
 
-  { id:"r35", name:"Poha with Peanuts", category:"breakfast", diet:["veg","vegan"],
+  { id:"r35", name:"Poha with Peanuts", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
     ingredients:[
       { ref:"g10", name:"Poha", amount:100, unit:"g" },
       { ref:"g15", name:"Peanuts", amount:30, unit:"g" },
@@ -8068,7 +8280,7 @@ const RECIPES_DATA = [
     method:"Rinse poha, drain. Sauté mustard seeds, curry leaves, onion, peanuts. Add poha, turmeric, salt, lemon juice.",
     time:15, serves:2, emoji:"🥣" },
 
-  { id:"r36", name:"Oats Idli", category:"breakfast", diet:["veg","vegan"],
+  { id:"r36", name:"Oats Idli", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
     ingredients:[
       { ref:"g11", name:"Oats", amount:100, unit:"g" },
       { name:"Semolina", amount:50, unit:"g" },
@@ -8079,7 +8291,7 @@ const RECIPES_DATA = [
     method:"Blend oats to flour, mix with semolina, curd, grated carrot, ENO. Pour in idli molds. Steam 12 min.",
     time:25, serves:3, emoji:"🥞" },
 
-  { id:"r37", name:"Flaxseed Roti", category:"breakfast", diet:["veg","vegan"],
+  { id:"r37", name:"Flaxseed Roti", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { ref:"g2", name:"Wheat Flour", amount:100, unit:"g" },
       { ref:"s4", name:"Flaxseeds", amount:20, unit:"g" },
@@ -8089,7 +8301,7 @@ const RECIPES_DATA = [
     method:"Mix atta with ground flaxseeds, salt, water. Knead soft dough, roll thin rotis. Cook on tawa both sides.",
     time:20, serves:4, emoji:"🫓" },
 
-  { id:"r38", name:"Bajra Khichdi", category:"breakfast", diet:["veg","vegan"],
+  { id:"r38", name:"Bajra Khichdi", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","lunch","dinner"],
     ingredients:[
       { ref:"g12", name:"Bajra", amount:80, unit:"g" },
       { ref:"g5", name:"Moong Dal", amount:50, unit:"g" },
@@ -8101,7 +8313,7 @@ const RECIPES_DATA = [
     time:35, serves:2, emoji:"🌾" },
 
   // ─── SPECIAL ───
-  { id:"r39", name:"Amla Murabba", category:"special", diet:["veg","vegan"],
+  { id:"r39", name:"Amla Murabba", category:"special", diet:["veg","vegan"], meals:[],
     ingredients:[
       { ref:"f10", name:"Amla", amount:200, unit:"g" },
       { name:"Jaggery", amount:150, unit:"g" },
@@ -8111,7 +8323,7 @@ const RECIPES_DATA = [
     method:"Boil amla, cool, remove seeds. Dissolve jaggery in water, add amla, spices. Cook till syrup thickens. Store.",
     time:40, serves:10, emoji:"🟢" },
 
-  { id:"r40", name:"Sesame Til Chikki", category:"snack", diet:["veg","vegan"],
+  { id:"r40", name:"Sesame Til Chikki", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"s5", name:"Sesame Seeds", amount:100, unit:"g" },
       { name:"Jaggery", amount:80, unit:"g" }
@@ -8120,7 +8332,7 @@ const RECIPES_DATA = [
     method:"Dry roast sesame seeds. Melt jaggery to soft ball stage. Mix in sesame, pour on greased surface. Cut when warm.",
     time:20, serves:6, emoji:"🌱" },
 
-  { id:"r41", name:"Drumstick Soup", category:"veg", diet:["veg","vegan"],
+  { id:"r41", name:"Drumstick Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
     ingredients:[
       { ref:"v11", name:"Drumstick", amount:150, unit:"g" },
       { ref:"l4", name:"Moringa Leaves", amount:50, unit:"g" },
@@ -8131,7 +8343,7 @@ const RECIPES_DATA = [
     method:"Sauté aromatics, add drumsticks, moringa leaves, water. Boil 15 min. Blend, strain, season. Serve warm.",
     time:25, serves:2, emoji:"🍵" },
 
-  { id:"r42", name:"Jowar Bhakri with Pitla", category:"veg", diet:["veg","vegan"],
+  { id:"r42", name:"Jowar Bhakri with Pitla", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"g13", name:"Jowar Flour", amount:100, unit:"g" },
       { ref:"g4", name:"Chana Besan", amount:60, unit:"g" },
@@ -8142,7 +8354,7 @@ const RECIPES_DATA = [
     method:"Make bhakri with jowar flour and water. Prepare pitla: temper chana besan in water, stir to thicken.",
     time:30, serves:2, emoji:"🌾" },
 
-  { id:"r43", name:"Beetroot Raita", category:"veg", diet:["veg"],
+  { id:"r43", name:"Beetroot Raita", category:"veg", diet:["veg"], meals:["snack"],
     ingredients:[
       { ref:"v14", name:"Beetroot", amount:100, unit:"g" },
       { name:"Curd", amount:200, unit:"g" },
@@ -8152,7 +8364,7 @@ const RECIPES_DATA = [
     method:"Boil and grate beetroot. Whisk curd smooth, fold in beetroot. Add cumin powder, mint, salt. Serve chilled.",
     time:15, serves:2, emoji:"🫐" },
 
-  { id:"r44", name:"Walnut Banana Smoothie", category:"snack", diet:["veg"],
+  { id:"r44", name:"Walnut Banana Smoothie", category:"snack", diet:["veg"], meals:["snack"],
     ingredients:[
       { ref:"s2", name:"Walnuts", amount:30, unit:"g" },
       { ref:"f1", name:"Banana", amount:120, unit:"g" },
@@ -8163,7 +8375,7 @@ const RECIPES_DATA = [
     method:"Blend all ingredients until smooth. Add honey if needed. Serve immediately or refrigerate max 4 hrs.",
     time:5, serves:2, emoji:"🍌" },
 
-  { id:"r45", name:"Papaya Chaat", category:"snack", diet:["veg","vegan"],
+  { id:"r45", name:"Papaya Chaat", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"f4", name:"Papaya", amount:200, unit:"g" },
       { ref:"f8", name:"Pomegranate", amount:50, unit:"g" },
@@ -8173,7 +8385,7 @@ const RECIPES_DATA = [
     method:"Cube papaya. Toss with pomegranate arils, chaat masala, lemon juice, black salt. Serve chilled.",
     time:10, serves:2, emoji:"🍑" },
 
-  { id:"r46", name:"Guava Amla Juice", category:"drinks", diet:["veg","vegan"],
+  { id:"r46", name:"Guava Amla Juice", category:"drinks", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"f3", name:"Guava", amount:150, unit:"g" },
       { ref:"f10", name:"Amla", amount:30, unit:"g" },
@@ -8184,7 +8396,7 @@ const RECIPES_DATA = [
     method:"Blend guava and amla with water. Strain. Add mint, black salt, serve over ice.",
     time:8, serves:2, emoji:"🥤" },
 
-  { id:"r47", name:"Chicken Soup with Veggies", category:"non-veg", diet:["non-veg"],
+  { id:"r47", name:"Chicken Soup with Veggies", category:"non-veg", diet:["non-veg"], meals:["dinner"],
     ingredients:[
       { ref:"n1", name:"Chicken", amount:150, unit:"g" },
       { ref:"v4", name:"Carrot", amount:80, unit:"g" },
@@ -8195,7 +8407,7 @@ const RECIPES_DATA = [
     method:"Simmer chicken pieces in water with ginger. Remove bones. Add vegetables, simmer 20 min. Season.",
     time:40, serves:2, emoji:"🍵" },
 
-  { id:"r48", name:"Sardine Curry", category:"non-veg", diet:["non-veg"],
+  { id:"r48", name:"Sardine Curry", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"n7", name:"Sardine", amount:200, unit:"g" },
       { ref:"v1", name:"Tomato", amount:100, unit:"g" },
@@ -8206,7 +8418,7 @@ const RECIPES_DATA = [
     method:"Fry sardines lightly. Prepare kokum-tomato gravy with coconut milk and spices. Add fish, simmer 8 min.",
     time:25, serves:2, emoji:"🐟" },
 
-  { id:"r49", name:"Jowar Smoothie Bowl", category:"breakfast", diet:["veg"],
+  { id:"r49", name:"Jowar Smoothie Bowl", category:"breakfast", diet:["veg"], meals:["breakfast"],
     ingredients:[
       { ref:"g13", name:"Jowar", amount:50, unit:"g" },
       { ref:"f2", name:"Mango", amount:100, unit:"g" },
@@ -8217,7 +8429,7 @@ const RECIPES_DATA = [
     method:"Blend mango with curd. Cook jowar to porridge, cool. Top with mango curd, chia seeds and fruit.",
     time:25, serves:2, emoji:"🥭" },
 
-  { id:"r50", name:"Pumpkin Seed Chutney", category:"condiment", diet:["veg","vegan"],
+  { id:"r50", name:"Pumpkin Seed Chutney", category:"condiment", diet:["veg","vegan"], meals:[],
     ingredients:[
       { ref:"s6", name:"Pumpkin Seeds", amount:50, unit:"g" },
       { ref:"l3", name:"Coriander / Amaranth", amount:30, unit:"g" },
@@ -8227,7 +8439,7 @@ const RECIPES_DATA = [
     method:"Dry roast pumpkin seeds. Grind with herbs, green chilli, garlic, salt and water to smooth chutney.",
     time:10, serves:4, emoji:"🌱" },
 
-  { id:"r51", name:"Soya Chunk Curry", category:"veg", diet:["veg","vegan"],
+  { id:"r51", name:"Soya Chunk Curry", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"g9", name:"Soya Chunks", amount:60, unit:"g" },
       { ref:"v1", name:"Tomato", amount:100, unit:"g" },
@@ -8238,7 +8450,7 @@ const RECIPES_DATA = [
     method:"Soak soya chunks in hot water 15 min, squeeze. Make onion-tomato gravy, add chunks, simmer 15 min.",
     time:30, serves:3, emoji:"🍱" },
 
-  { id:"r52", name:"Mixed Dal Soup", category:"veg", diet:["veg","vegan"],
+  { id:"r52", name:"Mixed Dal Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
     ingredients:[
       { ref:"g3", name:"Toor Dal", amount:40, unit:"g" },
       { ref:"g6", name:"Masoor Dal", amount:40, unit:"g" },
@@ -8249,7 +8461,7 @@ const RECIPES_DATA = [
     method:"Pressure cook dals with carrot. Add chopped spinach, blend partially, season. Finish with lemon and jeera tadka.",
     time:25, serves:3, emoji:"🍲" },
 
-  { id:"r53", name:"Mango Lassi", category:"drinks", diet:["veg"],
+  { id:"r53", name:"Mango Lassi", category:"drinks", diet:["veg"], meals:["snack"],
     ingredients:[
       { ref:"f2", name:"Mango", amount:150, unit:"g" },
       { name:"Curd", amount:150, unit:"g" },
@@ -8260,7 +8472,7 @@ const RECIPES_DATA = [
     method:"Blend mango pulp, curd, milk, sugar and cardamom. Serve chilled over ice.",
     time:5, serves:2, emoji:"🥤" },
 
-  { id:"r54", name:"Coconut Chutney", category:"condiment", diet:["veg","vegan"],
+  { id:"r54", name:"Coconut Chutney", category:"condiment", diet:["veg","vegan"], meals:[],
     ingredients:[
       { ref:"f15", name:"Fresh Coconut", amount:80, unit:"g" },
       { name:"Roasted Chana Dal", amount:20, unit:"g" },
@@ -8270,7 +8482,7 @@ const RECIPES_DATA = [
     method:"Grind coconut, roasted dal, chilli, ginger with water to smooth paste. Temper with mustard, curry leaves.",
     time:10, serves:4, emoji:"🥥" },
 
-  { id:"r55", name:"Jackfruit Sabzi", category:"veg", diet:["veg","vegan"],
+  { id:"r55", name:"Jackfruit Sabzi", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { ref:"f11", name:"Jackfruit (raw)", amount:200, unit:"g" },
       { ref:"v3", name:"Onion", amount:80, unit:"g" },
@@ -8280,7 +8492,7 @@ const RECIPES_DATA = [
     method:"Boil raw jackfruit till tender. Shred. Sauté with onion, tomato, spices. Cook till dry. Serve with roti.",
     time:40, serves:3, emoji:"🍋" },
 
-  { id:"r56", name:"Watermelon Mint Cooler", category:"drinks", diet:["veg","vegan"],
+  { id:"r56", name:"Watermelon Mint Cooler", category:"drinks", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"f7", name:"Watermelon", amount:300, unit:"g" },
       { ref:"l10", name:"Mint", amount:15, unit:"g" },
@@ -8290,7 +8502,7 @@ const RECIPES_DATA = [
     method:"Blend watermelon and mint. Strain, add lemon juice and black salt. Serve over ice.",
     time:5, serves:2, emoji:"🍉" },
 
-  { id:"r57", name:"Rajgira (Amaranth) Laddoo", category:"snack", diet:["veg","vegan"],
+  { id:"r57", name:"Rajgira (Amaranth) Laddoo", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"l3", name:"Amaranth Seeds (popped)", amount:100, unit:"g" },
       { name:"Jaggery", amount:80, unit:"g" },
@@ -8300,7 +8512,7 @@ const RECIPES_DATA = [
     method:"Melt jaggery to soft stage. Mix in popped amaranth, almonds quickly. Shape into balls while warm.",
     time:20, serves:8, emoji:"🟡" },
 
-  { id:"r58", name:"Cluster Bean Stir Fry", category:"veg", diet:["veg","vegan"],
+  { id:"r58", name:"Cluster Bean Stir Fry", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v18", name:"Cluster Beans", amount:150, unit:"g" },
       { ref:"g15", name:"Peanuts", amount:30, unit:"g" },
@@ -8311,7 +8523,7 @@ const RECIPES_DATA = [
     method:"Blanche cluster beans. Sauté peanuts, add beans, grated coconut, spices, sesame. Cook on medium heat.",
     time:20, serves:2, emoji:"🫘" },
 
-  { id:"r59", name:"Tinda Aloo Curry", category:"veg", diet:["veg","vegan"],
+  { id:"r59", name:"Tinda Aloo Curry", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v16", name:"Tinda", amount:200, unit:"g" },
       { ref:"v2", name:"Potato", amount:100, unit:"g" },
@@ -8322,7 +8534,7 @@ const RECIPES_DATA = [
     method:"Sauté cubed tinda and potato with onion-tomato masala. Add water, cover cook till soft. Garnish with coriander.",
     time:25, serves:2, emoji:"🍏" },
 
-  { id:"r60", name:"Coriander Mint Chutney", category:"condiment", diet:["veg","vegan"],
+  { id:"r60", name:"Coriander Mint Chutney", category:"condiment", diet:["veg","vegan"], meals:[],
     ingredients:[
       { ref:"l6", name:"Coriander Leaves", amount:50, unit:"g" },
       { ref:"l10", name:"Mint", amount:20, unit:"g" },
@@ -8332,7 +8544,7 @@ const RECIPES_DATA = [
     method:"Blend all ingredients with little water to smooth chutney. Adjust salt and lemon. Store refrigerated.",
     time:5, serves:6, emoji:"🌿" },
 
-  { id:"r61", name:"Paneer Tikka", category:"veg", diet:["veg"],
+  { id:"r61", name:"Paneer Tikka", category:"veg", diet:["veg"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Paneer", amount:200, unit:"g" },
       { ref:"v6", name:"Capsicum", amount:80, unit:"g" },
@@ -8343,7 +8555,7 @@ const RECIPES_DATA = [
     method:"Marinate paneer cubes in spiced yoghurt 1 hr. Skewer with capsicum, onion. Grill or air-fry at 200°C.",
     time:30, serves:3, emoji:"🧀" },
 
-  { id:"r62", name:"Turnip Gajar Sabzi", category:"veg", diet:["veg","vegan"],
+  { id:"r62", name:"Turnip Gajar Sabzi", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v19", name:"Turnip", amount:150, unit:"g" },
       { ref:"v4", name:"Carrot", amount:100, unit:"g" },
@@ -8354,7 +8566,7 @@ const RECIPES_DATA = [
     method:"Sauté onion, ginger. Add cubed turnip and carrot with spices. Cook covered. Add mustard leaves, toss.",
     time:20, serves:2, emoji:"🌰" },
 
-  { id:"r63", name:"Coconut Rice", category:"veg", diet:["veg","vegan"],
+  { id:"r63", name:"Coconut Rice", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { ref:"g1", name:"Brown Rice", amount:150, unit:"g" },
       { ref:"f15", name:"Coconut (grated)", amount:60, unit:"g" },
@@ -8364,7 +8576,7 @@ const RECIPES_DATA = [
     method:"Cook rice. Sauté mustard seeds, cashews, curry leaves in oil. Add grated coconut, roast. Mix into rice.",
     time:25, serves:3, emoji:"🥥" },
 
-  { id:"r64", name:"Shakarkand Chaat", category:"snack", diet:["veg","vegan"],
+  { id:"r64", name:"Shakarkand Chaat", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"v20", name:"Sweet Potato", amount:200, unit:"g" },
       { ref:"f8", name:"Pomegranate", amount:50, unit:"g" },
@@ -8374,7 +8586,7 @@ const RECIPES_DATA = [
     method:"Roast or boil sweet potato, cube. Toss with pomegranate, chaat masala, lemon juice. Serve warm.",
     time:20, serves:2, emoji:"🍠" },
 
-  { id:"r65", name:"Fish Tikka", category:"non-veg", diet:["non-veg"],
+  { id:"r65", name:"Fish Tikka", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
     ingredients:[
       { ref:"n4", name:"Pomfret", amount:250, unit:"g" },
       { name:"Yoghurt, Turmeric, Ajwain", amount:80, unit:"g" },
@@ -8383,6 +8595,1762 @@ const RECIPES_DATA = [
     nutrients:{ calories:280, protein:40, carbs:5, fat:10, fiber:0, vitC:10, vitA:0, calcium:120, iron:1.5, magnesium:55 },
     method:"Marinate fish in yoghurt-spice mix 30 min. Grill in oven at 220°C for 12-15 min, basting once. Serve with mint chutney.",
     time:25, serves:2, emoji:"🐠" },
+
+  { id:"r66", name:"Idli with Sambar", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+    ingredients:[
+      { name:"Rice", amount:100, unit:"g" },
+      { name:"Urad Dal", amount:40, unit:"g" },
+      { name:"Toor Dal", amount:40, unit:"g" },
+      { name:"Tomato", amount:60, unit:"g" },
+      { name:"Drumstick", amount:50, unit:"g" },
+      { name:"Onion", amount:40, unit:"g" },
+      { name:"Oil", amount:8, unit:"g" },
+      { name:"Salt and spices", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:760.2, protein:28.3, carbs:142.5, fat:10.8, fiber:19.2, vitC:82.7, vitA:70.2, calcium:184.8, iron:6.2, magnesium:205.1 },
+    method:"Soak rice and urad dal, grind and ferment overnight. Steam batter in idli moulds 12 min. Cook toor dal with vegetables, add tamarind and sambar spices, temper with mustard and curry leaves.",
+    time:40, serves:3, emoji:"🍚" },
+
+  { id:"r67", name:"Plain Dosa with Chutney", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
+    ingredients:[
+      { name:"Rice", amount:100, unit:"g" },
+      { name:"Urad Dal", amount:30, unit:"g" },
+      { name:"Coconut (grated)", amount:40, unit:"g" },
+      { name:"Green Chilli", amount:5, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:681.1, protein:15.6, carbs:103.5, fat:24.1, fiber:10.1, vitC:8.4, vitA:2.4, calcium:61.7, iron:2.8, magnesium:81.5 },
+    method:"Soak and grind rice and urad dal, ferment overnight. Spread thin on a hot tawa, drizzle a little oil, cook till crisp. Serve with coconut chutney.",
+    time:35, serves:3, emoji:"🥞" },
+
+  { id:"r68", name:"Pesarattu (Green Moong Dosa)", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+    ingredients:[
+      { name:"Green Moong", amount:120, unit:"g" },
+      { name:"Rice", amount:20, unit:"g" },
+      { name:"Ginger", amount:10, unit:"g" },
+      { name:"Green Chilli", amount:5, unit:"g" },
+      { name:"Onion", amount:40, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:584.2, protein:30.9, carbs:90.2, fat:11.7, fiber:20.4, vitC:16.7, vitA:9.6, calcium:162.3, iron:9.1, magnesium:240.7 },
+    method:"Soak whole green moong and a little rice 6 hours, grind with ginger and chilli. Spread on a tawa, top with chopped onion, cook both sides. Serve with ginger chutney.",
+    time:30, serves:3, emoji:"🥞" },
+
+  { id:"r69", name:"Ven Pongal", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+    ingredients:[
+      { name:"Rice", amount:90, unit:"g" },
+      { name:"Moong Dal", amount:45, unit:"g" },
+      { name:"Ghee", amount:12, unit:"g" },
+      { name:"Ginger", amount:8, unit:"g" },
+      { name:"Curry Leaves", amount:3, unit:"g" },
+      { name:"Salt and spices", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:593, protein:17.8, carbs:103, fat:13.4, fiber:9.2, vitC:0.8, vitA:136.5, calcium:102.1, iron:4.3, magnesium:115.6 },
+    method:"Dry-roast moong dal, cook with rice till soft and mushy. Temper ghee with pepper, cumin, ginger and curry leaves, mix in.",
+    time:30, serves:3, emoji:"🍲" },
+
+  { id:"r70", name:"Foxtail Millet Upma", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+    ingredients:[
+      { name:"Foxtail Millet", amount:120, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Carrot", amount:50, unit:"g" },
+      { name:"Green Peas", amount:40, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Curry Leaves", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:561.7, protein:18.1, carbs:88.9, fat:15.5, fiber:14.1, vitC:22.8, vitA:462.7, calcium:100.1, iron:4.2, magnesium:122.7 },
+    method:"Roast millet lightly. Temper mustard, curry leaves, onion and vegetables, add water and millet, cook covered till fluffy.",
+    time:25, serves:3, emoji:"🥣" },
+
+  { id:"r71", name:"Vegetable Uttapam", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+    ingredients:[
+      { name:"Rice", amount:100, unit:"g" },
+      { name:"Urad Dal", amount:30, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Tomato", amount:50, unit:"g" },
+      { name:"Carrot", amount:40, unit:"g" },
+      { name:"Coriander Leaves", amount:10, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:585.2, protein:15.8, carbs:108, fat:11.2, fiber:9.2, vitC:15.8, vitA:388.7, calcium:91.6, iron:2.4, magnesium:85.5 },
+    method:"Use fermented idli-dosa batter. Pour a thick round on a tawa, top with chopped vegetables, cook both sides with a little oil.",
+    time:30, serves:3, emoji:"🥞" },
+
+  { id:"r72", name:"Vegetable Dalia Porridge", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+    ingredients:[
+      { name:"Broken Wheat", amount:100, unit:"g" },
+      { name:"Carrot", amount:50, unit:"g" },
+      { name:"Green Peas", amount:40, unit:"g" },
+      { name:"French Beans", amount:40, unit:"g" },
+      { name:"Onion", amount:40, unit:"g" },
+      { name:"Oil", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:494, protein:15.3, carbs:86.1, fat:9.8, fiber:17.5, vitC:26.7, vitA:446.7, calcium:91.5, iron:5.1, magnesium:159.2 },
+    method:"Roast dalia, saute onion and vegetables, add dalia with 3 cups water, cook covered till soft and porridge-like.",
+    time:25, serves:3, emoji:"🥣" },
+
+  { id:"r73", name:"Besan Chilla with Mint Chutney", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+    ingredients:[
+      { name:"Besan", amount:120, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Tomato", amount:50, unit:"g" },
+      { name:"Coriander Leaves", amount:10, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:595.7, protein:28.1, carbs:78.6, fat:18.6, fiber:15.9, vitC:13.8, vitA:58.7, calcium:93.2, iron:7, magnesium:220.3 },
+    method:"Mix besan with water, spices and chopped vegetables into a pouring batter. Cook thin pancakes on a tawa. Serve with mint chutney.",
+    time:20, serves:3, emoji:"🥞" },
+
+  { id:"r74", name:"Thalipeeth", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
+    ingredients:[
+      { name:"Pearl Millet (Whole Bajra)", amount:60, unit:"g" },
+      { name:"Sorghum (Whole Jowar)", amount:60, unit:"g" },
+      { name:"Besan", amount:40, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Coriander Leaves", amount:10, unit:"g" },
+      { name:"Sesame Seeds", amount:8, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" }
+    ],
+    nutrients:{ calories:759, protein:24.3, carbs:115.1, fat:22.9, fiber:19.3, vitC:7.1, vitA:33.8, calcium:156.7, iron:10.7, magnesium:287.9 },
+    method:"Mix the multigrain flours with onion, coriander, sesame and spices into a dough with warm water. Pat thin on a damp cloth, cook on a tawa with a little oil.",
+    time:30, serves:3, emoji:"🫓" },
+
+  { id:"r75", name:"Akki Roti (Rice Roti)", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
+    ingredients:[
+      { name:"Rice Flour", amount:150, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Carrot", amount:50, unit:"g" },
+      { name:"Coriander Leaves", amount:10, unit:"g" },
+      { name:"Coconut (grated)", amount:20, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:751, protein:10.9, carbs:133, fat:18.9, fiber:7.9, vitC:10, vitA:451.2, calcium:52.5, iron:1.5, magnesium:72.5 },
+    method:"Mix rice flour with grated vegetables, coconut and salt, knead with warm water. Pat out thin on the tawa and cook till golden.",
+    time:25, serves:3, emoji:"🫓" },
+
+  { id:"r76", name:"Idiyappam with Vegetable Kurma", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+    ingredients:[
+      { name:"Rice Flour", amount:150, unit:"g" },
+      { name:"Carrot", amount:60, unit:"g" },
+      { name:"Green Peas", amount:50, unit:"g" },
+      { name:"French Beans", amount:50, unit:"g" },
+      { name:"Potato", amount:60, unit:"g" },
+      { name:"Coconut (grated)", amount:40, unit:"g" },
+      { name:"Oil", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:888.1, protein:15.7, carbs:152.7, fat:23.7, fiber:14.4, vitC:42.7, vitA:537.5, calcium:78.6, iron:3.5, magnesium:115.3 },
+    method:"Knead rice flour with hot water, press into strings, steam 8 min. Cook vegetables in a coconut-green chilli gravy for the kurma.",
+    time:40, serves:3, emoji:"🍜" },
+
+  { id:"r77", name:"Masala Omelette with Roti", category:"breakfast", diet:["non-veg"], meals:["breakfast","dinner"],
+    ingredients:[
+      { name:"Egg", amount:200, unit:"g" },
+      { name:"Onion", amount:40, unit:"g" },
+      { name:"Tomato", amount:40, unit:"g" },
+      { name:"Green Chilli", amount:5, unit:"g" },
+      { name:"Atta", amount:60, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:603.6, protein:33.3, carbs:49.7, fat:30.1, fiber:7.8, vitC:15.8, vitA:339.2, calcium:150.7, iron:6.8, magnesium:115.8 },
+    method:"Beat eggs with onion, tomato, chilli and coriander. Cook as an omelette. Serve with phulka made from atta.",
+    time:15, serves:2, emoji:"🍳" },
+
+  { id:"r78", name:"Ragi Ambali (Ragi Porridge)", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","snack"],
+    ingredients:[
+      { name:"Finger Millet (Whole Ragi)", amount:40, unit:"g" },
+      { name:"Curd", amount:100, unit:"g" },
+      { name:"Water", amount:300, unit:"ml" }
+    ],
+    nutrients:{ calories:191.2, protein:6.4, carbs:33.5, fat:3.8, fiber:4.6, vitC:0.5, vitA:27, calcium:257.6, iron:1.7, magnesium:66.8 },
+    method:"Mix ragi flour in water, cook till thick and glossy, cool. Stir in curd and a pinch of salt; serve as a cooling porridge.",
+    time:15, serves:2, emoji:"🥣" },
+
+  { id:"r79", name:"Khaman Dhokla", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","snack"],
+    ingredients:[
+      { name:"Besan", amount:150, unit:"g" },
+      { name:"Curd", amount:60, unit:"g" },
+      { name:"Lemon", amount:10, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Green Chilli", amount:5, unit:"g" },
+      { name:"Sesame Seeds", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:738.4, protein:36.2, carbs:92.4, fat:24.6, fiber:17.5, vitC:12.8, vitA:18.8, calcium:191.8, iron:8.2, magnesium:275.7 },
+    method:"Whisk besan with curd, water, lemon and fruit salt. Steam 15 min in a greased plate, then pour over a mustard-chilli tempering.",
+    time:30, serves:4, emoji:"🟨" },
+
+  { id:"r80", name:"Stuffed Mooli Paratha with Curd", category:"breakfast", diet:["veg"], meals:["breakfast"],
+    ingredients:[
+      { name:"Atta", amount:180, unit:"g" },
+      { name:"Radish", amount:150, unit:"g" },
+      { name:"Curd", amount:150, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:870.2, protein:28.3, carbs:142, fat:23.6, fiber:23.2, vitC:23.6, vitA:44.5, calcium:307.3, iron:10.1, magnesium:287.6 },
+    method:"Squeeze grated radish dry, mix with spices, stuff into atta dough rounds. Cook on a tawa with a little oil. Serve with curd.",
+    time:35, serves:3, emoji:"🫓" },
+
+  { id:"r81", name:"Little Millet Pongal (Samai)", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+    ingredients:[
+      { name:"Little Millet", amount:100, unit:"g" },
+      { name:"Moong Dal", amount:40, unit:"g" },
+      { name:"Ghee", amount:10, unit:"g" },
+      { name:"Ginger", amount:8, unit:"g" },
+      { name:"Curry Leaves", amount:3, unit:"g" },
+      { name:"Salt and spices", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:588.1, protein:18, carbs:95.7, fat:15.6, fiber:15.1, vitC:0.8, vitA:119.4, calcium:104.8, iron:12.6, magnesium:219.4 },
+    method:"Cook little millet with moong dal till soft. Temper ghee with pepper, cumin, ginger and curry leaves and fold in.",
+    time:30, serves:3, emoji:"🍲" },
+
+  { id:"r82", name:"Sattu Paratha", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
+    ingredients:[
+      { name:"Atta", amount:180, unit:"g" },
+      { name:"Besan", amount:60, unit:"g" },
+      { name:"Onion", amount:40, unit:"g" },
+      { name:"Green Chilli", amount:5, unit:"g" },
+      { name:"Lemon", amount:10, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" }
+    ],
+    nutrients:{ calories:997.7, protein:35.4, carbs:167.7, fat:22.2, fiber:27.4, vitC:15.5, vitA:2.5, calcium:113.5, iron:12, magnesium:352.1 },
+    method:"Mix roasted gram flour (sattu) with onion, chilli, lemon and spices. Stuff into atta dough, roll, cook on a tawa with oil.",
+    time:30, serves:3, emoji:"🫓" },
+
+  { id:"r83", name:"Appam with Vegetable Stew", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+    ingredients:[
+      { name:"Rice", amount:100, unit:"g" },
+      { name:"Coconut (grated)", amount:40, unit:"g" },
+      { name:"Potato", amount:80, unit:"g" },
+      { name:"Carrot", amount:60, unit:"g" },
+      { name:"Green Peas", amount:40, unit:"g" },
+      { name:"Milk", amount:100, unit:"ml" },
+      { name:"Oil", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:736.9, protein:15.8, carbs:115, fat:25.4, fiber:10.1, vitC:37.7, vitA:562.2, calcium:167, iron:3.1, magnesium:83.6 },
+    method:"Ferment rice-coconut batter, cook lacy appams in a small pan. Simmer vegetables in thin coconut milk with whole spices for the stew.",
+    time:45, serves:3, emoji:"🥞" },
+
+  { id:"r84", name:"Vegetable Semiya Upma", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
+    ingredients:[
+      { name:"Vermicelli", amount:120, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Carrot", amount:50, unit:"g" },
+      { name:"Green Peas", amount:40, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Curry Leaves", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:586.9, protein:15.3, carbs:103.4, fat:11.5, fiber:8.1, vitC:22.8, vitA:462.7, calcium:86.9, iron:2.7, magnesium:73.5 },
+    method:"Roast vermicelli. Saute onion and vegetables with mustard and curry leaves, add water, then vermicelli, and cook covered 4 min.",
+    time:20, serves:3, emoji:"🍜" },
+
+  { id:"r85", name:"Egg Dosa", category:"breakfast", diet:["non-veg"], meals:["breakfast"],
+    ingredients:[
+      { name:"Rice", amount:60, unit:"g" },
+      { name:"Urad Dal", amount:20, unit:"g" },
+      { name:"Egg", amount:100, unit:"g" },
+      { name:"Onion", amount:30, unit:"g" },
+      { name:"Oil", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:502.1, protein:21.9, carbs:62.9, fat:18.1, fiber:4.7, vitC:2.2, vitA:160, calcium:99.1, iron:3, magnesium:58.6 },
+    method:"Spread dosa batter on a hot tawa, break an egg over it, spread with a spoon, sprinkle onion and pepper, cook both sides.",
+    time:15, serves:2, emoji:"🥞" },
+
+  { id:"r86", name:"Punjabi Kadhi with Rice", category:"veg", diet:["veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Curd", amount:250, unit:"g" },
+      { name:"Besan", amount:50, unit:"g" },
+      { name:"Rice", amount:120, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:905, protein:29.5, carbs:144.1, fat:24.9, fiber:9.2, vitC:6.3, vitA:73.5, calcium:371.1, iron:4.7, magnesium:157.4 },
+    method:"Whisk curd with besan and water, simmer 25 min with turmeric. Temper with cumin, red chilli and fenugreek. Serve with steamed rice.",
+    time:40, serves:4, emoji:"🍛" },
+
+  { id:"r87", name:"Sindhi Kadhi", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Besan", amount:50, unit:"g" },
+      { name:"Okra", amount:100, unit:"g" },
+      { name:"Drumstick", amount:80, unit:"g" },
+      { name:"Potato", amount:100, unit:"g" },
+      { name:"Tomato", amount:80, unit:"g" },
+      { name:"Tamarind", amount:10, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" }
+    ],
+    nutrients:{ calories:477.5, protein:17.6, carbs:69.6, fat:16, fiber:14.9, vitC:167.3, vitA:129, calcium:154.9, iron:4.7, magnesium:217 },
+    method:"Roast besan, whisk into water with tamarind and spices, simmer. Add vegetables and cook till tender. Temper with fenugreek and curry leaves.",
+    time:40, serves:4, emoji:"🍲" },
+
+  { id:"r88", name:"Lauki Chana Dal", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Chana Dal", amount:100, unit:"g" },
+      { name:"Bottle Gourd", amount:250, unit:"g" },
+      { name:"Tomato", amount:60, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:543.2, protein:25.1, carbs:79, fat:16, fiber:15.1, vitC:40.6, vitA:32.2, calcium:158.5, iron:7, magnesium:164.1 },
+    method:"Pressure cook soaked chana dal with bottle gourd cubes. Temper cumin, onion and tomato, mix in and simmer.",
+    time:35, serves:4, emoji:"🍲" },
+
+  { id:"r89", name:"Bottle Gourd Sabzi", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Bottle Gourd", amount:350, unit:"g" },
+      { name:"Tomato", amount:60, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:183.3, protein:3.6, carbs:20.9, fat:10.6, fiber:4.3, vitC:47.5, vitA:29.2, calcium:124.5, iron:1.7, magnesium:58.1 },
+    method:"Saute cumin, onion and tomato, add cubed bottle gourd and spices, cook covered without extra water till soft. Serve with phulka.",
+    time:25, serves:3, emoji:"🥬" },
+
+  { id:"r90", name:"Bharwan Karela (Stuffed Bitter Gourd)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Bitter Gourd", amount:300, unit:"g" },
+      { name:"Onion", amount:80, unit:"g" },
+      { name:"Besan", amount:30, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:349.1, protein:11.1, carbs:38.9, fat:18.2, fiber:14.6, vitC:258.5, vitA:24, calcium:112.9, iron:3.9, magnesium:120.8 },
+    method:"Scrape and parboil bitter gourd. Stuff with fried onion, besan and spices. Shallow-cook covered till tender.",
+    time:45, serves:3, emoji:"🥒" },
+
+  { id:"r91", name:"Dum Aloo (Kashmiri)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Potato", amount:350, unit:"g" },
+      { name:"Curd", amount:80, unit:"g" },
+      { name:"Oil", amount:20, unit:"g" },
+      { name:"Salt and spices", amount:8, unit:"g" },
+      { name:"Ginger", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:523.9, protein:10.8, carbs:68.7, fat:23.9, fiber:9.9, vitC:71.6, vitA:29.6, calcium:171.3, iron:4.4, magnesium:109.5 },
+    method:"Prick baby potatoes, pan-fry lightly. Simmer in a gravy of curd, ginger, fennel and Kashmiri chilli.",
+    time:45, serves:3, emoji:"🥔" },
+
+  { id:"r92", name:"Matar Paneer", category:"veg", diet:["veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Paneer", amount:200, unit:"g" },
+      { name:"Green Peas", amount:150, unit:"g" },
+      { name:"Tomato", amount:150, unit:"g" },
+      { name:"Onion", amount:80, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:922.5, protein:47, carbs:43.3, fat:62.6, fiber:12.3, vitC:87.5, vitA:466, calcium:510.9, iron:4.3, magnesium:108 },
+    method:"Cook an onion-tomato masala, add peas and simmer. Fold in paneer cubes and cook 5 min.",
+    time:30, serves:3, emoji:"🧀" },
+
+  { id:"r93", name:"Kadai Paneer", category:"veg", diet:["veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Paneer", amount:200, unit:"g" },
+      { name:"Capsicum", amount:100, unit:"g" },
+      { name:"Tomato", amount:150, unit:"g" },
+      { name:"Onion", amount:80, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:7, unit:"g" }
+    ],
+    nutrients:{ calories:834.9, protein:40, carbs:28.8, fat:62.4, fiber:7, vitC:155.6, vitA:567, calcium:484.4, iron:2.7, magnesium:70.5 },
+    method:"Cook onion and tomato with freshly ground kadai masala, add capsicum strips and paneer, simmer briefly.",
+    time:30, serves:3, emoji:"🧀" },
+
+  { id:"r94", name:"Mushroom Matar Masala", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Mushroom", amount:250, unit:"g" },
+      { name:"Green Peas", amount:100, unit:"g" },
+      { name:"Tomato", amount:120, unit:"g" },
+      { name:"Onion", amount:80, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:310.2, protein:15.7, carbs:36.9, fat:14, fiber:11.6, vitC:68.5, vitA:93.4, calcium:82.9, iron:4.2, magnesium:86.7 },
+    method:"Saute onion-tomato masala, add mushrooms and peas, cook uncovered till the water dries and the gravy thickens.",
+    time:25, serves:3, emoji:"🍄" },
+
+  { id:"r95", name:"Mixed Vegetable Korma", category:"veg", diet:["veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Carrot", amount:80, unit:"g" },
+      { name:"Green Peas", amount:60, unit:"g" },
+      { name:"French Beans", amount:60, unit:"g" },
+      { name:"Potato", amount:80, unit:"g" },
+      { name:"Cauliflower", amount:100, unit:"g" },
+      { name:"Curd", amount:100, unit:"g" },
+      { name:"Coconut (grated)", amount:30, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" }
+    ],
+    nutrients:{ calories:485.4, protein:13, carbs:48.4, fat:29, fiber:13.8, vitC:101.3, vitA:738.8, calcium:219.4, iron:3.6, magnesium:99.4 },
+    method:"Cook vegetables in a gravy of onion, coconut and curd paste with whole spices till tender.",
+    time:40, serves:4, emoji:"🥘" },
+
+  { id:"r96", name:"Avial (Kerala)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Raw Banana", amount:100, unit:"g" },
+      { name:"Yam", amount:100, unit:"g" },
+      { name:"Drumstick", amount:80, unit:"g" },
+      { name:"Carrot", amount:80, unit:"g" },
+      { name:"French Beans", amount:60, unit:"g" },
+      { name:"Coconut (grated)", amount:60, unit:"g" },
+      { name:"Curd", amount:100, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:648.8, protein:11.6, carbs:83.6, fat:34, fiber:18.9, vitC:153, vitA:776.2, calcium:223, iron:3.5, magnesium:139.8 },
+    method:"Steam mixed vegetables with turmeric. Mix with ground coconut, green chilli and cumin paste and curd, finish with raw coconut oil and curry leaves.",
+    time:40, serves:4, emoji:"🥥" },
+
+  { id:"r97", name:"Kerala Vegetable Stew", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Potato", amount:100, unit:"g" },
+      { name:"Carrot", amount:80, unit:"g" },
+      { name:"Green Peas", amount:50, unit:"g" },
+      { name:"French Beans", amount:60, unit:"g" },
+      { name:"Coconut (grated)", amount:50, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Oil", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:436.6, protein:8.7, carbs:48.4, fat:25.1, fiber:14.4, vitC:57.1, vitA:708, calcium:91.6, iron:3.7, magnesium:85.1 },
+    method:"Simmer vegetables with whole spices and ginger in thin coconut milk. Finish with thick coconut milk and curry leaves. Serve with appam or phulka.",
+    time:35, serves:3, emoji:"🥣" },
+
+  { id:"r98", name:"Cabbage Thoran", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Cabbage", amount:300, unit:"g" },
+      { name:"Coconut (grated)", amount:40, unit:"g" },
+      { name:"Onion", amount:30, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Curry Leaves", amount:3, unit:"g" },
+      { name:"Salt and spices", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:328.9, protein:6.1, carbs:28.3, fat:23.9, fiber:12.6, vitC:111.8, vitA:48, calcium:169.4, iron:3.1, magnesium:59.1 },
+    method:"Temper mustard, urad dal and curry leaves, add shredded cabbage and turmeric, cook, then mix in coconut-cumin-chilli paste.",
+    time:20, serves:3, emoji:"🥬" },
+
+  { id:"r99", name:"Beans Poriyal", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"French Beans", amount:300, unit:"g" },
+      { name:"Coconut (grated)", amount:40, unit:"g" },
+      { name:"Onion", amount:30, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Curry Leaves", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:338.2, protein:7.2, carbs:30.4, fat:23.6, fiber:14.5, vitC:39.5, vitA:135, calcium:148.4, iron:4, magnesium:92.1 },
+    method:"Temper mustard, urad dal and curry leaves, add chopped beans and salt, cook covered till tender, finish with coconut.",
+    time:20, serves:3, emoji:"🥬" },
+
+  { id:"r100", name:"Lauki Kootu", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Bottle Gourd", amount:250, unit:"g" },
+      { name:"Chana Dal", amount:70, unit:"g" },
+      { name:"Coconut (grated)", amount:40, unit:"g" },
+      { name:"Oil", amount:8, unit:"g" },
+      { name:"Curry Leaves", amount:3, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:525.1, protein:18.8, carbs:59.8, fat:25.4, fiber:13.7, vitC:28.8, vitA:35.4, calcium:150.7, iron:5.9, magnesium:130.1 },
+    method:"Cook chana dal and bottle gourd till soft. Add coconut-cumin-chilli paste, simmer and temper with mustard and curry leaves.",
+    time:30, serves:4, emoji:"🥣" },
+
+  { id:"r101", name:"Tomato Rasam with Rice", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Tomato", amount:200, unit:"g" },
+      { name:"Toor Dal", amount:40, unit:"g" },
+      { name:"Rice", amount:100, unit:"g" },
+      { name:"Tamarind", amount:10, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Oil", amount:8, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:639.2, protein:18.9, carbs:123.3, fat:10.2, fiber:11.3, vitC:31.3, vitA:89.2, calcium:122.9, iron:4.7, magnesium:138.4 },
+    method:"Boil toor dal soft. Simmer tomato, tamarind, pepper-cumin-garlic crush, add dal water, temper with mustard and curry leaves. Serve over rice.",
+    time:30, serves:3, emoji:"🍲" },
+
+  { id:"r102", name:"Bisi Bele Bath", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Rice", amount:100, unit:"g" },
+      { name:"Toor Dal", amount:80, unit:"g" },
+      { name:"Carrot", amount:60, unit:"g" },
+      { name:"Green Peas", amount:50, unit:"g" },
+      { name:"French Beans", amount:60, unit:"g" },
+      { name:"Tamarind", amount:10, unit:"g" },
+      { name:"Ghee", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:858.2, protein:30.1, carbs:156.8, fat:15.1, fiber:21.8, vitC:31.8, vitA:650, calcium:206.9, iron:8.1, magnesium:232.3 },
+    method:"Cook rice, dal and vegetables together till very soft. Add tamarind and bisi bele bath masala, simmer and finish with ghee.",
+    time:50, serves:4, emoji:"🍲" },
+
+  { id:"r103", name:"Lemon Rice", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Rice", amount:120, unit:"g" },
+      { name:"Lemon", amount:30, unit:"g" },
+      { name:"Peanuts", amount:20, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Curry Leaves", amount:3, unit:"g" },
+      { name:"Salt and spices", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:654.1, protein:14.4, carbs:102.9, fat:22.8, fiber:4.7, vitC:16.3, vitA:33.3, calcium:73.9, iron:2.5, magnesium:69.7 },
+    method:"Temper mustard, chana dal, peanuts, curry leaves and turmeric in oil, mix with cooked rice and lemon juice.",
+    time:20, serves:3, emoji:"🍋" },
+
+  { id:"r104", name:"Puliyogare (Tamarind Rice)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Rice", amount:120, unit:"g" },
+      { name:"Tamarind", amount:25, unit:"g" },
+      { name:"Peanuts", amount:20, unit:"g" },
+      { name:"Sesame Seeds", amount:8, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:783, protein:16.4, carbs:118.3, fat:30.2, fiber:6.6, vitC:1.4, vitA:6.6, calcium:149.7, iron:4.7, magnesium:123.1 },
+    method:"Cook a thick tamarind paste with roasted spice-sesame powder, peanuts and jaggery. Toss through cooked rice.",
+    time:25, serves:3, emoji:"🍛" },
+
+  { id:"r105", name:"Curd Rice (Thayir Sadam)", category:"veg", diet:["veg"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Rice", amount:100, unit:"g" },
+      { name:"Curd", amount:250, unit:"g" },
+      { name:"Milk", amount:60, unit:"ml" },
+      { name:"Ginger", amount:5, unit:"g" },
+      { name:"Curry Leaves", amount:3, unit:"g" },
+      { name:"Oil", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:591.9, protein:17.9, carbs:95.1, fat:16.8, fiber:1.3, vitC:2.2, vitA:125.1, calcium:402.5, iron:1, magnesium:61.5 },
+    method:"Mash soft-cooked rice with milk and curd, add salt. Temper mustard, curry leaves, ginger and green chilli.",
+    time:15, serves:3, emoji:"🥣" },
+
+  { id:"r106", name:"Tomato Rice", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Rice", amount:120, unit:"g" },
+      { name:"Tomato", amount:250, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:606.5, protein:12, carbs:113.1, fat:13.8, fiber:6.7, vitC:40, vitA:111, calcium:73.6, iron:2.8, magnesium:71.9 },
+    method:"Saute onion and tomato with mint and spices till soft, add rice and water, cook covered till fluffy.",
+    time:25, serves:3, emoji:"🍅" },
+
+  { id:"r107", name:"Vegetable Pulao", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Basmati Rice", amount:150, unit:"g" },
+      { name:"Carrot", amount:60, unit:"g" },
+      { name:"Green Peas", amount:60, unit:"g" },
+      { name:"French Beans", amount:60, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Ghee", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:761.8, protein:18.2, carbs:143.7, fat:13.7, fiber:11, vitC:39.7, vitA:650.6, calcium:105.8, iron:3.9, magnesium:95.5 },
+    method:"Saute whole spices and onion in ghee, add vegetables and rinsed basmati, cook with water till grains separate.",
+    time:35, serves:4, emoji:"🍚" },
+
+  { id:"r108", name:"Jeera Rice with Dal Fry", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Basmati Rice", amount:120, unit:"g" },
+      { name:"Toor Dal", amount:60, unit:"g" },
+      { name:"Tomato", amount:80, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Ghee", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:785.5, protein:24.9, carbs:142.6, fat:14.3, fiber:13.8, vitC:16.1, vitA:139.4, calcium:131.8, iron:5.3, magnesium:164.6 },
+    method:"Cook cumin rice. Pressure cook toor dal, finish with a garlic, onion and tomato tempering.",
+    time:35, serves:3, emoji:"🍛" },
+
+  { id:"r109", name:"Gutti Vankaya (Stuffed Brinjal)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Brinjal", amount:300, unit:"g" },
+      { name:"Peanuts", amount:30, unit:"g" },
+      { name:"Sesame Seeds", amount:10, unit:"g" },
+      { name:"Coconut (grated)", amount:20, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" }
+    ],
+    nutrients:{ calories:529.8, protein:13.9, carbs:33.7, fat:42, fiber:15.6, vitC:11.6, vitA:3.1, calcium:168.7, iron:4, magnesium:139.9 },
+    method:"Slit small brinjals, stuff with a roasted peanut-sesame-coconut masala, cook covered with tamarind till soft.",
+    time:40, serves:3, emoji:"🍆" },
+
+  { id:"r110", name:"Gongura Pappu", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Toor Dal", amount:100, unit:"g" },
+      { name:"Gongura (Roselle Leaves)", amount:100, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:530.9, protein:25.2, carbs:82.3, fat:13.3, fiber:20.4, vitC:18.6, vitA:74, calcium:344, iron:8.5, magnesium:248 },
+    method:"Cook toor dal soft. Saute sorrel-like gongura leaves, mash into dal and temper with garlic and red chilli.",
+    time:30, serves:3, emoji:"🌿" },
+
+  { id:"r111", name:"Palak Dal", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Moong Dal", amount:100, unit:"g" },
+      { name:"Spinach", amount:200, unit:"g" },
+      { name:"Tomato", amount:60, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:515.7, protein:31.3, carbs:77.2, fat:12.6, fiber:22.3, vitC:67.3, vitA:973.2, calcium:358.5, iron:13.1, magnesium:363.6 },
+    method:"Pressure cook moong dal with spinach, mash lightly, finish with a garlic and cumin tempering.",
+    time:30, serves:3, emoji:"🍲" },
+
+  { id:"r112", name:"Masoor Dal Curry", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Masoor Dal", amount:100, unit:"g" },
+      { name:"Tomato", amount:80, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:498.3, protein:26.2, carbs:72.4, fat:11.8, fiber:14, vitC:19.3, vitA:76.6, calcium:106, iron:8.5, magnesium:59.8 },
+    method:"Boil masoor dal with turmeric till soft. Temper with cumin, garlic, onion and tomato, simmer a few minutes.",
+    time:25, serves:3, emoji:"🍲" },
+
+  { id:"r113", name:"Dal Makhani", category:"veg", diet:["veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Urad Dal", amount:100, unit:"g" },
+      { name:"Rajma", amount:30, unit:"g" },
+      { name:"Tomato", amount:150, unit:"g" },
+      { name:"Butter", amount:20, unit:"g" },
+      { name:"Cream", amount:40, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:751.5, protein:34.3, carbs:88.1, fat:30.7, fiber:28.8, vitC:23, vitA:325.8, calcium:266.7, iron:7.8, magnesium:226.5 },
+    method:"Cook whole urad and rajma till very soft. Simmer with tomato puree, butter and cream for 30 min.",
+    time:60, serves:4, emoji:"🍲" },
+
+  { id:"r114", name:"Kala Chana Curry", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Black Chickpeas", amount:120, unit:"g" },
+      { name:"Onion", amount:80, unit:"g" },
+      { name:"Tomato", amount:100, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:605.5, protein:26.4, carbs:87.5, fat:18.9, fiber:24.5, vitC:24.1, vitA:51.6, calcium:292.4, iron:7.9, magnesium:169 },
+    method:"Soak and pressure cook kala chana. Cook in an onion-tomato masala till thick.",
+    time:45, serves:4, emoji:"🍲" },
+
+  { id:"r115", name:"Lobia (Black-Eyed Pea) Curry", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Lobia", amount:120, unit:"g" },
+      { name:"Onion", amount:80, unit:"g" },
+      { name:"Tomato", amount:100, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:573.8, protein:31.1, carbs:85.8, fat:14.3, fiber:17, vitC:21.6, vitA:50.6, calcium:140.8, iron:11.7, magnesium:249.8 },
+    method:"Soak and boil lobia. Simmer in an onion-tomato masala with ginger and coriander.",
+    time:40, serves:4, emoji:"🍲" },
+
+  { id:"r116", name:"Kollu Rasam (Horse Gram)", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Horse Gram", amount:60, unit:"g" },
+      { name:"Tomato", amount:100, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Tamarind", amount:8, unit:"g" },
+      { name:"Oil", amount:6, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:306.3, protein:15.3, carbs:47.7, fat:7, fiber:6, vitC:17.7, vitA:48, calcium:218.6, iron:5.5, magnesium:122 },
+    method:"Pressure cook horse gram, keep the water. Boil with tamarind, tomato, pepper and garlic, temper with mustard and curry leaves.",
+    time:35, serves:3, emoji:"🍲" },
+
+  { id:"r117", name:"Matki Usal", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Moth Beans", amount:120, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Tomato", amount:60, unit:"g" },
+      { name:"Coconut (grated)", amount:20, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:604.5, protein:30, carbs:87.8, fat:19.2, fiber:10.2, vitC:18.7, vitA:33.8, calcium:285, iron:13.1, magnesium:299 },
+    method:"Sprout matki, cook with onion-tomato and goda masala till tender, garnish with coconut and coriander.",
+    time:35, serves:3, emoji:"🫘" },
+
+  { id:"r118", name:"Undhiyu", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Potato", amount:100, unit:"g" },
+      { name:"Sweet Potato", amount:100, unit:"g" },
+      { name:"Raw Banana", amount:80, unit:"g" },
+      { name:"Brinjal", amount:100, unit:"g" },
+      { name:"Sword Beans", amount:100, unit:"g" },
+      { name:"Green Peas", amount:60, unit:"g" },
+      { name:"Fenugreek Leaves", amount:40, unit:"g" },
+      { name:"Oil", amount:25, unit:"g" },
+      { name:"Coconut (grated)", amount:30, unit:"g" }
+    ],
+    nutrients:{ calories:698.6, protein:15.3, carbs:83.7, fat:36.4, fiber:20.6, vitC:85.5, vitA:876.4, calcium:292.2, iron:5.5, magnesium:165.8 },
+    method:"Cook winter vegetables with a green coconut-coriander masala and methi dumplings in a covered pot till tender.",
+    time:60, serves:4, emoji:"🥘" },
+
+  { id:"r119", name:"Bagara Baingan", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Brinjal", amount:300, unit:"g" },
+      { name:"Peanuts", amount:30, unit:"g" },
+      { name:"Sesame Seeds", amount:15, unit:"g" },
+      { name:"Coconut (grated)", amount:30, unit:"g" },
+      { name:"Tamarind", amount:10, unit:"g" },
+      { name:"Oil", amount:20, unit:"g" }
+    ],
+    nutrients:{ calories:638, protein:14.8, carbs:37, fat:52.8, fiber:16.6, vitC:7.8, vitA:3.4, calcium:212.4, iron:5.2, magnesium:163.8 },
+    method:"Fry small brinjals lightly, simmer in a Hyderabadi gravy of ground peanut, sesame, coconut and tamarind.",
+    time:40, serves:3, emoji:"🍆" },
+
+  { id:"r120", name:"Kachumber Salad", category:"veg", diet:["veg","vegan"], meals:["snack"],
+    ingredients:[
+      { name:"Cucumber", amount:150, unit:"g" },
+      { name:"Tomato", amount:100, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Lemon", amount:15, unit:"g" },
+      { name:"Coriander Leaves", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:71.1, protein:3, carbs:16.6, fat:0.5, fiber:3.7, vitC:33.6, vitA:83.3, calcium:58.4, iron:1.1, magnesium:40.3 },
+    method:"Dice cucumber, tomato and onion, toss with lemon, salt, roasted cumin and coriander.",
+    time:10, serves:2, emoji:"🥗" },
+
+  { id:"r121", name:"Mamidikaya Pappu (Raw Mango Dal)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Toor Dal", amount:100, unit:"g" },
+      { name:"Raw Mango", amount:100, unit:"g" },
+      { name:"Onion", amount:40, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:536.9, protein:24.1, carbs:86.4, fat:12.6, fiber:18.6, vitC:21.8, vitA:9, calcium:179.7, iron:6.3, magnesium:207 },
+    method:"Cook toor dal with raw mango pieces till soft, mash and temper with mustard, garlic and chilli.",
+    time:30, serves:3, emoji:"🥭" },
+
+  { id:"r122", name:"Banana Flower Poriyal", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Banana Flower", amount:250, unit:"g" },
+      { name:"Moong Dal", amount:30, unit:"g" },
+      { name:"Coconut (grated)", amount:30, unit:"g" },
+      { name:"Onion", amount:40, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Curry Leaves", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:445.4, protein:12.8, carbs:52.4, fat:21.8, fiber:22.6, vitC:29, vitA:39.3, calcium:215.5, iron:6.8, magnesium:191.6 },
+    method:"Clean and chop banana flower, steam with moong dal, mix with temper and coconut.",
+    time:35, serves:3, emoji:"🌸" },
+
+  { id:"r123", name:"Lotus Stem Sabzi (Kamal Kakdi)", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Lotus Stem", amount:250, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Tomato", amount:80, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:344, protein:8.4, carbs:53.7, fat:13, fiber:15.5, vitC:126.1, vitA:38.6, calcium:154.3, iron:4.3, magnesium:82.3 },
+    method:"Slice lotus stem, boil briefly, then cook with onion, tomato and spices till tender.",
+    time:30, serves:3, emoji:"🥬" },
+
+  { id:"r124", name:"Cauliflower Matar Sabzi", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Cauliflower", amount:250, unit:"g" },
+      { name:"Green Peas", amount:100, unit:"g" },
+      { name:"Tomato", amount:80, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:298.5, protein:12, carbs:36.8, fat:13.9, fiber:13.2, vitC:175.4, vitA:76.6, calcium:119.5, iron:3.7, magnesium:94.3 },
+    method:"Saute onion-tomato, add cauliflower florets and peas, cover and cook till tender.",
+    time:25, serves:3, emoji:"🥦" },
+
+  { id:"r125", name:"Shukto (Bengali)", category:"veg", diet:["veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Raw Banana", amount:80, unit:"g" },
+      { name:"Bitter Gourd", amount:60, unit:"g" },
+      { name:"Drumstick", amount:60, unit:"g" },
+      { name:"Brinjal", amount:80, unit:"g" },
+      { name:"Sweet Potato", amount:80, unit:"g" },
+      { name:"Milk", amount:150, unit:"ml" },
+      { name:"Oil", amount:12, unit:"g" }
+    ],
+    nutrients:{ calories:390, protein:9.6, carbs:53.7, fat:17.7, fiber:10.5, vitC:147.4, vitA:685.8, calcium:234.1, iron:1.4, magnesium:105 },
+    method:"Cook mixed vegetables lightly with ginger and poppy-mustard paste, finish with milk.",
+    time:40, serves:4, emoji:"🥘" },
+
+  { id:"r126", name:"Alu Posto", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Potato", amount:300, unit:"g" },
+      { name:"Sesame Seeds", amount:20, unit:"g" },
+      { name:"Green Chilli", amount:8, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" }
+    ],
+    nutrients:{ calories:481.4, protein:9.8, carbs:56.3, fat:25.3, fiber:9.1, vitC:71.5, vitA:4, calcium:232.4, iron:5.4, magnesium:141 },
+    method:"Fry potato cubes with nigella seeds, add a sesame-and-mustard paste and cook till tender.",
+    time:25, serves:3, emoji:"🥔" },
+
+  { id:"r127", name:"Cholar Dal (Bengali)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Chana Dal", amount:120, unit:"g" },
+      { name:"Coconut (grated)", amount:30, unit:"g" },
+      { name:"Ghee", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:678, protein:28, carbs:80.7, fat:28.9, fiber:17.4, vitC:5.1, vitA:109.2, calcium:95.4, iron:8.2, magnesium:159.6 },
+    method:"Cook chana dal till soft. Temper with cumin, bay leaf, dried chilli and coconut pieces, finish with a little ghee.",
+    time:40, serves:4, emoji:"🍲" },
+
+  { id:"r128", name:"Lau Ghonto (Bengali Bottle Gourd)", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Bottle Gourd", amount:300, unit:"g" },
+      { name:"Potato", amount:80, unit:"g" },
+      { name:"Moong Dal", amount:30, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:328.4, protein:11, carbs:44.7, fat:12.9, fiber:9.1, vitC:46.4, vitA:5.8, calcium:140.8, iron:4, magnesium:116.1 },
+    method:"Fry panch phoron, add bottle gourd, potato and soaked moong dal, cook till dry and tender.",
+    time:25, serves:3, emoji:"🥬" },
+
+  { id:"r129", name:"Dalma (Odisha)", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Toor Dal", amount:100, unit:"g" },
+      { name:"Raw Papaya", amount:100, unit:"g" },
+      { name:"Pumpkin", amount:100, unit:"g" },
+      { name:"Brinjal", amount:80, unit:"g" },
+      { name:"Coconut (grated)", amount:30, unit:"g" },
+      { name:"Ghee", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:612.2, protein:25.5, carbs:85.3, fat:22, fiber:22.4, vitC:46.7, vitA:264.8, calcium:186.4, iron:7.2, magnesium:225.8 },
+    method:"Cook toor dal with vegetables and a little ginger, temper with cumin and dried chilli, finish with roasted coconut.",
+    time:40, serves:4, emoji:"🍲" },
+
+  { id:"r130", name:"Pithla Zunka (Maharashtra)", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Besan", amount:100, unit:"g" },
+      { name:"Onion", amount:80, unit:"g" },
+      { name:"Green Chilli", amount:8, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:566.4, protein:23.5, carbs:68.2, fat:22.2, fiber:13.5, vitC:17.8, vitA:7.8, calcium:80.8, iron:5.9, magnesium:183.8 },
+    method:"Cook onion and chilli, stir in besan slurry to make a thick porridge-like zunka. Serve with bhakri.",
+    time:20, serves:3, emoji:"🥣" },
+
+  { id:"r131", name:"Varan Bhat (Maharashtra)", category:"veg", diet:["veg"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Toor Dal", amount:100, unit:"g" },
+      { name:"Rice", amount:100, unit:"g" },
+      { name:"Ghee", amount:15, unit:"g" },
+      { name:"Lemon", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:834.6, protein:29.4, carbs:144.4, fat:17.5, fiber:17, vitC:5.6, vitA:129.1, calcium:153.6, iron:6.5, magnesium:211.8 },
+    method:"Cook toor dal with turmeric, mash, season with salt. Serve on hot rice with ghee and lemon.",
+    time:30, serves:3, emoji:"🍚" },
+
+  { id:"r132", name:"Gatte ki Sabzi (Rajasthan)", category:"veg", diet:["veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Besan", amount:150, unit:"g" },
+      { name:"Curd", amount:150, unit:"g" },
+      { name:"Oil", amount:20, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Salt and spices", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:894.5, protein:39.8, carbs:103.6, fat:35.9, fiber:19.5, vitC:6, vitA:48.5, calcium:293.3, iron:9.1, magnesium:289 },
+    method:"Boil besan dough logs, slice, simmer in a curd-based spiced gravy.",
+    time:50, serves:4, emoji:"🥘" },
+
+  { id:"r133", name:"Ragi Mudde with Saaru", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Finger Millet (Whole Ragi)", amount:150, unit:"g" },
+      { name:"Toor Dal", amount:60, unit:"g" },
+      { name:"Tomato", amount:100, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Oil", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:798.4, protein:25.6, carbs:152.3, fat:11.2, fiber:27.6, vitC:16.5, vitA:42, calcium:618.5, iron:9.4, magnesium:328.3 },
+    method:"Cook ragi flour into soft balls (mudde). Serve with a thin lentil-tomato saaru.",
+    time:40, serves:3, emoji:"🟤" },
+
+  { id:"r134", name:"Jowar Roti with Baingan Bharta", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Sorghum (Whole Jowar)", amount:150, unit:"g" },
+      { name:"Brinjal", amount:300, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Tomato", amount:60, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" }
+    ],
+    nutrients:{ calories:739.4, protein:19.8, carbs:134.8, fat:15.6, fiber:25.3, vitC:19.4, vitA:28.2, calcium:84.3, iron:7, magnesium:311.1 },
+    method:"Make jowar rotis with hot water. Roast brinjal, mash and cook with onion and tomato.",
+    time:35, serves:3, emoji:"🫓" },
+
+  { id:"r135", name:"Methi Matar Malai", category:"veg", diet:["veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Fenugreek Leaves", amount:100, unit:"g" },
+      { name:"Green Peas", amount:100, unit:"g" },
+      { name:"Milk", amount:150, unit:"ml" },
+      { name:"Cream", amount:40, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" }
+    ],
+    nutrients:{ calories:468.4, protein:16.1, carbs:34, fat:30.3, fiber:10, vitC:97.9, vitA:559, calcium:629.3, iron:3.5, magnesium:89.6 },
+    method:"Cook onion paste with milk, add fenugreek leaves and peas, finish with cream.",
+    time:30, serves:3, emoji:"🥘" },
+
+  { id:"r136", name:"Parwal (Pointed Gourd) Sabzi", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Pointed Gourd", amount:300, unit:"g" },
+      { name:"Potato", amount:80, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:259.3, protein:7.1, carbs:32.9, fat:13.4, fiber:11.4, vitC:41.1, vitA:163, calcium:94.1, iron:3.3, magnesium:61.4 },
+    method:"Fry potato and pointed gourd with onion and spices till tender.",
+    time:25, serves:3, emoji:"🥒" },
+
+  { id:"r137", name:"Ridge Gourd (Turai) Sabzi", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Ridge Gourd", amount:300, unit:"g" },
+      { name:"Tomato", amount:80, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:194.4, protein:5.3, carbs:22.7, fat:11.2, fiber:8.2, vitC:51.3, vitA:97.6, calcium:95.5, iron:2.3, magnesium:81.8 },
+    method:"Saute onion and tomato with cumin, add peeled sliced ridge gourd, cook covered till soft.",
+    time:25, serves:3, emoji:"🥒" },
+
+  { id:"r138", name:"Pumpkin Sabzi (Kaddu)", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Pumpkin", amount:300, unit:"g" },
+      { name:"Onion", amount:40, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Jaggery", amount:8, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:224.6, protein:3.9, carbs:33.1, fat:10.7, fiber:3.2, vitC:30.4, vitA:514, calcium:94.6, iron:4.1, magnesium:53.6 },
+    method:"Cook cubed pumpkin with fenugreek seeds, a little jaggery and spices till soft.",
+    time:25, serves:3, emoji:"🎃" },
+
+  { id:"r139", name:"Banana Stem Kootu", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Banana Stem", amount:250, unit:"g" },
+      { name:"Moong Dal", amount:50, unit:"g" },
+      { name:"Coconut (grated)", amount:30, unit:"g" },
+      { name:"Oil", amount:8, unit:"g" },
+      { name:"Curry Leaves", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:416.2, protein:14.4, carbs:50.6, fat:18.8, fiber:16.9, vitC:13.5, vitA:33, calcium:121.1, iron:5.6, magnesium:130.4 },
+    method:"Cook finely chopped banana stem with moong dal and a coconut-cumin paste; temper with mustard.",
+    time:30, serves:3, emoji:"🥬" },
+
+  { id:"r140", name:"Bamboo Shoot Curry", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+    ingredients:[
+      { name:"Bamboo Shoot", amount:250, unit:"g" },
+      { name:"Potato", amount:80, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:269.7, protein:9.2, carbs:33.8, fat:13.4, fiber:9.4, vitC:30.2, vitA:5, calcium:73.6, iron:2.9, magnesium:40.9 },
+    method:"Boil bamboo shoot to remove bitterness, cook with potato and a light spice base.",
+    time:35, serves:3, emoji:"🎍" },
+
+  { id:"r141", name:"Mixed Vegetable Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+    ingredients:[
+      { name:"Carrot", amount:80, unit:"g" },
+      { name:"Cabbage", amount:80, unit:"g" },
+      { name:"French Beans", amount:60, unit:"g" },
+      { name:"Tomato", amount:100, unit:"g" },
+      { name:"Onion", amount:40, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Oil", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:170.4, protein:4.7, carbs:27.1, fat:6.6, fiber:8.3, vitC:60.2, vitA:735, calcium:114.3, iron:1.8, magnesium:51.2 },
+    method:"Saute garlic and onion, add chopped vegetables and water, simmer till soft, season with pepper.",
+    time:25, serves:3, emoji:"🥣" },
+
+  { id:"r142", name:"Tomato Shorba", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+    ingredients:[
+      { name:"Tomato", amount:350, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Ginger", amount:8, unit:"g" },
+      { name:"Oil", amount:6, unit:"g" },
+      { name:"Salt and spices", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:143.1, protein:4.1, carbs:19.2, fat:7.1, fiber:5.3, vitC:52.2, vitA:150, calcium:62.8, iron:1.8, magnesium:49.9 },
+    method:"Cook tomatoes with garlic and ginger, blend, strain and simmer with pepper and a little tempering.",
+    time:20, serves:3, emoji:"🍅" },
+
+  { id:"r143", name:"Palak Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+    ingredients:[
+      { name:"Spinach", amount:300, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Potato", amount:60, unit:"g" },
+      { name:"Oil", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:200.2, protein:11, carbs:28.3, fat:7.3, fiber:8.9, vitC:102.2, vitA:1407, calcium:330.2, iron:8.8, magnesium:257.8 },
+    method:"Cook spinach with onion, garlic and a little potato, blend smooth, season with pepper and lemon.",
+    time:20, serves:3, emoji:"🥣" },
+
+  { id:"r144", name:"Pumpkin Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+    ingredients:[
+      { name:"Pumpkin", amount:350, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Ginger", amount:8, unit:"g" },
+      { name:"Oil", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:170.4, protein:4.2, carbs:28.8, fat:6.5, fiber:2.8, vitC:35.6, vitA:595, calcium:86.3, iron:2.9, magnesium:50.4 },
+    method:"Cook pumpkin with onion and ginger, blend, simmer with pepper and cumin.",
+    time:25, serves:3, emoji:"🎃" },
+
+  { id:"r145", name:"Sweet Corn Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+    ingredients:[
+      { name:"Sweet Corn", amount:200, unit:"g" },
+      { name:"Carrot", amount:50, unit:"g" },
+      { name:"French Beans", amount:40, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Oil", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:261, protein:8.3, carbs:48.4, fat:8, fiber:6.9, vitC:24.2, vitA:449.5, calcium:49.8, iron:1.7, magnesium:92 },
+    method:"Cook corn, blend half, simmer with finely chopped vegetables and pepper.",
+    time:20, serves:3, emoji:"🌽" },
+
+  { id:"r146", name:"Masoor Dal Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+    ingredients:[
+      { name:"Masoor Dal", amount:80, unit:"g" },
+      { name:"Tomato", amount:100, unit:"g" },
+      { name:"Carrot", amount:60, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Oil", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:389.2, protein:21.2, carbs:60.5, fat:7.2, fiber:11.8, vitC:21.2, vitA:574.2, calcium:89.1, iron:6.5, magnesium:49 },
+    method:"Cook masoor dal with tomato and carrot, blend lightly, season with cumin and pepper.",
+    time:25, serves:3, emoji:"🥣" },
+
+  { id:"r147", name:"Vegetable Daliya Khichdi", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Broken Wheat", amount:100, unit:"g" },
+      { name:"Moong Dal", amount:50, unit:"g" },
+      { name:"Carrot", amount:60, unit:"g" },
+      { name:"Green Peas", amount:50, unit:"g" },
+      { name:"Ghee", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:679.3, protein:27.1, carbs:115, fat:12.7, fiber:25, vitC:23.8, vitA:610, calcium:147.3, iron:8.7, magnesium:250.2 },
+    method:"Pressure cook dalia, moong dal and vegetables with turmeric, finish with cumin tempering in ghee.",
+    time:30, serves:3, emoji:"🍲" },
+
+  { id:"r148", name:"Barnyard Millet Khichdi", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Barnyard Millet", amount:100, unit:"g" },
+      { name:"Moong Dal", amount:50, unit:"g" },
+      { name:"Carrot", amount:60, unit:"g" },
+      { name:"Green Peas", amount:50, unit:"g" },
+      { name:"Ghee", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:644.3, protein:21.8, carbs:111.5, fat:13.4, fiber:23, vitC:23.8, vitA:610, calcium:126.3, iron:9.8, magnesium:206.2 },
+    method:"Cook barnyard millet, moong dal and vegetables together till soft, finish with cumin tempering.",
+    time:30, serves:3, emoji:"🍲" },
+
+  { id:"r149", name:"Kodo Millet Curd Rice", category:"veg", diet:["veg"], meals:["dinner"],
+    ingredients:[
+      { name:"Kodo Millet", amount:100, unit:"g" },
+      { name:"Curd", amount:250, unit:"g" },
+      { name:"Carrot", amount:40, unit:"g" },
+      { name:"Cucumber", amount:50, unit:"g" },
+      { name:"Oil", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:535.9, protein:17.8, carbs:83.5, fat:15.8, fiber:10.4, vitC:5.1, vitA:404, calcium:348.2, iron:1, magnesium:188.3 },
+    method:"Cook kodo millet soft, cool, mix with curd, grated carrot and cucumber; temper with mustard and curry leaves.",
+    time:25, serves:3, emoji:"🥣" },
+
+  { id:"r150", name:"Phulka with Dal and Sabzi Plate", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+    ingredients:[
+      { name:"Atta", amount:150, unit:"g" },
+      { name:"Moong Dal", amount:60, unit:"g" },
+      { name:"Bottle Gourd", amount:150, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:4, unit:"g" }
+    ],
+    nutrients:{ calories:840.7, protein:33.7, carbs:151.4, fat:13.7, fiber:27.9, vitC:15.4, vitA:7.6, calcium:190.9, iron:12.4, magnesium:343.4 },
+    method:"Serve soft phulkas with a thin moong dal and a lightly spiced bottle gourd sabzi.",
+    time:30, serves:3, emoji:"🫓" },
+
+  { id:"r151", name:"Paneer Bhurji Roti Wrap", category:"veg", diet:["veg"], meals:["dinner"],
+    ingredients:[
+      { name:"Paneer", amount:150, unit:"g" },
+      { name:"Atta", amount:120, unit:"g" },
+      { name:"Onion", amount:50, unit:"g" },
+      { name:"Tomato", amount:50, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:969.4, protein:42.4, carbs:96.3, fat:46.7, fiber:14.6, vitC:10.7, vitA:276, calcium:377.7, iron:6.4, magnesium:191.4 },
+    method:"Cook crumbled paneer with onion, tomato and spices. Roll in whole wheat rotis.",
+    time:20, serves:3, emoji:"🌯" },
+
+  { id:"r152", name:"Kadai Chicken", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Chicken", amount:500, unit:"g" },
+      { name:"Capsicum", amount:100, unit:"g" },
+      { name:"Tomato", amount:150, unit:"g" },
+      { name:"Onion", amount:100, unit:"g" },
+      { name:"Oil", amount:20, unit:"g" },
+      { name:"Salt and spices", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:1123, protein:159.3, carbs:25.1, fat:39.5, fiber:7.6, vitC:157.2, vitA:308, calcium:152, iron:7.5, magnesium:177.5 },
+    method:"Cook chicken with ground kadai masala, onion, tomato and capsicum till thick.",
+    time:45, serves:4, emoji:"🍗" },
+
+  { id:"r153", name:"Chicken Chettinad", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Chicken", amount:500, unit:"g" },
+      { name:"Onion", amount:120, unit:"g" },
+      { name:"Tomato", amount:100, unit:"g" },
+      { name:"Coconut (grated)", amount:40, unit:"g" },
+      { name:"Oil", amount:20, unit:"g" },
+      { name:"Salt and spices", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:1238.4, protein:159.6, carbs:26.1, fat:52.5, fiber:9.3, vitC:25.1, vitA:132, calcium:158.2, iron:8.3, magnesium:180.8 },
+    method:"Cook chicken in a roasted pepper-fennel-coconut Chettinad masala till the gravy clings.",
+    time:50, serves:4, emoji:"🍗" },
+
+  { id:"r154", name:"Kerala Chicken Stew", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Chicken", amount:400, unit:"g" },
+      { name:"Potato", amount:100, unit:"g" },
+      { name:"Carrot", amount:60, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Coconut (grated)", amount:50, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:1051, protein:128.8, carbs:36.1, fat:41.2, fiber:9.4, vitC:29.5, vitA:565, calcium:112.6, iron:6.3, magnesium:152.2 },
+    method:"Simmer chicken and vegetables in thin coconut milk with whole spices, finish with thick coconut milk. Light and mild.",
+    time:45, serves:4, emoji:"🍲" },
+
+  { id:"r155", name:"Pepper Chicken", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Chicken", amount:500, unit:"g" },
+      { name:"Onion", amount:100, unit:"g" },
+      { name:"Curry Leaves", amount:4, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:1025.1, protein:157.2, carbs:14.1, fat:33.9, fiber:4, vitC:8.4, vitA:128, calcium:163.2, iron:6.7, magnesium:152.8 },
+    method:"Cook chicken with onion and crushed black pepper till dry and peppery.",
+    time:35, serves:4, emoji:"🍗" },
+
+  { id:"r156", name:"Chicken Saagwala", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Chicken", amount:450, unit:"g" },
+      { name:"Spinach", amount:300, unit:"g" },
+      { name:"Onion", amount:80, unit:"g" },
+      { name:"Tomato", amount:80, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:1007.9, protein:150.5, carbs:24.4, fat:33.2, fiber:10.4, vitC:101.7, vitA:1518.6, calcium:414.9, iron:14.1, magnesium:378.3 },
+    method:"Cook chicken in an onion-tomato masala, fold in pureed spinach.",
+    time:45, serves:4, emoji:"🍗" },
+
+  { id:"r157", name:"Tandoori Chicken (Oven Baked)", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Chicken", amount:500, unit:"g" },
+      { name:"Curd", amount:100, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Lemon", amount:20, unit:"g" },
+      { name:"Salt and spices", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:1002.4, protein:159.6, carbs:10.6, fat:32.2, fiber:2.6, vitC:11.9, vitA:115.2, calcium:232.2, iron:6.7, magnesium:154.6 },
+    method:"Marinate chicken in curd, lemon and spices for 4 hours. Bake or grill till charred and cooked.",
+    time:50, serves:4, emoji:"🍗" },
+
+  { id:"r158", name:"Chicken Tikka", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Chicken", amount:450, unit:"g" },
+      { name:"Hung Curd", amount:100, unit:"g" },
+      { name:"Capsicum", amount:60, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:988.9, protein:149.4, carbs:16.2, fat:32.5, fiber:3.8, vitC:81.8, vitA:212.2, calcium:249.5, iron:6, magnesium:148.5 },
+    method:"Marinate chicken cubes in hung curd and spices, skewer with capsicum and onion, grill.",
+    time:40, serves:4, emoji:"🍗" },
+
+  { id:"r159", name:"Chicken Dalcha", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Chicken", amount:300, unit:"g" },
+      { name:"Chana Dal", amount:100, unit:"g" },
+      { name:"Bottle Gourd", amount:150, unit:"g" },
+      { name:"Tomato", amount:80, unit:"g" },
+      { name:"Tamarind", amount:8, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" }
+    ],
+    nutrients:{ calories:1055.6, protein:116.8, carbs:74.2, fat:31.3, fiber:13.1, vitC:29.4, vitA:83.8, calcium:153.9, iron:9.1, magnesium:222.7 },
+    method:"Cook chicken with chana dal and bottle gourd in a tangy Hyderabadi gravy.",
+    time:50, serves:4, emoji:"🍲" },
+
+  { id:"r160", name:"Country Chicken Fry (Nati Kodi)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Country Chicken", amount:500, unit:"g" },
+      { name:"Onion", amount:100, unit:"g" },
+      { name:"Curry Leaves", amount:4, unit:"g" },
+      { name:"Oil", amount:20, unit:"g" },
+      { name:"Salt and spices", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:994.3, protein:127.2, carbs:14.1, fat:45.9, fiber:4, vitC:8.4, vitA:123, calcium:163.2, iron:7.7, magnesium:157.8 },
+    method:"Pressure cook country chicken with spice paste, then fry dry with curry leaves.",
+    time:50, serves:4, emoji:"🍗" },
+
+  { id:"r161", name:"Mutton Curry (Dhaba Style)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Mutton", amount:500, unit:"g" },
+      { name:"Onion", amount:150, unit:"g" },
+      { name:"Tomato", amount:120, unit:"g" },
+      { name:"Oil", amount:25, unit:"g" },
+      { name:"Salt and spices", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:1046.6, protein:108.8, carbs:23.6, fat:56.4, fiber:6.5, vitC:28.9, vitA:60.4, calcium:146.5, iron:15, magnesium:168.2 },
+    method:"Brown mutton, cook in onion-tomato masala on low heat till tender.",
+    time:70, serves:4, emoji:"🍖" },
+
+  { id:"r162", name:"Kosha Mangsho (Bengali Mutton)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Mutton", amount:500, unit:"g" },
+      { name:"Onion", amount:200, unit:"g" },
+      { name:"Potato", amount:100, unit:"g" },
+      { name:"Curd", amount:80, unit:"g" },
+      { name:"Oil", amount:25, unit:"g" },
+      { name:"Salt and spices", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:1170, protein:113.1, carbs:44.4, fat:58.9, fiber:8.1, vitC:36.2, vitA:31.6, calcium:254, iron:15.6, magnesium:192.6 },
+    method:"Slow-cook mutton with a long-fried onion masala and potato till the gravy is dark and thick.",
+    time:80, serves:4, emoji:"🍖" },
+
+  { id:"r163", name:"Mutton Haleem", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Mutton", amount:400, unit:"g" },
+      { name:"Broken Wheat", amount:100, unit:"g" },
+      { name:"Chana Dal", amount:40, unit:"g" },
+      { name:"Masoor Dal", amount:40, unit:"g" },
+      { name:"Ghee", amount:25, unit:"g" },
+      { name:"Onion", amount:80, unit:"g" },
+      { name:"Salt and spices", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:1489.6, protein:115.9, carbs:129.8, fat:54.1, fiber:24.7, vitC:8.7, vitA:236.4, calcium:192.2, iron:20.9, magnesium:310.4 },
+    method:"Slow cook mutton with wheat and lentils, mash till smooth, top with fried onion and ghee.",
+    time:120, serves:5, emoji:"🍲" },
+
+  { id:"r164", name:"Mutton Pepper Fry", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Mutton", amount:500, unit:"g" },
+      { name:"Onion", amount:120, unit:"g" },
+      { name:"Curry Leaves", amount:4, unit:"g" },
+      { name:"Oil", amount:20, unit:"g" },
+      { name:"Salt and spices", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:967.3, protein:107.4, carbs:15.9, fat:51, fiber:4.3, vitC:9.8, vitA:48, calcium:152.8, iron:14.2, magnesium:149.8 },
+    method:"Pressure cook mutton, then dry fry with onion, curry leaves and crushed pepper.",
+    time:60, serves:4, emoji:"🍖" },
+
+  { id:"r165", name:"Mutton Biryani", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Mutton", amount:500, unit:"g" },
+      { name:"Basmati Rice", amount:250, unit:"g" },
+      { name:"Onion", amount:150, unit:"g" },
+      { name:"Curd", amount:100, unit:"g" },
+      { name:"Ghee", amount:25, unit:"g" },
+      { name:"Salt and spices", amount:12, unit:"g" }
+    ],
+    nutrients:{ calories:1967.3, protein:131.7, carbs:219.6, fat:60.9, fiber:8.8, vitC:12.8, vitA:249, calcium:287.5, iron:17.1, magnesium:233.5 },
+    method:"Marinate mutton in curd and spices. Layer with par-cooked basmati and dum cook.",
+    time:90, serves:5, emoji:"🍚" },
+
+  { id:"r166", name:"Mutton Paya-Style Soup", category:"non-veg", diet:["non-veg"], meals:["dinner"],
+    ingredients:[
+      { name:"Mutton", amount:300, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Garlic", amount:10, unit:"g" },
+      { name:"Ginger", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:493.3, protein:65.1, carbs:13.7, fat:18.8, fiber:2.9, vitC:8.6, vitA:6, calcium:93.5, iron:8.9, magnesium:96.8 },
+    method:"Slow simmer bone-in mutton with ginger, garlic, pepper and whole spices till the broth is rich.",
+    time:80, serves:4, emoji:"🍲" },
+
+  { id:"r167", name:"Goan Fish Curry", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Kingfish", amount:400, unit:"g" },
+      { name:"Coconut (grated)", amount:60, unit:"g" },
+      { name:"Tamarind", amount:10, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:837.6, protein:87.8, carbs:24.8, fat:44.3, fiber:8.9, vitC:7.3, vitA:208.2, calcium:121.6, iron:7.3, magnesium:190.4 },
+    method:"Simmer fish in a ground coconut-red chilli curry soured with tamarind.",
+    time:35, serves:4, emoji:"🐟" },
+
+  { id:"r168", name:"Macher Jhol (Bengali Fish Curry)", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Rohu", amount:400, unit:"g" },
+      { name:"Potato", amount:150, unit:"g" },
+      { name:"Tomato", amount:60, unit:"g" },
+      { name:"Oil", amount:20, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:708.5, protein:70.6, carbs:30.8, fat:26.5, fiber:5.5, vitC:39, vitA:231.2, calcium:288, iron:6.5, magnesium:181.1 },
+    method:"Lightly fry rohu, simmer with potato in a thin turmeric-cumin-ginger gravy.",
+    time:30, serves:4, emoji:"🐟" },
+
+  { id:"r169", name:"Fish Fry (Shallow Fried)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Pomfret", amount:400, unit:"g" },
+      { name:"Rice Flour", amount:20, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" },
+      { name:"Lemon", amount:15, unit:"g" }
+    ],
+    nutrients:{ calories:787.6, protein:78, carbs:20.4, fat:43.9, fiber:2.4, vitC:8.6, vitA:226.2, calcium:129.9, iron:4.8, magnesium:140.2 },
+    method:"Marinate pomfret in chilli, turmeric and lemon, coat with rice flour and shallow fry.",
+    time:25, serves:3, emoji:"🐟" },
+
+  { id:"r170", name:"Kerala Fish Molee", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Seabass", amount:400, unit:"g" },
+      { name:"Coconut (grated)", amount:60, unit:"g" },
+      { name:"Onion", amount:70, unit:"g" },
+      { name:"Tomato", amount:60, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:742.1, protein:75.8, carbs:20.4, fat:40.5, fiber:8.6, vitC:15.9, vitA:210.2, calcium:110.5, iron:4.7, magnesium:154.8 },
+    method:"Poach fish in a mild coconut milk stew with ginger, green chilli and onion.",
+    time:35, serves:4, emoji:"🐟" },
+
+  { id:"r171", name:"Karimeen Pollichathu", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Pearl Spot", amount:450, unit:"g" },
+      { name:"Onion", amount:100, unit:"g" },
+      { name:"Tomato", amount:80, unit:"g" },
+      { name:"Oil", amount:18, unit:"g" },
+      { name:"Salt and spices", amount:7, unit:"g" }
+    ],
+    nutrients:{ calories:737.8, protein:88.1, carbs:15.9, fat:32.5, fiber:4.4, vitC:19.3, vitA:130.6, calcium:284, iron:6.2, magnesium:167.8 },
+    method:"Marinate and fry pearl spot, wrap in banana leaf with onion-tomato masala and cook.",
+    time:40, serves:3, emoji:"🐟" },
+
+  { id:"r172", name:"Paturi (Steamed Fish in Banana Leaf)", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Hilsa", amount:400, unit:"g" },
+      { name:"Coconut (grated)", amount:30, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" },
+      { name:"Green Chilli", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:1306.4, protein:85.8, carbs:8, fat:98.1, fiber:4.3, vitC:10.1, vitA:208.9, calcium:389.3, iron:9.9, magnesium:151 },
+    method:"Coat fish with mustard-coconut paste, wrap in banana leaf and steam. Very light.",
+    time:35, serves:3, emoji:"🐟" },
+
+  { id:"r173", name:"Tuna Curry (Choora Curry)", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Tuna", amount:400, unit:"g" },
+      { name:"Tomato", amount:100, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Coconut (grated)", amount:40, unit:"g" },
+      { name:"Tamarind", amount:8, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" }
+    ],
+    nutrients:{ calories:772.8, protein:99.1, carbs:20.4, fat:31.5, fiber:6.2, vitC:19.9, vitA:114.2, calcium:75.3, iron:5.6, magnesium:177.2 },
+    method:"Simmer tuna chunks in a tamarind-coconut gravy with curry leaves.",
+    time:35, serves:4, emoji:"🐟" },
+
+  { id:"r174", name:"Mackerel Fry (Bangda)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Mackerel", amount:450, unit:"g" },
+      { name:"Rice Flour", amount:20, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:1145.7, protein:87.4, carbs:19, fat:78.4, fiber:2, vitC:0.6, vitA:186, calcium:80, iron:8.4, magnesium:361 },
+    method:"Marinate in chilli-turmeric-lemon, coat lightly with rice flour and shallow fry.",
+    time:25, serves:3, emoji:"🐟" },
+
+  { id:"r175", name:"Anchovy Fry (Nethili)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Anchovies", amount:250, unit:"g" },
+      { name:"Rice Flour", amount:20, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:547.8, protein:51.8, carbs:18.5, fat:27.8, fiber:1.7, vitC:0.5, vitA:42.5, calcium:389.5, iron:9.2, magnesium:119.5 },
+    method:"Marinate in spices and fry crisp. Small fish eaten whole are rich in calcium.",
+    time:20, serves:3, emoji:"🐟" },
+
+  { id:"r176", name:"Murrel (Viral) Pepper Curry", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Snakehead Murrel", amount:400, unit:"g" },
+      { name:"Onion", amount:80, unit:"g" },
+      { name:"Tomato", amount:60, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:560.1, protein:78.3, carbs:13.8, fat:20.2, fiber:4.1, vitC:15.1, vitA:73.2, calcium:216.4, iron:7.8, magnesium:150.6 },
+    method:"Simmer fish in a peppery onion-tomato gravy, light and good for recovery meals.",
+    time:35, serves:4, emoji:"🐟" },
+
+  { id:"r177", name:"Tilapia Fish Curry", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Tilapia", amount:450, unit:"g" },
+      { name:"Tomato", amount:100, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Coconut (grated)", amount:30, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" }
+    ],
+    nutrients:{ calories:686.3, protein:92.5, carbs:14, fat:29.8, fiber:4.9, vitC:19.3, vitA:42, calcium:73, iron:3.8, magnesium:148.1 },
+    method:"Cook tilapia in a light coconut-tomato curry.",
+    time:30, serves:4, emoji:"🐟" },
+
+  { id:"r178", name:"Rawas (Indian Salmon) Tawa Fry", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+    ingredients:[
+      { name:"Indian Salmon", amount:400, unit:"g" },
+      { name:"Rice Flour", amount:15, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" },
+      { name:"Lemon", amount:15, unit:"g" }
+    ],
+    nutrients:{ calories:619.8, protein:81.6, carbs:15.9, fat:24.8, fiber:2, vitC:8.4, vitA:125.2, calcium:105.4, iron:3.4, magnesium:136.4 },
+    method:"Coat fillets in rice-flour and masala and cook on a tawa with a little oil.",
+    time:20, serves:3, emoji:"🐟" },
+
+  { id:"r179", name:"Bombay Duck (Bombil) Fry", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Bombay Duck", amount:350, unit:"g" },
+      { name:"Rice Flour", amount:25, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:487.1, protein:54.5, carbs:22.5, fat:19, fiber:1.9, vitC:0.5, vitA:75, calcium:232.5, iron:4.5, magnesium:123.8 },
+    method:"Marinate Bombil in chilli-ginger-garlic, coat with rice flour and shallow fry.",
+    time:25, serves:3, emoji:"🐟" },
+
+  { id:"r180", name:"Prawn Curry (Goan Style)", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Tiger Prawns", amount:400, unit:"g" },
+      { name:"Coconut (grated)", amount:60, unit:"g" },
+      { name:"Tamarind", amount:8, unit:"g" },
+      { name:"Onion", amount:60, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Salt and spices", amount:7, unit:"g" }
+    ],
+    nutrients:{ calories:777.9, protein:99.6, carbs:23.8, fat:33.8, fiber:8.6, vitC:7.2, vitA:7.2, calcium:336.1, iron:10.2, magnesium:226.6 },
+    method:"Cook prawns briefly in a coconut-tamarind-chilli curry.",
+    time:30, serves:4, emoji:"🦐" },
+
+  { id:"r181", name:"Prawn Biryani", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Tiger Prawns", amount:300, unit:"g" },
+      { name:"Basmati Rice", amount:200, unit:"g" },
+      { name:"Onion", amount:100, unit:"g" },
+      { name:"Curd", amount:60, unit:"g" },
+      { name:"Ghee", amount:20, unit:"g" },
+      { name:"Salt and spices", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:1280, protein:92.5, carbs:173.7, fat:25, fiber:6.8, vitC:8.7, vitA:194.2, calcium:365, iron:9.1, magnesium:222.2 },
+    method:"Marinate prawns, make a masala, layer with par-cooked basmati and dum cook for 15 min.",
+    time:50, serves:4, emoji:"🍚" },
+
+  { id:"r182", name:"Kerala Prawn Roast", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Tiger Prawns", amount:350, unit:"g" },
+      { name:"Onion", amount:100, unit:"g" },
+      { name:"Tomato", amount:60, unit:"g" },
+      { name:"Coconut (grated)", amount:20, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:7, unit:"g" }
+    ],
+    nutrients:{ calories:621, protein:87.1, carbs:18.8, fat:23.6, fiber:6, vitC:17.1, vitA:32.2, calcium:304.8, iron:8.4, magnesium:194.5 },
+    method:"Roast prawns in a dark onion-chilli masala with curry leaves.",
+    time:30, serves:3, emoji:"🦐" },
+
+  { id:"r183", name:"Crab Masala", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Mud Crab", amount:600, unit:"g" },
+      { name:"Onion", amount:100, unit:"g" },
+      { name:"Tomato", amount:80, unit:"g" },
+      { name:"Coconut (grated)", amount:30, unit:"g" },
+      { name:"Oil", amount:18, unit:"g" },
+      { name:"Salt and spices", amount:8, unit:"g" }
+    ],
+    nutrients:{ calories:924.9, protein:117.7, carbs:20.9, fat:38, fiber:7.4, vitC:20.3, vitA:59.6, calcium:601.2, iron:6.8, magnesium:356.4 },
+    method:"Cook cleaned crab in an onion-tomato-pepper masala till shells turn red and the gravy thickens.",
+    time:45, serves:3, emoji:"🦀" },
+
+  { id:"r184", name:"Squid Roast (Koonthal)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+    ingredients:[
+      { name:"Squid", amount:350, unit:"g" },
+      { name:"Onion", amount:100, unit:"g" },
+      { name:"Tomato", amount:60, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:7, unit:"g" }
+    ],
+    nutrients:{ calories:525.7, protein:58.4, carbs:26, fat:20.8, fiber:4.2, vitC:30.5, vitA:67.2, calcium:169, iron:4.1, magnesium:146.1 },
+    method:"Cook squid rings briefly then roast with onion-tomato masala and curry leaves.",
+    time:35, serves:3, emoji:"🦑" },
+
+  { id:"r185", name:"Fish Soup (Meen Rasam)", category:"non-veg", diet:["non-veg"], meals:["dinner"],
+    ingredients:[
+      { name:"Seabass", amount:250, unit:"g" },
+      { name:"Tomato", amount:100, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Tamarind", amount:8, unit:"g" },
+      { name:"Salt and spices", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:306, protein:47.2, carbs:14, fat:7, fiber:3, vitC:17.2, vitA:159.7, calcium:87.9, iron:2.8, magnesium:100.4 },
+    method:"Simmer fish pieces in a thin pepper-garlic-tamarind broth. Light and warming.",
+    time:25, serves:3, emoji:"🍲" },
+
+  { id:"r186", name:"Egg Roast (Kerala)", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+    ingredients:[
+      { name:"Egg", amount:300, unit:"g" },
+      { name:"Onion", amount:120, unit:"g" },
+      { name:"Tomato", amount:80, unit:"g" },
+      { name:"Oil", amount:15, unit:"g" },
+      { name:"Salt and spices", amount:6, unit:"g" }
+    ],
+    nutrients:{ calories:641.4, protein:40.5, carbs:19.4, fat:44.4, fiber:4.5, vitC:20.7, vitA:519.6, calcium:227.6, iron:7, magnesium:68.8 },
+    method:"Cook onion till dark with spices, add tomato, then fold in boiled halved eggs.",
+    time:30, serves:3, emoji:"🥚" },
+
+  { id:"r187", name:"Boiled Egg Salad Plate", category:"non-veg", diet:["non-veg"], meals:["dinner","snack"],
+    ingredients:[
+      { name:"Egg", amount:200, unit:"g" },
+      { name:"Cucumber", amount:100, unit:"g" },
+      { name:"Tomato", amount:100, unit:"g" },
+      { name:"Onion", amount:40, unit:"g" },
+      { name:"Lemon", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:337.9, protein:27.3, carbs:13.6, fat:19.4, fiber:2.7, vitC:25.3, vitA:367.1, calcium:149.8, iron:4.3, magnesium:52.8 },
+    method:"Boil eggs, slice and serve with cucumber, tomato and onion tossed in lemon and pepper.",
+    time:15, serves:2, emoji:"🥗" },
+
+  { id:"r188", name:"Chicken Clear Soup with Vegetables", category:"non-veg", diet:["non-veg"], meals:["dinner"],
+    ingredients:[
+      { name:"Chicken", amount:250, unit:"g" },
+      { name:"Carrot", amount:60, unit:"g" },
+      { name:"French Beans", amount:50, unit:"g" },
+      { name:"Garlic", amount:8, unit:"g" },
+      { name:"Ginger", amount:8, unit:"g" },
+      { name:"Oil", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:515.1, protein:79.6, carbs:13.6, fat:14.3, fiber:3.7, vitC:12.4, vitA:558.5, calcium:91.6, iron:3.4, magnesium:87.6 },
+    method:"Simmer chicken with ginger, garlic and vegetables, season with pepper. Light and filling.",
+    time:35, serves:3, emoji:"🍲" },
+
+  { id:"r189", name:"Chana Chaat", category:"veg", diet:["veg","vegan"], meals:["snack"],
+    ingredients:[
+      { name:"Chickpeas", amount:100, unit:"g" },
+      { name:"Onion", amount:40, unit:"g" },
+      { name:"Tomato", amount:50, unit:"g" },
+      { name:"Cucumber", amount:50, unit:"g" },
+      { name:"Lemon", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:399.4, protein:20.4, carbs:69.4, fat:6.2, fiber:18.8, vitC:20.8, vitA:26.6, calcium:129.8, iron:6.6, magnesium:131.8 },
+    method:"Toss boiled chickpeas with chopped vegetables, lemon, chaat masala and coriander.",
+    time:15, serves:2, emoji:"🥗" },
+
+  { id:"r190", name:"Masala Corn Cup", category:"veg", diet:["veg","vegan"], meals:["snack"],
+    ingredients:[
+      { name:"Sweet Corn", amount:200, unit:"g" },
+      { name:"Lemon", amount:10, unit:"g" },
+      { name:"Butter", amount:8, unit:"g" },
+      { name:"Salt and spices", amount:2, unit:"g" }
+    ],
+    nutrients:{ calories:238.1, protein:7, carbs:39.9, fat:9.5, fiber:4.8, vitC:19.5, vitA:74.8, calcium:16.5, iron:1.4, magnesium:79 },
+    method:"Steam corn kernels and toss with a little butter, lemon, pepper and chaat masala.",
+    time:10, serves:2, emoji:"🌽" },
+
+  { id:"r191", name:"Fruit Chaat", category:"snack", diet:["veg","vegan"], meals:["snack"],
+    ingredients:[
+      { name:"Apple", amount:100, unit:"g" },
+      { name:"Banana", amount:100, unit:"g" },
+      { name:"Pomegranate", amount:60, unit:"g" },
+      { name:"Papaya", amount:100, unit:"g" },
+      { name:"Lemon", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:236.7, protein:3, carbs:60.3, fat:1.6, fiber:9.4, vitC:86.6, vitA:53.1, calcium:39.6, iron:0.9, magnesium:61 },
+    method:"Dice seasonal fruit, toss with lemon, a pinch of black salt and chaat masala.",
+    time:10, serves:2, emoji:"🍉" },
+
+  { id:"r192", name:"Sabudana Khichdi", category:"veg", diet:["veg","vegan"], meals:["snack","breakfast"],
+    ingredients:[
+      { name:"Sago Pearls", amount:100, unit:"g" },
+      { name:"Potato", amount:80, unit:"g" },
+      { name:"Peanuts", amount:30, unit:"g" },
+      { name:"Ghee", amount:12, unit:"g" },
+      { name:"Green Chilli", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:699.7, protein:9.7, carbs:107.5, fat:26.8, fiber:5.3, vitC:23.2, vitA:103.2, calcium:58.1, iron:3.3, magnesium:71 },
+    method:"Soak sabudana 4 hours, saute with cumin, potato, chilli and roasted peanuts.",
+    time:30, serves:3, emoji:"🍲" },
+
+  { id:"r193", name:"Murmura Chivda", category:"snack", diet:["veg","vegan"], meals:["snack"],
+    ingredients:[
+      { name:"Puffed Rice", amount:100, unit:"g" },
+      { name:"Peanuts", amount:30, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Curry Leaves", amount:3, unit:"g" },
+      { name:"Salt and spices", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:595.4, protein:15.8, carbs:79.9, fat:25.5, fiber:5, vitC:0.4, vitA:33, calcium:76.5, iron:2.9, magnesium:77.7 },
+    method:"Roast puffed rice, toss with a tempering of peanuts, curry leaves and turmeric.",
+    time:15, serves:4, emoji:"🥣" },
+
+  { id:"r194", name:"Dahi Poha", category:"veg", diet:["veg"], meals:["snack","breakfast"],
+    ingredients:[
+      { name:"Poha", amount:60, unit:"g" },
+      { name:"Curd", amount:150, unit:"g" },
+      { name:"Cucumber", amount:50, unit:"g" },
+      { name:"Pomegranate", amount:30, unit:"g" }
+    ],
+    nutrients:{ calories:330, protein:10.1, carbs:60.8, fat:6.1, fiber:2.3, vitC:5.2, vitA:43, calcium:203, iron:12.4, magnesium:52.1 },
+    method:"Soak poha briefly, mix with curd, cucumber and pomegranate.",
+    time:10, serves:2, emoji:"🥣" },
+
+  { id:"r195", name:"Moong Dal Dhokla", category:"veg", diet:["veg","vegan"], meals:["snack","breakfast"],
+    ingredients:[
+      { name:"Moong Dal", amount:150, unit:"g" },
+      { name:"Ginger", amount:8, unit:"g" },
+      { name:"Green Chilli", amount:5, unit:"g" },
+      { name:"Oil", amount:8, unit:"g" },
+      { name:"Lemon", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:602.5, protein:36.4, carbs:97.3, fat:9.9, fiber:24.5, vitC:12.9, vitA:11.5, calcium:190.8, iron:10.2, magnesium:288.9 },
+    method:"Grind soaked moong dal, steam as a thick batter and cut into squares.",
+    time:30, serves:4, emoji:"🟨" },
+
+  { id:"r196", name:"Peanut Chikki", category:"snack", diet:["veg","vegan"], meals:["snack"],
+    ingredients:[
+      { name:"Peanuts", amount:150, unit:"g" },
+      { name:"Jaggery", amount:120, unit:"g" }
+    ],
+    nutrients:{ calories:1310.1, protein:39.5, carbs:141.6, fat:73.6, fiber:12.8, vitC:0, vitA:0, calcium:234, iron:20.1, magnesium:336 },
+    method:"Melt jaggery, mix with roasted peanuts, spread and cut into pieces.",
+    time:25, serves:6, emoji:"🍘" },
+
+  { id:"r197", name:"Masala Buttermilk (Chaas)", category:"drinks", diet:["veg"], meals:["snack"],
+    ingredients:[
+      { name:"Curd", amount:100, unit:"g" },
+      { name:"Water", amount:300, unit:"ml" },
+      { name:"Mint Leaves", amount:5, unit:"g" },
+      { name:"Salt and spices", amount:2, unit:"g" }
+    ],
+    nutrients:{ calories:68, protein:3.9, carbs:6.1, fat:3.5, fiber:0.8, vitC:2.2, vitA:39.6, calcium:138, iron:0.7, magnesium:19.1 },
+    method:"Whisk curd with water, roasted cumin, mint and black salt.",
+    time:5, serves:2, emoji:"🥤" },
+
+  { id:"r198", name:"Jaljeera", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+    ingredients:[
+      { name:"Lemon", amount:20, unit:"g" },
+      { name:"Mint Leaves", amount:10, unit:"g" },
+      { name:"Water", amount:400, unit:"ml" },
+      { name:"Jaggery", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:57.2, protein:0.9, carbs:14, fat:0.4, fiber:2, vitC:14, vitA:24.4, calcium:45.2, iron:2.3, magnesium:20.9 },
+    method:"Blend mint with roasted cumin and tamarind, mix with chilled water, lemon and black salt.",
+    time:10, serves:2, emoji:"🥤" },
+
+  { id:"r199", name:"Aam Panna", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+    ingredients:[
+      { name:"Raw Mango", amount:200, unit:"g" },
+      { name:"Jaggery", amount:50, unit:"g" },
+      { name:"Water", amount:500, unit:"ml" },
+      { name:"Mint Leaves", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:325.7, protein:1.8, carbs:79.4, fat:0.9, fiber:3.9, vitC:33.5, vitA:20.6, calcium:70, iron:6.2, magnesium:58.1 },
+    method:"Boil raw mango, pulp, blend with jaggery, cumin and mint, dilute with chilled water.",
+    time:25, serves:3, emoji:"🥭" },
+
+  { id:"r200", name:"Bael Sherbet", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+    ingredients:[
+      { name:"Bael", amount:100, unit:"g" },
+      { name:"Jaggery", amount:30, unit:"g" },
+      { name:"Water", amount:500, unit:"ml" }
+    ],
+    nutrients:{ calories:251.9, protein:1.9, carbs:61.4, fat:0.3, fiber:2.9, vitC:8, vitA:55, calcium:109, iron:3.9, magnesium:46 },
+    method:"Mash bael pulp, strain, mix with jaggery and cold water. A traditional summer cooler.",
+    time:15, serves:3, emoji:"🥤" },
+
+  { id:"r201", name:"Sattu Sherbet", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+    ingredients:[
+      { name:"Besan", amount:50, unit:"g" },
+      { name:"Water", amount:400, unit:"ml" },
+      { name:"Lemon", amount:10, unit:"g" },
+      { name:"Salt and spices", amount:2, unit:"g" }
+    ],
+    nutrients:{ calories:202.2, protein:11.3, carbs:30.9, fat:3.6, fiber:6.3, vitC:5.5, vitA:2.1, calcium:33.1, iron:2.9, magnesium:87.8 },
+    method:"Mix roasted gram flour (sattu) with water, lemon, roasted cumin and black salt.",
+    time:5, serves:2, emoji:"🥤" },
+
+  { id:"r202", name:"Ragi Malt", category:"drinks", diet:["veg"], meals:["snack","breakfast"],
+    ingredients:[
+      { name:"Finger Millet (Whole Ragi)", amount:30, unit:"g" },
+      { name:"Milk", amount:250, unit:"ml" },
+      { name:"Jaggery", amount:12, unit:"g" }
+    ],
+    nutrients:{ calories:296.9, protein:10.2, carbs:45.4, fat:8.7, fiber:3.5, vitC:2.5, vitA:115, calcium:395.3, iron:2.5, magnesium:74.5 },
+    method:"Cook ragi flour in water till thick, add milk and jaggery.",
+    time:10, serves:2, emoji:"🥤" },
+
+  { id:"r203", name:"Haldi Doodh (Golden Milk)", category:"drinks", diet:["veg"], meals:["snack"],
+    ingredients:[
+      { name:"Milk", amount:250, unit:"ml" },
+      { name:"Ginger", amount:3, unit:"g" },
+      { name:"Salt and spices", amount:1, unit:"g" }
+    ],
+    nutrients:{ calories:157.8, protein:8.2, carbs:13, fat:8.4, fiber:0.3, vitC:2.8, vitA:116, calcium:287, iron:0.2, magnesium:28.3 },
+    method:"Warm milk with turmeric, a pinch of pepper and ginger. Good at bedtime.",
+    time:10, serves:1, emoji:"🥛" },
+
+  { id:"r204", name:"Sweet Lassi", category:"drinks", diet:["veg"], meals:["snack"],
+    ingredients:[
+      { name:"Curd", amount:200, unit:"g" },
+      { name:"Water", amount:100, unit:"ml" },
+      { name:"Sugar", amount:20, unit:"g" }
+    ],
+    nutrients:{ calories:197.4, protein:7, carbs:29.4, fat:6.6, fiber:0, vitC:1, vitA:54, calcium:240.2, iron:0.2, magnesium:24 },
+    method:"Whisk curd with water and a little sugar till frothy.",
+    time:5, serves:2, emoji:"🥤" },
+
+  { id:"r205", name:"Cucumber Mint Cooler", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+    ingredients:[
+      { name:"Cucumber", amount:200, unit:"g" },
+      { name:"Mint Leaves", amount:8, unit:"g" },
+      { name:"Lemon", amount:15, unit:"g" },
+      { name:"Water", amount:250, unit:"ml" }
+    ],
+    nutrients:{ calories:37.9, protein:1.8, carbs:9.2, fat:0.3, fiber:2, vitC:16.4, vitA:27.1, calcium:51.9, iron:1.1, magnesium:32.2 },
+    method:"Blend cucumber, mint and lemon with water, serve chilled.",
+    time:5, serves:2, emoji:"🥤" },
+
+  { id:"r206", name:"Nimbu Pani (Lemon Sherbet)", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+    ingredients:[
+      { name:"Lemon", amount:40, unit:"g" },
+      { name:"Water", amount:400, unit:"ml" },
+      { name:"Jaggery", amount:15, unit:"g" }
+    ],
+    nutrients:{ calories:69, protein:0.5, carbs:18.4, fat:0.1, fiber:1.1, vitC:21.2, vitA:0.4, calcium:22.4, iron:1.9, magnesium:13.7 },
+    method:"Mix lemon juice, jaggery, a pinch of salt and roasted cumin in chilled water.",
+    time:5, serves:2, emoji:"🥤" }
 ];
 </script>
 
