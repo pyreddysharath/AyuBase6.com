@@ -19073,7 +19073,8 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     var u=U()||{}, mine=u.mine, L=u.latest, ph=u.phase||'', btn=$('au-btn'), line=$('au-line'), note=$('au-note'), bar=$('au-bar');
     var bg=ph==='checking' && !!u.checkedAt; if(bg) ph='';   // a new check runs in the background: the last result stays, only the button says Checking…
     if(Date.now()<hold && u.store!=='play' && ph!=='downloading' && ph!=='allow' && ph!=='installing'){ ph='checking'; bg=false; L=null; }
-    $('au-ver').textContent='App version'+(mine&&mine.name?' '+mine.name:'');
+    var wv=+(window.ayuNative && window.ayuNative.wwwVersion)||0;   // the version the screens were packed in: shown only when it is not the app's
+    $('au-ver').textContent='App version'+(mine&&mine.name?' '+mine.name:'')+(wv && mine && mine.code && wv!==mine.code ? ' (screens from 0.1.'+wv+')' : '');
     var cls='', txt='', b='Check for update', alt=true, dis=false, nt='', pct=-1;
     if(u.store==='play'){ cls='ok'; txt='Google Play keeps AyuBase6 up to date.'; b='Open Google Play'; alt=true; dis=false; }   // the Google Play version
     else if(ph==='downloading'){ cls='busy'; txt='Downloading the update… '+(u.pct||0)+'%'; b='Downloading…'; dis=true; alt=false; pct=u.pct||0; }
