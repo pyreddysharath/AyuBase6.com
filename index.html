@@ -21166,6 +21166,7 @@ html body #ayu-checklist .ayu-act-form label span{flex:0 0 46px}
 html body #ayu-checklist .ayu-act-form input{flex:1 1 auto;min-width:0;height:36px;border:1.5px solid rgba(167,91,18,.5);border-radius:10px;padding:0 8px;font:inherit;font-size:.92rem;background:#fff;color:inherit}
 html body #ayu-checklist .ayu-act-form .af-btns{display:flex;gap:8px;justify-content:flex-end}
 html body #ayu-checklist .ayu-act-form .af-msg{font-size:.78rem;color:#b91c1c;margin:0 0 6px}
+html body #ayu-checklist .ayu-act-form .af-note{font-size:.78rem;color:#92400e;background:#fef3c7;border-radius:8px;padding:6px 9px;margin:0 0 6px}
 html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
 </style>
 <script id="features-20261113-js">
@@ -21324,8 +21325,32 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
       var before=null; [].some.call(part.querySelectorAll('.rout-row'),function(r){ var c=r.querySelector('.rout-cb'), f=c && WAKE_OFFSETS[c.dataset.key]; if(f && f[0]>a.off[0]){ before=r; return true; } return false; });
       part.insertBefore(row, before || part.querySelector('.sec-lotus-layer') || null);
     });
-    repaintChecks(); if(editing) decorate();
+    sortParts(); repaintChecks(); if(editing) decorate();
     return true;
+  }
+  // Each part of the day lists its activities by start time (an activity moves with its "i" panel).
+  function sortParts(){
+    partsOf().forEach(function(part){
+      var units=[].filter.call(part.children,function(r){ return r.classList.contains('rout-row'); }).map(function(r,i){
+        var els=[r], n=r.nextElementSibling; while(n && n.classList.contains('rout-info-panel')){ els.push(n); n=n.nextElementSibling; }
+        var cb=r.querySelector('.rout-cb'), f=cb && WAKE_OFFSETS[cb.dataset.key];
+        return {els:els, at:f ? f[0] : 1e9, i:i, end:n};
+      });
+      if(units.length<2) return;
+      var sorted=units.slice().sort(function(a,b){ return (a.at-b.at) || (a.i-b.i); });
+      if(sorted.every(function(u,i){ return u===units[i]; })) return;
+      var anchor=units[units.length-1].end;
+      sorted.forEach(function(u){ u.els.forEach(function(el){ part.insertBefore(el,anchor); }); });
+    });
+  }
+  // The other activities in the list (not the removed ones), with their names and minutes after waking
+  function others(self){
+    var o=ed(), out=[];
+    [].forEach.call(list().querySelectorAll('.rout-cb'),function(cb){
+      var k=cb.dataset.key, f=WAKE_OFFSETS[k]; if(!f || k===self || o.del.indexOf(k)>=0) return;
+      out.push({key:k, name:String((textNode(cb)||{}).textContent||'').trim(), a:f[0], b:f[f.length-1]});
+    });
+    return out;
   }
   function closeForm(){ var f=list() && list().querySelector('.ayu-act-form'); if(f) f.remove(); }
   function decorate(){
@@ -21361,16 +21386,27 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
     var f=document.createElement('div'); f.className='ayu-act-form';
     f.innerHTML='<label><span>Activity</span><input type="text" class="af-t" maxlength="60" placeholder="e.g. Take medicine"></label>'
       +'<label><span>From</span><input type="time" class="af-a"></label><label><span>To</span><input type="time" class="af-b"></label>'
-      +'<p class="af-msg" hidden></p><div class="af-btns"><button type="button" class="af-save">Save</button><button type="button" class="af-no">Cancel</button></div>';
+      +'<p class="af-note" hidden></p><p class="af-msg" hidden></p><div class="af-btns"><button type="button" class="af-save">Save</button><button type="button" class="af-no">Cancel</button></div>';
     f.querySelector('.af-t').value=txt; f.querySelector('.af-a').value=hhmm(wk+off[0]); f.querySelector('.af-b').value=hhmm(wk+off[off.length-1]);
     anchor.after(f); try{ f.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
     f.addEventListener('click',function(e){ e.stopPropagation(); });
     f.querySelector('.af-no').addEventListener('click',closeForm);
+    function range(){ var a=toMin(f.querySelector('.af-a').value), b=toMin(f.querySelector('.af-b').value); if(a===null) return null; if(b===null) b=a+30;
+      var oa=((a-wk)%1440+1440)%1440; return [oa, oa+(((b-a)%1440+1440)%1440 || 30)]; }
+    function clock(m){ return typeof minutesToClock==='function' ? minutesToClock(wk+m) : hhmm(wk+m); }
+    function note(){   // a gentle note when the time runs into another activity; saving is still allowed
+      var n=f.querySelector('.af-note'), r=range(), hit=r ? others(key).filter(function(u){ return r[0]<u.b && u.a<r[1]; }) : [];
+      if(!hit.length){ n.hidden=true; n.textContent=''; return; }
+      n.textContent='Overlaps with '+hit.slice(0,2).map(function(u){ return u.name+' ('+clock(u.a)+' – '+clock(u.b)+')'; }).join(' and ')+(hit.length>2 ? ' and '+(hit.length-2)+' more' : '')+'. You can still save.';
+      n.hidden=false;
+    }
+    f.querySelector('.af-a').addEventListener('input',note); f.querySelector('.af-b').addEventListener('input',note); note();
     f.querySelector('.af-save').addEventListener('click',function(){
       var t=f.querySelector('.af-t').value.trim().replace(/\s+/g,' '), a=toMin(f.querySelector('.af-a').value), b=toMin(f.querySelector('.af-b').value), msg=f.querySelector('.af-msg');
       if(!t || a===null){ msg.textContent=!t ? 'Type the activity.' : 'Choose the From time.'; msg.hidden=false; return; }
       if(b===null) b=a+30;
       var x=ed(), oa=((a-wk)%1440+1440)%1440, ob=oa+(((b-a)%1440+1440)%1440 || 30), nf=[oa,ob];
+      if(others(key).some(function(u){ return u.name.toLowerCase()===t.toLowerCase() && u.a===nf[0] && u.b===nf[1]; })){ msg.textContent='“'+t+'” is already in your list at this time.'; msg.hidden=false; return; }
       if(isNew){ var id; do{ id='u'; for(var i=0;i<7;i++) id+=String.fromCharCode(97+Math.floor(Math.random()*26)); }while(WAKE_OFFSETS[id]); x.add.push({key:id,part:partIdx,txt:t,off:nf}); }
       else if(DEF_OFF && DEF_OFF[key]){
         var base=x.txt[key] ? String(DEF_TXT[key]||'').trim() : txt;
