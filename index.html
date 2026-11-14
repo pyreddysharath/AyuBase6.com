@@ -23808,14 +23808,15 @@ html body .ayu-age-sw svg{width:18px;height:18px}
     var rh=h.closest('.calc-row-stacked'), rw=wt.closest('.calc-row-stacked'); if(!rh || !rw) return;
     if(!rh.parentNode.classList.contains('ayu-hw')){ var box=document.createElement('div'); box.className='ayu-hw'; box.style.setProperty('--wc',x[2]); rh.parentNode.insertBefore(box,rh); box.appendChild(rh); box.appendChild(rw); }
     scale(x[0],true,'Height','cm'); scale(x[1],false,'Weight','kg');
-    var box=rh.parentNode;
+    var box=rh.parentNode; box.dataset.kb = x[0]==='height-slider' ? 'ayuBmiView' : 'ayuBmiViewVit';   // Food and Vitals each keep their own choice (Vitals starts from what was chosen before)
+    try{ if(localStorage.getItem(box.dataset.kb)===null) localStorage.setItem(box.dataset.kb,localStorage.getItem('ayuBmiView')||'bar'); }catch(e){}
     if(!box.querySelector('.ayu-age-sw')){ var sw=document.createElement('button'); sw.type='button'; sw.className='ayu-age-sw ayu-hw-sw';
-      sw.addEventListener('click',function(e){ e.stopPropagation(); try{ localStorage.setItem(KB,bmiView()==='tape'?'bar':'tape'); }catch(e2){} paintBmi(); });
+      sw.addEventListener('click',function(e){ e.stopPropagation(); try{ localStorage.setItem(box.dataset.kb,bmiView(box)==='tape'?'bar':'tape'); }catch(e2){} paintBmi(); });
       box.appendChild(sw); paintBmi(); }
   }
   var KB='ayuBmiView';
-  function bmiView(){ try{ return localStorage.getItem(KB)==='tape' ? 'tape' : 'bar'; }catch(e){ return 'bar'; } }
-  function paintBmi(){ document.querySelectorAll('.ayu-hw').forEach(function(box){ var tp=bmiView()==='tape'; box.classList.toggle('ayu-hw-tape',tp);
+  function bmiView(box){ try{ var k=(box&&box.dataset.kb)||KB, v=localStorage.getItem(k); return v==='tape' ? 'tape' : 'bar'; }catch(e){ return 'bar'; } }
+  function paintBmi(){ document.querySelectorAll('.ayu-hw').forEach(function(box){ var tp=bmiView(box)==='tape'; box.classList.toggle('ayu-hw-tape',tp);
     var b=box.querySelector('.ayu-hw-sw'); if(b){ b.innerHTML=tp?BAR:WHL; b.title=tp?'Show the bars':'Show the tape and scale'; b.setAttribute('aria-label',b.title); } }); }
   function run(){ W.forEach(wheel); HW.forEach(hw);
     age('body-age-slider','#2563eb',function(){ return BODY_AGE_GROUPS; },'.body-age-section');
@@ -24306,6 +24307,13 @@ html body :is(#bmi-wrap,#calc-bmi-wrap) .bmi-num:not(#ayu-x1){font-size:1.2rem !
 html body :is(#bmi-wrap,#calc-bmi-wrap) .bmi-cat:not(#ayu-x1){font-size:.7rem !important;line-height:1.2;margin-top:1px}
 html body :is(#bmi-range,#calc-bmi-range):not(#ayu-x1){font-size:.98rem !important;line-height:1.2}
 @media(max-width:360px){html body :is(#bmi-wrap,#calc-bmi-wrap) .bmi-num:not(#ayu-x1){font-size:1.05rem !important}}
+</style>
+<style id="bmi-toggle-20261114">
+/* BMI (Food and Vitals): the tape/bar switch sits at the bottom right of the whole section, below the result boxes, and is smaller */
+html body :is(#sec-physical,.calc-card:has(.ayu-hw)):not(#ayu-x1){position:relative !important;padding-bottom:50px !important}
+html body :is(#sec-physical,.calc-card:has(.ayu-hw)) .ayu-hw:not(#ayu-x1){position:static !important;padding-bottom:0 !important}
+html body :is(#sec-physical,.calc-card:has(.ayu-hw)) .ayu-hw > .ayu-hw-sw:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){position:absolute !important;right:14px !important;bottom:12px !important;left:auto !important;top:auto !important;width:28px !important;height:28px !important;border-radius:8px !important;z-index:3}
+html body :is(#sec-physical,.calc-card:has(.ayu-hw)) .ayu-hw > .ayu-hw-sw svg{width:15px !important;height:15px !important}
 </style>
 </body>
 
