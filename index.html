@@ -10188,12 +10188,14 @@ const WAKE_OFFSETS = {
   walkex:    [30, 75],
   sun:       [75, 105],
   breakfast: [105, 165],
-  fruits:    [315, 345],
-  lunch:     [405, 465],
-  snacks:    [615, 675],
-  dinner:    [795, 855],
-  nomobile:  [900, 960],
-  sleep:     [960, 1005],
+  // Wake 6:30 AM gives: fruit 11:00, lunch 12:30–1:30, snack 4:00–5:00, dinner 6:30–7:30, screens off 9:00, sleep 10:00–10:30 PM.
+  // Lunch well before 3 PM; dinner ends 2.5–3 hours or more before bed; 8–8.5 hours in bed (adults need 7 or more hours of sleep).
+  fruits:    [270, 300],
+  lunch:     [360, 420],
+  snacks:    [570, 630],
+  dinner:    [720, 780],
+  nomobile:  [870, 930],
+  sleep:     [930, 960],
 };
 function minutesToClock(totalMin){
   let m=((totalMin%1440)+1440)%1440;
@@ -18890,7 +18892,7 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     $('clk-world-list').addEventListener('keydown',function(e){ var hd=e.target.closest && e.target.closest('.cri-hdr'); if(hd && e.target===hd && (e.key==='Enter' || e.key===' ')){ e.preventDefault(); hd.click(); } });
     $('clk-world-list').addEventListener('click',function(e){
       var hd=e.target.closest('.cri-hdr');
-      if(hd){ var tzo=hd.parentNode.dataset.tz; if(replacing) close(); worldOpen=worldOpen===tzo ? '' : tzo; paintWorld(true); return; }
+      if(hd && !e.target.closest('.wc-remove')){ var tzo=hd.parentNode.dataset.tz; if(replacing) close(); worldOpen=worldOpen===tzo ? '' : tzo; paintWorld(true); return; }
       var chg=e.target.closest('.wc-change'); if(chg){ if(replacing) { close(); paintWorld(true); } else wireWorld.change(chg.closest('[data-tz]').dataset.tz); return; }
       var del=e.target.closest('.wc-remove'); if(!del) return;
       if(replacing) close();
@@ -18927,18 +18929,17 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     if(fmtRow && list.contains(fmtRow)){ fmtRow.hidden=true; list.parentNode.appendChild(fmtRow); }
     if(form && list.contains(form)) formHome();
     var CHEV='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.500l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    var LOCK='<svg class="wc-lock" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2Zm-7-2a2 2 0 0 1 4 0v2h-4V7Z"/></svg>';
     list.innerHTML=L.map(function(c){
       var day=dayTxt(c.tz,d), op=worldOpen===c.tz, t=cityTime(c.tz,d), m=/^(.*?)\s*([AaPp]\.?[Mm]\.?)$/.exec(t);
-      return '<div class="custom-reminder-item ayu-alarm-item clk-wc'+(op?' open':'')+'" data-tz="'+esc(c.tz)+'"><div class="cri-hdr" role="button" tabindex="0" aria-expanded="'+op+'" aria-label="'+esc(c.city)+', '+esc(t)+'. '+(op?'Close':'Open')+' the settings"><div class="cri-main"><div class="wc-name"><span>'+esc(c.city)+'</span>'+(APP && c.lock?'<span class="wc-badge" title="On the lock screen">'+LOCK+'</span>':'')+'</div>'
+      return '<div class="custom-reminder-item ayu-alarm-item clk-wc'+(op?' open':'')+'" data-tz="'+esc(c.tz)+'"><div class="cri-hdr" role="button" tabindex="0" aria-expanded="'+op+'" aria-label="'+esc(c.city)+', '+esc(t)+'. '+(op?'Close':'Open')+' the settings"><div class="cri-main"><div class="wc-name"><span>'+esc(c.city)+'</span></div>'
         +'<div class="cri-sub">'+esc(c.country)+' · '+esc(diffTxt(c.tz,d))+(day?' · '+day:'')+'</div></div>'
-        +'<strong class="wc-time">'+(m?esc(m[1])+'<small>'+esc(m[2].toUpperCase())+'</small>':esc(t))+'</strong><span class="clk-w-chev" aria-hidden="true">'+CHEV+'</span></div>'
+        +'<strong class="wc-time">'+(m?esc(m[1])+'<small>'+esc(m[2].toUpperCase())+'</small>':esc(t))+'</strong><button type="button" class="wc-remove" aria-label="Remove '+esc(c.city)+'">×</button><span class="clk-w-chev" aria-hidden="true">'+CHEV+'</span></div>'
         +(op?'<div class="wc-body">'
           +'<div class="wc-row"><span class="wc-l">Time zone</span><span class="wc-v">'+esc(gmtTxt(c.tz,d))+'</span><button type="button" class="wc-change" aria-label="Change the city or time zone of this entry">'+(replacing===c.tz?'Cancel':'Change')+'</button></div>'
           +'<div class="wc-slot" data-slot="form"></div><div class="wc-slot" data-slot="fmt"></div>'
           +(APP?'<div class="wc-row"><span class="wc-l">Show on lock screen</span><label class="master-switch" title="Show on lock screen"><input type="checkbox" data-lock="'+esc(c.tz)+'"'+(c.lock?' checked':'')+' aria-label="Show '+esc(c.city)+' on the lock screen"></label></div>'
             +(c.lock?'<div class="wc-row clk-w-name"><span class="wc-l">Name on lock screen</span><input type="text" maxlength="24" data-name="'+esc(c.tz)+'" value="'+esc(c.label||'')+'" placeholder="'+esc(c.city)+'" aria-label="Your own name for '+esc(c.city)+' on the lock screen"></div><div class="wc-slot" data-slot="look"></div>':''):'')
-          +'<div class="wc-foot"><button type="button" class="wc-remove" aria-label="Remove '+esc(c.city)+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 3h6l1 2h4v2H4V5h4l1-2Zm-3 6h12l-1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 9Z"/></svg>Remove</button></div></div>':'')+'</div>';
+          +'</div>':'')+'</div>';
     }).join('');
     if(!L.length) list.innerHTML='<p class="clk-note">Add the cities you want to keep an eye on.</p>';
     var it=list.querySelector('.clk-wc.open');
@@ -21233,10 +21234,8 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
   function inUse(){
     if(!APP) return;
     ['nomobile','sleep'].forEach(function(k){
-      var cb=document.querySelector('.rout-cb[data-key="'+k+'"]'), sp=cb && cb.closest('label').querySelector('span'), tm=$('rt-'+k);
-      if(sp && tm && !sp.querySelector('.ayu-inuse')){ var m=document.createElement('span'); m.className='ayu-inuse'; m.textContent='📱'; m.title='Reminds you only while the phone is in use'; m.setAttribute('aria-label','Reminds you only while the phone is in use'); sp.insertBefore(m,tm); sp.insertBefore(document.createTextNode(' '),tm); }
       var inf=$('rout-info-'+k);
-      if(inf && !inf.querySelector('.ayu-inuse-note')){ var d=document.createElement('div'); d.className='ayu-inuse-note'; d.innerHTML='<b>📱 Only while the phone is in use</b>: this reminder comes only if the phone’s screen is on at that time. A phone that is already put away is not disturbed.'; inf.appendChild(d); }
+      if(inf && !inf.querySelector('.ayu-inuse-note')){ var d=document.createElement('div'); d.className='ayu-inuse-note'; d.innerHTML='<b>Only while the phone is in use</b>: this reminder comes only if the phone’s screen is on at that time. A phone that is already put away is not disturbed.'; inf.appendChild(d); }
     });
   }
 
@@ -21609,12 +21608,10 @@ html body #sec-backup [id^="subtab-"] .fst-ic:not(#ayu-x1){flex:0 0 14px;width:1
 /* World Clock entries: city on the left, time on the right, a chevron to open the settings */
 html body #rem-alarm-card #clk-world-list{display:flex;flex-direction:column;gap:10px}
 html body #rem-alarm-card #clk-world-list .clk-wc:not(#ayu-x1):not(#ayu-x2){margin:0 !important;padding:0 !important;border-radius:16px !important;overflow:hidden;display:block !important}
-html body #rem-alarm-card #clk-world-list .clk-wc > .cri-hdr:not(#ayu-x1):not(#ayu-x2){display:flex !important;align-items:center !important;gap:10px !important;padding:13px 12px 13px 16px !important;cursor:pointer;min-height:0 !important}
+html body #rem-alarm-card #clk-world-list .clk-wc > .cri-hdr:not(#ayu-x1):not(#ayu-x2){display:flex !important;align-items:center !important;gap:8px !important;padding:13px 12px 13px 16px !important;cursor:pointer;min-height:0 !important}
 html body #rem-alarm-card #clk-world-list .clk-wc .cri-main:not(#ayu-x1):not(#ayu-x2){flex:1 1 auto !important;min-width:0 !important;display:block !important}
 html body #rem-alarm-card #clk-world-list .clk-wc .wc-name{display:flex;align-items:center;gap:6px;font-size:1.08rem;font-weight:800;color:#134e4a;line-height:1.25}
 html body #rem-alarm-card #clk-world-list .clk-wc .wc-name > span:first-child{min-width:0;overflow-wrap:anywhere}
-html body #rem-alarm-card #clk-world-list .clk-wc .wc-badge{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:color-mix(in srgb,#0f766e 14%,#fff);color:#0f766e}
-html body #rem-alarm-card #clk-world-list .clk-wc .wc-lock{width:12px;height:12px}
 html body #rem-alarm-card #clk-world-list .clk-wc .cri-sub:not(#ayu-x1):not(#ayu-x2){margin:3px 0 0 !important;font-size:.8rem !important;line-height:1.35 !important;color:#134e4a !important;opacity:.78;white-space:normal !important;overflow:visible !important;text-overflow:clip !important}
 html body #rem-alarm-card #clk-world-list .clk-wc .wc-time:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto;font-size:1.55rem !important;font-weight:800;letter-spacing:-.01em;color:#0f766e;white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1}
 html body #rem-alarm-card #clk-world-list .clk-wc .wc-time small{font-size:.5em;font-weight:800;margin-left:3px;opacity:.85}
@@ -21632,9 +21629,8 @@ html body #rem-alarm-card #clk-world-list .wc-slot:empty{display:none}
 html body #rem-alarm-card #clk-world-list .wc-slot[data-slot=form]{padding:10px 0 4px;border-bottom:1px solid color-mix(in srgb,#0f766e 12%,#fff)}
 html body #rem-alarm-card #clk-world-list .clk-w-name input:not(#ayu-x1){flex:0 1 190px}
 html body #rem-alarm-card #clk-world-list .wc-slot > .clk-wlook:not(#ayu-x1):not(#ayu-x2){margin:10px 0 !important;background:color-mix(in srgb,#0f766e 5%,#fff) !important}
-html body #rem-alarm-card #clk-world-list .wc-foot{display:flex;justify-content:flex-end;padding:9px 0}
-html body #rem-alarm-card #clk-world-list .wc-remove:not(#ayu-x1):not(#ayu-x2){display:inline-flex;align-items:center;gap:6px;border:1.5px solid #dc2626 !important;background:#fff !important;color:#b91c1c !important;border-radius:10px !important;padding:6px 12px !important;font:inherit;font-size:.82rem !important;font-weight:700 !important;cursor:pointer;box-shadow:none !important;min-height:0 !important}
-html body #rem-alarm-card #clk-world-list .wc-remove svg{width:15px;height:15px}
+html body #rem-alarm-card #clk-world-list .wc-body > :last-child{border-bottom:0}
+html body #rem-alarm-card #clk-world-list .clk-wc .wc-remove:not(#ayu-x1):not(#ayu-x2){flex:0 0 30px;width:30px;height:30px;min-height:0 !important;margin:0 !important;padding:0 !important;display:inline-flex;align-items:center;justify-content:center;border-radius:50% !important;border:1.5px solid color-mix(in srgb,#0f766e 45%,#fff) !important;background:#fff !important;color:#0f766e !important;font:inherit;font-size:1.25rem !important;font-weight:700 !important;line-height:1 !important;cursor:pointer;box-shadow:none !important}
 @media (max-width:380px){ html body #rem-alarm-card #clk-world-list .clk-wc .wc-time:not(#ayu-x1):not(#ayu-x2){font-size:1.35rem !important} }
 </style>
 </body>
