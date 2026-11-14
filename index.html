@@ -6139,7 +6139,7 @@ function appendCoverageRow(sec, selNutrients, showNutrientCols){
   const n=checked[sec.key]?.size||0, total=sec.src().length;
 
   const tr=document.createElement('tr'); tr.id='cov-row-'+sec.key;
-  let rowHtml=`<td class="cov-rowlbl" id="cov-lbl-${sec.key}"><span class="cov-arr food-chevron" id="cov-arr-${sec.key}" aria-hidden="true"><svg viewBox="0 0 8 12" width="8" height="12"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${sec.ttl}<div class="cov-count" id="cov-count-${sec.key}" onclick="event.stopPropagation(); openWish('${sec.key}')">${EDIT_ICON_SVG}</div></td>`;
+  let rowHtml=`<td class="cov-rowlbl" id="cov-lbl-${sec.key}">${sec.ttl}<span class="cov-count" id="cov-count-${sec.key}" onclick="event.stopPropagation(); openWish('${sec.key}')">(${n}/${total}) ${EDIT_ICON_SVG}</span><span class="cov-arr food-chevron" id="cov-arr-${sec.key}" aria-hidden="true"><svg viewBox="0 0 8 12" width="8" height="12"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>`;
   if(showNutrientCols){
     selNutrients.forEach(nk=>{
       const cov=sectionWeeklyCoverage(sec.key,nk);
@@ -6185,7 +6185,7 @@ function appendSummaryRows(activeSections, selNutrients){
 function refreshCoverageNumbers(sectionKey){
   const n=checked[sectionKey]?.size||0, total=SEC_MAP[sectionKey].src().length;
   const countEl=document.getElementById('cov-count-'+sectionKey);
-  if(countEl) countEl.innerHTML=`${EDIT_ICON_SVG}`;
+  if(countEl) countEl.innerHTML=`(${n}/${total}) ${EDIT_ICON_SVG}`;
 
   const selNutrients=selAge?getSelectedNutrientKeys():[];
   const showNutrientCols=selAge&&selNutrients.length>0;
@@ -6654,7 +6654,8 @@ function buildRecipes(diets){
   REC_DAYS.forEach((day,di)=>{
     const tab=document.createElement('div'); tab.className='rec-day-tab'+(di===todayRec?' active':'')+(fast && fast.days.indexOf(di)>=0?' fast':'');
     if(fast && fast.days.indexOf(di)>=0) tab.title='Fasting day';
-    tab.textContent=day.slice(0,3);
+    tab.textContent=day.charAt(0); tab.setAttribute('aria-label',day+(fast && fast.days.indexOf(di)>=0?' (fasting day)':''));
+    if(!tab.title) tab.title=day;
     tab.addEventListener('click',()=>{
       nav.querySelectorAll('.rec-day-tab').forEach((t,i)=>t.classList.toggle('active',i===di));
       panels.querySelectorAll('.rec-day-panel').forEach((p,i)=>p.classList.toggle('active',i===di));
@@ -6675,7 +6676,7 @@ function buildRecipes(diets){
       let pool=basePool;
       if(inWin){ const fp=fastList.filter(r=>inMeal(r,FAST_SLOT[label])); if(fp.length) pool=fp; }
       const fastTag=inWin?'Fasting':'';
-      const block=document.createElement('div'); block.className='rec-block'+(fastTag?' fast':'');
+      const block=document.createElement('div'); block.className='rec-block'+(fastTag?' fast':''); block.dataset.meal=label.toLowerCase();
       const mealHead=document.createElement('div'); mealHead.className='rec-meal-label';
       mealHead.innerHTML=`${label}${fastTag?`<span class="rec-fast-tag">${fastTag}</span>`:''}`;
       block.appendChild(mealHead);
@@ -6692,7 +6693,7 @@ function buildRecipes(diets){
       function paint(){
         mealRow.innerHTML=`<span class="rec-meal-name">${cur[0].name}</span><span class="rec-meal-arr food-chevron" aria-hidden="true"><svg viewBox="0 0 8 12" width="8" height="12"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
         detail.innerHTML=buildRecipeCardHtml(cur[0]);
-        altRow.innerHTML=cur.length>1?`<span class="rec-alt-l">Other options</span>`+cur.slice(1).map((a,i)=>`<button type="button" class="rec-alt" data-i="${i+1}">${a.name}</button>`).join(''):'';
+        altRow.innerHTML=cur.length>1?`<span class="rec-alt-l">Try instead</span>`+cur.slice(1).map((a,i)=>`<button type="button" class="rec-alt" data-i="${i+1}">${a.name}</button>`).join(''):'';
       }
       paint();
       altRow.addEventListener('click',e=>{
@@ -23986,6 +23987,51 @@ html body #nutrition-panel #results .cov-table th:first-child{background:color-m
 #nutrition-panel .rec-block .rec-meal-detail{margin:0 0 8px}
 #nutrition-panel .rec-block .rec-alts{margin:4px 0 0}
 #nutrition-panel .rec-block.fast{border-left-color:var(--deep,#204b38)}
+</style>
+<style id="food-plan-20261114c">
+/* Nutrients & Food and Plan: two different backgrounds */
+html body #nutrition-panel #results .cart-wrapper{background:#e3f3e8 !important}
+html body #nutrition-panel #results #weekly-plan-block .weekly-plan-card{background:#fff6e0 !important}
+html body #nutrition-panel #results .cart-header:hover{background:#d3ebdb !important}
+html body #nutrition-panel #results .wp-header:hover,html body #nutrition-panel #results .wp-sub-hdr:hover{background:#ffedc2 !important}
+html body #nutrition-panel #results .wp-sub-block{border-bottom-color:#f0dfb0 !important}
+html body #nutrition-panel #results .wp-header{border-bottom-color:#f0dfb0 !important}
+/* Food Category table: header row one colour, body rows another; name (n/total) edit, chevron at the end */
+html body #nutrition-panel #results .cov-table thead th,html body #nutrition-panel #results .cov-table th:first-child,html body #nutrition-panel #results .cov-table th#cov-th-Calories{background:#25704f;color:#fff}
+html body #nutrition-panel #results .cov-table thead th span{color:#d6efe0}
+html body #nutrition-panel #results .cov-table td.cov-rowlbl{background:#cfe8d8;position:sticky;padding-right:30px}
+html body #nutrition-panel #results .cov-table tr.cov-summary td.cov-rowlbl{background:#b9dcc6;padding-right:9px}
+html body #nutrition-panel #results .cov-table td[id$="-Calories"]{background:#eef8f1}
+html body #nutrition-panel #results .cov-table td.cov-rowlbl .cov-count{position:static;transform:none;float:none;display:inline-flex;align-items:center;gap:4px;margin:0 0 0 6px;padding:2px 0;font-size:.74rem;font-weight:600;color:#3d6b53}
+html body #nutrition-panel #results .cov-table td.cov-rowlbl .cov-arr{position:absolute;right:9px;top:50%;margin:-6px 0 0;display:inline-flex}
+/* week tabs: M T W T F S S, all visible; fasting day in saffron */
+#nutrition-panel .rec-day-nav{gap:5px}
+#nutrition-panel .rec-day-nav .rec-day-tab{flex:1 1 0;min-width:0;padding:9px 0;text-align:center}
+#nutrition-panel .rec-day-tab.fast{background:#d97706;color:#fff;border:2px solid #d97706;border-bottom:none}
+#nutrition-panel .rec-day-tab.fast::after{background:#fff;margin-left:4px}
+#nutrition-panel .rec-day-tab.fast.active{background:#92400e;border-color:#92400e;color:#fff}
+#nutrition-panel .rec-day-tab.fast:hover{background:#c26a05}
+#nutrition-panel .rec-fast-note{border-left-color:#d97706;background:#fff1d6;color:#7c3d06}
+#nutrition-panel .rec-fast-tag{background:#d97706;color:#fff}
+/* Recipes For You: a colour for each meal */
+#nutrition-panel .rec-block{--bc:#25704f;--bd:#204b38;--bt:#eff8f1;border-left:5px solid var(--bc);background:var(--bt);border-radius:0 12px 12px 0;padding:12px 12px 12px 14px;margin:0 0 14px}
+#nutrition-panel .rec-block[data-meal="breakfast"]{--bc:#08766e;--bd:#155c56;--bt:#e4f6f2}
+#nutrition-panel .rec-block[data-meal="lunch"]{--bc:#25704f;--bd:#204b38;--bt:#e6f5e9}
+#nutrition-panel .rec-block[data-meal="snacks"]{--bc:#6250b3;--bd:#493b7f;--bt:#f0ebfb}
+#nutrition-panel .rec-block[data-meal="dinner"]{--bc:#255cc0;--bd:#1d3f79;--bt:#e8f0ff}
+#nutrition-panel .rec-block .rec-meal-label{color:var(--bd);font-size:.8rem;margin:0 0 8px}
+#nutrition-panel .rec-block .rec-meal-row,#nutrition-panel .rec-block .rec-meal-row.fast{background:#fff;box-shadow:0 1px 0 rgba(0,0,0,.04),inset 0 0 0 1.5px color-mix(in srgb,var(--bc) 28%,#fff);margin:0 0 8px}
+#nutrition-panel .rec-block .rec-meal-name{color:var(--bd)}
+#nutrition-panel .rec-block .rec-meal-arr{color:var(--bc)}
+#nutrition-panel .rec-block .rec-meal-detail{margin:0 0 8px}
+#nutrition-panel .rec-block.fast{border-left-color:var(--bc)}
+/* alternatives: label above, equal-width chips in a grid */
+#nutrition-panel .rec-block .rec-alts{display:grid;grid-template-columns:1fr 1fr;align-items:stretch;gap:8px;margin:4px 0 0}
+#nutrition-panel .rec-block .rec-alts .rec-alt-l{grid-row:auto}
+#nutrition-panel .rec-block .rec-alts .rec-alt-l{grid-column:1/-1;margin:0;color:var(--bd);font-size:.68rem}
+#nutrition-panel .rec-block .rec-alt{width:100%;height:100%;min-height:40px;padding:6px 10px;border-radius:10px;border:1.5px solid color-mix(in srgb,var(--bc) 40%,#fff);background:#fff;color:var(--bd);text-align:center;line-height:1.25;display:flex;align-items:center;justify-content:center}
+#nutrition-panel .rec-block .rec-alt:hover{background:color-mix(in srgb,var(--bc) 10%,#fff)}
+html body #nutrition-panel #results #wsh-rec{background:linear-gradient(90deg,#e4f6f2,#f0ebfb 55%,#e8f0ff) !important}
 </style>
 </body>
 
