@@ -4551,6 +4551,10 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
         <label class="dpill" id="dp-nv">    <input type="checkbox" value="non-veg">🍗 Non-Vegetarian</label>
         <label class="dpill" id="dp-vegan"> <input type="checkbox" value="vegan">  🌱 Vegan</label>
       </div>
+      <div class="cu-wrap" id="cu-wrap">
+        <div class="cu-h">Cuisine</div>
+        <div class="cu-row" id="cu-row" role="group" aria-label="Cuisine"></div>
+      </div>
       <div id="refresh-wrap" style="display:none;margin-top:14px">
         <button id="refresh-btn" class="refresh-btn">🔄 Refresh Results</button>
       </div>
@@ -6623,6 +6627,10 @@ function buildRecipes(diets){
   const fast=(window.ayuFasting && window.ayuFasting())||null;
   let fastList=[];
   if(fast){ const fd=fast.diets.length?fast.diets:diets; fastList=RECIPES_DATA.filter(r=>r.diet.some(d=>fd.includes(d))); if(!fd.includes('non-veg')) fastList=fastList.filter(r=>!r.diet.every(d=>d==='non-veg')); }
+  // Cuisine (Dietary Preference): dishes of the chosen cuisines first; "Any" dishes fit every choice; other dishes only fill a gap.
+  const cu=(window.ayuCuisine && window.ayuCuisine.get())||[]; let cuFallback=false;
+  const cuOk=r=>String(r.cuisine||'A').split('').some(c=>c==='A'||cu.indexOf(c)>=0);
+  const cuBadge=r=>window.ayuCuisine?window.ayuCuisine.badge(r):'';
   const FAST_SLOT={Breakfast:'fast_breakfast',Lunch:'fast_lunch',Snacks:'fast_snack',Dinner:'fast_dinner'};
   const FAST_MEAL={morning:'Breakfast',afternoon:'Lunch',evening:'Snacks',night:'Dinner'};
   // the planned dish and two alternatives of the same kind
@@ -6633,6 +6641,15 @@ function buildRecipes(diets){
     const out=[pool[i]], gap=Math.max(1,Math.floor(n/3));
     for(let a=1;out.length<3 && a<=n;a++){ const c=pool[(i+gap*a)%n]; if(!out.includes(c) && used.indexOf(c.id)<0) out.push(c); }
     for(let a=1;out.length<3 && a<n;a++){ const c=pool[(i+a)%n]; if(!out.includes(c)) out.push(c); }
+    return out;
+  }
+
+  function pickCu(pool,di,k,used){
+    if(!cu.length) return pickOptions(pool,di,k,used);
+    const m=pool.filter(cuOk);
+    if(!m.length){ cuFallback=true; return pickOptions(pool,di,k,used); }
+    const out=pickOptions(m,di,k,used);
+    if(out.length<3){ cuFallback=true; pool.forEach(c=>{ if(out.length<3 && out.indexOf(c)<0) out.push(c); }); }
     return out;
   }
 
@@ -6697,14 +6714,14 @@ function buildRecipes(diets){
         block.appendChild(mealRow); panel.appendChild(block);
         return;
       }
-      const cur=pickOptions(pool,di,offset,usedToday);
+      const cur=pickCu(pool,di,offset,usedToday);
       usedToday.push(cur[0].id);
       const detail=document.createElement('div'); detail.className='rcard rec-meal-detail';
       const altRow=document.createElement('div'); altRow.className='rec-alts';
       function paint(){
-        mealRow.innerHTML=`<span class="rec-meal-name">${cur[0].name}</span><span class="rec-meal-arr food-chevron" aria-hidden="true"><svg viewBox="0 0 8 12" width="8" height="12"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+        mealRow.innerHTML=`<span class="rec-meal-name">${cur[0].name}</span>${cuBadge(cur[0])}<span class="rec-meal-arr food-chevron" aria-hidden="true"><svg viewBox="0 0 8 12" width="8" height="12"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
         detail.innerHTML=buildRecipeCardHtml(cur[0]);
-        altRow.innerHTML=cur.length>1?`<span class="rec-alt-l">Alternatives</span>`+cur.slice(1).map((a,i)=>`<button type="button" class="rec-alt" data-i="${i+1}">${a.name}</button>`).join(''):'';
+        altRow.innerHTML=cur.length>1?`<span class="rec-alt-l">Alternatives</span>`+cur.slice(1).map((a,i)=>`<button type="button" class="rec-alt" data-i="${i+1}">${a.name}${cuBadge(a)}</button>`).join(''):'';
       }
       paint();
       altRow.addEventListener('click',e=>{
@@ -6723,6 +6740,7 @@ function buildRecipes(diets){
     });
     panels.appendChild(panel);
   });
+  if(cuFallback){ const nt=document.createElement('div'); nt.className='cu-note'; nt.textContent='Some meals include other cuisines because few dishes match your choice.'; sec.insertBefore(nt,nav); }
 }
 
 // ════════════════════════════════════════════════
@@ -7960,7 +7978,7 @@ const DAIRY_DATA = [
 
 const RECIPES_DATA = [
   // ─── VEGETARIAN ───
-  { id:"r1", name:"Palak Paneer", category:"veg", diet:["veg"], meals:["lunch","dinner"],
+  { id:"r1", name:"Palak Paneer", cuisine:"N", category:"veg", diet:["veg"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"l1", name:"Spinach", amount:200, unit:"g" },
       { name:"Paneer", amount:100, unit:"g" },
@@ -7972,7 +7990,7 @@ const RECIPES_DATA = [
     method:"Blanch spinach, blend smooth. Sauté onion, garlic, spices, add spinach purée, fold in paneer cubes. Finish with cream.",
     time:25, serves:2, emoji:"🥬" },
 
-  { id:"r2", name:"Methi Thepla", category:"veg", diet:["veg"], meals:["breakfast","dinner"],
+  { id:"r2", name:"Methi Thepla", cuisine:"W", category:"veg", diet:["veg"], meals:["breakfast","dinner"],
     ingredients:[
       { ref:"l2", name:"Fenugreek Leaves", amount:100, unit:"g" },
       { ref:"g2", name:"Wheat Flour", amount:100, unit:"g" },
@@ -7983,7 +8001,7 @@ const RECIPES_DATA = [
     method:"Mix methi with atta, curd, spices. Knead dough, roll into thin flatbreads. Cook on tawa with oil.",
     time:20, serves:4, emoji:"🌿" },
 
-  { id:"r3", name:"Sambar", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r3", name:"Sambar", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"g3", name:"Toor Dal", amount:80, unit:"g" },
       { ref:"v5", name:"Brinjal", amount:100, unit:"g" },
@@ -7995,7 +8013,7 @@ const RECIPES_DATA = [
     method:"Cook toor dal till soft. Add vegetables, tamarind water, sambar powder. Simmer 15 min. Temper with mustard, curry leaves.",
     time:35, serves:4, emoji:"🍲" },
 
-  { id:"r4", name:"Aloo Gobi", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r4", name:"Aloo Gobi", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v2", name:"Potato", amount:200, unit:"g" },
       { ref:"v7", name:"Cauliflower", amount:200, unit:"g" },
@@ -8006,7 +8024,7 @@ const RECIPES_DATA = [
     method:"Sauté onion, ginger, garlic. Add potatoes, cauliflower and spices. Cover and cook on low heat till tender.",
     time:25, serves:3, emoji:"🥔" },
 
-  { id:"r5", name:"Rajma Chawal", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r5", name:"Rajma Chawal", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { ref:"g8", name:"Rajma", amount:100, unit:"g" },
       { ref:"g1", name:"Brown Rice", amount:100, unit:"g" },
@@ -8017,7 +8035,7 @@ const RECIPES_DATA = [
     method:"Soak rajma overnight, pressure cook. Make tomato-onion gravy, add cooked rajma. Simmer thick. Serve with rice.",
     time:50, serves:3, emoji:"🫘" },
 
-  { id:"r6", name:"Dal Tadka", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r6", name:"Dal Tadka", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"g6", name:"Masoor Dal", amount:80, unit:"g" },
       { ref:"v3", name:"Onion", amount:60, unit:"g" },
@@ -8028,7 +8046,7 @@ const RECIPES_DATA = [
     method:"Boil dal with turmeric. Make onion-tomato masala, add dal, simmer. Finish with ghee tadka of cumin, hing, chilli.",
     time:25, serves:3, emoji:"🍛" },
 
-  { id:"r7", name:"Moong Dal Khichdi", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r7", name:"Moong Dal Khichdi", cuisine:"A", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"g5", name:"Moong Dal", amount:60, unit:"g" },
       { ref:"g1", name:"Brown Rice", amount:80, unit:"g" },
@@ -8039,7 +8057,7 @@ const RECIPES_DATA = [
     method:"Wash dal and rice. Pressure cook with vegetables, turmeric, salt, water (3:1). Temper with ghee, cumin.",
     time:20, serves:2, emoji:"🍚" },
 
-  { id:"r8", name:"Baingan Bharta", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r8", name:"Baingan Bharta", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v5", name:"Brinjal", amount:300, unit:"g" },
       { ref:"v3", name:"Onion", amount:100, unit:"g" },
@@ -8050,7 +8068,7 @@ const RECIPES_DATA = [
     method:"Roast whole brinjal on flame till charred. Peel, mash pulp. Sauté onion, add tomato, spices, fold in bharta.",
     time:30, serves:2, emoji:"🍆" },
 
-  { id:"r9", name:"Vegetable Upma", category:"veg", diet:["veg","vegan"], meals:["breakfast"],
+  { id:"r9", name:"Vegetable Upma", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["breakfast"],
     ingredients:[
       { name:"Semolina (Rava)", amount:100, unit:"g" },
       { ref:"v4", name:"Carrot", amount:50, unit:"g" },
@@ -8061,7 +8079,7 @@ const RECIPES_DATA = [
     method:"Dry roast rava. Sauté mustard seeds, curry leaves, onions, vegetables. Add water, salt. Pour rava stirring continuously.",
     time:20, serves:2, emoji:"🥣" },
 
-  { id:"r10", name:"Paneer Bhurji", category:"veg", diet:["veg"], meals:["dinner","lunch"],
+  { id:"r10", name:"Paneer Bhurji", cuisine:"N", category:"veg", diet:["veg"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Paneer", amount:200, unit:"g" },
       { ref:"v6", name:"Capsicum", amount:80, unit:"g" },
@@ -8072,7 +8090,7 @@ const RECIPES_DATA = [
     method:"Crumble paneer. Sauté onion, capsicum, tomato with spices. Add crumbled paneer, toss on high flame.",
     time:15, serves:2, emoji:"🧀" },
 
-  { id:"r11", name:"Chole Masala", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r11", name:"Chole Masala", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { ref:"g7", name:"Chickpeas", amount:120, unit:"g" },
       { ref:"v1", name:"Tomato", amount:100, unit:"g" },
@@ -8083,7 +8101,7 @@ const RECIPES_DATA = [
     method:"Soak and pressure cook chickpeas. Prepare spiced tomato-onion base, add chickpeas, simmer till thick.",
     time:45, serves:3, emoji:"🫘" },
 
-  { id:"r12", name:"Aloo Methi", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r12", name:"Aloo Methi", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v2", name:"Potato", amount:200, unit:"g" },
       { ref:"l2", name:"Fenugreek Leaves", amount:100, unit:"g" },
@@ -8094,7 +8112,7 @@ const RECIPES_DATA = [
     method:"Sauté onion, add cubed potatoes, cook half done. Add washed methi leaves, spices, cook till dry.",
     time:25, serves:2, emoji:"🌿" },
 
-  { id:"r13", name:"Sarson Ka Saag", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r13", name:"Sarson Ka Saag", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { ref:"l7", name:"Mustard Leaves", amount:200, unit:"g" },
       { ref:"l1", name:"Spinach", amount:100, unit:"g" },
@@ -8105,7 +8123,7 @@ const RECIPES_DATA = [
     method:"Pressure cook both greens. Blend coarsely, add cornmeal, cook on low. Serve with makki ki roti and butter.",
     time:40, serves:3, emoji:"🌿" },
 
-  { id:"r14", name:"Chaulai Saag", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r14", name:"Chaulai Saag", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"l3", name:"Amaranth Leaves", amount:200, unit:"g" },
       { ref:"v3", name:"Onion", amount:50, unit:"g" },
@@ -8115,7 +8133,7 @@ const RECIPES_DATA = [
     method:"Blanch amaranth leaves briefly. Sauté garlic and onion, add leaves, cook on high flame with salt and cumin.",
     time:15, serves:2, emoji:"🥬" },
 
-  { id:"r15", name:"Moringa Dal", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r15", name:"Moringa Dal", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"l4", name:"Drumstick Leaves", amount:80, unit:"g" },
       { ref:"g3", name:"Toor Dal", amount:80, unit:"g" },
@@ -8126,7 +8144,7 @@ const RECIPES_DATA = [
     method:"Cook toor dal. Prepare tomato-spice base, add drumstick leaves, pour over dal, simmer 10 min.",
     time:30, serves:3, emoji:"🌱" },
 
-  { id:"r16", name:"Stuffed Capsicum", category:"veg", diet:["veg"], meals:["lunch","dinner"],
+  { id:"r16", name:"Stuffed Capsicum", cuisine:"N", category:"veg", diet:["veg"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v6", name:"Capsicum", amount:200, unit:"g" },
       { name:"Paneer", amount:100, unit:"g" },
@@ -8137,7 +8155,7 @@ const RECIPES_DATA = [
     method:"Hollow capsicums. Fill with mashed paneer-potato-spice mixture. Pan fry or bake at 180°C for 20 min.",
     time:30, serves:2, emoji:"🫑" },
 
-  { id:"r17", name:"Bhindi Masala", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r17", name:"Bhindi Masala", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v15", name:"Okra", amount:200, unit:"g" },
       { ref:"v3", name:"Onion", amount:80, unit:"g" },
@@ -8148,7 +8166,7 @@ const RECIPES_DATA = [
     method:"Slit okra, fry till crisp. Sauté onion-tomato masala, add fried okra, toss with dry spices.",
     time:25, serves:2, emoji:"🥬" },
 
-  { id:"r18", name:"Vegetable Biryani", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r18", name:"Vegetable Biryani", cuisine:"NS", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { ref:"g1", name:"Brown Rice", amount:150, unit:"g" },
       { ref:"v4", name:"Carrot", amount:80, unit:"g" },
@@ -8160,7 +8178,7 @@ const RECIPES_DATA = [
     method:"Par-cook rice. Layer with sautéed spiced vegetables, fried onions, saffron milk. Dum cook covered 20 min.",
     time:50, serves:4, emoji:"🍚" },
 
-  { id:"r19", name:"Moong Dal Chilla", category:"veg", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r19", name:"Moong Dal Chilla", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { ref:"g5", name:"Moong Dal", amount:100, unit:"g" },
       { ref:"v6", name:"Capsicum", amount:50, unit:"g" },
@@ -8171,7 +8189,7 @@ const RECIPES_DATA = [
     method:"Soak moong dal 2 hrs, blend to batter. Mix in chopped veggies. Spread on hot tawa like dosa. Cook crisp.",
     time:30, serves:3, emoji:"🫓" },
 
-  { id:"r20", name:"Gajar Halwa", category:"veg", diet:["veg"], meals:["snack"],
+  { id:"r20", name:"Gajar Halwa", cuisine:"N", category:"veg", diet:["veg"], meals:["snack"],
     ingredients:[
       { ref:"v4", name:"Carrot", amount:400, unit:"g" },
       { name:"Milk", amount:200, unit:"ml" },
@@ -8183,7 +8201,7 @@ const RECIPES_DATA = [
     time:40, serves:4, emoji:"🥕" },
 
   // ─── NON-VEG ───
-  { id:"r21", name:"Chicken Curry", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r21", name:"Chicken Curry", cuisine:"N", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { ref:"n1", name:"Chicken Breast", amount:250, unit:"g" },
       { ref:"v3", name:"Onion", amount:100, unit:"g" },
@@ -8194,7 +8212,7 @@ const RECIPES_DATA = [
     method:"Marinate chicken in yoghurt-spice. Brown onions, add tomato masala. Cook chicken till done. Simmer thick gravy.",
     time:40, serves:3, emoji:"🍗" },
 
-  { id:"r22", name:"Egg Bhurji", category:"non-veg", diet:["non-veg"], meals:["breakfast","lunch","dinner"],
+  { id:"r22", name:"Egg Bhurji", cuisine:"N", category:"non-veg", diet:["non-veg"], meals:["breakfast","lunch","dinner"],
     ingredients:[
       { ref:"n2", name:"Egg", amount:180, unit:"g" },
       { ref:"v3", name:"Onion", amount:80, unit:"g" },
@@ -8205,7 +8223,7 @@ const RECIPES_DATA = [
     method:"Sauté onion, capsicum, tomato with spices. Pour beaten eggs, scramble on medium heat. Garnish with coriander.",
     time:15, serves:2, emoji:"🥚" },
 
-  { id:"r23", name:"Fish Curry (South Indian)", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+  { id:"r23", name:"Fish Curry (South Indian)", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"n3", name:"Rohu Fish", amount:300, unit:"g" },
       { ref:"v1", name:"Tomato", amount:100, unit:"g" },
@@ -8216,7 +8234,7 @@ const RECIPES_DATA = [
     method:"Fry fish pieces briefly. Prepare tamarind-tomato gravy with coconut milk and fish masala. Add fish, simmer gently.",
     time:30, serves:3, emoji:"🐟" },
 
-  { id:"r24", name:"Mutton Rogan Josh", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r24", name:"Mutton Rogan Josh", cuisine:"N", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { ref:"n5", name:"Mutton", amount:300, unit:"g" },
       { ref:"v3", name:"Onion", amount:100, unit:"g" },
@@ -8227,7 +8245,7 @@ const RECIPES_DATA = [
     method:"Slow cook mutton in Kashmiri whole spices and onion. Add whisked yoghurt, pressure cook till tender.",
     time:60, serves:3, emoji:"🥩" },
 
-  { id:"r25", name:"Prawn Masala", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+  { id:"r25", name:"Prawn Masala", cuisine:"W", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"n6", name:"Prawn", amount:250, unit:"g" },
       { ref:"v1", name:"Tomato", amount:100, unit:"g" },
@@ -8238,7 +8256,7 @@ const RECIPES_DATA = [
     method:"Marinate prawns with turmeric, salt. Sauté onion, tomato, coconut paste with spices. Add prawns, cook 8 min.",
     time:25, serves:2, emoji:"🦐" },
 
-  { id:"r26", name:"Egg Curry", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+  { id:"r26", name:"Egg Curry", cuisine:"N", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"n2", name:"Egg", amount:240, unit:"g" },
       { ref:"v1", name:"Tomato", amount:120, unit:"g" },
@@ -8249,7 +8267,7 @@ const RECIPES_DATA = [
     method:"Hard boil eggs, halve. Make spiced onion-tomato gravy. Add eggs, simmer 10 min. Temper with mustard seeds.",
     time:25, serves:3, emoji:"🥚" },
 
-  { id:"r27", name:"Chicken Biryani", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r27", name:"Chicken Biryani", cuisine:"NS", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { ref:"n1", name:"Chicken Breast", amount:300, unit:"g" },
       { ref:"g1", name:"Brown Rice", amount:150, unit:"g" },
@@ -8260,7 +8278,7 @@ const RECIPES_DATA = [
     method:"Marinate chicken in yoghurt-spice. Par-cook rice separately. Layer chicken and rice. Dum cook 25 min.",
     time:60, serves:4, emoji:"🍚" },
 
-  { id:"r28", name:"Keema Matar", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r28", name:"Keema Matar", cuisine:"N", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { ref:"n5", name:"Mutton (minced)", amount:200, unit:"g" },
       { ref:"v8", name:"Green Peas", amount:100, unit:"g" },
@@ -8272,7 +8290,7 @@ const RECIPES_DATA = [
     time:30, serves:3, emoji:"🫛" },
 
   // ─── SNACKS & LIGHT MEALS ───
-  { id:"r29", name:"Roasted Makhana", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack"],
+  { id:"r29", name:"Roasted Makhana", cuisine:"A", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack"],
     ingredients:[
       { ref:"s10", name:"Fox Nuts (Makhana)", amount:50, unit:"g" },
       { name:"Ghee", amount:10, unit:"g" },
@@ -8282,7 +8300,7 @@ const RECIPES_DATA = [
     method:"Heat ghee in pan. Add makhana, roast on low flame 8–10 min stirring. Add spices off heat. Serve warm.",
     time:12, serves:2, emoji:"⚪" },
 
-  { id:"r30", name:"Almond Date Ladoo", category:"snack", diet:["veg","vegan"], meals:["snack"],
+  { id:"r30", name:"Almond Date Ladoo", cuisine:"A", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"s1", name:"Almonds", amount:60, unit:"g" },
       { ref:"s11", name:"Dates", amount:80, unit:"g" },
@@ -8292,7 +8310,7 @@ const RECIPES_DATA = [
     method:"Blend almonds coarse. Remove date seeds, blend dates. Mix both, shape into balls. Refrigerate 30 min.",
     time:20, serves:8, emoji:"🟤" },
 
-  { id:"r31", name:"Pumpkin Seed Trail Mix", category:"snack", diet:["veg","vegan"], meals:["snack"],
+  { id:"r31", name:"Pumpkin Seed Trail Mix", cuisine:"C", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"s6", name:"Pumpkin Seeds", amount:30, unit:"g" },
       { ref:"s7", name:"Sunflower Seeds", amount:20, unit:"g" },
@@ -8303,7 +8321,7 @@ const RECIPES_DATA = [
     method:"Lightly toast seeds in dry pan. Cool completely. Mix with pistachios and dry fruit. Store in airtight jar.",
     time:10, serves:3, emoji:"🌱" },
 
-  { id:"r32", name:"Sprouts Chaat", category:"veg", diet:["veg","vegan"], meals:["snack"],
+  { id:"r32", name:"Sprouts Chaat", cuisine:"A", category:"veg", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"g5", name:"Moong Sprouts", amount:150, unit:"g" },
       { ref:"v1", name:"Tomato", amount:80, unit:"g" },
@@ -8314,7 +8332,7 @@ const RECIPES_DATA = [
     method:"Steam sprouts 5 min. Mix with chopped veggies, guava. Toss with chaat masala, lemon juice, coriander.",
     time:15, serves:2, emoji:"🥗" },
 
-  { id:"r33", name:"Chia Pudding with Mango", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack"],
+  { id:"r33", name:"Chia Pudding with Mango", cuisine:"C", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack"],
     ingredients:[
       { ref:"s8", name:"Chia Seeds", amount:30, unit:"g" },
       { name:"Coconut Milk", amount:200, unit:"ml" },
@@ -8325,7 +8343,7 @@ const RECIPES_DATA = [
     time:10, serves:2, emoji:"🥭" },
 
   // ─── BREAKFAST ───
-  { id:"r34", name:"Ragi Dosa", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r34", name:"Ragi Dosa", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { ref:"g14", name:"Ragi", amount:80, unit:"g" },
       { name:"Urad Dal", amount:40, unit:"g" },
@@ -8335,7 +8353,7 @@ const RECIPES_DATA = [
     method:"Soak ragi and urad dal overnight, blend batter, ferment 8 hrs. Spread thin on hot tawa. Cook crisp.",
     time:15, serves:4, emoji:"🫓" },
 
-  { id:"r35", name:"Poha with Peanuts", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
+  { id:"r35", name:"Poha with Peanuts", cuisine:"W", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
     ingredients:[
       { ref:"g10", name:"Poha", amount:100, unit:"g" },
       { ref:"g15", name:"Peanuts", amount:30, unit:"g" },
@@ -8346,7 +8364,7 @@ const RECIPES_DATA = [
     method:"Rinse poha, drain. Sauté mustard seeds, curry leaves, onion, peanuts. Add poha, turmeric, salt, lemon juice.",
     time:15, serves:2, emoji:"🥣" },
 
-  { id:"r36", name:"Oats Idli", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
+  { id:"r36", name:"Oats Idli", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
     ingredients:[
       { ref:"g11", name:"Oats", amount:100, unit:"g" },
       { name:"Semolina", amount:50, unit:"g" },
@@ -8357,7 +8375,7 @@ const RECIPES_DATA = [
     method:"Blend oats to flour, mix with semolina, curd, grated carrot, ENO. Pour in idli molds. Steam 12 min.",
     time:25, serves:3, emoji:"🥞" },
 
-  { id:"r37", name:"Flaxseed Roti", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r37", name:"Flaxseed Roti", cuisine:"A", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { ref:"g2", name:"Wheat Flour", amount:100, unit:"g" },
       { ref:"s4", name:"Flaxseeds", amount:20, unit:"g" },
@@ -8367,7 +8385,7 @@ const RECIPES_DATA = [
     method:"Mix atta with ground flaxseeds, salt, water. Knead soft dough, roll thin rotis. Cook on tawa both sides.",
     time:20, serves:4, emoji:"🫓" },
 
-  { id:"r38", name:"Bajra Khichdi", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","lunch","dinner"],
+  { id:"r38", name:"Bajra Khichdi", cuisine:"W", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","lunch","dinner"],
     ingredients:[
       { ref:"g12", name:"Bajra", amount:80, unit:"g" },
       { ref:"g5", name:"Moong Dal", amount:50, unit:"g" },
@@ -8379,7 +8397,7 @@ const RECIPES_DATA = [
     time:35, serves:2, emoji:"🌾" },
 
   // ─── SPECIAL ───
-  { id:"r39", name:"Amla Murabba", category:"special", diet:["veg","vegan"], meals:[],
+  { id:"r39", name:"Amla Murabba", cuisine:"N", category:"special", diet:["veg","vegan"], meals:[],
     ingredients:[
       { ref:"f10", name:"Amla", amount:200, unit:"g" },
       { name:"Jaggery", amount:150, unit:"g" },
@@ -8389,7 +8407,7 @@ const RECIPES_DATA = [
     method:"Boil amla, cool, remove seeds. Dissolve jaggery in water, add amla, spices. Cook till syrup thickens. Store.",
     time:40, serves:10, emoji:"🟢" },
 
-  { id:"r40", name:"Sesame Til Chikki", category:"snack", diet:["veg","vegan"], meals:["snack"],
+  { id:"r40", name:"Sesame Til Chikki", cuisine:"W", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"s5", name:"Sesame Seeds", amount:100, unit:"g" },
       { name:"Jaggery", amount:80, unit:"g" }
@@ -8398,7 +8416,7 @@ const RECIPES_DATA = [
     method:"Dry roast sesame seeds. Melt jaggery to soft ball stage. Mix in sesame, pour on greased surface. Cut when warm.",
     time:20, serves:6, emoji:"🌱" },
 
-  { id:"r41", name:"Drumstick Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+  { id:"r41", name:"Drumstick Soup", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["dinner"],
     ingredients:[
       { ref:"v11", name:"Drumstick", amount:150, unit:"g" },
       { ref:"l4", name:"Moringa Leaves", amount:50, unit:"g" },
@@ -8409,7 +8427,7 @@ const RECIPES_DATA = [
     method:"Sauté aromatics, add drumsticks, moringa leaves, water. Boil 15 min. Blend, strain, season. Serve warm.",
     time:25, serves:2, emoji:"🍵" },
 
-  { id:"r42", name:"Jowar Bhakri with Pitla", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r42", name:"Jowar Bhakri with Pitla", cuisine:"W", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"g13", name:"Jowar Flour", amount:100, unit:"g" },
       { ref:"g4", name:"Chana Besan", amount:60, unit:"g" },
@@ -8420,7 +8438,7 @@ const RECIPES_DATA = [
     method:"Make bhakri with jowar flour and water. Prepare pitla: temper chana besan in water, stir to thicken.",
     time:30, serves:2, emoji:"🌾" },
 
-  { id:"r43", name:"Beetroot Raita", category:"veg", diet:["veg"], meals:["snack"],
+  { id:"r43", name:"Beetroot Raita", cuisine:"A", category:"veg", diet:["veg"], meals:["snack"],
     ingredients:[
       { ref:"v14", name:"Beetroot", amount:100, unit:"g" },
       { name:"Curd", amount:200, unit:"g" },
@@ -8430,7 +8448,7 @@ const RECIPES_DATA = [
     method:"Boil and grate beetroot. Whisk curd smooth, fold in beetroot. Add cumin powder, mint, salt. Serve chilled.",
     time:15, serves:2, emoji:"🫐" },
 
-  { id:"r44", name:"Walnut Banana Smoothie", category:"snack", diet:["veg"], meals:["snack","fast_breakfast","fast_snack"],
+  { id:"r44", name:"Walnut Banana Smoothie", cuisine:"C", category:"snack", diet:["veg"], meals:["snack","fast_breakfast","fast_snack"],
     ingredients:[
       { ref:"s2", name:"Walnuts", amount:30, unit:"g" },
       { ref:"f1", name:"Banana", amount:120, unit:"g" },
@@ -8441,7 +8459,7 @@ const RECIPES_DATA = [
     method:"Blend all ingredients until smooth. Add honey if needed. Serve immediately or refrigerate max 4 hrs.",
     time:5, serves:2, emoji:"🍌" },
 
-  { id:"r45", name:"Papaya Chaat", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack"],
+  { id:"r45", name:"Papaya Chaat", cuisine:"A", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack"],
     ingredients:[
       { ref:"f4", name:"Papaya", amount:200, unit:"g" },
       { ref:"f8", name:"Pomegranate", amount:50, unit:"g" },
@@ -8451,7 +8469,7 @@ const RECIPES_DATA = [
     method:"Cube papaya. Toss with pomegranate arils, chaat masala, lemon juice, black salt. Serve chilled.",
     time:10, serves:2, emoji:"🍑" },
 
-  { id:"r46", name:"Guava Amla Juice", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+  { id:"r46", name:"Guava Amla Juice", cuisine:"A", category:"drinks", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"f3", name:"Guava", amount:150, unit:"g" },
       { ref:"f10", name:"Amla", amount:30, unit:"g" },
@@ -8462,7 +8480,7 @@ const RECIPES_DATA = [
     method:"Blend guava and amla with water. Strain. Add mint, black salt, serve over ice.",
     time:8, serves:2, emoji:"🥤" },
 
-  { id:"r47", name:"Chicken Soup with Veggies", category:"non-veg", diet:["non-veg"], meals:["dinner"],
+  { id:"r47", name:"Chicken Soup with Veggies", cuisine:"C", category:"non-veg", diet:["non-veg"], meals:["dinner"],
     ingredients:[
       { ref:"n1", name:"Chicken", amount:150, unit:"g" },
       { ref:"v4", name:"Carrot", amount:80, unit:"g" },
@@ -8473,7 +8491,7 @@ const RECIPES_DATA = [
     method:"Simmer chicken pieces in water with ginger. Remove bones. Add vegetables, simmer 20 min. Season.",
     time:40, serves:2, emoji:"🍵" },
 
-  { id:"r48", name:"Sardine Curry", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+  { id:"r48", name:"Sardine Curry", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"n7", name:"Sardine", amount:200, unit:"g" },
       { ref:"v1", name:"Tomato", amount:100, unit:"g" },
@@ -8484,7 +8502,7 @@ const RECIPES_DATA = [
     method:"Fry sardines lightly. Prepare kokum-tomato gravy with coconut milk and spices. Add fish, simmer 8 min.",
     time:25, serves:2, emoji:"🐟" },
 
-  { id:"r49", name:"Jowar Smoothie Bowl", category:"breakfast", diet:["veg"], meals:["breakfast"],
+  { id:"r49", name:"Jowar Smoothie Bowl", cuisine:"C", category:"breakfast", diet:["veg"], meals:["breakfast"],
     ingredients:[
       { ref:"g13", name:"Jowar", amount:50, unit:"g" },
       { ref:"f2", name:"Mango", amount:100, unit:"g" },
@@ -8495,7 +8513,7 @@ const RECIPES_DATA = [
     method:"Blend mango with curd. Cook jowar to porridge, cool. Top with mango curd, chia seeds and fruit.",
     time:25, serves:2, emoji:"🥭" },
 
-  { id:"r50", name:"Pumpkin Seed Chutney", category:"condiment", diet:["veg","vegan"], meals:[],
+  { id:"r50", name:"Pumpkin Seed Chutney", cuisine:"A", category:"condiment", diet:["veg","vegan"], meals:[],
     ingredients:[
       { ref:"s6", name:"Pumpkin Seeds", amount:50, unit:"g" },
       { ref:"l3", name:"Coriander / Amaranth", amount:30, unit:"g" },
@@ -8505,7 +8523,7 @@ const RECIPES_DATA = [
     method:"Dry roast pumpkin seeds. Grind with herbs, green chilli, garlic, salt and water to smooth chutney.",
     time:10, serves:4, emoji:"🌱" },
 
-  { id:"r51", name:"Soya Chunk Curry", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r51", name:"Soya Chunk Curry", cuisine:"A", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"g9", name:"Soya Chunks", amount:60, unit:"g" },
       { ref:"v1", name:"Tomato", amount:100, unit:"g" },
@@ -8516,7 +8534,7 @@ const RECIPES_DATA = [
     method:"Soak soya chunks in hot water 15 min, squeeze. Make onion-tomato gravy, add chunks, simmer 15 min.",
     time:30, serves:3, emoji:"🍱" },
 
-  { id:"r52", name:"Mixed Dal Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+  { id:"r52", name:"Mixed Dal Soup", cuisine:"A", category:"veg", diet:["veg","vegan"], meals:["dinner"],
     ingredients:[
       { ref:"g3", name:"Toor Dal", amount:40, unit:"g" },
       { ref:"g6", name:"Masoor Dal", amount:40, unit:"g" },
@@ -8527,7 +8545,7 @@ const RECIPES_DATA = [
     method:"Pressure cook dals with carrot. Add chopped spinach, blend partially, season. Finish with lemon and jeera tadka.",
     time:25, serves:3, emoji:"🍲" },
 
-  { id:"r53", name:"Mango Lassi", category:"drinks", diet:["veg"], meals:["snack","fast_snack"],
+  { id:"r53", name:"Mango Lassi", cuisine:"N", category:"drinks", diet:["veg"], meals:["snack","fast_snack"],
     ingredients:[
       { ref:"f2", name:"Mango", amount:150, unit:"g" },
       { name:"Curd", amount:150, unit:"g" },
@@ -8538,7 +8556,7 @@ const RECIPES_DATA = [
     method:"Blend mango pulp, curd, milk, sugar and cardamom. Serve chilled over ice.",
     time:5, serves:2, emoji:"🥤" },
 
-  { id:"r54", name:"Coconut Chutney", category:"condiment", diet:["veg","vegan"], meals:[],
+  { id:"r54", name:"Coconut Chutney", cuisine:"S", category:"condiment", diet:["veg","vegan"], meals:[],
     ingredients:[
       { ref:"f15", name:"Fresh Coconut", amount:80, unit:"g" },
       { name:"Roasted Chana Dal", amount:20, unit:"g" },
@@ -8548,7 +8566,7 @@ const RECIPES_DATA = [
     method:"Grind coconut, roasted dal, chilli, ginger with water to smooth paste. Temper with mustard, curry leaves.",
     time:10, serves:4, emoji:"🥥" },
 
-  { id:"r55", name:"Jackfruit Sabzi", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r55", name:"Jackfruit Sabzi", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { ref:"f11", name:"Jackfruit (raw)", amount:200, unit:"g" },
       { ref:"v3", name:"Onion", amount:80, unit:"g" },
@@ -8558,7 +8576,7 @@ const RECIPES_DATA = [
     method:"Boil raw jackfruit till tender. Shred. Sauté with onion, tomato, spices. Cook till dry. Serve with roti.",
     time:40, serves:3, emoji:"🍋" },
 
-  { id:"r56", name:"Watermelon Mint Cooler", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+  { id:"r56", name:"Watermelon Mint Cooler", cuisine:"A", category:"drinks", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { ref:"f7", name:"Watermelon", amount:300, unit:"g" },
       { ref:"l10", name:"Mint", amount:15, unit:"g" },
@@ -8568,7 +8586,7 @@ const RECIPES_DATA = [
     method:"Blend watermelon and mint. Strain, add lemon juice and black salt. Serve over ice.",
     time:5, serves:2, emoji:"🍉" },
 
-  { id:"r57", name:"Rajgira (Amaranth) Laddoo", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack"],
+  { id:"r57", name:"Rajgira (Amaranth) Laddoo", cuisine:"A", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack"],
     ingredients:[
       { ref:"l3", name:"Amaranth Seeds (popped)", amount:100, unit:"g" },
       { name:"Jaggery", amount:80, unit:"g" },
@@ -8578,7 +8596,7 @@ const RECIPES_DATA = [
     method:"Melt jaggery to soft stage. Mix in popped amaranth, almonds quickly. Shape into balls while warm.",
     time:20, serves:8, emoji:"🟡" },
 
-  { id:"r58", name:"Cluster Bean Stir Fry", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r58", name:"Cluster Bean Stir Fry", cuisine:"W", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v18", name:"Cluster Beans", amount:150, unit:"g" },
       { ref:"g15", name:"Peanuts", amount:30, unit:"g" },
@@ -8589,7 +8607,7 @@ const RECIPES_DATA = [
     method:"Blanche cluster beans. Sauté peanuts, add beans, grated coconut, spices, sesame. Cook on medium heat.",
     time:20, serves:2, emoji:"🫘" },
 
-  { id:"r59", name:"Tinda Aloo Curry", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r59", name:"Tinda Aloo Curry", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v16", name:"Tinda", amount:200, unit:"g" },
       { ref:"v2", name:"Potato", amount:100, unit:"g" },
@@ -8600,7 +8618,7 @@ const RECIPES_DATA = [
     method:"Sauté cubed tinda and potato with onion-tomato masala. Add water, cover cook till soft. Garnish with coriander.",
     time:25, serves:2, emoji:"🍏" },
 
-  { id:"r60", name:"Coriander Mint Chutney", category:"condiment", diet:["veg","vegan"], meals:[],
+  { id:"r60", name:"Coriander Mint Chutney", cuisine:"A", category:"condiment", diet:["veg","vegan"], meals:[],
     ingredients:[
       { ref:"l6", name:"Coriander Leaves", amount:50, unit:"g" },
       { ref:"l10", name:"Mint", amount:20, unit:"g" },
@@ -8610,7 +8628,7 @@ const RECIPES_DATA = [
     method:"Blend all ingredients with little water to smooth chutney. Adjust salt and lemon. Store refrigerated.",
     time:5, serves:6, emoji:"🌿" },
 
-  { id:"r61", name:"Paneer Tikka", category:"veg", diet:["veg"], meals:["dinner","lunch"],
+  { id:"r61", name:"Paneer Tikka", cuisine:"N", category:"veg", diet:["veg"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Paneer", amount:200, unit:"g" },
       { ref:"v6", name:"Capsicum", amount:80, unit:"g" },
@@ -8621,7 +8639,7 @@ const RECIPES_DATA = [
     method:"Marinate paneer cubes in spiced yoghurt 1 hr. Skewer with capsicum, onion. Grill or air-fry at 200°C.",
     time:30, serves:3, emoji:"🧀" },
 
-  { id:"r62", name:"Turnip Gajar Sabzi", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r62", name:"Turnip Gajar Sabzi", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { ref:"v19", name:"Turnip", amount:150, unit:"g" },
       { ref:"v4", name:"Carrot", amount:100, unit:"g" },
@@ -8632,7 +8650,7 @@ const RECIPES_DATA = [
     method:"Sauté onion, ginger. Add cubed turnip and carrot with spices. Cook covered. Add mustard leaves, toss.",
     time:20, serves:2, emoji:"🌰" },
 
-  { id:"r63", name:"Coconut Rice", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r63", name:"Coconut Rice", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { ref:"g1", name:"Brown Rice", amount:150, unit:"g" },
       { ref:"f15", name:"Coconut (grated)", amount:60, unit:"g" },
@@ -8642,7 +8660,7 @@ const RECIPES_DATA = [
     method:"Cook rice. Sauté mustard seeds, cashews, curry leaves in oil. Add grated coconut, roast. Mix into rice.",
     time:25, serves:3, emoji:"🥥" },
 
-  { id:"r64", name:"Shakarkand Chaat", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack","fast_dinner"],
+  { id:"r64", name:"Shakarkand Chaat", cuisine:"N", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack","fast_dinner"],
     ingredients:[
       { ref:"v20", name:"Sweet Potato", amount:200, unit:"g" },
       { ref:"f8", name:"Pomegranate", amount:50, unit:"g" },
@@ -8652,7 +8670,7 @@ const RECIPES_DATA = [
     method:"Roast or boil sweet potato, cube. Toss with pomegranate, chaat masala, lemon juice. Serve warm.",
     time:20, serves:2, emoji:"🍠" },
 
-  { id:"r65", name:"Fish Tikka", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+  { id:"r65", name:"Fish Tikka", cuisine:"N", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
     ingredients:[
       { ref:"n4", name:"Pomfret", amount:250, unit:"g" },
       { name:"Yoghurt, Turmeric, Ajwain", amount:80, unit:"g" },
@@ -8662,7 +8680,7 @@ const RECIPES_DATA = [
     method:"Marinate fish in yoghurt-spice mix 30 min. Grill in oven at 220°C for 12-15 min, basting once. Serve with mint chutney.",
     time:25, serves:2, emoji:"🐠" },
 
-  { id:"r66", name:"Idli with Sambar", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r66", name:"Idli with Sambar", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { name:"Rice", amount:100, unit:"g" },
       { name:"Urad Dal", amount:40, unit:"g" },
@@ -8677,7 +8695,7 @@ const RECIPES_DATA = [
     method:"Soak rice and urad dal, grind and ferment overnight. Steam batter in idli moulds 12 min. Cook toor dal with vegetables, add tamarind and sambar spices, temper with mustard and curry leaves.",
     time:40, serves:3, emoji:"🍚" },
 
-  { id:"r67", name:"Plain Dosa with Chutney", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
+  { id:"r67", name:"Plain Dosa with Chutney", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
     ingredients:[
       { name:"Rice", amount:100, unit:"g" },
       { name:"Urad Dal", amount:30, unit:"g" },
@@ -8689,7 +8707,7 @@ const RECIPES_DATA = [
     method:"Soak and grind rice and urad dal, ferment overnight. Spread thin on a hot tawa, drizzle a little oil, cook till crisp. Serve with coconut chutney.",
     time:35, serves:3, emoji:"🥞" },
 
-  { id:"r68", name:"Pesarattu (Green Moong Dosa)", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r68", name:"Pesarattu (Green Moong Dosa)", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { name:"Green Moong", amount:120, unit:"g" },
       { name:"Rice", amount:20, unit:"g" },
@@ -8702,7 +8720,7 @@ const RECIPES_DATA = [
     method:"Soak whole green moong and a little rice 6 hours, grind with ginger and chilli. Spread on a tawa, top with chopped onion, cook both sides. Serve with ginger chutney.",
     time:30, serves:3, emoji:"🥞" },
 
-  { id:"r69", name:"Ven Pongal", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r69", name:"Ven Pongal", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { name:"Rice", amount:90, unit:"g" },
       { name:"Moong Dal", amount:45, unit:"g" },
@@ -8715,7 +8733,7 @@ const RECIPES_DATA = [
     method:"Dry-roast moong dal, cook with rice till soft and mushy. Temper ghee with pepper, cumin, ginger and curry leaves, mix in.",
     time:30, serves:3, emoji:"🍲" },
 
-  { id:"r70", name:"Foxtail Millet Upma", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r70", name:"Foxtail Millet Upma", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { name:"Foxtail Millet", amount:120, unit:"g" },
       { name:"Onion", amount:50, unit:"g" },
@@ -8728,7 +8746,7 @@ const RECIPES_DATA = [
     method:"Roast millet lightly. Temper mustard, curry leaves, onion and vegetables, add water and millet, cook covered till fluffy.",
     time:25, serves:3, emoji:"🥣" },
 
-  { id:"r71", name:"Vegetable Uttapam", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r71", name:"Vegetable Uttapam", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { name:"Rice", amount:100, unit:"g" },
       { name:"Urad Dal", amount:30, unit:"g" },
@@ -8742,7 +8760,7 @@ const RECIPES_DATA = [
     method:"Use fermented idli-dosa batter. Pour a thick round on a tawa, top with chopped vegetables, cook both sides with a little oil.",
     time:30, serves:3, emoji:"🥞" },
 
-  { id:"r72", name:"Vegetable Dalia Porridge", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r72", name:"Vegetable Dalia Porridge", cuisine:"N", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { name:"Broken Wheat", amount:100, unit:"g" },
       { name:"Carrot", amount:50, unit:"g" },
@@ -8755,7 +8773,7 @@ const RECIPES_DATA = [
     method:"Roast dalia, saute onion and vegetables, add dalia with 3 cups water, cook covered till soft and porridge-like.",
     time:25, serves:3, emoji:"🥣" },
 
-  { id:"r73", name:"Besan Chilla with Mint Chutney", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r73", name:"Besan Chilla with Mint Chutney", cuisine:"N", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { name:"Besan", amount:120, unit:"g" },
       { name:"Onion", amount:50, unit:"g" },
@@ -8768,7 +8786,7 @@ const RECIPES_DATA = [
     method:"Mix besan with water, spices and chopped vegetables into a pouring batter. Cook thin pancakes on a tawa. Serve with mint chutney.",
     time:20, serves:3, emoji:"🥞" },
 
-  { id:"r74", name:"Thalipeeth", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
+  { id:"r74", name:"Thalipeeth", cuisine:"W", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
     ingredients:[
       { name:"Pearl Millet (Whole Bajra)", amount:60, unit:"g" },
       { name:"Sorghum (Whole Jowar)", amount:60, unit:"g" },
@@ -8782,7 +8800,7 @@ const RECIPES_DATA = [
     method:"Mix the multigrain flours with onion, coriander, sesame and spices into a dough with warm water. Pat thin on a damp cloth, cook on a tawa with a little oil.",
     time:30, serves:3, emoji:"🫓" },
 
-  { id:"r75", name:"Akki Roti (Rice Roti)", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
+  { id:"r75", name:"Akki Roti (Rice Roti)", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
     ingredients:[
       { name:"Rice Flour", amount:150, unit:"g" },
       { name:"Onion", amount:50, unit:"g" },
@@ -8795,7 +8813,7 @@ const RECIPES_DATA = [
     method:"Mix rice flour with grated vegetables, coconut and salt, knead with warm water. Pat out thin on the tawa and cook till golden.",
     time:25, serves:3, emoji:"🫓" },
 
-  { id:"r76", name:"Idiyappam with Vegetable Kurma", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r76", name:"Idiyappam with Vegetable Kurma", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { name:"Rice Flour", amount:150, unit:"g" },
       { name:"Carrot", amount:60, unit:"g" },
@@ -8809,7 +8827,7 @@ const RECIPES_DATA = [
     method:"Knead rice flour with hot water, press into strings, steam 8 min. Cook vegetables in a coconut-green chilli gravy for the kurma.",
     time:40, serves:3, emoji:"🍜" },
 
-  { id:"r77", name:"Masala Omelette with Roti", category:"breakfast", diet:["non-veg"], meals:["breakfast","dinner"],
+  { id:"r77", name:"Masala Omelette with Roti", cuisine:"A", category:"breakfast", diet:["non-veg"], meals:["breakfast","dinner"],
     ingredients:[
       { name:"Egg", amount:200, unit:"g" },
       { name:"Onion", amount:40, unit:"g" },
@@ -8822,7 +8840,7 @@ const RECIPES_DATA = [
     method:"Beat eggs with onion, tomato, chilli and coriander. Cook as an omelette. Serve with phulka made from atta.",
     time:15, serves:2, emoji:"🍳" },
 
-  { id:"r78", name:"Ragi Ambali (Ragi Porridge)", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","snack"],
+  { id:"r78", name:"Ragi Ambali (Ragi Porridge)", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","snack"],
     ingredients:[
       { name:"Finger Millet (Whole Ragi)", amount:40, unit:"g" },
       { name:"Curd", amount:100, unit:"g" },
@@ -8832,7 +8850,7 @@ const RECIPES_DATA = [
     method:"Mix ragi flour in water, cook till thick and glossy, cool. Stir in curd and a pinch of salt; serve as a cooling porridge.",
     time:15, serves:2, emoji:"🥣" },
 
-  { id:"r79", name:"Khaman Dhokla", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","snack"],
+  { id:"r79", name:"Khaman Dhokla", cuisine:"W", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","snack"],
     ingredients:[
       { name:"Besan", amount:150, unit:"g" },
       { name:"Curd", amount:60, unit:"g" },
@@ -8845,7 +8863,7 @@ const RECIPES_DATA = [
     method:"Whisk besan with curd, water, lemon and fruit salt. Steam 15 min in a greased plate, then pour over a mustard-chilli tempering.",
     time:30, serves:4, emoji:"🟨" },
 
-  { id:"r80", name:"Stuffed Mooli Paratha with Curd", category:"breakfast", diet:["veg"], meals:["breakfast"],
+  { id:"r80", name:"Stuffed Mooli Paratha with Curd", cuisine:"N", category:"breakfast", diet:["veg"], meals:["breakfast"],
     ingredients:[
       { name:"Atta", amount:180, unit:"g" },
       { name:"Radish", amount:150, unit:"g" },
@@ -8857,7 +8875,7 @@ const RECIPES_DATA = [
     method:"Squeeze grated radish dry, mix with spices, stuff into atta dough rounds. Cook on a tawa with a little oil. Serve with curd.",
     time:35, serves:3, emoji:"🫓" },
 
-  { id:"r81", name:"Little Millet Pongal (Samai)", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r81", name:"Little Millet Pongal (Samai)", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { name:"Little Millet", amount:100, unit:"g" },
       { name:"Moong Dal", amount:40, unit:"g" },
@@ -8870,7 +8888,7 @@ const RECIPES_DATA = [
     method:"Cook little millet with moong dal till soft. Temper ghee with pepper, cumin, ginger and curry leaves and fold in.",
     time:30, serves:3, emoji:"🍲" },
 
-  { id:"r82", name:"Sattu Paratha", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
+  { id:"r82", name:"Sattu Paratha", cuisine:"E", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
     ingredients:[
       { name:"Atta", amount:180, unit:"g" },
       { name:"Besan", amount:60, unit:"g" },
@@ -8883,7 +8901,7 @@ const RECIPES_DATA = [
     method:"Mix roasted gram flour (sattu) with onion, chilli, lemon and spices. Stuff into atta dough, roll, cook on a tawa with oil.",
     time:30, serves:3, emoji:"🫓" },
 
-  { id:"r83", name:"Appam with Vegetable Stew", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
+  { id:"r83", name:"Appam with Vegetable Stew", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast","dinner"],
     ingredients:[
       { name:"Rice", amount:100, unit:"g" },
       { name:"Coconut (grated)", amount:40, unit:"g" },
@@ -8897,7 +8915,7 @@ const RECIPES_DATA = [
     method:"Ferment rice-coconut batter, cook lacy appams in a small pan. Simmer vegetables in thin coconut milk with whole spices for the stew.",
     time:45, serves:3, emoji:"🥞" },
 
-  { id:"r84", name:"Vegetable Semiya Upma", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
+  { id:"r84", name:"Vegetable Semiya Upma", cuisine:"S", category:"breakfast", diet:["veg","vegan"], meals:["breakfast"],
     ingredients:[
       { name:"Vermicelli", amount:120, unit:"g" },
       { name:"Onion", amount:50, unit:"g" },
@@ -8910,7 +8928,7 @@ const RECIPES_DATA = [
     method:"Roast vermicelli. Saute onion and vegetables with mustard and curry leaves, add water, then vermicelli, and cook covered 4 min.",
     time:20, serves:3, emoji:"🍜" },
 
-  { id:"r85", name:"Egg Dosa", category:"breakfast", diet:["non-veg"], meals:["breakfast"],
+  { id:"r85", name:"Egg Dosa", cuisine:"S", category:"breakfast", diet:["non-veg"], meals:["breakfast"],
     ingredients:[
       { name:"Rice", amount:60, unit:"g" },
       { name:"Urad Dal", amount:20, unit:"g" },
@@ -8922,7 +8940,7 @@ const RECIPES_DATA = [
     method:"Spread dosa batter on a hot tawa, break an egg over it, spread with a spoon, sprinkle onion and pepper, cook both sides.",
     time:15, serves:2, emoji:"🥞" },
 
-  { id:"r86", name:"Punjabi Kadhi with Rice", category:"veg", diet:["veg"], meals:["lunch"],
+  { id:"r86", name:"Punjabi Kadhi with Rice", cuisine:"N", category:"veg", diet:["veg"], meals:["lunch"],
     ingredients:[
       { name:"Curd", amount:250, unit:"g" },
       { name:"Besan", amount:50, unit:"g" },
@@ -8935,7 +8953,7 @@ const RECIPES_DATA = [
     method:"Whisk curd with besan and water, simmer 25 min with turmeric. Temper with cumin, red chilli and fenugreek. Serve with steamed rice.",
     time:40, serves:4, emoji:"🍛" },
 
-  { id:"r87", name:"Sindhi Kadhi", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r87", name:"Sindhi Kadhi", cuisine:"W", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Besan", amount:50, unit:"g" },
       { name:"Okra", amount:100, unit:"g" },
@@ -8949,7 +8967,7 @@ const RECIPES_DATA = [
     method:"Roast besan, whisk into water with tamarind and spices, simmer. Add vegetables and cook till tender. Temper with fenugreek and curry leaves.",
     time:40, serves:4, emoji:"🍲" },
 
-  { id:"r88", name:"Lauki Chana Dal", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r88", name:"Lauki Chana Dal", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Chana Dal", amount:100, unit:"g" },
       { name:"Bottle Gourd", amount:250, unit:"g" },
@@ -8962,7 +8980,7 @@ const RECIPES_DATA = [
     method:"Pressure cook soaked chana dal with bottle gourd cubes. Temper cumin, onion and tomato, mix in and simmer.",
     time:35, serves:4, emoji:"🍲" },
 
-  { id:"r89", name:"Bottle Gourd Sabzi", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r89", name:"Bottle Gourd Sabzi", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Bottle Gourd", amount:350, unit:"g" },
       { name:"Tomato", amount:60, unit:"g" },
@@ -8974,7 +8992,7 @@ const RECIPES_DATA = [
     method:"Saute cumin, onion and tomato, add cubed bottle gourd and spices, cook covered without extra water till soft. Serve with phulka.",
     time:25, serves:3, emoji:"🥬" },
 
-  { id:"r90", name:"Bharwan Karela (Stuffed Bitter Gourd)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r90", name:"Bharwan Karela (Stuffed Bitter Gourd)", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Bitter Gourd", amount:300, unit:"g" },
       { name:"Onion", amount:80, unit:"g" },
@@ -8986,7 +9004,7 @@ const RECIPES_DATA = [
     method:"Scrape and parboil bitter gourd. Stuff with fried onion, besan and spices. Shallow-cook covered till tender.",
     time:45, serves:3, emoji:"🥒" },
 
-  { id:"r91", name:"Dum Aloo (Kashmiri)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r91", name:"Dum Aloo (Kashmiri)", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Potato", amount:350, unit:"g" },
       { name:"Curd", amount:80, unit:"g" },
@@ -8998,7 +9016,7 @@ const RECIPES_DATA = [
     method:"Prick baby potatoes, pan-fry lightly. Simmer in a gravy of curd, ginger, fennel and Kashmiri chilli.",
     time:45, serves:3, emoji:"🥔" },
 
-  { id:"r92", name:"Matar Paneer", category:"veg", diet:["veg"], meals:["lunch"],
+  { id:"r92", name:"Matar Paneer", cuisine:"N", category:"veg", diet:["veg"], meals:["lunch"],
     ingredients:[
       { name:"Paneer", amount:200, unit:"g" },
       { name:"Green Peas", amount:150, unit:"g" },
@@ -9011,7 +9029,7 @@ const RECIPES_DATA = [
     method:"Cook an onion-tomato masala, add peas and simmer. Fold in paneer cubes and cook 5 min.",
     time:30, serves:3, emoji:"🧀" },
 
-  { id:"r93", name:"Kadai Paneer", category:"veg", diet:["veg"], meals:["lunch"],
+  { id:"r93", name:"Kadai Paneer", cuisine:"N", category:"veg", diet:["veg"], meals:["lunch"],
     ingredients:[
       { name:"Paneer", amount:200, unit:"g" },
       { name:"Capsicum", amount:100, unit:"g" },
@@ -9024,7 +9042,7 @@ const RECIPES_DATA = [
     method:"Cook onion and tomato with freshly ground kadai masala, add capsicum strips and paneer, simmer briefly.",
     time:30, serves:3, emoji:"🧀" },
 
-  { id:"r94", name:"Mushroom Matar Masala", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r94", name:"Mushroom Matar Masala", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Mushroom", amount:250, unit:"g" },
       { name:"Green Peas", amount:100, unit:"g" },
@@ -9037,7 +9055,7 @@ const RECIPES_DATA = [
     method:"Saute onion-tomato masala, add mushrooms and peas, cook uncovered till the water dries and the gravy thickens.",
     time:25, serves:3, emoji:"🍄" },
 
-  { id:"r95", name:"Mixed Vegetable Korma", category:"veg", diet:["veg"], meals:["lunch"],
+  { id:"r95", name:"Mixed Vegetable Korma", cuisine:"N", category:"veg", diet:["veg"], meals:["lunch"],
     ingredients:[
       { name:"Carrot", amount:80, unit:"g" },
       { name:"Green Peas", amount:60, unit:"g" },
@@ -9052,7 +9070,7 @@ const RECIPES_DATA = [
     method:"Cook vegetables in a gravy of onion, coconut and curd paste with whole spices till tender.",
     time:40, serves:4, emoji:"🥘" },
 
-  { id:"r96", name:"Avial (Kerala)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r96", name:"Avial (Kerala)", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Raw Banana", amount:100, unit:"g" },
       { name:"Yam", amount:100, unit:"g" },
@@ -9067,7 +9085,7 @@ const RECIPES_DATA = [
     method:"Steam mixed vegetables with turmeric. Mix with ground coconut, green chilli and cumin paste and curd, finish with raw coconut oil and curry leaves.",
     time:40, serves:4, emoji:"🥥" },
 
-  { id:"r97", name:"Kerala Vegetable Stew", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r97", name:"Kerala Vegetable Stew", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Potato", amount:100, unit:"g" },
       { name:"Carrot", amount:80, unit:"g" },
@@ -9081,7 +9099,7 @@ const RECIPES_DATA = [
     method:"Simmer vegetables with whole spices and ginger in thin coconut milk. Finish with thick coconut milk and curry leaves. Serve with appam or phulka.",
     time:35, serves:3, emoji:"🥣" },
 
-  { id:"r98", name:"Cabbage Thoran", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r98", name:"Cabbage Thoran", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Cabbage", amount:300, unit:"g" },
       { name:"Coconut (grated)", amount:40, unit:"g" },
@@ -9094,7 +9112,7 @@ const RECIPES_DATA = [
     method:"Temper mustard, urad dal and curry leaves, add shredded cabbage and turmeric, cook, then mix in coconut-cumin-chilli paste.",
     time:20, serves:3, emoji:"🥬" },
 
-  { id:"r99", name:"Beans Poriyal", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r99", name:"Beans Poriyal", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"French Beans", amount:300, unit:"g" },
       { name:"Coconut (grated)", amount:40, unit:"g" },
@@ -9106,7 +9124,7 @@ const RECIPES_DATA = [
     method:"Temper mustard, urad dal and curry leaves, add chopped beans and salt, cook covered till tender, finish with coconut.",
     time:20, serves:3, emoji:"🥬" },
 
-  { id:"r100", name:"Lauki Kootu", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r100", name:"Lauki Kootu", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Bottle Gourd", amount:250, unit:"g" },
       { name:"Chana Dal", amount:70, unit:"g" },
@@ -9119,7 +9137,7 @@ const RECIPES_DATA = [
     method:"Cook chana dal and bottle gourd till soft. Add coconut-cumin-chilli paste, simmer and temper with mustard and curry leaves.",
     time:30, serves:4, emoji:"🥣" },
 
-  { id:"r101", name:"Tomato Rasam with Rice", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r101", name:"Tomato Rasam with Rice", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Tomato", amount:200, unit:"g" },
       { name:"Toor Dal", amount:40, unit:"g" },
@@ -9133,7 +9151,7 @@ const RECIPES_DATA = [
     method:"Boil toor dal soft. Simmer tomato, tamarind, pepper-cumin-garlic crush, add dal water, temper with mustard and curry leaves. Serve over rice.",
     time:30, serves:3, emoji:"🍲" },
 
-  { id:"r102", name:"Bisi Bele Bath", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r102", name:"Bisi Bele Bath", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Rice", amount:100, unit:"g" },
       { name:"Toor Dal", amount:80, unit:"g" },
@@ -9148,7 +9166,7 @@ const RECIPES_DATA = [
     method:"Cook rice, dal and vegetables together till very soft. Add tamarind and bisi bele bath masala, simmer and finish with ghee.",
     time:50, serves:4, emoji:"🍲" },
 
-  { id:"r103", name:"Lemon Rice", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r103", name:"Lemon Rice", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Rice", amount:120, unit:"g" },
       { name:"Lemon", amount:30, unit:"g" },
@@ -9161,7 +9179,7 @@ const RECIPES_DATA = [
     method:"Temper mustard, chana dal, peanuts, curry leaves and turmeric in oil, mix with cooked rice and lemon juice.",
     time:20, serves:3, emoji:"🍋" },
 
-  { id:"r104", name:"Puliyogare (Tamarind Rice)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r104", name:"Puliyogare (Tamarind Rice)", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Rice", amount:120, unit:"g" },
       { name:"Tamarind", amount:25, unit:"g" },
@@ -9174,7 +9192,7 @@ const RECIPES_DATA = [
     method:"Cook a thick tamarind paste with roasted spice-sesame powder, peanuts and jaggery. Toss through cooked rice.",
     time:25, serves:3, emoji:"🍛" },
 
-  { id:"r105", name:"Curd Rice (Thayir Sadam)", category:"veg", diet:["veg"], meals:["dinner","lunch"],
+  { id:"r105", name:"Curd Rice (Thayir Sadam)", cuisine:"S", category:"veg", diet:["veg"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Rice", amount:100, unit:"g" },
       { name:"Curd", amount:250, unit:"g" },
@@ -9187,7 +9205,7 @@ const RECIPES_DATA = [
     method:"Mash soft-cooked rice with milk and curd, add salt. Temper mustard, curry leaves, ginger and green chilli.",
     time:15, serves:3, emoji:"🥣" },
 
-  { id:"r106", name:"Tomato Rice", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r106", name:"Tomato Rice", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Rice", amount:120, unit:"g" },
       { name:"Tomato", amount:250, unit:"g" },
@@ -9199,7 +9217,7 @@ const RECIPES_DATA = [
     method:"Saute onion and tomato with mint and spices till soft, add rice and water, cook covered till fluffy.",
     time:25, serves:3, emoji:"🍅" },
 
-  { id:"r107", name:"Vegetable Pulao", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r107", name:"Vegetable Pulao", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Basmati Rice", amount:150, unit:"g" },
       { name:"Carrot", amount:60, unit:"g" },
@@ -9213,7 +9231,7 @@ const RECIPES_DATA = [
     method:"Saute whole spices and onion in ghee, add vegetables and rinsed basmati, cook with water till grains separate.",
     time:35, serves:4, emoji:"🍚" },
 
-  { id:"r108", name:"Jeera Rice with Dal Fry", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r108", name:"Jeera Rice with Dal Fry", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Basmati Rice", amount:120, unit:"g" },
       { name:"Toor Dal", amount:60, unit:"g" },
@@ -9226,7 +9244,7 @@ const RECIPES_DATA = [
     method:"Cook cumin rice. Pressure cook toor dal, finish with a garlic, onion and tomato tempering.",
     time:35, serves:3, emoji:"🍛" },
 
-  { id:"r109", name:"Gutti Vankaya (Stuffed Brinjal)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r109", name:"Gutti Vankaya (Stuffed Brinjal)", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Brinjal", amount:300, unit:"g" },
       { name:"Peanuts", amount:30, unit:"g" },
@@ -9239,7 +9257,7 @@ const RECIPES_DATA = [
     method:"Slit small brinjals, stuff with a roasted peanut-sesame-coconut masala, cook covered with tamarind till soft.",
     time:40, serves:3, emoji:"🍆" },
 
-  { id:"r110", name:"Gongura Pappu", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r110", name:"Gongura Pappu", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Toor Dal", amount:100, unit:"g" },
       { name:"Gongura (Roselle Leaves)", amount:100, unit:"g" },
@@ -9252,7 +9270,7 @@ const RECIPES_DATA = [
     method:"Cook toor dal soft. Saute sorrel-like gongura leaves, mash into dal and temper with garlic and red chilli.",
     time:30, serves:3, emoji:"🌿" },
 
-  { id:"r111", name:"Palak Dal", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r111", name:"Palak Dal", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Moong Dal", amount:100, unit:"g" },
       { name:"Spinach", amount:200, unit:"g" },
@@ -9265,7 +9283,7 @@ const RECIPES_DATA = [
     method:"Pressure cook moong dal with spinach, mash lightly, finish with a garlic and cumin tempering.",
     time:30, serves:3, emoji:"🍲" },
 
-  { id:"r112", name:"Masoor Dal Curry", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r112", name:"Masoor Dal Curry", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Masoor Dal", amount:100, unit:"g" },
       { name:"Tomato", amount:80, unit:"g" },
@@ -9278,7 +9296,7 @@ const RECIPES_DATA = [
     method:"Boil masoor dal with turmeric till soft. Temper with cumin, garlic, onion and tomato, simmer a few minutes.",
     time:25, serves:3, emoji:"🍲" },
 
-  { id:"r113", name:"Dal Makhani", category:"veg", diet:["veg"], meals:["lunch"],
+  { id:"r113", name:"Dal Makhani", cuisine:"N", category:"veg", diet:["veg"], meals:["lunch"],
     ingredients:[
       { name:"Urad Dal", amount:100, unit:"g" },
       { name:"Rajma", amount:30, unit:"g" },
@@ -9291,7 +9309,7 @@ const RECIPES_DATA = [
     method:"Cook whole urad and rajma till very soft. Simmer with tomato puree, butter and cream for 30 min.",
     time:60, serves:4, emoji:"🍲" },
 
-  { id:"r114", name:"Kala Chana Curry", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r114", name:"Kala Chana Curry", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Black Chickpeas", amount:120, unit:"g" },
       { name:"Onion", amount:80, unit:"g" },
@@ -9303,7 +9321,7 @@ const RECIPES_DATA = [
     method:"Soak and pressure cook kala chana. Cook in an onion-tomato masala till thick.",
     time:45, serves:4, emoji:"🍲" },
 
-  { id:"r115", name:"Lobia (Black-Eyed Pea) Curry", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r115", name:"Lobia (Black-Eyed Pea) Curry", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Lobia", amount:120, unit:"g" },
       { name:"Onion", amount:80, unit:"g" },
@@ -9315,7 +9333,7 @@ const RECIPES_DATA = [
     method:"Soak and boil lobia. Simmer in an onion-tomato masala with ginger and coriander.",
     time:40, serves:4, emoji:"🍲" },
 
-  { id:"r116", name:"Kollu Rasam (Horse Gram)", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r116", name:"Kollu Rasam (Horse Gram)", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Horse Gram", amount:60, unit:"g" },
       { name:"Tomato", amount:100, unit:"g" },
@@ -9328,7 +9346,7 @@ const RECIPES_DATA = [
     method:"Pressure cook horse gram, keep the water. Boil with tamarind, tomato, pepper and garlic, temper with mustard and curry leaves.",
     time:35, serves:3, emoji:"🍲" },
 
-  { id:"r117", name:"Matki Usal", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r117", name:"Matki Usal", cuisine:"W", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Moth Beans", amount:120, unit:"g" },
       { name:"Onion", amount:60, unit:"g" },
@@ -9341,7 +9359,7 @@ const RECIPES_DATA = [
     method:"Sprout matki, cook with onion-tomato and goda masala till tender, garnish with coconut and coriander.",
     time:35, serves:3, emoji:"🫘" },
 
-  { id:"r118", name:"Undhiyu", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r118", name:"Undhiyu", cuisine:"W", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Potato", amount:100, unit:"g" },
       { name:"Sweet Potato", amount:100, unit:"g" },
@@ -9357,7 +9375,7 @@ const RECIPES_DATA = [
     method:"Cook winter vegetables with a green coconut-coriander masala and methi dumplings in a covered pot till tender.",
     time:60, serves:4, emoji:"🥘" },
 
-  { id:"r119", name:"Bagara Baingan", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r119", name:"Bagara Baingan", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Brinjal", amount:300, unit:"g" },
       { name:"Peanuts", amount:30, unit:"g" },
@@ -9370,7 +9388,7 @@ const RECIPES_DATA = [
     method:"Fry small brinjals lightly, simmer in a Hyderabadi gravy of ground peanut, sesame, coconut and tamarind.",
     time:40, serves:3, emoji:"🍆" },
 
-  { id:"r120", name:"Kachumber Salad", category:"veg", diet:["veg","vegan"], meals:["snack"],
+  { id:"r120", name:"Kachumber Salad", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { name:"Cucumber", amount:150, unit:"g" },
       { name:"Tomato", amount:100, unit:"g" },
@@ -9382,7 +9400,7 @@ const RECIPES_DATA = [
     method:"Dice cucumber, tomato and onion, toss with lemon, salt, roasted cumin and coriander.",
     time:10, serves:2, emoji:"🥗" },
 
-  { id:"r121", name:"Mamidikaya Pappu (Raw Mango Dal)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r121", name:"Mamidikaya Pappu (Raw Mango Dal)", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Toor Dal", amount:100, unit:"g" },
       { name:"Raw Mango", amount:100, unit:"g" },
@@ -9395,7 +9413,7 @@ const RECIPES_DATA = [
     method:"Cook toor dal with raw mango pieces till soft, mash and temper with mustard, garlic and chilli.",
     time:30, serves:3, emoji:"🥭" },
 
-  { id:"r122", name:"Banana Flower Poriyal", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r122", name:"Banana Flower Poriyal", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Banana Flower", amount:250, unit:"g" },
       { name:"Moong Dal", amount:30, unit:"g" },
@@ -9408,7 +9426,7 @@ const RECIPES_DATA = [
     method:"Clean and chop banana flower, steam with moong dal, mix with temper and coconut.",
     time:35, serves:3, emoji:"🌸" },
 
-  { id:"r123", name:"Lotus Stem Sabzi (Kamal Kakdi)", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r123", name:"Lotus Stem Sabzi (Kamal Kakdi)", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Lotus Stem", amount:250, unit:"g" },
       { name:"Onion", amount:60, unit:"g" },
@@ -9420,7 +9438,7 @@ const RECIPES_DATA = [
     method:"Slice lotus stem, boil briefly, then cook with onion, tomato and spices till tender.",
     time:30, serves:3, emoji:"🥬" },
 
-  { id:"r124", name:"Cauliflower Matar Sabzi", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r124", name:"Cauliflower Matar Sabzi", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Cauliflower", amount:250, unit:"g" },
       { name:"Green Peas", amount:100, unit:"g" },
@@ -9433,7 +9451,7 @@ const RECIPES_DATA = [
     method:"Saute onion-tomato, add cauliflower florets and peas, cover and cook till tender.",
     time:25, serves:3, emoji:"🥦" },
 
-  { id:"r125", name:"Shukto (Bengali)", category:"veg", diet:["veg"], meals:["lunch"],
+  { id:"r125", name:"Shukto (Bengali)", cuisine:"E", category:"veg", diet:["veg"], meals:["lunch"],
     ingredients:[
       { name:"Raw Banana", amount:80, unit:"g" },
       { name:"Bitter Gourd", amount:60, unit:"g" },
@@ -9447,7 +9465,7 @@ const RECIPES_DATA = [
     method:"Cook mixed vegetables lightly with ginger and poppy-mustard paste, finish with milk.",
     time:40, serves:4, emoji:"🥘" },
 
-  { id:"r126", name:"Alu Posto", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r126", name:"Alu Posto", cuisine:"E", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Potato", amount:300, unit:"g" },
       { name:"Sesame Seeds", amount:20, unit:"g" },
@@ -9458,7 +9476,7 @@ const RECIPES_DATA = [
     method:"Fry potato cubes with nigella seeds, add a sesame-and-mustard paste and cook till tender.",
     time:25, serves:3, emoji:"🥔" },
 
-  { id:"r127", name:"Cholar Dal (Bengali)", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r127", name:"Cholar Dal (Bengali)", cuisine:"E", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Chana Dal", amount:120, unit:"g" },
       { name:"Coconut (grated)", amount:30, unit:"g" },
@@ -9469,7 +9487,7 @@ const RECIPES_DATA = [
     method:"Cook chana dal till soft. Temper with cumin, bay leaf, dried chilli and coconut pieces, finish with a little ghee.",
     time:40, serves:4, emoji:"🍲" },
 
-  { id:"r128", name:"Lau Ghonto (Bengali Bottle Gourd)", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r128", name:"Lau Ghonto (Bengali Bottle Gourd)", cuisine:"E", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Bottle Gourd", amount:300, unit:"g" },
       { name:"Potato", amount:80, unit:"g" },
@@ -9481,7 +9499,7 @@ const RECIPES_DATA = [
     method:"Fry panch phoron, add bottle gourd, potato and soaked moong dal, cook till dry and tender.",
     time:25, serves:3, emoji:"🥬" },
 
-  { id:"r129", name:"Dalma (Odisha)", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r129", name:"Dalma (Odisha)", cuisine:"E", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Toor Dal", amount:100, unit:"g" },
       { name:"Raw Papaya", amount:100, unit:"g" },
@@ -9494,7 +9512,7 @@ const RECIPES_DATA = [
     method:"Cook toor dal with vegetables and a little ginger, temper with cumin and dried chilli, finish with roasted coconut.",
     time:40, serves:4, emoji:"🍲" },
 
-  { id:"r130", name:"Pithla Zunka (Maharashtra)", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r130", name:"Pithla Zunka (Maharashtra)", cuisine:"W", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Besan", amount:100, unit:"g" },
       { name:"Onion", amount:80, unit:"g" },
@@ -9506,7 +9524,7 @@ const RECIPES_DATA = [
     method:"Cook onion and chilli, stir in besan slurry to make a thick porridge-like zunka. Serve with bhakri.",
     time:20, serves:3, emoji:"🥣" },
 
-  { id:"r131", name:"Varan Bhat (Maharashtra)", category:"veg", diet:["veg"], meals:["dinner","lunch"],
+  { id:"r131", name:"Varan Bhat (Maharashtra)", cuisine:"W", category:"veg", diet:["veg"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Toor Dal", amount:100, unit:"g" },
       { name:"Rice", amount:100, unit:"g" },
@@ -9518,7 +9536,7 @@ const RECIPES_DATA = [
     method:"Cook toor dal with turmeric, mash, season with salt. Serve on hot rice with ghee and lemon.",
     time:30, serves:3, emoji:"🍚" },
 
-  { id:"r132", name:"Gatte ki Sabzi (Rajasthan)", category:"veg", diet:["veg"], meals:["lunch"],
+  { id:"r132", name:"Gatte ki Sabzi (Rajasthan)", cuisine:"W", category:"veg", diet:["veg"], meals:["lunch"],
     ingredients:[
       { name:"Besan", amount:150, unit:"g" },
       { name:"Curd", amount:150, unit:"g" },
@@ -9530,7 +9548,7 @@ const RECIPES_DATA = [
     method:"Boil besan dough logs, slice, simmer in a curd-based spiced gravy.",
     time:50, serves:4, emoji:"🥘" },
 
-  { id:"r133", name:"Ragi Mudde with Saaru", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r133", name:"Ragi Mudde with Saaru", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Finger Millet (Whole Ragi)", amount:150, unit:"g" },
       { name:"Toor Dal", amount:60, unit:"g" },
@@ -9542,7 +9560,7 @@ const RECIPES_DATA = [
     method:"Cook ragi flour into soft balls (mudde). Serve with a thin lentil-tomato saaru.",
     time:40, serves:3, emoji:"🟤" },
 
-  { id:"r134", name:"Jowar Roti with Baingan Bharta", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r134", name:"Jowar Roti with Baingan Bharta", cuisine:"W", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Sorghum (Whole Jowar)", amount:150, unit:"g" },
       { name:"Brinjal", amount:300, unit:"g" },
@@ -9554,7 +9572,7 @@ const RECIPES_DATA = [
     method:"Make jowar rotis with hot water. Roast brinjal, mash and cook with onion and tomato.",
     time:35, serves:3, emoji:"🫓" },
 
-  { id:"r135", name:"Methi Matar Malai", category:"veg", diet:["veg"], meals:["lunch"],
+  { id:"r135", name:"Methi Matar Malai", cuisine:"N", category:"veg", diet:["veg"], meals:["lunch"],
     ingredients:[
       { name:"Fenugreek Leaves", amount:100, unit:"g" },
       { name:"Green Peas", amount:100, unit:"g" },
@@ -9567,7 +9585,7 @@ const RECIPES_DATA = [
     method:"Cook onion paste with milk, add fenugreek leaves and peas, finish with cream.",
     time:30, serves:3, emoji:"🥘" },
 
-  { id:"r136", name:"Parwal (Pointed Gourd) Sabzi", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r136", name:"Parwal (Pointed Gourd) Sabzi", cuisine:"E", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Pointed Gourd", amount:300, unit:"g" },
       { name:"Potato", amount:80, unit:"g" },
@@ -9579,7 +9597,7 @@ const RECIPES_DATA = [
     method:"Fry potato and pointed gourd with onion and spices till tender.",
     time:25, serves:3, emoji:"🥒" },
 
-  { id:"r137", name:"Ridge Gourd (Turai) Sabzi", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r137", name:"Ridge Gourd (Turai) Sabzi", cuisine:"A", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Ridge Gourd", amount:300, unit:"g" },
       { name:"Tomato", amount:80, unit:"g" },
@@ -9591,7 +9609,7 @@ const RECIPES_DATA = [
     method:"Saute onion and tomato with cumin, add peeled sliced ridge gourd, cook covered till soft.",
     time:25, serves:3, emoji:"🥒" },
 
-  { id:"r138", name:"Pumpkin Sabzi (Kaddu)", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r138", name:"Pumpkin Sabzi (Kaddu)", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Pumpkin", amount:300, unit:"g" },
       { name:"Onion", amount:40, unit:"g" },
@@ -9603,7 +9621,7 @@ const RECIPES_DATA = [
     method:"Cook cubed pumpkin with fenugreek seeds, a little jaggery and spices till soft.",
     time:25, serves:3, emoji:"🎃" },
 
-  { id:"r139", name:"Banana Stem Kootu", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
+  { id:"r139", name:"Banana Stem Kootu", cuisine:"S", category:"veg", diet:["veg","vegan"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Banana Stem", amount:250, unit:"g" },
       { name:"Moong Dal", amount:50, unit:"g" },
@@ -9615,7 +9633,7 @@ const RECIPES_DATA = [
     method:"Cook finely chopped banana stem with moong dal and a coconut-cumin paste; temper with mustard.",
     time:30, serves:3, emoji:"🥬" },
 
-  { id:"r140", name:"Bamboo Shoot Curry", category:"veg", diet:["veg","vegan"], meals:["lunch"],
+  { id:"r140", name:"Bamboo Shoot Curry", cuisine:"E", category:"veg", diet:["veg","vegan"], meals:["lunch"],
     ingredients:[
       { name:"Bamboo Shoot", amount:250, unit:"g" },
       { name:"Potato", amount:80, unit:"g" },
@@ -9627,7 +9645,7 @@ const RECIPES_DATA = [
     method:"Boil bamboo shoot to remove bitterness, cook with potato and a light spice base.",
     time:35, serves:3, emoji:"🎍" },
 
-  { id:"r141", name:"Mixed Vegetable Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+  { id:"r141", name:"Mixed Vegetable Soup", cuisine:"C", category:"veg", diet:["veg","vegan"], meals:["dinner"],
     ingredients:[
       { name:"Carrot", amount:80, unit:"g" },
       { name:"Cabbage", amount:80, unit:"g" },
@@ -9641,7 +9659,7 @@ const RECIPES_DATA = [
     method:"Saute garlic and onion, add chopped vegetables and water, simmer till soft, season with pepper.",
     time:25, serves:3, emoji:"🥣" },
 
-  { id:"r142", name:"Tomato Shorba", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+  { id:"r142", name:"Tomato Shorba", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["dinner"],
     ingredients:[
       { name:"Tomato", amount:350, unit:"g" },
       { name:"Garlic", amount:8, unit:"g" },
@@ -9653,7 +9671,7 @@ const RECIPES_DATA = [
     method:"Cook tomatoes with garlic and ginger, blend, strain and simmer with pepper and a little tempering.",
     time:20, serves:3, emoji:"🍅" },
 
-  { id:"r143", name:"Palak Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+  { id:"r143", name:"Palak Soup", cuisine:"C", category:"veg", diet:["veg","vegan"], meals:["dinner"],
     ingredients:[
       { name:"Spinach", amount:300, unit:"g" },
       { name:"Onion", amount:50, unit:"g" },
@@ -9665,7 +9683,7 @@ const RECIPES_DATA = [
     method:"Cook spinach with onion, garlic and a little potato, blend smooth, season with pepper and lemon.",
     time:20, serves:3, emoji:"🥣" },
 
-  { id:"r144", name:"Pumpkin Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+  { id:"r144", name:"Pumpkin Soup", cuisine:"C", category:"veg", diet:["veg","vegan"], meals:["dinner"],
     ingredients:[
       { name:"Pumpkin", amount:350, unit:"g" },
       { name:"Onion", amount:50, unit:"g" },
@@ -9676,7 +9694,7 @@ const RECIPES_DATA = [
     method:"Cook pumpkin with onion and ginger, blend, simmer with pepper and cumin.",
     time:25, serves:3, emoji:"🎃" },
 
-  { id:"r145", name:"Sweet Corn Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+  { id:"r145", name:"Sweet Corn Soup", cuisine:"C", category:"veg", diet:["veg","vegan"], meals:["dinner"],
     ingredients:[
       { name:"Sweet Corn", amount:200, unit:"g" },
       { name:"Carrot", amount:50, unit:"g" },
@@ -9688,7 +9706,7 @@ const RECIPES_DATA = [
     method:"Cook corn, blend half, simmer with finely chopped vegetables and pepper.",
     time:20, serves:3, emoji:"🌽" },
 
-  { id:"r146", name:"Masoor Dal Soup", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+  { id:"r146", name:"Masoor Dal Soup", cuisine:"A", category:"veg", diet:["veg","vegan"], meals:["dinner"],
     ingredients:[
       { name:"Masoor Dal", amount:80, unit:"g" },
       { name:"Tomato", amount:100, unit:"g" },
@@ -9700,7 +9718,7 @@ const RECIPES_DATA = [
     method:"Cook masoor dal with tomato and carrot, blend lightly, season with cumin and pepper.",
     time:25, serves:3, emoji:"🥣" },
 
-  { id:"r147", name:"Vegetable Daliya Khichdi", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r147", name:"Vegetable Daliya Khichdi", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Broken Wheat", amount:100, unit:"g" },
       { name:"Moong Dal", amount:50, unit:"g" },
@@ -9713,7 +9731,7 @@ const RECIPES_DATA = [
     method:"Pressure cook dalia, moong dal and vegetables with turmeric, finish with cumin tempering in ghee.",
     time:30, serves:3, emoji:"🍲" },
 
-  { id:"r148", name:"Barnyard Millet Khichdi", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
+  { id:"r148", name:"Barnyard Millet Khichdi", cuisine:"A", category:"veg", diet:["veg","vegan"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Barnyard Millet", amount:100, unit:"g" },
       { name:"Moong Dal", amount:50, unit:"g" },
@@ -9726,7 +9744,7 @@ const RECIPES_DATA = [
     method:"Cook barnyard millet, moong dal and vegetables together till soft, finish with cumin tempering.",
     time:30, serves:3, emoji:"🍲" },
 
-  { id:"r149", name:"Kodo Millet Curd Rice", category:"veg", diet:["veg"], meals:["dinner"],
+  { id:"r149", name:"Kodo Millet Curd Rice", cuisine:"S", category:"veg", diet:["veg"], meals:["dinner"],
     ingredients:[
       { name:"Kodo Millet", amount:100, unit:"g" },
       { name:"Curd", amount:250, unit:"g" },
@@ -9738,7 +9756,7 @@ const RECIPES_DATA = [
     method:"Cook kodo millet soft, cool, mix with curd, grated carrot and cucumber; temper with mustard and curry leaves.",
     time:25, serves:3, emoji:"🥣" },
 
-  { id:"r150", name:"Phulka with Dal and Sabzi Plate", category:"veg", diet:["veg","vegan"], meals:["dinner"],
+  { id:"r150", name:"Phulka with Dal and Sabzi Plate", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["dinner"],
     ingredients:[
       { name:"Atta", amount:150, unit:"g" },
       { name:"Moong Dal", amount:60, unit:"g" },
@@ -9750,7 +9768,7 @@ const RECIPES_DATA = [
     method:"Serve soft phulkas with a thin moong dal and a lightly spiced bottle gourd sabzi.",
     time:30, serves:3, emoji:"🫓" },
 
-  { id:"r151", name:"Paneer Bhurji Roti Wrap", category:"veg", diet:["veg"], meals:["dinner"],
+  { id:"r151", name:"Paneer Bhurji Roti Wrap", cuisine:"N", category:"veg", diet:["veg"], meals:["dinner"],
     ingredients:[
       { name:"Paneer", amount:150, unit:"g" },
       { name:"Atta", amount:120, unit:"g" },
@@ -9762,7 +9780,7 @@ const RECIPES_DATA = [
     method:"Cook crumbled paneer with onion, tomato and spices. Roll in whole wheat rotis.",
     time:20, serves:3, emoji:"🌯" },
 
-  { id:"r152", name:"Kadai Chicken", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r152", name:"Kadai Chicken", cuisine:"N", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Chicken", amount:500, unit:"g" },
       { name:"Capsicum", amount:100, unit:"g" },
@@ -9775,7 +9793,7 @@ const RECIPES_DATA = [
     method:"Cook chicken with ground kadai masala, onion, tomato and capsicum till thick.",
     time:45, serves:4, emoji:"🍗" },
 
-  { id:"r153", name:"Chicken Chettinad", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r153", name:"Chicken Chettinad", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Chicken", amount:500, unit:"g" },
       { name:"Onion", amount:120, unit:"g" },
@@ -9788,7 +9806,7 @@ const RECIPES_DATA = [
     method:"Cook chicken in a roasted pepper-fennel-coconut Chettinad masala till the gravy clings.",
     time:50, serves:4, emoji:"🍗" },
 
-  { id:"r154", name:"Kerala Chicken Stew", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+  { id:"r154", name:"Kerala Chicken Stew", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Chicken", amount:400, unit:"g" },
       { name:"Potato", amount:100, unit:"g" },
@@ -9801,7 +9819,7 @@ const RECIPES_DATA = [
     method:"Simmer chicken and vegetables in thin coconut milk with whole spices, finish with thick coconut milk. Light and mild.",
     time:45, serves:4, emoji:"🍲" },
 
-  { id:"r155", name:"Pepper Chicken", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+  { id:"r155", name:"Pepper Chicken", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Chicken", amount:500, unit:"g" },
       { name:"Onion", amount:100, unit:"g" },
@@ -9813,7 +9831,7 @@ const RECIPES_DATA = [
     method:"Cook chicken with onion and crushed black pepper till dry and peppery.",
     time:35, serves:4, emoji:"🍗" },
 
-  { id:"r156", name:"Chicken Saagwala", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r156", name:"Chicken Saagwala", cuisine:"N", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Chicken", amount:450, unit:"g" },
       { name:"Spinach", amount:300, unit:"g" },
@@ -9826,7 +9844,7 @@ const RECIPES_DATA = [
     method:"Cook chicken in an onion-tomato masala, fold in pureed spinach.",
     time:45, serves:4, emoji:"🍗" },
 
-  { id:"r157", name:"Tandoori Chicken (Oven Baked)", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+  { id:"r157", name:"Tandoori Chicken (Oven Baked)", cuisine:"N", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Chicken", amount:500, unit:"g" },
       { name:"Curd", amount:100, unit:"g" },
@@ -9838,7 +9856,7 @@ const RECIPES_DATA = [
     method:"Marinate chicken in curd, lemon and spices for 4 hours. Bake or grill till charred and cooked.",
     time:50, serves:4, emoji:"🍗" },
 
-  { id:"r158", name:"Chicken Tikka", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+  { id:"r158", name:"Chicken Tikka", cuisine:"N", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Chicken", amount:450, unit:"g" },
       { name:"Hung Curd", amount:100, unit:"g" },
@@ -9851,7 +9869,7 @@ const RECIPES_DATA = [
     method:"Marinate chicken cubes in hung curd and spices, skewer with capsicum and onion, grill.",
     time:40, serves:4, emoji:"🍗" },
 
-  { id:"r159", name:"Chicken Dalcha", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r159", name:"Chicken Dalcha", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Chicken", amount:300, unit:"g" },
       { name:"Chana Dal", amount:100, unit:"g" },
@@ -9864,7 +9882,7 @@ const RECIPES_DATA = [
     method:"Cook chicken with chana dal and bottle gourd in a tangy Hyderabadi gravy.",
     time:50, serves:4, emoji:"🍲" },
 
-  { id:"r160", name:"Country Chicken Fry (Nati Kodi)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r160", name:"Country Chicken Fry (Nati Kodi)", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Country Chicken", amount:500, unit:"g" },
       { name:"Onion", amount:100, unit:"g" },
@@ -9876,7 +9894,7 @@ const RECIPES_DATA = [
     method:"Pressure cook country chicken with spice paste, then fry dry with curry leaves.",
     time:50, serves:4, emoji:"🍗" },
 
-  { id:"r161", name:"Mutton Curry (Dhaba Style)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r161", name:"Mutton Curry (Dhaba Style)", cuisine:"N", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Mutton", amount:500, unit:"g" },
       { name:"Onion", amount:150, unit:"g" },
@@ -9888,7 +9906,7 @@ const RECIPES_DATA = [
     method:"Brown mutton, cook in onion-tomato masala on low heat till tender.",
     time:70, serves:4, emoji:"🍖" },
 
-  { id:"r162", name:"Kosha Mangsho (Bengali Mutton)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r162", name:"Kosha Mangsho (Bengali Mutton)", cuisine:"E", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Mutton", amount:500, unit:"g" },
       { name:"Onion", amount:200, unit:"g" },
@@ -9901,7 +9919,7 @@ const RECIPES_DATA = [
     method:"Slow-cook mutton with a long-fried onion masala and potato till the gravy is dark and thick.",
     time:80, serves:4, emoji:"🍖" },
 
-  { id:"r163", name:"Mutton Haleem", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r163", name:"Mutton Haleem", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Mutton", amount:400, unit:"g" },
       { name:"Broken Wheat", amount:100, unit:"g" },
@@ -9915,7 +9933,7 @@ const RECIPES_DATA = [
     method:"Slow cook mutton with wheat and lentils, mash till smooth, top with fried onion and ghee.",
     time:120, serves:5, emoji:"🍲" },
 
-  { id:"r164", name:"Mutton Pepper Fry", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r164", name:"Mutton Pepper Fry", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Mutton", amount:500, unit:"g" },
       { name:"Onion", amount:120, unit:"g" },
@@ -9927,7 +9945,7 @@ const RECIPES_DATA = [
     method:"Pressure cook mutton, then dry fry with onion, curry leaves and crushed pepper.",
     time:60, serves:4, emoji:"🍖" },
 
-  { id:"r165", name:"Mutton Biryani", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r165", name:"Mutton Biryani", cuisine:"NS", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Mutton", amount:500, unit:"g" },
       { name:"Basmati Rice", amount:250, unit:"g" },
@@ -9940,7 +9958,7 @@ const RECIPES_DATA = [
     method:"Marinate mutton in curd and spices. Layer with par-cooked basmati and dum cook.",
     time:90, serves:5, emoji:"🍚" },
 
-  { id:"r166", name:"Mutton Paya-Style Soup", category:"non-veg", diet:["non-veg"], meals:["dinner"],
+  { id:"r166", name:"Mutton Paya-Style Soup", cuisine:"N", category:"non-veg", diet:["non-veg"], meals:["dinner"],
     ingredients:[
       { name:"Mutton", amount:300, unit:"g" },
       { name:"Onion", amount:60, unit:"g" },
@@ -9952,7 +9970,7 @@ const RECIPES_DATA = [
     method:"Slow simmer bone-in mutton with ginger, garlic, pepper and whole spices till the broth is rich.",
     time:80, serves:4, emoji:"🍲" },
 
-  { id:"r167", name:"Goan Fish Curry", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+  { id:"r167", name:"Goan Fish Curry", cuisine:"W", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Kingfish", amount:400, unit:"g" },
       { name:"Coconut (grated)", amount:60, unit:"g" },
@@ -9965,7 +9983,7 @@ const RECIPES_DATA = [
     method:"Simmer fish in a ground coconut-red chilli curry soured with tamarind.",
     time:35, serves:4, emoji:"🐟" },
 
-  { id:"r168", name:"Macher Jhol (Bengali Fish Curry)", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+  { id:"r168", name:"Macher Jhol (Bengali Fish Curry)", cuisine:"E", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Rohu", amount:400, unit:"g" },
       { name:"Potato", amount:150, unit:"g" },
@@ -9977,7 +9995,7 @@ const RECIPES_DATA = [
     method:"Lightly fry rohu, simmer with potato in a thin turmeric-cumin-ginger gravy.",
     time:30, serves:4, emoji:"🐟" },
 
-  { id:"r169", name:"Fish Fry (Shallow Fried)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r169", name:"Fish Fry (Shallow Fried)", cuisine:"A", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Pomfret", amount:400, unit:"g" },
       { name:"Rice Flour", amount:20, unit:"g" },
@@ -9989,7 +10007,7 @@ const RECIPES_DATA = [
     method:"Marinate pomfret in chilli, turmeric and lemon, coat with rice flour and shallow fry.",
     time:25, serves:3, emoji:"🐟" },
 
-  { id:"r170", name:"Kerala Fish Molee", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+  { id:"r170", name:"Kerala Fish Molee", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Seabass", amount:400, unit:"g" },
       { name:"Coconut (grated)", amount:60, unit:"g" },
@@ -10002,7 +10020,7 @@ const RECIPES_DATA = [
     method:"Poach fish in a mild coconut milk stew with ginger, green chilli and onion.",
     time:35, serves:4, emoji:"🐟" },
 
-  { id:"r171", name:"Karimeen Pollichathu", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r171", name:"Karimeen Pollichathu", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Pearl Spot", amount:450, unit:"g" },
       { name:"Onion", amount:100, unit:"g" },
@@ -10014,7 +10032,7 @@ const RECIPES_DATA = [
     method:"Marinate and fry pearl spot, wrap in banana leaf with onion-tomato masala and cook.",
     time:40, serves:3, emoji:"🐟" },
 
-  { id:"r172", name:"Paturi (Steamed Fish in Banana Leaf)", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch","fast_dinner"],
+  { id:"r172", name:"Paturi (Steamed Fish in Banana Leaf)", cuisine:"E", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch","fast_dinner"],
     ingredients:[
       { name:"Hilsa", amount:400, unit:"g" },
       { name:"Coconut (grated)", amount:30, unit:"g" },
@@ -10026,7 +10044,7 @@ const RECIPES_DATA = [
     method:"Coat fish with mustard-coconut paste, wrap in banana leaf and steam. Very light.",
     time:35, serves:3, emoji:"🐟" },
 
-  { id:"r173", name:"Tuna Curry (Choora Curry)", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+  { id:"r173", name:"Tuna Curry (Choora Curry)", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Tuna", amount:400, unit:"g" },
       { name:"Tomato", amount:100, unit:"g" },
@@ -10039,7 +10057,7 @@ const RECIPES_DATA = [
     method:"Simmer tuna chunks in a tamarind-coconut gravy with curry leaves.",
     time:35, serves:4, emoji:"🐟" },
 
-  { id:"r174", name:"Mackerel Fry (Bangda)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r174", name:"Mackerel Fry (Bangda)", cuisine:"W", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Mackerel", amount:450, unit:"g" },
       { name:"Rice Flour", amount:20, unit:"g" },
@@ -10050,7 +10068,7 @@ const RECIPES_DATA = [
     method:"Marinate in chilli-turmeric-lemon, coat lightly with rice flour and shallow fry.",
     time:25, serves:3, emoji:"🐟" },
 
-  { id:"r175", name:"Anchovy Fry (Nethili)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r175", name:"Anchovy Fry (Nethili)", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Anchovies", amount:250, unit:"g" },
       { name:"Rice Flour", amount:20, unit:"g" },
@@ -10061,7 +10079,7 @@ const RECIPES_DATA = [
     method:"Marinate in spices and fry crisp. Small fish eaten whole are rich in calcium.",
     time:20, serves:3, emoji:"🐟" },
 
-  { id:"r176", name:"Murrel (Viral) Pepper Curry", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+  { id:"r176", name:"Murrel (Viral) Pepper Curry", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Snakehead Murrel", amount:400, unit:"g" },
       { name:"Onion", amount:80, unit:"g" },
@@ -10073,7 +10091,7 @@ const RECIPES_DATA = [
     method:"Simmer fish in a peppery onion-tomato gravy, light and good for recovery meals.",
     time:35, serves:4, emoji:"🐟" },
 
-  { id:"r177", name:"Tilapia Fish Curry", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+  { id:"r177", name:"Tilapia Fish Curry", cuisine:"A", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Tilapia", amount:450, unit:"g" },
       { name:"Tomato", amount:100, unit:"g" },
@@ -10085,7 +10103,7 @@ const RECIPES_DATA = [
     method:"Cook tilapia in a light coconut-tomato curry.",
     time:30, serves:4, emoji:"🐟" },
 
-  { id:"r178", name:"Rawas (Indian Salmon) Tawa Fry", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+  { id:"r178", name:"Rawas (Indian Salmon) Tawa Fry", cuisine:"W", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
     ingredients:[
       { name:"Indian Salmon", amount:400, unit:"g" },
       { name:"Rice Flour", amount:15, unit:"g" },
@@ -10097,7 +10115,7 @@ const RECIPES_DATA = [
     method:"Coat fillets in rice-flour and masala and cook on a tawa with a little oil.",
     time:20, serves:3, emoji:"🐟" },
 
-  { id:"r179", name:"Bombay Duck (Bombil) Fry", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r179", name:"Bombay Duck (Bombil) Fry", cuisine:"W", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Bombay Duck", amount:350, unit:"g" },
       { name:"Rice Flour", amount:25, unit:"g" },
@@ -10108,7 +10126,7 @@ const RECIPES_DATA = [
     method:"Marinate Bombil in chilli-ginger-garlic, coat with rice flour and shallow fry.",
     time:25, serves:3, emoji:"🐟" },
 
-  { id:"r180", name:"Prawn Curry (Goan Style)", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+  { id:"r180", name:"Prawn Curry (Goan Style)", cuisine:"W", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Tiger Prawns", amount:400, unit:"g" },
       { name:"Coconut (grated)", amount:60, unit:"g" },
@@ -10121,7 +10139,7 @@ const RECIPES_DATA = [
     method:"Cook prawns briefly in a coconut-tamarind-chilli curry.",
     time:30, serves:4, emoji:"🦐" },
 
-  { id:"r181", name:"Prawn Biryani", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r181", name:"Prawn Biryani", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Tiger Prawns", amount:300, unit:"g" },
       { name:"Basmati Rice", amount:200, unit:"g" },
@@ -10134,7 +10152,7 @@ const RECIPES_DATA = [
     method:"Marinate prawns, make a masala, layer with par-cooked basmati and dum cook for 15 min.",
     time:50, serves:4, emoji:"🍚" },
 
-  { id:"r182", name:"Kerala Prawn Roast", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r182", name:"Kerala Prawn Roast", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Tiger Prawns", amount:350, unit:"g" },
       { name:"Onion", amount:100, unit:"g" },
@@ -10147,7 +10165,7 @@ const RECIPES_DATA = [
     method:"Roast prawns in a dark onion-chilli masala with curry leaves.",
     time:30, serves:3, emoji:"🦐" },
 
-  { id:"r183", name:"Crab Masala", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r183", name:"Crab Masala", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Mud Crab", amount:600, unit:"g" },
       { name:"Onion", amount:100, unit:"g" },
@@ -10160,7 +10178,7 @@ const RECIPES_DATA = [
     method:"Cook cleaned crab in an onion-tomato-pepper masala till shells turn red and the gravy thickens.",
     time:45, serves:3, emoji:"🦀" },
 
-  { id:"r184", name:"Squid Roast (Koonthal)", category:"non-veg", diet:["non-veg"], meals:["lunch"],
+  { id:"r184", name:"Squid Roast (Koonthal)", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch"],
     ingredients:[
       { name:"Squid", amount:350, unit:"g" },
       { name:"Onion", amount:100, unit:"g" },
@@ -10172,7 +10190,7 @@ const RECIPES_DATA = [
     method:"Cook squid rings briefly then roast with onion-tomato masala and curry leaves.",
     time:35, serves:3, emoji:"🦑" },
 
-  { id:"r185", name:"Fish Soup (Meen Rasam)", category:"non-veg", diet:["non-veg"], meals:["dinner","fast_dinner"],
+  { id:"r185", name:"Fish Soup (Meen Rasam)", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["dinner","fast_dinner"],
     ingredients:[
       { name:"Seabass", amount:250, unit:"g" },
       { name:"Tomato", amount:100, unit:"g" },
@@ -10184,7 +10202,7 @@ const RECIPES_DATA = [
     method:"Simmer fish pieces in a thin pepper-garlic-tamarind broth. Light and warming.",
     time:25, serves:3, emoji:"🍲" },
 
-  { id:"r186", name:"Egg Roast (Kerala)", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
+  { id:"r186", name:"Egg Roast (Kerala)", cuisine:"S", category:"non-veg", diet:["non-veg"], meals:["lunch","dinner"],
     ingredients:[
       { name:"Egg", amount:300, unit:"g" },
       { name:"Onion", amount:120, unit:"g" },
@@ -10196,7 +10214,7 @@ const RECIPES_DATA = [
     method:"Cook onion till dark with spices, add tomato, then fold in boiled halved eggs.",
     time:30, serves:3, emoji:"🥚" },
 
-  { id:"r187", name:"Boiled Egg Salad Plate", category:"non-veg", diet:["non-veg"], meals:["dinner","snack","fast_breakfast","fast_dinner"],
+  { id:"r187", name:"Boiled Egg Salad Plate", cuisine:"C", category:"non-veg", diet:["non-veg"], meals:["dinner","snack","fast_breakfast","fast_dinner"],
     ingredients:[
       { name:"Egg", amount:200, unit:"g" },
       { name:"Cucumber", amount:100, unit:"g" },
@@ -10208,7 +10226,7 @@ const RECIPES_DATA = [
     method:"Boil eggs, slice and serve with cucumber, tomato and onion tossed in lemon and pepper.",
     time:15, serves:2, emoji:"🥗" },
 
-  { id:"r188", name:"Chicken Clear Soup with Vegetables", category:"non-veg", diet:["non-veg"], meals:["dinner","fast_dinner"],
+  { id:"r188", name:"Chicken Clear Soup with Vegetables", cuisine:"C", category:"non-veg", diet:["non-veg"], meals:["dinner","fast_dinner"],
     ingredients:[
       { name:"Chicken", amount:250, unit:"g" },
       { name:"Carrot", amount:60, unit:"g" },
@@ -10221,7 +10239,7 @@ const RECIPES_DATA = [
     method:"Simmer chicken with ginger, garlic and vegetables, season with pepper. Light and filling.",
     time:35, serves:3, emoji:"🍲" },
 
-  { id:"r189", name:"Chana Chaat", category:"veg", diet:["veg","vegan"], meals:["snack"],
+  { id:"r189", name:"Chana Chaat", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { name:"Chickpeas", amount:100, unit:"g" },
       { name:"Onion", amount:40, unit:"g" },
@@ -10233,7 +10251,7 @@ const RECIPES_DATA = [
     method:"Toss boiled chickpeas with chopped vegetables, lemon, chaat masala and coriander.",
     time:15, serves:2, emoji:"🥗" },
 
-  { id:"r190", name:"Masala Corn Cup", category:"veg", diet:["veg","vegan"], meals:["snack"],
+  { id:"r190", name:"Masala Corn Cup", cuisine:"A", category:"veg", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { name:"Sweet Corn", amount:200, unit:"g" },
       { name:"Lemon", amount:10, unit:"g" },
@@ -10244,7 +10262,7 @@ const RECIPES_DATA = [
     method:"Steam corn kernels and toss with a little butter, lemon, pepper and chaat masala.",
     time:10, serves:2, emoji:"🌽" },
 
-  { id:"r191", name:"Fruit Chaat", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack","fast_breakfast"],
+  { id:"r191", name:"Fruit Chaat", cuisine:"N", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack","fast_breakfast"],
     ingredients:[
       { name:"Apple", amount:100, unit:"g" },
       { name:"Banana", amount:100, unit:"g" },
@@ -10256,7 +10274,7 @@ const RECIPES_DATA = [
     method:"Dice seasonal fruit, toss with lemon, a pinch of black salt and chaat masala.",
     time:10, serves:2, emoji:"🍉" },
 
-  { id:"r192", name:"Sabudana Khichdi", category:"veg", diet:["veg","vegan"], meals:["snack","breakfast","fast_breakfast","fast_lunch"],
+  { id:"r192", name:"Sabudana Khichdi", cuisine:"W", category:"veg", diet:["veg","vegan"], meals:["snack","breakfast","fast_breakfast","fast_lunch"],
     ingredients:[
       { name:"Sago Pearls", amount:100, unit:"g" },
       { name:"Potato", amount:80, unit:"g" },
@@ -10268,7 +10286,7 @@ const RECIPES_DATA = [
     method:"Soak sabudana 4 hours, saute with cumin, potato, chilli and roasted peanuts.",
     time:30, serves:3, emoji:"🍲" },
 
-  { id:"r193", name:"Murmura Chivda", category:"snack", diet:["veg","vegan"], meals:["snack"],
+  { id:"r193", name:"Murmura Chivda", cuisine:"A", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { name:"Puffed Rice", amount:100, unit:"g" },
       { name:"Peanuts", amount:30, unit:"g" },
@@ -10280,7 +10298,7 @@ const RECIPES_DATA = [
     method:"Roast puffed rice, toss with a tempering of peanuts, curry leaves and turmeric.",
     time:15, serves:4, emoji:"🥣" },
 
-  { id:"r194", name:"Dahi Poha", category:"veg", diet:["veg"], meals:["snack","breakfast"],
+  { id:"r194", name:"Dahi Poha", cuisine:"W", category:"veg", diet:["veg"], meals:["snack","breakfast"],
     ingredients:[
       { name:"Poha", amount:60, unit:"g" },
       { name:"Curd", amount:150, unit:"g" },
@@ -10291,7 +10309,7 @@ const RECIPES_DATA = [
     method:"Soak poha briefly, mix with curd, cucumber and pomegranate.",
     time:10, serves:2, emoji:"🥣" },
 
-  { id:"r195", name:"Moong Dal Dhokla", category:"veg", diet:["veg","vegan"], meals:["snack","breakfast"],
+  { id:"r195", name:"Moong Dal Dhokla", cuisine:"W", category:"veg", diet:["veg","vegan"], meals:["snack","breakfast"],
     ingredients:[
       { name:"Moong Dal", amount:150, unit:"g" },
       { name:"Ginger", amount:8, unit:"g" },
@@ -10303,7 +10321,7 @@ const RECIPES_DATA = [
     method:"Grind soaked moong dal, steam as a thick batter and cut into squares.",
     time:30, serves:4, emoji:"🟨" },
 
-  { id:"r196", name:"Peanut Chikki", category:"snack", diet:["veg","vegan"], meals:["snack"],
+  { id:"r196", name:"Peanut Chikki", cuisine:"W", category:"snack", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { name:"Peanuts", amount:150, unit:"g" },
       { name:"Jaggery", amount:120, unit:"g" }
@@ -10312,7 +10330,7 @@ const RECIPES_DATA = [
     method:"Melt jaggery, mix with roasted peanuts, spread and cut into pieces.",
     time:25, serves:6, emoji:"🍘" },
 
-  { id:"r197", name:"Masala Buttermilk (Chaas)", category:"drinks", diet:["veg"], meals:["snack","fast_snack"],
+  { id:"r197", name:"Masala Buttermilk (Chaas)", cuisine:"A", category:"drinks", diet:["veg"], meals:["snack","fast_snack"],
     ingredients:[
       { name:"Curd", amount:100, unit:"g" },
       { name:"Water", amount:300, unit:"ml" },
@@ -10323,7 +10341,7 @@ const RECIPES_DATA = [
     method:"Whisk curd with water, roasted cumin, mint and black salt.",
     time:5, serves:2, emoji:"🥤" },
 
-  { id:"r198", name:"Jaljeera", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+  { id:"r198", name:"Jaljeera", cuisine:"N", category:"drinks", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { name:"Lemon", amount:20, unit:"g" },
       { name:"Mint Leaves", amount:10, unit:"g" },
@@ -10335,7 +10353,7 @@ const RECIPES_DATA = [
     method:"Blend mint with roasted cumin and tamarind, mix with chilled water, lemon and black salt.",
     time:10, serves:2, emoji:"🥤" },
 
-  { id:"r199", name:"Aam Panna", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+  { id:"r199", name:"Aam Panna", cuisine:"N", category:"drinks", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { name:"Raw Mango", amount:200, unit:"g" },
       { name:"Jaggery", amount:50, unit:"g" },
@@ -10346,7 +10364,7 @@ const RECIPES_DATA = [
     method:"Boil raw mango, pulp, blend with jaggery, cumin and mint, dilute with chilled water.",
     time:25, serves:3, emoji:"🥭" },
 
-  { id:"r200", name:"Bael Sherbet", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+  { id:"r200", name:"Bael Sherbet", cuisine:"N", category:"drinks", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { name:"Bael", amount:100, unit:"g" },
       { name:"Jaggery", amount:30, unit:"g" },
@@ -10356,7 +10374,7 @@ const RECIPES_DATA = [
     method:"Mash bael pulp, strain, mix with jaggery and cold water. A traditional summer cooler.",
     time:15, serves:3, emoji:"🥤" },
 
-  { id:"r201", name:"Sattu Sherbet", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+  { id:"r201", name:"Sattu Sherbet", cuisine:"E", category:"drinks", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { name:"Besan", amount:50, unit:"g" },
       { name:"Water", amount:400, unit:"ml" },
@@ -10367,7 +10385,7 @@ const RECIPES_DATA = [
     method:"Mix roasted gram flour (sattu) with water, lemon, roasted cumin and black salt.",
     time:5, serves:2, emoji:"🥤" },
 
-  { id:"r202", name:"Ragi Malt", category:"drinks", diet:["veg"], meals:["snack","breakfast"],
+  { id:"r202", name:"Ragi Malt", cuisine:"S", category:"drinks", diet:["veg"], meals:["snack","breakfast"],
     ingredients:[
       { name:"Finger Millet (Whole Ragi)", amount:30, unit:"g" },
       { name:"Milk", amount:250, unit:"ml" },
@@ -10377,7 +10395,7 @@ const RECIPES_DATA = [
     method:"Cook ragi flour in water till thick, add milk and jaggery.",
     time:10, serves:2, emoji:"🥤" },
 
-  { id:"r203", name:"Haldi Doodh (Golden Milk)", category:"drinks", diet:["veg"], meals:["snack","fast_snack"],
+  { id:"r203", name:"Haldi Doodh (Golden Milk)", cuisine:"N", category:"drinks", diet:["veg"], meals:["snack","fast_snack"],
     ingredients:[
       { name:"Milk", amount:250, unit:"ml" },
       { name:"Ginger", amount:3, unit:"g" },
@@ -10387,7 +10405,7 @@ const RECIPES_DATA = [
     method:"Warm milk with turmeric, a pinch of pepper and ginger. Good at bedtime.",
     time:10, serves:1, emoji:"🥛" },
 
-  { id:"r204", name:"Sweet Lassi", category:"drinks", diet:["veg"], meals:["snack","fast_snack","fast_breakfast"],
+  { id:"r204", name:"Sweet Lassi", cuisine:"N", category:"drinks", diet:["veg"], meals:["snack","fast_snack","fast_breakfast"],
     ingredients:[
       { name:"Curd", amount:200, unit:"g" },
       { name:"Water", amount:100, unit:"ml" },
@@ -10397,7 +10415,7 @@ const RECIPES_DATA = [
     method:"Whisk curd with water and a little sugar till frothy.",
     time:5, serves:2, emoji:"🥤" },
 
-  { id:"r205", name:"Cucumber Mint Cooler", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+  { id:"r205", name:"Cucumber Mint Cooler", cuisine:"A", category:"drinks", diet:["veg","vegan"], meals:["snack"],
     ingredients:[
       { name:"Cucumber", amount:200, unit:"g" },
       { name:"Mint Leaves", amount:8, unit:"g" },
@@ -10408,7 +10426,7 @@ const RECIPES_DATA = [
     method:"Blend cucumber, mint and lemon with water, serve chilled.",
     time:5, serves:2, emoji:"🥤" },
 
-  { id:"r206", name:"Nimbu Pani (Lemon Sherbet)", category:"drinks", diet:["veg","vegan"], meals:["snack","fast_snack"],
+  { id:"r206", name:"Nimbu Pani (Lemon Sherbet)", cuisine:"A", category:"drinks", diet:["veg","vegan"], meals:["snack","fast_snack"],
     ingredients:[
       { name:"Lemon", amount:40, unit:"g" },
       { name:"Water", amount:400, unit:"ml" },
@@ -10418,7 +10436,7 @@ const RECIPES_DATA = [
     method:"Mix lemon juice, jaggery, a pinch of salt and roasted cumin in chilled water.",
     time:5, serves:2, emoji:"🥤" },
 
-  { id:"r207", name:"Samak Rice (Barnyard Millet) Khichdi", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
+  { id:"r207", name:"Samak Rice (Barnyard Millet) Khichdi", cuisine:"A", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
     ingredients:[
       { name:"Samak rice (barnyard millet)", amount:100, unit:"g" },
       { name:"Potato", amount:100, unit:"g" },
@@ -10431,7 +10449,7 @@ const RECIPES_DATA = [
     method:"Cook rinsed samak rice with potato cubes, peanuts, cumin, ginger and green chilli. Season with rock salt (sendha namak).",
     time:30, serves:3, emoji:"🍲" },
 
-  { id:"r208", name:"Kuttu Roti with Aloo Sabzi", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
+  { id:"r208", name:"Kuttu Roti with Aloo Sabzi", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
     ingredients:[
       { name:"Kuttu (buckwheat) flour", amount:120, unit:"g" },
       { name:"Potato", amount:200, unit:"g" },
@@ -10442,7 +10460,7 @@ const RECIPES_DATA = [
     method:"Knead kuttu flour with boiled potato and warm water into soft rotis. Serve with a cumin-chilli potato sabzi with rock salt.",
     time:35, serves:3, emoji:"🫓" },
 
-  { id:"r209", name:"Singhara Roti with Lauki Sabzi", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
+  { id:"r209", name:"Singhara Roti with Lauki Sabzi", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
     ingredients:[
       { name:"Singhara (water chestnut) flour", amount:120, unit:"g" },
       { name:"Bottle Gourd", amount:250, unit:"g" },
@@ -10453,7 +10471,7 @@ const RECIPES_DATA = [
     method:"Make soft rotis from singhara flour and boiled potato dough. Serve with bottle gourd cooked with cumin and rock salt.",
     time:35, serves:3, emoji:"🫓" },
 
-  { id:"r210", name:"Rajgira Roti with Pumpkin Sabzi", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
+  { id:"r210", name:"Rajgira Roti with Pumpkin Sabzi", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
     ingredients:[
       { name:"Rajgira (amaranth) flour", amount:120, unit:"g" },
       { name:"Pumpkin", amount:250, unit:"g" },
@@ -10464,7 +10482,7 @@ const RECIPES_DATA = [
     method:"Make rotis from rajgira flour with warm water. Serve with a lightly sweet-spicy pumpkin sabzi.",
     time:35, serves:3, emoji:"🫓" },
 
-  { id:"r211", name:"Kuttu Dosa with Potato Masala", category:"veg", diet:["veg"], meals:["fast_breakfast","fast_lunch"],
+  { id:"r211", name:"Kuttu Dosa with Potato Masala", cuisine:"A", category:"veg", diet:["veg"], meals:["fast_breakfast","fast_lunch"],
     ingredients:[
       { name:"Kuttu (buckwheat) flour", amount:100, unit:"g" },
       { name:"Curd", amount:60, unit:"g" },
@@ -10476,7 +10494,7 @@ const RECIPES_DATA = [
     method:"Whisk kuttu flour with curd and water, make thin dosas. Fill with a cumin-chilli potato masala.",
     time:30, serves:3, emoji:"🥞" },
 
-  { id:"r212", name:"Sabudana Kheer", category:"veg", diet:["veg"], meals:["fast_snack","fast_breakfast"],
+  { id:"r212", name:"Sabudana Kheer", cuisine:"W", category:"veg", diet:["veg"], meals:["fast_snack","fast_breakfast"],
     ingredients:[
       { name:"Sago Pearls", amount:50, unit:"g" },
       { name:"Milk", amount:400, unit:"ml" },
@@ -10487,7 +10505,7 @@ const RECIPES_DATA = [
     method:"Simmer soaked sabudana in milk till clear, sweeten lightly, add cardamom and nuts.",
     time:30, serves:3, emoji:"🥛" },
 
-  { id:"r213", name:"Samak Rice Kheer", category:"veg", diet:["veg"], meals:["fast_snack","fast_breakfast"],
+  { id:"r213", name:"Samak Rice Kheer", cuisine:"A", category:"veg", diet:["veg"], meals:["fast_snack","fast_breakfast"],
     ingredients:[
       { name:"Samak rice (barnyard millet)", amount:50, unit:"g" },
       { name:"Milk", amount:400, unit:"ml" },
@@ -10498,7 +10516,7 @@ const RECIPES_DATA = [
     method:"Cook samak rice in milk till soft and creamy, sweeten lightly, add cardamom and nuts.",
     time:30, serves:3, emoji:"🥛" },
 
-  { id:"r214", name:"Makhana Kheer", category:"veg", diet:["veg"], meals:["fast_snack"],
+  { id:"r214", name:"Makhana Kheer", cuisine:"N", category:"veg", diet:["veg"], meals:["fast_snack"],
     ingredients:[
       { name:"Makhana (fox nuts)", amount:40, unit:"g" },
       { name:"Milk", amount:400, unit:"ml" },
@@ -10509,7 +10527,7 @@ const RECIPES_DATA = [
     method:"Roast makhana, simmer in milk till soft, sweeten lightly with cardamom.",
     time:25, serves:3, emoji:"🥛" },
 
-  { id:"r215", name:"Fruit and Milk Bowl", category:"veg", diet:["veg"], meals:["fast_breakfast","fast_snack","fast_dinner"],
+  { id:"r215", name:"Fruit and Milk Bowl", cuisine:"C", category:"veg", diet:["veg"], meals:["fast_breakfast","fast_snack","fast_dinner"],
     ingredients:[
       { name:"Banana", amount:100, unit:"g" },
       { name:"Apple", amount:100, unit:"g" },
@@ -10522,7 +10540,7 @@ const RECIPES_DATA = [
     method:"Dice fruit and serve in chilled milk with a few nuts. A traditional phalahar bowl.",
     time:10, serves:2, emoji:"🍎" },
 
-  { id:"r216", name:"Kheera Raita (Cucumber Curd)", category:"veg", diet:["veg"], meals:["fast_snack","fast_dinner"],
+  { id:"r216", name:"Kheera Raita (Cucumber Curd)", cuisine:"N", category:"veg", diet:["veg"], meals:["fast_snack","fast_dinner"],
     ingredients:[
       { name:"Curd", amount:250, unit:"g" },
       { name:"Cucumber", amount:150, unit:"g" },
@@ -10532,7 +10550,7 @@ const RECIPES_DATA = [
     method:"Mix whisked curd with grated cucumber, rock salt and roasted cumin.",
     time:10, serves:2, emoji:"🥒" },
 
-  { id:"r217", name:"Vrat Aloo Jeera", category:"veg", diet:["veg","vegan"], meals:["fast_lunch"],
+  { id:"r217", name:"Vrat Aloo Jeera", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["fast_lunch"],
     ingredients:[
       { name:"Potato", amount:300, unit:"g" },
       { name:"Oil", amount:12, unit:"g" },
@@ -10543,7 +10561,7 @@ const RECIPES_DATA = [
     method:"Saute boiled potato cubes with cumin and green chilli, season with rock salt and lemon.",
     time:20, serves:3, emoji:"🥔" },
 
-  { id:"r218", name:"Kaddu ki Sabzi (Vrat)", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
+  { id:"r218", name:"Kaddu ki Sabzi (Vrat)", cuisine:"N", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
     ingredients:[
       { name:"Pumpkin", amount:300, unit:"g" },
       { name:"Oil", amount:10, unit:"g" },
@@ -10554,7 +10572,7 @@ const RECIPES_DATA = [
     method:"Cook pumpkin cubes with cumin, a little jaggery and rock salt till soft.",
     time:25, serves:3, emoji:"🎃" },
 
-  { id:"r219", name:"Dahi Aloo (Vrat)", category:"veg", diet:["veg"], meals:["fast_lunch","fast_dinner"],
+  { id:"r219", name:"Dahi Aloo (Vrat)", cuisine:"N", category:"veg", diet:["veg"], meals:["fast_lunch","fast_dinner"],
     ingredients:[
       { name:"Potato", amount:200, unit:"g" },
       { name:"Curd", amount:200, unit:"g" },
@@ -10565,7 +10583,7 @@ const RECIPES_DATA = [
     method:"Toss boiled potato with a cumin tempering, fold in whisked curd.",
     time:25, serves:3, emoji:"🥔" },
 
-  { id:"r220", name:"Moongphali (Peanut) Chaat", category:"veg", diet:["veg","vegan"], meals:["fast_snack"],
+  { id:"r220", name:"Moongphali (Peanut) Chaat", cuisine:"A", category:"veg", diet:["veg","vegan"], meals:["fast_snack"],
     ingredients:[
       { name:"Peanuts", amount:60, unit:"g" },
       { name:"Cucumber", amount:80, unit:"g" },
@@ -10576,7 +10594,7 @@ const RECIPES_DATA = [
     method:"Toss boiled peanuts with cucumber, tomato, lemon and rock salt.",
     time:10, serves:2, emoji:"🥜" },
 
-  { id:"r221", name:"Tender Coconut Water", category:"drinks", diet:["veg","vegan"], meals:["fast_snack","fast_breakfast"],
+  { id:"r221", name:"Tender Coconut Water", cuisine:"S", category:"drinks", diet:["veg","vegan"], meals:["fast_snack","fast_breakfast"],
     ingredients:[
       { name:"Tender Coconut Water", amount:300, unit:"ml" }
     ],
@@ -16055,7 +16073,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   // What can be saved. Each group has its own checkbox. Add keys here when the app starts remembering more.
   var GROUPS=[
     {id:'body',label:'Body',keys:['ayuBase6-body-choices']},
-    {id:'food',label:'Food',keys:['ayuBase6-food-choices','ayuBase6-food-fasting']},
+    {id:'food',label:'Food',keys:['ayuBase6-food-choices','ayuBase6-food-fasting','ayuBase6-food-cuisine']},
     {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1']},
     {id:'checks',label:'Checks',keys:['ayuBase6WakeUpTime','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-muted','ayuBase6-routine-days','ayuBase6-routine-alarm','ayuBase6-routine-edits']},
     {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-rem-alarm','ayuBase6-rem-alarms','ayuBase6-timer','ayuBase6-world']}
@@ -24208,6 +24226,75 @@ html body #sec-cookies > p:not(#ayu-x1),html body #sec-cookies #cookies-current-
 <style id="new-reminder-box-20261114">
 html body #alerts-panel #custom-reminders-list > .custom-reminder-form:not(#ayu-x1){border:1px solid rgba(13,148,136,.28) !important;border-radius:14px !important;background:#e6fffa !important;padding:14px 12px 12px !important;margin:0 0 10px !important}
 </style>
+<style id="cuisine-20261114">
+#sec-diet .cu-wrap{margin-top:16px}
+#sec-diet .cu-h{font-weight:800;font-size:.84rem;color:var(--deep,#204b38);border-left:4px solid var(--accent,#25704f);padding:1px 0 1px 9px;margin:0 0 9px}
+#sec-diet .cu-row{display:flex;flex-wrap:wrap;gap:7px}
+.cu-c,.cu-b{--a:#6f7f50;--p:#e6ebdc;--d:#4f5a3a}
+[data-c="S"]{--a:#1d5a43;--p:#d3eadf;--d:#143d2e}[data-c="N"]{--a:#2f8a67;--p:#d4efe3;--d:#1d5a43}[data-c="E"]{--a:#35a373;--p:#d9f5e7;--d:#1e6b49}[data-c="W"]{--a:#5f9a2a;--p:#e6f3c9;--d:#4d7a1c}[data-c="C"]{--a:#2f8a8a;--p:#d2ecec;--d:#1d5959}[data-c="A"]{--a:#6f7f50;--p:#e6ebdc;--d:#4f5a3a}
+.cu-c{display:inline-flex;align-items:center;gap:6px;padding:5px 12px 5px 6px;border-radius:999px;border:1.5px solid color-mix(in srgb,var(--a) 38%,#fff);background:var(--p);color:var(--d);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer}
+.cu-c b{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.68rem;background:color-mix(in srgb,var(--a) 22%,#fff);color:var(--d)}
+.cu-c[aria-pressed="true"]{background:var(--a);border-color:var(--a);color:#fff}
+.cu-c[aria-pressed="true"] b{background:rgba(255,255,255,.28);color:#fff}
+.cu-b{display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;margin-left:5px;border-radius:50%;background:var(--a);color:#fff;font-size:.66rem;font-weight:800;line-height:1;box-shadow:0 0 0 3px var(--p);cursor:pointer;vertical-align:middle}
+.cu-b + .cu-b{margin-left:7px}
+.rec-alt .cu-b{width:16px;height:16px;font-size:.56rem;box-shadow:0 0 0 2px var(--p);margin-left:6px}
+.cu-tip{position:fixed;z-index:9999;background:#204b38;color:#fff;font-size:.74rem;font-weight:700;padding:4px 9px;border-radius:8px;pointer-events:none;transform:translate(-50%,-100%);white-space:nowrap}
+.cu-note{margin:0 0 8px;font-size:.74rem;line-height:1.4;color:#4a6151}
+</style>
+<script id="cuisine-20261114-js">
+(function(){
+  var KEY='ayuBase6-food-cuisine', ORDER=['S','N','E','W','C'];
+  var NAME={S:'South Indian',N:'North Indian',E:'East Indian',W:'West Indian',C:'Continental',A:'Any cuisine'};
+  var SYM={S:'S',N:'N',E:'E',W:'W',C:'C',A:'★'};
+  function load(){ try{ var v=JSON.parse(localStorage.getItem(KEY)||'[]'); return Array.isArray(v)?v.filter(function(c){ return ORDER.indexOf(c)>=0; }):[]; }catch(e){ return []; } }
+  var st=load();
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){} }
+  function paint(){
+    var row=document.getElementById('cu-row'); if(!row) return;
+    row.innerHTML=ORDER.concat(['A']).map(function(c){
+      var on=c==='A' ? !st.length : st.indexOf(c)>=0;
+      return '<button type="button" class="cu-c" data-c="'+c+'" aria-pressed="'+on+'"><b>'+SYM[c]+'</b>'+(c==='A'?'Any':NAME[c])+'</button>';
+    }).join('');
+  }
+  function plan(){
+    var r=document.getElementById('results');
+    if(r && r.style.display==='block' && typeof buildRecipes==='function' && typeof getDiets==='function'){ var d=getDiets(); try{ buildRecipes(d.length?d:['veg']); }catch(e){} }
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest && e.target.closest('#cu-row .cu-c'); if(!b) return;
+    var c=b.getAttribute('data-c');
+    if(c==='A') st=[]; else { var i=st.indexOf(c); if(i>=0) st.splice(i,1); else st.push(c); }
+    save(); paint(); plan();
+  });
+  window.ayuCuisine={
+    get:function(){ return st.slice(); },
+    badge:function(r){
+      var code=String((r&&r.cuisine)||'A'); if(!code) code='A';
+      return code.split('').map(function(c){ return '<span class="cu-b" data-c="'+c+'" role="button" tabindex="0" aria-label="'+NAME[c]+'">'+SYM[c]+'</span>'; }).join('');
+    },
+    reset:function(){ st=[]; save(); paint(); plan(); }
+  };
+  // tap a badge: its cuisine name shows above it; the next tap anywhere hides it
+  var tip=null, tt=0;
+  function hide(){ if(tip){ tip.remove(); tip=null; } clearTimeout(tt); }
+  function show(b){
+    hide(); var names=[]; var el=b; var row=b.parentNode;
+    [].forEach.call(row.querySelectorAll('.cu-b'),function(x){ names.push(NAME[x.getAttribute('data-c')]); });
+    tip=document.createElement('div'); tip.className='cu-tip'; tip.textContent=names.join(' · ');
+    var r=b.getBoundingClientRect(); tip.style.left=Math.max(60,Math.min(window.innerWidth-60,r.left+r.width/2))+'px'; tip.style.top=(r.top-6)+'px';
+    document.body.appendChild(tip); tt=setTimeout(hide,2600);
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest && e.target.closest('.cu-b');
+    if(!b){ hide(); return; }
+    e.stopPropagation(); e.preventDefault(); show(b);
+  },true);
+  document.addEventListener('keydown',function(e){ var b=e.target.closest&&e.target.closest('.cu-b'); if(b && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); show(b); } });
+  window.addEventListener('scroll',hide,true);
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paint); else paint();
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
