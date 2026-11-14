@@ -4570,14 +4570,8 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
         <button type="button" class="fday" data-d="6" aria-pressed="false" aria-label="Sunday">S</button>
       </div>
       <div id="fast-more" hidden>
-        <p class="fast-sum" id="fast-sum"></p>
-        <h3 class="fast-h" id="fast-when-h">When?<span id="fast-when-day"></span></h3>
-        <div class="fwhen-row" role="group" aria-label="When do you fast?">
-          <button type="button" class="fwhen" data-w="morning" aria-pressed="false">Morning</button>
-          <button type="button" class="fwhen" data-w="afternoon" aria-pressed="false">Afternoon</button>
-          <button type="button" class="fwhen" data-w="evening" aria-pressed="false">Evening</button>
-          <button type="button" class="fwhen" data-w="night" aria-pressed="false">Night</button>
-        </div>
+        <h3 class="fast-h" id="fast-when-h">When?</h3>
+        <div id="fast-rows"></div>
         <h3 class="fast-h">Fasting diet?</h3>
         <div class="diet-row">
           <label class="fpill"><input type="checkbox" name="fast-diet" value="veg"> 🥦 Vegetarian</label>
@@ -23891,10 +23885,12 @@ html body #rem-alarm-card #clk-world-list .clk-wc .wc-remove:not(#ayu-x1):not(#a
 </style>
 <script id="fasting-20261114-js">
 (function(){
-  // Food → Fasting?: fasting days, a timing for each day, and the diet to follow. Saved on this device and in Backup & Restore (Food).
+  // Food → Fasting?: fasting days (tap again to unselect), a line per day with its own timing, and the diet to follow.
+  // Saved on this device and in Backup & Restore (Food).
   var KEY='ayuBase6-food-fasting', WH=['morning','afternoon','evening','night'], DN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], DF=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  var st={days:[],whenBy:{},diets:[]}, editing=-1;
+  var st={days:[],whenBy:{},diets:[]};
   function $(s,r){ return (r||document).querySelector(s); }
+  function label(w){ return w.charAt(0).toUpperCase()+w.slice(1); }
   function cleanWhen(w){ if(w==='full'||w==='sunset') w=WH.slice(); else if(typeof w==='string') w=[w]; return (Array.isArray(w)?w:[]).filter(function(v,i,a){ return WH.indexOf(v)>=0 && a.indexOf(v)===i; }).sort(function(a,b){ return WH.indexOf(a)-WH.indexOf(b); }); }
   function load(){
     try{
@@ -23903,25 +23899,20 @@ html body #rem-alarm-card #clk-world-list .clk-wc .wc-remove:not(#ayu-x1):not(#a
       st.whenBy={};
       st.days.forEach(function(d){ var w=(o.whenBy && o.whenBy[d]!==undefined)?o.whenBy[d]:o.when; st.whenBy[d]=cleanWhen(w); });   // an older shared timing applies to every day
       st.diets=(Array.isArray(o.diets)?o.diets:[]).filter(function(v){ return /^(veg|non-veg|vegan)$/.test(v); });
-      editing=st.days.length?st.days[0]:-1;
     }catch(e){}
   }
   function save(){ try{ if(!st.days.length && !st.diets.length) localStorage.removeItem(KEY); else localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){} }
-  function label(w){ return w.charAt(0).toUpperCase()+w.slice(1); }
   function paint(){
     var sec=$('#sec-fast'); if(!sec) return;
-    [].forEach.call(sec.querySelectorAll('.fday'),function(b){
-      var n=+b.dataset.d, on=st.days.indexOf(n)>=0, fx=b.querySelector('.fx');
-      b.setAttribute('aria-pressed',on?'true':'false'); b.classList.toggle('edit',on && n===editing);
-      if(on && !fx){ fx=document.createElement('span'); fx.className='fx'; fx.setAttribute('role','button'); fx.setAttribute('aria-label','Remove '+DF[n]); b.appendChild(fx); }
-      if(!on && fx) fx.remove();
-    });
-    var cur=st.whenBy[editing]||[];
-    [].forEach.call(sec.querySelectorAll('.fwhen'),function(b){ b.setAttribute('aria-pressed',cur.indexOf(b.dataset.w)>=0?'true':'false'); });
+    [].forEach.call(sec.querySelectorAll('.fday'),function(b){ b.setAttribute('aria-pressed',st.days.indexOf(+b.dataset.d)>=0?'true':'false'); });
     [].forEach.call(sec.querySelectorAll('.fpill input'),function(i){ i.checked=st.diets.indexOf(i.value)>=0; });
     $('#fast-more').hidden=!st.days.length;
-    var d=$('#fast-when-day'); if(d) d.textContent=editing>=0?' · '+DF[editing]:'';
-    var s=$('#fast-sum'); if(s) s.textContent=st.days.map(function(n){ var w=st.whenBy[n]||[]; return DN[n]+': '+(w.length && w.length<4?w.map(label).join(', '):'Whole day'); }).join('  ·  ');
+    var box=$('#fast-rows'); if(!box) return;
+    box.innerHTML=st.days.map(function(n){
+      var cur=st.whenBy[n]||[];
+      return '<div class="frow" data-d="'+n+'" role="group" aria-label="'+DF[n]+'"><span class="frow-d">'+DN[n]+'</span>'+
+        WH.map(function(w){ return '<button type="button" class="fwhen" data-w="'+w+'" data-d="'+n+'" aria-pressed="'+(cur.indexOf(w)>=0?'true':'false')+'">'+label(w)+'</button>'; }).join('')+'</div>';
+    }).join('');
   }
   function plan(){
     var r=document.getElementById('results');
@@ -23932,17 +23923,14 @@ html body #rem-alarm-card #clk-world-list .clk-wc .wc-remove:not(#ayu-x1):not(#a
     var d=e.target.closest && e.target.closest('#sec-fast .fday');
     if(d){
       var n=+d.dataset.d, i=st.days.indexOf(n);
-      if(e.target.closest('.fx')){   // × removes the day
-        if(i>=0){ st.days.splice(i,1); delete st.whenBy[n]; if(editing===n) editing=st.days.length?st.days[Math.min(i,st.days.length-1)]:-1; }
-      } else if(i<0){ st.days.push(n); st.days.sort(); st.whenBy[n]=[]; editing=n; }
-      else editing=n;
+      if(i>=0){ st.days.splice(i,1); delete st.whenBy[n]; } else { st.days.push(n); st.days.sort(); st.whenBy[n]=[]; }
       changed(); return;
     }
     var w=e.target.closest && e.target.closest('#sec-fast .fwhen');
-    if(w && editing>=0){
-      var cur=st.whenBy[editing]||(st.whenBy[editing]=[]), k=cur.indexOf(w.dataset.w);
+    if(w){
+      var dn=+w.dataset.d, cur=st.whenBy[dn]||(st.whenBy[dn]=[]), k=cur.indexOf(w.dataset.w);
       if(k>=0) cur.splice(k,1); else cur.push(w.dataset.w);
-      st.whenBy[editing]=cleanWhen(cur); changed();
+      st.whenBy[dn]=cleanWhen(cur); changed();
     }
   });
   document.addEventListener('change',function(e){
@@ -23954,7 +23942,7 @@ html body #rem-alarm-card #clk-world-list .clk-wc .wc-remove:not(#ayu-x1):not(#a
     var by={}; st.days.forEach(function(n){ var w=st.whenBy[n]||[]; by[n]=w.length?w.slice():WH.slice(); });
     return {days:st.days.slice(),whenBy:by,diets:st.diets.slice()};
   };
-  window.ayuFastingReset=function(){ st.days=[]; st.whenBy={}; st.diets=[]; editing=-1; save(); paint(); plan(); };
+  window.ayuFastingReset=function(){ st.days=[]; st.whenBy={}; st.diets=[]; save(); paint(); plan(); };
   load(); paint();
 })();
 </script>
@@ -24182,13 +24170,12 @@ html body #nutrition-panel #results .rec-day-nav .rec-day-tab.fast.active::after
 #nutrition-panel .rec-block .rec-alts .rec-alt:hover{background:#d9ebb4}
 </style>
 <style id="food-fast-perday-20261114">
-#sec-fast .fday{position:relative;overflow:visible}
-#sec-fast .fday.edit{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent,#25704f) 30%,#fff)}
-#sec-fast .fday .fx{position:absolute;top:-5px;right:-5px;width:15px;height:15px;border-radius:50%;background:#fff;border:1.5px solid var(--accent,#25704f);color:var(--accent,#25704f);display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1;cursor:pointer}
-#sec-fast .fday .fx::before{content:"\00d7";margin-top:-1px;font-weight:700}
-#sec-fast .fast-sum{margin:14px 0 0;font-size:.8rem;font-weight:600;color:var(--deep,#204b38);line-height:1.5}
-#sec-fast #fast-when-day{font-weight:700;color:var(--accent,#25704f)}
-#sec-fast .fast-days{padding:6px 5px 0}
+#sec-fast .fast-days{padding:0}
+/* When?: one line per fasting day */
+#sec-fast .frow{display:flex;align-items:center;gap:5px;margin:0 0 8px}
+#sec-fast .frow-d{flex:0 0 28px;font-size:.74rem;font-weight:700;color:var(--deep,#204b38)}
+#sec-fast .frow{gap:4px}
+#sec-fast .frow .fwhen{flex:1 1 0;min-width:0;padding:5px 0;font-size:clamp(.58rem,2.7vw,.74rem);letter-spacing:-.2px}
 /* week tabs: folder tabs with dividers, open day solid green */
 html body #nutrition-panel #results #weekly-plan-block .rec-day-nav{gap:0;padding:2px 0 0;border-bottom:2px solid #2f8a67}
 html body #nutrition-panel #results .rec-day-nav .rec-day-tab,html body #nutrition-panel #results .rec-day-nav .rec-day-tab.fast{position:relative;background:transparent;border:0;border-radius:9px 9px 0 0;color:#6b8e7b;font-weight:700;margin-bottom:-2px;padding:11px 0 10px}
