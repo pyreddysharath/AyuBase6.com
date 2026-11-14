@@ -6720,8 +6720,9 @@ function buildRecipes(diets){
       const altRow=document.createElement('div'); altRow.className='rec-alts';
       function paint(){
         mealRow.innerHTML=`<span class="rec-meal-name">${cur[0].name}</span>${cuBadge(cur[0])}<span class="rec-meal-arr food-chevron" aria-hidden="true"><svg viewBox="0 0 8 12" width="8" height="12"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+        mealRow.dataset.c=String(cur[0].cuisine||'A').charAt(0);
         detail.innerHTML=buildRecipeCardHtml(cur[0]);
-        altRow.innerHTML=cur.length>1?`<span class="rec-alt-l">Alternatives</span>`+cur.slice(1).map((a,i)=>`<button type="button" class="rec-alt" data-i="${i+1}">${a.name}${cuBadge(a)}</button>`).join(''):'';
+        altRow.innerHTML=cur.length>1?`<span class="rec-alt-l">Alternatives</span>`+cur.slice(1).map((a,i)=>`<button type="button" class="rec-alt" data-i="${i+1}" data-c="${String(a.cuisine||'A').charAt(0)}">${a.name}${cuBadge(a)}</button>`).join(''):'';
       }
       paint();
       altRow.addEventListener('click',e=>{
@@ -24230,9 +24231,9 @@ html body #alerts-panel #custom-reminders-list > .custom-reminder-form:not(#ayu-
 #sec-diet .cu-wrap{margin-top:16px}
 #sec-diet .cu-h{font-weight:800;font-size:.84rem;color:var(--deep,#204b38);border-left:4px solid var(--accent,#25704f);padding:1px 0 1px 9px;margin:0 0 9px}
 #sec-diet .cu-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.cu-c,.cu-b{--a:#7b8f84;--t:#fff;--p:color-mix(in srgb,var(--a) 22%,#fff);--d:#3f5247}
-[data-c="S"]{--a:#1d5a43;--t:#fff;--d:#143d2e}[data-c="N"]{--a:#2f8a67;--t:#fff;--d:#1d5a43}[data-c="E"]{--a:#4fc08c;--t:#0f3a28;--d:#1e6b49}[data-c="W"]{--a:#7fb83f;--t:#1f3d0a;--d:#4d7a1c}[data-c="C"]{--a:#a6c64a;--t:#2d3d0a;--d:#5c7114}[data-c="A"]{--a:#7b8f84;--t:#fff;--d:#3f5247}
-.cu-c{display:inline-flex;align-items:center;gap:6px;padding:5px 12px 5px 6px;border-radius:999px;border:1.5px solid color-mix(in srgb,var(--a) 38%,#fff);background:var(--p);color:var(--d);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer}
+:where(.cu-c,.cu-b,.rec-meal-row[data-c],.rec-alt[data-c]){--a:#7b8f84;--t:#fff;--p:color-mix(in srgb,var(--a) 22%,#fff);--d:#3f5247}
+[data-c="S"]{--a:#1d5a43;--t:#fff;--p:#d3eadf;--d:#143d2e}[data-c="N"]{--a:#2f8a67;--t:#fff;--p:#d4efe3;--d:#1d5a43}[data-c="E"]{--a:#4fc08c;--t:#0f3a28;--p:#d9f5e7;--d:#1e6b49}[data-c="W"]{--a:#7fb83f;--t:#1f3d0a;--p:#e6f3c9;--d:#4d7a1c}[data-c="C"]{--a:#a6c64a;--t:#2d3d0a;--p:#eaf2c8;--d:#5c7114}[data-c="A"]{--a:#7b8f84;--t:#fff;--p:#e4ebe7;--d:#3f5247}
+.cu-c{display:inline-flex;align-items:center;gap:6px;padding:5px 12px 5px 6px;border-radius:999px;border:1.5px solid color-mix(in srgb,var(--a) 38%,#fff);background:var(--p);color:var(--d);font:inherit;font-size:clamp(.66rem,3.3vw,.8rem);font-weight:700;cursor:pointer;white-space:nowrap;min-width:0;gap:clamp(4px,1.6vw,6px);padding-right:clamp(8px,3vw,12px)}
 .cu-c b{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.68rem;background:color-mix(in srgb,var(--a) 22%,#fff);color:var(--d)}
 .cu-c[aria-pressed="true"]{background:var(--a);border-color:var(--a);color:var(--t)}
 .cu-c[aria-pressed="true"] b{background:color-mix(in srgb,var(--t) 22%,transparent);color:var(--t)}
@@ -24240,6 +24241,8 @@ html body #alerts-panel #custom-reminders-list > .custom-reminder-form:not(#ayu-
 .cu-b + .cu-b{margin-left:7px}
 .rec-alt .cu-b{width:16px;height:16px;font-size:.56rem;box-shadow:0 0 0 2px var(--p);margin-left:6px}
 .cu-tip{position:fixed;z-index:9999;background:#204b38;color:#fff;font-size:.74rem;font-weight:700;padding:4px 9px;border-radius:8px;pointer-events:none;transform:translate(-50%,-100%);white-space:nowrap}
+.rec-meal-row[data-c]:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){background:var(--p) !important;border-color:color-mix(in srgb,var(--a) 35%,#fff) !important}
+html body #nutrition-panel .rec-block .rec-alt[data-c]:not(#ayu-x1):not(#ayu-x2){background:var(--p) !important;border-color:color-mix(in srgb,var(--a) 35%,#fff) !important;color:var(--d) !important}
 .cu-note{margin:0 0 8px;font-size:.74rem;line-height:1.4;color:#4a6151}
 </style>
 <script id="cuisine-20261114-js">
