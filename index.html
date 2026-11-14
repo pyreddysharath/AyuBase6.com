@@ -4556,6 +4556,37 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
       </div>
     </div>
 
+    <!-- ── SECTION 2b: FASTING ───────────────── -->
+    <div class="card" id="sec-fast">
+      <h2>Fasting?</h2>
+      <p class="fast-lbl" id="fast-days-lbl">Fasting days</p>
+      <div class="fast-days" role="group" aria-labelledby="fast-days-lbl">
+        <button type="button" class="fday" data-d="0" aria-pressed="false" aria-label="Monday">M</button>
+        <button type="button" class="fday" data-d="1" aria-pressed="false" aria-label="Tuesday">T</button>
+        <button type="button" class="fday" data-d="2" aria-pressed="false" aria-label="Wednesday">W</button>
+        <button type="button" class="fday" data-d="3" aria-pressed="false" aria-label="Thursday">T</button>
+        <button type="button" class="fday" data-d="4" aria-pressed="false" aria-label="Friday">F</button>
+        <button type="button" class="fday" data-d="5" aria-pressed="false" aria-label="Saturday">S</button>
+        <button type="button" class="fday" data-d="6" aria-pressed="false" aria-label="Sunday">S</button>
+      </div>
+      <div id="fast-more" hidden>
+        <h3 class="fast-h">When?</h3>
+        <div class="fwhen-row" role="group" aria-label="When do you fast?">
+          <button type="button" class="fwhen" data-w="morning" aria-pressed="false">Morning</button>
+          <button type="button" class="fwhen" data-w="evening" aria-pressed="false">Evening</button>
+          <button type="button" class="fwhen" data-w="full" aria-pressed="false">Full day</button>
+          <button type="button" class="fwhen" data-w="sunset" aria-pressed="false">Sunrise to sunset</button>
+        </div>
+        <p class="fast-help">Morning plans breakfast as the fast, evening plans dinner, and the other two plan the whole day. If you skip this, the whole day is planned.</p>
+        <h3 class="fast-h">Fasting diet?</h3>
+        <div class="diet-row">
+          <label class="fpill"><input type="checkbox" name="fast-diet" value="veg"> 🥦 Vegetarian</label>
+          <label class="fpill"><input type="checkbox" name="fast-diet" value="non-veg"> 🍗 Non-Vegetarian</label>
+          <label class="fpill"><input type="checkbox" name="fast-diet" value="vegan"> 🌱 Vegan</label>
+        </div>
+      </div>
+    </div>
+
     <!-- ── SECTION 5: NUTRIENTS ──────────────── -->
     <!-- ── RESULTS (coverage table + groceries + recipes) ── -->
     <div id="results">
@@ -6578,13 +6609,19 @@ function buildRecipes(diets){
   const snackPool=list.filter(r=>inMeal(r,'snack'));
   const MEALS=[['Breakfast',breakfastPool,0],['Lunch',lunchPool,0],['Snacks',snackPool,0],['Dinner',dinnerPool,1]];
   const gcd=(a,b)=>b?gcd(b,a%b):a;
+  // Fasting days (Fasting? section): meals inside the fasting time come from the fasting-friendly dishes.
+  const fast=(window.ayuFasting && window.ayuFasting())||null;
+  let fastList=[];
+  if(fast){ const fd=fast.diets.length?fast.diets:diets; fastList=RECIPES_DATA.filter(r=>r.diet.some(d=>fd.includes(d))); if(!fd.includes('non-veg')) fastList=fastList.filter(r=>!r.diet.every(d=>d==='non-veg')); }
+  const FAST_SLOT={Breakfast:'fast_breakfast',Lunch:'fast_lunch',Snacks:'fast_snack',Dinner:'fast_dinner'};
+  const FAST_WIN={morning:['Breakfast'],evening:['Dinner'],full:['Breakfast','Lunch','Snacks','Dinner'],sunset:['Breakfast','Lunch','Snacks','Dinner']};
   // the planned dish and two alternatives of the same kind
-  function pickOptions(pool,di,k,avoid){
+  function pickOptions(pool,di,k,used){
     const n=pool.length, step=[5,7,3,11,13,1].find(x=>gcd(x,n)===1);
     let i=(di*step+k*Math.ceil(n/2))%n;
-    if(avoid && pool[i].id===avoid) i=(i+1)%n;
+    for(let t=0;t<n && used.indexOf(pool[i].id)>=0;t++) i=(i+1)%n;   // not a dish already planned that day
     const out=[pool[i]], gap=Math.max(1,Math.floor(n/3));
-    for(let a=1;out.length<3 && a<=n;a++){ const c=pool[(i+gap*a)%n]; if(!out.includes(c) && c.id!==avoid) out.push(c); }
+    for(let a=1;out.length<3 && a<=n;a++){ const c=pool[(i+gap*a)%n]; if(!out.includes(c) && used.indexOf(c.id)<0) out.push(c); }
     for(let a=1;out.length<3 && a<n;a++){ const c=pool[(i+a)%n]; if(!out.includes(c)) out.push(c); }
     return out;
   }
@@ -6615,7 +6652,8 @@ function buildRecipes(diets){
 
   const todayRec=(new Date().getDay()+6)%7;   // week starts on Monday; open on today's tab
   REC_DAYS.forEach((day,di)=>{
-    const tab=document.createElement('div'); tab.className='rec-day-tab'+(di===todayRec?' active':'');
+    const tab=document.createElement('div'); tab.className='rec-day-tab'+(di===todayRec?' active':'')+(fast && fast.days.indexOf(di)>=0?' fast':'');
+    if(fast && fast.days.indexOf(di)>=0) tab.title='Fasting day';
     tab.textContent=day.slice(0,3);
     tab.addEventListener('click',()=>{
       nav.querySelectorAll('.rec-day-tab').forEach((t,i)=>t.classList.toggle('active',i===di));
@@ -6625,20 +6663,30 @@ function buildRecipes(diets){
     nav.appendChild(tab);
 
     const panel=document.createElement('div'); panel.className='rec-day-panel'+(di===todayRec?' active':'');
-    let lunchId='';
-    MEALS.forEach(([label,pool,offset])=>{
-      const mealRow=document.createElement('div'); mealRow.className='rec-meal-row';
+    const isFast=!!fast && fast.days.indexOf(di)>=0;
+    if(isFast){
+      const note=document.createElement('div'); note.className='rec-fast-note';
+      note.textContent='Fasting day · '+({morning:'morning',evening:'evening',full:'full day',sunset:'sunrise to sunset'}[fast.when])+'. Meals in the fasting time are fasting-friendly.';
+      panel.appendChild(note);
+    }
+    const usedToday=[];
+    MEALS.forEach(([label,basePool,offset])=>{
+      const inWin=isFast && FAST_WIN[fast.when].indexOf(label)>=0;
+      let pool=basePool;
+      if(inWin){ const fp=fastList.filter(r=>inMeal(r,FAST_SLOT[label])); if(fp.length) pool=fp; }
+      const fastTag=inWin?(fast.when==='sunset' && label==='Dinner'?'Break fast':'Fasting'):'';
+      const mealRow=document.createElement('div'); mealRow.className='rec-meal-row'+(fastTag?' fast':'');
       if(!pool.length){
         mealRow.innerHTML=`<span class="rec-meal-label">${label}</span><span class="rec-meal-name" style="color:#8a8672">No matching recipe</span>`;
         panel.appendChild(mealRow);
         return;
       }
-      const cur=pickOptions(pool,di,offset,label==='Dinner'?lunchId:'');
-      if(label==='Lunch') lunchId=cur[0].id;
+      const cur=pickOptions(pool,di,offset,usedToday);
+      usedToday.push(cur[0].id);
       const detail=document.createElement('div'); detail.className='rcard rec-meal-detail';
       const altRow=document.createElement('div'); altRow.className='rec-alts';
       function paint(){
-        mealRow.innerHTML=`<span class="rec-meal-label">${label}</span><span class="rec-meal-name">${cur[0].name}</span>`;
+        mealRow.innerHTML=`<span class="rec-meal-label">${label}${fastTag?`<span class="rec-fast-tag">${fastTag}</span>`:''}</span><span class="rec-meal-name">${cur[0].name}</span>`;
         detail.innerHTML=buildRecipeCardHtml(cur[0]);
         altRow.innerHTML=cur.length>1?`<span class="rec-alt-l">Or</span>`+cur.slice(1).map((a,i)=>`<button type="button" class="rec-alt" data-i="${i+1}">${a.name}</button>`).join(''):'';
       }
@@ -8206,7 +8254,7 @@ const RECIPES_DATA = [
     time:30, serves:3, emoji:"🫛" },
 
   // ─── SNACKS & LIGHT MEALS ───
-  { id:"r29", name:"Roasted Makhana", category:"snack", diet:["veg","vegan"], meals:["snack"],
+  { id:"r29", name:"Roasted Makhana", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack"],
     ingredients:[
       { ref:"s10", name:"Fox Nuts (Makhana)", amount:50, unit:"g" },
       { name:"Ghee", amount:10, unit:"g" },
@@ -8248,7 +8296,7 @@ const RECIPES_DATA = [
     method:"Steam sprouts 5 min. Mix with chopped veggies, guava. Toss with chaat masala, lemon juice, coriander.",
     time:15, serves:2, emoji:"🥗" },
 
-  { id:"r33", name:"Chia Pudding with Mango", category:"snack", diet:["veg","vegan"], meals:["snack"],
+  { id:"r33", name:"Chia Pudding with Mango", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack"],
     ingredients:[
       { ref:"s8", name:"Chia Seeds", amount:30, unit:"g" },
       { name:"Coconut Milk", amount:200, unit:"ml" },
@@ -8364,7 +8412,7 @@ const RECIPES_DATA = [
     method:"Boil and grate beetroot. Whisk curd smooth, fold in beetroot. Add cumin powder, mint, salt. Serve chilled.",
     time:15, serves:2, emoji:"🫐" },
 
-  { id:"r44", name:"Walnut Banana Smoothie", category:"snack", diet:["veg"], meals:["snack"],
+  { id:"r44", name:"Walnut Banana Smoothie", category:"snack", diet:["veg"], meals:["snack","fast_breakfast","fast_snack"],
     ingredients:[
       { ref:"s2", name:"Walnuts", amount:30, unit:"g" },
       { ref:"f1", name:"Banana", amount:120, unit:"g" },
@@ -8375,7 +8423,7 @@ const RECIPES_DATA = [
     method:"Blend all ingredients until smooth. Add honey if needed. Serve immediately or refrigerate max 4 hrs.",
     time:5, serves:2, emoji:"🍌" },
 
-  { id:"r45", name:"Papaya Chaat", category:"snack", diet:["veg","vegan"], meals:["snack"],
+  { id:"r45", name:"Papaya Chaat", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack"],
     ingredients:[
       { ref:"f4", name:"Papaya", amount:200, unit:"g" },
       { ref:"f8", name:"Pomegranate", amount:50, unit:"g" },
@@ -8461,7 +8509,7 @@ const RECIPES_DATA = [
     method:"Pressure cook dals with carrot. Add chopped spinach, blend partially, season. Finish with lemon and jeera tadka.",
     time:25, serves:3, emoji:"🍲" },
 
-  { id:"r53", name:"Mango Lassi", category:"drinks", diet:["veg"], meals:["snack"],
+  { id:"r53", name:"Mango Lassi", category:"drinks", diet:["veg"], meals:["snack","fast_snack"],
     ingredients:[
       { ref:"f2", name:"Mango", amount:150, unit:"g" },
       { name:"Curd", amount:150, unit:"g" },
@@ -8502,7 +8550,7 @@ const RECIPES_DATA = [
     method:"Blend watermelon and mint. Strain, add lemon juice and black salt. Serve over ice.",
     time:5, serves:2, emoji:"🍉" },
 
-  { id:"r57", name:"Rajgira (Amaranth) Laddoo", category:"snack", diet:["veg","vegan"], meals:["snack"],
+  { id:"r57", name:"Rajgira (Amaranth) Laddoo", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack"],
     ingredients:[
       { ref:"l3", name:"Amaranth Seeds (popped)", amount:100, unit:"g" },
       { name:"Jaggery", amount:80, unit:"g" },
@@ -8576,7 +8624,7 @@ const RECIPES_DATA = [
     method:"Cook rice. Sauté mustard seeds, cashews, curry leaves in oil. Add grated coconut, roast. Mix into rice.",
     time:25, serves:3, emoji:"🥥" },
 
-  { id:"r64", name:"Shakarkand Chaat", category:"snack", diet:["veg","vegan"], meals:["snack"],
+  { id:"r64", name:"Shakarkand Chaat", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack","fast_dinner"],
     ingredients:[
       { ref:"v20", name:"Sweet Potato", amount:200, unit:"g" },
       { ref:"f8", name:"Pomegranate", amount:50, unit:"g" },
@@ -9948,7 +9996,7 @@ const RECIPES_DATA = [
     method:"Marinate and fry pearl spot, wrap in banana leaf with onion-tomato masala and cook.",
     time:40, serves:3, emoji:"🐟" },
 
-  { id:"r172", name:"Paturi (Steamed Fish in Banana Leaf)", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch"],
+  { id:"r172", name:"Paturi (Steamed Fish in Banana Leaf)", category:"non-veg", diet:["non-veg"], meals:["dinner","lunch","fast_dinner"],
     ingredients:[
       { name:"Hilsa", amount:400, unit:"g" },
       { name:"Coconut (grated)", amount:30, unit:"g" },
@@ -10106,7 +10154,7 @@ const RECIPES_DATA = [
     method:"Cook squid rings briefly then roast with onion-tomato masala and curry leaves.",
     time:35, serves:3, emoji:"🦑" },
 
-  { id:"r185", name:"Fish Soup (Meen Rasam)", category:"non-veg", diet:["non-veg"], meals:["dinner"],
+  { id:"r185", name:"Fish Soup (Meen Rasam)", category:"non-veg", diet:["non-veg"], meals:["dinner","fast_dinner"],
     ingredients:[
       { name:"Seabass", amount:250, unit:"g" },
       { name:"Tomato", amount:100, unit:"g" },
@@ -10130,7 +10178,7 @@ const RECIPES_DATA = [
     method:"Cook onion till dark with spices, add tomato, then fold in boiled halved eggs.",
     time:30, serves:3, emoji:"🥚" },
 
-  { id:"r187", name:"Boiled Egg Salad Plate", category:"non-veg", diet:["non-veg"], meals:["dinner","snack"],
+  { id:"r187", name:"Boiled Egg Salad Plate", category:"non-veg", diet:["non-veg"], meals:["dinner","snack","fast_breakfast","fast_dinner"],
     ingredients:[
       { name:"Egg", amount:200, unit:"g" },
       { name:"Cucumber", amount:100, unit:"g" },
@@ -10142,7 +10190,7 @@ const RECIPES_DATA = [
     method:"Boil eggs, slice and serve with cucumber, tomato and onion tossed in lemon and pepper.",
     time:15, serves:2, emoji:"🥗" },
 
-  { id:"r188", name:"Chicken Clear Soup with Vegetables", category:"non-veg", diet:["non-veg"], meals:["dinner"],
+  { id:"r188", name:"Chicken Clear Soup with Vegetables", category:"non-veg", diet:["non-veg"], meals:["dinner","fast_dinner"],
     ingredients:[
       { name:"Chicken", amount:250, unit:"g" },
       { name:"Carrot", amount:60, unit:"g" },
@@ -10178,7 +10226,7 @@ const RECIPES_DATA = [
     method:"Steam corn kernels and toss with a little butter, lemon, pepper and chaat masala.",
     time:10, serves:2, emoji:"🌽" },
 
-  { id:"r191", name:"Fruit Chaat", category:"snack", diet:["veg","vegan"], meals:["snack"],
+  { id:"r191", name:"Fruit Chaat", category:"snack", diet:["veg","vegan"], meals:["snack","fast_snack","fast_breakfast"],
     ingredients:[
       { name:"Apple", amount:100, unit:"g" },
       { name:"Banana", amount:100, unit:"g" },
@@ -10190,7 +10238,7 @@ const RECIPES_DATA = [
     method:"Dice seasonal fruit, toss with lemon, a pinch of black salt and chaat masala.",
     time:10, serves:2, emoji:"🍉" },
 
-  { id:"r192", name:"Sabudana Khichdi", category:"veg", diet:["veg","vegan"], meals:["snack","breakfast"],
+  { id:"r192", name:"Sabudana Khichdi", category:"veg", diet:["veg","vegan"], meals:["snack","breakfast","fast_breakfast","fast_lunch"],
     ingredients:[
       { name:"Sago Pearls", amount:100, unit:"g" },
       { name:"Potato", amount:80, unit:"g" },
@@ -10246,7 +10294,7 @@ const RECIPES_DATA = [
     method:"Melt jaggery, mix with roasted peanuts, spread and cut into pieces.",
     time:25, serves:6, emoji:"🍘" },
 
-  { id:"r197", name:"Masala Buttermilk (Chaas)", category:"drinks", diet:["veg"], meals:["snack"],
+  { id:"r197", name:"Masala Buttermilk (Chaas)", category:"drinks", diet:["veg"], meals:["snack","fast_snack"],
     ingredients:[
       { name:"Curd", amount:100, unit:"g" },
       { name:"Water", amount:300, unit:"ml" },
@@ -10311,7 +10359,7 @@ const RECIPES_DATA = [
     method:"Cook ragi flour in water till thick, add milk and jaggery.",
     time:10, serves:2, emoji:"🥤" },
 
-  { id:"r203", name:"Haldi Doodh (Golden Milk)", category:"drinks", diet:["veg"], meals:["snack"],
+  { id:"r203", name:"Haldi Doodh (Golden Milk)", category:"drinks", diet:["veg"], meals:["snack","fast_snack"],
     ingredients:[
       { name:"Milk", amount:250, unit:"ml" },
       { name:"Ginger", amount:3, unit:"g" },
@@ -10321,7 +10369,7 @@ const RECIPES_DATA = [
     method:"Warm milk with turmeric, a pinch of pepper and ginger. Good at bedtime.",
     time:10, serves:1, emoji:"🥛" },
 
-  { id:"r204", name:"Sweet Lassi", category:"drinks", diet:["veg"], meals:["snack"],
+  { id:"r204", name:"Sweet Lassi", category:"drinks", diet:["veg"], meals:["snack","fast_snack","fast_breakfast"],
     ingredients:[
       { name:"Curd", amount:200, unit:"g" },
       { name:"Water", amount:100, unit:"ml" },
@@ -10342,7 +10390,7 @@ const RECIPES_DATA = [
     method:"Blend cucumber, mint and lemon with water, serve chilled.",
     time:5, serves:2, emoji:"🥤" },
 
-  { id:"r206", name:"Nimbu Pani (Lemon Sherbet)", category:"drinks", diet:["veg","vegan"], meals:["snack"],
+  { id:"r206", name:"Nimbu Pani (Lemon Sherbet)", category:"drinks", diet:["veg","vegan"], meals:["snack","fast_snack"],
     ingredients:[
       { name:"Lemon", amount:40, unit:"g" },
       { name:"Water", amount:400, unit:"ml" },
@@ -10350,7 +10398,173 @@ const RECIPES_DATA = [
     ],
     nutrients:{ calories:69, protein:0.5, carbs:18.4, fat:0.1, fiber:1.1, vitC:21.2, vitA:0.4, calcium:22.4, iron:1.9, magnesium:13.7 },
     method:"Mix lemon juice, jaggery, a pinch of salt and roasted cumin in chilled water.",
-    time:5, serves:2, emoji:"🥤" }
+    time:5, serves:2, emoji:"🥤" },
+
+  { id:"r207", name:"Samak Rice (Barnyard Millet) Khichdi", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
+    ingredients:[
+      { name:"Samak rice (barnyard millet)", amount:100, unit:"g" },
+      { name:"Potato", amount:100, unit:"g" },
+      { name:"Peanuts", amount:25, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Green Chilli", amount:5, unit:"g" },
+      { name:"Ginger", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:620.1, protein:14.9, carbs:87.9, fat:24.6, fiber:14.5, vitC:27.4, vitA:2.4, calcium:56.7, iron:7, magnesium:150.3 },
+    method:"Cook rinsed samak rice with potato cubes, peanuts, cumin, ginger and green chilli. Season with rock salt (sendha namak).",
+    time:30, serves:3, emoji:"🍲" },
+
+  { id:"r208", name:"Kuttu Roti with Aloo Sabzi", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
+    ingredients:[
+      { name:"Kuttu (buckwheat) flour", amount:120, unit:"g" },
+      { name:"Potato", amount:200, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Green Chilli", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:673.7, protein:19.7, carbs:119.7, fat:16.3, fiber:16.5, vitC:47.2, vitA:2.4, calcium:46.5, iron:4.3, magnesium:324.3 },
+    method:"Knead kuttu flour with boiled potato and warm water into soft rotis. Serve with a cumin-chilli potato sabzi with rock salt.",
+    time:35, serves:3, emoji:"🫓" },
+
+  { id:"r209", name:"Singhara Roti with Lauki Sabzi", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
+    ingredients:[
+      { name:"Singhara (water chestnut) flour", amount:120, unit:"g" },
+      { name:"Bottle Gourd", amount:250, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Green Chilli", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:526.3, protein:7.2, carbs:102.5, fat:10.8, fiber:6.6, vitC:32.2, vitA:2.4, calcium:77.9, iron:2.3, magnesium:58.6 },
+    method:"Make soft rotis from singhara flour and boiled potato dough. Serve with bottle gourd cooked with cumin and rock salt.",
+    time:35, serves:3, emoji:"🫓" },
+
+  { id:"r210", name:"Rajgira Roti with Pumpkin Sabzi", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
+    ingredients:[
+      { name:"Rajgira (amaranth) flour", amount:120, unit:"g" },
+      { name:"Pumpkin", amount:250, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Jaggery", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:617.8, protein:19.3, carbs:99.2, fat:18.7, fiber:9.7, vitC:27.3, vitA:425, calcium:247.3, iron:11.7, magnesium:331.1 },
+    method:"Make rotis from rajgira flour with warm water. Serve with a lightly sweet-spicy pumpkin sabzi.",
+    time:35, serves:3, emoji:"🫓" },
+
+  { id:"r211", name:"Kuttu Dosa with Potato Masala", category:"veg", diet:["veg"], meals:["fast_breakfast","fast_lunch"],
+    ingredients:[
+      { name:"Kuttu (buckwheat) flour", amount:100, unit:"g" },
+      { name:"Curd", amount:60, unit:"g" },
+      { name:"Potato", amount:150, unit:"g" },
+      { name:"Ghee", amount:10, unit:"g" },
+      { name:"Green Chilli", amount:5, unit:"g" }
+    ],
+    nutrients:{ calories:586.5, protein:18.2, carbs:99.8, fat:15.5, fiber:13.4, vitC:37.5, vitA:102.6, calcium:108.9, iron:3.5, magnesium:273.8 },
+    method:"Whisk kuttu flour with curd and water, make thin dosas. Fill with a cumin-chilli potato masala.",
+    time:30, serves:3, emoji:"🥞" },
+
+  { id:"r212", name:"Sabudana Kheer", category:"veg", diet:["veg"], meals:["fast_snack","fast_breakfast"],
+    ingredients:[
+      { name:"Sago Pearls", amount:50, unit:"g" },
+      { name:"Milk", amount:400, unit:"ml" },
+      { name:"Sugar", amount:25, unit:"g" },
+      { name:"Dry Fruits", amount:15, unit:"g" }
+    ],
+    nutrients:{ calories:606.8, protein:15.6, carbs:91.8, fat:20.7, fiber:1.6, vitC:4.2, vitA:184.8, calcium:483.2, iron:1.1, magnesium:70.5 },
+    method:"Simmer soaked sabudana in milk till clear, sweeten lightly, add cardamom and nuts.",
+    time:30, serves:3, emoji:"🥛" },
+
+  { id:"r213", name:"Samak Rice Kheer", category:"veg", diet:["veg"], meals:["fast_snack","fast_breakfast"],
+    ingredients:[
+      { name:"Samak rice (barnyard millet)", amount:50, unit:"g" },
+      { name:"Milk", amount:400, unit:"ml" },
+      { name:"Sugar", amount:25, unit:"g" },
+      { name:"Dry Fruits", amount:15, unit:"g" }
+    ],
+    nutrients:{ calories:581.2, protein:18.6, carbs:80.2, fat:21.8, fiber:6.2, vitC:4.2, vitA:184.8, calcium:483.2, iron:3, magnesium:111 },
+    method:"Cook samak rice in milk till soft and creamy, sweeten lightly, add cardamom and nuts.",
+    time:30, serves:3, emoji:"🥛" },
+
+  { id:"r214", name:"Makhana Kheer", category:"veg", diet:["veg"], meals:["fast_snack"],
+    ingredients:[
+      { name:"Makhana (fox nuts)", amount:40, unit:"g" },
+      { name:"Milk", amount:400, unit:"ml" },
+      { name:"Sugar", amount:25, unit:"g" },
+      { name:"Dry Fruits", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:537.5, protein:18.5, carbs:77.2, fat:18.2, fiber:6.6, vitC:4.1, vitA:184.5, calcium:490.2, iron:0.9, magnesium:104 },
+    method:"Roast makhana, simmer in milk till soft, sweeten lightly with cardamom.",
+    time:25, serves:3, emoji:"🥛" },
+
+  { id:"r215", name:"Fruit and Milk Bowl", category:"veg", diet:["veg"], meals:["fast_breakfast","fast_snack","fast_dinner"],
+    ingredients:[
+      { name:"Banana", amount:100, unit:"g" },
+      { name:"Apple", amount:100, unit:"g" },
+      { name:"Pomegranate", amount:60, unit:"g" },
+      { name:"Papaya", amount:100, unit:"g" },
+      { name:"Milk", amount:200, unit:"ml" },
+      { name:"Dry Fruits", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:413.8, protein:11.1, carbs:71.2, fat:13.1, fiber:9.9, vitC:83.4, vitA:145.5, calcium:277, iron:1.2, magnesium:100.2 },
+    method:"Dice fruit and serve in chilled milk with a few nuts. A traditional phalahar bowl.",
+    time:10, serves:2, emoji:"🍎" },
+
+  { id:"r216", name:"Kheera Raita (Cucumber Curd)", category:"veg", diet:["veg"], meals:["fast_snack","fast_dinner"],
+    ingredients:[
+      { name:"Curd", amount:250, unit:"g" },
+      { name:"Cucumber", amount:150, unit:"g" },
+      { name:"Rock salt and roasted cumin", amount:2, unit:"g" }
+    ],
+    nutrients:{ calories:178.3, protein:10, carbs:18.1, fat:8.6, fiber:1.2, vitC:6, vitA:77, calcium:332, iron:1.1, magnesium:53.5 },
+    method:"Mix whisked curd with grated cucumber, rock salt and roasted cumin.",
+    time:10, serves:2, emoji:"🥒" },
+
+  { id:"r217", name:"Vrat Aloo Jeera", category:"veg", diet:["veg","vegan"], meals:["fast_lunch"],
+    ingredients:[
+      { name:"Potato", amount:300, unit:"g" },
+      { name:"Oil", amount:12, unit:"g" },
+      { name:"Green Chilli", amount:5, unit:"g" },
+      { name:"Lemon", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:342, protein:6.2, carbs:52.4, fat:12.3, fiber:7, vitC:72.5, vitA:2.5, calcium:39.5, iron:2.5, magnesium:71 },
+    method:"Saute boiled potato cubes with cumin and green chilli, season with rock salt and lemon.",
+    time:20, serves:3, emoji:"🥔" },
+
+  { id:"r218", name:"Kaddu ki Sabzi (Vrat)", category:"veg", diet:["veg","vegan"], meals:["fast_lunch","fast_dinner"],
+    ingredients:[
+      { name:"Pumpkin", amount:300, unit:"g" },
+      { name:"Oil", amount:10, unit:"g" },
+      { name:"Jaggery", amount:5, unit:"g" },
+      { name:"Cumin and rock salt", amount:3, unit:"g" }
+    ],
+    nutrients:{ calories:194.2, protein:3.4, carbs:25.9, fat:10.6, fiber:2.2, vitC:27.3, vitA:513, calcium:79, iron:3.5, magnesium:45.5 },
+    method:"Cook pumpkin cubes with cumin, a little jaggery and rock salt till soft.",
+    time:25, serves:3, emoji:"🎃" },
+
+  { id:"r219", name:"Dahi Aloo (Vrat)", category:"veg", diet:["veg"], meals:["fast_lunch","fast_dinner"],
+    ingredients:[
+      { name:"Potato", amount:200, unit:"g" },
+      { name:"Curd", amount:200, unit:"g" },
+      { name:"Ghee", amount:8, unit:"g" },
+      { name:"Cumin and rock salt", amount:2, unit:"g" }
+    ],
+    nutrients:{ calories:351.8, protein:11.2, carbs:44.4, fat:15, fiber:4.9, vitC:41.2, vitA:123.2, calcium:272, iron:2.2, magnesium:74 },
+    method:"Toss boiled potato with a cumin tempering, fold in whisked curd.",
+    time:25, serves:3, emoji:"🥔" },
+
+  { id:"r220", name:"Moongphali (Peanut) Chaat", category:"veg", diet:["veg","vegan"], meals:["fast_snack"],
+    ingredients:[
+      { name:"Peanuts", amount:60, unit:"g" },
+      { name:"Cucumber", amount:80, unit:"g" },
+      { name:"Tomato", amount:60, unit:"g" },
+      { name:"Lemon", amount:10, unit:"g" }
+    ],
+    nutrients:{ calories:365.9, protein:16.8, carbs:15.8, fat:29.6, fiber:6.5, vitC:16.1, vitA:29.3, calcium:76.6, iron:3.2, magnesium:118.6 },
+    method:"Toss boiled peanuts with cucumber, tomato, lemon and rock salt.",
+    time:10, serves:2, emoji:"🥜" },
+
+  { id:"r221", name:"Tender Coconut Water", category:"drinks", diet:["veg","vegan"], meals:["fast_snack","fast_breakfast"],
+    ingredients:[
+      { name:"Tender Coconut Water", amount:300, unit:"ml" }
+    ],
+    nutrients:{ calories:57, protein:2.1, carbs:11.1, fat:0.6, fiber:3.3, vitC:7.2, vitA:0, calcium:72, iron:0.9, magnesium:75 },
+    method:"Serve chilled. Natural fluid and electrolytes for fasting days.",
+    time:2, serves:1, emoji:"🥥" }
 ];
 </script>
 
@@ -15820,7 +16034,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   // What can be saved. Each group has its own checkbox. Add keys here when the app starts remembering more.
   var GROUPS=[
     {id:'body',label:'Body',keys:['ayuBase6-body-choices']},
-    {id:'food',label:'Food',keys:['ayuBase6-food-choices']},
+    {id:'food',label:'Food',keys:['ayuBase6-food-choices','ayuBase6-food-fasting']},
     {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1']},
     {id:'checks',label:'Checks',keys:['ayuBase6WakeUpTime','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-muted','ayuBase6-routine-days','ayuBase6-routine-alarm','ayuBase6-routine-edits']},
     {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-rem-alarm','ayuBase6-rem-alarms','ayuBase6-timer','ayuBase6-world']}
@@ -16393,6 +16607,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
     [].slice.call(document.querySelectorAll('.dpill input:checked')).forEach(function(d){ d.checked=false; fire(d,'change'); });
     onFoodAgeChange();
     try{ localStorage.removeItem('ayuBase6-food-choices'); }catch(e){}
+    if(window.ayuFastingReset) window.ayuFastingReset();
   }
   add('body-download-wrap','body-reset-btn','Reset Body',resetBody);
   add('food-download-wrap','food-reset-btn','Reset Food',resetFood);
@@ -17086,7 +17301,7 @@ html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opa
     var b=document.getElementById(btnId), a=document.querySelector(afterSel); if(!b||!a) return false;
     var row=document.createElement('div'); row.className='bf-inline-reset'; a.after(row); row.appendChild(b); return true;
   }
-  function go(){ var ok1=move('body-reset-btn','#activity-panel .activity-type-section'), ok2=move('food-reset-btn','#sec-diet'); return ok1&&ok2; }
+  function go(){ var ok1=move('body-reset-btn','#activity-panel .activity-type-section'), ok2=move('food-reset-btn','#sec-fast'); return ok1&&ok2; }
   var n=0,t=setInterval(function(){ if(go()||++n>40) clearInterval(t); },150);
   // The reset buttons are greyed out until something above them has been changed.
   function dirtyBody(){
@@ -17098,6 +17313,7 @@ html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opa
   function dirtyFood(){
     var a=document.getElementById('food-age-slider'); if(a&&String(a.value)!=='5') return true;
     try{ if(typeof foodGender!=='undefined'&&foodGender) return true; if((typeof heightTouched!=='undefined'&&heightTouched)||(typeof weightTouched!=='undefined'&&weightTouched)) return true; }catch(e){}
+    if(window.ayuFasting && window.ayuFasting()) return true;
     return !!document.querySelector('.dpill input:checked');
   }
   function sync(){
@@ -19252,7 +19468,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-f
   var SEL='.tab-panel .bf-reset-btn, .tab-panel .reset-icon-btn';
   var TEXT={
     'body-reset-btn':'Reset Body? Age and activity choices go back to the start.',
-    'food-reset-btn':'Reset Food? Age, gender, height, weight and diet choices go back to the start.',
+    'food-reset-btn':'Reset Food? Age, gender, height, weight, diet and fasting choices go back to the start.',
     'lab-reset-btn':'Reset Lab Insights? This clears any lab values you’ve added.',
     'tracker-reset-btn':'Reset the Tracker? This deletes all saved readings on this device.'
   };
@@ -23648,6 +23864,92 @@ html body #rem-alarm-card #clk-world-list .wc-slot > .clk-wlook:not(#ayu-x1):not
 html body #rem-alarm-card #clk-world-list .wc-body > :last-child{border-bottom:0}
 html body #rem-alarm-card #clk-world-list .clk-wc .wc-remove:not(#ayu-x1):not(#ayu-x2){flex:0 0 30px;width:30px;height:30px;min-height:0 !important;margin:0 !important;padding:0 !important;display:inline-flex;align-items:center;justify-content:center;border-radius:0 !important;border:0 !important;background:none !important;color:#0f766e !important;font:inherit;font-size:1.5rem !important;font-weight:700 !important;line-height:1 !important;cursor:pointer;box-shadow:none !important}
 @media (max-width:380px){ html body #rem-alarm-card #clk-world-list .clk-wc .wc-time:not(#ayu-x1):not(#ayu-x2){font-size:1.35rem !important} }
+</style>
+<script id="fasting-20261114-js">
+(function(){
+  // Food → Fasting?: fasting days, when, and the diet to follow. Saved on this device and in Backup & Restore (Food).
+  var KEY='ayuBase6-food-fasting', st={days:[],when:'',diets:[]};
+  function $(s,r){ return (r||document).querySelector(s); }
+  function load(){
+    try{
+      var o=JSON.parse(localStorage.getItem(KEY)||'null'); if(!o || typeof o!=='object') return;
+      st.days=(Array.isArray(o.days)?o.days:[]).filter(function(d,i,a){ return d===(d|0) && d>=0 && d<=6 && a.indexOf(d)===i; }).sort();
+      st.when=/^(morning|evening|full|sunset)$/.test(o.when)?o.when:'';
+      st.diets=(Array.isArray(o.diets)?o.diets:[]).filter(function(v){ return /^(veg|non-veg|vegan)$/.test(v); });
+    }catch(e){}
+  }
+  function save(){ try{ if(!st.days.length && !st.when && !st.diets.length) localStorage.removeItem(KEY); else localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){} }
+  function paint(){
+    var sec=$('#sec-fast'); if(!sec) return;
+    [].forEach.call(sec.querySelectorAll('.fday'),function(b){ b.setAttribute('aria-pressed',st.days.indexOf(+b.dataset.d)>=0?'true':'false'); });
+    [].forEach.call(sec.querySelectorAll('.fwhen'),function(b){ b.setAttribute('aria-pressed',st.when===b.dataset.w?'true':'false'); });
+    [].forEach.call(sec.querySelectorAll('.fpill input'),function(i){ i.checked=st.diets.indexOf(i.value)>=0; });
+    $('#fast-more').hidden=!st.days.length;
+  }
+  function plan(){
+    var r=document.getElementById('results');
+    if(r && r.style.display==='block' && typeof buildRecipes==='function' && typeof getDiets==='function'){ var d=getDiets(); try{ buildRecipes(d.length?d:['veg']); }catch(e){} }
+  }
+  function changed(){ save(); paint(); plan(); }
+  document.addEventListener('click',function(e){
+    var d=e.target.closest && e.target.closest('#sec-fast .fday');
+    if(d){ var n=+d.dataset.d, i=st.days.indexOf(n); if(i>=0) st.days.splice(i,1); else st.days.push(n); st.days.sort(); changed(); return; }
+    var w=e.target.closest && e.target.closest('#sec-fast .fwhen');
+    if(w){ st.when=(st.when===w.dataset.w)?'':w.dataset.w; changed(); }
+  });
+  document.addEventListener('change',function(e){
+    var i=e.target.closest && e.target.closest('#sec-fast .fpill input'); if(!i) return;
+    st.diets=[].map.call(document.querySelectorAll('#sec-fast .fpill input:checked'),function(x){ return x.value; }); changed();
+  });
+  window.ayuFasting=function(){ return st.days.length?{days:st.days.slice(),when:st.when||'full',diets:st.diets.slice()}:null; };
+  window.ayuFastingReset=function(){ st.days=[]; st.when=''; st.diets=[]; save(); paint(); plan(); };
+  load(); paint();
+})();
+</script>
+<style id="food-fasting-20261114">
+/* Food → Fasting? (same Food colours; round day buttons, plain checkboxes like Dietary Preference) */
+#sec-fast .fast-lbl{margin:0 0 10px;font-size:.9rem;font-weight:600;color:var(--deep,#204b38)}
+#sec-fast .fast-days{display:flex;justify-content:space-between;gap:6px}
+#sec-fast .fday{flex:0 0 auto;width:40px;height:40px;padding:0;border-radius:50%;border:2px solid color-mix(in srgb,var(--accent,#25704f) 55%,#fff);background:transparent;color:var(--deep,#204b38);font:inherit;font-size:.95rem;font-weight:700;cursor:pointer}
+#sec-fast .fday[aria-pressed="true"],#sec-fast .fwhen[aria-pressed="true"]{background:var(--accent,#25704f);border-color:var(--accent,#25704f);color:#fff}
+#sec-fast .fast-h{margin:18px 0 10px;padding-top:14px;border-top:1.5px solid var(--line,#dcebdd);font-size:.95rem;font-weight:600;color:var(--deep,#204b38)}
+#sec-fast .fwhen-row{display:flex;flex-wrap:wrap;gap:8px}
+#sec-fast .fwhen{padding:8px 14px;border-radius:999px;border:2px solid color-mix(in srgb,var(--accent,#25704f) 55%,#fff);background:transparent;color:var(--deep,#204b38);font:inherit;font-size:.88rem;font-weight:600;cursor:pointer}
+#sec-fast .fast-help{margin:8px 0 0;font-size:.78rem;color:#4a6151}
+#sec-fast .fpill{display:flex;align-items:center;gap:10px;padding:3px 0;font-size:.95rem;font-weight:500;color:#2d6a4f;cursor:pointer}
+#sec-fast .fpill input{accent-color:#2d6a4f;width:17px;height:17px}
+#sec-fast [hidden]{display:none !important}
+/* the week: current day = solid Food green; fasting day = outlined with a dot */
+#nutrition-panel .rec-day-tab.fast{background:#fff;color:var(--deep,#204b38);border:2px solid var(--accent,#25704f);border-bottom:none}
+#nutrition-panel .rec-day-tab.fast::after{content:"";display:inline-block;width:6px;height:6px;margin-left:6px;border-radius:50%;background:var(--accent,#25704f);vertical-align:middle}
+#nutrition-panel .rec-day-tab.fast.active{background:var(--g3);border-color:var(--deep,#204b38);color:#fff}
+#nutrition-panel .rec-day-tab.fast.active::after{background:#fff}
+#nutrition-panel .rec-fast-note{margin:0 0 8px;padding:7px 10px;border-radius:6px;border-left:3px solid var(--accent,#25704f);background:var(--tint,#eff8f1);color:var(--deep,#204b38);font-size:.78rem}
+#nutrition-panel .rec-meal-row.fast{background:var(--tint,#eff8f1);box-shadow:inset 3px 0 0 var(--accent,#25704f)}
+#nutrition-panel .rec-fast-tag{margin-left:6px;padding:1px 7px;border-radius:999px;background:var(--accent,#25704f);color:#fff;font-size:.62rem;font-weight:700;letter-spacing:0;text-transform:none}
+</style>
+<style id="food-flat-20261114">
+/* Nutrients & Food and Plan: full width, no box; each part opens with a chevron */
+html body #nutrition-panel #results{margin-left:-12px;margin-right:-12px}
+@media (min-width:900px){ html body #nutrition-panel #results{margin-left:-30px;margin-right:-30px} }
+html body #nutrition-panel #results .cart-wrapper,html body #nutrition-panel #results .weekly-plan-card{background:none !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;margin:0 !important;overflow:visible !important}
+html body #nutrition-panel #results .cart-wrapper{border-top:1.5px solid var(--line,#dcebdd) !important}
+html body #nutrition-panel #results .cart-header,html body #nutrition-panel #results .wp-header{background:none !important;border:0 !important;border-bottom:1.5px solid var(--line,#dcebdd) !important;border-radius:0 !important;padding:16px 16px !important;min-height:0}
+html body #nutrition-panel #results .cart-header:hover,html body #nutrition-panel #results .wp-header:hover,html body #nutrition-panel #results .wp-sub-hdr:hover{background:var(--tint,#eff8f1) !important}
+html body #nutrition-panel #results .cart-title,html body #nutrition-panel #results .wp-title{color:var(--deep,#204b38) !important;font-size:1.1rem !important;font-weight:700 !important;letter-spacing:0 !important}
+html body #nutrition-panel #results .cart-header .sec-toplevel-arr,html body #nutrition-panel #results .wp-arr,html body #nutrition-panel #results .wp-sub-arr{color:var(--accent,#25704f) !important}
+html body #nutrition-panel #results .wp-body{padding:0 !important}
+html body #nutrition-panel #results .wp-sub-block{border:0 !important;border-radius:0 !important;border-bottom:1.5px solid var(--line,#dcebdd) !important;margin:0 !important;overflow:visible !important}
+html body #nutrition-panel #results .wp-sub-hdr{background:none !important;padding:14px 16px !important;font-size:1rem !important;color:var(--deep,#204b38) !important}
+html body #nutrition-panel #results .wp-sub-body{padding:4px 16px 14px !important}
+html body #nutrition-panel #results .groc-section,html body #nutrition-panel #results .rec-section{background:none !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;padding:0 !important;margin:0 !important}
+html body #nutrition-panel #results .cov-table-scroll{margin-top:0}
+html body #nutrition-panel #results .cov-table th{background:var(--tint,#eff8f1)}
+html body #nutrition-panel #results .cov-table td.cov-rowlbl{background:var(--tint,#eff8f1)}
+@media (min-width:900px){
+  html body #nutrition-panel #results .cart-header,html body #nutrition-panel #results .wp-header,html body #nutrition-panel #results .wp-sub-hdr{padding-left:30px !important;padding-right:30px !important}
+  html body #nutrition-panel #results .wp-sub-body{padding-left:30px !important;padding-right:30px !important}
+}
 </style>
 </body>
 
