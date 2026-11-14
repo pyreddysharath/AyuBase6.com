@@ -24326,13 +24326,15 @@ html body .ayu-scale .as-in .t{position:absolute;right:0;width:8px;height:1.5px;
 html body .ayu-scale .as-in .t.m{width:12px}
 html body .ayu-scale .as-in .t.f{width:18px;height:2px;background:color-mix(in srgb,var(--wc) 75%,#475569)}
 /* in the tape view the value reads on one line: feet and inches with cm, kg with lbs */
-html body .ayu-hw.ayu-hw-tape:not(#ayu-x1){display:grid !important;grid-template-columns:76px minmax(0,1fr);gap:4px 18px;align-items:center}
+html body .ayu-hw.ayu-hw-tape:not(#ayu-x1){display:grid !important;grid-template-columns:64px minmax(0,1fr);gap:4px 14px;align-items:center}
 html body .ayu-hw.ayu-hw-tape > .calc-row-stacked:not(#ayu-x1){display:contents !important}
 html body .ayu-hw.ayu-hw-tape > .calc-row-stacked:first-child > :first-child:not(#ayu-x1){grid-column:1/-1;grid-row:1;white-space:nowrap;margin:0 !important}
-html body .ayu-hw.ayu-hw-tape > .calc-row-stacked:nth-child(2) > :first-child:not(#ayu-x1){grid-column:1/-1;grid-row:2;white-space:nowrap;margin:0 !important}
-html body .ayu-hw.ayu-hw-tape .ayu-scale.v:not(#ayu-x1){grid-column:1;grid-row:3;margin:6px 0 0}
-html body .ayu-hw.ayu-hw-tape .ayu-scale.h:not(#ayu-x1){grid-column:2;grid-row:3;margin:6px 0 0}
+html body .ayu-hw.ayu-hw-tape > .calc-row-stacked:nth-child(2) > :first-child:not(#ayu-x1){grid-column:2;grid-row:2;align-self:end;white-space:nowrap;margin:0 !important;font-size:clamp(.66rem,3.4vw,.8rem)}
+html body .ayu-hw.ayu-hw-tape .ayu-scale.v:not(#ayu-x1){grid-column:1;grid-row:2/span 2;margin:6px 0 0}
+html body .ayu-hw.ayu-hw-tape .ayu-scale.h:not(#ayu-x1){grid-column:2;grid-row:3;align-self:start;margin:2px 0 0}
+html body .ayu-hw.ayu-hw-tape > .calc-row-stacked:nth-child(2) .slider-val:not(#ayu-x1){font-size:1em !important}
 html body .ayu-hw.ayu-hw-tape .slider-val:not(#ayu-x1){white-space:nowrap}
+html body #calc-bmi-wrap .bmi-box:not(#ayu-x1){background:#d3f4fa !important}
 </style>
 </body>
 
