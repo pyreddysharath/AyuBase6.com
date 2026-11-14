@@ -19166,6 +19166,8 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   }
   setInterval(paintLeft,20000); setTimeout(paintLeft,1500);
   document.addEventListener('ayu-alarm-changed',function(){ setTimeout(paintLeft,150); });
+  var leftT=0; function leftSoon(e){ if(e.target && e.target.id==='wake-time-slider'){ clearTimeout(leftT); leftT=setTimeout(paintLeft,300); } }   // the time left follows the Wake-up time slider
+  document.addEventListener('input',leftSoon,true); document.addEventListener('change',leftSoon,true);
   window.addEventListener('ayu-alarm-snoozed',function(){ paintLeft(); });
   document.addEventListener('visibilitychange',function(){ if(!document.hidden) setTimeout(paintLeft,700); });
   function paintList(){
@@ -23172,6 +23174,8 @@ html body #routines-panel #chk-alarm .ayu-sub-hdr h3 .ayu-al-left{font-size:.76r
 /* Wake-up Alarm: no empty line under Preview notification */
 html body #routines-panel #start-my-day-card #chk-alarm:not(.ayu-closed):not(#ayu-x1){padding-bottom:0 !important}
 html body #routines-panel #chk-alarm .ayu-sub-hdr h3 .ayu-al-left:empty{display:none}
+html body #routines-panel #chk-alarm .ayu-sub-hdr h3:not(#ayu-x1):not(#ayu-x2){flex-wrap:wrap;row-gap:0}
+html body #routines-panel #chk-alarm .ayu-sub-hdr h3 > span:not(.ayu-al-left):not(#ayu-x1){white-space:nowrap}
 /* Cookies: the buttons centred */
 html body #sec-cookies .feedback-form-section:has(#cookies-save-btn):not(#ayu-x1){justify-content:center !important}
 /* Undo rows can be swiped away */
