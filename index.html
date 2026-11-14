@@ -6285,8 +6285,23 @@ function buildCard(item, key){
 //  so it reads as a lightweight generated/animated icon rather than a
 //  photo or a static glyph.
 // ════════════════════════════════════════════════
+// Newer emoji (Unicode 14/15) show as an empty box on older phones; draw a close older one instead.
+const EMOJI_FALLBACK={'🫛':'🌿','🫘':'🌰','🪷':'🌸','🫚':'🌱'};
+const _emojiOk={};
+function fixEmoji(e){
+  const fb=EMOJI_FALLBACK[e]; if(!fb) return e;
+  if(!(e in _emojiOk)){
+    _emojiOk[e]=true;
+    try{
+      const c=document.createElement('canvas'); c.width=c.height=32; const x=c.getContext('2d');
+      const draw=ch=>{ x.clearRect(0,0,32,32); x.font='24px sans-serif'; x.textBaseline='top'; x.fillText(ch,2,2); return c.toDataURL(); };
+      if(draw(e)===draw('\u{10FFFF}')) _emojiOk[e]=false;
+    }catch(err){}
+  }
+  return _emojiOk[e]?e:fb;
+}
 function animateFoodIcon(item, el){
-  el.innerHTML = `<span class="food-emoji">${item.emoji}</span><span class="food-shine"></span>`;
+  el.innerHTML = `<span class="food-emoji">${fixEmoji(item.emoji)}</span><span class="food-shine"></span>`;
 }
 
 // ════════════════════════════════════════════════
@@ -6397,7 +6412,7 @@ function renderModalGrid(items, key){
     cb.addEventListener('change',()=>c.classList.toggle('on',cb.checked));
     c.appendChild(cb);
 
-    let cellsHtml=`<span class="modal-item-name">${item.emoji} ${item.name}<br><span class="ihindi">${item.hindi||''}</span></span>`;
+    let cellsHtml=`<span class="modal-item-name">${fixEmoji(item.emoji)} ${item.name}<br><span class="ihindi">${item.hindi||''}</span></span>`;
     cellsHtml+=`<span class="modal-item-qty">${item.serving.amount}${item.serving.unit||'g'}</span>`;
     selNutrients.forEach(nk=>{
       const perKey=NT_KEY_MAP[nk];
@@ -6934,7 +6949,7 @@ const VEGETABLES_DATA = [
   { id:"v20", name:"Green Peas", hindi:"Matar", season:"Winter", emoji:"🫛",
     per100g:{ calories:81, protein:5.4, carbs:14, fat:0.4, fiber:5.1, vitC:40, vitA:38, potassium:244, calcium:25, iron:1.5, magnesium:33 },
     serving:{ amount:100, unit:"g" } },
-  { id:"v21", name:"Cluster Beans", hindi:"Gwar Phali", season:"Summer", emoji:"🫘",
+  { id:"v21", name:"Cluster Beans", hindi:"Gwar Phali", season:"Summer", emoji:"🫛",
     per100g:{ calories:33, protein:3.2, carbs:7.1, fat:0.3, fiber:4.8, vitC:49, vitA:0, potassium:417, calcium:130, iron:1.1, magnesium:42 },
     serving:{ amount:150, unit:"g" } },
   { id:"v22", name:"Round Gourd", hindi:"Tinda", season:"Summer", emoji:"🥒",
@@ -6958,7 +6973,7 @@ const VEGETABLES_DATA = [
   { id:"v28", name:"Zucchini", hindi:"Zucchini", season:"All year", emoji:"🥒",
     per100g:{ calories:17, protein:1.2, carbs:3.1, fat:0.3, fiber:1.0, vitC:18, vitA:10, potassium:261, calcium:16, iron:0.4, magnesium:18 },
     serving:{ amount:150, unit:"g" } },
-  { id:"v29", name:"Knol Khol", hindi:"Ganth Gobi", season:"Winter", emoji:"🥦",
+  { id:"v29", name:"Knol Khol", hindi:"Ganth Gobi", season:"Winter", emoji:"🥬",
     per100g:{ calories:27, protein:1.7, carbs:6.2, fat:0.1, fiber:3.6, vitC:62, vitA:0, potassium:350, calcium:24, iron:0.4, magnesium:19 },
     serving:{ amount:150, unit:"g" } },
   { id:"v30", name:"Ash Gourd", hindi:"Petha", season:"All year", emoji:"🎃",
@@ -7027,7 +7042,7 @@ const VEGETABLES_DATA = [
   { id:"v51", name:"Cucumber", hindi:"Kheera", season:"Summer", emoji:"🥒", noDefault:true,
     per100g:{ calories:15, protein:0.7, carbs:3.6, fat:0.1, fiber:0.5, vitC:3, vitA:5, potassium:147, calcium:16, iron:0.3, magnesium:13 },
     serving:{ amount:100, unit:"g" } },
-  { id:"v52", name:"Apple Gourd", hindi:"Tinda", season:"Summer", emoji:"🥬", noDefault:true,
+  { id:"v52", name:"Apple Gourd", hindi:"Tinda", season:"Summer", emoji:"🥒", noDefault:true,
     per100g:{ calories:21, protein:1.4, carbs:3.4, fat:0.2, fiber:1, vitC:18, vitA:3, potassium:200, calcium:25, iron:0.9, magnesium:17 },
     serving:{ amount:100, unit:"g" } },
   { id:"v53", name:"Turnip", hindi:"Shalgam", season:"Winter", emoji:"🥔", noDefault:true,
@@ -7042,7 +7057,7 @@ const VEGETABLES_DATA = [
   { id:"v56", name:"Banana Flower", hindi:"Kela Phool", season:"All year", emoji:"🌸", noDefault:true,
     per100g:{ calories:51, protein:1.6, carbs:9.9, fat:0.6, fiber:5.7, vitC:10, vitA:3, potassium:553, calcium:56, iron:1.6, magnesium:48 },
     serving:{ amount:100, unit:"g" } },
-  { id:"v57", name:"Lotus Stem", hindi:"Kamal Kakdi", season:"All year", emoji:"🥬", noDefault:true,
+  { id:"v57", name:"Lotus Stem", hindi:"Kamal Kakdi", season:"All year", emoji:"🪷", noDefault:true,
     per100g:{ calories:74, protein:2.6, carbs:17, fat:0.1, fiber:4.9, vitC:44, vitA:0, potassium:556, calcium:45, iron:1.2, magnesium:23 },
     serving:{ amount:100, unit:"g" } },
   { id:"v58", name:"Chayote (Chow Chow)", hindi:"Chow Chow", season:"All year", emoji:"🥒", noDefault:true,
@@ -7066,16 +7081,16 @@ const VEGETABLES_DATA = [
   { id:"v64", name:"Sword Beans", hindi:"Sem / Papdi", season:"Winter", emoji:"🫛", noDefault:true,
     per100g:{ calories:44, protein:3.8, carbs:7, fat:0.3, fiber:3, vitC:8, vitA:10, potassium:200, calcium:60, iron:1.3, magnesium:40 },
     serving:{ amount:100, unit:"g" } },
-  { id:"v65", name:"Raw Jackfruit", hindi:"Kathal", season:"Summer", emoji:"🥬", noDefault:true,
+  { id:"v65", name:"Raw Jackfruit", hindi:"Kathal", season:"Summer", emoji:"🍈", noDefault:true,
     per100g:{ calories:51, protein:2.6, carbs:9, fat:0.3, fiber:3, vitC:13, vitA:6, potassium:300, calcium:30, iron:1, magnesium:30 },
     serving:{ amount:100, unit:"g" } },
   { id:"v66", name:"Spine Gourd", hindi:"Kantola / Kakrol", season:"Monsoon", emoji:"🥒", noDefault:true,
     per100g:{ calories:17, protein:3.1, carbs:3.1, fat:0.3, fiber:3, vitC:60, vitA:5, potassium:250, calcium:33, iron:2, magnesium:25 },
     serving:{ amount:100, unit:"g" } },
-  { id:"v67", name:"Banana Stem", hindi:"Kela Thanda", season:"All year", emoji:"🥬", noDefault:true,
+  { id:"v67", name:"Banana Stem", hindi:"Kela Thanda", season:"All year", emoji:"🍌", noDefault:true,
     per100g:{ calories:25, protein:0.5, carbs:5.6, fat:0.1, fiber:2.4, vitC:5, vitA:0, potassium:300, calcium:12, iron:0.6, magnesium:10 },
     serving:{ amount:100, unit:"g" } },
-  { id:"v68", name:"Water Chestnut", hindi:"Singhara", season:"Winter", emoji:"🥔", noDefault:true,
+  { id:"v68", name:"Water Chestnut", hindi:"Singhara", season:"Winter", emoji:"🌰", noDefault:true,
     per100g:{ calories:97, protein:1.4, carbs:23.9, fat:0.1, fiber:3, vitC:4, vitA:0, potassium:584, calcium:11, iron:0.1, magnesium:22 },
     serving:{ amount:100, unit:"g" } },
   { id:"v69", name:"Bamboo Shoot", hindi:"Bans Kari", season:"Monsoon", emoji:"🎍", noDefault:true,
@@ -7225,7 +7240,7 @@ const LENTILS_DATA = [
   { id:"p17", name:"Field Beans", hindi:"Val Dal", season:"Winter", emoji:"🫘",
     per100g:{ calories:341, protein:25, carbs:60, fat:1.5, fiber:25, vitC:3.4, vitA:0, potassium:1186, calcium:55, iron:5.6, magnesium:130 },
     serving:{ amount:50, unit:"g" } },
-  { id:"p18", name:"Green Chickpeas", hindi:"Hara Chana", season:"Winter", emoji:"🌱",
+  { id:"p18", name:"Green Chickpeas", hindi:"Hara Chana", season:"Winter", emoji:"🫛",
     per100g:{ calories:164, protein:8.9, carbs:27, fat:2.6, fiber:8.0, vitC:13, vitA:285, potassium:291, calcium:53, iron:2.6, magnesium:49 },
     serving:{ amount:80, unit:"g" } },
   { id:"p19", name:"Kabuli Chana (Chickpeas)", hindi:"Kabuli Chana", season:"All year", emoji:"🫘",
@@ -7306,7 +7321,7 @@ const RICE_DATA = [
   { id:"r18", name:"Kalanamak Rice", hindi:"Kalanamak Chawal", season:"All year", emoji:"🍚",
     per100g:{ calories:344, protein:7.8, carbs:78, fat:0.6, fiber:1.2, vitC:0, vitA:0, potassium:120, calcium:11, iron:1.1, magnesium:28 },
     serving:{ amount:100, unit:"g" } },
-  { id:"r19", name:"Bamboo Rice", hindi:"Bamboo Chawal", season:"Seasonal", emoji:"🎋",
+  { id:"r19", name:"Bamboo Rice", hindi:"Bamboo Chawal", season:"Seasonal", emoji:"🌾",
     per100g:{ calories:356, protein:9.0, carbs:73, fat:2.0, fiber:3.5, vitC:0, vitA:0, potassium:180, calcium:15, iron:1.8, magnesium:70 },
     serving:{ amount:80, unit:"g" } },
   { id:"r20", name:"Parboiled Rice", hindi:"Ukda Chawal", season:"All year", emoji:"🍚",
@@ -7315,7 +7330,7 @@ const RICE_DATA = [
   { id:"r21", name:"Broken Rice", hindi:"Tukda Chawal", season:"All year", emoji:"🍚",
     per100g:{ calories:350, protein:7.0, carbs:79, fat:0.4, fiber:0.9, vitC:0, vitA:0, potassium:95, calcium:8, iron:0.5, magnesium:18 },
     serving:{ amount:100, unit:"g" } },
-  { id:"r22", name:"Puffed Rice", hindi:"Murmura", season:"All year", emoji:"🍚",
+  { id:"r22", name:"Puffed Rice", hindi:"Murmura", season:"All year", emoji:"🍿",
     per100g:{ calories:325, protein:7.5, carbs:73, fat:0.5, fiber:1.5, vitC:0, vitA:0, potassium:80, calcium:12, iron:1.0, magnesium:20 },
     serving:{ amount:40, unit:"g" } },
   { id:"r23", name:"Flaked Rice", hindi:"Poha", season:"All year", emoji:"🍚",
@@ -7330,7 +7345,7 @@ const RICE_DATA = [
   { id:"r26", name:"Poha (Flattened Rice)", hindi:"Poha", season:"All year", emoji:"🍚",
     per100g:{ calories:346, protein:6.6, carbs:77, fat:1.2, fiber:2.3, vitC:0, vitA:0, potassium:100, calcium:11, iron:2.8, magnesium:26 },
     serving:{ amount:60, unit:"g" } },
-  { id:"r27", name:"Puffed Rice", hindi:"Murmura/Mamra", season:"All year", emoji:"🍚",
+  { id:"r27", name:"Puffed Rice", hindi:"Murmura/Mamra", season:"All year", emoji:"🍿",
     per100g:{ calories:325, protein:7.5, carbs:80, fat:0.5, fiber:1.5, vitC:0, vitA:0, potassium:105, calcium:12, iron:0.6, magnesium:20 },
     serving:{ amount:60, unit:"g" } },
   { id:"r28", name:"Foxtail Millet", hindi:"Kangni / Thinai", season:"All year", emoji:"🌾", noDefault:true,
@@ -7366,7 +7381,7 @@ const RICE_DATA = [
   { id:"r38", name:"Sago Pearls", hindi:"Sabudana", season:"All year", emoji:"⚪", noDefault:true,
     per100g:{ calories:358, protein:0.2, carbs:88.7, fat:0, fiber:0.9, vitC:0, vitA:0, potassium:11, calcium:20, iron:1.2, magnesium:1 },
     serving:{ amount:40, unit:"g" } },
-  { id:"r39", name:"Rolled Oats", hindi:"Jai", season:"All year", emoji:"🌾", noDefault:true,
+  { id:"r39", name:"Rolled Oats", hindi:"Jai", season:"All year", emoji:"🥣", noDefault:true,
     per100g:{ calories:389, protein:16.9, carbs:66, fat:6.9, fiber:10.6, vitC:0, vitA:0, potassium:429, calcium:54, iron:4.7, magnesium:177 },
     serving:{ amount:40, unit:"g" } },
   { id:"r40", name:"Barley", hindi:"Jau", season:"Winter", emoji:"🌾", noDefault:true,
@@ -7450,7 +7465,7 @@ const FRUITS_DATA = [
   { id:"u3", name:"Papaya", hindi:"Papita", season:"All year", emoji:"🍈",
     per100g:{ calories:43, protein:0.5, carbs:11, fat:0.3, fiber:1.7, vitC:62, vitA:47, potassium:182, calcium:20, iron:0.3, magnesium:21 },
     serving:{ amount:150, unit:"g" } },
-  { id:"u4", name:"Guava", hindi:"Amrood", season:"Winter", emoji:"🍈",
+  { id:"u4", name:"Guava", hindi:"Amrood", season:"Winter", emoji:"🍐",
     per100g:{ calories:68, protein:2.6, carbs:14, fat:1.0, fiber:5.4, vitC:228, vitA:31, potassium:417, calcium:18, iron:0.3, magnesium:22 },
     serving:{ amount:150, unit:"g" } },
   { id:"u5", name:"Pomegranate", hindi:"Anar", season:"Winter", emoji:"🍎",
@@ -7471,7 +7486,7 @@ const FRUITS_DATA = [
   { id:"u10", name:"Coconut", hindi:"Nariyal", season:"All year", emoji:"🥥",
     per100g:{ calories:354, protein:3.3, carbs:15, fat:33, fiber:9.0, vitC:3.3, vitA:0, potassium:356, calcium:14, iron:2.4, magnesium:32 },
     serving:{ amount:50, unit:"g" } },
-  { id:"u11", name:"Lychee", hindi:"Litchi", season:"Summer", emoji:"🍈",
+  { id:"u11", name:"Lychee", hindi:"Litchi", season:"Summer", emoji:"🍒",
     per100g:{ calories:66, protein:0.8, carbs:17, fat:0.4, fiber:1.3, vitC:71.5, vitA:0, potassium:171, calcium:5, iron:0.3, magnesium:10 },
     serving:{ amount:100, unit:"g" } },
   { id:"u12", name:"Black Plum", hindi:"Jamun", season:"Summer", emoji:"🍇",
@@ -7486,7 +7501,7 @@ const FRUITS_DATA = [
   { id:"u15", name:"Orange", hindi:"Santra", season:"Winter", emoji:"🍊",
     per100g:{ calories:47, protein:0.9, carbs:12, fat:0.1, fiber:2.4, vitC:53, vitA:11, potassium:181, calcium:40, iron:0.1, magnesium:10 },
     serving:{ amount:150, unit:"g" } },
-  { id:"u16", name:"Sweet Lime", hindi:"Mausambi", season:"All year", emoji:"🍊",
+  { id:"u16", name:"Sweet Lime", hindi:"Mausambi", season:"All year", emoji:"🍋",
     per100g:{ calories:43, protein:0.7, carbs:10, fat:0.2, fiber:1.8, vitC:50, vitA:3, potassium:163, calcium:22, iron:0.1, magnesium:10 },
     serving:{ amount:150, unit:"g" } },
   { id:"u17", name:"Grapes", hindi:"Angoor", season:"Winter", emoji:"🍇",
@@ -7522,7 +7537,7 @@ const FRUITS_DATA = [
   { id:"u27", name:"Mulberry", hindi:"Shahtoot", season:"Summer", emoji:"🫐",
     per100g:{ calories:43, protein:1.4, carbs:9.8, fat:0.4, fiber:1.7, vitC:36.4, vitA:25, potassium:194, calcium:39, iron:1.9, magnesium:18 },
     serving:{ amount:100, unit:"g" } },
-  { id:"u28", name:"Gooseberry", hindi:"Amla", season:"Winter", emoji:"🫒",
+  { id:"u28", name:"Gooseberry", hindi:"Amla", season:"Winter", emoji:"🍏",
     per100g:{ calories:44, protein:0.9, carbs:10.2, fat:0.6, fiber:4.3, vitC:600, vitA:290, potassium:198, calcium:25, iron:0.3, magnesium:10 },
     serving:{ amount:50, unit:"g" } },
   { id:"u29", name:"Dates", hindi:"Khajoor", season:"Winter", emoji:"🌰",
@@ -7591,10 +7606,10 @@ const SNACKS_DATA = [
   { id:"k1", name:"Roasted Bengal Gram", hindi:"Bhuna Chana", season:"All year", emoji:"🫘",
     per100g:{ calories:364, protein:20, carbs:58, fat:5.5, fiber:10, vitC:0, vitA:0, potassium:846, calcium:58, iron:5.0, magnesium:170 },
     serving:{ amount:30, unit:"g" } },
-  { id:"k2", name:"Roasted Foxnuts", hindi:"Bhune Makhane", season:"All year", emoji:"🌰",
+  { id:"k2", name:"Roasted Foxnuts", hindi:"Bhune Makhane", season:"All year", emoji:"🍿",
     per100g:{ calories:347, protein:9.7, carbs:76, fat:0.1, fiber:14.5, vitC:0, vitA:0, potassium:600, calcium:60, iron:1.4, magnesium:180 },
     serving:{ amount:30, unit:"g" } },
-  { id:"k3", name:"Puffed Rice", hindi:"Murmura", season:"All year", emoji:"🍚",
+  { id:"k3", name:"Puffed Rice", hindi:"Murmura", season:"All year", emoji:"🍿",
     per100g:{ calories:325, protein:7.5, carbs:73, fat:0.5, fiber:1.5, vitC:0, vitA:0, potassium:80, calcium:12, iron:1.0, magnesium:20 },
     serving:{ amount:30, unit:"g" } },
   { id:"k4", name:"Boiled Sprouts", hindi:"Ubla Sprouts", season:"All year", emoji:"🌱",
@@ -7618,22 +7633,22 @@ const SNACKS_DATA = [
   { id:"k10", name:"Puffed Amaranth Pops", hindi:"Rajgira Pops", season:"All year", emoji:"🌾",
     per100g:{ calories:358, protein:14, carbs:63, fat:6.0, fiber:6.0, vitC:0, vitA:0, potassium:508, calcium:159, iron:7.6, magnesium:248 },
     serving:{ amount:30, unit:"g" } },
-  { id:"k11", name:"Ragi Millet Laddoo", hindi:"Ragi Laddoo", season:"All year", emoji:"🟤",
+  { id:"k11", name:"Ragi Millet Laddoo", hindi:"Ragi Laddoo", season:"All year", emoji:"🍡",
     per100g:{ calories:410, protein:7.0, carbs:62, fat:15, fiber:5.0, vitC:0, vitA:0, potassium:300, calcium:250, iron:3.0, magnesium:90 },
     serving:{ amount:30, unit:"g" } },
-  { id:"k12", name:"Flaxseed Sesame Laddoo", hindi:"Alsi Til Laddoo", season:"All year", emoji:"🟤",
+  { id:"k12", name:"Flaxseed Sesame Laddoo", hindi:"Alsi Til Laddoo", season:"All year", emoji:"🍡",
     per100g:{ calories:480, protein:12, carbs:38, fat:32, fiber:10, vitC:0, vitA:0, potassium:500, calcium:320, iron:6.0, magnesium:220 },
     serving:{ amount:25, unit:"g" } },
-  { id:"k13", name:"Dates and Nuts Laddoo", hindi:"Khajoor Laddoo", season:"All year", emoji:"🟤",
+  { id:"k13", name:"Dates and Nuts Laddoo", hindi:"Khajoor Laddoo", season:"All year", emoji:"🍡",
     per100g:{ calories:420, protein:7.0, carbs:55, fat:20, fiber:6.0, vitC:0, vitA:0, potassium:450, calcium:80, iron:2.0, magnesium:90 },
     serving:{ amount:30, unit:"g" } },
-  { id:"k14", name:"Green Gram Laddoo", hindi:"Moong Dal Laddoo", season:"All year", emoji:"🟡",
+  { id:"k14", name:"Green Gram Laddoo", hindi:"Moong Dal Laddoo", season:"All year", emoji:"🍡",
     per100g:{ calories:430, protein:10, carbs:50, fat:20, fiber:4.0, vitC:0, vitA:0, potassium:350, calcium:90, iron:3.0, magnesium:100 },
     serving:{ amount:30, unit:"g" } },
-  { id:"k15", name:"Oats Almond Laddoo", hindi:"Oats Badam Laddoo", season:"All year", emoji:"🟤",
+  { id:"k15", name:"Oats Almond Laddoo", hindi:"Oats Badam Laddoo", season:"All year", emoji:"🍡",
     per100g:{ calories:440, protein:11, carbs:45, fat:24, fiber:7.0, vitC:0, vitA:0, potassium:380, calcium:120, iron:3.0, magnesium:130 },
     serving:{ amount:30, unit:"g" } },
-  { id:"k16", name:"Amaranth Jaggery Laddoo", hindi:"Rajgira Gud Laddoo", season:"All year", emoji:"🟠",
+  { id:"k16", name:"Amaranth Jaggery Laddoo", hindi:"Rajgira Gud Laddoo", season:"All year", emoji:"🍡",
     per100g:{ calories:400, protein:8.0, carbs:66, fat:10, fiber:5.0, vitC:0, vitA:0, potassium:400, calcium:150, iron:5.0, magnesium:150 },
     serving:{ amount:30, unit:"g" } },
   { id:"k17", name:"Chia Seeds", hindi:"Chia Beej", season:"All year", emoji:"⚫",
@@ -7645,22 +7660,22 @@ const SNACKS_DATA = [
   { id:"k19", name:"Sunflower Seeds", hindi:"Surajmukhi Beej", season:"All year", emoji:"🌻",
     per100g:{ calories:584, protein:21, carbs:20, fat:51, fiber:8.6, vitC:1.4, vitA:0, potassium:645, calcium:78, iron:5.3, magnesium:325 },
     serving:{ amount:20, unit:"g" } },
-  { id:"k20", name:"Watermelon Seeds", hindi:"Tarbooz Beej", season:"All year", emoji:"⚫",
+  { id:"k20", name:"Watermelon Seeds", hindi:"Tarbooz Beej", season:"All year", emoji:"🍉",
     per100g:{ calories:557, protein:28, carbs:15, fat:47, fiber:4.0, vitC:0, vitA:0, potassium:648, calcium:54, iron:7.3, magnesium:514 },
     serving:{ amount:15, unit:"g" } },
   { id:"k21", name:"Sesame Seeds", hindi:"Til", season:"All year", emoji:"⚪",
     per100g:{ calories:573, protein:18, carbs:23, fat:50, fiber:12, vitC:0, vitA:0, potassium:468, calcium:975, iron:14.6, magnesium:351 },
     serving:{ amount:15, unit:"g" } },
-  { id:"k22", name:"Muskmelon Seeds", hindi:"Kharbooza Beej", season:"All year", emoji:"🟡",
+  { id:"k22", name:"Muskmelon Seeds", hindi:"Kharbooza Beej", season:"All year", emoji:"🍈",
     per100g:{ calories:557, protein:29, carbs:16, fat:45, fiber:4.0, vitC:0, vitA:0, potassium:600, calcium:50, iron:7.0, magnesium:500 },
     serving:{ amount:15, unit:"g" } },
-  { id:"k23", name:"Hemp Seeds", hindi:"Bhang Beej", season:"All year", emoji:"🟢",
+  { id:"k23", name:"Hemp Seeds", hindi:"Bhang Beej", season:"All year", emoji:"🌿",
     per100g:{ calories:553, protein:31, carbs:8.7, fat:49, fiber:4.0, vitC:1.0, vitA:1, potassium:1200, calcium:70, iron:7.9, magnesium:700 },
     serving:{ amount:15, unit:"g" } },
-  { id:"k24", name:"Roasted Chana", hindi:"Bhuna Chana", season:"All year", emoji:"🥜",
+  { id:"k24", name:"Roasted Chana", hindi:"Bhuna Chana", season:"All year", emoji:"🫘",
     per100g:{ calories:364, protein:22.5, carbs:57.8, fat:5.3, fiber:18.3, vitC:0, vitA:0, potassium:846, calcium:58, iron:5.1, magnesium:132 },
     serving:{ amount:30, unit:"g" } },
-  { id:"k25", name:"Makhana (Fox Nuts)", hindi:"Makhana", season:"All year", emoji:"🥜",
+  { id:"k25", name:"Makhana (Fox Nuts)", hindi:"Makhana", season:"All year", emoji:"🍿",
     per100g:{ calories:347, protein:9.7, carbs:76.9, fat:0.1, fiber:14.5, vitC:0, vitA:0, potassium:710, calcium:60, iron:1.4, magnesium:110 },
     serving:{ amount:30, unit:"g" } },
   { id:"k26", name:"Roasted Almonds", hindi:"Bhuna Badam", season:"All year", emoji:"🥜",
@@ -7675,7 +7690,7 @@ const SNACKS_DATA = [
   { id:"k29", name:"Peanuts (Roasted)", hindi:"Bhuni Moongfali", season:"All year", emoji:"🥜",
     per100g:{ calories:567, protein:25.8, carbs:16.1, fat:49.2, fiber:8.5, vitC:0, vitA:0, potassium:705, calcium:92, iron:4.6, magnesium:168 },
     serving:{ amount:30, unit:"g" } },
-  { id:"k30", name:"Dhokla", hindi:"Dhokla", season:"All year", emoji:"🍰",
+  { id:"k30", name:"Dhokla", hindi:"Dhokla", season:"All year", emoji:"🟨",
     per100g:{ calories:160, protein:6.0, carbs:26, fat:3.5, fiber:2.0, vitC:0, vitA:2, potassium:180, calcium:30, iron:1.2, magnesium:20 },
     serving:{ amount:100, unit:"g" } },
 ];
@@ -24086,6 +24101,15 @@ html body #nutrition-panel #results .rec-day-nav .rec-day-tab.fast.active::after
 #nutrition-panel .rec-block[data-meal="snacks"]{--bc:#8ccb4a;--bd:#3d6d1b;--bt:#f3fae7}
 #nutrition-panel .rec-block[data-meal="dinner"]{--bc:#2b9a78;--bd:#175a45;--bt:#e7f6f0}
 html body #nutrition-panel #results .rec-day-nav{border-bottom-color:#cfeedd}
+</style>
+<style id="food-cart-list-20261114">
+/* Cart This Week: a vertical bar before each group; items listed without boxes */
+html body #nutrition-panel #results .groc-group{border-left:5px solid #2fb585;padding-left:12px;margin-top:12px !important}
+html body #nutrition-panel #results .groc-group:first-child{margin-top:12px !important}
+html body #nutrition-panel #results .groc-group-title{border-bottom:0 !important;padding:8px 0 !important;align-items:center}
+html body #nutrition-panel #results .groc-grid.groc-group-body{margin-top:0 !important;gap:0 !important}
+html body #nutrition-panel #results .groc-grid .gcard{border:0 !important;border-bottom:1px solid #e1efe6 !important;border-radius:0 !important;background:none !important;box-shadow:none !important;padding:8px 0 !important}
+html body #nutrition-panel #results .groc-grid .gcard:last-child{border-bottom:0 !important}
 </style>
 </body>
 
