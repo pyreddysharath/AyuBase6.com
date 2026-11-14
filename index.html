@@ -24132,6 +24132,26 @@ html body #nutrition-panel #results .rec-day-nav .rec-day-tab.fast::after{backgr
 #nutrition-panel .rec-block[data-meal="snacks"]{--bc:#9bd36a;--bd:#2f5d1d;--bt:#f6fbee}
 #nutrition-panel .rec-block[data-meal="dinner"]{--bc:#3fa58a;--bd:#17524a;--bt:#eff9f6}
 </style>
+<style id="food-plan-20261114g">
+/* Fasting: smaller day buttons; When? on one line */
+#sec-fast .fday{max-width:34px;font-size:.85rem;border-width:1.5px}
+#sec-fast .fast-days{gap:4px}
+#sec-fast .fwhen-row{flex-wrap:nowrap;gap:5px}
+#sec-fast .fwhen{flex:1 1 0;min-width:0;padding:5px 1px;font-size:.74rem;letter-spacing:-.1px;border-width:1.5px;text-align:center;white-space:nowrap}
+/* week: real tabs with an underline for the open day */
+html body #nutrition-panel #results #weekly-plan-block .rec-day-nav{gap:0;padding:2px 0 0;margin-bottom:14px;border-bottom:2px solid #d6eee1}
+html body #nutrition-panel #results .rec-day-nav .rec-day-tab,html body #nutrition-panel #results .rec-day-nav .rec-day-tab.fast{flex:1 1 0;min-width:0;background:transparent;border:0;border-bottom:3px solid transparent;border-radius:0;box-shadow:none;color:#5b7f6c;margin-bottom:-2px;padding:9px 0 8px}
+html body #nutrition-panel #results .rec-day-nav .rec-day-tab:hover:not(.active){background:#eef8f2;border-color:transparent;color:#1d5a43}
+html body #nutrition-panel #results .rec-day-nav .rec-day-tab.active,html body #nutrition-panel #results .rec-day-nav .rec-day-tab.fast.active{background:linear-gradient(#fff,#eaf7f0);border:0;border-bottom:3px solid #2f8a67;border-radius:8px 8px 0 0;color:#1d5a43;box-shadow:none}
+html body #nutrition-panel #results .rec-day-nav .rec-day-tab.fast::after{background:#2f8a67}
+html body #nutrition-panel #results .rec-day-nav .rec-day-tab.fast.active::after{background:#2f8a67}
+/* meal blocks: no big bar; small bar before the title; main item = tinted bar with chevron; alternatives in lime */
+#nutrition-panel .rec-block{border-left:0 !important;border-radius:12px;padding:12px}
+#nutrition-panel .rec-block .rec-meal-label::before{content:"";flex:0 0 auto;width:4px;height:15px;border-radius:2px;background:var(--bc);margin-right:8px}
+#nutrition-panel .rec-block .rec-meal-row,#nutrition-panel .rec-block .rec-meal-row.fast{background:color-mix(in srgb,var(--bc) 22%,#fff);box-shadow:none !important;border:0}
+#nutrition-panel .rec-block .rec-alts .rec-alt{background:#e6f3c9;border:0;box-shadow:none;color:#335a1c}
+#nutrition-panel .rec-block .rec-alts .rec-alt:hover{background:#d9ebb4}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
