@@ -15097,6 +15097,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       stopReminderTimers(item);
       const data={speak:form.elements.speak?form.elements.speak.checked:false,voice:form.elements.voice?form.elements.voice.value:'',speakLang:form.elements.speakLang?form.elements.speakLang.value:'',name:String(d.get('name')).trim(),mode:mode.value,duration:duration,times:mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],sound:d.get('sound'),days:(mode.value==='dates'&&sched!=='weekly')?[0,1,2,3,4,5,6]:[...days].sort((a,b)=>a-b),vibrate:form.elements.vibrate?form.elements.vibrate.checked:true};
       if(mode.value==='dates'){data.sched=sched;if(sched==='once'||sched==='yearly')data.date=onDay;if(sched==='monthly')data.mdays=mdays.slice().sort((a,b)=>a-b)}
+      if(saved.on===false)data.on=false;
       item.dataset.reminder=JSON.stringify(data);
       item.classList.remove('open');form.remove();window.ayuRemPaint(item,data);
       if(!existing)list.append(item);startReminder(item);
@@ -15138,7 +15139,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   }
   window.ayuDurationPicker=openDurationPicker;
   function startReminder(item){
-    const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name)return;
+    const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name||data.on===false)return;
     item.dataset.startedAt=item.dataset.startedAt||String(Date.now());   // repeating reminders count from this moment (Android app)
     const notify=()=>{try{if(Array.isArray(data.days)&&data.days.length&&!data.days.includes(new Date().getDay()))return;if(window.ayuLeader===false)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')(typeof showNudgeNotification==='function'?showNudgeNotification(data.name,'It is time for your reminder.',{key:'custom-'+item.dataset.reminderId}):new Notification(data.name,{body:'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()}))}catch(_){}};
     if(data.mode==='regular')item._reminderTimer=setInterval(notify,Math.max(1,Number(data.duration)||1)*60000);
@@ -15165,7 +15166,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
 </style>
 <script id="per-reminder-schedule-logic">
 (function(){
-  const defaults={start:'08:00',end:'20:00'};
+  const defaults={start:'10:00',end:'20:00'};
   const specs=[
     {id:'alert-card-drink',key:'drink',title:'Water'},
     {id:'alert-card-walk',key:'walk',title:'Walk'},
@@ -15325,6 +15326,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     return null;
   }
   window.ayuReminderSlots={next:nextSlot,latest:latestSlot};
+  window.ayuSaveHours=saveHours;
   window.ayuReminderWindows=function(){return cards};   // read by the reminder rules (Android app)
   const lastSlot={},GRACE=5*60000;
   function tick(key){
@@ -19996,7 +19998,17 @@ html body #alerts-panel :is(#rem-alarm-card,#custom-reminders-card) > .alert-car
     var R=window.__ayuRem;
     var sub=data.mode==='dates' ? window.ayuDatesText(data,R) : (data.mode==='regular'?'Every '+R.durationLabel(data.duration):'At '+(data.times||[]).map(R.formatClock).join(', '))+' · '+daysText(data.days);
     var del=document.createElement('button'); del.type='button'; del.className='custom-reminder-delete'; del.textContent='×'; del.setAttribute('aria-label','Delete reminder'); del.title='Delete reminder';
-    var h=window.ayuItemHead(item,data.name,sub,[del]);
+    var sw=document.createElement('label'); sw.className='master-switch'; sw.title=data.name+' on or off';
+    sw.innerHTML='<input type="checkbox" aria-label="'+data.name.replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; })+' on or off">';
+    var swi=sw.querySelector('input'); swi.checked=data.on!==false; item.classList.toggle('ayu-off',data.on===false);
+    sw.addEventListener('click',function(e){ e.stopPropagation(); });
+    swi.addEventListener('change',function(){
+      var d={}; try{ d=JSON.parse(item.dataset.reminder||'{}'); }catch(e){}
+      if(swi.checked) delete d.on; else d.on=false;
+      item.classList.toggle('ayu-off',!swi.checked); R.stopReminderTimers(item); item.dataset.reminder=JSON.stringify(d); if(swi.checked) R.startReminder(item);
+      try{ document.dispatchEvent(new Event('ayu-alarm-changed')); }catch(e){} try{ if(window.ayuNative && window.ayuNative.sync) window.ayuNative.sync(); }catch(e){}
+    });
+    var h=window.ayuItemHead(item,data.name,sub,[sw,del]);
     del.addEventListener('click',function(e){ e.stopPropagation(); var list=item.parentNode; R.stopReminderTimers(item); item.classList.remove('open');
       window.ayuUndo(item,'Reminder deleted',function(){ item.querySelector('.cri-body').innerHTML=''; R.startReminder(item); window.ayuListColours(list); }); window.ayuListColours(list); });
     function toggle(){ if(item.classList.contains('open')){ item.querySelector('.cri-body').innerHTML=''; item.classList.remove('open'); h.setAttribute('aria-expanded','false'); R.startReminder(item); } else window.addCustomReminderForm(item); }
@@ -22503,7 +22515,7 @@ html body #start-my-day-card #chk-alarm.ayu-sub:not(#ayu-x1){margin-bottom:0 !im
     }
     if(remOn) document.querySelectorAll('#custom-reminders-list .custom-reminder-item').forEach(function(item){
       try{
-        var d = JSON.parse(item.dataset.reminder||'{}'); if(!d.name || d.sound==='none') return;
+        var d = JSON.parse(item.dataset.reminder||'{}'); if(!d.name || d.sound==='none' || d.on===false) return;
         var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode };
         if(Array.isArray(d.days) && d.days.length && d.days.length<7) c.days = d.days.filter(function(n){ return n>=0 && n<=6; });
         if(d.mode==='regular'){ c.every = Math.max(1, Number(d.duration)||1); c.anchor = Number(item.dataset.startedAt)||Date.now(); }
@@ -23038,12 +23050,12 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
     var out=[];
     [['break','Eyes (20-20-20)','alert-card-break'],['walk','Walk','alert-card-walk'],['drink','Water','alert-card-drink'],['eyeex','Eye Exercise','alert-card-break-ex']].forEach(function(x){
       var sw=function(){ var c=$(x[2]); return c && (c.querySelector('.alert-enabled-toggle input') || $(x[0]==='eyeex'?'eye-ex-notify':'alert-'+x[0]+'-notify')); };
-      if(sw()) out.push(['Health Breaks', x[1], '', sw, goHB(x[2])]);
+      if(sw()) out.push(['Reminders › Health Breaks', x[1], '', sw, goHB(x[2])]);
     });
     [].forEach.call(document.querySelectorAll('#custom-reminders-list .custom-reminder-item'),function(it){
       var d={}; try{ d=JSON.parse(it.dataset.reminder||'{}'); }catch(e){}
       var sw=function(){ return it.querySelector('.cri-hdr .master-switch input, .master-switch input'); };
-      if(sw()) out.push(['Personal Reminders', d.name||'Reminder', '', sw, function(){ closeFooter(); if(typeof switchTab==='function') switchTab('alerts'); if(window.ayuRemTab) window.ayuRemTab('personal'); setTimeout(function(){ try{ it.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} },150); }]);
+      if(sw()) out.push(['Reminders › Personal', d.name||'Reminder', '', sw, function(){ closeFooter(); if(typeof switchTab==='function') switchTab('alerts'); if(window.ayuRemTab) window.ayuRemTab('personal'); setTimeout(function(){ try{ it.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} },150); }]);
     });
     var cl=function(){ return $('routines-master-toggle'); };
     if(cl()) out.push(['Checks', $('ayu-checklist') ? 'Daily Checklist' : 'Notify Me', '', cl, function(){ closeFooter(); if(typeof switchTab==='function') switchTab('routines'); setTimeout(function(){ var b=$('ayu-checklist')||$('routines-notify-card'); try{ b.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },150); }]);
@@ -23052,7 +23064,7 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
     var l=J('ayuBase6-rem-alarms'); if(!Array.isArray(l)) l=[];
     l.filter(function(a){ return a && a.id && !a.draft; }).sort(function(a,b){ return (+a.at||0)-(+b.at||0); }).forEach(function(a){
       var sw=function(){ var it=document.querySelector('#rem-alarm-list [data-id="'+a.id+'"]'); return it && it.querySelector('.master-switch input'); };
-      out.push(['Clock alarms', clock(a.at)+(a.name?' · '+a.name:''), a.expired&&!a.on?'Expired':'', sw, function(){ closeFooter(); if(window.ayuShowAlarm) window.ayuShowAlarm(a.id); }]);
+      out.push(['Clock › Alarms', clock(a.at)+(a.name?' · '+a.name:''), a.expired&&!a.on?'Expired':'', sw, function(){ closeFooter(); if(window.ayuShowAlarm) window.ayuShowAlarm(a.id); }]);
     });
     return out;
   }
@@ -23061,7 +23073,7 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
     var sec=$('sec-notifications'); if(!sec) return;
     if(!wrap){ wrap=document.createElement('div'); wrap.className='na-wrap'; wrap.id='notif-all';
       var hc=$('ns-test')||sec.querySelector('.notif-help-card'); sec.insertBefore(wrap, hc && hc.parentNode===sec ? hc : null); }
-    var ORD=['Checks','Health Breaks','Personal Reminders','Clock alarms'];
+    var ORD=['Checks','Reminders › Health Breaks','Reminders › Personal','Clock › Alarms'];
     list=items().map(function(x,i){ return [x,i]; }).sort(function(a,b){ return (ORD.indexOf(a[0][0])-ORD.indexOf(b[0][0])) || (a[1]-b[1]); }).map(function(x){ return x[0]; });
     var g='', h='<div class="ns-h" id="ns-app">App notifications</div>';
     if(!list.length) h+='<p class="na-none">No reminders or alarms yet.</p>';
@@ -23400,48 +23412,40 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
     var host=$('wake-zone-label'), el=$('wake-shift-note'), n=shiftNow();
     if(!n || !host){ if(el) el.remove(); return; }
     if(!el){ el=document.createElement('div'); el.id='wake-shift-note'; el.setAttribute('role','status'); host.after(el); }
-    var h='<span>Wake-up Alarm snoozed <b>'+n+' min</b> today, so today’s checks'+(hbAny()?' and Health Breaks':'')+' run '+n+' min later.</span><button type="button">Undo</button>';
+    var h='<span>Wake-up Alarm snoozed <b>'+n+' min</b> today, so today’s checks run '+n+' min later.</span><button type="button">Undo</button>';
     if(el.dataset.h!==h){ el.dataset.h=h; el.innerHTML=h; el.querySelector('button').addEventListener('click',function(){ S(KS,null); shiftChanged(); }); }
   }
-  function shiftChanged(){ repaintChecks(); shiftNote(); hbApply(); }
+  function shiftChanged(){ repaintChecks(); shiftNote(); }
   window.ayuWakeShift=function(min,day){ if(day && day!==ymd()) return; min=Math.round(+min||0); if(min<=0) return; S(KS,{day:ymd(),min:Math.min(600,shiftNow()+min)}); shiftChanged(); };
   var lastDay=ymd(); setInterval(function(){ if(ymd()!==lastDay){ lastDay=ymd(); shiftChanged(); } },60000);
 
-  // ── 41. Health Breaks: From = one hour after the Wake-up Alarm (a switch per section, on at first) ──
-  var KY='ayuHbWakeSync', KO='ayuHbOwnStart', HB={'break':'alert-card-break','walk':'alert-card-walk','drink':'alert-card-drink'};
+  // ── 41. Health Breaks (Eyes, Walk, Water): with a Wake-up Alarm, From = 2.5 hours after it and To = 10 hours after From; without one, 10 AM to 8 PM.
+  //        Applied when the alarm is set, switched off or on, or its time changes. Each section's From/To can still be changed by hand. ──
+  var HB={'break':'alert-card-break','walk':'alert-card-walk','drink':'alert-card-drink'}, hbLast=null, hbT=0;
   function hhmm(m){ m=((m%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
-  function syncOn(k){ var o=J(KY)||{}; return o[k]!==false; }
   function wakeAlarmOn(){ var w=J('ayuBase6-routine-alarm'); return !!(w && w.on); }
-  function hbAny(){ return wakeAlarmOn() && Object.keys(HB).some(function(k){ var c=$(HB[k]), t=c && c.querySelector('.alert-enabled-toggle input'); return t && t.checked && syncOn(k); }); }
   function draw(btn,v){ if(btn) btn.textContent=(typeof window.fmt12==='function') ? window.fmt12(v) : v; }
-  function hbRow(card,k){
-    var row=card.querySelector('.ayu-wsync'); if(row) return row;
-    var sch=card.querySelector('.per-reminder-schedule'); if(!sch) return null;
-    row=document.createElement('div'); row.className='ayu-wsync';
-    row.innerHTML='<span class="ayu-wsync-l">Start 1 hour after Wake-up Alarm<small></small></span><label class="master-switch" title="Start 1 hour after Wake-up Alarm"><input type="checkbox" aria-label="Start 1 hour after Wake-up Alarm"></label>';
-    var inp=row.querySelector('input'); inp.checked=syncOn(k);
-    inp.addEventListener('change',function(){ var o=J(KY)||{}; o[k]=inp.checked; S(KY,o); hbApply(); });
-    sch.after(row); return row;
-  }
+  function hbKey(){ return wakeAlarmOn() ? '1:'+wakeMin() : '0'; }
   function hbApply(){
+    var k0=hbKey(); if(hbLast===null){ return; } if(k0===hbLast) return; hbLast=k0;
     var W=null; try{ W=(typeof window.ayuReminderWindows==='function') ? window.ayuReminderWindows() : null; }catch(e){}
     if(!W) return;
-    var own=J(KO)||{}, ch=false, active=wakeAlarmOn(), t=hhmm(wakeMin()+shiftNow()+60);
+    var f=wakeMin()+150, t=wakeAlarmOn() ? [hhmm(f),hhmm(f+600)] : ['10:00','20:00'], ch=false;
     Object.keys(HB).forEach(function(k){
       var st=W[k], card=$(HB[k]); if(!st || !card) return;
-      var row=hbRow(card,k), on=active && syncOn(k), btn=card.querySelector('.per-reminder-schedule [data-time="start"]'), moved=false;
-      if(on){ if(!(k in own)){ own[k]=st.start; ch=true; } if(st.start!==t){ st.start=t; moved=true; } }
-      else if(k in own){ if(st.start!==own[k]){ st.start=own[k]; moved=true; } delete own[k]; ch=true; }
-      if(moved){ draw(btn,st.start); try{ if(typeof window.scheduleAlertTimer==='function') window.scheduleAlertTimer(k); }catch(e){} }
-      if(btn) btn.classList.toggle('ayu-synced',on);
-      var sm=row && row.querySelector('small'); if(sm){ var tx=on ? 'From follows the alarm; turn this off to set From yourself.' : (syncOn(k) ? 'Wake-up Alarm is off, so your own From is used.' : ''); if(sm.textContent!==tx) sm.textContent=tx; }
+      if(st.start!==t[0] || st.end!==t[1]){ st.start=t[0]; st.end=t[1]; ch=true; }
+      ['start','end'].forEach(function(w){ draw(card.querySelector('.per-reminder-schedule [data-time="'+w+'"]'),st[w]); });
+      try{ if(typeof window.scheduleAlertTimer==='function') window.scheduleAlertTimer(k); }catch(e){}
     });
-    if(ch) S(KO,own);
+    if(ch){ try{ if(window.ayuSaveHours) window.ayuSaveHours(); }catch(e){} try{ if(window.ayuNative && window.ayuNative.sync) window.ayuNative.sync(); }catch(e){} }
   }
+  function hbSoon(){ clearTimeout(hbT); hbT=setTimeout(hbApply,350); }
+  try{ localStorage.removeItem('ayuHbWakeSync'); localStorage.removeItem('ayuHbOwnStart'); }catch(e){}
+  setTimeout(function(){ hbLast=hbKey(); },3000);   // what is saved at start-up is kept; only a change after that moves From/To
   window.ayuHbSync=hbApply;
-  document.addEventListener('ayu-alarm-changed',function(){ setTimeout(function(){ hbApply(); shiftNote(); },200); });
-  document.addEventListener('input',function(e){ if(e.target && e.target.id==='wake-time-slider') setTimeout(hbApply,50); },true);
-  document.addEventListener('change',function(e){ if(e.target && (e.target.id==='wake-time-slider' || (e.target.closest && e.target.closest('.alert-enabled-toggle')))) setTimeout(function(){ hbApply(); shiftNote(); },80); },true);
+  document.addEventListener('ayu-alarm-changed',hbSoon);
+  document.addEventListener('input',function(e){ if(e.target && e.target.id==='wake-time-slider') hbSoon(); },true);
+  document.addEventListener('change',function(e){ if(e.target && e.target.id==='wake-time-slider') hbSoon(); },true);
 
   // ── 39. "Do not use mobile" and "Sleep": in the app they remind only while the phone is in use ──
   function inUse(){
