@@ -18679,6 +18679,7 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
       +'<p class="clk-wmsg" id="clk-w-msg" role="status"></p>'
       +'<div class="wc-row" id="clk-w-fmtrow" hidden><span class="wc-l">Time format</span><select id="clk-w-fmt" aria-label="Time format"><option value="phone">'+(APP?'As on the phone':'As on this device')+'</option><option value="12">12-hour (2:30 PM)</option><option value="24">24-hour (14:30)</option></select></div>'
       +(APP?'<div class="clk-wlook" id="clk-w-look" hidden><div class="clk-wlook-t">On the lock screen</div>'
+        +'<div class="ayu-al-row clk-w-name"><span class="ayu-al-lbl">Name</span><input type="text" id="clk-w-name" maxlength="24" aria-label="Your own name for this city on the lock screen"></div>'
         +'<div class="ayu-al-row"><span class="ayu-al-lbl">Show</span><select id="clk-w-place" aria-label="Show the city, the country or both"><option value="both">City and country</option><option value="city">City</option><option value="country">Country</option></select></div>'
         +'<div class="ayu-al-row"><span class="ayu-al-lbl">Time zone</span><select id="clk-w-zone" aria-label="Show the time zone"><option value="0">Hidden</option><option value="1">Shown (GMT+5:30)</option></select></div>'
         +'<div class="ayu-al-row"><span class="ayu-al-lbl">Clock style</span><select id="clk-w-style" aria-label="Clock style"><optgroup label="Digital"><option value="d1">Regular</option><option value="d2">Large and light</option><option value="d3">Bold</option><option value="d4">Display digits</option></optgroup><optgroup label="Clock faces (Android 12+)"><option value="f1">Face and name</option><option value="f2">Face, name and time</option><option value="f3">Face and bold name</option><option value="f4">Face beside the text</option></optgroup></select></div>'
@@ -18862,11 +18863,17 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     $('clk-w-cancel').addEventListener('click',function(){ var was=replacing; close(); if(was) paintWorld(true); });
     function close(){ replacing=''; formHome(); form.hidden=true; $('clk-w-addrow').hidden=false; res.innerHTML=''; }
     wireWorld.change=function(tz){   // pick another city or time zone for this entry
-      replacing=tz; msg.textContent=''; form.hidden=false; $('clk-w-addrow').hidden=false; qI.value=''; paintWorld(true); search(); try{ qI.focus({preventScroll:true}); }catch(e){ qI.focus(); }
+      replacing=tz; worldOpen=tz; msg.textContent=''; form.hidden=false; $('clk-w-addrow').hidden=false; qI.value=''; paintWorld(true); search(); try{ qI.focus({preventScroll:true}); }catch(e){ qI.focus(); }
     };
     function search(){
       var s=qI.value.trim().toLowerCase(), d=new Date();
-      var hits=CITIES.filter(function(c){ return validTz(c[2]) && (!s || (c[0]+' '+c[1]).toLowerCase().indexOf(s)>=0); }).sort(function(a,b){ return (a[0]+a[1]).localeCompare(b[0]+b[1]); });   // every city, A to Z
+      var hits=CITIES.filter(function(c){ return validTz(c[2]) && (!s || (c[0]+' '+c[1]).toLowerCase().indexOf(s)>=0); });
+      if(!s){   // no search: one city for each country and time, the capital where it is listed
+        var CAPS=/^(Delhi|New Delhi|Abu Dhabi|Jakarta|Hanoi|Beijing|Berlin|Washington, D\.C\.|Canberra|Ottawa|Brasília|Pretoria|Tokyo|London|Paris|Rome|Madrid|Moscow|Seoul|Singapore)$/, pick={}, keep=[];
+        hits.forEach(function(c){ var k=c[1]+'|'+offsetMin(c[2],d), o=pick[k]; if(!o){ pick[k]=c; } else if(CAPS.test(c[0]) && !CAPS.test(o[0])) pick[k]=c; });
+        hits=hits.filter(function(c){ return pick[c[1]+'|'+offsetMin(c[2],d)]===c; });
+      }
+      hits=hits.sort(function(a,b){ return (a[0]+a[1]).localeCompare(b[0]+b[1]); });   // every city, A to Z
       res.innerHTML=hits.length ? hits.map(function(c,i){ var dup=sameAs(c[2]); return '<button type="button" data-i="'+CITIES.indexOf(c)+'"'+(dup?' aria-disabled="true"':'')+'>'+esc(c[0])+', '+esc(c[1])+'<small>'+esc(cityTime(c[2],d))+(dup?' · same time as '+esc(dup.city):'')+'</small></button>'; }).join('')
         : '<p class="clk-note">No match. Try a bigger city nearby, or the country.</p>';
     }
@@ -18892,8 +18899,8 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     $('clk-world-list').addEventListener('keydown',function(e){ var hd=e.target.closest && e.target.closest('.cri-hdr'); if(hd && e.target===hd && (e.key==='Enter' || e.key===' ')){ e.preventDefault(); hd.click(); } });
     $('clk-world-list').addEventListener('click',function(e){
       var hd=e.target.closest('.cri-hdr');
-      if(hd && !e.target.closest('.wc-remove')){ var tzo=hd.parentNode.dataset.tz; if(replacing) close(); worldOpen=worldOpen===tzo ? '' : tzo; paintWorld(true); return; }
-      var chg=e.target.closest('.wc-change'); if(chg){ if(replacing) { close(); paintWorld(true); } else wireWorld.change(chg.closest('[data-tz]').dataset.tz); return; }
+      if(hd && !e.target.closest('.wc-remove, .wc-edit')){ var tzo=hd.parentNode.dataset.tz; if(replacing) close(); worldOpen=worldOpen===tzo ? '' : tzo; paintWorld(true); return; }
+      var chg=e.target.closest('.wc-edit'); if(chg){ var ctz=chg.closest('[data-tz]').dataset.tz; if(replacing===ctz){ close(); paintWorld(true); } else wireWorld.change(ctz); return; }
       var del=e.target.closest('.wc-remove'); if(!del) return;
       if(replacing) close();
       var it=del.closest('[data-tz]'), tz=it.dataset.tz, idx=-1, saved=null;
@@ -18928,24 +18935,26 @@ html body #rem-alarm-card .clk-lock .s{display:block;font-weight:400;font-size:1
     if(look && list.contains(look)){ look.hidden=true; list.parentNode.appendChild(look); }
     if(fmtRow && list.contains(fmtRow)){ fmtRow.hidden=true; list.parentNode.appendChild(fmtRow); }
     if(form && list.contains(form)) formHome();
+    var PEN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.500 6.500l4 4" stroke="currentColor" stroke-width="2"/></svg>';
     var CHEV='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.500l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     list.innerHTML=L.map(function(c){
       var day=dayTxt(c.tz,d), op=worldOpen===c.tz, t=cityTime(c.tz,d), m=/^(.*?)\s*([AaPp]\.?[Mm]\.?)$/.exec(t);
-      return '<div class="custom-reminder-item ayu-alarm-item clk-wc'+(op?' open':'')+'" data-tz="'+esc(c.tz)+'"><div class="cri-hdr" role="button" tabindex="0" aria-expanded="'+op+'" aria-label="'+esc(c.city)+', '+esc(t)+'. '+(op?'Close':'Open')+' the settings"><div class="cri-main"><div class="wc-name"><span>'+esc(c.city)+'</span></div>'
+      return '<div class="custom-reminder-item ayu-alarm-item clk-wc'+(op?' open':'')+'" data-tz="'+esc(c.tz)+'"><div class="cri-hdr" role="button" tabindex="0" aria-expanded="'+op+'" aria-label="'+esc(c.city)+', '+esc(t)+'. '+(op?'Close':'Open')+' the settings"><div class="cri-main"><div class="wc-name"><span>'+esc(c.city)+'</span><small class="wc-gmt">'+esc(gmtTxt(c.tz,d))+'</small><button type="button" class="wc-edit" aria-label="Change the city or time zone of '+esc(c.city)+'" title="Change the city or time zone">'+PEN+'</button></div>'
         +'<div class="cri-sub">'+esc(c.country)+' · '+esc(diffTxt(c.tz,d))+(day?' · '+day:'')+'</div></div>'
         +'<strong class="wc-time">'+(m?esc(m[1])+'<small>'+esc(m[2].toUpperCase())+'</small>':esc(t))+'</strong><button type="button" class="wc-remove" aria-label="Remove '+esc(c.city)+'">×</button><span class="clk-w-chev" aria-hidden="true">'+CHEV+'</span></div>'
         +(op?'<div class="wc-body">'
-          +'<div class="wc-row"><span class="wc-l">Time zone</span><span class="wc-v">'+esc(gmtTxt(c.tz,d))+'</span><button type="button" class="wc-change" aria-label="Change the city or time zone of this entry">'+(replacing===c.tz?'Cancel':'Change')+'</button></div>'
           +'<div class="wc-slot" data-slot="form"></div><div class="wc-slot" data-slot="fmt"></div>'
           +(APP?'<div class="wc-row"><span class="wc-l">Show on lock screen</span><label class="master-switch" title="Show on lock screen"><input type="checkbox" data-lock="'+esc(c.tz)+'"'+(c.lock?' checked':'')+' aria-label="Show '+esc(c.city)+' on the lock screen"></label></div>'
-            +(c.lock?'<div class="wc-row clk-w-name"><span class="wc-l">Name on lock screen</span><input type="text" maxlength="24" data-name="'+esc(c.tz)+'" value="'+esc(c.label||'')+'" placeholder="'+esc(c.city)+'" aria-label="Your own name for '+esc(c.city)+' on the lock screen"></div><div class="wc-slot" data-slot="look"></div>':''):'')
+            +(c.lock?'<div class="wc-slot" data-slot="look"></div>':''):'')
           +'</div>':'')+'</div>';
     }).join('');
     if(!L.length) list.innerHTML='<p class="clk-note">Add the cities you want to keep an eye on.</p>';
     var it=list.querySelector('.clk-wc.open');
     function slot(n){ return it && it.querySelector('.wc-slot[data-slot="'+n+'"]'); }
     if(fmtRow){ if(slot('fmt')){ slot('fmt').appendChild(fmtRow); fmtRow.hidden=false; } else fmtRow.hidden=true; }
-    if(look){ if(slot('look')){ slot('look').appendChild(look); look.hidden=false; } else look.hidden=true; }   // the lock-screen settings sit right under the open city's switch, while that switch is on
+    if(look){ if(slot('look')){ slot('look').appendChild(look); look.hidden=false;
+        var nmI=$('clk-w-name'), oc=L.filter(function(x){ return x.tz===it.dataset.tz; })[0];
+        if(nmI && oc){ nmI.dataset.name=oc.tz; nmI.placeholder=oc.city; if(document.activeElement!==nmI) nmI.value=oc.label||''; } } else look.hidden=true; }   // the lock-screen settings sit right under the open city's switch, while that switch is on
     if(form && replacing){ if(slot('form') && it.dataset.tz===replacing){ slot('form').appendChild(form); if(focused) try{ focused.focus({preventScroll:true}); }catch(e){} } else { replacing=''; form.hidden=true; $('clk-w-addrow').hidden=false; } }
     try{ if(window.ayuListColours) window.ayuListColours(list); }catch(e){}
   }
@@ -21655,18 +21664,20 @@ html body #rem-alarm-card #clk-world-list .clk-wc .clk-w-chev:not(#ayu-x1):not(#
 html body #rem-alarm-card #clk-world-list .clk-wc .clk-w-chev svg{width:18px;height:18px;display:block}
 html body #rem-alarm-card #clk-world-list .clk-wc.open .clk-w-chev{transform:rotate(180deg)}
 html body #rem-alarm-card #clk-world-list .clk-wc > .cri-hdr:focus-visible{outline:2px solid #0f766e;outline-offset:-2px;border-radius:16px}
-html body #rem-alarm-card #clk-world-list .wc-body{margin:0 10px 10px;padding:2px 12px;border-radius:12px;background:#fff;border:1px solid color-mix(in srgb,#0f766e 18%,#fff)}
+html body #rem-alarm-card #clk-world-list .wc-body{margin:0;padding:0 16px 8px;border:0;background:none}
+html body #rem-alarm-card #clk-world-list .clk-wc .wc-gmt{font-size:.74rem;font-weight:700;color:#0f766e;opacity:.9;white-space:nowrap}
+html body #rem-alarm-card #clk-world-list .clk-wc .wc-edit:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto;width:26px;height:26px;min-height:0 !important;margin:0 !important;padding:0 !important;display:inline-flex;align-items:center;justify-content:center;border:0 !important;background:none !important;color:#0f766e !important;box-shadow:none !important;cursor:pointer}
+html body #rem-alarm-card #clk-world-list .clk-wc .wc-edit svg{width:17px;height:17px;display:block}
 html body #rem-alarm-card #clk-world-list .wc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:50px;padding:7px 0;border-bottom:1px solid color-mix(in srgb,#0f766e 12%,#fff);font-size:.88rem;color:#134e4a}
 html body #rem-alarm-card #clk-world-list .wc-l{flex:0 0 auto;font-weight:700}
 html body #rem-alarm-card #clk-world-list .wc-v{flex:1 1 auto;min-width:0;text-align:right;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 html body #rem-alarm-card #clk-world-list .wc-row select:not(#ayu-x1):not(#ayu-x2){flex:0 1 215px;min-width:0;width:auto !important;margin:0 !important}
-html body #rem-alarm-card #clk-world-list .wc-change:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto;border:1.5px solid #0f766e !important;background:#fff !important;color:#0f766e !important;border-radius:10px !important;padding:6px 12px !important;font:inherit;font-size:.82rem !important;font-weight:700 !important;cursor:pointer;box-shadow:none !important;min-height:0 !important}
 html body #rem-alarm-card #clk-world-list .wc-slot:empty{display:none}
 html body #rem-alarm-card #clk-world-list .wc-slot[data-slot=form]{padding:10px 0 4px;border-bottom:1px solid color-mix(in srgb,#0f766e 12%,#fff)}
-html body #rem-alarm-card #clk-world-list .clk-w-name input:not(#ayu-x1){flex:0 1 190px}
-html body #rem-alarm-card #clk-world-list .wc-slot > .clk-wlook:not(#ayu-x1):not(#ayu-x2){margin:10px 0 !important;background:color-mix(in srgb,#0f766e 5%,#fff) !important}
+html body #rem-alarm-card #clk-world-list .clk-w-name input:not(#ayu-x1){flex:1 1 0;width:auto}
+html body #rem-alarm-card #clk-world-list .wc-slot > .clk-wlook:not(#ayu-x1):not(#ayu-x2){margin:10px 0 0 !important;padding:0 !important;background:none !important;border:0 !important}
 html body #rem-alarm-card #clk-world-list .wc-body > :last-child{border-bottom:0}
-html body #rem-alarm-card #clk-world-list .clk-wc .wc-remove:not(#ayu-x1):not(#ayu-x2){flex:0 0 30px;width:30px;height:30px;min-height:0 !important;margin:0 !important;padding:0 !important;display:inline-flex;align-items:center;justify-content:center;border-radius:50% !important;border:1.5px solid color-mix(in srgb,#0f766e 45%,#fff) !important;background:#fff !important;color:#0f766e !important;font:inherit;font-size:1.25rem !important;font-weight:700 !important;line-height:1 !important;cursor:pointer;box-shadow:none !important}
+html body #rem-alarm-card #clk-world-list .clk-wc .wc-remove:not(#ayu-x1):not(#ayu-x2){flex:0 0 30px;width:30px;height:30px;min-height:0 !important;margin:0 !important;padding:0 !important;display:inline-flex;align-items:center;justify-content:center;border-radius:0 !important;border:0 !important;background:none !important;color:#0f766e !important;font:inherit;font-size:1.5rem !important;font-weight:700 !important;line-height:1 !important;cursor:pointer;box-shadow:none !important}
 @media (max-width:380px){ html body #rem-alarm-card #clk-world-list .clk-wc .wc-time:not(#ayu-x1):not(#ayu-x2){font-size:1.35rem !important} }
 </style>
 </body>
