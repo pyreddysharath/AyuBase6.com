@@ -4573,11 +4573,10 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
         <h3 class="fast-h">When?</h3>
         <div class="fwhen-row" role="group" aria-label="When do you fast?">
           <button type="button" class="fwhen" data-w="morning" aria-pressed="false">Morning</button>
+          <button type="button" class="fwhen" data-w="afternoon" aria-pressed="false">Afternoon</button>
           <button type="button" class="fwhen" data-w="evening" aria-pressed="false">Evening</button>
-          <button type="button" class="fwhen" data-w="full" aria-pressed="false">Full day</button>
-          <button type="button" class="fwhen" data-w="sunset" aria-pressed="false">Sunrise to sunset</button>
+          <button type="button" class="fwhen" data-w="night" aria-pressed="false">Night</button>
         </div>
-        <p class="fast-help">Morning plans breakfast as the fast, evening plans dinner, and the other two plan the whole day. If you skip this, the whole day is planned.</p>
         <h3 class="fast-h">Fasting diet?</h3>
         <div class="diet-row">
           <label class="fpill"><input type="checkbox" name="fast-diet" value="veg"> 🥦 Vegetarian</label>
@@ -5826,6 +5825,7 @@ function onInputsChanged(){
   if(!wpBody.classList.contains('open')){ wpBody.classList.add('open'); wpArr.classList.add('open'); }
   rebuildGroceries();
   buildRecipes(diets.length?diets:['veg']);
+  if(!window.__recOpenOnce){ window.__recOpenOnce=true; const rb=document.getElementById('wsb-rec'), rh=document.getElementById('wsh-rec'); if(rb && !rb.classList.contains('open')){ rb.classList.add('open'); const a=rh.querySelector('.wp-sub-arr'); if(a) a.classList.add('open'); } }
 }
 
 // ════════════════════════════════════════════════
@@ -6139,7 +6139,7 @@ function appendCoverageRow(sec, selNutrients, showNutrientCols){
   const n=checked[sec.key]?.size||0, total=sec.src().length;
 
   const tr=document.createElement('tr'); tr.id='cov-row-'+sec.key;
-  let rowHtml=`<td class="cov-rowlbl" id="cov-lbl-${sec.key}"><span class="cov-arr food-chevron" id="cov-arr-${sec.key}" aria-hidden="true"><svg viewBox="0 0 8 12" width="8" height="12"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${sec.ttl}<div class="cov-count" id="cov-count-${sec.key}" onclick="event.stopPropagation(); openWish('${sec.key}')">${n}/${total} items selected ${EDIT_ICON_SVG}</div></td>`;
+  let rowHtml=`<td class="cov-rowlbl" id="cov-lbl-${sec.key}"><span class="cov-arr food-chevron" id="cov-arr-${sec.key}" aria-hidden="true"><svg viewBox="0 0 8 12" width="8" height="12"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${sec.ttl}<div class="cov-count" id="cov-count-${sec.key}" onclick="event.stopPropagation(); openWish('${sec.key}')">${EDIT_ICON_SVG}</div></td>`;
   if(showNutrientCols){
     selNutrients.forEach(nk=>{
       const cov=sectionWeeklyCoverage(sec.key,nk);
@@ -6185,7 +6185,7 @@ function appendSummaryRows(activeSections, selNutrients){
 function refreshCoverageNumbers(sectionKey){
   const n=checked[sectionKey]?.size||0, total=SEC_MAP[sectionKey].src().length;
   const countEl=document.getElementById('cov-count-'+sectionKey);
-  if(countEl) countEl.innerHTML=`${n}/${total} items selected ${EDIT_ICON_SVG}`;
+  if(countEl) countEl.innerHTML=`${EDIT_ICON_SVG}`;
 
   const selNutrients=selAge?getSelectedNutrientKeys():[];
   const showNutrientCols=selAge&&selNutrients.length>0;
@@ -6614,7 +6614,7 @@ function buildRecipes(diets){
   let fastList=[];
   if(fast){ const fd=fast.diets.length?fast.diets:diets; fastList=RECIPES_DATA.filter(r=>r.diet.some(d=>fd.includes(d))); if(!fd.includes('non-veg')) fastList=fastList.filter(r=>!r.diet.every(d=>d==='non-veg')); }
   const FAST_SLOT={Breakfast:'fast_breakfast',Lunch:'fast_lunch',Snacks:'fast_snack',Dinner:'fast_dinner'};
-  const FAST_WIN={morning:['Breakfast'],evening:['Dinner'],full:['Breakfast','Lunch','Snacks','Dinner'],sunset:['Breakfast','Lunch','Snacks','Dinner']};
+  const FAST_MEAL={morning:'Breakfast',afternoon:'Lunch',evening:'Snacks',night:'Dinner'};
   // the planned dish and two alternatives of the same kind
   function pickOptions(pool,di,k,used){
     const n=pool.length, step=[5,7,3,11,13,1].find(x=>gcd(x,n)===1);
@@ -6666,19 +6666,23 @@ function buildRecipes(diets){
     const isFast=!!fast && fast.days.indexOf(di)>=0;
     if(isFast){
       const note=document.createElement('div'); note.className='rec-fast-note';
-      note.textContent='Fasting day · '+({morning:'morning',evening:'evening',full:'full day',sunset:'sunrise to sunset'}[fast.when])+'. Meals in the fasting time are fasting-friendly.';
+      note.textContent='Fasting day · '+(fast.when.length===4?'whole day':fast.when.join(', '))+'. Meals in the fasting time are fasting-friendly.';
       panel.appendChild(note);
     }
     const usedToday=[];
     MEALS.forEach(([label,basePool,offset])=>{
-      const inWin=isFast && FAST_WIN[fast.when].indexOf(label)>=0;
+      const inWin=isFast && fast.when.some(w=>FAST_MEAL[w]===label);
       let pool=basePool;
       if(inWin){ const fp=fastList.filter(r=>inMeal(r,FAST_SLOT[label])); if(fp.length) pool=fp; }
-      const fastTag=inWin?(fast.when==='sunset' && label==='Dinner'?'Break fast':'Fasting'):'';
+      const fastTag=inWin?'Fasting':'';
+      const block=document.createElement('div'); block.className='rec-block'+(fastTag?' fast':'');
+      const mealHead=document.createElement('div'); mealHead.className='rec-meal-label';
+      mealHead.innerHTML=`${label}${fastTag?`<span class="rec-fast-tag">${fastTag}</span>`:''}`;
+      block.appendChild(mealHead);
       const mealRow=document.createElement('div'); mealRow.className='rec-meal-row'+(fastTag?' fast':'');
       if(!pool.length){
-        mealRow.innerHTML=`<span class="rec-meal-label">${label}</span><span class="rec-meal-name" style="color:#8a8672">No matching recipe</span>`;
-        panel.appendChild(mealRow);
+        mealRow.innerHTML=`<span class="rec-meal-name" style="color:#8a8672">No matching recipe</span>`;
+        block.appendChild(mealRow); panel.appendChild(block);
         return;
       }
       const cur=pickOptions(pool,di,offset,usedToday);
@@ -6686,9 +6690,9 @@ function buildRecipes(diets){
       const detail=document.createElement('div'); detail.className='rcard rec-meal-detail';
       const altRow=document.createElement('div'); altRow.className='rec-alts';
       function paint(){
-        mealRow.innerHTML=`<span class="rec-meal-label">${label}${fastTag?`<span class="rec-fast-tag">${fastTag}</span>`:''}</span><span class="rec-meal-name">${cur[0].name}</span>`;
+        mealRow.innerHTML=`<span class="rec-meal-name">${cur[0].name}</span><span class="rec-meal-arr food-chevron" aria-hidden="true"><svg viewBox="0 0 8 12" width="8" height="12"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
         detail.innerHTML=buildRecipeCardHtml(cur[0]);
-        altRow.innerHTML=cur.length>1?`<span class="rec-alt-l">Or</span>`+cur.slice(1).map((a,i)=>`<button type="button" class="rec-alt" data-i="${i+1}">${a.name}</button>`).join(''):'';
+        altRow.innerHTML=cur.length>1?`<span class="rec-alt-l">Other options</span>`+cur.slice(1).map((a,i)=>`<button type="button" class="rec-alt" data-i="${i+1}">${a.name}</button>`).join(''):'';
       }
       paint();
       altRow.addEventListener('click',e=>{
@@ -6697,11 +6701,13 @@ function buildRecipes(diets){
       });
       mealRow.addEventListener('click',()=>{
         const open=detail.classList.toggle('open');
+        mealRow.classList.toggle('open',open);
         keepHeaderInView(mealRow);
       });
-      panel.appendChild(mealRow);
-      panel.appendChild(altRow);
-      panel.appendChild(detail);
+      block.appendChild(mealRow);
+      block.appendChild(detail);
+      block.appendChild(altRow);
+      panel.appendChild(block);
     });
     panels.appendChild(panel);
   });
@@ -23868,21 +23874,22 @@ html body #rem-alarm-card #clk-world-list .clk-wc .wc-remove:not(#ayu-x1):not(#a
 <script id="fasting-20261114-js">
 (function(){
   // Food → Fasting?: fasting days, when, and the diet to follow. Saved on this device and in Backup & Restore (Food).
-  var KEY='ayuBase6-food-fasting', st={days:[],when:'',diets:[]};
+  var KEY='ayuBase6-food-fasting', st={days:[],when:[],diets:[]}, WH=['morning','afternoon','evening','night'];
   function $(s,r){ return (r||document).querySelector(s); }
   function load(){
     try{
       var o=JSON.parse(localStorage.getItem(KEY)||'null'); if(!o || typeof o!=='object') return;
       st.days=(Array.isArray(o.days)?o.days:[]).filter(function(d,i,a){ return d===(d|0) && d>=0 && d<=6 && a.indexOf(d)===i; }).sort();
-      st.when=/^(morning|evening|full|sunset)$/.test(o.when)?o.when:'';
+      var w=o.when; if(w==='full'||w==='sunset') w=WH.slice(); else if(typeof w==='string') w=[w];
+      st.when=(Array.isArray(w)?w:[]).filter(function(v,i,a){ return WH.indexOf(v)>=0 && a.indexOf(v)===i; }).sort(function(a,b){ return WH.indexOf(a)-WH.indexOf(b); });
       st.diets=(Array.isArray(o.diets)?o.diets:[]).filter(function(v){ return /^(veg|non-veg|vegan)$/.test(v); });
     }catch(e){}
   }
-  function save(){ try{ if(!st.days.length && !st.when && !st.diets.length) localStorage.removeItem(KEY); else localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){} }
+  function save(){ try{ if(!st.days.length && !st.when.length && !st.diets.length) localStorage.removeItem(KEY); else localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){} }
   function paint(){
     var sec=$('#sec-fast'); if(!sec) return;
     [].forEach.call(sec.querySelectorAll('.fday'),function(b){ b.setAttribute('aria-pressed',st.days.indexOf(+b.dataset.d)>=0?'true':'false'); });
-    [].forEach.call(sec.querySelectorAll('.fwhen'),function(b){ b.setAttribute('aria-pressed',st.when===b.dataset.w?'true':'false'); });
+    [].forEach.call(sec.querySelectorAll('.fwhen'),function(b){ b.setAttribute('aria-pressed',st.when.indexOf(b.dataset.w)>=0?'true':'false'); });
     [].forEach.call(sec.querySelectorAll('.fpill input'),function(i){ i.checked=st.diets.indexOf(i.value)>=0; });
     $('#fast-more').hidden=!st.days.length;
   }
@@ -23895,14 +23902,14 @@ html body #rem-alarm-card #clk-world-list .clk-wc .wc-remove:not(#ayu-x1):not(#a
     var d=e.target.closest && e.target.closest('#sec-fast .fday');
     if(d){ var n=+d.dataset.d, i=st.days.indexOf(n); if(i>=0) st.days.splice(i,1); else st.days.push(n); st.days.sort(); changed(); return; }
     var w=e.target.closest && e.target.closest('#sec-fast .fwhen');
-    if(w){ st.when=(st.when===w.dataset.w)?'':w.dataset.w; changed(); }
+    if(w){ var k=st.when.indexOf(w.dataset.w); if(k>=0) st.when.splice(k,1); else { st.when.push(w.dataset.w); st.when.sort(function(a,b){ return WH.indexOf(a)-WH.indexOf(b); }); } changed(); }
   });
   document.addEventListener('change',function(e){
     var i=e.target.closest && e.target.closest('#sec-fast .fpill input'); if(!i) return;
     st.diets=[].map.call(document.querySelectorAll('#sec-fast .fpill input:checked'),function(x){ return x.value; }); changed();
   });
-  window.ayuFasting=function(){ return st.days.length?{days:st.days.slice(),when:st.when||'full',diets:st.diets.slice()}:null; };
-  window.ayuFastingReset=function(){ st.days=[]; st.when=''; st.diets=[]; save(); paint(); plan(); };
+  window.ayuFasting=function(){ return st.days.length?{days:st.days.slice(),when:st.when.length?st.when.slice():WH.slice(),diets:st.diets.slice()}:null; };
+  window.ayuFastingReset=function(){ st.days=[]; st.when=[]; st.diets=[]; save(); paint(); plan(); };
   load(); paint();
 })();
 </script>
@@ -23950,6 +23957,35 @@ html body #nutrition-panel #results .cov-table td.cov-rowlbl{background:var(--ti
   html body #nutrition-panel #results .cart-header,html body #nutrition-panel #results .wp-header,html body #nutrition-panel #results .wp-sub-hdr{padding-left:30px !important;padding-right:30px !important}
   html body #nutrition-panel #results .wp-sub-body{padding-left:30px !important;padding-right:30px !important}
 }
+</style>
+<style id="food-plan-20261114b">
+/* Fasting day buttons fit the section on any width */
+#sec-fast .fast-days{gap:4px}
+#sec-fast .fday{flex:1 1 0;min-width:0;max-width:40px;width:auto;height:auto;aspect-ratio:1/1}
+/* Nutrients & Food and Plan: different backgrounds */
+html body #nutrition-panel #results .cart-wrapper{background:var(--tint,#eff8f1) !important}
+html body #nutrition-panel #results #weekly-plan-block .weekly-plan-card{background:#fff !important}
+html body #nutrition-panel #results .cart-header:hover{background:color-mix(in srgb,var(--accent,#25704f) 10%,var(--tint,#eff8f1)) !important}
+/* Food Category table: no gap between rows; coloured Food Category and Calories columns */
+html body #nutrition-panel #results .cov-expand-row td{padding:0 !important;border-bottom:0 !important}
+html body #nutrition-panel #results .cov-expand-body.open{padding:12px}
+html body #nutrition-panel #results .cov-table td.cov-rowlbl{display:table-cell;white-space:nowrap}
+html body #nutrition-panel #results .cov-table td.cov-rowlbl:not(.cov-sum){padding-right:38px}
+html body #nutrition-panel #results .cov-table td.cov-rowlbl .cov-count{position:absolute;right:10px;top:50%;transform:translateY(-50%);margin:0;padding:4px;cursor:pointer}
+html body #nutrition-panel #results .cov-table th:first-child,html body #nutrition-panel #results .cov-table td.cov-rowlbl{background:color-mix(in srgb,var(--accent,#25704f) 16%,#fff)}
+html body #nutrition-panel #results .cov-table th#cov-th-Calories{background:color-mix(in srgb,var(--accent,#25704f) 20%,#fff)}
+html body #nutrition-panel #results .cov-table td[id$="-Calories"]{background:color-mix(in srgb,var(--accent,#25704f) 9%,#fff)}
+html body #nutrition-panel #results .cov-table th:first-child{background:color-mix(in srgb,var(--accent,#25704f) 24%,#fff)}
+/* Recipes For You: each meal is a block with a vertical bar */
+#nutrition-panel .rec-block{border-left:4px solid var(--accent,#25704f);padding:2px 0 2px 12px;margin:0 0 18px}
+#nutrition-panel .rec-block .rec-meal-label{display:flex;align-items:center;margin:0 0 6px;font-size:.78rem;color:var(--deep,#204b38);letter-spacing:.4px}
+#nutrition-panel .rec-block .rec-meal-row{margin:0 0 6px;justify-content:space-between}
+#nutrition-panel .rec-block .rec-meal-name{text-align:left;flex:1 1 auto}
+#nutrition-panel .rec-block .rec-meal-arr{flex:0 0 auto;color:var(--accent,#25704f);display:inline-flex;transition:transform .15s}
+#nutrition-panel .rec-block .rec-meal-row.open .rec-meal-arr{transform:rotate(90deg)}
+#nutrition-panel .rec-block .rec-meal-detail{margin:0 0 8px}
+#nutrition-panel .rec-block .rec-alts{margin:4px 0 0}
+#nutrition-panel .rec-block.fast{border-left-color:var(--deep,#204b38)}
 </style>
 </body>
 
