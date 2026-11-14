@@ -5845,7 +5845,7 @@ const SECTIONS=[
   {key:'juices', ttl:'🥤 Juices',             src:()=>JUICES_DATA,     diets:['veg','vegan','non-veg']},
   {key:'nonveg', ttl:'🍗 Non-Vegetarian',     src:()=>NONVEG_DATA,     diets:['non-veg']},
   {key:'sprouts',ttl:'🌱 Sprouts',            src:()=>SPROUTS_DATA,    diets:['veg','vegan','non-veg']},
-  {key:'dairy',  ttl:'🥣 Dairy & Traditional',src:()=>DAIRY_DATA,      diets:['veg','non-veg']},
+  {key:'dairy',  ttl:'🥣 Dairy',src:()=>DAIRY_DATA,      diets:['veg','non-veg']},
 ];
 const SEC_MAP={};
 SECTIONS.forEach(s=>SEC_MAP[s.key]=s);
@@ -6693,7 +6693,7 @@ function buildRecipes(diets){
       function paint(){
         mealRow.innerHTML=`<span class="rec-meal-name">${cur[0].name}</span><span class="rec-meal-arr food-chevron" aria-hidden="true"><svg viewBox="0 0 8 12" width="8" height="12"><path d="M1.5 1.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
         detail.innerHTML=buildRecipeCardHtml(cur[0]);
-        altRow.innerHTML=cur.length>1?`<span class="rec-alt-l">Try instead</span>`+cur.slice(1).map((a,i)=>`<button type="button" class="rec-alt" data-i="${i+1}">${a.name}</button>`).join(''):'';
+        altRow.innerHTML=cur.length>1?`<span class="rec-alt-l">Alternatives</span>`+cur.slice(1).map((a,i)=>`<button type="button" class="rec-alt" data-i="${i+1}">${a.name}</button>`).join(''):'';
       }
       paint();
       altRow.addEventListener('click',e=>{
@@ -24032,6 +24032,35 @@ html body #nutrition-panel #results .cov-table td.cov-rowlbl .cov-arr{position:a
 #nutrition-panel .rec-block .rec-alt{width:100%;height:100%;min-height:40px;padding:6px 10px;border-radius:10px;border:1.5px solid color-mix(in srgb,var(--bc) 40%,#fff);background:#fff;color:var(--bd);text-align:center;line-height:1.25;display:flex;align-items:center;justify-content:center}
 #nutrition-panel .rec-block .rec-alt:hover{background:color-mix(in srgb,var(--bc) 10%,#fff)}
 html body #nutrition-panel #results #wsh-rec{background:linear-gradient(90deg,#a6d1b7,#bddcb0 60%,#d3e8c6) !important}
+</style>
+<style id="food-plan-20261114d">
+/* Nutrients & Food and Plan: bar headers in two Food-green variants, white bodies, tinted sub-sections */
+html body #nutrition-panel #results .cart-wrapper,html body #nutrition-panel #results #weekly-plan-block .weekly-plan-card{background:#fff !important;border-radius:0 !important;overflow:hidden !important}
+html body #nutrition-panel #results .cart-wrapper{margin-bottom:16px !important}
+html body #nutrition-panel #results .cart-header{background:linear-gradient(100deg,#1d5a43,#2f8a67) !important;border:0 !important;padding-top:17px !important;padding-bottom:17px !important}
+html body #nutrition-panel #results .wp-header{background:linear-gradient(100deg,#35692a,#5b9a42) !important;border:0 !important;padding-top:17px !important;padding-bottom:17px !important}
+html body #nutrition-panel #results .cart-header:hover{background:linear-gradient(100deg,#184c39,#287a5a) !important}
+html body #nutrition-panel #results .wp-header:hover{background:linear-gradient(100deg,#2d5a23,#518b3a) !important}
+html body #nutrition-panel #results .cart-title,html body #nutrition-panel #results .wp-title{color:#fff !important}
+html body #nutrition-panel #results .cart-header .sec-toplevel-arr,html body #nutrition-panel #results .wp-arr{color:#fff !important}
+html body #nutrition-panel #results .wp-body{background:#fff}
+/* sub-sections: Cart (sea green) and Recipes (lime green), each with a stripe */
+html body #nutrition-panel #results .wp-sub-block{border:0 !important;border-bottom:1.5px solid #fff !important}
+html body #nutrition-panel #results .wp-sub-hdr{border-left:5px solid var(--sb,#2f8a67) !important;background:var(--st,#e3f3ea) !important;color:#1f4d36 !important}
+html body #nutrition-panel #results .wp-sub-hdr:hover{background:color-mix(in srgb,var(--sb,#2f8a67) 18%,#fff) !important}
+html body #nutrition-panel #results #wsh-groc{--sb:#2f8a67;--st:#dff2e8}
+html body #nutrition-panel #results #wsh-rec{--sb:#5b9a42;--st:#e7f3d6;background:var(--st) !important}
+html body #nutrition-panel #results .wp-sub-body{background:#fff}
+html body #nutrition-panel #results .wp-sub-hdr .wp-sub-arr{color:var(--sb,#2f8a67) !important}
+html body #nutrition-panel #results #weekly-plan-block .rec-day-nav{padding-top:2px}
+/* Food Category table: light rows down to Estimated; darker summary rows */
+html body #nutrition-panel #results .cov-table thead th,html body #nutrition-panel #results .cov-table th:first-child,html body #nutrition-panel #results .cov-table th#cov-th-Calories{background:#3d8b66;color:#fff}
+html body #nutrition-panel #results .cov-table td.cov-rowlbl{background:#e4f3ea}
+html body #nutrition-panel #results .cov-table td[id$="-Calories"]{background:#f1f9f4}
+html body #nutrition-panel #results .cov-table tr.cov-summary td{background:#d3eadb}
+html body #nutrition-panel #results .cov-table tr.cov-summary td.cov-rowlbl{background:#b9dcc8}
+html body #nutrition-panel #results .cov-table td{border-bottom-color:#d6e9dd}
+html body #nutrition-panel #results #coverage-table-wrap{background:#fff}
 </style>
 </body>
 
