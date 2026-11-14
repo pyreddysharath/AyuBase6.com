@@ -4904,7 +4904,7 @@ function updateBMI(){
     document.getElementById('weight-val').textContent=`${wKg} kg (${lbs} lbs)`;
   }
   if(heightTouched){
-    const totalInches=hCm/2.54, ft=Math.floor(totalInches/12), inch=Math.round(totalInches%12);
+    const totalInches=Math.round(hCm/2.54), ft=Math.floor(totalInches/12), inch=totalInches%12;
     document.getElementById('height-val').textContent=`${ft}'${inch}" (${hCm} cm)`;
   }
   // BMI needs both measurements — don't show/compute it until the person
@@ -4980,7 +4980,7 @@ function updateCalcBMI(){
     document.getElementById('calc-weight-val').textContent=`${wKg} kg (${lbs} lbs)`;
   }
   if(calcHeightTouched){
-    const totalInches=hCm/2.54, ft=Math.floor(totalInches/12), inch=Math.round(totalInches%12);
+    const totalInches=Math.round(hCm/2.54), ft=Math.floor(totalInches/12), inch=totalInches%12;
     document.getElementById('calc-height-val').textContent=`${ft}'${inch}" (${hCm} cm)`;
   }
   // BMI needs both measurements — don't show/compute it until the person
@@ -23786,19 +23786,24 @@ html body .ayu-age-sw svg{width:18px;height:18px}
   function scale(id,vert,name,unit){
     var s=$(id); if(!s || s.dataset.ayuScale) return null; s.dataset.ayuScale='1';
     var old=s.nextElementSibling; if(old && old.classList.contains('ayu-wheel')) old.remove();
-    var mn=Math.round(+s.min||0), mx=Math.round(+s.max||100), n=mx-mn, labs='';
-    for(var v=mn;v<=mx;v+=5){ var at=(vert ? (mx-v) : (v-mn))*ST; labs+='<b style="'+(vert?'top':'left')+':'+at+'px">'+v+'</b>'; }
-    var w=document.createElement('div'); w.className='ayu-scale '+(vert?'v':'h');
-    w.innerHTML='<div class="as-track" tabindex="0" role="slider" aria-orientation="'+(vert?'vertical':'horizontal')+'" aria-label="'+name+' in '+unit+': drag to set" aria-valuemin="'+mn+'" aria-valuemax="'+mx+'"><div class="as-in" style="'+(vert?'height':'width')+':'+(n*ST)+'px">'+labs+'</div></div><i class="as-mid" aria-hidden="true"></i>';
+    // Height is read in feet and inches (a tick for every inch); the value stays in cm underneath
+    var ftin=!!vert, U=ftin?14:ST, mn=Math.round(+s.min||0), mx=Math.round(+s.max||100), labs='';
+    function toU(c){ return ftin?Math.round(c/2.54):c; }
+    function toC(u){ return ftin?Math.round(u*2.54):u; }
+    var lo=toU(mn), hi=toU(mx), n=hi-lo;
+    if(ftin){ for(var q=lo;q<=hi;q++){ var at=(hi-q)*U, ft=Math.floor(q/12), inn=q%12; labs+='<i class="t'+(inn===0?' f':inn===6?' m':'')+'" style="top:'+at+'px"></i>'; if(inn===0) labs+='<b style="top:'+at+'px">'+ft+"'</b>"; else if(inn===6) labs+='<b style="top:'+at+'px">'+ft+"'6\"</b>"; } }
+    else for(var v=mn;v<=mx;v+=5){ var at2=(vert ? (mx-v) : (v-mn))*ST; labs+='<b style="'+(vert?'top':'left')+':'+at2+'px">'+v+'</b>'; }
+    var w=document.createElement('div'); w.className='ayu-scale '+(vert?'v':'h')+(ftin?' ayu-ftin':'');
+    w.innerHTML='<div class="as-track" tabindex="0" role="slider" aria-orientation="'+(vert?'vertical':'horizontal')+'" aria-label="'+name+' in '+(ftin?'feet and inches':unit)+': drag to set" aria-valuemin="'+mn+'" aria-valuemax="'+mx+'"><div class="as-in" style="'+(vert?'height':'width')+':'+(n*U)+'px">'+labs+'</div></div><i class="as-mid" aria-hidden="true"></i>';
     s.classList.add('ayu-scale-src'); s.after(w);
     var tr=w.firstChild, lock=0, last=0, t=null;
     function pos(){ return vert ? tr.scrollTop : tr.scrollLeft; }
     function put(x){ if(vert) tr.scrollTop=x; else tr.scrollLeft=x; }
-    function valAt(){ var i=Math.max(0,Math.min(n,Math.round(pos()/ST))); return vert ? mx-i : mn+i; }
-    function setVal(v){ v=Math.max(mn,Math.min(mx,v)); if(v===Math.round(+s.value)) return; s.value=String(v); s.dispatchEvent(new Event('input',{bubbles:true})); s.dispatchEvent(new Event('change',{bubbles:true})); }
-    function toScale(){ if(!tr.offsetParent) return; var v=Math.round(+s.value), x=(vert ? mx-v : v-mn)*ST; if(Math.abs(pos()-x)>1){ lock=Date.now()+300; put(x); } tr.setAttribute('aria-valuenow',String(v)); }
+    function valAt(){ var i=Math.max(0,Math.min(n,Math.round(pos()/U))); return vert ? hi-i : lo+i; }
+    function setVal(u){ var c=Math.max(mn,Math.min(mx,toC(u))); if(c===Math.round(+s.value)) return; s.value=String(c); s.dispatchEvent(new Event('input',{bubbles:true})); s.dispatchEvent(new Event('change',{bubbles:true})); }
+    function toScale(){ if(!tr.offsetParent) return; var c=Math.round(+s.value), v=toU(c), x=(vert ? hi-v : v-lo)*U; if(Math.abs(pos()-x)>1){ lock=Date.now()+300; put(x); } tr.setAttribute('aria-valuenow',String(c)); }
     tr.addEventListener('scroll',function(){ if(Date.now()<lock) return; last=Date.now(); setVal(valAt()); clearTimeout(t); t=setTimeout(function(){ last=0; toScale(); },260); });   // settles on a whole number
-    tr.addEventListener('keydown',function(e){ var d=(e.key==='ArrowUp'||e.key==='ArrowRight')?1:(e.key==='ArrowDown'||e.key==='ArrowLeft')?-1:0; if(!d) return; e.preventDefault(); setVal(Math.round(+s.value)+d); toScale(); });
+    tr.addEventListener('keydown',function(e){ var d=(e.key==='ArrowUp'||e.key==='ArrowRight')?1:(e.key==='ArrowDown'||e.key==='ArrowLeft')?-1:0; if(!d) return; e.preventDefault(); setVal(toU(Math.round(+s.value))+d); toScale(); });
     s.addEventListener('input',function(){ if(Date.now()-last>300) toScale(); });
     setInterval(function(){ if(Date.now()-last>700) toScale(); },600);
     toScale(); return w;
@@ -24314,6 +24319,20 @@ html body :is(#sec-physical,.calc-card:has(.ayu-hw)):not(#ayu-x1){position:relat
 html body :is(#sec-physical,.calc-card:has(.ayu-hw)) .ayu-hw:not(#ayu-x1){position:static !important;padding-bottom:0 !important}
 html body :is(#sec-physical,.calc-card:has(.ayu-hw)) .ayu-hw > .ayu-hw-sw:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){position:absolute !important;right:14px !important;bottom:12px !important;left:auto !important;top:auto !important;width:28px !important;height:28px !important;border-radius:8px !important;z-index:3}
 html body :is(#sec-physical,.calc-card:has(.ayu-hw)) .ayu-hw > .ayu-hw-sw svg{width:15px !important;height:15px !important}
+</style>
+<style id="bmi-ftin-20261114">
+html body .ayu-scale.v.ayu-ftin .as-in:not(#ayu-x1){background:none !important}
+html body .ayu-scale .as-in .t{position:absolute;right:0;width:8px;height:1.5px;transform:translateY(-50%);background:color-mix(in srgb,var(--wc) 55%,#94a3b8)}
+html body .ayu-scale .as-in .t.m{width:12px}
+html body .ayu-scale .as-in .t.f{width:18px;height:2px;background:color-mix(in srgb,var(--wc) 75%,#475569)}
+/* in the tape view the value reads on one line: feet and inches with cm, kg with lbs */
+html body .ayu-hw.ayu-hw-tape:not(#ayu-x1){display:grid !important;grid-template-columns:76px minmax(0,1fr);gap:4px 18px;align-items:center}
+html body .ayu-hw.ayu-hw-tape > .calc-row-stacked:not(#ayu-x1){display:contents !important}
+html body .ayu-hw.ayu-hw-tape > .calc-row-stacked:first-child > :first-child:not(#ayu-x1){grid-column:1/-1;grid-row:1;white-space:nowrap;margin:0 !important}
+html body .ayu-hw.ayu-hw-tape > .calc-row-stacked:nth-child(2) > :first-child:not(#ayu-x1){grid-column:1/-1;grid-row:2;white-space:nowrap;margin:0 !important}
+html body .ayu-hw.ayu-hw-tape .ayu-scale.v:not(#ayu-x1){grid-column:1;grid-row:3;margin:6px 0 0}
+html body .ayu-hw.ayu-hw-tape .ayu-scale.h:not(#ayu-x1){grid-column:2;grid-row:3;margin:6px 0 0}
+html body .ayu-hw.ayu-hw-tape .slider-val:not(#ayu-x1){white-space:nowrap}
 </style>
 </body>
 
