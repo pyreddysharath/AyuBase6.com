@@ -23110,7 +23110,7 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
     $('na-all').addEventListener('click',function(){
       var old=$('na-ask'); if(old){ old.remove(); return; }
       var box=document.createElement('div'); box.id='na-ask'; box.className='notif-off-ask';
-      box.innerHTML='<p class="noa-q"><b>Turn off every reminder and alarm?</b></p><ul class="noa-list"><li>Their settings stay as they are.</li></ul><div class="noa-btns"><button type="button" class="noa-yes">Turn off</button><button type="button" class="noa-no">Cancel</button></div>';
+      box.innerHTML='<p class="noa-q"><b>Turn off every reminder and alarm?</b></p><div class="noa-btns"><button type="button" class="noa-yes">Turn off</button><button type="button" class="noa-no">Cancel</button></div>';
       this.after(box); setTimeout(function(){ try{ box.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} },60);
       box.querySelector('.noa-no').addEventListener('click',function(){ box.remove(); });
       box.querySelector('.noa-yes').addEventListener('click',function(){
