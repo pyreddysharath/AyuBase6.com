@@ -14924,7 +14924,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     const saved=existing?JSON.parse(existing.dataset.reminder||'{}'):{};
     const form=document.createElement('form');form.className='custom-reminder-form';
     form.innerHTML='<label class="wide">Reminder name<input name="name" required maxlength="80" placeholder="e.g. Medicines, school pickup"></label>'+ 
-      '<label class="wide rem-details">Details<textarea name="details" rows="2" maxlength="200" placeholder="Optional, e.g. dose or place"></textarea></label>'+ 
+      '<label class="wide rem-details">Details<textarea name="details" rows="2" maxlength="1000" placeholder="Optional, e.g. dose or place"></textarea></label>'+ 
       '<label class="wide">Frequency<select name="frequency-mode"><option value="regular">At regular times</option><option value="selected">At selected times</option><option value="dates">On chosen dates</option></select></label>'+ 
       '<div class="wide reminder-frequency-fields"></div>'+ 
       '<div class="wide repeat-on"><div class="repeat-on-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Daily</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div></div>'+
@@ -14955,7 +14955,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       const ex=fields.querySelector('.sched-extra'); if(!ex)return;
       if(repeatOn)repeatOn.hidden=sched!=='weekly';
       if(sched==='once'||sched==='yearly'){
-        ex.innerHTML='<label class="sched-date"><span>Date</span><input type="date" name="sdate" aria-label="Date"></label><p class="sched-note">'+(sched==='once'?'Reminds once, on this date.':'Reminds on this day every year. 29 February reminds on 28 February in other years.')+'</p>';
+        ex.innerHTML='<label class="sched-date"><span>Date</span><input type="date" name="sdate" aria-label="Date"></label><p class="sched-note">'+(sched==='once'?'':'Reminds on this day every year. 29 February reminds on 28 February in other years.')+'</p>';
         const di=ex.querySelector('input'); di.value=onDay; di.addEventListener('change',()=>{if(di.value)onDay=di.value});
       } else if(sched==='monthly'){
         ex.innerHTML='<div class="mday-grid" role="group" aria-label="Days of the month"></div><p class="sched-note">Reminds on these days every month. A day a month does not have (like the 31st) reminds on its last day.</p>';
@@ -14973,10 +14973,10 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
         btn.addEventListener('click',()=>openDurationPicker(duration,v=>{duration=v;showDuration()}));
       } else {
         fields.innerHTML=(mode.value==='dates'?schedHtml():'')+'<div class="selected-times-wrap"><span class="st-lbl">Time</span><div class="st-col"><div class="selected-times-list"></div><button type="button" class="add-selected-time">＋ Add time</button></div></div>';
-        if(mode.value==='dates'){const sc=fields.querySelector('[name="sched"]');sc.value=sched;sc.addEventListener('change',()=>{sched=sc.value;drawSched()});drawSched()}
+        if(mode.value==='dates'){const sc=fields.querySelector('[name="sched"]');sc.value=sched;sc.addEventListener('change',()=>{sched=sc.value;drawSched();if(fields._once)fields._once()});drawSched()}
         const timesList=fields.querySelector('.selected-times-list');
         function drawTimes(){timesList.innerHTML='';chosenTimes.forEach((t,i)=>{const row=document.createElement('div');row.className='selected-time-row';const b=document.createElement('button');b.type='button';b.className='duration-clock-trigger selected-time-btn';b.textContent=formatClock(t);b.addEventListener('click',()=>openTimePicker('custom',t,v=>{chosenTimes[i]=v;drawTimes()},'Select time'));const rm=document.createElement('button');rm.type='button';rm.className='remove-selected-time';rm.textContent='×';rm.setAttribute('aria-label','Remove time');rm.disabled=chosenTimes.length===1;rm.addEventListener('click',()=>{chosenTimes.splice(i,1);drawTimes()});row.append(b,rm);timesList.append(row)})}
-        drawTimes();fields.querySelector('.add-selected-time').addEventListener('click',()=>{chosenTimes.push('09:00');drawTimes();const b=timesList.lastElementChild?.querySelector('button');if(b)b.click()});
+        fields._once=function(){const one=mode.value==='dates'&&sched==='once';if(one&&chosenTimes.length>1)chosenTimes=chosenTimes.slice(0,1);fields.querySelector('.add-selected-time').hidden=one;drawTimes()};fields._once();fields.querySelector('.add-selected-time').addEventListener('click',()=>{chosenTimes.push('09:00');drawTimes();const b=timesList.lastElementChild?.querySelector('button');if(b)b.click()});
       }
     }
     mode.addEventListener('change',renderFrequency);renderFrequency();
@@ -14993,7 +14993,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     form.addEventListener('submit',function(e){
       e.preventDefault();const d=new FormData(form);const item=existing||document.createElement('div');if(!existing){item.className='custom-reminder-item';item.dataset.reminderId=String(++customReminderCounter)}
       stopReminderTimers(item);
-      const data={speak:form.elements.speak?form.elements.speak.checked:false,voice:form.elements.voice?form.elements.voice.value:'',speakLang:form.elements.speakLang?form.elements.speakLang.value:'',name:String(d.get('name')).trim(),details:String(d.get('details')||'').trim(),mode:mode.value,duration:duration,times:mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],sound:d.get('sound'),days:(mode.value==='dates'&&sched!=='weekly')?[0,1,2,3,4,5,6]:[...days].sort((a,b)=>a-b),vibrate:form.elements.vibrate?form.elements.vibrate.checked:true};
+      const data={speak:form.elements.speak?form.elements.speak.checked:false,voice:form.elements.voice?form.elements.voice.value:'',speakLang:form.elements.speakLang?form.elements.speakLang.value:'',name:String(d.get('name')).trim(),details:String(d.get('details')||'').trim(),mode:mode.value,duration:duration,times:mode.value!=='regular'?[...new Set(mode.value==='dates'&&sched==='once'?chosenTimes.slice(0,1):chosenTimes)].sort():[],sound:d.get('sound'),days:(mode.value==='dates'&&sched!=='weekly')?[0,1,2,3,4,5,6]:[...days].sort((a,b)=>a-b),vibrate:form.elements.vibrate?form.elements.vibrate.checked:true};
       if(mode.value==='dates'){data.sched=sched;if(sched==='once'||sched==='yearly')data.date=onDay;if(sched==='monthly')data.mdays=mdays.slice().sort((a,b)=>a-b)}
       if(saved.on===false)data.on=false;
       item.dataset.reminder=JSON.stringify(data);
@@ -22422,7 +22422,7 @@ html body #start-my-day-card #chk-alarm.ayu-sub:not(#ayu-x1){margin-bottom:0 !im
     if(remOn) document.querySelectorAll('#custom-reminders-list .custom-reminder-item').forEach(function(item){
       try{
         var d = JSON.parse(item.dataset.reminder||'{}'); if(!d.name || d.sound==='none' || d.on===false) return;
-        var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode }; if(d.details) c.details = String(d.details).slice(0,200);
+        var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode }; if(d.details) c.details = String(d.details).slice(0,1000);
         if(Array.isArray(d.days) && d.days.length && d.days.length<7) c.days = d.days.filter(function(n){ return n>=0 && n<=6; });
         if(d.mode==='regular'){ c.every = Math.max(1, Number(d.duration)||1); c.anchor = Number(item.dataset.startedAt)||Date.now(); }
         else if(d.mode==='dates'){ c.sched = d.sched||'once'; if(d.date) c.date = d.date; if(Array.isArray(d.mdays)) c.mdays = d.mdays.slice(); if(c.sched!=='weekly') delete c.days; c.times = (d.times||[]).map(toMin).filter(function(m){ return m!==null; }); }
@@ -24291,6 +24291,10 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .selected-t
   html body #alerts-panel #custom-reminders-card .custom-reminder-form .sched-extra .sched-date:not(#ayu-x1),
   html body #alerts-panel #custom-reminders-card .custom-reminder-form .selected-times-wrap:not(#ayu-x1){grid-template-columns:92px minmax(0,1fr)}
 }
+</style>
+<style id="rem-once-20261115">
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .add-selected-time[hidden]{display:none !important}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .sched-extra .sched-note:empty{display:none}
 </style>
 </body>
 
