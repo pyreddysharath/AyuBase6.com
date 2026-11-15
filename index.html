@@ -18749,7 +18749,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
       ALERT_SOUNDS.alarm=ALERT_SOUNDS.alarm||{wave:'square',notes:[{f:880,d:.12},{f:0,d:.08},{f:880,d:.12},{f:0,d:.08},{f:880,d:.12},{f:0,d:.08},{f:880,d:.12}]};
     }
   }catch(e){}
-  var APP_TONES=[['rise','Rising chime'],['alarm','Classic alarm'],['bell','Soft Bell'],['chime','Chime'],['marimba','Marimba Pop'],['xylophone','Xylophone'],['ping','Ping'],['bubble','Bubble'],['drop','Water drop'],['drum','Drum']];
+  var APP_TONES=[['rise','Rising Chime'],['alarm','Classic Alarm'],['bell','Soft Bell'],['chime','Chime'],['marimba','Marimba Pop'],['xylophone','Xylophone'],['ping','Ping'],['bubble','Bubble'],['drop','Water Drop'],['drum','Drum']];
   var DEF={on:false,tone:'rise',ring:1,snoozeMin:10,snoozeMax:3,keys:'stop',lock:'snooze'};
   try{ if(!localStorage.getItem('ayuWakeRing1')){ localStorage.setItem('ayuWakeRing1','1'); var w0=JSON.parse(localStorage.getItem('ayuBase6-routine-alarm')||'null'); if(w0 && +w0.ring===0){ w0.ring=1; localStorage.setItem('ayuBase6-routine-alarm',JSON.stringify(w0)); } } }catch(e){}
   var A={
@@ -18828,8 +18828,8 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
   function opts(list,v){ return list.map(function(o){ return '<option value="'+o[0]+'"'+(String(o[0])===String(v)?' selected':'')+'>'+o[1]+'</option>'; }).join(''); }
   function toneOptions(){
     var pt=[]; try{ pt=JSON.parse(localStorage.getItem('ayuPhoneTones')||'[]'); if(!Array.isArray(pt)) pt=[]; }catch(e){ pt=[]; }
-    var h=APP ? '<optgroup label="Phone"><option value="phone">Phone’s default alarm</option>'+pt.map(function(t){ return '<option value="'+esc(t.uri)+'">'+esc(t.title)+'</option>'; }).join('')+'</optgroup>' : '';
-    h+='<optgroup label="AyuBase6 tones">'+APP_TONES.map(function(t){ return '<option value="'+t[0]+'">'+t[1]+'</option>'; }).join('')+'</optgroup>';
+    var h=APP ? '<optgroup label="System"><option value="phone">Phone’s default alarm</option>'+pt.map(function(t){ return '<option value="'+esc(t.uri)+'">'+esc(t.title)+'</option>'; }).join('')+'</optgroup>' : '';
+    h+='<optgroup label="App">'+APP_TONES.map(function(t){ return '<option value="'+t[0]+'">'+t[1]+'</option>'; }).join('')+'</optgroup>';
     var nm=ownName();
     h+='<optgroup label="Your own">'+(nm?'<option value="own">'+esc(nm)+'</option>':'')+'<option value="upload">Upload a sound…</option></optgroup>';
     h+='<option value="none">No sound (vibrate only)</option>';
@@ -22240,8 +22240,11 @@ html body #routines-panel #chk-alarm > .ayu-sec-hdr:not(#ayu-x1),html body #rout
 </style>
 <script id="sound-sort-20261108-js">
 (function(){
-  // every Sound drop-down: its sounds in alphabetical order ("Silent" and "Upload a sound…" stay last)
+  // Every Sound list (Reminders, Checks, Clock, Timer): the same names, the same groups and the same order.
+  // Groups: System (the phone's own sounds, app only), App (AyuBase6's sounds), Your own. Each group A to Z; "No sound" and "Silent" last.
   var SEL='select[id$="-sound"]:not(#eye-ex-count):not(#eye-ex-days), select[id$="-tone"], select[name="sound"], #chk-sound';
+  var NAMES={rise:'Rising Chime',alarm:'Classic Alarm',bell:'Soft Bell',chime:'Chime',marimba:'Marimba Pop',xylophone:'Xylophone',ping:'Ping',bubble:'Bubble',drop:'Water Drop',drum:'Drum',footsteps:'Footsteps',splash:'Splash'};
+  var GL={'phone':'System','system':'System','ayubase6 tones':'App','app':'App','your own':'Your own'}, GO={'System':0,'App':1,'Your own':2};
   function last(o){ return /^(none|silent|upload)$/i.test(o.value) || /^(silent|upload a sound)/i.test(o.textContent.trim()); }
   function key(o){ return o.textContent.trim().toLowerCase(); }
   function sortIn(parent){
@@ -22250,12 +22253,27 @@ html body #routines-panel #chk-alarm > .ayu-sec-hdr:not(#ayu-x1),html body #rout
     if(want.every(function(o,i){ return o===os[i]; })) return false;
     var at=os[os.length-1].nextSibling; want.forEach(function(o){ parent.insertBefore(o,at); }); return true;
   }
-  function sortSel(s){
-    var v=s.value, ch=sortIn(s);
-    [].forEach.call(s.querySelectorAll('optgroup'),function(g){ if(sortIn(g)) ch=true; });
+  function unify(s){
+    var v=s.value, ch=false, app=null;
+    [].forEach.call(s.querySelectorAll('option'),function(o){ var n=NAMES[o.value]; if(n && o.textContent!==n){ o.textContent=n; ch=true; } });
+    [].forEach.call(s.querySelectorAll('optgroup'),function(g){ var n=GL[String(g.label).toLowerCase()]; if(n && g.label!==n){ g.label=n; ch=true; } if(g.label==='App') app=g; });
+    var loose=[].filter.call(s.children,function(c){ return c.tagName==='OPTION' && NAMES[c.value] && !last(c); });   // plain AyuBase6 sounds: they go in the App group
+    if(loose.length){
+      if(!app){ app=document.createElement('optgroup'); app.label='App'; s.insertBefore(app,loose[0]); }
+      loose.forEach(function(o){ app.appendChild(o); }); ch=true;
+    }
+    var gs=[].filter.call(s.children,function(c){ return c.tagName==='OPTGROUP'; });
+    var want=gs.slice().sort(function(a,b){ return (GO[a.label]==null?9:GO[a.label])-(GO[b.label]==null?9:GO[b.label]); });
+    if(!want.every(function(g,i){ return g===gs[i]; })){ var first=s.querySelector(':scope > optgroup'); want.forEach(function(g){ s.insertBefore(g,first); }); ch=true; }
+    if(sortIn(s)) ch=true;
+    gs.forEach(function(g){ if(sortIn(g)) ch=true; });
+    var tail=[].filter.call(s.children,function(c){ return c.tagName==='OPTION'; });   // No sound / Silent stay after the groups
+    if(tail.length && s.lastElementChild!==tail[tail.length-1]){ tail.forEach(function(o){ s.appendChild(o); }); ch=true; }
     if(ch){ s.value=v; try{ s.dispatchEvent(new CustomEvent('ayu-options-sorted')); }catch(e){} }
+    return ch;
   }
-  function all(){ document.querySelectorAll(SEL).forEach(sortSel); }
+  window.ayuSoundUnify=unify;
+  function all(){ document.querySelectorAll(SEL).forEach(unify); }
   var busy=false;
   new MutationObserver(function(){ if(busy) return; busy=true; setTimeout(function(){ all(); busy=false; },60); }).observe(document.body,{subtree:true,childList:true});
   all(); document.addEventListener('DOMContentLoaded',all); window.addEventListener('load',all);
@@ -23342,12 +23360,13 @@ html body select.ayu-own-list{pointer-events:none}
 <script id="sound-list-20261113-js">
 (function(){
   var SEL='select[id$="-sound"]:not(#eye-ex-count):not(#eye-ex-days), select[id$="-tone"], select[name="sound"], #chk-sound';
-  var GC={ 'phone':'#475569', 'your own':'#7c3aed' };
+  var GC={ 'system':'#475569', 'your own':'#7c3aed' };
   function accent(sel){ try{ var c=getComputedStyle(sel).borderTopColor; if(c && !/rgba?\(0, 0, 0(, 0)?\)|transparent/.test(c)) return c; }catch(e){} return '#0f766e'; }
   function mark(){ document.querySelectorAll(SEL).forEach(function(s){ if(!s.classList.contains('ayu-own-list')) s.classList.add('ayu-own-list'); }); }
   function close(){ var d=document.getElementById('ayu-snd'); if(d) d.remove(); }
   function open(sel){
     close();
+    if(typeof window.ayuSoundUnify==='function') window.ayuSoundUnify(sel);   // names, groups and order are put right when it opens
     var ac=accent(sel), d=document.createElement('div'); d.id='ayu-snd'; d.setAttribute('role','dialog'); d.setAttribute('aria-label','Sound'); d.style.setProperty('--as-c',ac);
     var h='<div class="as-box"><div class="as-hd"><span>Sound</span><button type="button" class="as-x" aria-label="Close">×</button></div><div class="as-list">';
     function opt(o,g){ return '<button type="button" class="as-o'+(o.value===sel.value?' on':'')+'" style="--g:'+g+'" data-v="'+o.value.replace(/"/g,'&quot;')+'"><i></i><span>'+o.textContent.replace(/</g,'&lt;')+'</span></button>'; }
@@ -23374,6 +23393,7 @@ html body select.ayu-own-list{pointer-events:none}
     e.preventDefault(); e.stopPropagation(); open(hit);
   },true);
   document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+  window.ayuIsSoundSelect=function(s){ try{ return !!(s && s.matches && s.matches(SEL)); }catch(e){ return false; } }; window.ayuOpenSoundList=open;
   mark(); setInterval(mark,800);
   // the phone's own alarm sounds and ringtones, for the alarm lists
   function phoneTones(){
@@ -23381,7 +23401,7 @@ html body select.ayu-own-list{pointer-events:none}
     n.listTones().then(function(l){
       if(!Array.isArray(l)) return; var s=JSON.stringify(l); try{ if(localStorage.getItem('ayuPhoneTones')===s) return; localStorage.setItem('ayuPhoneTones',s); }catch(e){ return; }
       if(typeof window.ayuToneOptions!=='function') return;
-      ['wake-al-tone','rem-al-tone','remf-al-tone'].forEach(function(id){ var el=document.getElementById(id); if(!el) return; var v=el.value; el.innerHTML=window.ayuToneOptions(); el.value=v; });
+      ['wake-al-tone','rem-al-tone','remf-al-tone','clk-t-tone'].forEach(function(id){ var el=document.getElementById(id); if(!el) return; var v=el.value; el.innerHTML=window.ayuToneOptions(); el.value=v; });
     }).catch(function(){});
   }
   setTimeout(phoneTones,2500);
@@ -25702,6 +25722,7 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
       menu.appendChild(b);
     });
     trigger.addEventListener('click',()=>{
+      if (typeof window.ayuIsSoundSelect === 'function' && window.ayuIsSoundSelect(select) && typeof window.ayuOpenSoundList === 'function') { closeMenu(); window.ayuOpenSoundList(select); return; }   // every Sound list is the same one (System / App / Your own), drawn when it is opened
       if (select.classList.contains('alert-interval-select') && typeof window.openReminderIntervalPicker === 'function') {
         closeMenu();
         window.openReminderIntervalPicker(select);
@@ -25711,7 +25732,7 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
       closeMenu(); active=item; sync(); placeMenu(item); trigger.setAttribute('aria-expanded','true');
       const chosen=menu.querySelector('[aria-selected="true"]'); if(chosen) chosen.scrollIntoView({block:'nearest'});
     });
-    select.addEventListener('change',sync);
+    select.addEventListener('change',sync); select.addEventListener('ayu-options-sorted',sync);
     wrap.appendChild(trigger); document.body.appendChild(menu);
     // CSS width follows the original control's flex sizing, including the sound-row controls.
     const ro = new ResizeObserver(()=>{
