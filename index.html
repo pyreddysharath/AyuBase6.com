@@ -23510,7 +23510,7 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
         +'<button type="button" class="bg-x" aria-label="Close" title="Close">×</button>';
       el.querySelector('.bg-x').addEventListener('click',function(){ S(KC,{sig:sig,at:Date.now()}); bgPaint(p); });
       el.querySelectorAll('.bg-btns button').forEach(function(b){ b.addEventListener('click',function(e){ e.stopPropagation(); var n=window.ayuNative, a=b.dataset.a;
-        if(a==='battery' && n.openBattery) n.openBattery(); else if(a==='notif' && n.openNotifSettings) n.openNotifSettings(); else if(typeof showFooterSection==='function') showFooterSection('check'); }); });
+        if(a==='battery' && n.openBattery) n.openBattery(); else if(a==='notif' && n.openNotifSettings) n.openNotifSettings(); else if(typeof showFooterSection==='function'){ showFooterSection('check'); setTimeout(function(){ if(window.ayuRunCheck) ayuRunCheck(); },400); } }); });
     });
   }
   function bgCheck(){
