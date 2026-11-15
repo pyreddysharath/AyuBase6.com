@@ -21197,6 +21197,12 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
           card.insertAdjacentHTML('afterend','<div class="au-auto-row"><span class="au-auto-l">Check automatically</span><label class="master-switch" title="Check automatically"><input type="checkbox" id="au-auto" aria-label="Check for updates automatically"></label></div><div class="au-note au-auto-note">Every 2 hours from 10 AM to 8 PM, with a quiet notification.</div>');
           var sw=$('au-auto'); sw.checked=(isNaN(n)?2:n)>0;
           sw.addEventListener('change',function(){ N.updateChecksSet(sw.checked?2:0).catch(function(){}); });
+          if(typeof N.autoUpdateGet==='function' && !$('au-autoinst')){
+            sec.querySelector('.au-auto-note').insertAdjacentHTML('afterend','<div class="au-auto-row au-inst-row"><span class="au-auto-l">Update automatically</span><label class="master-switch" title="Update automatically"><input type="checkbox" id="au-autoinst" aria-label="Update automatically"></label></div><div class="au-note au-auto-note au-inst-row">New versions download by themselves, then Android asks you to confirm.</div>');
+            var si=$('au-autoinst'); si.checked=!!N.autoUpdateGet();
+            si.addEventListener('change',function(){ N.autoUpdateSet(si.checked); });
+            window.addEventListener('ayu-update-info',function(){ if(si.checked!==!!N.autoUpdateGet()) si.checked=!!N.autoUpdateGet(); });
+          }
         }).catch(function(){});
       }
     }
@@ -21235,7 +21241,7 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     else { cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
     if(L && (u.error==='download'||u.error==='install')){ b='Update'; alt=false; }
     if(bg && !L && u.store!=='play'){ b='Checking…'; dis=true; }
-    var ar=document.querySelector('#sec-app .au-auto-row'); if(ar) ar.hidden=u.store==='play';   // Google Play checks by itself
+    document.querySelectorAll('#sec-app .au-auto-row,#sec-app .au-inst-row').forEach(function(ar){ ar.hidden=u.store==='play'; });   // Google Play checks by itself
     line.className='au-line '+cls; line.textContent=txt; note.textContent=nt;
     btn.textContent=b; btn.disabled=dis; btn.classList.toggle('alt',alt);
     $('au-barrow').hidden=pct<0; $('au-x').hidden=!(window.ayuNative && window.ayuNative.updateCancel); if(pct>=0) bar.firstChild.style.width=pct+'%';
@@ -24253,6 +24259,13 @@ html body .ayu-scale.h .as-tag.t3{left:4px;top:5px}
 html body .ayu-scale.h .as-tag.t4{left:4px;top:24px;opacity:.8}
 html body .ayu-scale.v .as-tag.t1{left:3px;top:3px}
 html body .ayu-scale.v .as-tag.t2{left:28px;top:3px;opacity:.8}
+</style>
+<style id="auto-update-20261115">
+/* Update automatically: the switch under the Update button in the update banner */
+.ayu-upd-banner .appb-auto{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0 0;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.88);color:#3b2a14;font-size:.8rem;font-weight:800;line-height:1.25}
+.ayu-upd-banner .appb-auto .master-switch{flex:0 0 auto;margin:0}
+.ayu-upd-banner .appb-auto .master-switch input:checked:not(#ayu-x1){background:var(--appb-c,#16a34a) !important}
+html body #sec-app .au-inst-row.au-auto-row{margin-top:10px !important}
 </style>
 </body>
 
