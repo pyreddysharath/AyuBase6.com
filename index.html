@@ -23696,6 +23696,7 @@ html body .ayu-age-sw svg{width:18px;height:18px}
     var lo=toU(mn), hi=toU(mx), n=hi-lo;
     if(ftin){ for(var q=lo;q<=hi;q++){ var at=(hi-q)*U, ft=Math.floor(q/12), inn=q%12; labs+='<i class="t'+(inn===0?' f':inn===6?' m':'')+'" style="top:'+at+'px"></i>'; if(inn===0) labs+='<b style="top:'+at+'px">'+ft+"'</b>"; else if(inn===6) labs+='<b style="top:'+at+'px">'+ft+"'6\"</b>"; } }
     else for(var v=mn;v<=mx;v+=5){ var at2=(vert ? (mx-v) : (v-mn))*ST; labs+='<b style="'+(vert?'top':'left')+':'+at2+'px">'+v+'</b>'; }
+    if(!vert && /kg/i.test(unit)){ for(var lb=Math.ceil(mn*2.20462/10)*10; lb<=mx*2.20462; lb+=10){ var lx=(lb/2.20462-mn)*ST; labs+='<i class="lbt" style="left:'+lx+'px"></i><b class="lb" style="left:'+lx+'px">'+lb+' lb</b>'; } }
     var w=document.createElement('div'); w.className='ayu-scale '+(vert?'v':'h')+(ftin?' ayu-ftin':'');
     w.innerHTML='<div class="as-track" tabindex="0" role="slider" aria-orientation="'+(vert?'vertical':'horizontal')+'" aria-label="'+name+' in '+(ftin?'feet and inches':unit)+': drag to set" aria-valuemin="'+mn+'" aria-valuemax="'+mx+'"><div class="as-in" style="'+(vert?'height':'width')+':'+(n*U)+'px">'+labs+'</div></div><i class="as-mid" aria-hidden="true"></i>';
     s.classList.add('ayu-scale-src'); s.after(w);
@@ -24238,6 +24239,11 @@ html body .ayu-hw.ayu-hw-tape .ayu-scale.h:not(#ayu-x1){grid-column:2;grid-row:3
 html body .ayu-hw.ayu-hw-tape > .calc-row-stacked:nth-child(2) .slider-val:not(#ayu-x1){font-size:1em !important}
 html body .ayu-hw.ayu-hw-tape .slider-val:not(#ayu-x1){white-space:nowrap}
 html body #calc-bmi-wrap .bmi-box:not(#ayu-x1){background:#d3f4fa !important}
+</style>
+<style id="bmi-lbs-20261115">
+/* Weight scale: pounds are marked under the kg numbers, every 10 lb */
+html body .ayu-scale.h .as-in b.lb:not(#ayu-x1){top:25px;font-size:9.5px;font-weight:700;color:#b45309;white-space:nowrap}
+html body .ayu-scale.h .as-in .lbt:not(#ayu-x1){position:absolute;top:21px;width:1.5px;height:5px;margin-left:-.75px;background:#b45309;opacity:.8}
 </style>
 </body>
 
