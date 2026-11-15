@@ -13599,30 +13599,10 @@ function toggleSiteInfo(id){
   }, 30);
 }
 
-// ── "Our Other Sites" — data-driven from config/OurOtherSites.json ──
-// The section's intro text and its list of sites (name, url, blurb) live in
-// that JSON file rather than being hardcoded here, so the list can be
-// edited without touching this HTML. Fetching a local file only works when
-// the page is served over http(s) — opening it directly as a file:// page
-// blocks fetch() for security reasons — so this falls back to an identical
-// embedded copy of that same data when the fetch fails, keeping the
-// section working either way.
-const OUR_OTHER_SITES_FALLBACK = {
-  content: "A couple of other things we've built — feel free to drop by if any of these sound useful to you.",
-  sites: [
-    {
-      site: "BharatGaruda.com",
-      url: "https://bharatgaruda.com",
-      information: "India's government sites aggregator — brings together official government links across every state and union territory of India, in one place."
-    },
-    {
-      site: "IntiGuttu.com",
-      url: "https://intiguttu.com",
-      information: "A private, no-login home reference app — for household DIY fixes, everyday tips, and recipes from every state of India and country in the world."
-    }
-  ]
-};
-
+// ── "Our Other Sites" — always read from config/OurOtherSites.json ──
+// The intro text and the list of sites (name, url, blurb) live only in that
+// JSON file, so the list is edited there without touching this HTML. The sites
+// are shown in alphabetical order by name.
 function slugifySiteName(name){
   return String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'site';
 }
@@ -13631,8 +13611,9 @@ function renderOurOtherSites(data){
   const introEl = document.getElementById('othersites-intro');
   const listEl = document.getElementById('othersites-list');
   if(!introEl || !listEl) return;
-  introEl.textContent = (data && data.content) || OUR_OTHER_SITES_FALLBACK.content;
-  const sites = (data && Array.isArray(data.sites)) ? data.sites : OUR_OTHER_SITES_FALLBACK.sites;
+  if(!data || !Array.isArray(data.sites)){ introEl.textContent = ''; listEl.innerHTML = '<p class="othersites-intro">The list could not be loaded. Check your internet and open this again.</p>'; return; }
+  introEl.textContent = data.content || '';
+  const sites = data.sites.slice().sort((a, b) => String(a.site || a.url || '').localeCompare(String(b.site || b.url || ''), undefined, { sensitivity: 'base' }));
   const infoIconSvg = `<svg viewBox="0 0 24 24" aria-hidden="true"><g transform="skewX(-10)">
     <ellipse cx="12" cy="12" rx="8" ry="9" fill="none" stroke="currentColor" stroke-width="2.3"></ellipse>
     <rect x="10.7" y="9.6" width="2.6" height="6.6" rx="0.5" fill="currentColor"></rect>
@@ -13663,9 +13644,7 @@ async function loadOurOtherSites(){
     const data = await res.json();
     renderOurOtherSites(data);
   } catch(err){
-    // Expected on file:// or when the config folder isn't alongside the
-    // page — fall back to the embedded copy so the section still works.
-    renderOurOtherSites(OUR_OTHER_SITES_FALLBACK);
+    renderOurOtherSites(null);   // no copy of the list in this file: it is shown only when the JSON can be read
   }
 }
 loadOurOtherSites();
