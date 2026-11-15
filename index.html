@@ -10664,7 +10664,7 @@ const RECIPES_DATA = [
       <button id="notif-enable-btn" onclick="ayuSysNotifBtn()">Allow notifications</button>
     </div>
     <div class="ns-h" id="ns-test">Test notifications</div>
-    <button type="button" class="notif-help-card" onclick="showFooterSection('check')">
+    <button type="button" class="notif-help-card" onclick="showFooterSection('check');setTimeout(function(){ if(window.ayuRunCheck) ayuRunCheck(); },400)">
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/><path d="M10.6 8.3a1.5 1.5 0 0 1 2.9.5c0 1-1.5 1.4-1.5 2.2"/><path d="M12 13.2h.01"/></svg>
       <span class="nhc-t"><b>Run a quick check</b><span>Run a quick check of sound, volume and alarms</span></span><span class="nhc-go" aria-hidden="true">›</span>
     </button>
@@ -13822,6 +13822,7 @@ function showFooterSection(id){
 // clears the feedback inputs — the fields are just hidden, not reset —
 // so a draft name/message is still there when Feedback is reopened.
 document.addEventListener('click', function(e){
+  if (e.isTrusted===false) return;   // a click made by the app itself (a switch flipped for you) is not you leaving the footer
   if (!document.contains(e.target)) return;   // the tapped button removed itself (a Cancel inside the footer)
   if (e.target.closest('#ayu-pop, [role="dialog"], [aria-modal="true"]')) return;   // OK on a pop-up opened from the footer keeps the section open
   if (!e.target.closest('.app-footer') && !e.target.closest('#footer-tabs-row')) {
