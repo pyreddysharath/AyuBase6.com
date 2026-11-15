@@ -14916,24 +14916,24 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     const N=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     return ' · '+[1,2,3,4,5,6,0].filter(d=>days.includes(d)).map(d=>N[d]).join(', ');
   }
-  // Details: a little rich text (bold, italic, underline, bullets). Only these tags are ever kept.
+  // Notes: a little rich text (bold, italic, underline, bullets). Only these tags are ever kept.
   const D_OK={B:1,STRONG:1,I:1,EM:1,U:1,BR:1,UL:1,OL:1,LI:1,DIV:1,P:1};
-  function detailsClean(src){
+  function notesClean(src){
     src=String(src||''); if(!/<\/?[a-z][^>]*>/i.test(src)) src=src.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
     const t=document.createElement('template'); t.innerHTML=src;
     (function walk(n){ [...n.childNodes].forEach(c=>{ if(c.nodeType===3) return; if(c.nodeType!==1){ c.remove(); return; } walk(c); if(!D_OK[c.tagName]) c.replaceWith(...c.childNodes); else [...c.attributes].forEach(a=>c.removeAttribute(a.name)); }); })(t.content);
     return t.innerHTML;
   }
-  function detailsText(html){
-    const s=detailsClean(html).replace(/<br\s*\/?>/gi,'\n').replace(/<\/(div|p|li)>/gi,'\n').replace(/<li>/gi,'• ').replace(/<[^>]+>/g,'');
+  function notesText(html){
+    const s=notesClean(html).replace(/<br\s*\/?>/gi,'\n').replace(/<\/(div|p|li)>/gi,'\n').replace(/<li>/gi,'• ').replace(/<[^>]+>/g,'');
     const ta=document.createElement('textarea'); ta.innerHTML=s; return ta.value.replace(/\n{3,}/g,'\n\n').trim();
   }
-  window.ayuDetailsText=detailsText; window.ayuDetailsClean=detailsClean;
-  function openDetailsPopup(title,html){
+  window.ayuNotesText=notesText; window.ayuNotesClean=notesClean;
+  function openNotesPopup(title,html){
     const ov=document.createElement('div'); ov.className='tp-overlay';
     ov.innerHTML='<div class="tp-dialog rd-dialog" role="dialog" aria-modal="true"><div class="tp-title"></div><div class="rd-view"></div><div class="rd-close-row"><button type="button" class="rd-close">Close</button></div></div>';
     ov.querySelector('.tp-title').textContent=title||'Notes'; ov.querySelector('.rd-dialog').setAttribute('aria-label',title||'Notes');
-    const v=ov.querySelector('.rd-view'), c=detailsClean(html); if(detailsText(c)) v.innerHTML=c; else { v.textContent='Nothing entered yet.'; v.classList.add('rd-empty'); }
+    const v=ov.querySelector('.rd-view'), c=notesClean(html); if(notesText(c)) v.innerHTML=c; else { v.textContent='Nothing entered yet.'; v.classList.add('rd-empty'); }
     const close=()=>{ ov.remove(); document.removeEventListener('keydown',esc,true); }; const esc=e=>{ if(e.key==='Escape'){ e.stopPropagation(); close(); } };
     ov.addEventListener('click',e=>{ if(e.target===ov) close(); }); ov.querySelector('.rd-close').addEventListener('click',close); document.addEventListener('keydown',esc,true);
     document.body.append(ov); ov.querySelector('.rd-close').focus();
@@ -14946,20 +14946,20 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     const saved=existing?JSON.parse(existing.dataset.reminder||'{}'):{};
     const form=document.createElement('form');form.className='custom-reminder-form';
     form.innerHTML='<label class="wide">Reminder name<input name="name" required maxlength="80" placeholder="e.g. Medicines, school pickup"></label>'+ 
-      '<div class="wide rem-details"><span class="rd-lbl">Notes</span><div class="rd-box"><div class="rd-bar"><button type="button" data-c="bold" aria-label="Bold" title="Bold"><b>B</b></button><button type="button" data-c="italic" aria-label="Italic" title="Italic"><i>I</i></button><button type="button" data-c="underline" aria-label="Underline" title="Underline"><u>U</u></button><button type="button" data-c="insertUnorderedList" aria-label="Bullet list" title="Bullet list">•≡</button><button type="button" class="rd-pop" aria-label="Show the notes in a pop-up" title="Show in a pop-up"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="rd-ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Notes" data-ph="Optional, e.g. dose or place"></div></div><input type="hidden" name="details"></div>'+ 
+      '<div class="wide rem-notes"><span class="rd-lbl">Notes</span><div class="rd-box"><div class="rd-bar"><button type="button" data-c="bold" aria-label="Bold" title="Bold"><b>B</b></button><button type="button" data-c="italic" aria-label="Italic" title="Italic"><i>I</i></button><button type="button" data-c="underline" aria-label="Underline" title="Underline"><u>U</u></button><button type="button" data-c="insertUnorderedList" aria-label="Bullet list" title="Bullet list">•≡</button><button type="button" class="rd-pop" aria-label="Show the notes in a pop-up" title="Show in a pop-up"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="rd-ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Notes" data-ph="Optional, e.g. dose or place"></div></div><input type="hidden" name="notes"></div>'+ 
       '<label class="wide">Frequency<select name="frequency-mode"><option value="regular">At regular times</option><option value="selected">At selected times</option><option value="dates">On chosen dates</option></select></label>'+ 
       '<div class="wide reminder-frequency-fields"></div>'+ 
       '<div class="wide repeat-on"><div class="repeat-on-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Daily</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div></div>'+
       '<label>Sound<select name="sound"><option value="chime">Chime</option><option value="drop">Water drop</option><option value="drum">Drum</option><option value="none">Silent</option></select></label>'+ 
       '<div class="wide reminder-form-actions"><button class="save-reminder" type="submit">Save</button><button class="cancel-reminder" type="button">Cancel</button></div>';
     const mode=form.querySelector('[name="frequency-mode"]'), fields=form.querySelector('.reminder-frequency-fields');
-    form.elements.name.value=saved.name||''; form.elements.details.value=detailsClean(saved.details); form.elements.sound.value=saved.sound||'chime'; mode.value=saved.mode||'selected';
-    (function(){ const ed=form.querySelector('.rd-ed'), hid=form.elements.details, MAXD=1000; ed.innerHTML=hid.value; let last=ed.innerHTML;
-      const sync=()=>{ if(detailsText(ed.innerHTML).length>MAXD){ ed.innerHTML=last; const r=document.createRange(); r.selectNodeContents(ed); r.collapse(false); const sl=getSelection(); sl.removeAllRanges(); sl.addRange(r); } last=ed.innerHTML; hid.value=detailsText(ed.innerHTML)?detailsClean(ed.innerHTML):''; };
+    form.elements.name.value=saved.name||''; form.elements.notes.value=notesClean(saved.notes); form.elements.sound.value=saved.sound||'chime'; mode.value=saved.mode||'selected';
+    (function(){ const ed=form.querySelector('.rd-ed'), hid=form.elements.notes, MAXD=1000; ed.innerHTML=hid.value; let last=ed.innerHTML;
+      const sync=()=>{ if(notesText(ed.innerHTML).length>MAXD){ ed.innerHTML=last; const r=document.createRange(); r.selectNodeContents(ed); r.collapse(false); const sl=getSelection(); sl.removeAllRanges(); sl.addRange(r); } last=ed.innerHTML; hid.value=notesText(ed.innerHTML)?notesClean(ed.innerHTML):''; };
       ed.addEventListener('input',sync);
       ed.addEventListener('paste',e=>{ e.preventDefault(); const tx=(e.clipboardData||window.clipboardData).getData('text/plain'); document.execCommand('insertText',false,tx); });
       form.querySelectorAll('.rd-bar button[data-c]').forEach(b=>{ b.addEventListener('mousedown',e=>e.preventDefault()); b.addEventListener('click',()=>{ ed.focus(); document.execCommand(b.dataset.c); sync(); form.dispatchEvent(new Event('input',{bubbles:true})); }); });
-      form.querySelector('.rd-pop').addEventListener('click',()=>openDetailsPopup(String(form.elements.name.value).trim()||'Notes',hid.value));
+      form.querySelector('.rd-pop').addEventListener('click',()=>openNotesPopup(String(form.elements.name.value).trim()||'Notes',hid.value));
     })();
     let chosenTimes=(saved.times||[]).slice(); if(!chosenTimes.length)chosenTimes=['09:00'];
     let duration=Number(saved.duration)||15;
@@ -15013,7 +15013,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     // an open reminder: Save stays grey until something is changed
     const saveBtn=form.querySelector('.save-reminder');
     (()=>{const snd=form.elements.sound&&form.elements.sound.closest('label');if(!snd||form.querySelector('.ayu-vib-fld'))return;const v=document.createElement('div');v.className='ayu-vib-fld ayu-vib-only';v.innerHTML='<span>Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" name="vibrate" aria-label="Vibrate"></label>';const sv=existing?JSON.parse(existing.dataset.reminder||'{}'):{};v.querySelector('input').checked=('vibrate' in sv)?sv.vibrate!==false:(typeof isMasterNotifyOn==='function'&&!!isMasterNotifyOn());snd.after(v)})();
-    const stateNow=()=>JSON.stringify([form.elements.speak?[form.elements.speak.checked,form.elements.speak.checked?form.elements.voice.value:'',form.elements.speak.checked&&form.elements.speakLang?form.elements.speakLang.value:'']:[!!saved.speak,saved.speak?(saved.voice||''):'',saved.speak?(saved.speakLang||''):''],mode.value==='dates'?[sched,onDay,mdays.join(',')]:0,String(form.elements.name.value).trim(),String(form.elements.details.value).trim(),mode.value,mode.value==='regular'?duration:0,mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],form.elements.sound.value,[...days].sort((a,b)=>a-b),form.elements.vibrate?form.elements.vibrate.checked:true]);
+    const stateNow=()=>JSON.stringify([form.elements.speak?[form.elements.speak.checked,form.elements.speak.checked?form.elements.voice.value:'',form.elements.speak.checked&&form.elements.speakLang?form.elements.speakLang.value:'']:[!!saved.speak,saved.speak?(saved.voice||''):'',saved.speak?(saved.speakLang||''):''],mode.value==='dates'?[sched,onDay,mdays.join(',')]:0,String(form.elements.name.value).trim(),String(form.elements.notes.value).trim(),mode.value,mode.value==='regular'?duration:0,mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],form.elements.sound.value,[...days].sort((a,b)=>a-b),form.elements.vibrate?form.elements.vibrate.checked:true]);
     const stateStart=stateNow();
     const checkDirty=()=>{if(existing)saveBtn.disabled=stateNow()===stateStart};
     ['input','change','click'].forEach(ev=>form.addEventListener(ev,()=>setTimeout(checkDirty,0)));
@@ -15022,7 +15022,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     form.addEventListener('submit',function(e){
       e.preventDefault();const d=new FormData(form);const item=existing||document.createElement('div');if(!existing){item.className='custom-reminder-item';item.dataset.reminderId=String(++customReminderCounter)}
       stopReminderTimers(item);
-      const data={speak:form.elements.speak?form.elements.speak.checked:false,voice:form.elements.voice?form.elements.voice.value:'',speakLang:form.elements.speakLang?form.elements.speakLang.value:'',name:String(d.get('name')).trim(),details:detailsText(String(d.get('details')||''))?detailsClean(d.get('details')):'',mode:mode.value,duration:duration,times:mode.value!=='regular'?[...new Set(mode.value==='dates'&&sched==='once'?chosenTimes.slice(0,1):chosenTimes)].sort():[],sound:d.get('sound'),days:(mode.value==='dates'&&sched!=='weekly')?[0,1,2,3,4,5,6]:[...days].sort((a,b)=>a-b),vibrate:form.elements.vibrate?form.elements.vibrate.checked:true};
+      const data={speak:form.elements.speak?form.elements.speak.checked:false,voice:form.elements.voice?form.elements.voice.value:'',speakLang:form.elements.speakLang?form.elements.speakLang.value:'',name:String(d.get('name')).trim(),notes:notesText(String(d.get('notes')||''))?notesClean(d.get('notes')):'',mode:mode.value,duration:duration,times:mode.value!=='regular'?[...new Set(mode.value==='dates'&&sched==='once'?chosenTimes.slice(0,1):chosenTimes)].sort():[],sound:d.get('sound'),days:(mode.value==='dates'&&sched!=='weekly')?[0,1,2,3,4,5,6]:[...days].sort((a,b)=>a-b),vibrate:form.elements.vibrate?form.elements.vibrate.checked:true};
       if(mode.value==='dates'){data.sched=sched;if(sched==='once'||sched==='yearly')data.date=onDay;if(sched==='monthly')data.mdays=mdays.slice().sort((a,b)=>a-b)}
       if(saved.on===false)data.on=false;
       item.dataset.reminder=JSON.stringify(data);
@@ -15068,7 +15068,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
   function startReminder(item){
     const data=JSON.parse(item.dataset.reminder||'{}');if(!data.name||data.on===false)return;
     item.dataset.startedAt=item.dataset.startedAt||String(Date.now());   // repeating reminders count from this moment (Android app)
-    const notify=()=>{try{if(Array.isArray(data.days)&&data.days.length&&!data.days.includes(new Date().getDay()))return;if(window.ayuLeader===false)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')(typeof showNudgeNotification==='function'?showNudgeNotification(data.name,detailsText(data.details)||'It is time for your reminder.',{key:'custom-'+item.dataset.reminderId}):new Notification(data.name,{body:detailsText(data.details)||'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()}))}catch(_){}};
+    const notify=()=>{try{if(Array.isArray(data.days)&&data.days.length&&!data.days.includes(new Date().getDay()))return;if(window.ayuLeader===false)return;if(data.sound!=='none'&&'Notification'in window&&Notification.permission==='granted')(typeof showNudgeNotification==='function'?showNudgeNotification(data.name,notesText(data.notes)||'It is time for your reminder.',{key:'custom-'+item.dataset.reminderId}):new Notification(data.name,{body:notesText(data.notes)||'It is time for your reminder.',tag:'ayubase6-custom-'+item.dataset.reminderId+'-'+Date.now()}))}catch(_){}};
     if(data.mode==='regular')item._reminderTimer=setInterval(notify,Math.max(1,Number(data.duration)||1)*60000);
     else if(data.mode==='dates')item._reminderTimer=setInterval(()=>{const n=new Date(),hm=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');if(!(data.times||[]).includes(hm)||!window.ayuOnDate(data,n))return;const k=n.toDateString()+hm;if(item._lastFire===k)return;item._lastFire=k;notify()},15000);
     else {item._reminderTimeouts=[];item._reminderTimers=[];data.times.forEach(t=>{const [hh,mm]=t.split(':').map(Number),now=new Date(),next=new Date();next.setHours(hh,mm,0,0);if(next<=now)next.setDate(next.getDate()+1);const delay=next-now;item._reminderTimeouts.push(setTimeout(()=>{notify();item._reminderTimers.push(setInterval(notify,24*60*60*1000))},delay))})}
@@ -22451,7 +22451,7 @@ html body #start-my-day-card #chk-alarm.ayu-sub:not(#ayu-x1){margin-bottom:0 !im
     if(remOn) document.querySelectorAll('#custom-reminders-list .custom-reminder-item').forEach(function(item){
       try{
         var d = JSON.parse(item.dataset.reminder||'{}'); if(!d.name || d.sound==='none' || d.on===false) return;
-        var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode }; var dt = window.ayuDetailsText ? window.ayuDetailsText(d.details) : ''; if(dt) c.details = dt.slice(0,1000);
+        var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode }; var dt = window.ayuNotesText ? window.ayuNotesText(d.notes) : ''; if(dt) c.notes = dt.slice(0,1000);
         if(Array.isArray(d.days) && d.days.length && d.days.length<7) c.days = d.days.filter(function(n){ return n>=0 && n<=6; });
         if(d.mode==='regular'){ c.every = Math.max(1, Number(d.duration)||1); c.anchor = Number(item.dataset.startedAt)||Date.now(); }
         else if(d.mode==='dates'){ c.sched = d.sched||'once'; if(d.date) c.date = d.date; if(Array.isArray(d.mdays)) c.mdays = d.mdays.slice(); if(c.sched!=='weekly') delete c.days; c.times = (d.times||[]).map(toMin).filter(function(m){ return m!==null; }); }
@@ -24307,8 +24307,7 @@ html body :is(#bmi-wrap,#calc-bmi-wrap) :is(#bmi-range,#calc-bmi-range).bmi-num:
 @media(max-width:360px){html body :is(#bmi-wrap,#calc-bmi-wrap) .bmi-num:not(#ayu-x1){font-size:.92rem !important} html body :is(#bmi-wrap,#calc-bmi-wrap) :is(#bmi-range,#calc-bmi-range).bmi-num:not(#ayu-x1){font-size:.76rem !important}}
 </style>
 <style id="rem-form-rows-20261115">
-/* Personal reminder form: Details, Date and Time are rows like the other fields (label left, field right) */
-html body #alerts-panel #custom-reminders-card .custom-reminder-form .rem-details-old:not(#ayu-x1){min-height:58px;resize:vertical;padding:8px 10px;font-family:inherit;font-size:13.3333px;line-height:1.35;box-sizing:border-box;width:100%;background:#fff !important;border:1px solid rgb(15,118,110) !important;border-radius:12px !important;color:#1e293b;box-shadow:none !important;outline:0}
+/* Personal reminder form: Notes, Date and Time are rows like the other fields (label left, field right) */
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .sched-extra .sched-date:not(#ayu-x1){margin-top:4px}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .sched-extra .sched-date:not(#ayu-x1){display:grid !important;grid-template-columns:112px minmax(0,1fr);align-items:center;column-gap:8px;flex-wrap:nowrap;font-size:13px;font-weight:400;color:inherit}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .sched-extra .sched-date > span{font:inherit}
@@ -24324,9 +24323,9 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .selected-t
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .add-selected-time[hidden]{display:none !important}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .sched-extra .sched-note:empty{display:none}
 </style>
-<style id="rem-details-rich-20261115">
-/* Details: a small rich-text box (bold, italic, underline, bullets) with a pop-up that shows it as entered */
-html body #alerts-panel #custom-reminders-card .custom-reminder-form .rem-details:not(#ayu-x1){grid-column:1/-1;display:grid;grid-template-columns:112px minmax(0,1fr);column-gap:8px;align-items:start;font-size:13px}
+<style id="rem-notes-rich-20261115">
+/* Notes: a small rich-text box (bold, italic, underline, bullets) with a pop-up that shows it as entered */
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .rem-notes:not(#ayu-x1){grid-column:1/-1;display:grid;grid-template-columns:112px minmax(0,1fr);column-gap:8px;align-items:start;font-size:13px}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .rd-lbl{line-height:40px}
 .rd-box{min-width:0;background:#fff;border:1px solid rgb(15,118,110);border-radius:12px;overflow:hidden}
 .rd-bar{display:flex;align-items:center;gap:4px;padding:4px 6px;border-bottom:1px solid color-mix(in srgb,rgb(15,118,110) 22%,#fff);background:color-mix(in srgb,rgb(15,118,110) 6%,#fff)}
@@ -24341,7 +24340,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .rd-lbl{lin
 .rd-view.rd-empty{color:#64748b;font-style:italic}
 .rd-close-row{display:flex;justify-content:flex-end;margin-top:12px}
 .rd-close{padding:8px 18px;border:0;border-radius:10px;background:var(--tp-accent,#0d9488);color:#fff;font:inherit;font-weight:600;cursor:pointer}
-@media (max-width:420px){html body #alerts-panel #custom-reminders-card .custom-reminder-form .rem-details:not(#ayu-x1){grid-template-columns:92px minmax(0,1fr)}}
+@media (max-width:420px){html body #alerts-panel #custom-reminders-card .custom-reminder-form .rem-notes:not(#ayu-x1){grid-template-columns:92px minmax(0,1fr)}}
 </style>
 </body>
 
