@@ -23694,11 +23694,12 @@ html body .ayu-age-sw svg{width:18px;height:18px}
     function toU(c){ return ftin?Math.round(c/2.54):c; }
     function toC(u){ return ftin?Math.round(u*2.54):u; }
     var lo=toU(mn), hi=toU(mx), n=hi-lo;
-    if(ftin){ for(var q=lo;q<=hi;q++){ var at=(hi-q)*U, ft=Math.floor(q/12), inn=q%12; labs+='<i class="t'+(inn===0?' f':inn===6?' m':'')+'" style="top:'+at+'px"></i>'; if(inn===0) labs+='<b style="top:'+at+'px">'+ft+"'</b>"; else if(inn===6) labs+='<b style="top:'+at+'px">'+ft+"'6\"</b>"; } }
+    if(ftin){ for(var q=lo;q<=hi;q++){ var at=(hi-q)*U, ft=Math.floor(q/12), inn=q%12; labs+='<i class="t'+(inn===0?' f':inn===6?' m':'')+'" style="top:'+at+'px"></i>'; if(inn===0) labs+='<b style="top:'+at+'px">'+ft+"'</b>"; else if(inn===6) labs+='<b style="top:'+at+'px">'+ft+"'6\"</b>"; }
+      for(var cm=Math.ceil(mn/10)*10; cm<=mx; cm+=10){ labs+='<b class="cmv" style="top:'+((hi-cm/2.54)*U)+'px">'+cm+'</b>'; } }
     else for(var v=mn;v<=mx;v+=5){ var at2=(vert ? (mx-v) : (v-mn))*ST; labs+='<b style="'+(vert?'top':'left')+':'+at2+'px">'+v+'</b>'; }
-    if(!vert && /kg/i.test(unit)){ for(var lb=Math.ceil(mn*2.20462/10)*10; lb<=mx*2.20462; lb+=10){ var lx=(lb/2.20462-mn)*ST; labs+='<i class="lbt" style="left:'+lx+'px"></i><b class="lb" style="left:'+lx+'px">'+lb+' lb</b>'; } }
+    if(!vert && /kg/i.test(unit)){ for(var lb=Math.ceil(mn*2.20462/10)*10; lb<=mx*2.20462; lb+=10){ var lx=(lb/2.20462-mn)*ST; labs+='<i class="lbt" style="left:'+lx+'px"></i><b class="lb" style="left:'+lx+'px">'+lb+'</b>'; } }
     var w=document.createElement('div'); w.className='ayu-scale '+(vert?'v':'h')+(ftin?' ayu-ftin':'');
-    w.innerHTML='<div class="as-track" tabindex="0" role="slider" aria-orientation="'+(vert?'vertical':'horizontal')+'" aria-label="'+name+' in '+(ftin?'feet and inches':unit)+': drag to set" aria-valuemin="'+mn+'" aria-valuemax="'+mx+'"><div class="as-in" style="'+(vert?'height':'width')+':'+(n*U)+'px">'+labs+'</div></div><i class="as-mid" aria-hidden="true"></i>';
+    w.innerHTML='<div class="as-track" tabindex="0" role="slider" aria-orientation="'+(vert?'vertical':'horizontal')+'" aria-label="'+name+' in '+(ftin?'feet and inches':unit)+': drag to set" aria-valuemin="'+mn+'" aria-valuemax="'+mx+'"><div class="as-in" style="'+(vert?'height':'width')+':'+(n*U)+'px">'+labs+'</div></div><i class="as-mid" aria-hidden="true"></i>'+(vert ? '<span class="as-tag t1">ft</span><span class="as-tag t2">cm</span>' : (/kg/i.test(unit) ? '<span class="as-tag t3">kg</span><span class="as-tag t4">lb</span>' : ''));
     s.classList.add('ayu-scale-src'); s.after(w);
     var tr=w.firstChild, lock=0, last=0, t=null;
     function pos(){ return vert ? tr.scrollTop : tr.scrollLeft; }
@@ -24240,10 +24241,18 @@ html body .ayu-hw.ayu-hw-tape > .calc-row-stacked:nth-child(2) .slider-val:not(#
 html body .ayu-hw.ayu-hw-tape .slider-val:not(#ayu-x1){white-space:nowrap}
 html body #calc-bmi-wrap .bmi-box:not(#ayu-x1){background:#d3f4fa !important}
 </style>
+
 <style id="bmi-lbs-20261115">
-/* Weight scale: pounds are marked under the kg numbers, every 10 lb */
-html body .ayu-scale.h .as-in b.lb:not(#ayu-x1){top:25px;font-size:9.5px;font-weight:700;color:#b45309;white-space:nowrap}
-html body .ayu-scale.h .as-in .lbt:not(#ayu-x1){position:absolute;top:21px;width:1.5px;height:5px;margin-left:-.75px;background:#b45309;opacity:.8}
+/* Scales carry both units: weight shows kg and lb, height shows feet-inches and cm. A small fixed tag names each row. */
+html body .ayu-scale .as-in b.lb:not(#ayu-x1),html body .ayu-scale .as-in b.cmv:not(#ayu-x1){font-weight:500;font-size:9.5px;opacity:.62;white-space:nowrap}
+html body .ayu-scale.h .as-in b.lb:not(#ayu-x1){top:26px}
+html body .ayu-scale.h .as-in .lbt:not(#ayu-x1){position:absolute;top:21px;width:1.5px;height:4px;margin-left:-.75px;background:color-mix(in srgb,var(--wc) 55%,#94a3b8);opacity:.8}
+html body .ayu-scale.v .as-in b.cmv:not(#ayu-x1){left:31px}
+html body .ayu-scale .as-tag{position:absolute;z-index:2;pointer-events:none;font-size:8.5px;font-weight:800;line-height:1;letter-spacing:.04em;text-transform:uppercase;padding:2px 4px;border-radius:5px;color:color-mix(in srgb,var(--wc) 75%,#334155);background:color-mix(in srgb,var(--wc) 12%,#fff);box-shadow:0 0 0 1px color-mix(in srgb,var(--wc) 22%,#fff)}
+html body .ayu-scale.h .as-tag.t3{left:4px;top:5px}
+html body .ayu-scale.h .as-tag.t4{left:4px;top:24px;opacity:.8}
+html body .ayu-scale.v .as-tag.t1{left:3px;top:3px}
+html body .ayu-scale.v .as-tag.t2{left:28px;top:3px;opacity:.8}
 </style>
 </body>
 
