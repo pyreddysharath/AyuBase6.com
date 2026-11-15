@@ -4030,6 +4030,92 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
 
     </div>
 
+<div class="alert-card collapsed" id="alert-card-stretch">
+      <div class="alert-card-hdr">
+        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 6c-2.61.7-5.67 1-8.5 1s-5.89-.3-8.5-1L3 8c1.86.5 4 .83 6 1v13h2v-6h2v6h2V9c2-.17 4.14-.5 6-1l-.5-2zM12 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg><span class="section-title-text">Stretch</span></h2>
+        <button type="button" class="alert-card-chev" aria-label="Expand or collapse" aria-expanded="false" tabindex="-1"><svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg></button>
+      </div>
+
+      <div class="alert-task" id="alert-stretch-task">
+        <p class="alert-card-sub">Loosen your neck, shoulders and wrists after long sitting.</p>
+        <strong>Stretch for 1–2 minutes at each reminder.</strong>
+        <ul>
+          <li>Neck: tilt your ear towards your shoulder, 15 seconds each side</li>
+          <li>Shoulders: roll them back 10 times</li>
+          <li>Wrists: pull the fingers back gently, 15 seconds each hand</li>
+          <li>Eases stiffness and tension from desk and phone use</li>
+        </ul>
+      </div>
+<div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 2 hours</span></div>
+
+      <div class="alert-row alert-sound-line">
+        <div class="alert-row-lbl dotted-lbl">Sound</div>
+        <div class="alert-sound-row">
+          <select id="alert-stretch-sound" class="alert-sound-select" onchange="onAlertSoundChange('stretch')">
+            <option value="xylophone">Xylophone</option>
+            <option value="marimba">Marimba Pop</option>
+            <option value="ping">Ping</option>
+            <option value="chime">Gentle Chime</option>
+          </select>
+          <button type="button" class="alert-icon-btn" id="alert-stretch-play" title="Preview sound" onclick="previewAlertSound('stretch')">▶</button>
+          <button type="button" class="alert-icon-btn" id="alert-stretch-mute" title="Mute" onclick="toggleAlertMute('stretch')">🔊</button>
+        </div>
+      </div>
+
+      <div class="alert-row alert-preview-row"><span class="row-dot" aria-hidden="true">•</span><button type="button" class="alert-preview-btn" onclick="previewAlertNotification('stretch')">Preview notification</button></div>
+      <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
+        <input type="checkbox" id="alert-stretch-notify" class="notify-cb" onchange="onAlertNotifyChange('stretch')"><label for="alert-stretch-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
+      <div class="notif-blocked-hint" id="alert-stretch-notif-hint" style="display:none"></div>
+      <div class="notif-mock" id="alert-stretch-notif-mock">
+        <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 6c-2.61.7-5.67 1-8.5 1s-5.89-.3-8.5-1L3 8c1.86.5 4 .83 6 1v13h2v-6h2v6h2V9c2-.17 4.14-.5 6-1l-.5-2zM12 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg></span>
+        <div class="notif-mock-text"><strong>Stretch</strong><span>Time to stretch — neck, shoulders and wrists for 1–2 minutes.</span></div>
+      </div>
+
+    </div>
+
+
+<div class="alert-card collapsed" id="alert-card-breathe">
+      <div class="alert-card-hdr">
+        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14.5 17c0 1.65-1.35 3-3 3s-3-1.35-3-3h2c0 .55.45 1 1 1s1-.45 1-1-.45-1-1-1H2v-2h9.5c1.65 0 3 1.35 3 3zM19 6.5C19 4.57 17.43 3 15.5 3S12 4.57 12 6.5h2c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5S16.33 8 15.5 8H2v2h13.5c1.93 0 3.5-1.57 3.5-3.5zm-.5 4.5H2v2h16.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5v2c1.93 0 3.5-1.57 3.5-3.5S20.43 11 18.5 11z"/></svg><span class="section-title-text">Breathing</span></h2>
+        <button type="button" class="alert-card-chev" aria-label="Expand or collapse" aria-expanded="false" tabindex="-1"><svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg></button>
+      </div>
+
+      <div class="alert-task" id="alert-breathe-task">
+        <p class="alert-card-sub">A calm minute to lower stress and reset your focus.</p>
+        <strong>Box breathing for 1–2 minutes: in 4, hold 4, out 4, hold 4.</strong>
+        <ul>
+          <li>Sit upright and repeat about 4 rounds, breathing gently through the nose</li>
+          <li>Slows the heart rate, lowers stress and steadies focus</li>
+          <li>Stop and breathe normally if you feel dizzy</li>
+        </ul>
+      </div>
+<div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 3 hours</span></div>
+
+      <div class="alert-row alert-sound-line">
+        <div class="alert-row-lbl dotted-lbl">Sound</div>
+        <div class="alert-sound-row">
+          <select id="alert-breathe-sound" class="alert-sound-select" onchange="onAlertSoundChange('breathe')">
+            <option value="bell">Soft Bell</option>
+            <option value="chime">Gentle Chime</option>
+            <option value="bubble">Bubble</option>
+          </select>
+          <button type="button" class="alert-icon-btn" id="alert-breathe-play" title="Preview sound" onclick="previewAlertSound('breathe')">▶</button>
+          <button type="button" class="alert-icon-btn" id="alert-breathe-mute" title="Mute" onclick="toggleAlertMute('breathe')">🔊</button>
+        </div>
+      </div>
+
+      <div class="alert-row alert-preview-row"><span class="row-dot" aria-hidden="true">•</span><button type="button" class="alert-preview-btn" onclick="previewAlertNotification('breathe')">Preview notification</button></div>
+      <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
+        <input type="checkbox" id="alert-breathe-notify" class="notify-cb" onchange="onAlertNotifyChange('breathe')"><label for="alert-breathe-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
+      <div class="notif-blocked-hint" id="alert-breathe-notif-hint" style="display:none"></div>
+      <div class="notif-mock" id="alert-breathe-notif-mock">
+        <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.5 17c0 1.65-1.35 3-3 3s-3-1.35-3-3h2c0 .55.45 1 1 1s1-.45 1-1-.45-1-1-1H2v-2h9.5c1.65 0 3 1.35 3 3zM19 6.5C19 4.57 17.43 3 15.5 3S12 4.57 12 6.5h2c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5S16.33 8 15.5 8H2v2h13.5c1.93 0 3.5-1.57 3.5-3.5zm-.5 4.5H2v2h16.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5v2c1.93 0 3.5-1.57 3.5-3.5S20.43 11 18.5 11z"/></svg></span>
+        <div class="notif-mock-text"><strong>Breathing</strong><span>Take a calm minute — breathe in 4, hold 4, out 4, hold 4. Repeat 4 times.</span></div>
+      </div>
+
+    </div>
+
+
 <div class="alert-card collapsed" id="alert-card-walk">
       <div class="alert-card-hdr">
         <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.5a2 2 0 100-4 2 2 0 000 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg><span class="section-title-text">Walk</span></h2>
@@ -10829,14 +10915,16 @@ function inScheduleWindow(d){
   if(a===null || b===null || a===b) return true;      // incomplete / identical → no restriction
   return a<b ? (cur>=a && cur<=b) : (cur>=a || cur<=b); // overnight windows supported
 }
-const ALERT_DEFAULTS={ break:{minutes:20,sound:'chime'}, walk:{minutes:45,sound:'drum'}, drink:{minutes:60,sound:'drop'} };
+const ALERT_DEFAULTS={ break:{minutes:20,sound:'chime'}, walk:{minutes:45,sound:'drum'}, drink:{minutes:60,sound:'drop'}, stretch:{minutes:120,sound:'xylophone'}, breathe:{minutes:180,sound:'bell'} };
 const ALERT_LABELS={
   break:{title:'Eyes', icon:'👁️', msg:'Look 20 feet away for 20 seconds — 20-20-20 time!'},
   walk: {title:'Walk',  icon:'🚶', msg:'Time for a 2–5 minute walk or stretch!'},
   drink:{title:'Water', icon:'💧', msg:'Drink a glass of water — about 200ml keeps you on track!'},
+  stretch:{title:'Stretch', icon:'🤸', msg:'Time to stretch — neck, shoulders and wrists for 1–2 minutes.'},
+  breathe:{title:'Breathing', icon:'🌬️', msg:'Take a calm minute — breathe in 4, hold 4, out 4, hold 4. Repeat 4 times.'},
 };
 const alertState={};
-['break','walk','drink'].forEach(key=>{
+['break','walk','drink','stretch','breathe'].forEach(key=>{
   alertState[key]={ enabled:true, minutes:ALERT_DEFAULTS[key].minutes, sound:ALERT_DEFAULTS[key].sound, muted:false, notify:false, timerId:null };
 });
 
@@ -11060,7 +11148,7 @@ function nudgeDisableActions(){
   return NUDGE_IS_PHONE ? [ {action:'disable-this', title:'Turn off this'} ] : undefined;
 }
 function handleNudgeClick(key, action){
-  if((action==='disable-this'||action==='disable-all') && /^(break|walk|drink|eyeex)$/.test(String(key))){
+  if((action==='disable-this'||action==='disable-all') && /^(break|walk|drink|stretch|breathe|eyeex)$/.test(String(key))){
     try{ const h=nudgeDefaultHandlers(key); (action==='disable-all'?h.onDisableAll:h.onDisableThis)(); }catch(e){}
     return;
   }
@@ -11665,7 +11753,7 @@ function syncAllReminderNotifyFlags(forceState){
   // Explicitly update the four visible top-row switches in Reminders.
   // Keep the input checked state (which drives the switch styling), the
   // reminder runtime state, and the browser-notification state in sync.
-  ['drink','walk','break'].forEach(key=>{
+  ['drink','walk','break','stretch','breathe'].forEach(key=>{
     const cb=document.getElementById('alert-'+key+'-notify');
     if(cb){
       cb.checked=masterOn;
@@ -11683,7 +11771,7 @@ function syncAllReminderNotifyFlags(forceState){
     const card=input.closest('.alert-card');
     if(!card) return;
     const title=(card.querySelector('h2')?.innerText||'').trim();
-    const mainId=/^Water$/i.test(title)?'alert-drink-notify':/^Walk$/i.test(title)?'alert-walk-notify':/Eyes \(20-20-20\)/i.test(title)?'alert-break-notify':/Eyes \(Exercise\)/i.test(title)?'eye-ex-notify':null;
+    const mainId=/^Water$/i.test(title)?'alert-drink-notify':/^Stretch$/i.test(title)?'alert-stretch-notify':/^Breathing$/i.test(title)?'alert-breathe-notify':/^Walk$/i.test(title)?'alert-walk-notify':/Eyes \(20-20-20\)/i.test(title)?'alert-break-notify':/Eyes \(Exercise\)/i.test(title)?'eye-ex-notify':null;
     const main=mainId?document.getElementById(mainId):null;
     if(main) input.checked=main.checked;
     card.classList.toggle('alert-disabled',!input.checked);
@@ -11844,7 +11932,7 @@ function updateRemindersNotifBanner(){
 // button itself remains responsible for turning all sections on or off.
 document.addEventListener('change', function(e){
   const target=e.target;
-  if(!target || !['alert-break-notify','alert-walk-notify','alert-drink-notify','eye-ex-notify'].includes(target.id)) return;
+  if(!target || !['alert-break-notify','alert-walk-notify','alert-drink-notify','alert-stretch-notify','alert-breathe-notify','eye-ex-notify'].includes(target.id)) return;
   // Deliberately do not call setMasterNotifyFlag(), updateRemindersNotifBanner(),
   // or refreshNotifStatusUI() here: individual toggles must not affect the master.
 });
@@ -11854,7 +11942,7 @@ document.addEventListener('change', function(e){
 // if the browser already has notification permission from a previous
 // visit, sync that in too — otherwise it'll just use the in-app preview
 // until the person grants it.
-['break','walk','drink'].forEach(key=>{
+['break','walk','drink','stretch','breathe'].forEach(key=>{
   const slider=document.getElementById('alert-'+key+'-time');
   if(slider) updateSliderFill(slider,'var(--alert-2)');
   // These reminders are opt-in on a fresh page load.
@@ -12453,7 +12541,7 @@ function resetRemindersToDefault(){
 
   const permGranted=(typeof Notification!=='undefined' && Notification.permission==='granted');
 
-  ['break','walk','drink'].forEach(key=>{
+  ['break','walk','drink','stretch','breathe'].forEach(key=>{
     const def=ALERT_DEFAULTS[key];
     Object.assign(alertState[key], { enabled:true, minutes:def.minutes, sound:def.sound, muted:false, notify:permGranted });
 
@@ -14721,7 +14809,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     +'</ul>';
   document.querySelectorAll('.notif-info').forEach(function(el){ if(el.id!=='install-help') el.innerHTML=(el.id==='master-notif-info'?REM_NOTE:NOTE); });
   // Each section's own "i" panel also carries the notification notes, under a separate title.
-  ['drink','walk','break','break-ex'].forEach(function(k){
+  ['drink','walk','break','stretch','breathe','break-ex'].forEach(function(k){
     var task=document.getElementById('alert-'+k+'-task'); if(!task||task.querySelector('.section-notif-note')) return;
     var d=document.createElement('div'); d.className='section-notif-note';
     d.innerHTML='<strong class="section-notif-title">Notifications</strong>'+SEC_NOTE;
@@ -14865,14 +14953,14 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     const cards=[...document.querySelectorAll('#alerts-panel .alert-card')].filter(c=>c.id!=='alert-card-schedule'&&c.id!=='custom-reminders-card');
     cards.forEach(card=>{
       const title=(card.querySelector('h2')?.innerText||'').trim();
-      if(!/Eyes \(20-20-20\)|^Walk$|^Water$|Eyes \(Exercise\)/i.test(title)) return;
+      if(!/Eyes \(20-20-20\)|^Walk$|^Water$|^Stretch$|^Breathing$|Eyes \(Exercise\)/i.test(title)) return;
       const key=card.id.replace('alert-card-','');
       if(card.querySelector('.alert-enabled-toggle')) return;
       const hdr=card.querySelector('.alert-card-hdr'); if(!hdr)return;
       const label=document.createElement('label');label.className='alert-enabled-toggle';
       label.innerHTML='<input type="checkbox" aria-label="Enable '+title.replace(/"/g,'')+'" />';
       const input=label.querySelector('input');
-      const mainSwitchId=({drink:'alert-drink-notify',walk:'alert-walk-notify',break:'alert-break-notify','eye-ex':'eye-ex-notify'})[key];
+      const mainSwitchId=({drink:'alert-drink-notify',walk:'alert-walk-notify',break:'alert-break-notify',stretch:'alert-stretch-notify',breathe:'alert-breathe-notify','eye-ex':'eye-ex-notify'})[key];
       const mainSwitch=mainSwitchId ? document.getElementById(mainSwitchId) : null;
       input.checked=mainSwitch ? mainSwitch.checked : !!(window.alertState && window.alertState[key] && window.alertState[key].enabled);
       card.classList.toggle('alert-disabled',!input.checked);
@@ -14894,7 +14982,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     if(page){
       const directCards=[...page.querySelectorAll(':scope > .alert-card')];
       const find=(re)=>directCards.find(c=>re.test((c.querySelector('h2')?.innerText||'').trim()));
-      const ordered=[find(/Eyes \(20-20-20\)/i),find(/^Walk$/i),find(/^Water$/i),find(/Eyes \(Exercise\)/i)].filter(Boolean);
+      const ordered=[find(/Eyes \(20-20-20\)/i),find(/^Walk$/i),find(/^Water$/i),find(/^Stretch$/i),find(/^Breathing$/i),find(/Eyes \(Exercise\)/i)].filter(Boolean);
       const custom=document.getElementById('custom-reminders-card');
       const bottomIds=['reminders-notif-banner','reminders-notif-error','master-notif-info','install-row','install-help'];
       const bottom=bottomIds.map(id=>document.getElementById(id)).filter(el=>el && el.parentElement===page);
@@ -15098,6 +15186,8 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   const defaults={start:'10:00',end:'20:00'};
   const specs=[
     {id:'alert-card-drink',key:'drink',title:'Water'},
+    {id:'alert-card-stretch',key:'stretch',title:'Stretch'},
+    {id:'alert-card-breathe',key:'breathe',title:'Breathing'},
     {id:'alert-card-walk',key:'walk',title:'Walk'},
     {id:'alert-card-break',key:'break',title:'Eyes (20-20-20)'},
     {id:'alert-card-break-ex',key:'break-ex',title:'Eyes (Exercise)'}
@@ -15166,7 +15256,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
       ['start','end'].forEach(w=>{const b=card.querySelector('.per-reminder-schedule [data-time="'+w+'"]');if(b)drawButton(b,st[w])});
     });
     updateExerciseTimes(true);
-    ['break','walk','drink'].forEach(k=>{if(typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)});
+    ['break','walk','drink','stretch','breathe'].forEach(k=>{if(typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)});
     saveHours();
   }
   function wireTopSchedule(){
@@ -15222,7 +15312,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     const oldStart=document.getElementById('schedule-start'),oldEnd=document.getElementById('schedule-end');
     if(oldStart)oldStart.value=defaults.start;if(oldEnd)oldEnd.value=defaults.end;
     if(typeof scheduleState!=='undefined'){scheduleState.start=defaults.start;scheduleState.end=defaults.end}
-    if(typeof alertState!=='undefined'){['break','walk','drink'].forEach(k=>{if(alertState[k]&&typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)})}
+    if(typeof alertState!=='undefined'){['break','walk','drink','stretch','breathe'].forEach(k=>{if(alertState[k]&&typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)})}
     updateExerciseTimes();
   }
   // Reminder times are rebuilt from From/To every day: the first reminder is at From, then every N minutes
@@ -15383,7 +15473,7 @@ document.getElementById('clock-picker-close').onclick=close;overlay.addEventList
 <script id="reminders-default-off-fix">
 (function(){
   function setDefaultsOff(){
-    const items=[['drink','alert-card-drink'],['walk','alert-card-walk'],['break','alert-card-break']];
+    const items=[['drink','alert-card-drink'],['walk','alert-card-walk'],['break','alert-card-break'],['stretch','alert-card-stretch'],['breathe','alert-card-breathe']];
     items.forEach(([key,cardId])=>{
       const cb=document.getElementById('alert-'+key+'-notify');
       const card=document.getElementById(cardId);
@@ -16241,6 +16331,8 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('alerts','#alert-card-break',0,C.rem,'<b>Health Breaks → Eyes (20-20-20)</b>: a short eye break at regular intervals. Each part has its own switch, hours, days, sound, Read aloud and Vibrate.');
   sec('alerts','#alert-card-walk',0,C.rem,'<b>Walk</b>: a reminder to get up and move.');
   sec('alerts','#alert-card-drink',0,C.rem,'<b>Water</b>: a reminder to drink water.');
+  sec('alerts','#alert-card-stretch',0,C.rem,'<b>Stretch</b>: a reminder to loosen your neck, shoulders and wrists.');
+  sec('alerts','#alert-card-breathe',0,C.rem,'<b>Breathing</b>: a reminder for a calm minute of box breathing.');
   sec('alerts','#alert-card-break-ex',0,C.rem,'<b>Eye Exercise</b>: guided eye exercises on the days you choose.');
   sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: your own reminders. Tap <b>+</b> to add one: at set times, every so often, or on chosen dates.');
   sec('alerts','#rem-alarm-card .clk-now',0,C.rem,'<b>Clock</b>: the time and date now, with four tabs below: Alarm, Timer, Stopwatch and World Clock.');
@@ -16931,7 +17023,7 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
       var v=JSON.parse(localStorage.getItem(KEYS[k])||'null'); return clean(k==='rem'?(v&&v.days):v);
     }catch(e){ return /eyeex$/.test(k) ? EX_DEF.slice() : ALL.slice(); }
   }
-  function hbAll(){ var o={}; ['break','walk','drink','eyeex'].forEach(function(s){ o[s]=get('rem-'+s).slice(); }); return o; }
+  function hbAll(){ var o={}; ['break','walk','drink','stretch','breathe','eyeex'].forEach(function(s){ o[s]=get('rem-'+s).slice(); }); return o; }
   function get(k){ if(!cache[k])cache[k]=load(k); return cache[k]; }
   function save(k){
     try{
@@ -16958,14 +17050,14 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
   window.ayuDays={
     get:function(k){return get(k)},
     ok:function(k,d){return get(k).indexOf((d||new Date()).getDay())>=0},
-    reset:function(k){cache[k]=ALL.slice();if(draws[k])draws[k]();if(k==='rem')['break','walk','drink','eyeex'].forEach(function(s){cache['rem-'+s]=s==='eyeex'?EX_DEF.slice():ALL.slice();if(draws['rem-'+s])draws['rem-'+s]()});},
+    reset:function(k){cache[k]=ALL.slice();if(draws[k])draws[k]();if(k==='rem')['break','walk','drink','stretch','breathe','eyeex'].forEach(function(s){cache['rem-'+s]=s==='eyeex'?EX_DEF.slice():ALL.slice();if(draws['rem-'+s])draws['rem-'+s]()});},
     all:function(){return hbAll()},
     refresh:function(){cache={};Object.keys(draws).forEach(function(k){draws[k]()})}
   };
   function install(){
     var h=document.getElementById('rh-days');if(h&&!h.dataset.built){h.dataset.built='1';build(h,'rem')}
     // each Health Breaks section: after From
-    [['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['eyeex','alert-card-break-ex']].forEach(function(p){
+    [['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['stretch','alert-card-stretch'],['breathe','alert-card-breathe'],['eyeex','alert-card-break-ex']].forEach(function(p){
       var c=document.getElementById(p[1]), fr=c&&c.querySelector('.per-reminder-schedule'); if(!fr||document.getElementById('days-'+p[0]))return;
       var d=document.createElement('div');d.id='days-'+p[0];d.className='otd-row ayu-hb-days';d.setAttribute('role','group');fr.after(d);build(d,'rem-'+p[0]);
     });
@@ -17302,7 +17394,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 (function(){
   // When several reminders are due together, they are shown one after another with a gap: twice the time the earlier one asks of you
   // (Eyes 20 s, Eye exercise 30 s, Walk about 3 min, Water about 30 s, a Checks item about 1 min), never more than 10 minutes.
-  var ACT={break:20,eyeex:30,walk:180,drink:30}, free=0, q=[], timer=null;
+  var ACT={break:20,eyeex:30,walk:180,drink:30,stretch:90,breathe:90}, free=0, q=[], timer=null;
   function gap(key){ var s=ACT[key]; if(!s) s=60; return Math.min(600,2*s)*1000; }
   function pump(){ timer=null; if(!q.length) return; var now=Date.now(); if(now<free){ timer=setTimeout(pump,free-now+30); return; } var it=q.shift(); free=Date.now()+gap(it.key); try{ it.fn(); }catch(e){} if(q.length) timer=setTimeout(pump,free-Date.now()+30); }
   function submit(key,fn){ if(q.some(function(x){return x.key===key;})) return true; q.push({key:key,fn:fn}); if(!timer) pump(); return true; }
@@ -19546,7 +19638,7 @@ html body #rem-alarm-card > .ayu-al-info{padding:12px 14px;border-radius:12px;ba
 
   // ── Reminders: the About text of each section opens from an i next to its title ──
   function descButtons(){
-    ['alert-card-break','alert-card-walk','alert-card-drink','alert-card-break-ex'].forEach(function(id){
+    ['alert-card-break','alert-card-walk','alert-card-drink','alert-card-stretch','alert-card-breathe','alert-card-break-ex'].forEach(function(id){
       var c=$(id), h=c&&c.querySelector('.alert-card-hdr'), t=c&&c.querySelector('.alert-task'); if(!h||!t||h.querySelector('.ayu-desc-btn')) return;
       var b=document.createElement('button'); b.type='button'; b.className='ayu-desc-btn';   // the “i” is drawn by CSS, so the title's text stays the same for other scripts
       var name=(h.querySelector('.section-title-text')||h).textContent.trim();
@@ -19661,11 +19753,11 @@ html body #chk-alarm > .ayu-al-body{margin-left:16px}
   function remSections(){
     function sect(k){ return function(){ try{ var s=JSON.parse(ls('ayubase6_reminder_section_states_v1')||'{}')||{}; s[k]=false; ls('ayubase6_reminder_section_states_v1',JSON.stringify(s)); }catch(e){} }; }
     var list=[['reminder-hours-card',function(){ ls('ayuBase6-reminder-hours',null); }]];
-    [['alert-card-break','break'],['alert-card-walk','walk'],['alert-card-drink','drink'],['alert-card-break-ex','eyeex']].forEach(function(x){ list.push([x[0],sect(x[1])]); });
+    [['alert-card-break','break'],['alert-card-walk','walk'],['alert-card-drink','drink'],['alert-card-stretch','stretch'],['alert-card-breathe','breathe'],['alert-card-break-ex','eyeex']].forEach(function(x){ list.push([x[0],sect(x[1])]); });
     list.push(['rem-alarm-card',function(){ ls('ayuBase6-rem-alarm',null); ls('ayuBase6-rem-alarms',null); }]);
     list.push(['custom-reminders-card',function(){ var l=$('custom-reminders-list'); if(l) l.innerHTML=''; ls('ayuBase6-my-reminders',null); },'Deletes your reminders']);   // the list is emptied too, or it is saved again as the page reloads
     var pg=document.querySelector('#alerts-panel .alert-page[data-remtab]'), t=pg?pg.dataset.remtab:'';
-    var only={breaks:['reminder-hours-card','alert-card-break','alert-card-walk','alert-card-drink','alert-card-break-ex'],alarm:['rem-alarm-card'],personal:['custom-reminders-card']}[t];
+    var only={breaks:['reminder-hours-card','alert-card-break','alert-card-walk','alert-card-drink','alert-card-stretch','alert-card-breathe','alert-card-break-ex'],alarm:['rem-alarm-card'],personal:['custom-reminders-card']}[t];
     if(only) list=list.filter(function(x){ return only.indexOf(x[0])>=0; });
     return list.map(function(x){ var c=$(x[0]); return c ? {name:title(c), clear:x[1], note:x[2]} : null; }).filter(Boolean);
   }
@@ -19705,7 +19797,7 @@ html body #chk-alarm > .ayu-al-body{margin-left:16px}
   function group(){
     var h=$('reminder-hours-card'); if(!h || h.parentNode.classList.contains('ayu-rem-group')) return;
     var g=document.createElement('div'); g.className='ayu-rem-group'; h.before(g);
-    ['reminder-hours-card','alert-card-break','alert-card-walk','alert-card-drink','alert-card-break-ex'].forEach(function(id){ var c=$(id); if(c) g.appendChild(c); });
+    ['reminder-hours-card','alert-card-break','alert-card-walk','alert-card-drink','alert-card-stretch','alert-card-breathe','alert-card-break-ex'].forEach(function(id){ var c=$(id); if(c) g.appendChild(c); });
     var hc=$('reminder-hours-card'); if(hc) hc.classList.remove('collapsed');
   }
 
@@ -20025,11 +20117,11 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
   var APP=!!window.AYU_ANDROID, PHONE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'');
   var CAN=APP || (PHONE && typeof navigator.vibrate==='function');
   if(CAN) document.documentElement.classList.add('ayu-can-vib');
-  var K='ayuBase6-vibrate', HB=['break','walk','drink','eyeex'];
+  var K='ayuBase6-vibrate', HB=['break','walk','drink','stretch','breathe','eyeex'];
   function load(){ try{ var o=JSON.parse(localStorage.getItem(K)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
   function save(o){ try{ localStorage.setItem(K,JSON.stringify(o)); }catch(e){} try{ document.dispatchEvent(new Event('ayu-alarm-changed')); }catch(e){} }
   function notifyOn(){ var t=document.getElementById('routines-master-toggle'); return !!(t && t.checked); }
-  var MAIN={'break':'alert-break-notify',walk:'alert-walk-notify',drink:'alert-drink-notify',eyeex:'eye-ex-notify'};
+  var MAIN={'break':'alert-break-notify',walk:'alert-walk-notify',drink:'alert-drink-notify',stretch:'alert-stretch-notify',breathe:'alert-breathe-notify',eyeex:'eye-ex-notify'};
   function mainOn(k){ var t=document.getElementById(MAIN[k]); return !!(t && t.checked); }
   function masterOn(){ try{ return typeof isMasterNotifyOn==='function' && !!isMasterNotifyOn(); }catch(e){ return false; } }
   // not set yet: Vibrate follows the section's own switch (off until that is on), like Checks follows Notify Me
@@ -20093,7 +20185,7 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
       days.after(r);
     } else if(!days) ok=false;
     // each Health Breaks section: after Sound
-    [['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['eyeex','alert-card-break-ex']].forEach(function(p){
+    [['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['stretch','alert-card-stretch'],['breathe','alert-card-breathe'],['eyeex','alert-card-break-ex']].forEach(function(p){
       var card=document.getElementById(p[1]), snd=card && card.querySelector('.alert-sound-line'); if(!snd){ ok=false; return; }
       if(card.querySelector('[data-vib-key]')) return;
       var name=(card.querySelector('h2 .section-title-text')||{}).textContent||'';
@@ -21489,7 +21581,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
    On the website: while AyuBase6 is open. In the Android app: the phone reads it, also with the app closed. */
 (function(){
   var APP=!!window.AYU_ANDROID, K='ayuBase6-speak';
-  var SHORT={'break':'Time for an eye break. Look 20 feet away for 20 seconds.',walk:'Time for a short walk.',drink:'Time to drink some water.',eyeex:'Time for your eye exercise.'};
+  var SHORT={'break':'Time for an eye break. Look 20 feet away for 20 seconds.',walk:'Time for a short walk.',drink:'Time to drink some water.',stretch:'Time to stretch your neck, shoulders and wrists.',breathe:'Time for a calm minute of box breathing.',eyeex:'Time for your eye exercise.'};
   // Spoken in the chosen language; only these languages are offered (and only when the device has a voice for them)
   var TR={
     hi:{'break':'आँखों को आराम देने का समय। 20 सेकंड के लिए 20 फ़ुट दूर देखें।',walk:'थोड़ी देर टहलने का समय।',drink:'पानी पीने का समय।',eyeex:'आँखों के व्यायाम का समय।',
@@ -21517,13 +21609,21 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
         end:'ટૂંક સમયમાં પૂરું થાય છે',sample:'તમારા રિમાઇન્ડર આ રીતે સંભળાશે.',
         a:{'Walk or Exercise':'ચાલો અથવા કસરત કરો','Sit in the Sun':'તડકામાં બેસો','Relax Your Eyes':'આંખોને આરામ આપો','Drink Water':'પાણી પીઓ','Bathroom Break':'બાથરૂમ વિરામ','Breakfast':'નાસ્તો','Fruits':'ફળો','Lunch':'બપોરનું ભોજન','Snacks':'હળવો નાસ્તો','Dinner':'રાત્રિ ભોજન','Screen Break':'સ્ક્રીનથી વિરામ','Sleep':'ઊંઘનો સમય'}}
   };
+  Object.assign(TR.hi,{stretch:'स्ट्रेच करने का समय। गर्दन, कंधे और कलाई को हल्का खींचें।',breathe:'गहरी साँस लेने का समय। 4 गिनती साँस लें, 4 रोकें, 4 में छोड़ें।'});
+  Object.assign(TR.te,{stretch:'స్ట్రెచ్ చేసే సమయం. మెడ, భుజాలు, మణికట్టులను సున్నితంగా సాగదీయండి.',breathe:'శ్వాస తీసుకునే సమయం. 4 లెక్కించి పీల్చండి, 4 ఆపండి, 4 లెక్కించి వదలండి.'});
+  Object.assign(TR.ta,{stretch:'நீட்டிப்பு பயிற்சி செய்ய நேரம். கழுத்து, தோள்கள், மணிக்கட்டுகளை மெதுவாக நீட்டுங்கள்.',breathe:'மூச்சுப் பயிற்சி நேரம். 4 எண்ணிக்கைக்கு உள்ளிழுத்து, 4 நிறுத்தி, 4 எண்ணிக்கைக்கு வெளியே விடுங்கள்.'});
+  Object.assign(TR.kn,{stretch:'ಸ್ಟ್ರೆಚ್ ಮಾಡುವ ಸಮಯ. ಕುತ್ತಿಗೆ, ಭುಜ, ಮಣಿಕಟ್ಟುಗಳನ್ನು ನಿಧಾನವಾಗಿ ಹಿಗ್ಗಿಸಿ.',breathe:'ಉಸಿರಾಟದ ಸಮಯ. 4 ಎಣಿಕೆಗೆ ಉಸಿರೆಳೆಯಿರಿ, 4 ಹಿಡಿಯಿರಿ, 4 ಎಣಿಕೆಗೆ ಬಿಡಿ.'});
+  Object.assign(TR.ml,{stretch:'സ്ട്രെച്ച് ചെയ്യാനുള്ള സമയം. കഴുത്ത്, തോളുകൾ, കൈക്കുഴകൾ എന്നിവ പതുക്കെ നീട്ടുക.',breathe:'ശ്വസന സമയം. 4 എണ്ണി ശ്വാസമെടുക്കുക, 4 പിടിക്കുക, 4 എണ്ണി വിടുക.'});
+  Object.assign(TR.mr,{stretch:'स्ट्रेच करण्याची वेळ. मान, खांदे आणि मनगट हळुवार ताणा.',breathe:'श्वास घेण्याची वेळ. 4 मोजून श्वास घ्या, 4 रोखा, 4 मोजून सोडा.'});
+  Object.assign(TR.bn,{stretch:'স্ট্রেচ করার সময়। ঘাড়, কাঁধ ও কবজি আলতো করে টানুন।',breathe:'শ্বাস নেওয়ার সময়। ৪ গুনে শ্বাস নিন, ৪ ধরে রাখুন, ৪ গুনে ছাড়ুন।'});
+  Object.assign(TR.gu,{stretch:'સ્ટ્રેચ કરવાનો સમય. ગરદન, ખભા અને કાંડાને હળવેથી ખેંચો.',breathe:'શ્વાસ લેવાનો સમય. 4 ગણીને શ્વાસ લો, 4 રોકો, 4 ગણીને છોડો.'});
   function L2(lang){ return String(lang||navigator.language||'en').slice(0,2).toLowerCase(); }
   function shortIn(key,lang){ var t=TR[L2(lang)]; return (t && t[key]) || SHORT[key] || ''; }
   function actIn(title,lang){ var t=TR[L2(lang)], base=String(title||'').replace(/\s*·\s*ending soon$/,''), end=base!==String(title||'');
     var name=(t && t.a[base]) || base; return end ? name+' '+((t && t.end) || 'is ending soon') : name; }
   function sampleIn(lang){ var t=TR[L2(lang)]; return (t && t.sample) || 'This is how your reminders will sound.'; }
   window.ayuSpeakText={ short:shortIn, act:actIn };
-  var CARDS=[['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['eyeex','alert-card-break-ex']];
+  var CARDS=[['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['stretch','alert-card-stretch'],['breathe','alert-card-breathe'],['eyeex','alert-card-break-ex']];
   function load(){ try{ var o=JSON.parse(localStorage.getItem(K)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
   function save(o){ try{ localStorage.setItem(K,JSON.stringify(o)); }catch(e){} try{ document.dispatchEvent(new Event('ayu-alarm-changed')); }catch(e){} }
   function cfg(k){ var o=load()[k]||{}; return {on:!!o.on, voice:String(o.voice||''), lang:String(o.lang||''), picked:!!o.picked}; }
@@ -21964,7 +22064,7 @@ html body #alerts-panel .alert-card .ayu-hb-days .otd-title:not(#ayu-x1):before{
 </style>
 <script id="hb-solo-20261108-js">
 (function(){
-  var APP=!!window.AYU_ANDROID, M='ayubase6-notif-master-on', S='ayubase6_reminder_section_states_v1', V='ayuBase6-hb-v2', KEYS=['drink','walk','break','eyeex'];
+  var APP=!!window.AYU_ANDROID, M='ayubase6-notif-master-on', S='ayubase6_reminder_section_states_v1', V='ayuBase6-hb-v2', KEYS=['drink','walk','break','stretch','breathe','eyeex'];
   function g(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   function p(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
   // once: the main switch goes away. New here or had the main switch off: every section off. On: as they were.
@@ -22213,7 +22313,7 @@ html body #routines-panel #routines-remind-panel #chk-vib-row:not(#ayu-x1){borde
   var ICON='<svg viewBox="0 0 14 14" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l4-4 4 4"/><path d="M3 11.5l4-4 4 4"/></svg>';
   var GROUPS={
     hb:{ title:function(){ var c=$('reminder-hours-card'), t=c && c.previousElementSibling; return (t && t.classList.contains('ayu-part-title')) ? t : null; },
-      list:function(){ return ['alert-card-break','alert-card-walk','alert-card-drink','alert-card-break-ex'].map(function(id){ var c=$(id); return c && {
+      list:function(){ return ['alert-card-break','alert-card-walk','alert-card-drink','alert-card-stretch','alert-card-breathe','alert-card-break-ex'].map(function(id){ var c=$(id); return c && {
         open:!c.classList.contains('collapsed'), on:!!(c.querySelector('.alert-enabled-toggle input')||{}).checked, chev:c.querySelector('.alert-card-chev') }; }).filter(Boolean); } },
     mdp:{ title:function(){ return document.querySelector('#start-my-day-card > .rout-card-hdr'); },
       list:function(){ return [['chk-alarm','wake-al-on']].concat($('ayu-checklist') ? [] : [['routines-notify-card','routines-master-toggle']]).map(function(p){ var s=$(p[0]); return s && {
@@ -22267,7 +22367,7 @@ html body .ayu-why[hidden]{display:none}
   // what is on that sends notifications (same things as the dots count)
   function what(){
     var out=[];
-    [['break','Eyes'],['walk','Walk'],['drink','Water'],['eyeex','Eyes (Exercise)']].forEach(function(x){ var e=$(x[0]==='eyeex'?'eye-ex-notify':'alert-'+x[0]+'-notify'); if(e && e.checked) out.push(x[1]); });
+    [['break','Eyes'],['walk','Walk'],['drink','Water'],['stretch','Stretch'],['breathe','Breathing'],['eyeex','Eyes (Exercise)']].forEach(function(x){ var e=$(x[0]==='eyeex'?'eye-ex-notify':'alert-'+x[0]+'-notify'); if(e && e.checked) out.push(x[1]); });
     try{ if(typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()) out.push('Checks Notify Me'); }catch(e){}
     var w=J('ayuBase6-routine-alarm'); if(w && w.on) out.push('Wake-up Alarm');
     var l=J('ayuBase6-rem-alarms'); if(!Array.isArray(l)){ var o=J('ayuBase6-rem-alarm'); l=(o && typeof o==='object')?[o]:[]; }
@@ -22431,7 +22531,7 @@ html body #start-my-day-card #chk-alarm.ayu-sub:not(#ayu-x1){margin-bottom:0 !im
     var rules = { v:1, tz:'UTC', phone: (typeof NUDGE_IS_PHONE!=='undefined' && !!NUDGE_IS_PHONE), reminders:[], exercise:null, checks:null, custom:[] };
     try{ rules.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; }catch(e){}
     var wins = (typeof window.ayuReminderWindows==='function') ? window.ayuReminderWindows() : {};
-    if(remOn) ['break','walk','drink'].forEach(function(key){
+    if(remOn) ['break','walk','drink','stretch','breathe'].forEach(function(key){
       var st = typeof alertState!=='undefined' && alertState[key]; if(!st || !st.enabled || !(st.minutes>0)) return;
       var w = wins[key] || {}, lab = ALERT_LABELS[key];
       var rr={ key:key, title:lab.title, body:lab.msg, every:st.minutes, from:toMin(w.start), to:toMin(w.end) }; var rd=window.ayuDays&&window.ayuDays.get('rem-'+key); if(rd&&rd.length<7) rr.days=rd.slice(); rules.reminders.push(rr);
@@ -22985,7 +23085,7 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
   // [group, name, note, the section's own switch (getter), open the section]
   function items(){
     var out=[];
-    [['break','Eyes (20-20-20)','alert-card-break'],['walk','Walk','alert-card-walk'],['drink','Water','alert-card-drink'],['eyeex','Eye Exercise','alert-card-break-ex']].forEach(function(x){
+    [['break','Eyes (20-20-20)','alert-card-break'],['walk','Walk','alert-card-walk'],['drink','Water','alert-card-drink'],['stretch','Stretch','alert-card-stretch'],['breathe','Breathing','alert-card-breathe'],['eyeex','Eye Exercise','alert-card-break-ex']].forEach(function(x){
       var sw=function(){ var c=$(x[2]); return c && (c.querySelector('.alert-enabled-toggle input') || $(x[0]==='eyeex'?'eye-ex-notify':'alert-'+x[0]+'-notify')); };
       if(sw()) out.push(['Reminders › Health Breaks', x[1], '', sw, goHB(x[2])]);
     });
@@ -23361,7 +23461,7 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
 
   // ── 41. Health Breaks (Eyes, Walk, Water): with a Wake-up Alarm, From = 2.5 hours after it and To = 10 hours after From; without one, 10 AM to 8 PM.
   //        Applied when the alarm is set, switched off or on, or its time changes. Each section's From/To can still be changed by hand. ──
-  var HB={'break':'alert-card-break','walk':'alert-card-walk','drink':'alert-card-drink'}, hbLast=null, hbT=0;
+  var HB={'break':'alert-card-break','walk':'alert-card-walk','drink':'alert-card-drink','stretch':'alert-card-stretch','breathe':'alert-card-breathe'}, hbLast=null, hbT=0;
   function hhmm(m){ m=((m%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
   function wakeAlarmOn(){ var w=J('ayuBase6-routine-alarm'); return !!(w && w.on); }
   function draw(btn,v){ if(btn) btn.textContent=(typeof window.fmt12==='function') ? window.fmt12(v) : v; }
@@ -24576,7 +24676,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   function applyRequestedReminderLayout(){
     const page=document.querySelector('#alerts-panel .alert-page');
     if(!page)return;
-    const ids=['alert-card-drink','alert-card-walk','alert-card-break','alert-card-break-ex'];
+    const ids=['alert-card-drink','alert-card-walk','alert-card-break','alert-card-stretch','alert-card-breathe','alert-card-break-ex'];
     ids.forEach(id=>{const card=document.getElementById(id);if(card)page.appendChild(card)});
     const custom=document.getElementById('custom-reminders-card');if(custom)page.appendChild(custom);
     const ex=document.getElementById('alert-card-break-ex');
@@ -24864,7 +24964,7 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
 </style>
 <script id="ayubase6-requested-notification-persistence">
 (function(){
-  const KEYS=['drink','walk','break','eyeex'];
+  const KEYS=['drink','walk','break','stretch','breathe','eyeex'];
   const MASTER_KEY='ayubase6_notifications_master_enabled';
   const STATE_KEY='ayubase6_reminder_section_states_v1';
   function getStates(){try{return JSON.parse(localStorage.getItem(STATE_KEY)||'{}')}catch(e){return {}}}
@@ -24876,7 +24976,7 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
     });
     try{localStorage.setItem(STATE_KEY,JSON.stringify(states))}catch(e){}
   }
-  const SECTION_CARD={drink:'alert-card-drink',walk:'alert-card-walk',break:'alert-card-break',eyeex:'alert-card-break-ex'};
+  const SECTION_CARD={drink:'alert-card-drink',walk:'alert-card-walk',break:'alert-card-break',stretch:'alert-card-stretch',breathe:'alert-card-breathe',eyeex:'alert-card-break-ex'};
   function masterExplicitlyOn(){
     try{ return localStorage.getItem('ayubase6-notif-master-on')==='1'; }catch(e){ return false; }
   }
@@ -24916,7 +25016,7 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
   window.ayuSaveReminderStates=saveStates;
   // Each section's "i" panel opens directly under its title row (above the From / Remind every rows).
   function placeInfoPanels(){
-    ['drink','walk','break','break-ex'].forEach(function(k){
+    ['drink','walk','break','stretch','breathe','break-ex'].forEach(function(k){
       var card=document.getElementById('alert-card-'+k);
       var anchor=card && card.querySelector('.alert-preview-row');
       var task=document.getElementById('alert-'+k+'-task');
