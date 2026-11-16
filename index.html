@@ -4030,6 +4030,67 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
 
     </div>
 
+<div class="alert-card collapsed" id="alert-card-posture">
+      <div class="alert-card-hdr">
+        <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="4.5" r="2.3"/><path d="M7.5 8h3l.5 5h4.5l1.5 6h-2.2l-1.1-4H9.5L8 8.5z"/><path d="M5 21h6v-2H5z"/></svg><span class="section-title-text">Posture</span></h2>
+        <button type="button" class="alert-card-chev" aria-label="Expand or collapse" aria-expanded="false" tabindex="-1"><svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg></button>
+      </div>
+
+      <div class="alert-task" id="alert-posture-task">
+        <p class="alert-card-sub">Sit well to ease back, neck and shoulder strain.</p>
+        <strong>Check your posture at each reminder.</strong>
+        <svg id="posture-fig" class="posture-fig" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 470" role="img" aria-label="Good sitting posture">
+          <rect width="720" height="470" rx="16" fill="#f0fdfa"/><rect x="20" y="448" width="680" height="6" rx="3" fill="#cbd5e1"/>
+          <rect x="166" y="298" width="130" height="14" rx="6" fill="#94a3b8"/><rect x="158" y="170" width="14" height="140" rx="6" fill="#94a3b8"/><rect x="222" y="312" width="10" height="136" fill="#94a3b8"/><rect x="190" y="444" width="74" height="6" rx="3" fill="#94a3b8"/>
+          <rect x="350" y="236" width="280" height="12" rx="5" fill="#94a3b8"/><rect x="606" y="248" width="12" height="200" fill="#94a3b8"/>
+          <rect x="440" y="118" width="130" height="86" rx="8" fill="#334155"/><rect x="448" y="126" width="114" height="70" rx="4" fill="#99f6e4"/><rect x="498" y="204" width="14" height="32" fill="#64748b"/><rect x="470" y="232" width="70" height="6" rx="3" fill="#64748b"/>
+          <ellipse cx="205" cy="118" rx="26" ry="29" fill="#fcd9b6" stroke="#0d9488" stroke-width="3"/><rect x="188" y="148" width="34" height="14" rx="6" fill="#fcd9b6"/>
+          <rect x="174" y="158" width="64" height="110" rx="26" fill="#22c55e"/>
+          <path d="M226 190 Q262 240 300 226 L370 226" stroke="#16a34a" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <rect x="174" y="262" width="146" height="34" rx="16" fill="#14532d"/><rect x="290" y="270" width="30" height="170" rx="13" fill="#14532d"/><rect x="290" y="430" width="62" height="18" rx="9" fill="#0f3d22"/>
+          <line x1="205" y1="30" x2="205" y2="275" stroke="#0d9488" stroke-width="2.5" stroke-dasharray="6 5"/>
+          <line x1="130" y1="118" x2="570" y2="118" stroke="#0d9488" stroke-width="2.5" stroke-dasharray="6 5"/>
+          <path d="M236 134 H438" stroke="#0d9488" stroke-width="2"/><path d="M236 134 l8 -5 v10z M438 134 l-8 -5 v10z" fill="#0d9488"/>
+          <path d="M280 296 V274 H304" fill="none" stroke="#0d9488" stroke-width="2.5"/>
+          <g fill="#0d9488"><circle cx="205" cy="64" r="15"/><circle cx="176" cy="168" r="15"/><circle cx="178" cy="225" r="15"/><circle cx="372" cy="380" r="15"/><circle cx="470" cy="118" r="15"/></g>
+          <g fill="#fff" font-family="system-ui,sans-serif" font-weight="700" font-size="16" text-anchor="middle"><text x="205" y="70">1</text><text x="176" y="174">2</text><text x="178" y="231">3</text><text x="372" y="386">4</text><text x="470" y="124">5</text></g>
+        </svg>
+        <ul class="posture-list">
+          <li><b>1 Head:</b> ears over shoulders, chin slightly tucked</li>
+          <li><b>2 Shoulders:</b> relaxed, not hunched</li>
+          <li><b>3 Back:</b> against the chair, natural curve</li>
+          <li><b>4 Feet:</b> flat on the floor, knees at 90°</li>
+          <li><b>5 Screen:</b> top at eye level, about 50–70 cm from your eyes</li>
+        </ul>
+      </div>
+<div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 90 minutes</span></div>
+
+      <div class="alert-row alert-sound-line">
+        <div class="alert-row-lbl dotted-lbl">Sound</div>
+        <div class="alert-sound-row">
+          <select id="alert-posture-sound" class="alert-sound-select" onchange="onAlertSoundChange('posture')">
+            <option value="ping">Ping</option>
+            <option value="bubble">Bubble</option>
+            <option value="chime">Gentle Chime</option>
+            <option value="bell">Soft Bell</option>
+          </select>
+          <button type="button" class="alert-icon-btn" id="alert-posture-play" title="Preview sound" onclick="previewAlertSound('posture')">▶</button>
+          <button type="button" class="alert-icon-btn" id="alert-posture-mute" title="Mute" onclick="toggleAlertMute('posture')">🔊</button>
+        </div>
+      </div>
+
+      <div class="alert-row alert-preview-row"><span class="row-dot" aria-hidden="true">•</span><button type="button" class="alert-preview-btn" onclick="previewAlertNotification('posture')">Preview notification</button></div>
+      <div class="alert-row alert-notify-row"><span class="row-dot">•</span>
+        <input type="checkbox" id="alert-posture-notify" class="notify-cb" onchange="onAlertNotifyChange('posture')"><label for="alert-posture-notify" class="notify-switch-label" title="Enable or disable this reminder"><span class="notify-switch-track"><span class="notify-switch-thumb"></span></span></label></div>
+      <div class="notif-blocked-hint" id="alert-posture-notif-hint" style="display:none"></div>
+      <div class="notif-mock" id="alert-posture-notif-mock">
+        <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="4.5" r="2.3"/><path d="M7.5 8h3l.5 5h4.5l1.5 6h-2.2l-1.1-4H9.5L8 8.5z"/><path d="M5 21h6v-2H5z"/></svg></span>
+        <div class="notif-mock-text"><strong>Posture check</strong><span>Sit tall: shoulders relaxed, back on the chair, feet flat, screen at eye level.</span><img class="posture-pic" id="posture-pic" alt="Good sitting posture"></div>
+      </div>
+
+    </div>
+
+
 <div class="alert-card collapsed" id="alert-card-stretch">
       <div class="alert-card-hdr">
         <h2><svg class="section-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 6c-2.61.7-5.67 1-8.5 1s-5.89-.3-8.5-1L3 8c1.86.5 4 .83 6 1v13h2v-6h2v6h2V9c2-.17 4.14-.5 6-1l-.5-2zM12 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg><span class="section-title-text">Stretch</span></h2>
@@ -4448,6 +4509,13 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-nomobile" style="display:none">
         <strong>Why it helps</strong><ul><li>Helps your mind wind down, so you fall asleep faster and sleep better.</li><li>Gives your eyes a rest after a day of screens.</li></ul><strong>Watch out</strong><ul><li>At first you may feel bored, or worry about missing a message.</li><li>The habit is hard to break, especially if the phone is also your alarm.</li></ul><strong>Tips</strong><ul><li>Charge the phone outside the bedroom, and use an alarm clock.</li><li>Set Do Not Disturb with a few allowed contacts for emergencies.</li><li>Replace scrolling with reading, light stretching or time with family.</li></ul>
+      </div>
+      <div class="rout-row">
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="windbreath"> <span>Wind-down breathing (4-7-8) <span class="rout-time" id="rt-windbreath">(9:45 – 10:00 PM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('windbreath')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-windbreath" style="display:none">
+        <strong>How</strong><ul><li>Sit or lie down. Breathe in through your nose for 4 counts, hold for 7, breathe out slowly through your mouth for 8.</li><li>Repeat 4 times, about 1.5 minutes.</li></ul><strong>Why it helps</strong><ul><li>The long out-breath slows your heart rate and calms the body before sleep.</li><li>Many people fall asleep more easily and feel less tense.</li></ul><strong>Watch out</strong><ul><li>It can make you light-headed or drowsy at first: do it seated or lying down, and stop if you feel dizzy.</li></ul>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="sleep"> <span>Sleep <span class="rout-time" id="rt-sleep">(10:00 – 11:00 PM)</span></span></label>
@@ -10915,16 +10983,17 @@ function inScheduleWindow(d){
   if(a===null || b===null || a===b) return true;      // incomplete / identical → no restriction
   return a<b ? (cur>=a && cur<=b) : (cur>=a || cur<=b); // overnight windows supported
 }
-const ALERT_DEFAULTS={ break:{minutes:20,sound:'chime'}, walk:{minutes:45,sound:'drum'}, drink:{minutes:60,sound:'drop'}, stretch:{minutes:120,sound:'xylophone'}, breathe:{minutes:180,sound:'bell'} };
+const ALERT_DEFAULTS={ break:{minutes:20,sound:'chime'}, walk:{minutes:45,sound:'drum'}, drink:{minutes:60,sound:'drop'}, posture:{minutes:90,sound:'ping'}, stretch:{minutes:120,sound:'xylophone'}, breathe:{minutes:180,sound:'bell'} };
 const ALERT_LABELS={
   break:{title:'Eyes', icon:'👁️', msg:'Look 20 feet away for 20 seconds — 20-20-20 time!'},
   walk: {title:'Walk',  icon:'🚶', msg:'Time for a 2–5 minute walk or stretch!'},
   drink:{title:'Water', icon:'💧', msg:'Drink a glass of water — about 200ml keeps you on track!'},
+  posture:{title:'Posture', icon:'🧘', msg:'Sit tall: shoulders relaxed, back on the chair, feet flat, screen at eye level.'},
   stretch:{title:'Stretch', icon:'🤸', msg:'Time to stretch — neck, shoulders and wrists for 1–2 minutes.'},
   breathe:{title:'Breathing', icon:'🌬️', msg:'Take a calm minute — breathe in 4, hold 4, out 4, hold 4. Repeat 4 times.'},
 };
 const alertState={};
-['break','walk','drink','stretch','breathe'].forEach(key=>{
+['break','walk','drink','posture','stretch','breathe'].forEach(key=>{
   alertState[key]={ enabled:true, minutes:ALERT_DEFAULTS[key].minutes, sound:ALERT_DEFAULTS[key].sound, muted:false, notify:false, timerId:null };
 });
 
@@ -11148,7 +11217,7 @@ function nudgeDisableActions(){
   return NUDGE_IS_PHONE ? [ {action:'disable-this', title:'Turn off this'} ] : undefined;
 }
 function handleNudgeClick(key, action){
-  if((action==='disable-this'||action==='disable-all') && /^(break|walk|drink|stretch|breathe|eyeex)$/.test(String(key))){
+  if((action==='disable-this'||action==='disable-all') && /^(break|walk|drink|posture|stretch|breathe|eyeex)$/.test(String(key))){
     try{ const h=nudgeDefaultHandlers(key); (action==='disable-all'?h.onDisableAll:h.onDisableThis)(); }catch(e){}
     return;
   }
@@ -11195,6 +11264,7 @@ function showNudgeNotification(title, body, o){
   if(fresh) opts.vibrate=(window.ayuVibrate && !window.ayuVibrate.on(key)) ? [] : [200,100,200,100,200];
   const icon=nudgeArt('icon',o.theme), badge=nudgeArt('badge',o.theme);
   if(icon) opts.icon=icon; if(badge) opts.badge=badge;
+  if(key==='posture'||key==='preview-posture'){ const pi=document.getElementById('posture-pic'); if(pi && pi.src && /^data:/.test(pi.src)) opts.image=pi.src; }   // posture check shows the sitting picture
   const viaReg=reg=>{
     if(o.actions) opts.actions=o.actions;
     const show=()=>reg.showNotification(title, opts).then(()=>{
@@ -11515,6 +11585,7 @@ const ROUTINE_NOTIFY_ITEMS={
   snacks:{title:'Snacks',body:'It’s time for your snack.'},
   dinner:{title:'Dinner',body:'It’s time for dinner.'},
   nomobile:{title:'Screen Break',body:'Put your mobile away for the evening.'},
+  windbreath:{title:'Wind-down Breathing',body:'Breathe in for 4, hold for 7, out for 8. Repeat 4 times.'},
   sleep:{title:'Sleep',body:'It’s time to prepare for sleep.'}
 };
 function routineNotificationsEnabled(){
@@ -11653,6 +11724,7 @@ function initRoutineNotifications(){
 }
 initRoutineNotifications();
 function previewAlertNotification(key){
+  if(key==='posture'){ const pm=document.getElementById('alert-posture-notif-mock'); if(pm) pm.classList.add('show'); }   // the picture notification shows under the button
   // On phones, preview the real system notification first; opening a popup
   // here can otherwise prevent Android Chrome from showing the notification.
   // Desktop keeps its existing popup preview behaviour.
@@ -11753,7 +11825,7 @@ function syncAllReminderNotifyFlags(forceState){
   // Explicitly update the four visible top-row switches in Reminders.
   // Keep the input checked state (which drives the switch styling), the
   // reminder runtime state, and the browser-notification state in sync.
-  ['drink','walk','break','stretch','breathe'].forEach(key=>{
+  ['drink','walk','break','posture','stretch','breathe'].forEach(key=>{
     const cb=document.getElementById('alert-'+key+'-notify');
     if(cb){
       cb.checked=masterOn;
@@ -11771,7 +11843,7 @@ function syncAllReminderNotifyFlags(forceState){
     const card=input.closest('.alert-card');
     if(!card) return;
     const title=(card.querySelector('h2')?.innerText||'').trim();
-    const mainId=/^Water$/i.test(title)?'alert-drink-notify':/^Stretch$/i.test(title)?'alert-stretch-notify':/^Breathing$/i.test(title)?'alert-breathe-notify':/^Walk$/i.test(title)?'alert-walk-notify':/Eyes \(20-20-20\)/i.test(title)?'alert-break-notify':/Eyes \(Exercise\)/i.test(title)?'eye-ex-notify':null;
+    const mainId=/^Water$/i.test(title)?'alert-drink-notify':/^Posture$/i.test(title)?'alert-posture-notify':/^Stretch$/i.test(title)?'alert-stretch-notify':/^Breathing$/i.test(title)?'alert-breathe-notify':/^Walk$/i.test(title)?'alert-walk-notify':/Eyes \(20-20-20\)/i.test(title)?'alert-break-notify':/Eyes \(Exercise\)/i.test(title)?'eye-ex-notify':null;
     const main=mainId?document.getElementById(mainId):null;
     if(main) input.checked=main.checked;
     card.classList.toggle('alert-disabled',!input.checked);
@@ -11932,7 +12004,7 @@ function updateRemindersNotifBanner(){
 // button itself remains responsible for turning all sections on or off.
 document.addEventListener('change', function(e){
   const target=e.target;
-  if(!target || !['alert-break-notify','alert-walk-notify','alert-drink-notify','alert-stretch-notify','alert-breathe-notify','eye-ex-notify'].includes(target.id)) return;
+  if(!target || !['alert-break-notify','alert-walk-notify','alert-drink-notify','alert-posture-notify','alert-stretch-notify','alert-breathe-notify','eye-ex-notify'].includes(target.id)) return;
   // Deliberately do not call setMasterNotifyFlag(), updateRemindersNotifBanner(),
   // or refreshNotifStatusUI() here: individual toggles must not affect the master.
 });
@@ -11942,7 +12014,7 @@ document.addEventListener('change', function(e){
 // if the browser already has notification permission from a previous
 // visit, sync that in too — otherwise it'll just use the in-app preview
 // until the person grants it.
-['break','walk','drink','stretch','breathe'].forEach(key=>{
+['break','walk','drink','posture','stretch','breathe'].forEach(key=>{
   const slider=document.getElementById('alert-'+key+'-time');
   if(slider) updateSliderFill(slider,'var(--alert-2)');
   // These reminders are opt-in on a fresh page load.
@@ -12401,6 +12473,7 @@ const WAKE_OFFSETS = {
   snacks:    [570, 630],
   dinner:    [720, 780],
   nomobile:  [870, 930],
+  windbreath:[915, 930],
   sleep:     [930, 960],
 };
 function minutesToClock(totalMin){
@@ -12541,7 +12614,7 @@ function resetRemindersToDefault(){
 
   const permGranted=(typeof Notification!=='undefined' && Notification.permission==='granted');
 
-  ['break','walk','drink','stretch','breathe'].forEach(key=>{
+  ['break','walk','drink','posture','stretch','breathe'].forEach(key=>{
     const def=ALERT_DEFAULTS[key];
     Object.assign(alertState[key], { enabled:true, minutes:def.minutes, sound:def.sound, muted:false, notify:permGranted });
 
@@ -14809,7 +14882,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     +'</ul>';
   document.querySelectorAll('.notif-info').forEach(function(el){ if(el.id!=='install-help') el.innerHTML=(el.id==='master-notif-info'?REM_NOTE:NOTE); });
   // Each section's own "i" panel also carries the notification notes, under a separate title.
-  ['drink','walk','break','stretch','breathe','break-ex'].forEach(function(k){
+  ['drink','walk','break','posture','stretch','breathe','break-ex'].forEach(function(k){
     var task=document.getElementById('alert-'+k+'-task'); if(!task||task.querySelector('.section-notif-note')) return;
     var d=document.createElement('div'); d.className='section-notif-note';
     d.innerHTML='<strong class="section-notif-title">Notifications</strong>'+SEC_NOTE;
@@ -14953,14 +15026,14 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     const cards=[...document.querySelectorAll('#alerts-panel .alert-card')].filter(c=>c.id!=='alert-card-schedule'&&c.id!=='custom-reminders-card');
     cards.forEach(card=>{
       const title=(card.querySelector('h2')?.innerText||'').trim();
-      if(!/Eyes \(20-20-20\)|^Walk$|^Water$|^Stretch$|^Breathing$|Eyes \(Exercise\)/i.test(title)) return;
+      if(!/Eyes \(20-20-20\)|^Walk$|^Water$|^Posture$|^Stretch$|^Breathing$|Eyes \(Exercise\)/i.test(title)) return;
       const key=card.id.replace('alert-card-','');
       if(card.querySelector('.alert-enabled-toggle')) return;
       const hdr=card.querySelector('.alert-card-hdr'); if(!hdr)return;
       const label=document.createElement('label');label.className='alert-enabled-toggle';
       label.innerHTML='<input type="checkbox" aria-label="Enable '+title.replace(/"/g,'')+'" />';
       const input=label.querySelector('input');
-      const mainSwitchId=({drink:'alert-drink-notify',walk:'alert-walk-notify',break:'alert-break-notify',stretch:'alert-stretch-notify',breathe:'alert-breathe-notify','eye-ex':'eye-ex-notify'})[key];
+      const mainSwitchId=({drink:'alert-drink-notify',walk:'alert-walk-notify',break:'alert-break-notify',posture:'alert-posture-notify',stretch:'alert-stretch-notify',breathe:'alert-breathe-notify','eye-ex':'eye-ex-notify'})[key];
       const mainSwitch=mainSwitchId ? document.getElementById(mainSwitchId) : null;
       input.checked=mainSwitch ? mainSwitch.checked : !!(window.alertState && window.alertState[key] && window.alertState[key].enabled);
       card.classList.toggle('alert-disabled',!input.checked);
@@ -14982,7 +15055,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     if(page){
       const directCards=[...page.querySelectorAll(':scope > .alert-card')];
       const find=(re)=>directCards.find(c=>re.test((c.querySelector('h2')?.innerText||'').trim()));
-      const ordered=[find(/Eyes \(20-20-20\)/i),find(/^Walk$/i),find(/^Water$/i),find(/^Stretch$/i),find(/^Breathing$/i),find(/Eyes \(Exercise\)/i)].filter(Boolean);
+      const ordered=[find(/Eyes \(20-20-20\)/i),find(/^Walk$/i),find(/^Water$/i),find(/^Posture$/i),find(/^Stretch$/i),find(/^Breathing$/i),find(/Eyes \(Exercise\)/i)].filter(Boolean);
       const custom=document.getElementById('custom-reminders-card');
       const bottomIds=['reminders-notif-banner','reminders-notif-error','master-notif-info','install-row','install-help'];
       const bottom=bottomIds.map(id=>document.getElementById(id)).filter(el=>el && el.parentElement===page);
@@ -15186,6 +15259,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   const defaults={start:'10:00',end:'20:00'};
   const specs=[
     {id:'alert-card-drink',key:'drink',title:'Water'},
+    {id:'alert-card-posture',key:'posture',title:'Posture'},
     {id:'alert-card-stretch',key:'stretch',title:'Stretch'},
     {id:'alert-card-breathe',key:'breathe',title:'Breathing'},
     {id:'alert-card-walk',key:'walk',title:'Walk'},
@@ -15256,7 +15330,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
       ['start','end'].forEach(w=>{const b=card.querySelector('.per-reminder-schedule [data-time="'+w+'"]');if(b)drawButton(b,st[w])});
     });
     updateExerciseTimes(true);
-    ['break','walk','drink','stretch','breathe'].forEach(k=>{if(typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)});
+    ['break','walk','drink','posture','stretch','breathe'].forEach(k=>{if(typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)});
     saveHours();
   }
   function wireTopSchedule(){
@@ -15312,7 +15386,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     const oldStart=document.getElementById('schedule-start'),oldEnd=document.getElementById('schedule-end');
     if(oldStart)oldStart.value=defaults.start;if(oldEnd)oldEnd.value=defaults.end;
     if(typeof scheduleState!=='undefined'){scheduleState.start=defaults.start;scheduleState.end=defaults.end}
-    if(typeof alertState!=='undefined'){['break','walk','drink','stretch','breathe'].forEach(k=>{if(alertState[k]&&typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)})}
+    if(typeof alertState!=='undefined'){['break','walk','drink','posture','stretch','breathe'].forEach(k=>{if(alertState[k]&&typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(k)})}
     updateExerciseTimes();
   }
   // Reminder times are rebuilt from From/To every day: the first reminder is at From, then every N minutes
@@ -15473,7 +15547,7 @@ document.getElementById('clock-picker-close').onclick=close;overlay.addEventList
 <script id="reminders-default-off-fix">
 (function(){
   function setDefaultsOff(){
-    const items=[['drink','alert-card-drink'],['walk','alert-card-walk'],['break','alert-card-break'],['stretch','alert-card-stretch'],['breathe','alert-card-breathe']];
+    const items=[['drink','alert-card-drink'],['walk','alert-card-walk'],['break','alert-card-break'],['posture','alert-card-posture'],['stretch','alert-card-stretch'],['breathe','alert-card-breathe']];
     items.forEach(([key,cardId])=>{
       const cb=document.getElementById('alert-'+key+'-notify');
       const card=document.getElementById(cardId);
@@ -16331,6 +16405,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('alerts','#alert-card-break',0,C.rem,'<b>Health Breaks → Eyes (20-20-20)</b>: a short eye break at regular intervals. Each part has its own switch, hours, days, sound, Read aloud and Vibrate.');
   sec('alerts','#alert-card-walk',0,C.rem,'<b>Walk</b>: a reminder to get up and move.');
   sec('alerts','#alert-card-drink',0,C.rem,'<b>Water</b>: a reminder to drink water.');
+  sec('alerts','#alert-card-posture',0,C.rem,'<b>Posture</b>: a reminder to check how you are sitting.');
   sec('alerts','#alert-card-stretch',0,C.rem,'<b>Stretch</b>: a reminder to loosen your neck, shoulders and wrists.');
   sec('alerts','#alert-card-breathe',0,C.rem,'<b>Breathing</b>: a reminder for a calm minute of box breathing.');
   sec('alerts','#alert-card-break-ex',0,C.rem,'<b>Eye Exercise</b>: guided eye exercises on the days you choose.');
@@ -17023,7 +17098,7 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
       var v=JSON.parse(localStorage.getItem(KEYS[k])||'null'); return clean(k==='rem'?(v&&v.days):v);
     }catch(e){ return /eyeex$/.test(k) ? EX_DEF.slice() : ALL.slice(); }
   }
-  function hbAll(){ var o={}; ['break','walk','drink','stretch','breathe','eyeex'].forEach(function(s){ o[s]=get('rem-'+s).slice(); }); return o; }
+  function hbAll(){ var o={}; ['break','walk','drink','posture','stretch','breathe','eyeex'].forEach(function(s){ o[s]=get('rem-'+s).slice(); }); return o; }
   function get(k){ if(!cache[k])cache[k]=load(k); return cache[k]; }
   function save(k){
     try{
@@ -17050,14 +17125,14 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
   window.ayuDays={
     get:function(k){return get(k)},
     ok:function(k,d){return get(k).indexOf((d||new Date()).getDay())>=0},
-    reset:function(k){cache[k]=ALL.slice();if(draws[k])draws[k]();if(k==='rem')['break','walk','drink','stretch','breathe','eyeex'].forEach(function(s){cache['rem-'+s]=s==='eyeex'?EX_DEF.slice():ALL.slice();if(draws['rem-'+s])draws['rem-'+s]()});},
+    reset:function(k){cache[k]=ALL.slice();if(draws[k])draws[k]();if(k==='rem')['break','walk','drink','posture','stretch','breathe','eyeex'].forEach(function(s){cache['rem-'+s]=s==='eyeex'?EX_DEF.slice():ALL.slice();if(draws['rem-'+s])draws['rem-'+s]()});},
     all:function(){return hbAll()},
     refresh:function(){cache={};Object.keys(draws).forEach(function(k){draws[k]()})}
   };
   function install(){
     var h=document.getElementById('rh-days');if(h&&!h.dataset.built){h.dataset.built='1';build(h,'rem')}
     // each Health Breaks section: after From
-    [['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['stretch','alert-card-stretch'],['breathe','alert-card-breathe'],['eyeex','alert-card-break-ex']].forEach(function(p){
+    [['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['posture','alert-card-posture'],['stretch','alert-card-stretch'],['breathe','alert-card-breathe'],['eyeex','alert-card-break-ex']].forEach(function(p){
       var c=document.getElementById(p[1]), fr=c&&c.querySelector('.per-reminder-schedule'); if(!fr||document.getElementById('days-'+p[0]))return;
       var d=document.createElement('div');d.id='days-'+p[0];d.className='otd-row ayu-hb-days';d.setAttribute('role','group');fr.after(d);build(d,'rem-'+p[0]);
     });
@@ -17394,7 +17469,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
 (function(){
   // When several reminders are due together, they are shown one after another with a gap: twice the time the earlier one asks of you
   // (Eyes 20 s, Eye exercise 30 s, Walk about 3 min, Water about 30 s, a Checks item about 1 min), never more than 10 minutes.
-  var ACT={break:20,eyeex:30,walk:180,drink:30,stretch:90,breathe:90}, free=0, q=[], timer=null;
+  var ACT={break:20,eyeex:30,walk:180,drink:30,posture:30,stretch:90,breathe:90}, free=0, q=[], timer=null;
   function gap(key){ var s=ACT[key]; if(!s) s=60; return Math.min(600,2*s)*1000; }
   function pump(){ timer=null; if(!q.length) return; var now=Date.now(); if(now<free){ timer=setTimeout(pump,free-now+30); return; } var it=q.shift(); free=Date.now()+gap(it.key); try{ it.fn(); }catch(e){} if(q.length) timer=setTimeout(pump,free-Date.now()+30); }
   function submit(key,fn){ if(q.some(function(x){return x.key===key;})) return true; q.push({key:key,fn:fn}); if(!timer) pump(); return true; }
@@ -19638,7 +19713,7 @@ html body #rem-alarm-card > .ayu-al-info{padding:12px 14px;border-radius:12px;ba
 
   // ── Reminders: the About text of each section opens from an i next to its title ──
   function descButtons(){
-    ['alert-card-break','alert-card-walk','alert-card-drink','alert-card-stretch','alert-card-breathe','alert-card-break-ex'].forEach(function(id){
+    ['alert-card-break','alert-card-walk','alert-card-drink','alert-card-posture','alert-card-stretch','alert-card-breathe','alert-card-break-ex'].forEach(function(id){
       var c=$(id), h=c&&c.querySelector('.alert-card-hdr'), t=c&&c.querySelector('.alert-task'); if(!h||!t||h.querySelector('.ayu-desc-btn')) return;
       var b=document.createElement('button'); b.type='button'; b.className='ayu-desc-btn';   // the “i” is drawn by CSS, so the title's text stays the same for other scripts
       var name=(h.querySelector('.section-title-text')||h).textContent.trim();
@@ -19753,11 +19828,11 @@ html body #chk-alarm > .ayu-al-body{margin-left:16px}
   function remSections(){
     function sect(k){ return function(){ try{ var s=JSON.parse(ls('ayubase6_reminder_section_states_v1')||'{}')||{}; s[k]=false; ls('ayubase6_reminder_section_states_v1',JSON.stringify(s)); }catch(e){} }; }
     var list=[['reminder-hours-card',function(){ ls('ayuBase6-reminder-hours',null); }]];
-    [['alert-card-break','break'],['alert-card-walk','walk'],['alert-card-drink','drink'],['alert-card-stretch','stretch'],['alert-card-breathe','breathe'],['alert-card-break-ex','eyeex']].forEach(function(x){ list.push([x[0],sect(x[1])]); });
+    [['alert-card-break','break'],['alert-card-walk','walk'],['alert-card-drink','drink'],['alert-card-posture','posture'],['alert-card-stretch','stretch'],['alert-card-breathe','breathe'],['alert-card-break-ex','eyeex']].forEach(function(x){ list.push([x[0],sect(x[1])]); });
     list.push(['rem-alarm-card',function(){ ls('ayuBase6-rem-alarm',null); ls('ayuBase6-rem-alarms',null); }]);
     list.push(['custom-reminders-card',function(){ var l=$('custom-reminders-list'); if(l) l.innerHTML=''; ls('ayuBase6-my-reminders',null); },'Deletes your reminders']);   // the list is emptied too, or it is saved again as the page reloads
     var pg=document.querySelector('#alerts-panel .alert-page[data-remtab]'), t=pg?pg.dataset.remtab:'';
-    var only={breaks:['reminder-hours-card','alert-card-break','alert-card-walk','alert-card-drink','alert-card-stretch','alert-card-breathe','alert-card-break-ex'],alarm:['rem-alarm-card'],personal:['custom-reminders-card']}[t];
+    var only={breaks:['reminder-hours-card','alert-card-break','alert-card-walk','alert-card-drink','alert-card-posture','alert-card-stretch','alert-card-breathe','alert-card-break-ex'],alarm:['rem-alarm-card'],personal:['custom-reminders-card']}[t];
     if(only) list=list.filter(function(x){ return only.indexOf(x[0])>=0; });
     return list.map(function(x){ var c=$(x[0]); return c ? {name:title(c), clear:x[1], note:x[2]} : null; }).filter(Boolean);
   }
@@ -19797,7 +19872,7 @@ html body #chk-alarm > .ayu-al-body{margin-left:16px}
   function group(){
     var h=$('reminder-hours-card'); if(!h || h.parentNode.classList.contains('ayu-rem-group')) return;
     var g=document.createElement('div'); g.className='ayu-rem-group'; h.before(g);
-    ['reminder-hours-card','alert-card-break','alert-card-walk','alert-card-drink','alert-card-stretch','alert-card-breathe','alert-card-break-ex'].forEach(function(id){ var c=$(id); if(c) g.appendChild(c); });
+    ['reminder-hours-card','alert-card-break','alert-card-walk','alert-card-drink','alert-card-posture','alert-card-stretch','alert-card-breathe','alert-card-break-ex'].forEach(function(id){ var c=$(id); if(c) g.appendChild(c); });
     var hc=$('reminder-hours-card'); if(hc) hc.classList.remove('collapsed');
   }
 
@@ -20117,11 +20192,11 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
   var APP=!!window.AYU_ANDROID, PHONE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'');
   var CAN=APP || (PHONE && typeof navigator.vibrate==='function');
   if(CAN) document.documentElement.classList.add('ayu-can-vib');
-  var K='ayuBase6-vibrate', HB=['break','walk','drink','stretch','breathe','eyeex'];
+  var K='ayuBase6-vibrate', HB=['break','walk','drink','posture','stretch','breathe','eyeex'];
   function load(){ try{ var o=JSON.parse(localStorage.getItem(K)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
   function save(o){ try{ localStorage.setItem(K,JSON.stringify(o)); }catch(e){} try{ document.dispatchEvent(new Event('ayu-alarm-changed')); }catch(e){} }
   function notifyOn(){ var t=document.getElementById('routines-master-toggle'); return !!(t && t.checked); }
-  var MAIN={'break':'alert-break-notify',walk:'alert-walk-notify',drink:'alert-drink-notify',stretch:'alert-stretch-notify',breathe:'alert-breathe-notify',eyeex:'eye-ex-notify'};
+  var MAIN={'break':'alert-break-notify',walk:'alert-walk-notify',drink:'alert-drink-notify',posture:'alert-posture-notify',stretch:'alert-stretch-notify',breathe:'alert-breathe-notify',eyeex:'eye-ex-notify'};
   function mainOn(k){ var t=document.getElementById(MAIN[k]); return !!(t && t.checked); }
   function masterOn(){ try{ return typeof isMasterNotifyOn==='function' && !!isMasterNotifyOn(); }catch(e){ return false; } }
   // not set yet: Vibrate follows the section's own switch (off until that is on), like Checks follows Notify Me
@@ -20185,7 +20260,7 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
       days.after(r);
     } else if(!days) ok=false;
     // each Health Breaks section: after Sound
-    [['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['stretch','alert-card-stretch'],['breathe','alert-card-breathe'],['eyeex','alert-card-break-ex']].forEach(function(p){
+    [['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['posture','alert-card-posture'],['stretch','alert-card-stretch'],['breathe','alert-card-breathe'],['eyeex','alert-card-break-ex']].forEach(function(p){
       var card=document.getElementById(p[1]), snd=card && card.querySelector('.alert-sound-line'); if(!snd){ ok=false; return; }
       if(card.querySelector('[data-vib-key]')) return;
       var name=(card.querySelector('h2 .section-title-text')||{}).textContent||'';
@@ -21581,7 +21656,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
    On the website: while AyuBase6 is open. In the Android app: the phone reads it, also with the app closed. */
 (function(){
   var APP=!!window.AYU_ANDROID, K='ayuBase6-speak';
-  var SHORT={'break':'Time for an eye break. Look 20 feet away for 20 seconds.',walk:'Time for a short walk.',drink:'Time to drink some water.',stretch:'Time to stretch your neck, shoulders and wrists.',breathe:'Time for a calm minute of box breathing.',eyeex:'Time for your eye exercise.'};
+  var SHORT={'break':'Time for an eye break. Look 20 feet away for 20 seconds.',walk:'Time for a short walk.',drink:'Time to drink some water.',posture:'Posture check: sit tall, shoulders relaxed, back on the chair, feet flat.',stretch:'Time to stretch your neck, shoulders and wrists.',breathe:'Time for a calm minute of box breathing.',eyeex:'Time for your eye exercise.'};
   // Spoken in the chosen language; only these languages are offered (and only when the device has a voice for them)
   var TR={
     hi:{'break':'आँखों को आराम देने का समय। 20 सेकंड के लिए 20 फ़ुट दूर देखें।',walk:'थोड़ी देर टहलने का समय।',drink:'पानी पीने का समय।',eyeex:'आँखों के व्यायाम का समय।',
@@ -21617,13 +21692,21 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-speak-
   Object.assign(TR.mr,{stretch:'स्ट्रेच करण्याची वेळ. मान, खांदे आणि मनगट हळुवार ताणा.',breathe:'श्वास घेण्याची वेळ. 4 मोजून श्वास घ्या, 4 रोखा, 4 मोजून सोडा.'});
   Object.assign(TR.bn,{stretch:'স্ট্রেচ করার সময়। ঘাড়, কাঁধ ও কবজি আলতো করে টানুন।',breathe:'শ্বাস নেওয়ার সময়। ৪ গুনে শ্বাস নিন, ৪ ধরে রাখুন, ৪ গুনে ছাড়ুন।'});
   Object.assign(TR.gu,{stretch:'સ્ટ્રેચ કરવાનો સમય. ગરદન, ખભા અને કાંડાને હળવેથી ખેંચો.',breathe:'શ્વાસ લેવાનો સમય. 4 ગણીને શ્વાસ લો, 4 રોકો, 4 ગણીને છોડો.'});
+  Object.assign(TR.hi,{posture:'पोस्चर जाँचें: सीधे बैठें, कंधे ढीले, पीठ कुर्सी से टिकी, पैर ज़मीन पर।'});
+  Object.assign(TR.te,{posture:'భంగిమ తనిఖీ: నిటారుగా కూర్చోండి, భుజాలు సడలించండి, వీపు కుర్చీకి ఆనించండి, పాదాలు నేలపై.'});
+  Object.assign(TR.ta,{posture:'அமரும் நிலையை சரிபார்: நிமிர்ந்து அமருங்கள், தோள்களை தளர்த்துங்கள், முதுகை நாற்காலியில் சாய்த்து, பாதங்கள் தரையில்.'});
+  Object.assign(TR.kn,{posture:'ಕುಳಿತುಕೊಳ್ಳುವ ಭಂಗಿ ಪರಿಶೀಲಿಸಿ: ನೇರವಾಗಿ ಕುಳಿತುಕೊಳ್ಳಿ, ಭುಜ ಸಡಿಲವಾಗಿರಲಿ, ಬೆನ್ನು ಕುರ್ಚಿಗೆ ಒರಗಲಿ, ಪಾದ ನೆಲದ ಮೇಲೆ.'});
+  Object.assign(TR.ml,{posture:'ഇരിപ്പ് പരിശോധിക്കുക: നേരെ ഇരിക്കുക, തോളുകൾ അയച്ചിടുക, മുതുക് കസേരയിൽ ചാരുക, പാദങ്ങൾ നിലത്ത്.'});
+  Object.assign(TR.mr,{posture:'बसण्याची पद्धत तपासा: सरळ बसा, खांदे सैल, पाठ खुर्चीला टेकलेली, पाय जमिनीवर.'});
+  Object.assign(TR.bn,{posture:'বসার ভঙ্গি দেখুন: সোজা হয়ে বসুন, কাঁধ শিথিল, পিঠ চেয়ারে ঠেকানো, পা মেঝেতে।'});
+  Object.assign(TR.gu,{posture:'બેસવાની રીત તપાસો: સીધા બેસો, ખભા ઢીલા, પીઠ ખુરશીને ટેકે, પગ જમીન પર.'});
   function L2(lang){ return String(lang||navigator.language||'en').slice(0,2).toLowerCase(); }
   function shortIn(key,lang){ var t=TR[L2(lang)]; return (t && t[key]) || SHORT[key] || ''; }
   function actIn(title,lang){ var t=TR[L2(lang)], base=String(title||'').replace(/\s*·\s*ending soon$/,''), end=base!==String(title||'');
     var name=(t && t.a[base]) || base; return end ? name+' '+((t && t.end) || 'is ending soon') : name; }
   function sampleIn(lang){ var t=TR[L2(lang)]; return (t && t.sample) || 'This is how your reminders will sound.'; }
   window.ayuSpeakText={ short:shortIn, act:actIn };
-  var CARDS=[['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['stretch','alert-card-stretch'],['breathe','alert-card-breathe'],['eyeex','alert-card-break-ex']];
+  var CARDS=[['break','alert-card-break'],['walk','alert-card-walk'],['drink','alert-card-drink'],['posture','alert-card-posture'],['stretch','alert-card-stretch'],['breathe','alert-card-breathe'],['eyeex','alert-card-break-ex']];
   function load(){ try{ var o=JSON.parse(localStorage.getItem(K)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
   function save(o){ try{ localStorage.setItem(K,JSON.stringify(o)); }catch(e){} try{ document.dispatchEvent(new Event('ayu-alarm-changed')); }catch(e){} }
   function cfg(k){ var o=load()[k]||{}; return {on:!!o.on, voice:String(o.voice||''), lang:String(o.lang||''), picked:!!o.picked}; }
@@ -22064,7 +22147,7 @@ html body #alerts-panel .alert-card .ayu-hb-days .otd-title:not(#ayu-x1):before{
 </style>
 <script id="hb-solo-20261108-js">
 (function(){
-  var APP=!!window.AYU_ANDROID, M='ayubase6-notif-master-on', S='ayubase6_reminder_section_states_v1', V='ayuBase6-hb-v2', KEYS=['drink','walk','break','stretch','breathe','eyeex'];
+  var APP=!!window.AYU_ANDROID, M='ayubase6-notif-master-on', S='ayubase6_reminder_section_states_v1', V='ayuBase6-hb-v2', KEYS=['drink','walk','break','posture','stretch','breathe','eyeex'];
   function g(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   function p(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
   // once: the main switch goes away. New here or had the main switch off: every section off. On: as they were.
@@ -22331,7 +22414,7 @@ html body #routines-panel #routines-remind-panel #chk-vib-row:not(#ayu-x1){borde
   var ICON='<svg viewBox="0 0 14 14" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l4-4 4 4"/><path d="M3 11.5l4-4 4 4"/></svg>';
   var GROUPS={
     hb:{ title:function(){ var c=$('reminder-hours-card'), t=c && c.previousElementSibling; return (t && t.classList.contains('ayu-part-title')) ? t : null; },
-      list:function(){ return ['alert-card-break','alert-card-walk','alert-card-drink','alert-card-stretch','alert-card-breathe','alert-card-break-ex'].map(function(id){ var c=$(id); return c && {
+      list:function(){ return ['alert-card-break','alert-card-walk','alert-card-drink','alert-card-posture','alert-card-stretch','alert-card-breathe','alert-card-break-ex'].map(function(id){ var c=$(id); return c && {
         open:!c.classList.contains('collapsed'), on:!!(c.querySelector('.alert-enabled-toggle input')||{}).checked, chev:c.querySelector('.alert-card-chev') }; }).filter(Boolean); } },
     mdp:{ title:function(){ return document.querySelector('#start-my-day-card > .rout-card-hdr'); },
       list:function(){ return [['chk-alarm','wake-al-on']].concat($('ayu-checklist') ? [] : [['routines-notify-card','routines-master-toggle']]).map(function(p){ var s=$(p[0]); return s && {
@@ -22385,7 +22468,7 @@ html body .ayu-why[hidden]{display:none}
   // what is on that sends notifications (same things as the dots count)
   function what(){
     var out=[];
-    [['break','Eyes'],['walk','Walk'],['drink','Water'],['stretch','Stretch'],['breathe','Breathing'],['eyeex','Eyes (Exercise)']].forEach(function(x){ var e=$(x[0]==='eyeex'?'eye-ex-notify':'alert-'+x[0]+'-notify'); if(e && e.checked) out.push(x[1]); });
+    [['break','Eyes'],['walk','Walk'],['drink','Water'],['posture','Posture'],['stretch','Stretch'],['breathe','Breathing'],['eyeex','Eyes (Exercise)']].forEach(function(x){ var e=$(x[0]==='eyeex'?'eye-ex-notify':'alert-'+x[0]+'-notify'); if(e && e.checked) out.push(x[1]); });
     try{ if(typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()) out.push('Checks Notify Me'); }catch(e){}
     var w=J('ayuBase6-routine-alarm'); if(w && w.on) out.push('Wake-up Alarm');
     var l=J('ayuBase6-rem-alarms'); if(!Array.isArray(l)){ var o=J('ayuBase6-rem-alarm'); l=(o && typeof o==='object')?[o]:[]; }
@@ -22549,7 +22632,7 @@ html body #start-my-day-card #chk-alarm.ayu-sub:not(#ayu-x1){margin-bottom:0 !im
     var rules = { v:1, tz:'UTC', phone: (typeof NUDGE_IS_PHONE!=='undefined' && !!NUDGE_IS_PHONE), reminders:[], exercise:null, checks:null, custom:[] };
     try{ rules.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; }catch(e){}
     var wins = (typeof window.ayuReminderWindows==='function') ? window.ayuReminderWindows() : {};
-    if(remOn) ['break','walk','drink','stretch','breathe'].forEach(function(key){
+    if(remOn) ['break','walk','drink','posture','stretch','breathe'].forEach(function(key){
       var st = typeof alertState!=='undefined' && alertState[key]; if(!st || !st.enabled || !(st.minutes>0)) return;
       var w = wins[key] || {}, lab = ALERT_LABELS[key];
       var rr={ key:key, title:lab.title, body:lab.msg, every:st.minutes, from:toMin(w.start), to:toMin(w.end) }; var rd=window.ayuDays&&window.ayuDays.get('rem-'+key); if(rd&&rd.length<7) rr.days=rd.slice(); rules.reminders.push(rr);
@@ -23103,7 +23186,7 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
   // [group, name, note, the section's own switch (getter), open the section]
   function items(){
     var out=[];
-    [['break','Eyes (20-20-20)','alert-card-break'],['walk','Walk','alert-card-walk'],['drink','Water','alert-card-drink'],['stretch','Stretch','alert-card-stretch'],['breathe','Breathing','alert-card-breathe'],['eyeex','Eye Exercise','alert-card-break-ex']].forEach(function(x){
+    [['break','Eyes (20-20-20)','alert-card-break'],['walk','Walk','alert-card-walk'],['drink','Water','alert-card-drink'],['posture','Posture','alert-card-posture'],['stretch','Stretch','alert-card-stretch'],['breathe','Breathing','alert-card-breathe'],['eyeex','Eye Exercise','alert-card-break-ex']].forEach(function(x){
       var sw=function(){ var c=$(x[2]); return c && (c.querySelector('.alert-enabled-toggle input') || $(x[0]==='eyeex'?'eye-ex-notify':'alert-'+x[0]+'-notify')); };
       if(sw()) out.push(['Reminders › Health Breaks', x[1], '', sw, goHB(x[2])]);
     });
@@ -23481,7 +23564,7 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
 
   // ── 41. Health Breaks (Eyes, Walk, Water): with a Wake-up Alarm, From = 2.5 hours after it and To = 10 hours after From; without one, 10 AM to 8 PM.
   //        Applied when the alarm is set, switched off or on, or its time changes. Each section's From/To can still be changed by hand. ──
-  var HB={'break':'alert-card-break','walk':'alert-card-walk','drink':'alert-card-drink','stretch':'alert-card-stretch','breathe':'alert-card-breathe'}, hbLast=null, hbT=0;
+  var HB={'break':'alert-card-break','walk':'alert-card-walk','drink':'alert-card-drink','posture':'alert-card-posture','stretch':'alert-card-stretch','breathe':'alert-card-breathe'}, hbLast=null, hbT=0;
   function hhmm(m){ m=((m%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
   function wakeAlarmOn(){ var w=J('ayuBase6-routine-alarm'); return !!(w && w.on); }
   function draw(btn,v){ if(btn) btn.textContent=(typeof window.fmt12==='function') ? window.fmt12(v) : v; }
@@ -24477,6 +24560,19 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .rd-lbl{lin
 .rd-close{padding:8px 18px;border:0;border-radius:10px;background:var(--tp-accent,#0d9488);color:#fff;font:inherit;font-weight:600;cursor:pointer}
 @media (max-width:420px){html body #alerts-panel #custom-reminders-card .custom-reminder-form .rem-notes:not(#ayu-x1){grid-template-columns:92px minmax(0,1fr)}}
 </style>
+<style id="posture-20261116">
+#alerts-panel .posture-fig{display:block;width:100%;height:auto;margin:10px 0 8px;border-radius:14px}
+#alerts-panel .posture-list{margin:6px 0 0;padding-left:18px}
+#alerts-panel .posture-pic{display:block;width:100%;max-width:300px;height:auto;margin-top:8px;border-radius:10px}
+</style>
+<script id="posture-20261116-js">
+(function(){
+  function pic(){ var f=document.getElementById('posture-fig'), i=document.getElementById('posture-pic'); if(!f||!i||i.getAttribute('src')) return;
+    try{ i.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(f)); }catch(e){} }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',pic); else pic();
+  window.addEventListener('load',pic);
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
@@ -24696,7 +24792,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   function applyRequestedReminderLayout(){
     const page=document.querySelector('#alerts-panel .alert-page');
     if(!page)return;
-    const ids=['alert-card-drink','alert-card-walk','alert-card-break','alert-card-stretch','alert-card-breathe','alert-card-break-ex'];
+    const ids=['alert-card-drink','alert-card-walk','alert-card-break','alert-card-posture','alert-card-stretch','alert-card-breathe','alert-card-break-ex'];
     ids.forEach(id=>{const card=document.getElementById(id);if(card)page.appendChild(card)});
     const custom=document.getElementById('custom-reminders-card');if(custom)page.appendChild(custom);
     const ex=document.getElementById('alert-card-break-ex');
@@ -24984,7 +25080,7 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
 </style>
 <script id="ayubase6-requested-notification-persistence">
 (function(){
-  const KEYS=['drink','walk','break','stretch','breathe','eyeex'];
+  const KEYS=['drink','walk','break','posture','stretch','breathe','eyeex'];
   const MASTER_KEY='ayubase6_notifications_master_enabled';
   const STATE_KEY='ayubase6_reminder_section_states_v1';
   function getStates(){try{return JSON.parse(localStorage.getItem(STATE_KEY)||'{}')}catch(e){return {}}}
@@ -24996,7 +25092,7 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
     });
     try{localStorage.setItem(STATE_KEY,JSON.stringify(states))}catch(e){}
   }
-  const SECTION_CARD={drink:'alert-card-drink',walk:'alert-card-walk',break:'alert-card-break',stretch:'alert-card-stretch',breathe:'alert-card-breathe',eyeex:'alert-card-break-ex'};
+  const SECTION_CARD={drink:'alert-card-drink',walk:'alert-card-walk',break:'alert-card-break',posture:'alert-card-posture',stretch:'alert-card-stretch',breathe:'alert-card-breathe',eyeex:'alert-card-break-ex'};
   function masterExplicitlyOn(){
     try{ return localStorage.getItem('ayubase6-notif-master-on')==='1'; }catch(e){ return false; }
   }
@@ -25036,7 +25132,7 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
   window.ayuSaveReminderStates=saveStates;
   // Each section's "i" panel opens directly under its title row (above the From / Remind every rows).
   function placeInfoPanels(){
-    ['drink','walk','break','stretch','breathe','break-ex'].forEach(function(k){
+    ['drink','walk','break','posture','stretch','breathe','break-ex'].forEach(function(k){
       var card=document.getElementById('alert-card-'+k);
       var anchor=card && card.querySelector('.alert-preview-row');
       var task=document.getElementById('alert-'+k+'-task');
@@ -25081,12 +25177,12 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
     const disableCurrent=e.target.closest('[data-ayu-disable-current]');
     if(disableCurrent){
       const card=disableCurrent.closest('.notif-mock');
-      const keyByCard={'alert-drink-notif-mock':'drink','alert-walk-notif-mock':'walk','alert-break-notif-mock':'break','alert-stretch-notif-mock':'stretch','alert-breathe-notif-mock':'breathe','eye-ex-notif-mock':'eyeex'};
+      const keyByCard={'alert-drink-notif-mock':'drink','alert-walk-notif-mock':'walk','alert-break-notif-mock':'break','alert-posture-notif-mock':'posture','alert-stretch-notif-mock':'stretch','alert-breathe-notif-mock':'breathe','eye-ex-notif-mock':'eyeex'};
       const key=card && keyByCard[card.id];
       if(key){
         const input=document.getElementById(key==='eyeex'?'eye-ex-notify':'alert-'+key+'-notify');
         if(input){input.checked=false;input.setAttribute('aria-checked','false');input.dispatchEvent(new Event('change',{bubbles:true}));}
-        const sectionCard=document.getElementById(({drink:'alert-card-drink',walk:'alert-card-walk',break:'alert-card-break',stretch:'alert-card-stretch',breathe:'alert-card-breathe',eyeex:'alert-card-break-ex'})[key]);
+        const sectionCard=document.getElementById(({drink:'alert-card-drink',walk:'alert-card-walk',break:'alert-card-break',posture:'alert-card-posture',stretch:'alert-card-stretch',breathe:'alert-card-breathe',eyeex:'alert-card-break-ex'})[key]);
         if(sectionCard){const headerSwitch=sectionCard.querySelector('.alert-enabled-toggle input');if(headerSwitch)headerSwitch.checked=false;sectionCard.classList.add('alert-disabled');}
         if(window.alertState && alertState[key]){alertState[key].enabled=false;alertState[key].notify=false;if(typeof scheduleAlertTimer==='function')scheduleAlertTimer(key);}
         if(key==='eyeex' && typeof eyeExState!=='undefined'){eyeExState.enabled=false;eyeExState.notify=false;}
@@ -26348,7 +26444,7 @@ html body :is(.reminder-custom-select-trigger[aria-expanded="true"], .duration-c
 
 <style id="reminders-collapsible-sections-20261030">
 /* Collapsible sections: header = icon + name + switch + chevron. */
-#alerts-panel .alert-card:is(#alert-card-drink,#alert-card-walk,#alert-card-stretch,#alert-card-breathe,#alert-card-break,#alert-card-break-ex) > .alert-card-hdr { cursor:pointer; flex-wrap:nowrap !important; }
+#alerts-panel .alert-card:is(#alert-card-drink,#alert-card-walk,#alert-card-posture,#alert-card-stretch,#alert-card-breathe,#alert-card-break,#alert-card-break-ex) > .alert-card-hdr { cursor:pointer; flex-wrap:nowrap !important; }
 #alerts-panel .alert-card-hdr > h2 { flex:1 1 auto; min-width:0; }
 #alerts-panel .alert-card-chev { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; padding:0; border:0; background:transparent; color:var(--alert-1,#0f766e); cursor:pointer; transition:transform .18s ease; }
 #alerts-panel .alert-card:not(.collapsed) .alert-card-chev { transform:rotate(180deg); }
@@ -26362,7 +26458,7 @@ html body :is(.reminder-custom-select-trigger[aria-expanded="true"], .duration-c
 </style>
 <script id="reminders-collapsible-sections-js-20261030">
 (function(){
-  var IDS=['alert-card-drink','alert-card-walk','alert-card-break','alert-card-stretch','alert-card-breathe','alert-card-break-ex'];
+  var IDS=['alert-card-drink','alert-card-walk','alert-card-break','alert-card-posture','alert-card-stretch','alert-card-breathe','alert-card-break-ex'];
   function setCollapsed(card,collapsed){
     card.classList.toggle('collapsed',collapsed);
     var chev=card.querySelector('.alert-card-chev'); if(chev) chev.setAttribute('aria-expanded',String(!collapsed));
@@ -26576,6 +26672,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 #alerts-panel #alert-card-break > .alert-task,
 #alerts-panel #alert-card-walk > .alert-task,
 #alerts-panel #alert-card-drink > .alert-task,
+#alerts-panel #alert-card-posture > .alert-task,
 #alerts-panel #alert-card-stretch > .alert-task,
 #alerts-panel #alert-card-breathe > .alert-task,
 #alerts-panel #alert-card-break-ex > .alert-task,
@@ -26804,6 +26901,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 #alerts-panel #alert-card-break > .alert-task,
 #alerts-panel #alert-card-walk > .alert-task,
 #alerts-panel #alert-card-drink > .alert-task,
+#alerts-panel #alert-card-posture > .alert-task,
 #alerts-panel #alert-card-stretch > .alert-task,
 #alerts-panel #alert-card-breathe > .alert-task,
 #alerts-panel #alert-card-break-ex > .alert-task{background:#d9f0ea!important}
