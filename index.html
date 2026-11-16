@@ -27040,3 +27040,12 @@ html body #alerts-panel .alert-card .ayu-desc .section-notif-title{border-left:4
 /* Posture, Stretch, Breathing: a line gap before each sub-heading that follows a list (Benefits, …) */
 html body #alerts-panel #alert-card-posture .ayu-desc ul + strong, html body #alerts-panel #alert-card-stretch .ayu-desc ul + strong, html body #alerts-panel #alert-card-breathe .ayu-desc ul + strong{display:block;margin-top:12px !important}
 </style>
+<style id="info-btn-20261116">
+/* Reminders: tapping (i) must not flash the whole title row; only the i changes (dark while its text is open). */
+html body #alerts-panel .alert-card, html body #alerts-panel .alert-card-hdr, html body #alerts-panel .alert-card-hdr *{-webkit-tap-highlight-color:transparent !important}
+html body #alerts-panel .alert-card-hdr{-webkit-user-select:none;user-select:none;outline:none !important}
+html body #alerts-panel .alert-card-hdr:focus, html body #alerts-panel .alert-card-hdr:focus-within, html body #alerts-panel .alert-card-hdr:active{background:transparent !important;box-shadow:none !important;outline:none !important}
+html body #alerts-panel .ayu-desc-btn:focus{outline:none !important}
+html body #alerts-panel .ayu-desc-btn:focus-visible{outline:2px solid #0f766e !important;outline-offset:2px}
+html body #alerts-panel .ayu-desc-btn[aria-expanded="true"]{background:#0f766e !important;border-color:#0f766e !important;color:#fff !important}
+</style>
