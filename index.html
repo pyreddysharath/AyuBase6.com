@@ -16416,14 +16416,14 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('routines','#ayu-checklist',0,C.checks,'<b>Daily Checklist</b>: your checks for the day, in three parts.');
   sec('routines','#ayu-checklist .ayu-cl-part',0,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.');
   sec('routines','#ayu-checklist .ayu-cl-part',1,C.checks,'<b>Afternoon</b>: the same ticks and tips for the middle of the day.');
-  sec('routines','#ayu-checklist .ayu-cl-part',2,C.checks,'<b>Evening &amp; Night</b>: checks to wind down. Ticks start fresh each day.');
+  sec('routines','#ayu-checklist .ayu-cl-part',2,C.checks,'<b>Evening &amp; Night</b>: checks to wind down, including <b>Wind-down breathing (4-7-8)</b> before sleep. Ticks start fresh each day.');
   // Reminders
   tab('alerts','.tab-btn.alerts',C.rem,'Gentle nudges, alarms and timers through the day.');
   sec('alerts','.ayu-rem-tabs',0,C.rem,'<b>Three parts</b>: Health Breaks, Personal Reminders and Clock. Tap an icon to open one.');
   sec('alerts','#alert-card-break',0,C.rem,'<b>Health Breaks → Eyes (20-20-20)</b>: a short eye break at regular intervals. Each part has its own switch, hours, days, sound, Read aloud and Vibrate.');
   sec('alerts','#alert-card-walk',0,C.rem,'<b>Walk</b>: a reminder to get up and move.');
   sec('alerts','#alert-card-drink',0,C.rem,'<b>Water</b>: a reminder to drink water.');
-  sec('alerts','#alert-card-posture',0,C.rem,'<b>Posture</b>: a reminder to check how you are sitting.');
+  sec('alerts','#alert-card-posture',0,C.rem,'<b>Posture</b>: every 90 minutes, a check of how you are sitting. The picture at the top shows how, and the notification shows it too.');
   sec('alerts','#alert-card-stretch',0,C.rem,'<b>Stretch</b>: a reminder to loosen your neck, shoulders and wrists.');
   sec('alerts','#alert-card-breathe',0,C.rem,'<b>Breathing</b>: a reminder for a calm minute of box breathing.');
   sec('alerts','#alert-card-break-ex',0,C.rem,'<b>Eye Exercise</b>: guided eye exercises on the days you choose.');
@@ -16453,7 +16453,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   ficon('backup','<b>Backup &amp; Restore</b>: the first icon at the bottom. Its dot means a backup is due.');
   fsec('backup','bkp','<b>Backup &amp; Restore</b>: save your data to a file and restore it later or on another device.'+(window.AYU_ANDROID?' The app can also back up to your Google account by itself.':''));
   fsec('backup','offline','<b>Save Offline</b>: keep pages and videos on this device to use AyuBase6 without internet.');
-  fsec('backup','app',window.AYU_ANDROID?'<b>App Updates</b>: your app version, Check for update, and whether to check automatically.':'<b>Download App</b>: the Android app, which sends reminders and alarms with the app closed.');
+  fsec('backup','app',window.AYU_ANDROID?'<b>App Updates</b>: your app version, Check for update, <b>Download</b> when a new version is ready, and whether to update automatically. A new version is also shown every 2 hours until you download it.':'<b>Download App</b>: the Android app, which sends reminders and alarms with the app closed.');
   ficon('settings','<b>Settings</b>: its dot means notifications or advertising cookies are on.');
   fsec('settings','notifications','<b>Notifications</b>: every reminder and alarm with its switch in one place, Turn all off, the permission, and a quick check if notifications don\'t arrive.');
   fsec('settings','cookies','<b>Cookies</b>: choose which cookies you allow.');
