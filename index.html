@@ -26676,7 +26676,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
     syncRoutines();
   }
   function addAbout(){
-    ['drink','walk','break','break-ex'].forEach(function(k){
+    ['drink','walk','break','break-ex','posture','stretch','breathe'].forEach(function(k){
       var t=$('alert-'+k+'-task'); if(!t || t.querySelector('.section-about-title')) return;
       var h=document.createElement('strong'); h.className='section-notif-title section-about-title'; h.textContent='About'; t.insertBefore(h,t.firstChild);
     });
@@ -27027,4 +27027,16 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 .media-offline-btn[hidden]{display:none}
 .media-offline-warn{flex:1 1 100%;font-size:.8rem;font-weight:600;color:#92400e;background:#fef3c7;border-radius:8px;padding:6px 10px}
 .media-offline-warn[hidden]{display:none}
+</style>
+
+<style id="info-panel-text-20261116">
+/* Reminders (i) panels: About and the other text use the same size, colour and line height as Notifications; no line between them. */
+html body #alerts-panel .alert-card .ayu-desc, html body #alerts-panel .alert-card .ayu-desc p, html body #alerts-panel .alert-card .ayu-desc li, html body #alerts-panel .alert-card .ayu-desc strong, html body #alerts-panel .alert-card .ayu-desc .alert-card-sub{font-family:inherit !important;font-size:.78rem !important;line-height:1.5 !important;font-style:normal !important;letter-spacing:0 !important;color:#134e4a !important}
+html body #alerts-panel .alert-card .ayu-desc{font-weight:400 !important}
+html body #alerts-panel .alert-card .ayu-desc strong, html body #alerts-panel .alert-card .ayu-desc b{font-weight:700 !important}
+html body #alerts-panel .alert-card .ayu-desc p{margin:0 0 6px !important}
+html body #alerts-panel .alert-card .ayu-desc .section-notif-note{border-top:0 !important;padding-top:0 !important;margin-top:12px !important}
+html body #alerts-panel .alert-card .ayu-desc .section-notif-title{border-left:4px solid #42d8c5 !important;padding:1px 0 1px 9px !important;margin:0 0 6px !important}
+/* Posture, Stretch, Breathing: a line gap before each sub-heading that follows a list (Benefits, …) */
+html body #alerts-panel #alert-card-posture .ayu-desc ul + strong, html body #alerts-panel #alert-card-stretch .ayu-desc ul + strong, html body #alerts-panel #alert-card-breathe .ayu-desc ul + strong{display:block;margin-top:12px !important}
 </style>
