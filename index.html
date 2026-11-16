@@ -27049,3 +27049,9 @@ html body #alerts-panel .ayu-desc-btn:focus{outline:none !important}
 html body #alerts-panel .ayu-desc-btn:focus-visible{outline:2px solid #0f766e !important;outline-offset:2px}
 html body #alerts-panel .ayu-desc-btn[aria-expanded="true"]{background:#0f766e !important;border-color:#0f766e !important;color:#fff !important}
 </style>
+<style id="petal-fade-20261116">
+/* Background flowers fade in softly once they are placed, instead of popping in. */
+@keyframes ayuPetalIn{from{opacity:0}}
+html.lotus-ready .sec-lotus-layer, html.lotus-ready .sec-bg-layer{animation:ayuPetalIn .6s ease-out both}
+@media (prefers-reduced-motion:reduce){ html.lotus-ready .sec-lotus-layer, html.lotus-ready .sec-bg-layer{animation:none} }
+</style>
