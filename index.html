@@ -4054,11 +4054,11 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
           <g fill="#fff" font-family="system-ui,sans-serif" font-weight="700" font-size="16" text-anchor="middle"><text x="205" y="70">1</text><text x="176" y="174">2</text><text x="178" y="231">3</text><text x="372" y="386">4</text><text x="470" y="124">5</text></g>
         </svg>
         <ul class="posture-list">
-          <li><b>1 Head:</b> ears over shoulders, chin slightly tucked</li>
-          <li><b>2 Shoulders:</b> relaxed, not hunched</li>
-          <li><b>3 Back:</b> against the chair, natural curve</li>
-          <li><b>4 Feet:</b> flat on the floor, knees at 90°</li>
-          <li><b>5 Screen:</b> top at eye level, about 50–70 cm from your eyes</li>
+          <li><span class="pn">1</span><span><b>Head:</b> ears over shoulders, chin slightly tucked</span></li>
+          <li><span class="pn">2</span><span><b>Shoulders:</b> relaxed, not hunched</span></li>
+          <li><span class="pn">3</span><span><b>Back:</b> against the chair, natural curve</span></li>
+          <li><span class="pn">4</span><span><b>Feet:</b> flat on the floor, knees at 90°</span></li>
+          <li><span class="pn">5</span><span><b>Screen:</b> top at eye level, about 50–70 cm from your eyes</span></li>
         </ul>
       </div>
 
@@ -19844,8 +19844,19 @@ html body #chk-alarm > .ayu-al-body{margin-left:16px}
     return out;
   }
   function remSections(){
-    function sect(k){ return function(){ try{ var s=JSON.parse(ls('ayubase6_reminder_section_states_v1')||'{}')||{}; s[k]=false; ls('ayubase6_reminder_section_states_v1',JSON.stringify(s)); }catch(e){} }; }
-    var list=[['reminder-hours-card',function(){ ls('ayuBase6-reminder-hours',null); }]];
+    function sect(k){ var f=function(){ try{ var s=JSON.parse(ls('ayubase6_reminder_section_states_v1')||'{}')||{}; s[k]=false; ls('ayubase6_reminder_section_states_v1',JSON.stringify(s)); }catch(e){}
+      // switch it off right here, as if the person had tapped the switch
+      var card=$(k==='eyeex'?'alert-card-break-ex':'alert-card-'+k), h=card&&card.querySelector('.alert-enabled-toggle input'), m=$(k==='eyeex'?'eye-ex-notify':'alert-'+k+'-notify');
+      if(h&&h.checked){ h.checked=false; h.dispatchEvent(new Event('change',{bubbles:true})); }
+      if(m&&m.checked){ m.checked=false; m.setAttribute('aria-checked','false'); m.dispatchEvent(new Event('change',{bubbles:true})); }
+      if(card) card.classList.add('alert-disabled');
+      if(window.ayuSaveReminderStates) window.ayuSaveReminderStates();
+      if(typeof refreshNotifStatusUI==='function') refreshNotifStatusUI(); };
+      f.live=true; return f; }
+    var hrs=function(){ ls('ayuBase6-reminder-hours',null);   // back to 9:00 AM – 6:00 PM and every day, on the spot
+      if(typeof window.resetRemindersToDefault==='function'){ var oc=window.confirm, st=ls('ayubase6_reminder_section_states_v1'); window.confirm=function(){ return true; }; try{ window.resetRemindersToDefault(); }finally{ window.confirm=oc; } if(st!==null) ls('ayubase6_reminder_section_states_v1',st); }
+      try{ if(window.ayuDays) window.ayuDays.refresh(); }catch(e){} }; hrs.live=true;
+    var list=[['reminder-hours-card',hrs]];
     [['alert-card-break','break'],['alert-card-walk','walk'],['alert-card-drink','drink'],['alert-card-posture','posture'],['alert-card-stretch','stretch'],['alert-card-breathe','breathe'],['alert-card-break-ex','eyeex']].forEach(function(x){ list.push([x[0],sect(x[1])]); });
     list.push(['rem-alarm-card',function(){ ls('ayuBase6-rem-alarm',null); ls('ayuBase6-rem-alarms',null); }]);
     list.push(['custom-reminders-card',function(){ var l=$('custom-reminders-list'); if(l) l.innerHTML=''; ls('ayuBase6-my-reminders',null); },'Deletes your reminders']);   // the list is emptied too, or it is saved again as the page reloads
@@ -19872,6 +19883,10 @@ html body #chk-alarm > .ayu-al-body{margin-left:16px}
     yes.addEventListener('click',function(){
       var picked=[].map.call(list.querySelectorAll('input:checked'),function(x){ return sections[+x.dataset.i]; });
       picked.forEach(function(s){ try{ s.clear(); }catch(e){} });
+      if(picked.every(function(s){ return s.clear.live; })){   // only switches: turned off on the spot, no reload
+        d.remove(); var dn=document.createElement('div'); dn.className='ayu-pr-done'; dn.setAttribute('role','status'); dn.textContent='✓ Reset done ('+picked.length+' section'+(picked.length===1?'':'s')+')';
+        btn.closest('.ayu-page-reset-row').after(dn); setTimeout(function(){ dn.remove(); },6000); return;
+      }
       try{ sessionStorage.setItem('ayuAfterReset', JSON.stringify({tab:panel.id.replace(/-panel$/,''), n:picked.length})); }catch(e){}
       location.reload();   // the page starts again from the cleared settings
     });
@@ -24579,10 +24594,13 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .rd-lbl{lin
 @media (max-width:420px){html body #alerts-panel #custom-reminders-card .custom-reminder-form .rem-notes:not(#ayu-x1){grid-template-columns:92px minmax(0,1fr)}}
 </style>
 <style id="posture-20261116">
-#alerts-panel .posture-top{margin:10px 0 4px}
+#alerts-panel .posture-top{margin:14px 0 22px;padding:12px 12px 8px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:16px}
 #alerts-panel .alert-card.collapsed .posture-top{display:none !important}
-#alerts-panel .posture-fig{display:block;width:100%;max-width:520px;height:auto;margin:10px auto 8px;border-radius:14px}
-#alerts-panel .posture-list{margin:6px 0 0;padding-left:18px}
+#alerts-panel .posture-fig{display:block;width:100%;max-width:520px;height:auto;margin:0 auto 10px;border-radius:12px}
+#alerts-panel .posture-list{list-style:none;margin:0;padding:0}
+#alerts-panel .posture-list li{display:flex;align-items:flex-start;gap:10px;padding:7px 2px;font-size:.92rem;line-height:1.35;border-top:1px solid #a7f3d0}
+#alerts-panel .posture-list li:first-child{border-top:0}
+#alerts-panel .posture-list .pn{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:#0d9488;color:#fff;font:700 12px/22px system-ui,sans-serif;text-align:center;margin-top:1px}
 #alerts-panel .posture-pic{display:block;width:100%;max-width:300px;height:auto;margin-top:8px;border-radius:10px}
 </style>
 <script id="posture-20261116-js">
