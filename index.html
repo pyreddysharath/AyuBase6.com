@@ -17422,8 +17422,10 @@ html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opa
   var polls=0, poll=setInterval(function(){ run(); if(++polls>=8) clearInterval(poll); },150);   // quiet re-checks while fonts and images arrive
   // wait until the age chips / wheel and the height & weight scales are built too (they change the layout), then reveal
   function decorReady(){ var a=document.querySelector('#activity-panel .body-age-section'), h=document.getElementById('height-slider');
-    return (!a || document.querySelector('#activity-panel .ayu-age-box')) && (!h || document.querySelector('.ayu-scale')); }
-  (function waitDecor(n){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ if(decorReady() || n>=28) reveal(); else setTimeout(function(){ waitDecor(n+1); },50); }); }); })(0);
+    return !!(a && h && document.querySelector('#activity-panel .ayu-age-box') && document.querySelector('.ayu-scale')); }
+  (function(){ var done=false; function go(){ if(done) return; done=true; try{ mo.disconnect(); }catch(e){} reveal(); }
+    var mo=new MutationObserver(function(){ if(decorReady()) go(); }); mo.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});   // the moment the controls exist, show the page
+    if(decorReady()) requestAnimationFrame(go); else setTimeout(go,1400); })();
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(again); else again();
   if(document.readyState==='complete') again(); else window.addEventListener('load',again);
   setTimeout(reveal,1500);                                  // never leave the images hidden
