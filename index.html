@@ -23213,10 +23213,10 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
       var sw=function(){ return it.querySelector('.cri-hdr .master-switch input, .master-switch input'); };
       if(sw()) out.push(['Reminders › Personal', d.name||'Reminder', '', sw, function(){ closeFooter(); if(typeof switchTab==='function') switchTab('alerts'); if(window.ayuRemTab) window.ayuRemTab('personal'); setTimeout(function(){ try{ it.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} },150); }]);
     });
+    var wk=function(){ return $('wake-al-on'); };   // Checks page order: Wake-up Alarm, then Notify Me / Daily Checklist
+    if(wk()) out.push(['Checks', 'Wake-up Alarm', '', wk, function(){ closeFooter(); if(window.ayuShowAlarm) window.ayuShowAlarm('wake'); }]);
     var cl=function(){ return $('routines-master-toggle'); };
     if(cl()) out.push(['Checks', $('ayu-checklist') ? 'Daily Checklist' : 'Notify Me', '', cl, function(){ closeFooter(); if(typeof switchTab==='function') switchTab('routines'); setTimeout(function(){ var b=$('ayu-checklist')||$('routines-notify-card'); try{ b.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },150); }]);
-    var wk=function(){ return $('wake-al-on'); };
-    if(wk()) out.push(['Checks', 'Wake-up Alarm', '', wk, function(){ closeFooter(); if(window.ayuShowAlarm) window.ayuShowAlarm('wake'); }]);
     var l=J('ayuBase6-rem-alarms'); if(!Array.isArray(l)) l=[];
     l.filter(function(a){ return a && a.id && !a.draft; }).sort(function(a,b){ return (+a.at||0)-(+b.at||0); }).forEach(function(a){
       var sw=function(){ var it=document.querySelector('#rem-alarm-list [data-id="'+a.id+'"]'); return it && it.querySelector('.master-switch input'); };
