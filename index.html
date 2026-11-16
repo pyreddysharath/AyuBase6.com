@@ -17420,7 +17420,10 @@ html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opa
   var settled=0; function again(){ run(); settled++; }
   // show everything only once the layout has stopped changing (fonts, images, restored state), so nothing pops in at the wrong place
   var polls=0, poll=setInterval(function(){ run(); if(++polls>=8) clearInterval(poll); },150);   // quiet re-checks while fonts and images arrive
-  requestAnimationFrame(function(){ requestAnimationFrame(reveal); });
+  // wait until the age chips / wheel and the height & weight scales are built too (they change the layout), then reveal
+  function decorReady(){ var a=document.querySelector('#activity-panel .body-age-section'), h=document.getElementById('height-slider');
+    return (!a || document.querySelector('#activity-panel .ayu-age-box')) && (!h || document.querySelector('.ayu-scale')); }
+  (function waitDecor(n){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ if(decorReady() || n>=28) reveal(); else setTimeout(function(){ waitDecor(n+1); },50); }); }); })(0);
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(again); else again();
   if(document.readyState==='complete') again(); else window.addEventListener('load',again);
   setTimeout(reveal,1500);                                  // never leave the images hidden
@@ -27049,16 +27052,3 @@ html body #alerts-panel .ayu-desc-btn:focus{outline:none !important}
 html body #alerts-panel .ayu-desc-btn:focus-visible{outline:2px solid #0f766e !important;outline-offset:2px}
 html body #alerts-panel .ayu-desc-btn[aria-expanded="true"]{background:#0f766e !important;border-color:#0f766e !important;color:#fff !important}
 </style>
-<style id="petal-fade-20261116">
-/* First load only: the page (text and flowers together) fades in softly once the flowers are placed. The flowers are rebuilt several times while the page settles, so they are not animated one by one. */
-@keyframes ayuPageIn{from{opacity:0}}
-html.lotus-fade .tab-panel{animation:ayuPageIn .5s ease-out both}
-@media (prefers-reduced-motion:reduce){ html.lotus-fade .tab-panel{animation:none} }
-</style>
-<script id="petal-fade-20261116-js">
-(function(){
-  var h=document.documentElement;
-  function go(){ if(!h.classList.contains('lotus-ready')||h.dataset.fadeDone) return; h.dataset.fadeDone='1'; h.classList.add('lotus-fade'); setTimeout(function(){ h.classList.remove('lotus-fade'); },900); }
-  new MutationObserver(go).observe(h,{attributes:true,attributeFilter:['class']}); go();
-})();
-</script>
