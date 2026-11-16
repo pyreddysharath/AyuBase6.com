@@ -25081,12 +25081,12 @@ html body #alerts-panel select#alert-break-time.alert-interval-select {
     const disableCurrent=e.target.closest('[data-ayu-disable-current]');
     if(disableCurrent){
       const card=disableCurrent.closest('.notif-mock');
-      const keyByCard={'alert-drink-notif-mock':'drink','alert-walk-notif-mock':'walk','alert-break-notif-mock':'break','eye-ex-notif-mock':'eyeex'};
+      const keyByCard={'alert-drink-notif-mock':'drink','alert-walk-notif-mock':'walk','alert-break-notif-mock':'break','alert-stretch-notif-mock':'stretch','alert-breathe-notif-mock':'breathe','eye-ex-notif-mock':'eyeex'};
       const key=card && keyByCard[card.id];
       if(key){
         const input=document.getElementById(key==='eyeex'?'eye-ex-notify':'alert-'+key+'-notify');
         if(input){input.checked=false;input.setAttribute('aria-checked','false');input.dispatchEvent(new Event('change',{bubbles:true}));}
-        const sectionCard=document.getElementById(({drink:'alert-card-drink',walk:'alert-card-walk',break:'alert-card-break',eyeex:'alert-card-break-ex'})[key]);
+        const sectionCard=document.getElementById(({drink:'alert-card-drink',walk:'alert-card-walk',break:'alert-card-break',stretch:'alert-card-stretch',breathe:'alert-card-breathe',eyeex:'alert-card-break-ex'})[key]);
         if(sectionCard){const headerSwitch=sectionCard.querySelector('.alert-enabled-toggle input');if(headerSwitch)headerSwitch.checked=false;sectionCard.classList.add('alert-disabled');}
         if(window.alertState && alertState[key]){alertState[key].enabled=false;alertState[key].notify=false;if(typeof scheduleAlertTimer==='function')scheduleAlertTimer(key);}
         if(key==='eyeex' && typeof eyeExState!=='undefined'){eyeExState.enabled=false;eyeExState.notify=false;}
@@ -26348,7 +26348,7 @@ html body :is(.reminder-custom-select-trigger[aria-expanded="true"], .duration-c
 
 <style id="reminders-collapsible-sections-20261030">
 /* Collapsible sections: header = icon + name + switch + chevron. */
-#alerts-panel .alert-card:is(#alert-card-drink,#alert-card-walk,#alert-card-break,#alert-card-break-ex) > .alert-card-hdr { cursor:pointer; flex-wrap:nowrap !important; }
+#alerts-panel .alert-card:is(#alert-card-drink,#alert-card-walk,#alert-card-stretch,#alert-card-breathe,#alert-card-break,#alert-card-break-ex) > .alert-card-hdr { cursor:pointer; flex-wrap:nowrap !important; }
 #alerts-panel .alert-card-hdr > h2 { flex:1 1 auto; min-width:0; }
 #alerts-panel .alert-card-chev { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; padding:0; border:0; background:transparent; color:var(--alert-1,#0f766e); cursor:pointer; transition:transform .18s ease; }
 #alerts-panel .alert-card:not(.collapsed) .alert-card-chev { transform:rotate(180deg); }
@@ -26362,7 +26362,7 @@ html body :is(.reminder-custom-select-trigger[aria-expanded="true"], .duration-c
 </style>
 <script id="reminders-collapsible-sections-js-20261030">
 (function(){
-  var IDS=['alert-card-drink','alert-card-walk','alert-card-break','alert-card-break-ex'];
+  var IDS=['alert-card-drink','alert-card-walk','alert-card-break','alert-card-stretch','alert-card-breathe','alert-card-break-ex'];
   function setCollapsed(card,collapsed){
     card.classList.toggle('collapsed',collapsed);
     var chev=card.querySelector('.alert-card-chev'); if(chev) chev.setAttribute('aria-expanded',String(!collapsed));
@@ -26576,6 +26576,8 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 #alerts-panel #alert-card-break > .alert-task,
 #alerts-panel #alert-card-walk > .alert-task,
 #alerts-panel #alert-card-drink > .alert-task,
+#alerts-panel #alert-card-stretch > .alert-task,
+#alerts-panel #alert-card-breathe > .alert-task,
 #alerts-panel #alert-card-break-ex > .alert-task,
 #alerts-panel #reminder-hours-card .reminder-hours-info{background:#eaf8f5!important}
 </style>
@@ -26802,6 +26804,8 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
 #alerts-panel #alert-card-break > .alert-task,
 #alerts-panel #alert-card-walk > .alert-task,
 #alerts-panel #alert-card-drink > .alert-task,
+#alerts-panel #alert-card-stretch > .alert-task,
+#alerts-panel #alert-card-breathe > .alert-task,
 #alerts-panel #alert-card-break-ex > .alert-task{background:#d9f0ea!important}
 #alerts-panel #reminder-hours-card .reminder-hours-info{background:#bde4db!important}
 </style>
