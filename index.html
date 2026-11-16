@@ -20002,7 +20002,10 @@ body:has(#tour-root.on) #alerts-panel .alert-page .ayu-rem-group, body:has(#tour
 .ayu-sub-tabs button svg{width:18px;height:18px;flex:0 0 18px;fill:currentColor}
 .ayu-sub-tabs button[aria-selected="true"]{background:var(--tb);color:#fff}
 .ayu-sub-tabs button:focus-visible{outline:2px solid var(--tb);outline-offset:-4px}
-@media (max-width:560px){ .ayu-sub-tabs.rem5 button{flex-direction:column;gap:3px;font-size:10.5px;padding:6px 2px} }
+ .ayu-sub-tabs.rem5{margin-bottom:10px}
+ .ayu-sub-tabs.rem5 button{min-height:34px;padding:4px 4px;font-size:11.5px;gap:5px}
+ .ayu-sub-tabs.rem5 button svg{width:15px;height:15px;flex:0 0 15px}
+@media (max-width:560px){ .ayu-sub-tabs.rem5 button{flex-direction:column;gap:1px;font-size:9.5px;padding:4px 1px;min-height:38px} .ayu-sub-tabs.rem5 button svg{width:15px;height:15px;flex:0 0 15px} }
 /* in Reminders only the Reminders bar shows; in Health Breaks (now under Care) only the Care bar shows */
 html body #alerts-panel .alert-page > .ayu-rem-tabs:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){display:none !important}
 html body #alerts-panel .alert-page[data-remtab="breaks"] > .ayu-sub-tabs.rem5{display:none}
