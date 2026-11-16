@@ -3746,7 +3746,7 @@ html.lotus-ready .tab-panel{transition:opacity .3s ease-out}
     <button class="tab-btn nutrition" onclick="switchTab('nutrition')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 3C9 3 4 8 4 15c0 4 3 6 7 6 7 0 12-7 9-18Z"/><path d="M5 21c3-6 7-10 12-13" fill="none" stroke="white" stroke-width="1.7"/></svg></span><span>FOOD</span></button>
     <button class="tab-btn mind" onclick="switchTab('mind')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 5C10 1 5 2 5 6c-4 1-4 6-2 8-2 4 1 7 5 7 2 2 4 0 4-3V5Zm0 0c2-4 7-3 7 1 4 1 4 6 2 8 2 4-1 7-5 7-2 2-4 0-4-3V5Z"/><path d="M12 6v12M6 10l3 2M18 10l-3 2" stroke="white" fill="none" stroke-width="1.3"/></svg></span><span>MIND</span></button>
     <button class="tab-btn calculator" onclick="switchTab('calculator')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.3 3.6 13.4C-1 8.9 5.2 2.2 10.2 6.6L12 8.3l1.8-1.7c5-4.4 11.2 2.3 6.6 6.8L12 21.3Z"/><path d="M3 15.3c1.8-.8 3.5-.7 5.2.5l3.4 2.6c.9.7 2.1.5 2.8-.3l4.1-4.3c.7-.7 1.8-.7 2.4-.1.7.7.7 1.7.1 2.4l-5.7 6.1c-1.4 1.5-3.6 1.7-5.3.6L3 18.4Z"/></svg></span><span>VITALS</span></button>
-    <button class="tab-btn routines" onclick="switchTab('routines',{keep:1})" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="2" width="18" height="20" rx="3"/><path d="m7 8 1.5 1.5L11 7M13 8h4M7 15l1.5 1.5L11 14M13 15h4" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>CARE</span></button>
+    <button class="tab-btn routines" onclick="switchTab('routines',{keep:1})" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="3 4 18 15" fill="currentColor" aria-hidden="true"><path d="M12 4c2 2.2 3 4.5 3 7s-1 4.8-3 7c-2-2.2-3-4.5-3-7s1-4.8 3-7z"/><path d="M3 9c3 0 5.3 1.2 6.5 3.2 1.2 2.3 1 4.6-.5 6.3C5.5 18 3 14.5 3 9z"/><path d="M21 9c-3 0-5.3 1.2-6.5 3.2-1.2 2.3-1 4.6.5 6.3C18.5 18 21 14.5 21 9z"/></svg></span><span>CARE</span></button>
     <button class="tab-btn alerts" onclick="switchTab('alerts')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a2 2 0 0 1 2 2c4 1 5 4 5 9 0 2 1 3 2 5H3c1-2 2-3 2-5 0-5 1-8 5-9a2 2 0 0 1 2-2ZM9 20h6a3 3 0 0 1-6 0Z"/><path d="M2 5 1 9M22 5l1 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>REMINDERS</span></button>
     <div id="tab-underline"></div>
     <svg width="0" height="0" style="position:absolute">
@@ -18748,7 +18748,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     if(!card.dataset.ayuDay){
       card.dataset.ayuDay='1'; card.id=card.id||'start-my-day-card';
       var h2=card.querySelector('.rout-card-hdr h2');
-      if(h2){ for(var n=h2.lastChild;n;n=n.previousSibling){ if(n.nodeType===3 && /Wake-up time/.test(n.textContent)){ n.textContent=' My Day'; break; } } }
+      if(h2){ for(var n=h2.lastChild;n;n=n.previousSibling){ if(n.nodeType===3 && /Wake-up time/.test(n.textContent)){ n.textContent=' Daily Rhythm'; break; } } }
       // the time: tap for the clock face, − / + for 15 minutes
       var hdr=card.querySelector('.wake-control-hdr'), val=$('wake-time-val');
       if(hdr && val){
@@ -20005,6 +20005,7 @@ body:has(#tour-root.on) #alerts-panel .alert-page .ayu-rem-group, body:has(#tour
 .ayu-sub-tabs button:focus-visible{outline:2px solid var(--tb);outline-offset:-4px}
  html body #alerts-panel:has(.alert-page[data-remtab="breaks"]){--alert-1:#8a1238;--alert-2:#c81e4d;--alert-3:#f4a6bb;--alert-4:#fde8ee;--accent:#c81e4d;--deep:#8a1238;--tint:#fff0f3;--line:#f3d6de;--petal:#fb7a98;background:linear-gradient(145deg,#fff0f3,#fcf8f9 70%)}
  html body #alerts-panel:has(.alert-page[data-remtab="breaks"]) .ayu-i:not(#ayu-x1):not(#ayu-x2){--ii-c:#c81e4d !important;color:#c81e4d !important;border-color:color-mix(in srgb,#c81e4d 55%,#fff) !important}
+ html body #tab-btns .tab-btn.routines .tab-btn-icon:not(#ayu-x1){width:30px !important;height:25px !important}
  .ayu-sub-tabs.rem5{margin-bottom:10px}
  .ayu-sub-tabs.rem5 button{min-height:34px;padding:4px 4px;font-size:11.5px;gap:5px}
  .ayu-sub-tabs.rem5 button svg{width:15px;height:15px;flex:0 0 15px}
