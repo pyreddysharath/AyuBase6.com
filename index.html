@@ -187,7 +187,7 @@ body { font-family: var(--font); min-height: 100vh; background: #f4f8ff; overflo
 .tab-btn.nutrition.active .tab-btn-icon{ filter: drop-shadow(0 2px 5px rgba(34,197,94,.5)); }
 .tab-btn.calculator.active .tab-btn-icon{ filter: drop-shadow(0 2px 5px rgba(8,145,178,.5)); }
 .tab-btn.alerts.active .tab-btn-icon{ filter: drop-shadow(0 2px 5px rgba(20,184,166,.5)); }
-.tab-btn.routines.active .tab-btn-icon{ filter: drop-shadow(0 2px 5px rgba(249,115,22,.5)); }
+.tab-btn.routines.active .tab-btn-icon{ filter: drop-shadow(0 2px 5px rgba(200,30,77,.5)); }
 .tab-btn.mind.active .tab-btn-icon{ filter: drop-shadow(0 2px 5px rgba(139,92,246,.5)); }
 .tab-btn.activity { color: #2563eb; }
 .tab-btn.activity.active { color: #2563eb; }
@@ -3112,7 +3112,7 @@ body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
 <style id="ayu-food-routines-selected-icon-contrast-fix">
 /* Keep the selected solid silhouettes visibly tinted, not white. */
 #tab-btns .tab-btn.nutrition.active .tab-btn-icon { color:#A9E6BE !important; fill:currentColor !important; }
-#tab-btns .tab-btn.routines.active .tab-btn-icon { color:#F8D59C !important; fill:currentColor !important; }
+#tab-btns .tab-btn.routines.active .tab-btn-icon { color:#FBD3DF !important; fill:currentColor !important; }
 </style>
 <style id="ayu-mobile-desktop-selected-tab-parity-20261024">
 /* Mobile selected tabs use the same solid background and contrasting icons as desktop. */
@@ -3128,7 +3128,7 @@ body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
  #tab-btns .tab-btn:not(.active) .tab-btn-icon {color:var(--tab-accent) !important;fill:currentColor !important;}
  #tab-btns .tab-btn.active .tab-btn-icon {color:inherit !important;fill:currentColor !important;}
  #tab-btns .tab-btn.nutrition.active .tab-btn-icon {color:#A9E6BE !important;fill:currentColor !important;}
- #tab-btns .tab-btn.routines.active .tab-btn-icon {color:#F8D59C !important;fill:currentColor !important;}
+ #tab-btns .tab-btn.routines.active .tab-btn-icon {color:#FBD3DF !important;fill:currentColor !important;}
 }
 </style>
 
@@ -18748,7 +18748,7 @@ html body #rem-alarm-card.alert-card{background-color:#5eead4 !important;border-
     if(!card.dataset.ayuDay){
       card.dataset.ayuDay='1'; card.id=card.id||'start-my-day-card';
       var h2=card.querySelector('.rout-card-hdr h2');
-      if(h2){ for(var n=h2.lastChild;n;n=n.previousSibling){ if(n.nodeType===3 && /Wake-up time/.test(n.textContent)){ n.textContent=' My Day Plan'; break; } } }
+      if(h2){ for(var n=h2.lastChild;n;n=n.previousSibling){ if(n.nodeType===3 && /Wake-up time/.test(n.textContent)){ n.textContent=' My Day'; break; } } }
       // the time: tap for the clock face, − / + for 15 minutes
       var hdr=card.querySelector('.wake-control-hdr'), val=$('wake-time-val');
       if(hdr && val){
@@ -20003,7 +20003,6 @@ body:has(#tour-root.on) #alerts-panel .alert-page .ayu-rem-group, body:has(#tour
 .ayu-sub-tabs button svg{width:18px;height:18px;flex:0 0 18px;fill:currentColor}
 .ayu-sub-tabs button[aria-selected="true"]{background:var(--tb);color:#fff}
 .ayu-sub-tabs button:focus-visible{outline:2px solid var(--tb);outline-offset:-4px}
- html body #start-my-day-card .rout-card-hdr > h2:not(#ayu-x1){display:none !important}
  html body #alerts-panel:has(.alert-page[data-remtab="breaks"]){--alert-1:#8a1238;--alert-2:#c81e4d;--alert-3:#f4a6bb;--alert-4:#fde8ee;--accent:#c81e4d;--deep:#8a1238;--tint:#fff0f3;--line:#f3d6de;--petal:#fb7a98;background:linear-gradient(145deg,#fff0f3,#fcf8f9 70%)}
  html body #alerts-panel:has(.alert-page[data-remtab="breaks"]) .ayu-i:not(#ayu-x1):not(#ayu-x2){--ii-c:#c81e4d !important;color:#c81e4d !important;border-color:color-mix(in srgb,#c81e4d 55%,#fff) !important}
  .ayu-sub-tabs.rem5{margin-bottom:10px}
