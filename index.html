@@ -3695,6 +3695,12 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
 </style>
 <style id="deco-hidden-until-ready-20261103">html:not(.lotus-ready) .tab-panel{opacity:0 !important;transition:none !important}html[data-petal-card] body :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel) :is(.body-age-section,.activity-type-section,.card,.rout-card,.mind-card,.alert-card,.calc-card)::after{content:none !important;display:none !important}
 html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacity:0 !important}html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer,html:not(.lotus-ready) .sec-lotus,html:not(.lotus-ready) .sec-bg{opacity:0 !important;transition:none}#nav-lotus,#app-nav::before{transition:none}</style>
+<style id="info-size-20261116">
+/* Every (i) is the same size as the (i) beside the sites in "Our Other Sites": a 13px circle. The tap area stays larger. */
+html body .ayu-i:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){width:13px !important;height:13px !important;min-width:13px !important;min-height:13px !important;max-width:13px !important;flex:0 0 13px !important;position:relative}
+html body .ayu-i:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3)::after{font-size:9px !important}
+html body .ayu-i:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3)::before{content:"";position:absolute;inset:-9px}
+</style>
 <style id="content-fade-20261116">
 /* First load: title and tabs show at once; the content and its flowers fade in together, once, from their hidden state (no restart, so no flash). */
 html.lotus-ready .tab-panel{transition:opacity .3s ease-out}
