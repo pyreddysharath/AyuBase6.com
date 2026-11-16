@@ -3745,7 +3745,7 @@ html.lotus-ready .tab-panel{transition:opacity .3s ease-out}
     <button class="tab-btn nutrition" onclick="switchTab('nutrition')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 3C9 3 4 8 4 15c0 4 3 6 7 6 7 0 12-7 9-18Z"/><path d="M5 21c3-6 7-10 12-13" fill="none" stroke="white" stroke-width="1.7"/></svg></span><span>FOOD</span></button>
     <button class="tab-btn mind" onclick="switchTab('mind')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 5C10 1 5 2 5 6c-4 1-4 6-2 8-2 4 1 7 5 7 2 2 4 0 4-3V5Zm0 0c2-4 7-3 7 1 4 1 4 6 2 8 2 4-1 7-5 7-2 2-4 0-4-3V5Z"/><path d="M12 6v12M6 10l3 2M18 10l-3 2" stroke="white" fill="none" stroke-width="1.3"/></svg></span><span>MIND</span></button>
     <button class="tab-btn calculator" onclick="switchTab('calculator')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.3 3.6 13.4C-1 8.9 5.2 2.2 10.2 6.6L12 8.3l1.8-1.7c5-4.4 11.2 2.3 6.6 6.8L12 21.3Z"/><path d="M3 15.3c1.8-.8 3.5-.7 5.2.5l3.4 2.6c.9.7 2.1.5 2.8-.3l4.1-4.3c.7-.7 1.8-.7 2.4-.1.7.7.7 1.7.1 2.4l-5.7 6.1c-1.4 1.5-3.6 1.7-5.3.6L3 18.4Z"/></svg></span><span>VITALS</span></button>
-    <button class="tab-btn routines" onclick="switchTab('routines')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="2" width="18" height="20" rx="3"/><path d="m7 8 1.5 1.5L11 7M13 8h4M7 15l1.5 1.5L11 14M13 15h4" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>CHECKS</span></button>
+    <button class="tab-btn routines" onclick="switchTab('routines',{keep:1})" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="2" width="18" height="20" rx="3"/><path d="m7 8 1.5 1.5L11 7M13 8h4M7 15l1.5 1.5L11 14M13 15h4" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>CARE</span></button>
     <button class="tab-btn alerts" onclick="switchTab('alerts')" role="tab" aria-selected="false"><span class="tab-btn-icon-wrap"><svg class="tab-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a2 2 0 0 1 2 2c4 1 5 4 5 9 0 2 1 3 2 5H3c1-2 2-3 2-5 0-5 1-8 5-9a2 2 0 0 1 2-2ZM9 20h6a3 3 0 0 1-6 0Z"/><path d="M2 5 1 9M22 5l1 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>REMINDERS</span></button>
     <div id="tab-underline"></div>
     <svg width="0" height="0" style="position:absolute">
@@ -4412,7 +4412,7 @@ html.lotus-ready .tab-panel{transition:opacity .3s ease-out}
 
 <!-- ══ ROUTINES PANEL ═══════════════════════ -->
 <div id="routines-panel" class="tab-panel" style="display:none">
-  <h1 class="ayu-content-page-title" style="--ayu-page-accent:#96500d">Checks</h1>
+  <h1 class="ayu-content-page-title" style="--ayu-page-accent:#96500d">Care</h1>
   <div class="rout-page">
 
     <div class="rout-card">
@@ -16404,8 +16404,8 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   var SEEN='ayuBase6-tour-seen';
   var C={body:'#2563eb',food:'#22c55e',checks:'var(--rout-2)',rem:'var(--alert-2)',mind:'var(--mind-2)',vit:'var(--calc-2)'};
   var STEPS=[];
-  function tab(tab,sel,c,text){ STEPS.push({tab:tab,sel:sel,c:c,html:'<p>'+text+'</p>',kind:'tab'}); }
-  function sec(tab,sel,idx,c,text){ STEPS.push({tab:tab,sel:sel,idx:idx||0,c:c,html:'<p>'+text+'</p>',kind:'sec'}); }
+  function tab(tab,sel,c,text,x){ var o={tab:tab,sel:sel,c:c,html:'<p>'+text+'</p>',kind:'tab'}; if(x) for(var k in x) o[k]=x[k]; STEPS.push(o); }
+  function sec(tab,sel,idx,c,text,x){ var o={tab:tab,sel:sel,idx:idx||0,c:c,html:'<p>'+text+'</p>',kind:'sec'}; if(x) for(var k in x) o[k]=x[k]; STEPS.push(o); }
   // Body
   tab('activity','.tab-btn.activity',C.body,'Your weekly exercise or yoga plan. Your choices are remembered on this device.');
   sec('activity','.body-age-section',0,C.body,'<b>Age</b>: drag the slider. It picks the plan for your age group.');
@@ -16420,26 +16420,28 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('nutrition','#cart-wrapper',0,C.food,'<b>Nutrients &amp; Food</b>: how each food group covers your weekly needs. Open a group to pick the foods you like.');
   sec('nutrition','#results .cart-wrapper ~ *',0,C.food,'<b>Plan</b>: <b>Cart This Week</b> (what to buy) and <b>Recipes For You</b>, plus the plan as a PDF.');
   // Checks
-  tab('routines','.tab-btn.routines',C.checks,'Your day, from morning to night.');
-  sec('routines','#start-my-day-card',0,C.checks,'<b>My Day Plan</b>: set your wake-up time, any time in 24 hours: slide the bar, or tap the time under it for a clock. Every check below is timed from it. Outside 4–10 AM it becomes a shift schedule, with meals, light and sleep adjusted.');
-  sec('routines','#chk-alarm',0,C.checks,'<b>Wake-up Alarm</b>: rings at your wake-up time on the days you choose (or Once), with its sound, vibrate, ring time and snooze. <b>Preview notification</b> shows exactly how it rings.');
-  sec('routines','#routines-notify-card',0,C.checks,'<b>Notify Me</b>: reminders for each check: when to remind you, on which days, the sound (or mute), Read aloud and Vibrate.');
-  sec('routines','#ayu-checklist',0,C.checks,'<b>Daily Checklist</b>: your checks for the day, in three parts.');
-  sec('routines','#ayu-checklist .ayu-cl-part',0,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.');
-  sec('routines','#ayu-checklist .ayu-cl-part',1,C.checks,'<b>Afternoon</b>: the same ticks and tips for the middle of the day.');
-  sec('routines','#ayu-checklist .ayu-cl-part',2,C.checks,'<b>Evening &amp; Night</b>: checks to wind down, including <b>Wind-down breathing (4-7-8)</b> before sleep. Ticks start fresh each day.');
+  tab('routines','.tab-btn.routines',C.checks,'<b>Care</b>: your day, and your health breaks.',{care:'checks'});
+  sec('routines','#routines-panel .ayu-sub-tabs.care',0,C.checks,'<b>Two parts</b>: Checks and Health Breaks. Tap one to open it.',{care:'checks'});
+  sec('routines','#start-my-day-card',0,C.checks,'<b>My Day Plan</b>: set your wake-up time, any time in 24 hours: slide the bar, or tap the time under it for a clock. Every check below is timed from it. Outside 4–10 AM it becomes a shift schedule, with meals, light and sleep adjusted.',{care:'checks'});
+  sec('routines','#chk-alarm',0,C.checks,'<b>Wake-up Alarm</b>: rings at your wake-up time on the days you choose (or Once), with its sound, vibrate, ring time and snooze. <b>Preview notification</b> shows exactly how it rings.',{care:'checks'});
+  sec('routines','#routines-notify-card',0,C.checks,'<b>Notify Me</b>: reminders for each check: when to remind you, on which days, the sound (or mute), Read aloud and Vibrate.',{care:'checks'});
+  sec('routines','#ayu-checklist',0,C.checks,'<b>Daily Checklist</b>: your checks for the day, in three parts.',{care:'checks'});
+  sec('routines','#ayu-checklist .ayu-cl-part',0,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.',{care:'checks'});
+  sec('routines','#ayu-checklist .ayu-cl-part',1,C.checks,'<b>Afternoon</b>: the same ticks and tips for the middle of the day.',{care:'checks'});
+  sec('routines','#ayu-checklist .ayu-cl-part',2,C.checks,'<b>Evening &amp; Night</b>: checks to wind down, including <b>Wind-down breathing (4-7-8)</b> before sleep. Ticks start fresh each day.',{care:'checks'});
+  sec('routines','#alerts-panel .ayu-sub-tabs.care',0,C.checks,'<b>Health Breaks</b>: gentle nudges through the day. Each part has its own switch.',{care:'hb'});
+  sec('routines','#alert-card-break',0,C.rem,'<b>Health Breaks → Eyes (20-20-20)</b>: a short eye break at regular intervals. Each part has its own switch, hours, days, sound, Read aloud and Vibrate.',{care:'hb'});
+  sec('routines','#alert-card-walk',0,C.rem,'<b>Walk</b>: a reminder to get up and move.',{care:'hb'});
+  sec('routines','#alert-card-drink',0,C.rem,'<b>Water</b>: a reminder to drink water.',{care:'hb'});
+  sec('routines','#alert-card-posture',0,C.rem,'<b>Posture</b>: every 90 minutes, a check of how you are sitting. The picture at the top shows how, and the notification shows it too.',{care:'hb'});
+  sec('routines','#alert-card-stretch',0,C.rem,'<b>Stretch</b>: a reminder to loosen your neck, shoulders and wrists.',{care:'hb'});
+  sec('routines','#alert-card-breathe',0,C.rem,'<b>Breathing</b>: a reminder for a calm minute of box breathing.',{care:'hb'});
+  sec('routines','#alert-card-break-ex',0,C.rem,'<b>Eye Exercise</b>: guided eye exercises on the days you choose.',{care:'hb'});
   // Reminders
   tab('alerts','.tab-btn.alerts',C.rem,'Gentle nudges, alarms and timers through the day.');
-  sec('alerts','.ayu-rem-tabs',0,C.rem,'<b>Three parts</b>: Health Breaks, Personal Reminders and Clock. Tap an icon to open one.');
-  sec('alerts','#alert-card-break',0,C.rem,'<b>Health Breaks → Eyes (20-20-20)</b>: a short eye break at regular intervals. Each part has its own switch, hours, days, sound, Read aloud and Vibrate.');
-  sec('alerts','#alert-card-walk',0,C.rem,'<b>Walk</b>: a reminder to get up and move.');
-  sec('alerts','#alert-card-drink',0,C.rem,'<b>Water</b>: a reminder to drink water.');
-  sec('alerts','#alert-card-posture',0,C.rem,'<b>Posture</b>: every 90 minutes, a check of how you are sitting. The picture at the top shows how, and the notification shows it too.');
-  sec('alerts','#alert-card-stretch',0,C.rem,'<b>Stretch</b>: a reminder to loosen your neck, shoulders and wrists.');
-  sec('alerts','#alert-card-breathe',0,C.rem,'<b>Breathing</b>: a reminder for a calm minute of box breathing.');
-  sec('alerts','#alert-card-break-ex',0,C.rem,'<b>Eye Exercise</b>: guided eye exercises on the days you choose.');
+  sec('alerts','#alerts-panel .ayu-sub-tabs.rem5',0,C.rem,'<b>Five parts</b>: Personal, Alarm, Timer, Stopwatch and World Clock. Tap one to open it.');
   sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: your own reminders. Tap <b>+</b> to add one: at set times, every so often, or on chosen dates.');
-  sec('alerts','#rem-alarm-card .clk-now',0,C.rem,'<b>Clock</b>: the time and date now, with four tabs below: Alarm, Timer, Stopwatch and World Clock.');
+  sec('alerts','#rem-alarm-card .clk-now',0,C.rem,'<b>Clock</b>: the time and date now, above Alarm, Timer, Stopwatch and World Clock.');
   sec('alerts','#rem-tap-row',0,C.rem,'<b>Phone’s time opens</b>: your phone’s Clock app or AyuBase6, while an AyuBase6 alarm is next.');
   sec('alerts','#rem-alarm-card .ayu-add-row',0,C.rem,'<b>Alarm</b>: add an alarm, set it and tap <b>Save</b>. Each has its own time, days (or Once), sound, vibrate and snooze. Expired ones show in amber at the top.');
   sec('alerts','#rem-alarm-card .clk-part',0,C.rem,'<b>Timer</b>: tap the time to set it, then choose how often it repeats.');
@@ -16487,8 +16489,8 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   function q(tab,sel,c,text,extra){ var s={tab:tab,sel:sel,idx:0,c:c,html:'<p>'+text+'</p>',kind:'tab',ms:3600}; if(extra) for(var k in extra) s[k]=extra[k]; QUICK.push(s); }
   q('activity','.tab-btn.activity',C.body,'<b>Body</b>: a weekly exercise or yoga plan for your age.');
   q('nutrition','.tab-btn.nutrition',C.food,'<b>Food</b>: a weekly food plan, with a shopping cart and recipes.');
-  q('routines','.tab-btn.routines',C.checks,'<b>Checks</b>: your day from morning to night, with a wake-up alarm and a daily checklist.');
-  q('alerts','.tab-btn.alerts',C.rem,'<b>Reminders</b>: health breaks, your own reminders, and a clock with alarms and timers.');
+  q('routines','.tab-btn.routines',C.checks,'<b>Care</b>: your day from morning to night with a wake-up alarm and checklist, plus gentle health breaks.');
+  q('alerts','.tab-btn.alerts',C.rem,'<b>Reminders</b>: your own reminders, alarms, a timer, a stopwatch and a world clock.');
   q('mind','.tab-btn.mind',C.mind,'<b>Mind</b>: short thoughts for a calmer day.');
   q('calculator','.tab-btn.calculator',C.vit,'<b>Vitals</b>: BMI, lab report insights and a tracker for your readings.');
   q(null,'.footer-tabs-icons',FC,'<b>At the bottom</b>: Backup &amp; Restore, Settings, Announcements, Help, Legal and Other sites.');
@@ -16608,7 +16610,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
     dir=dir||1;
     while(i>=0 && i<STEPS.length){
       var s0=STEPS[i];
-      if(s0.tab){ try{ if(typeof currentActiveTab==='undefined'||currentActiveTab!==s0.tab){ switchTab(s0.tab); window.scrollTo(0,0); } if(s0.tab==='alerts' && window.ayuClockTab) window.ayuClockTab('alarm'); }catch(e){} }
+      if(s0.tab){ try{ if(typeof currentActiveTab==='undefined'||currentActiveTab!==s0.tab){ switchTab(s0.tab); window.scrollTo(0,0); } if(s0.tab==='routines' && window.ayuCareView) window.ayuCareView(s0.care||'checks'); if(s0.tab==='alerts' && window.ayuClockTab) window.ayuClockTab('alarm'); }catch(e){} }
       try{ if(typeof closeAllFooterSections==='function') closeAllFooterSections(); }catch(e){}
       if(s0.foot){ try{ showFooterSection(s0.foot); if(s0.sub) showFooterSub(s0.foot,s0.sub); }catch(e){} }   // a footer part: open it
       if(s0.kind==='tab'||visible(target(s0))) break;
@@ -19991,6 +19993,126 @@ body:has(#tour-root.on) #alerts-panel .alert-page .ayu-rem-group, body:has(#tour
   var n=0,iv=setInterval(function(){ if(setup()||++n>40) clearInterval(iv); },250);
 })();
 </script>
+<style id="care-tabs-20261117">
+/* Care (Checks + Health Breaks) and Reminders (Personal, Alarm, Timer, Stopwatch, World Clock): the small bars at the top. */
+.ayu-sub-tabs{--tb:#0f766e;display:flex;gap:0;margin:0 0 12px;padding:0;border:2px solid var(--tb);border-radius:12px;overflow:hidden;background:#fff}
+.ayu-sub-tabs.care{--tb:#96500d}
+.ayu-sub-tabs button{flex:1 1 0;min-width:0;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:6px 4px;border:0;border-left:2px solid var(--tb);border-radius:0;background:#fff;color:var(--tb);font:inherit;font-size:12.5px;font-weight:700;line-height:1.15;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ayu-sub-tabs button:first-child{border-left:0}
+.ayu-sub-tabs button svg{width:18px;height:18px;flex:0 0 18px;fill:currentColor}
+.ayu-sub-tabs button[aria-selected="true"]{background:var(--tb);color:#fff}
+.ayu-sub-tabs button:focus-visible{outline:2px solid var(--tb);outline-offset:-4px}
+@media (max-width:560px){ .ayu-sub-tabs.rem5 button{flex-direction:column;gap:3px;font-size:10.5px;padding:6px 2px} }
+/* in Reminders only the Reminders bar shows; in Health Breaks (now under Care) only the Care bar shows */
+html body #alerts-panel .alert-page > .ayu-rem-tabs:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){display:none !important}
+html body #alerts-panel .alert-page[data-remtab="breaks"] > .ayu-sub-tabs.rem5{display:none}
+html body #alerts-panel .alert-page:not([data-remtab="breaks"]) > .ayu-sub-tabs.care{display:none}
+/* the old Alarm / Timer / Stopwatch / World Clock pills: the bar at the top does that now */
+html body #rem-alarm-card .clk-pills:not(#ayu-x1){display:none !important}
+/* the tour walks through every part */
+body:has(#tour-root.on) #alerts-panel .alert-page:not([data-remtab="breaks"]) .ayu-rem-group{display:none !important}
+body:has(#tour-root.on) #alerts-panel .alert-page[data-remtab="breaks"] :is(#rem-alarm-card,#custom-reminders-card){display:none !important}
+</style>
+<script id="care-tabs-20261117-js">
+(function(){
+  var CK='ayuCareTab', RK='ayuRemTab2', $=function(i){ return document.getElementById(i); };
+  var CT=[['checks','Checks','M22 7h-9v2h9V7zm0 8h-9v2h9v-2zM5.54 11L2 7.46l1.41-1.41 2.12 2.12 4.24-4.24 1.41 1.41L5.54 11zm0 8L2 15.46l1.41-1.41 2.12 2.12 4.24-4.24 1.41 1.41L5.54 19z'],
+          ['hb','Health Breaks','M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z']];
+  var RT=[['personal','Personal','M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'],
+          ['alarm','Alarm','M22 5.72l-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM7.88 3.39L6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM12.5 8H11v6l4.75 2.85.75-1.23-4-2.37V8zM12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9a9 9 0 000-18zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z'],
+          ['timer','Timer','M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42A8.962 8.962 0 0012 4c-4.97 0-9 4.03-9 9s4.02 9 9 9a8.994 8.994 0 007.03-14.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z'],
+          ['stopwatch','Stopwatch','M9 1h6v2H9V1zm3 5a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm-.9-9.5v4.2l3.1 1.8.75-1.25-2.45-1.45V10.5h-1.4zM19.03 7.39l1.42-1.42-1.41-1.41-1.42 1.42 1.41 1.41z'],
+          ['world','World Clock','M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z']];
+  var CLOCK=/^(alarm|timer|stopwatch|world)$/, REM=/^(personal|alarm|timer|stopwatch|world)$/;
+  var care=(function(){ try{ return localStorage.getItem(CK)==='hb'?'hb':'checks'; }catch(e){ return 'checks'; } })();
+  var rsub=(function(){ try{ var v=localStorage.getItem(RK); return REM.test(v||'')?v:'personal'; }catch(e){ return 'personal'; } })();
+  var L=window.ayuRemTab;            // the older switch: shows Health Breaks, Personal or the Clock card
+  var oc=null, internal=false;
+  function pg(){ return document.querySelector('#alerts-panel .alert-page'); }
+  function save(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function mark(){
+    document.querySelectorAll('.ayu-sub-tabs.care button').forEach(function(b){ var on=b.dataset.k===care; b.setAttribute('aria-selected',String(on)); b.tabIndex=on?0:-1; });
+    document.querySelectorAll('.ayu-sub-tabs.rem5 button').forEach(function(b){ var on=b.dataset.k===rsub; b.setAttribute('aria-selected',String(on)); b.tabIndex=on?0:-1; });
+  }
+  function title(t){ var h=document.querySelector('#alerts-panel > .ayu-content-page-title'); if(h && h.textContent!==t) h.textContent=t; }
+  // Reminders: one part at a time
+  function showRem(t,persist){
+    if(!REM.test(t||'')) t='personal';
+    rsub=t; if(persist!==false) save(RK,t);
+    if(L) L(t==='personal'?'personal':'alarm',persist!==false);
+    if(CLOCK.test(t) && oc) oc(t);
+    mark();
+  }
+  // Care: Checks, or Health Breaks (which live in the Reminders page, shown here)
+  function applyView(tab){
+    var ap=$('alerts-panel'), rp=$('routines-panel'), p=pg(); if(!ap||!rp||!p) return;
+    if(tab==='routines'){
+      if(care==='hb'){
+        rp.style.display='none'; rp.classList.remove('active'); ap.style.display='block'; ap.classList.add('active');
+        if(L) L('breaks',false); title('Care');
+        try{ if(typeof updateRemindersNotifBanner==='function') updateRemindersNotifBanner(); if(typeof syncEyeExStageSize==='function') requestAnimationFrame(syncEyeExStageSize); }catch(e){}
+      }
+    } else if(tab==='alerts'){
+      title('Reminders'); showRem(rsub,false);
+    }
+    mark();
+  }
+  var orig=window.switchTab;
+  window.switchTab=function(tab,o){
+    if(tab==='routines' && !internal && !(o&&o.keep)) care='checks';   // a link to a Checks item shows Checks
+    var r=orig.apply(this,arguments);
+    try{ applyView(tab); }catch(e){}
+    return r;
+  };
+  function careGo(v,persist){
+    care=(v==='hb')?'hb':'checks'; if(persist!==false) save(CK,care); mark();
+    internal=true; try{ window.switchTab('routines'); }finally{ internal=false; }
+    window.scrollTo(0,0);
+  }
+  window.ayuCareView=function(v){ care=(v==='hb')?'hb':'checks'; mark(); if(typeof currentActiveTab!=='undefined' && currentActiveTab==='routines'){ internal=true; try{ window.switchTab('routines'); }finally{ internal=false; } } };
+  window.ayuRemTab=function(t,persist){ if(t==='breaks'){ careGo('hb',persist!==false); return; } showRem(t,persist); };
+  // the bars
+  function bar(list,cls,label,pick){
+    var b=document.createElement('div'); b.className='ayu-sub-tabs '+cls; b.setAttribute('role','tablist'); b.setAttribute('aria-label',label);
+    list.forEach(function(x){ var bt=document.createElement('button'); bt.type='button'; bt.dataset.k=x[0]; bt.setAttribute('role','tab'); bt.title=x[1];
+      bt.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+x[2]+'"/></svg><span>'+x[1]+'</span>';
+      bt.addEventListener('click',function(){ pick(x[0]); }); b.appendChild(bt); });
+    b.addEventListener('keydown',function(e){ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return; var ks=list.map(function(x){return x[0];}), cur=b.querySelector('[aria-selected="true"]'), i=ks.indexOf(cur&&cur.dataset.k); i=(i+(e.key==='ArrowRight'?1:ks.length-1))%ks.length; pick(ks[i]); var nb=b.querySelector('[data-k="'+ks[i]+'"]'); if(nb) nb.focus(); e.preventDefault(); });
+    return b;
+  }
+  function setup(){
+    var p=pg(), rp=document.querySelector('#routines-panel .rout-page'); if(!p||!rp) return false;
+    if(!rp.querySelector('.ayu-sub-tabs')) rp.insertBefore(bar(CT,'care','Care',function(k){ careGo(k,true); }), rp.firstChild);
+    if(!p.querySelector('.ayu-sub-tabs.rem5')){
+      var r5=bar(RT,'rem5','Reminders',function(k){ showRem(k,true); }); p.insertBefore(r5,p.firstChild);
+      p.insertBefore(bar(CT,'care','Care',function(k){ careGo(k,true); }), r5.nextSibling);
+    }
+    // the bars stay at the top, right after the older (hidden) bar, whatever an ordering script does
+    if(p && !p._ayuCareFirst){ p._ayuCareFirst=1;
+      var fix=function(){ var old=p.querySelector(':scope > .ayu-rem-tabs'), r5=p.querySelector(':scope > .ayu-sub-tabs.rem5'), cb=p.querySelector(':scope > .ayu-sub-tabs.care'); if(!r5||!cb) return;
+        var anchor=old||null, want=[r5,cb], at=old?old.nextElementSibling:p.firstElementChild;
+        if(want[0]===at && want[1]===want[0].nextElementSibling) return;
+        mo.disconnect(); var ref=old?old.nextSibling:p.firstChild; p.insertBefore(r5,ref); p.insertBefore(cb,r5.nextSibling); mo.observe(p,{childList:true}); };
+      var mo=new MutationObserver(fix); mo.observe(p,{childList:true}); fix(); }
+    mark(); return true;
+  }
+  setup();
+  // the clock's own tab function arrives later: wrap it, so Alarm / Timer / Stopwatch / World Clock follow the bar
+  var n=0, iv=setInterval(function(){
+    var ok=setup();
+    if(!oc && window.ayuClockTab && !window.ayuClockTab.__care){ oc=window.ayuClockTab; var w=function(t){ oc(t); if(CLOCK.test(t)){ rsub=t; save(RK,t); if(L) L('alarm',true); mark(); } }; w.__care=1; window.ayuClockTab=w; if(CLOCK.test(rsub)) oc(rsub); }
+    if((ok && oc) || ++n>60) clearInterval(iv);
+  },250);
+  // a notification tap opens the right place
+  var prev=window.nudgeShowSection;
+  if(typeof prev==='function') window.nudgeShowSection=function(key){
+    try{ var k=String(key||''); if(k.indexOf('routine-')!==0){ if(/^alarm-rem/.test(k)) { if(typeof currentActiveTab!=='undefined' && currentActiveTab!=='alerts') window.switchTab('alerts'); showRem('alarm',false); } else if(/^custom/.test(k)){ if(typeof currentActiveTab!=='undefined' && currentActiveTab!=='alerts') window.switchTab('alerts'); showRem('personal',false); } else careGo('hb',false); } }catch(e){}
+    return prev.apply(this,arguments);
+  };
+  // the page opens on the last part used
+  mark();
+})();
+</script>
 <style id="vit-tabs-20261104">
 /* Vitals: three icons at the top (BMI, Lab Insights, Tracker); one section shows at a time. */
 .ayu-vit-tabs{--vt:#0e7490;display:flex;gap:8px;margin:0 0 14px;padding:4px;border-radius:16px;background:color-mix(in srgb,var(--vt) 10%,#fff)}
@@ -23237,7 +23359,7 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
     var out=[];
     [['break','Eyes (20-20-20)','alert-card-break'],['walk','Walk','alert-card-walk'],['drink','Water','alert-card-drink'],['posture','Posture','alert-card-posture'],['stretch','Stretch','alert-card-stretch'],['breathe','Breathing','alert-card-breathe'],['eyeex','Eye Exercise','alert-card-break-ex']].forEach(function(x){
       var sw=function(){ var c=$(x[2]); return c && (c.querySelector('.alert-enabled-toggle input') || $(x[0]==='eyeex'?'eye-ex-notify':'alert-'+x[0]+'-notify')); };
-      if(sw()) out.push(['Reminders › Health Breaks', x[1], '', sw, goHB(x[2])]);
+      if(sw()) out.push(['Care › Health Breaks', x[1], '', sw, goHB(x[2])]);
     });
     [].forEach.call(document.querySelectorAll('#custom-reminders-list .custom-reminder-item'),function(it){
       var d={}; try{ d=JSON.parse(it.dataset.reminder||'{}'); }catch(e){}
@@ -23245,13 +23367,13 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
       if(sw()) out.push(['Reminders › Personal', d.name||'Reminder', '', sw, function(){ closeFooter(); if(typeof switchTab==='function') switchTab('alerts'); if(window.ayuRemTab) window.ayuRemTab('personal'); setTimeout(function(){ try{ it.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} },150); }]);
     });
     var wk=function(){ return $('wake-al-on'); };   // Checks page order: Wake-up Alarm, then Notify Me / Daily Checklist
-    if(wk()) out.push(['Checks', 'Wake-up Alarm', '', wk, function(){ closeFooter(); if(window.ayuShowAlarm) window.ayuShowAlarm('wake'); }]);
+    if(wk()) out.push(['Care › Checks', 'Wake-up Alarm', '', wk, function(){ closeFooter(); if(window.ayuShowAlarm) window.ayuShowAlarm('wake'); }]);
     var cl=function(){ return $('routines-master-toggle'); };
-    if(cl()) out.push(['Checks', $('ayu-checklist') ? 'Daily Checklist' : 'Notify Me', '', cl, function(){ closeFooter(); if(typeof switchTab==='function') switchTab('routines'); setTimeout(function(){ var b=$('ayu-checklist')||$('routines-notify-card'); try{ b.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },150); }]);
+    if(cl()) out.push(['Care › Checks', $('ayu-checklist') ? 'Daily Checklist' : 'Notify Me', '', cl, function(){ closeFooter(); if(typeof switchTab==='function') switchTab('routines'); setTimeout(function(){ var b=$('ayu-checklist')||$('routines-notify-card'); try{ b.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },150); }]);
     var l=J('ayuBase6-rem-alarms'); if(!Array.isArray(l)) l=[];
     l.filter(function(a){ return a && a.id && !a.draft; }).sort(function(a,b){ return (+a.at||0)-(+b.at||0); }).forEach(function(a){
       var sw=function(){ var it=document.querySelector('#rem-alarm-list [data-id="'+a.id+'"]'); return it && it.querySelector('.master-switch input'); };
-      out.push(['Clock › Alarms', clock(a.at)+(a.name?' · '+a.name:''), a.expired&&!a.on?'Expired':'', sw, function(){ closeFooter(); if(window.ayuShowAlarm) window.ayuShowAlarm(a.id); }]);
+      out.push(['Reminders › Alarms', clock(a.at)+(a.name?' · '+a.name:''), a.expired&&!a.on?'Expired':'', sw, function(){ closeFooter(); if(window.ayuShowAlarm) window.ayuShowAlarm(a.id); }]);
     });
     return out;
   }
@@ -23260,7 +23382,7 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
     var sec=$('sec-notifications'); if(!sec) return;
     if(!wrap){ wrap=document.createElement('div'); wrap.className='na-wrap'; wrap.id='notif-all';
       var hc=$('ns-test')||sec.querySelector('.notif-help-card'); sec.insertBefore(wrap, hc && hc.parentNode===sec ? hc : null); }
-    var ORD=['Checks','Reminders › Health Breaks','Reminders › Personal','Clock › Alarms'];
+    var ORD=['Care › Checks','Care › Health Breaks','Reminders › Personal','Reminders › Alarms'];
     list=items().map(function(x,i){ return [x,i]; }).sort(function(a,b){ return (ORD.indexOf(a[0][0])-ORD.indexOf(b[0][0])) || (a[1]-b[1]); }).map(function(x){ return x[0]; });
     var g='', h='<div class="ns-h" id="ns-app">App notifications</div>';
     if(!list.length) h+='<p class="na-none">No reminders or alarms yet.</p>';
