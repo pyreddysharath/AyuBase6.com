@@ -16496,7 +16496,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   function absTop(el){ return el.getBoundingClientRect().top+window.scrollY; }
   function maxScroll(){ return Math.max(0,document.documentElement.scrollHeight-innerHeight); }
   function anchorY(s){ var t=target(s); return t?Math.min(maxScroll(),Math.max(0,absTop(t)-12)):0; }
-  function stepMs(s){ return s.ms || Math.min(11000,3500+s.html.replace(/<[^>]*>/g,'').length*40); }
+  function stepMs(s){ return s.ms || Math.min(7000,2500+s.html.replace(/<[^>]*>/g,'').length*26); }   // the full tour is about a third shorter; Pause and Next are always there
 
   // One timeline per tab: the tab itself and all its sections play as a single continuous scroll.
   function buildGroup(i){
