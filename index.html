@@ -4036,9 +4036,7 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
         <button type="button" class="alert-card-chev" aria-label="Expand or collapse" aria-expanded="false" tabindex="-1"><svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg></button>
       </div>
 
-      <div class="alert-task" id="alert-posture-task">
-        <p class="alert-card-sub">Sit well to ease back, neck and shoulder strain.</p>
-        <strong>Check your posture at each reminder.</strong>
+      <div class="posture-top">
         <svg id="posture-fig" class="posture-fig" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 470" role="img" aria-label="Good sitting posture">
           <rect width="720" height="470" rx="16" fill="#f0fdfa"/><rect x="20" y="448" width="680" height="6" rx="3" fill="#cbd5e1"/>
           <rect x="166" y="298" width="130" height="14" rx="6" fill="#94a3b8"/><rect x="158" y="170" width="14" height="140" rx="6" fill="#94a3b8"/><rect x="222" y="312" width="10" height="136" fill="#94a3b8"/><rect x="190" y="444" width="74" height="6" rx="3" fill="#94a3b8"/>
@@ -4063,6 +4061,22 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
           <li><b>5 Screen:</b> top at eye level, about 50–70 cm from your eyes</li>
         </ul>
       </div>
+
+
+      <div class="alert-task" id="alert-posture-task">
+        <p class="alert-card-sub">Keeps you aware of how you are sitting, so strain does not build up.</p>
+        <strong>Purpose</strong>
+        <ul>
+          <li>A reminder every 90 minutes to check your head, shoulders, back, feet and screen</li>
+          <li>Breaks long stretches of slouching at a desk or on the phone</li>
+        </ul>
+        <strong>Benefits</strong>
+        <ul>
+          <li>Less neck, shoulder and back pain</li>
+          <li>Less tiredness and eye strain</li>
+          <li>Easier breathing and better focus</li>
+        </ul>
+      </div>
 <div class="alert-fixed-frequency-row"><span class="alert-fixed-frequency">Every 90 minutes</span></div>
 
       <div class="alert-row alert-sound-line">
@@ -4085,7 +4099,7 @@ html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacit
       <div class="notif-blocked-hint" id="alert-posture-notif-hint" style="display:none"></div>
       <div class="notif-mock" id="alert-posture-notif-mock">
         <span class="notif-mock-icon"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="4.5" r="2.3"/><path d="M7.5 8h3l.5 5h4.5l1.5 6h-2.2l-1.1-4H9.5L8 8.5z"/><path d="M5 21h6v-2H5z"/></svg></span>
-        <div class="notif-mock-text"><strong>Posture check</strong><span>Sit tall: shoulders relaxed, back on the chair, feet flat, screen at eye level.</span><img class="posture-pic" id="posture-pic" alt="Good sitting posture"></div>
+        <div class="notif-mock-text"><strong>Posture check</strong><span>1 Head: ears over shoulders, chin tucked<br>2 Shoulders: relaxed, not hunched<br>3 Back: against the chair<br>4 Feet: flat, knees at 90°<br>5 Screen: top at eye level, 50–70 cm away</span><img class="posture-pic" id="posture-pic" alt="Good sitting posture"></div>
       </div>
 
     </div>
@@ -10988,7 +11002,7 @@ const ALERT_LABELS={
   break:{title:'Eyes', icon:'👁️', msg:'Look 20 feet away for 20 seconds — 20-20-20 time!'},
   walk: {title:'Walk',  icon:'🚶', msg:'Time for a 2–5 minute walk or stretch!'},
   drink:{title:'Water', icon:'💧', msg:'Drink a glass of water — about 200ml keeps you on track!'},
-  posture:{title:'Posture', icon:'🧘', msg:'Sit tall: shoulders relaxed, back on the chair, feet flat, screen at eye level.'},
+  posture:{title:'Posture check', icon:'🧘', msg:'1 Head: ears over shoulders, chin tucked\n2 Shoulders: relaxed, not hunched\n3 Back: against the chair\n4 Feet: flat, knees at 90°\n5 Screen: top at eye level, 50–70 cm away'},
   stretch:{title:'Stretch', icon:'🤸', msg:'Time to stretch — neck, shoulders and wrists for 1–2 minutes.'},
   breathe:{title:'Breathing', icon:'🌬️', msg:'Take a calm minute — breathe in 4, hold 4, out 4, hold 4. Repeat 4 times.'},
 };
@@ -11408,6 +11422,11 @@ function nudgePopupWire(win, doc, o){
   if(a) a.onclick=()=>{ try{ o.onDisableAll&&o.onDisableAll(); }catch(e){} confirmIn('All reminders turned off','You can turn them back on in Reminders.'); };
   doc.querySelectorAll('[data-pop-act]').forEach(btn=>{ btn.onclick=()=>{ const act=btn.getAttribute('data-pop-act'); try{ o.onAction&&o.onAction(act); }catch(e){} if(act==='done') confirmIn('Marked as done','Nice work.'); else if(act==='not-yet') confirmIn('Noted \u2014 not yet','We will not mark it as done.'); else closeWin(); }; });
 }
+function nudgePosturePic(o){   // the posture reminder shows the sitting picture in its window
+  if(!o || o.popKey!=='posture') return '';
+  const pi=document.getElementById('posture-pic'); if(!pi || !/^data:/.test(pi.src||'')) return '';
+  return '<img src="'+pi.src+'" alt="" style="display:block;width:100%;aspect-ratio:720/470;margin:6px 0 8px;border-radius:10px">';
+}
 function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
   o=o||{};
   const doc=win.document;
@@ -11435,7 +11454,7 @@ function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
     +'.c.expanded .ex-video{display:block}';
   doc.head.innerHTML='<meta charset="utf-8"><title>'+nudgeEsc(title)+'</title><style>'+css+'</style>';   // the title must be set after the head is rebuilt, or the window is called "about:blank"
   doc.body.innerHTML='<svg class="bg" viewBox="9.5 11.5 45 27" aria-hidden="true">'+lotus+'</svg>'
-    +'<div class="c"><h1>'+nudgeEsc(title)+'</h1><p>'+nudgeEsc(msg)+'</p>'+nudgePopupButtons(o)
+    +'<div class="c"><h1>'+nudgeEsc(title)+'</h1>'+nudgePosturePic(o)+'<p>'+nudgeEsc(msg).replace(/\n/g,'<br>')+'</p>'+nudgePopupButtons(o)
     +(withTimer?'<div class="t" id="n" title="Click to start the timer">\u25B6 '+(o.timerSecs||EYE_TIMER_SECS)+'s</div>':'')
     +(title==='Eye Exercise' && exerciseVideoSrc?'<button type="button" class="ex-toggle" id="ex-toggle" aria-expanded="false" title="Expand guided eye exercise video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span></button><video class="ex-video" id="ex-video" controls playsinline muted preload="metadata" src="'+exerciseVideoSrc.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></video>':'')+nudgePopupIcons(o)+'</div>';
   if(title==='Eye Exercise'){const w0=win.innerWidth; const toggle=doc.getElementById('ex-toggle'), card=doc.querySelector('.c'), video=doc.getElementById('ex-video');if(toggle&&card&&video)toggle.onclick=()=>{const expanded=card.classList.toggle('expanded');toggle.setAttribute('aria-expanded',String(expanded));toggle.innerHTML=expanded?'✕ <span>Hide exercise video</span>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span>';if(expanded){try{win.resizeTo(420,520)}catch(e){};video.play().catch(()=>{});}else{video.pause();try{ win.resizeBy(w0-win.innerWidth,0); const dh=Math.ceil(card.getBoundingClientRect().height)-win.innerHeight; if(Math.abs(dh)>1) win.resizeBy(0,dh); }catch(e){}}};}
@@ -11530,7 +11549,7 @@ function openNudgePopup(key, title, msg, o){
   const timer=!!o.timer;
   // Size each popup to its own title/body instead of giving every reminder a large fixed window.
   const msgLen=String(msg||'').length, titleLen=String(title||'').length, textLen=msgLen+titleLen;
-  const W=Math.max(270,Math.min(360,Math.round(250+Math.min(110,textLen)*0.65)));
+  const W=key==='posture'?360:Math.max(270,Math.min(360,Math.round(250+Math.min(110,textLen)*0.65)));
   const titleLines=Math.max(1,Math.ceil(titleLen*8.8/(W-36-62)));          // the title leaves room for the two icons
   const msgLines=Math.max(1,Math.ceil(msgLen*7.2/(W-36)));
   let H=Math.max(timer?140:82, Math.min(280, 34+titleLines*21+msgLines*19+(timer?48:0)+((o.buttons&&o.buttons.length)?46:0)+36));
@@ -11724,7 +11743,6 @@ function initRoutineNotifications(){
 }
 initRoutineNotifications();
 function previewAlertNotification(key){
-  if(key==='posture'){ const pm=document.getElementById('alert-posture-notif-mock'); if(pm) pm.classList.add('show'); }   // the picture notification shows under the button
   // On phones, preview the real system notification first; opening a popup
   // here can otherwise prevent Android Chrome from showing the notification.
   // Desktop keeps its existing popup preview behaviour.
@@ -11843,7 +11861,7 @@ function syncAllReminderNotifyFlags(forceState){
     const card=input.closest('.alert-card');
     if(!card) return;
     const title=(card.querySelector('h2')?.innerText||'').trim();
-    const mainId=/^Water$/i.test(title)?'alert-drink-notify':/^Posture$/i.test(title)?'alert-posture-notify':/^Stretch$/i.test(title)?'alert-stretch-notify':/^Breathing$/i.test(title)?'alert-breathe-notify':/^Walk$/i.test(title)?'alert-walk-notify':/Eyes \(20-20-20\)/i.test(title)?'alert-break-notify':/Eyes \(Exercise\)/i.test(title)?'eye-ex-notify':null;
+    const mainId=/^Water$/i.test(title)?'alert-drink-notify':/^Posture( check)?$/i.test(title)?'alert-posture-notify':/^Stretch$/i.test(title)?'alert-stretch-notify':/^Breathing$/i.test(title)?'alert-breathe-notify':/^Walk$/i.test(title)?'alert-walk-notify':/Eyes \(20-20-20\)/i.test(title)?'alert-break-notify':/Eyes \(Exercise\)/i.test(title)?'eye-ex-notify':null;
     const main=mainId?document.getElementById(mainId):null;
     if(main) input.checked=main.checked;
     card.classList.toggle('alert-disabled',!input.checked);
@@ -24561,7 +24579,9 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .rd-lbl{lin
 @media (max-width:420px){html body #alerts-panel #custom-reminders-card .custom-reminder-form .rem-notes:not(#ayu-x1){grid-template-columns:92px minmax(0,1fr)}}
 </style>
 <style id="posture-20261116">
-#alerts-panel .posture-fig{display:block;width:100%;height:auto;margin:10px 0 8px;border-radius:14px}
+#alerts-panel .posture-top{margin:10px 0 4px}
+#alerts-panel .alert-card.collapsed .posture-top{display:none !important}
+#alerts-panel .posture-fig{display:block;width:100%;max-width:520px;height:auto;margin:10px auto 8px;border-radius:14px}
 #alerts-panel .posture-list{margin:6px 0 0;padding-left:18px}
 #alerts-panel .posture-pic{display:block;width:100%;max-width:300px;height:auto;margin-top:8px;border-radius:10px}
 </style>
