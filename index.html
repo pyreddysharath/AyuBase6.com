@@ -3695,6 +3695,11 @@ html body #alerts-panel #alert-card-break-ex .eye-ex-wrap > .per-reminder-schedu
 </style>
 <style id="deco-hidden-until-ready-20261103">html:not(.lotus-ready) .tab-panel{opacity:0 !important;transition:none !important}html[data-petal-card] body :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel) :is(.body-age-section,.activity-type-section,.card,.rout-card,.mind-card,.alert-card,.calc-card)::after{content:none !important;display:none !important}
 html:not(.lotus-ready) #nav-lotus,html:not(.lotus-ready) #app-nav::before{opacity:0 !important}html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer,html:not(.lotus-ready) .sec-lotus,html:not(.lotus-ready) .sec-bg{opacity:0 !important;transition:none}#nav-lotus,#app-nav::before{transition:none}</style>
+<style id="content-fade-20261116">
+/* First load: title and tabs show at once; the content and its flowers fade in together, once, from their hidden state (no restart, so no flash). */
+html.lotus-ready .tab-panel{transition:opacity .3s ease-out}
+@media (prefers-reduced-motion:reduce){ html.lotus-ready .tab-panel{transition:none} }
+</style>
 </head>
 <body>
 
