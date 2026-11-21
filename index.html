@@ -23440,15 +23440,20 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
       var hc=$('ns-test')||sec.querySelector('.notif-help-card'); sec.insertBefore(wrap, hc && hc.parentNode===sec ? hc : null); }
     var ORD=['Care › My Day Plan','Care › Health Breaks','Reminders › Personal','Reminders › Alarms'];
     list=items().map(function(x,i){ return [x,i]; }).sort(function(a,b){ return (ORD.indexOf(a[0][0])-ORD.indexOf(b[0][0])) || (a[1]-b[1]); }).map(function(x){ return x[0]; });
-    var g='', h='<div class="ns-h" id="ns-app">App notifications</div>';
+    var g='', sec='', h='<div class="ns-h" id="ns-app">App notifications</div>';
     if(!list.length) h+='<p class="na-none">No reminders or alarms yet.</p>';
+    h+='<div class="na-sec care">Care</div><div id="na-care-ad"></div>';   // Care first, with Auto-close under its title
+    sec='Care';
     list.forEach(function(x,i){
-      if(x[0]!==g){ g=x[0]; h+='<div class="na-g">'+g+'</div>'; }
+      var parts=x[0].split(' › '), sn=parts[0], sub=parts[1]||parts[0];
+      if(sn!==sec){ sec=sn; h+='<div class="na-sec rem">'+sn+'</div>'; }
+      if(x[0]!==g){ g=x[0]; h+='<div class="na-g">'+sub+'</div>'; }
       h+='<div class="na-row"><button type="button" class="na-n" data-i="'+i+'" title="Open">'+esc(x[1])+(x[2]?'<small>'+x[2]+'</small>':'')+'</button>'
         +'<label class="master-switch" title="'+esc(x[1])+' on or off"><input type="checkbox" data-i="'+i+'" aria-label="'+esc(x[1])+' on or off"></label></div>';
     });
     h+='<button type="button" class="na-all" id="na-all">Turn all off</button>';
     wrap.innerHTML=h;
+    try{ if(window.ayuPlaceCareAd) window.ayuPlaceCareAd(); }catch(e){}
     wrap.querySelectorAll('.na-n').forEach(function(b){ b.addEventListener('click',function(){ list[+b.dataset.i][4](); }); });
     wrap.querySelectorAll('input[data-i]').forEach(function(inp){ inp.addEventListener('change',function(){ var o=list[+inp.dataset.i][3](); if(o && o.checked!==inp.checked) o.click(); setTimeout(paint,80); setTimeout(paint,600); }); });
     $('na-all').addEventListener('click',function(){
@@ -27398,16 +27403,17 @@ html body #alerts-panel:has(.alert-page[data-remtab="breaks"]) .ayu-rem-group .a
 html body #alerts-panel:has(.alert-page[data-remtab="breaks"]) .alert-card > .sec-lotus-layer:not(#ayu-x1):not(#ayu-x2){display:none !important}
 </style>
 <style id="care-autodismiss-20261121">
-/* Care: close notifications by themselves (My Day Plan and Health Breaks share this) */
-html body .ayu-care-ad{margin:16px 0 4px;padding:10px 14px;border-radius:14px;background:rgba(255,241,243,.95);border:1px solid rgba(232,96,122,.35);color:#7a1f35}
-html body .ayu-care-ad .ad-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-html body .ayu-care-ad .ad-t{flex:1 1 auto;font-weight:800;font-size:.92rem;color:#c94862;min-width:0}
-html body .ayu-care-ad .master-switch{flex:0 0 auto;margin:0}
+/* Settings → Notifications → Care: Auto-close after [time], on one line */
+html body .ayu-care-ad{margin:4px 0 6px;padding:8px 12px;border-radius:12px;background:rgba(255,241,243,.95);border:1px solid rgba(232,96,122,.35);color:#7a1f35}
+html body .ayu-care-ad .ad-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+html body .ayu-care-ad .ad-t{flex:0 0 auto;font-weight:800;font-size:.9rem;color:#c94862;white-space:nowrap}
+html body .ayu-care-ad select{flex:1 1 auto;min-width:0;max-width:150px;border:1.5px solid #e8607a;border-radius:10px;padding:5px 8px;font:inherit;font-size:.88rem;background:#fff;color:#c94862}
+html body .ayu-care-ad:not(.ad-on) select{opacity:.5}
+html body .ayu-care-ad .master-switch{flex:0 0 auto;margin:0 0 0 auto}
 html body .ayu-care-ad .master-switch input:checked:not(#ayu-x1){background:#e8607a !important;border-color:#e8607a !important}
-html body .ayu-care-ad .ad-opts{display:none;align-items:center;gap:8px;margin-top:8px;font-size:.86rem}
-html body .ayu-care-ad.ad-on .ad-opts{display:flex}
-html body .ayu-care-ad select{border:1.5px solid #e8607a;border-radius:10px;padding:6px 10px;font:inherit;background:#fff;color:#c94862}
-html body .ayu-care-ad .ad-note{margin:6px 0 0;font-size:.78rem;opacity:.85;line-height:1.35}
+html body #sec-notifications .na-sec{font-weight:800;font-size:1.02rem;padding:7px 12px;border-radius:12px;margin:16px 0 6px}
+html body #sec-notifications .na-sec.care{background:#fcd5dc;color:#c94862}
+html body #sec-notifications .na-sec.rem{background:#ccfbf1;color:#0d7a70}
 </style>
 <script id="care-autodismiss-20261121-js">
 (function(){
@@ -27415,27 +27421,23 @@ html body .ayu-care-ad .ad-note{margin:6px 0 0;font-size:.78rem;opacity:.85;line
   function load(){ var o=null; try{ o=JSON.parse(localStorage.getItem(K)||'null'); }catch(e){} o=(o&&typeof o==='object')?o:{}; return {on:o.on===true, min:OPTS.indexOf(+o.min)>=0?+o.min:10}; }
   function save(o){ try{ localStorage.setItem(K,JSON.stringify(o)); }catch(e){} try{ if(window.ayuNative && window.ayuNative.sync) setTimeout(window.ayuNative.sync,200); }catch(e){} paint(); }
   window.ayuCareAutoMin=function(){ var o=load(); return o.on ? o.min : 0; };
+  var el=null;
   function mk(){
     var d=document.createElement('div'); d.className='ayu-care-ad';
-    d.innerHTML='<div class="ad-row"><span class="ad-t">Close notifications by themselves</span><label class="master-switch" title="Close notifications by themselves"><input type="checkbox" aria-label="Close notifications by themselves"></label></div>'
-      +'<div class="ad-opts"><span>After</span><select aria-label="Close after">'+OPTS.map(function(m){ return '<option value="'+m+'">'+(m===60?'1 hour':m+(m===1?' minute':' minutes'))+'</option>'; }).join('')+'</select></div>'
-      +'<p class="ad-note">Care only: My Day Plan and Health Breaks. Reminders notifications stay until you close them.</p>';
+    d.innerHTML='<div class="ad-row"><span class="ad-t">Auto-close after</span><select aria-label="Auto-close after">'+OPTS.map(function(m){ return '<option value="'+m+'">'+(m===60?'1 hour':m+(m===1?' minute':' minutes'))+'</option>'; }).join('')+'</select><label class="master-switch" title="Auto-close Care notifications"><input type="checkbox" aria-label="Auto-close Care notifications"></label></div>';
     d.querySelector('input').addEventListener('change',function(e){ var o=load(); o.on=e.target.checked; save(o); });
     d.querySelector('select').addEventListener('change',function(e){ var o=load(); o.min=+e.target.value; save(o); });
     return d;
   }
-  function paint(){ var o=load(); [].forEach.call(document.querySelectorAll('.ayu-care-ad'),function(d){ d.classList.toggle('ad-on',o.on); d.querySelector('input').checked=o.on; d.querySelector('select').value=String(o.min); }); }
+  function paint(){ var o=load(); if(!el) return; el.classList.toggle('ad-on',o.on); el.querySelector('input').checked=o.on; el.querySelector('select').value=String(o.min); }
   function place(){
-    // Care pages: no switch there any more (it lives in Settings → Notifications)
     [].forEach.call(document.querySelectorAll('#routines-panel .ayu-care-ad, #alerts-panel .ayu-care-ad'),function(x){ x.remove(); });
-    var sec=document.getElementById('sec-notifications'); if(!sec) return false;
-    var d=sec.querySelector(':scope > .ayu-care-ad');
-    if(!d){ d=mk(); }
-    var w=document.getElementById('notif-all'), hc=document.getElementById('ns-test')||sec.querySelector('.notif-help-card');
-    var ref=w && w.parentNode===sec ? w.nextSibling : (hc && hc.parentNode===sec ? hc : null);
-    if(d.parentNode!==sec || (w && d.previousSibling!==w)) sec.insertBefore(d,ref);
+    var slot=document.getElementById('na-care-ad'); if(!slot) return false;
+    if(!el) el=mk();
+    if(el.parentNode!==slot) slot.appendChild(el);
     paint(); return true;
   }
+  window.ayuPlaceCareAd=place;
   setInterval(place,1000);
 })();
 </script>
