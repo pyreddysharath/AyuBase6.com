@@ -27455,4 +27455,12 @@ html body #ayu-checklist .rout-row .rout-check:not(#ayu-x1):not(#ayu-x2),html bo
 html body #ayu-checklist .rout-row .rout-check .rout-time:not(#ayu-x1):not(#ayu-x2){font-size:12px !important;font-weight:400 !important}
 /* Notify Me: Preview notification always last, whatever order the rows were added in */
 html body #routines-panel #routines-remind-panel #ayu-cl-prev:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){order:99}
-</style>
+
+/* My Day Plan: Wake-Up Alarm and Notify Me in one soft box under the time bar, and no extra space under it */
+html body #routines-panel #routines-notify-card:not(#ayu-x1):not(#ayu-x2){margin-bottom:0 !important}
+html body #routines-panel #routines-vibrate-card:not(#ayu-x1):not(#ayu-x2),html body #routines-panel #start-my-day-reset:not(#ayu-x1):not(#ayu-x2){margin:0 !important}
+html body #routines-panel #start-my-day-card:not(#ayu-x1):not(#ayu-x2){padding-bottom:14px !important}
+html body #routines-panel #start-my-day-card #chk-alarm:not(#ayu-x1):not(#ayu-x2){margin:14px 0 0 !important;padding:8px 10px !important;border:1px solid rgba(232,96,122,.3) !important;border-bottom:0 !important;border-radius:12px 12px 0 0 !important;background:rgba(255,241,243,.85) !important}
+html body #routines-panel #start-my-day-card #routines-notify-card:not(#ayu-x1):not(#ayu-x2){margin:0 !important;padding:8px 10px !important;border:1px solid rgba(232,96,122,.3) !important;border-top:1px solid rgba(232,96,122,.18) !important;border-radius:0 0 12px 12px !important;background:rgba(255,241,243,.85) !important}
+/* Notify Me: the i right after the title */
+html body #routines-panel #routines-notify-card .rout-card-hdr h2 .rout-info-btn:not(#ayu-x1):not(#ayu-x2){margin-left:-3px !important}</style>
