@@ -21770,14 +21770,15 @@ html:not(.ayu-can-vib) .chk-vib-only{display:none !important}
     p.querySelectorAll('input[name=routines-remind]').forEach(function(r){ var s=r.nextElementSibling; if(!s) return; if(r.value==='start') s.textContent='Start time'; if(r.value==='beforeend') s.textContent='Start time + before end time'; });
     // dots: Remind me, On these days, Sound, Vibrate
     var first=p.querySelector('label'); if(!first) return false;
+    var days=$('chk-days'); if(!days || days.parentNode!==p) return false;   // wait for the days row: without it Sound and Vibrate landed outside the panel (unaligned)
     var t=document.createElement('div'); t.className='chk-lbl chk-dot'; t.textContent='Remind me'; p.insertBefore(t,first);
-    var days=$('chk-days'), ot=days && days.querySelector('.otd-title'); if(ot) ot.classList.add('chk-dot');
+    var ot=days.querySelector('.otd-title'); if(ot) ot.classList.add('chk-dot');
     var s=document.createElement('div'); s.className='chk-row'; s.id='chk-sound-row';
     s.innerHTML='<span class="chk-lbl chk-dot">Sound</span><select id="chk-sound" aria-label="Sound for Checks notifications">'+toneOptions()+'</select><button type="button" class="chk-play" id="chk-sound-play" title="Preview" aria-label="Preview">▶</button>';
     var v=document.createElement('div'); v.className='chk-row chk-vib-only'; v.id='chk-vib-row';
     v.innerHTML='<span class="chk-lbl chk-dot">Vibrate</span>';
     v.appendChild(sw('chk-vibrate','Vibrate for Checks notifications',window.ayuVibrate ? window.ayuVibrate.chk() : false,function(x){ if(window.ayuVibrate && window.ayuVibrate.set) window.ayuVibrate.set('chk',x); }));
-    (days||p).after(s); s.after(v);
+    days.after(s); s.after(v);
     var sel=$('chk-sound'); sel.value=sound(); if(sel.value!==sound()) sel.selectedIndex=0;
     sel.addEventListener('change',function(){ try{ localStorage.setItem(K_SND,sel.value); }catch(e){} sync(); });
     $('chk-sound-play').addEventListener('click',function(){ try{ if(typeof playAlertPreset==='function') playAlertPreset(sel.value); }catch(e){} });
@@ -27398,7 +27399,7 @@ html body #alerts-panel:has(.alert-page[data-remtab="breaks"]) .alert-card > .se
 </style>
 <style id="care-autodismiss-20261121">
 /* Care: close notifications by themselves (My Day Plan and Health Breaks share this) */
-html body .ayu-care-ad{margin:10px 0 12px;padding:10px 14px;border-radius:14px;background:rgba(255,241,243,.95);border:1px solid rgba(232,96,122,.35);color:#7a1f35}
+html body .ayu-care-ad{margin:16px 0 4px;padding:10px 14px;border-radius:14px;background:rgba(255,241,243,.95);border:1px solid rgba(232,96,122,.35);color:#7a1f35}
 html body .ayu-care-ad .ad-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 html body .ayu-care-ad .ad-t{flex:1 1 auto;font-weight:800;font-size:.92rem;color:#c94862;min-width:0}
 html body .ayu-care-ad .master-switch{flex:0 0 auto;margin:0}
@@ -27407,7 +27408,6 @@ html body .ayu-care-ad .ad-opts{display:none;align-items:center;gap:8px;margin-t
 html body .ayu-care-ad.ad-on .ad-opts{display:flex}
 html body .ayu-care-ad select{border:1.5px solid #e8607a;border-radius:10px;padding:6px 10px;font:inherit;background:#fff;color:#c94862}
 html body .ayu-care-ad .ad-note{margin:6px 0 0;font-size:.78rem;opacity:.85;line-height:1.35}
-html body #alerts-panel .alert-page:not([data-remtab="breaks"]) .ayu-care-ad{display:none}
 </style>
 <script id="care-autodismiss-20261121-js">
 (function(){
@@ -27419,21 +27419,30 @@ html body #alerts-panel .alert-page:not([data-remtab="breaks"]) .ayu-care-ad{dis
     var d=document.createElement('div'); d.className='ayu-care-ad';
     d.innerHTML='<div class="ad-row"><span class="ad-t">Close notifications by themselves</span><label class="master-switch" title="Close notifications by themselves"><input type="checkbox" aria-label="Close notifications by themselves"></label></div>'
       +'<div class="ad-opts"><span>After</span><select aria-label="Close after">'+OPTS.map(function(m){ return '<option value="'+m+'">'+(m===60?'1 hour':m+(m===1?' minute':' minutes'))+'</option>'; }).join('')+'</select></div>'
-      +'<p class="ad-note">For My Day Plan and Health Breaks. Reminders notifications stay until you close them.</p>';
+      +'<p class="ad-note">Care only: My Day Plan and Health Breaks. Reminders notifications stay until you close them.</p>';
     d.querySelector('input').addEventListener('change',function(e){ var o=load(); o.on=e.target.checked; save(o); });
     d.querySelector('select').addEventListener('change',function(e){ var o=load(); o.min=+e.target.value; save(o); });
     return d;
   }
   function paint(){ var o=load(); [].forEach.call(document.querySelectorAll('.ayu-care-ad'),function(d){ d.classList.toggle('ad-on',o.on); d.querySelector('input').checked=o.on; d.querySelector('select').value=String(o.min); }); }
   function place(){
-    var ok=true;
-    ['#routines-panel .rout-page','#alerts-panel .alert-page'].forEach(function(sel){
-      var pg=document.querySelector(sel), bar=pg && pg.querySelector(':scope > .ayu-sub-tabs.care');
-      if(!bar){ ok=false; return; }
-      if(!pg.querySelector(':scope > .ayu-care-ad')) bar.after(mk());
-    });
-    paint(); return ok;
+    // Care pages: no switch there any more (it lives in Settings → Notifications)
+    [].forEach.call(document.querySelectorAll('#routines-panel .ayu-care-ad, #alerts-panel .ayu-care-ad'),function(x){ x.remove(); });
+    var sec=document.getElementById('sec-notifications'); if(!sec) return false;
+    var d=sec.querySelector(':scope > .ayu-care-ad');
+    if(!d){ d=mk(); }
+    var w=document.getElementById('notif-all'), hc=document.getElementById('ns-test')||sec.querySelector('.notif-help-card');
+    var ref=w && w.parentNode===sec ? w.nextSibling : (hc && hc.parentNode===sec ? hc : null);
+    if(d.parentNode!==sec || (w && d.previousSibling!==w)) sec.insertBefore(d,ref);
+    paint(); return true;
   }
-  var n=0, iv=setInterval(function(){ if(place() && n>4 || ++n>40) clearInterval(iv); },300);
+  setInterval(place,1000);
 })();
 </script>
+<style id="chk-items-20261121">
+/* Daily Checklist: the items in the same size as the fields of the other sections */
+html body #ayu-checklist .rout-row .rout-check:not(#ayu-x1):not(#ayu-x2),html body #ayu-checklist .rout-row .rout-check > span:not(#ayu-x1):not(#ayu-x2){font-size:14px !important;font-weight:400 !important;line-height:1.4 !important}
+html body #ayu-checklist .rout-row .rout-check .rout-time:not(#ayu-x1):not(#ayu-x2){font-size:12px !important;font-weight:400 !important}
+/* Notify Me: Preview notification always last, whatever order the rows were added in */
+html body #routines-panel #routines-remind-panel #ayu-cl-prev:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){order:99}
+</style>
