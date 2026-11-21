@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'ayubase6-pwa-v11';   // v11: Care petal in ruby (icons refreshed)
+const CACHE_NAME = 'ayubase6-pwa-v12';   // v12: new index.html (Care/Mind/Health Breaks updates) replaces the saved copy
 // Videos and preview images from content/ are kept here the first time they are used.
 // Separate from CACHE_NAME so an app update does not throw the videos away.
 const MEDIA_CACHE = 'ayubase6-media-v2';
