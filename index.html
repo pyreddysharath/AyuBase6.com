@@ -13894,6 +13894,7 @@ document.addEventListener('click', function(e){
   if (e.isTrusted===false) return;   // a click made by the app itself (a switch flipped for you) is not you leaving the footer
   if (!document.contains(e.target)) return;   // the tapped button removed itself (a Cancel inside the footer)
   if (e.target.closest('#ayu-pop, [role="dialog"], [aria-modal="true"]')) return;   // OK on a pop-up opened from the footer keeps the section open
+  if (e.target.closest('.tab-btn')) { var nsec=document.getElementById('sec-notifications'); if (nsec && nsec.offsetParent!==null) return; }   // Settings > Notifications stays open while you switch the top tabs
   if (!e.target.closest('.app-footer') && !e.target.closest('#footer-tabs-row')) {
     closeAllFooterSections();
   }
@@ -27412,7 +27413,7 @@ html body .ayu-care-ad .master-switch input:checked:not(#ayu-x1){background:#e86
 html body .ayu-care-ad .ad-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 html body .ayu-care-ad .ad-chips button{padding:3px 10px;border-radius:999px;border:1.5px solid #e8607a;background:#fff;color:#c94862;font:inherit;font-size:.8rem;line-height:1.25;cursor:pointer}
 html body .ayu-care-ad .ad-chips button.on{background:#e8607a;color:#fff;font-weight:800}
-html body .ayu-care-ad:not(.ad-on) .ad-chips{opacity:.5}
+html body .ayu-care-ad:not(.ad-on) .ad-chips{display:none}
 html body #sec-notifications .na-sec{font-weight:800;font-size:1.02rem;padding:7px 12px;border-radius:12px;margin:16px 0 6px}
 html body #sec-notifications .na-sec.care{background:#fcd5dc;color:#c94862}
 html body #sec-notifications .na-sec.rem{background:#ccfbf1;color:#0d7a70}
