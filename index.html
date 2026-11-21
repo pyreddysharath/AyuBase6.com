@@ -27404,13 +27404,15 @@ html body #alerts-panel:has(.alert-page[data-remtab="breaks"]) .alert-card > .se
 </style>
 <style id="care-autodismiss-20261121">
 /* Settings → Notifications → Care: Auto-close after [time], on one line */
-html body .ayu-care-ad{margin:4px 0 6px;padding:8px 12px;border-radius:12px;background:rgba(255,241,243,.95);border:1px solid rgba(232,96,122,.35);color:#7a1f35}
-html body .ayu-care-ad .ad-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
-html body .ayu-care-ad .ad-t{flex:0 0 auto;font-weight:800;font-size:.9rem;color:#c94862;white-space:nowrap}
-html body .ayu-care-ad select{flex:1 1 auto;min-width:0;max-width:150px;border:1.5px solid #e8607a;border-radius:10px;padding:5px 8px;font:inherit;font-size:.88rem;background:#fff;color:#c94862}
-html body .ayu-care-ad:not(.ad-on) select{opacity:.5}
-html body .ayu-care-ad .master-switch{flex:0 0 auto;margin:0 0 0 auto}
+html body .ayu-care-ad{margin:2px 0 4px;padding:6px 10px;border-radius:12px;background:rgba(255,241,243,.95);border:1px solid rgba(232,96,122,.35);color:#7a1f35}
+html body .ayu-care-ad .ad-row{display:flex;align-items:center;gap:8px;min-height:30px}
+html body .ayu-care-ad .ad-t{flex:1 1 auto;font-weight:800;font-size:.9rem;line-height:1.2;color:#c94862}
+html body .ayu-care-ad .master-switch{flex:0 0 auto;margin:0}
 html body .ayu-care-ad .master-switch input:checked:not(#ayu-x1){background:#e8607a !important;border-color:#e8607a !important}
+html body .ayu-care-ad .ad-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+html body .ayu-care-ad .ad-chips button{padding:3px 10px;border-radius:999px;border:1.5px solid #e8607a;background:#fff;color:#c94862;font:inherit;font-size:.8rem;line-height:1.25;cursor:pointer}
+html body .ayu-care-ad .ad-chips button.on{background:#e8607a;color:#fff;font-weight:800}
+html body .ayu-care-ad:not(.ad-on) .ad-chips{opacity:.5}
 html body #sec-notifications .na-sec{font-weight:800;font-size:1.02rem;padding:7px 12px;border-radius:12px;margin:16px 0 6px}
 html body #sec-notifications .na-sec.care{background:#fcd5dc;color:#c94862}
 html body #sec-notifications .na-sec.rem{background:#ccfbf1;color:#0d7a70}
@@ -27424,12 +27426,13 @@ html body #sec-notifications .na-sec.rem{background:#ccfbf1;color:#0d7a70}
   var el=null;
   function mk(){
     var d=document.createElement('div'); d.className='ayu-care-ad';
-    d.innerHTML='<div class="ad-row"><span class="ad-t">Auto-close after</span><select aria-label="Auto-close after">'+OPTS.map(function(m){ return '<option value="'+m+'">'+(m===60?'1 hour':m+(m===1?' minute':' minutes'))+'</option>'; }).join('')+'</select><label class="master-switch" title="Auto-close Care notifications"><input type="checkbox" aria-label="Auto-close Care notifications"></label></div>';
+    d.innerHTML='<div class="ad-row"><span class="ad-t">Auto-close after</span><label class="master-switch" title="Auto-close Care notifications"><input type="checkbox" aria-label="Auto-close Care notifications"></label></div>'
+      +'<div class="ad-chips" role="radiogroup" aria-label="Auto-close after">'+OPTS.map(function(m){ return '<button type="button" role="radio" data-m="'+m+'">'+(m===60?'1 hour':m+(m===1?' min':' min'))+'</button>'; }).join('')+'</div>';
     d.querySelector('input').addEventListener('change',function(e){ var o=load(); o.on=e.target.checked; save(o); });
-    d.querySelector('select').addEventListener('change',function(e){ var o=load(); o.min=+e.target.value; save(o); });
+    d.querySelector('.ad-chips').addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('button[data-m]'); if(!b) return; var o=load(); o.min=+b.dataset.m; save(o); });
     return d;
   }
-  function paint(){ var o=load(); if(!el) return; el.classList.toggle('ad-on',o.on); el.querySelector('input').checked=o.on; el.querySelector('select').value=String(o.min); }
+  function paint(){ var o=load(); if(!el) return; el.classList.toggle('ad-on',o.on); el.querySelector('input').checked=o.on; [].forEach.call(el.querySelectorAll('.ad-chips button'),function(b){ var on=(+b.dataset.m===o.min); b.classList.toggle('on',on); b.setAttribute('aria-checked',on?'true':'false'); }); }
   function place(){
     [].forEach.call(document.querySelectorAll('#routines-panel .ayu-care-ad, #alerts-panel .ayu-care-ad'),function(x){ x.remove(); });
     var slot=document.getElementById('na-care-ad'); if(!slot) return false;
