@@ -23456,7 +23456,11 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
     wrap.innerHTML=h;
     try{ if(window.ayuPlaceCareAd) window.ayuPlaceCareAd(); }catch(e){}
     wrap.querySelectorAll('.na-n').forEach(function(b){ b.addEventListener('click',function(){ list[+b.dataset.i][4](); }); });
-    wrap.querySelectorAll('input[data-i]').forEach(function(inp){ inp.addEventListener('change',function(){ var o=list[+inp.dataset.i][3](); if(o && o.checked!==inp.checked) o.click(); setTimeout(paint,80); setTimeout(paint,600); }); });
+    wrap.querySelectorAll('input[data-i]').forEach(function(inp){ inp.addEventListener('change',function(){
+      // the section above grows or shrinks when its switch flips: keep this row where it is on the screen (no jump)
+      var y0=inp.getBoundingClientRect().top, t0=Date.now();
+      (function hold(){ var d=inp.getBoundingClientRect().top-y0; if(Math.abs(d)>1){ try{ window.scrollTo({top:window.scrollY+d,behavior:'instant'}); }catch(e){ window.scrollBy(0,d); } } if(Date.now()-t0<1100 && document.contains(inp)) requestAnimationFrame(hold); })();
+      var o=list[+inp.dataset.i][3](); if(o && o.checked!==inp.checked) o.click(); setTimeout(paint,80); setTimeout(paint,600); }); });
     $('na-all').addEventListener('click',function(){
       var old=$('na-ask'); if(old){ old.remove(); return; }
       var box=document.createElement('div'); box.id='na-ask'; box.className='notif-off-ask';
