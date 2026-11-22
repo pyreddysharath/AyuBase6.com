@@ -25247,6 +25247,44 @@ html body #lab-results .lab-sec-chev{display:inline-flex;align-items:center}
 .lb-btns{display:flex;flex-direction:column;gap:8px}
 .lb-btns button{font:inherit;font-weight:600;padding:10px 12px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;color:#0f172a;cursor:pointer;text-align:center}
 .lb-btns button.pri{background:#0d9488;border-color:#0d9488;color:#fff}
+/* v4: flat list, Vitals colour, one colour per name */
+html body #lab-results details.lb-person{margin:0 0 12px;border:0;background:transparent;border-radius:0;overflow:visible}
+html body #lab-results .lb-phdr{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 2px;background:transparent;border-bottom:3px solid var(--pc);border-radius:0}
+html body #lab-results .lb-pn{font-size:1rem;font-weight:800;color:var(--pc);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body #lab-results .lb-pc{margin:0;background:var(--pc);color:#fff;font-size:.72rem;font-weight:700;border-radius:20px;padding:2px 9px}
+html body #lab-results .lb-phdr .lb-chev{color:var(--pc)}
+html body #lab-results .lb-pbody{padding:0}
+html body #lab-results .lb-ib{min-width:36px;min-height:36px;background:#fff;color:var(--pc,#0e7490);box-shadow:0 0 0 1px rgba(15,23,42,.1)}
+html body #lab-results .lb-ib svg{stroke-width:2.8}
+html body #lab-results .lb-del{color:#dc2626;background:#fff}
+html body #lab-results .lb-del:hover{background:#fee2e2}
+html body #lab-results .lb-acts{display:flex;gap:6px;flex:none}
+html body #lab-results .lb-year,html body #lab-results .lb-month{margin:0}
+html body #lab-results .lb-year>summary{background:transparent;border-radius:0;color:#0e7490;padding:8px 2px;font-size:.88rem}
+html body #lab-results .lb-month>summary{color:#475569;padding:6px 2px;font-size:.82rem;border-bottom:1px solid #e2e8f0}
+html body #lab-results .lb-year>summary .lb-chev,html body #lab-results .lb-month>summary .lb-chev{color:#0e7490}
+html body #lab-results .lb-rep,html body #lab-results .lb-s-ok,html body #lab-results .lb-s-bad,html body #lab-results .lb-s-warn,html body #lab-results .lb-s-na{margin:0;border:0;border-top:1px solid #e2e8f0;border-radius:0;background:transparent;overflow:visible;--lc:#0f172a}
+html body #lab-results .lb-month>.lb-rep:first-of-type{border-top:0}
+html body #lab-results .lb-rep>summary{padding:9px 2px;gap:6px}
+html body #lab-results .lb-rn{font-size:.84rem;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+html body #lab-results .lb-rn::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;background:#94a3b8}
+html body #lab-results .lb-s-ok .lb-rn::before{background:#16a34a}html body #lab-results .lb-s-bad .lb-rn::before{background:#dc2626}html body #lab-results .lb-s-warn .lb-rn::before{background:#f59e0b}
+html body #lab-results .lb-rsub{display:flex;align-items:center;gap:8px;font-size:.7rem;color:#64748b}
+html body #lab-results .lb-badge{font-size:.62rem;padding:2px 8px}
+html body #lab-results .lb-rbody{padding:2px 0 10px}
+html body #lab-results .lb-scroll{border:0;background:transparent;border-radius:0}
+html body #lab-results .lb-tbl{font-size:.78rem}
+html body #lab-results .lb-tbl th,html body #lab-results .lb-tbl td{padding:6px 6px}
+html body #lab-results .lb-tbl thead th{background:transparent;border-bottom:2px solid #a5f3fc;color:#0e7490}
+html body #lab-results .lb-tbl tbody tr>:first-child{border-left:0}
+html body #lab-results .lb-tbl tbody th{white-space:nowrap}
+html body #lab-results .lb-th{color:#0e7490}
+html body #lab-results .lb-blk,html body #lab-results .lb-fold{background:transparent;padding:6px 2px;border-top:1px solid #e2e8f0;border-radius:0}
+html body #lab-results .lb-bh,html body #lab-results .lb-fold>summary{color:#0e7490}
+html body #lab-results .lab-sec-name{font-size:.82rem}
+html body #lab-results .lab-sec-vals{font-size:.7rem}
+html body #lab-results .lb-editf .lb-in{background:#fff}
+html body .lab-actions-row{margin-bottom:16px}
 </style>
 <script id="lab-reports-20261122-js">
 (function(){
@@ -25268,7 +25306,9 @@ function uid(p){ return p+Date.now().toString(36)+Math.random().toString(36).sli
 function person(id){ return store.people.filter(function(p){ return p.id===id; })[0]; }
 function findRep(rid){ for(var i=0;i<store.people.length;i++){ var p=store.people[i]; for(var j=0;j<p.reports.length;j++) if(p.reports[j].id===rid) return {p:p,r:p.reports[j]}; } return null; }
 var urls={};            // report id → object URL of the file (this session only)
-var closed={}, openRep={}, editing=null, lastPid=null;
+var closed={}, openRep={}, openP={}, editing=null, lastPid=null;
+var PCOL=[['#0f766e','#f0fdfa','#99f6e4'],['#4338ca','#eef2ff','#c7d2fe'],['#be123c','#fff1f2','#fecdd3'],['#b45309','#fffbeb','#fde68a'],['#7e22ce','#faf5ff','#e9d5ff'],['#0369a1','#f0f9ff','#bae6fd']];
+function pcol(p){ if(p.ci==null){ var used=store.people.map(function(q){ return q.ci; }), i=0; while(used.indexOf(i)>=0 && i<PCOL.length) i++; p.ci=i%PCOL.length; } return PCOL[p.ci%PCOL.length]; }
 
 /* ───────── names and dates ───────── */
 var TITLE_RE=/^(mr|mrs|ms|miss|master|smt|shri|sri|dr|prof)\b\.?\s*/i;
@@ -25426,13 +25466,13 @@ function parseTmt(text){
   if((m=/(BRUCE|MODIFIED BRUCE|NAUGHTON)[^A-Za-z]{0,3}\s*:?\s*Exercise\s*Time\s*:?\s*(\d{1,2}[:.]\d{2})/i.exec(T))){ it.push(item('Protocol',titleCase(m[1]),'na','')); it.push(item('Exercise time',m[2].replace('.',':')+' min','na','')); }
   else if((m=/Exercise\s*Time\s*:?\s*(\d{1,2}[:.]\d{2})/i.exec(T))) it.push(item('Exercise time',m[1].replace('.',':')+' min','na',''));
   var hrOk=null, mx=/Max\.?\s*HR\s*:?\s*(\d{2,3})\W{0,3}\s*bpm\s*(\d{2,3})\s*%/i.exec(T);
-  if(mx){ var pct=num(mx[2]); hrOk=pct>=85; it.push(item('Max heart rate',mx[1]+' bpm ('+mx[2]+'% of predicted)',hrOk?'ok':'warn','at least 85% of predicted')); }
+  if(mx){ var pct=num(mx[2]); hrOk=pct>=85; it.push(item('Max heart rate',mx[1]+' bpm ('+mx[2]+'%)',hrOk?'ok':'warn','85% or more')); }
   else if((m=/Max\.?\s*HR\s*:?\s*(\d{2,3})\W{0,3}\s*bpm/i.exec(T))) it.push(item('Max heart rate',m[1]+' bpm','na',''));
   if((m=/HR at rest\s*:?\s*(\d{2,3})/i.exec(T))) it.push(item('Heart rate at rest',m[1]+' bpm',rate(num(m[1]),50,100)==='ok'?'ok':'warn','50–100 bpm'));
-  if((m=/\bBP\s*:\s*(\d{2,3})\s*\/\s*(\d{2,3})/i.exec(T))){ var s=num(m[1]), d=num(m[2]); it.push(item('Max blood pressure',s+'/'+d+' mmHg',(s>230||d>115)?'bad':(s>210||d>105)?'warn':'ok','below 210/105 during exercise')); }
+  if((m=/\bBP\s*:\s*(\d{2,3})\s*\/\s*(\d{2,3})/i.exec(T))){ var s=num(m[1]), d=num(m[2]); it.push(item('Max blood pressure',s+'/'+d+' mmHg',(s>230||d>115)?'bad':(s>210||d>105)?'warn':'ok','under 210/105')); }
   if((m=/BP\.?\s*at\s*rest\s*:?\s*(\d{2,3})\s*\/\s*(\d{2,3})/i.exec(T))){ var sr=num(m[1]), dr=num(m[2]); it.push(item('Blood pressure at rest',sr+'/'+dr+' mmHg',(sr<=120&&dr<=80)?'ok':(sr<140&&dr<90)?'warn':'bad','up to 120/80')); }
-  if((m=/Workload\s*:?\W{0,4}(\d{1,2}(?:[.,]\d+)?)\s*METS?/i.exec(T))){ v=num(m[1].replace(',','.')); it.push(item('Workload (fitness)',v+' METs',v>=10?'ok':v>=7?'warn':'bad','10 METs or more is good for most adults')); }
-  if((m=/Max\.?\s*ST\s*:?\s*(-?\s*\d+\.\d+)\s*mV/i.exec(T))){ v=num(m[1].replace(/\s/g,'')); var dep=v<=-0.1; it.push(item('Largest ST change',v+' mV',dep?'bad':'ok','ST depression below −0.1 mV is a concern')); }
+  if((m=/Workload\s*:?\W{0,4}(\d{1,2}(?:[.,]\d+)?)\s*METS?/i.exec(T))){ v=num(m[1].replace(',','.')); it.push(item('Workload (fitness)',v+' METs',v>=10?'ok':v>=7?'warn':'bad','10 or more')); }
+  if((m=/Max\.?\s*ST\s*:?\s*(-?\s*\d+\.\d+)\s*mV/i.exec(T))){ v=num(m[1].replace(/\s/g,'')); var dep=v<=-0.1; it.push(item('Largest ST change',v+' mV',dep?'bad':'ok','above −0.1 mV')); }
   var cls=[], conc=/Conclusion\s*:?\s*(.*?)(?:\b(?:Room|Location)\b|\d{1,3}\s*%\s*THR|$)/i.exec(T);
   if(conc && conc[1].trim()) cls.push(conc[1].trim().replace(/\.$/,''));
   if(/\d{2,3}\s*%\s*THR\s*AC/i.test(T)) cls.push((/(\d{2,3})\s*%\s*THR\s*AC/i.exec(T)[1])+'% target heart rate achieved');
@@ -25462,8 +25502,8 @@ function parseImaging(text,lines,title){
   if(/calcium score/i.test(title+' '+text)){
     var a=agat?num(agat[1]||agat[2]):null;
     if(a!=null){ var lvl=a===0?['None','ok','Low']:a<=10?['Minimal','ok','Low']:a<=100?['Small','warn','Moderate']:a<=400?['Moderate','warn','Moderate to high']:['Extensive','bad','High'];
-      it.push(item('Total calcium (Agatston) score',String(a),lvl[1],'0 = none; 1–10 minimal; 11–100 small; 101–400 moderate; over 400 extensive'));
-      it.push(item('Amount of plaque',lvl[0],lvl[1],'')); it.push(item('Risk level',lvl[2],lvl[1],'')); st=lvl[1]; }
+      it.push(item('Agatston score',String(a),lvl[1],'0 (none)'));
+      it.push(item('Plaque',lvl[0],lvl[1],'None')); it.push(item('Risk',lvl[2],lvl[1],'Low')); st=lvl[1]; }
     var NUM='(\\d+(?:\\.\\d+)?)', crow=[];
     ['RCA','LM','LAD','LCX','D','Total'].forEach(function(s){ var mm=new RegExp('\\b'+s+'\\s+'+NUM+'\\s+'+NUM+'\\s+'+NUM+'\\s+'+NUM+'(?:\\s+'+NUM+')?','i').exec(text); if(mm) crow.push([s].concat(mm.slice(1,6).map(function(x){ return x==null?'\u2013':x; }))); });
     if(crow.length>=2) tables.push({h:'Calcium score by artery',cols:['Site','Count','Volume (mm\u00B3)','Mass (mg)','Agatston score','Volume score'],rows:crow});
@@ -25584,7 +25624,7 @@ async function ingest(files){
         var rep=build(text,f), p=await resolvePerson(rep.name,f.name,asked);
         delete rep.name; p.reports.push(rep); lastPid=p.id; urls[rep.id]=URL.createObjectURL(f);
         var y=rep.date.slice(0,4), mo=rep.date.slice(5,7);
-        closed[p.id+'|'+y]=false; closed[p.id+'|'+y+'|'+mo]=false; openRep[rep.id]=files.length===1;
+        closed[p.id+'|'+y]=false; closed[p.id+'|'+y+'|'+mo]=false; openP[p.id]=true; openRep[rep.id]=files.length===1;
         added.push(rep); save(); render();
       }catch(e){ console.warn('Lab file failed',f.name,e); failed.push(f.name+(e&&e.message?' ('+e.message+')':'')); }
     }
@@ -25653,12 +25693,11 @@ function repBody(p,r){
 function repHtml(p,r){
   var s=labStatus(r), ed=editing&&editing.k==='r'&&editing.id===r.id, open=(openRep[r.id]||ed)?' open':'', c=counts(r), sc=dotCls(s);
   var bt=c||ST[s];
-  return '<details class="lb-rep lb-s-'+sc+'" data-rid="'+r.id+'"'+open+'><summary><span class="lb-rmain"><span class="lb-rtop"><span class="lb-rn">'+esc(r.title)+'</span>'
-    +'<button type="button" class="lb-ib" data-act="edit-r" data-id="'+r.id+'" aria-label="Edit name and date" title="Edit">'+PEN+'</button>'
+  return '<details class="lb-rep lb-s-'+sc+'" data-rid="'+r.id+'"'+open+'><summary><span class="lb-rmain"><span class="lb-rn">'+esc(r.title)+'</span>'
+    +'<span class="lb-rsub">'+esc(shortDate(r.date))+'<span class="lb-badge '+sc+'">'+esc(bt)+'</span></span></span>'
+    +'<span class="lb-acts"><button type="button" class="lb-ib" data-act="edit-r" data-id="'+r.id+'" aria-label="Edit" title="Edit">'+PEN+'</button>'
     +(urls[r.id]?'<a class="lb-ib lb-file" href="'+esc(urls[r.id])+'" target="_blank" rel="noopener" aria-label="Open file" title="Open file">'+FILE+'</a>':'')
-    +'</span><span class="lb-rsub">'+esc(shortDate(r.date))+'</span></span>'
-    +'<span class="lb-badge '+sc+'">'+esc(bt)+'</span>'
-    +'<button type="button" class="lb-ib lb-del" data-act="del-r" data-id="'+r.id+'" aria-label="Delete report" title="Delete">'+TRASH+'</button>'+chev()+'</summary><div class="lb-rbody">'+repBody(p,r)+'</div></details>';
+    +'<button type="button" class="lb-ib lb-del" data-act="del-r" data-id="'+r.id+'" aria-label="Delete report" title="Delete">'+TRASH+'</button></span>'+chev()+'</summary><div class="lb-rbody">'+repBody(p,r)+'</div></details>';
 }
 function personHtml(p){
   var ed=editing&&editing.k==='p'&&editing.id===p.id, byY={}, ys;
@@ -25666,7 +25705,7 @@ function personHtml(p){
   ys=Object.keys(byY).sort(function(a,b){ return b-a; });
   var nm=ed?'<span class="lb-edit"><input class="lb-in" value="'+esc(p.name)+'" data-in="p" data-id="'+p.id+'" aria-label="Name"><button type="button" class="lb-ok" data-act="save-edit" aria-label="Save">✓</button><button type="button" class="lb-x" data-act="cancel-edit" aria-label="Cancel">✕</button></span>'
     : '<span class="lb-pn">'+esc(p.name)+'</span><button type="button" class="lb-ib" data-act="edit-p" data-id="'+p.id+'" aria-label="Edit name" title="Edit name">'+PEN+'</button>';
-  var h='<div class="lb-person" data-pid="'+p.id+'"><div class="lb-phdr">'+nm+'<span class="lb-pc">'+p.reports.length+'</span><button type="button" class="lb-ib lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">'+TRASH+'</button></div>';
+  var pc=pcol(p), h='<details class="lb-person" data-pid="'+p.id+'" style="--pc:'+pc[0]+';--pbg:'+pc[1]+';--pbd:'+pc[2]+'"'+((openP[p.id]||ed)?' open':'')+'><summary class="lb-phdr">'+nm+'<span class="lb-pc">'+p.reports.length+'</span><button type="button" class="lb-ib lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">'+TRASH+'</button>'+chev()+'</summary><div class="lb-pbody">';
   if(!p.reports.length) h+='<div class="lab-card-note">No reports yet.</div>';
   ys.forEach(function(y){
     var yk=p.id+'|'+y, byM={}; byY[y].forEach(function(r){ (byM[r.date.slice(5,7)]=byM[r.date.slice(5,7)]||[]).push(r); });
@@ -25678,7 +25717,7 @@ function personHtml(p){
     });
     h+='</details>';
   });
-  return h+'</div>';
+  return h+'</div></details>';
 }
 function render(){
   var wrap=$('lab-results'); if(!wrap) return;
@@ -25760,6 +25799,7 @@ if(host){
     var d=e.target; if(!d||!d.classList) return;
     if(d.classList.contains('lb-year')||d.classList.contains('lb-month')){ closed[d.getAttribute('data-k')]=!d.open; }
     else if(d.classList.contains('lb-rep')){ openRep[d.getAttribute('data-rid')]=d.open; }
+    else if(d.classList.contains('lb-person')){ openP[d.getAttribute('data-pid')]=d.open; }
     else if(d.classList.contains('lab-sec')){ var k=d.getAttribute('data-key'); if(d.open) labOpen.add(k); else labOpen['delete'](k); }
   },true);
 }
@@ -25782,7 +25822,7 @@ function manualReport(){
   if(!p){ p={id:uid('p'),name:'Me',aliases:[],reports:[]}; store.people.push(p); }
   var r=p.reports.filter(function(x){ return x.manual; })[0];
   if(!r){ r={id:uid('r'),type:'lab',manual:true,title:'Values typed in',date:todayStr(),file:'',rows:[],other:[],items:[],lines:[],st:'na',added:Date.now()}; p.reports.push(r); }
-  openRep[r.id]=true; closed[p.id+'|'+r.date.slice(0,4)]=false; closed[p.id+'|'+r.date.slice(0,4)+'|'+r.date.slice(5,7)]=false; return r;
+  openRep[r.id]=true; openP[p.id]=true; closed[p.id+'|'+r.date.slice(0,4)]=false; closed[p.id+'|'+r.date.slice(0,4)+'|'+r.date.slice(5,7)]=false; return r;
 }
 window.addLabRow=function(refId,value){
   if(refId==null||value==null||isNaN(value)) return;
