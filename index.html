@@ -25247,44 +25247,52 @@ html body #lab-results .lab-sec-chev{display:inline-flex;align-items:center}
 .lb-btns{display:flex;flex-direction:column;gap:8px}
 .lb-btns button{font:inherit;font-weight:600;padding:10px 12px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;color:#0f172a;cursor:pointer;text-align:center}
 .lb-btns button.pri{background:#0d9488;border-color:#0d9488;color:#fff}
-/* v4: flat list, Vitals colour, one colour per name */
-html body #lab-results details.lb-person{margin:0 0 12px;border:0;background:transparent;border-radius:0;overflow:visible}
-html body #lab-results .lb-phdr{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 2px;background:transparent;border-bottom:3px solid var(--pc);border-radius:0}
-html body #lab-results .lb-pn{font-size:1rem;font-weight:800;color:var(--pc);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-html body #lab-results .lb-pc{margin:0;background:var(--pc);color:#fff;font-size:.72rem;font-weight:700;border-radius:20px;padding:2px 9px}
-html body #lab-results .lb-phdr .lb-chev{color:var(--pc)}
-html body #lab-results .lb-pbody{padding:0}
-html body #lab-results .lb-ib{min-width:36px;min-height:36px;background:#fff;color:var(--pc,#0e7490);box-shadow:0 0 0 1px rgba(15,23,42,.1)}
+/* v5: filled names (dark / light), short accent bar before headings, report cards */
+html body #lab-results details.lb-person{margin:0 0 10px;border:0;background:transparent;overflow:visible}
+html body #lab-results .lb-d{--hb:#155e75;--ht:#fff;--bar:#155e75;--cnt:#fff;--cntt:#155e75}
+html body #lab-results .lb-l{--hb:#a5f3fc;--ht:#0e4f63;--bar:#0891b2;--cnt:#155e75;--cntt:#fff}
+html body #lab-results .lb-phdr{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 10px;background:var(--hb);border:0;border-radius:12px}
+html body #lab-results .lb-pn{font-size:1rem;font-weight:800;color:var(--ht);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body #lab-results .lb-pc{margin:0;background:var(--cnt);color:var(--cntt);font-size:.72rem;font-weight:700;border-radius:20px;padding:2px 9px}
+html body #lab-results .lb-phdr .lb-chev{color:var(--ht)}
+html body #lab-results .lb-pbody{padding:2px 0 0}
+html body #lab-results .lb-ib{min-width:36px;min-height:36px;background:#fff;color:#155e75;box-shadow:0 0 0 1px rgba(15,23,42,.1)}
 html body #lab-results .lb-ib svg{stroke-width:2.8}
-html body #lab-results .lb-del{color:#dc2626;background:#fff}
+html body #lab-results .lb-del{color:#dc2626}
 html body #lab-results .lb-del:hover{background:#fee2e2}
 html body #lab-results .lb-acts{display:flex;gap:6px;flex:none}
 html body #lab-results .lb-year,html body #lab-results .lb-month{margin:0}
-html body #lab-results .lb-year>summary{background:transparent;border-radius:0;color:#0e7490;padding:8px 2px;font-size:.88rem}
-html body #lab-results .lb-month>summary{color:#475569;padding:6px 2px;font-size:.82rem;border-bottom:1px solid #e2e8f0}
+html body #lab-results .lb-year>summary,html body #lab-results .lb-month>summary{background:transparent;border:0;border-radius:0;color:#0e7490;padding:8px 4px}
+html body #lab-results .lb-year>summary{font-size:.92rem}
+html body #lab-results .lb-month>summary{font-size:.84rem;color:#475569}
+html body #lab-results .lb-year>summary>span:first-child::before,html body #lab-results .lb-month>summary>span:first-child::before,html body #lab-results .lb-th::before,html body #lab-results .lb-bh::before,html body #lab-results .lb-fold>summary::before{content:"";display:inline-block;width:4px;height:1em;border-radius:2px;background:var(--bar,#0891b2);margin-right:7px;vertical-align:-.12em}
+html body #lab-results .lb-fold>summary{justify-content:flex-start}
+html body #lab-results .lb-fold>summary .lb-chev{margin-left:auto}
 html body #lab-results .lb-year>summary .lb-chev,html body #lab-results .lb-month>summary .lb-chev{color:#0e7490}
-html body #lab-results .lb-rep,html body #lab-results .lb-s-ok,html body #lab-results .lb-s-bad,html body #lab-results .lb-s-warn,html body #lab-results .lb-s-na{margin:0;border:0;border-top:1px solid #e2e8f0;border-radius:0;background:transparent;overflow:visible;--lc:#0f172a}
-html body #lab-results .lb-month>.lb-rep:first-of-type{border-top:0}
-html body #lab-results .lb-rep>summary{padding:9px 2px;gap:6px}
+html body #lab-results .lb-rep,html body #lab-results .lb-s-ok,html body #lab-results .lb-s-bad,html body #lab-results .lb-s-warn,html body #lab-results .lb-s-na{margin:6px 0;border:0;border-radius:12px;background:#fff;overflow:visible;box-shadow:0 1px 3px rgba(15,23,42,.14);--lc:#0f172a}
+html body #lab-results .lb-rep>summary{padding:10px;gap:6px}
 html body #lab-results .lb-rn{font-size:.84rem;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 html body #lab-results .lb-rn::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;background:#94a3b8}
 html body #lab-results .lb-s-ok .lb-rn::before{background:#16a34a}html body #lab-results .lb-s-bad .lb-rn::before{background:#dc2626}html body #lab-results .lb-s-warn .lb-rn::before{background:#f59e0b}
 html body #lab-results .lb-rsub{display:flex;align-items:center;gap:8px;font-size:.7rem;color:#64748b}
 html body #lab-results .lb-badge{font-size:.62rem;padding:2px 8px}
-html body #lab-results .lb-rbody{padding:2px 0 10px}
+html body #lab-results .lb-rbody{padding:0 10px 12px}
 html body #lab-results .lb-scroll{border:0;background:transparent;border-radius:0}
 html body #lab-results .lb-tbl{font-size:.78rem}
-html body #lab-results .lb-tbl th,html body #lab-results .lb-tbl td{padding:6px 6px}
+html body #lab-results .lb-tbl th,html body #lab-results .lb-tbl td{padding:6px 6px;border-bottom:0}
 html body #lab-results .lb-tbl thead th{background:transparent;border-bottom:2px solid #a5f3fc;color:#0e7490}
+html body #lab-results .lb-tbl tbody tr:nth-child(even)>*{background:#f1f9fb}
 html body #lab-results .lb-tbl tbody tr>:first-child{border-left:0}
 html body #lab-results .lb-tbl tbody th{white-space:nowrap}
-html body #lab-results .lb-th{color:#0e7490}
-html body #lab-results .lb-blk,html body #lab-results .lb-fold{background:transparent;padding:6px 2px;border-top:1px solid #e2e8f0;border-radius:0}
-html body #lab-results .lb-bh,html body #lab-results .lb-fold>summary{color:#0e7490}
+html body #lab-results .lb-th{color:#0e7490;font-size:.84rem;margin-bottom:4px}
+html body #lab-results .lb-blk,html body #lab-results .lb-fold{background:transparent;padding:6px 2px;border:0;border-radius:0;margin:6px 0}
+html body #lab-results .lb-bh,html body #lab-results .lb-fold>summary{color:#0e7490;font-size:.84rem}
 html body #lab-results .lab-sec-name{font-size:.82rem}
 html body #lab-results .lab-sec-vals{font-size:.7rem}
 html body #lab-results .lb-editf .lb-in{background:#fff}
+html body #lab-results .lb-phdr .lb-in{background:#fff;color:#0f172a}
 html body .lab-actions-row{margin-bottom:16px}
+html body #lab-results .lb-bh{display:block}
 </style>
 <script id="lab-reports-20261122-js">
 (function(){
@@ -25685,7 +25693,7 @@ function repBody(p,r){
   if(rt.items.length) h+=itemsTable(rt.items);
   rt.tables.forEach(function(t){ h+=tableHtml(t); });
   (r.lines||[]).forEach(function(b){
-    var inner='<ul class="lb-ul">'+b.t.map(function(s){ return '<li>'+esc(s)+'</li>'; }).join('')+'</ul>';
+    var inner='<ul class="lb-ul">'+b.t.filter(function(x){ return String(x).replace(/[^A-Za-z0-9]/g,'').length>1; }).map(function(s){ return '<li>'+esc(s)+'</li>'; }).join('')+'</ul>';
     h+=b.fold?'<details class="lb-fold"><summary>'+esc(b.h)+chev()+'</summary>'+inner+'</details>':'<div class="lb-blk"><div class="lb-bh">'+esc(b.h)+'</div>'+inner+'</div>';
   });
   return h;
@@ -25705,7 +25713,7 @@ function personHtml(p){
   ys=Object.keys(byY).sort(function(a,b){ return b-a; });
   var nm=ed?'<span class="lb-edit"><input class="lb-in" value="'+esc(p.name)+'" data-in="p" data-id="'+p.id+'" aria-label="Name"><button type="button" class="lb-ok" data-act="save-edit" aria-label="Save">✓</button><button type="button" class="lb-x" data-act="cancel-edit" aria-label="Cancel">✕</button></span>'
     : '<span class="lb-pn">'+esc(p.name)+'</span><button type="button" class="lb-ib" data-act="edit-p" data-id="'+p.id+'" aria-label="Edit name" title="Edit name">'+PEN+'</button>';
-  var pc=pcol(p), h='<details class="lb-person" data-pid="'+p.id+'" style="--pc:'+pc[0]+';--pbg:'+pc[1]+';--pbd:'+pc[2]+'"'+((openP[p.id]||ed)?' open':'')+'><summary class="lb-phdr">'+nm+'<span class="lb-pc">'+p.reports.length+'</span><button type="button" class="lb-ib lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">'+TRASH+'</button>'+chev()+'</summary><div class="lb-pbody">';
+  var h='<details class="lb-person '+(store.people.indexOf(p)%2?'lb-l':'lb-d')+'" data-pid="'+p.id+'"'+((openP[p.id]||ed)?' open':'')+'><summary class="lb-phdr">'+nm+'<span class="lb-pc">'+p.reports.length+'</span><button type="button" class="lb-ib lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">'+TRASH+'</button>'+chev()+'</summary><div class="lb-pbody">';
   if(!p.reports.length) h+='<div class="lab-card-note">No reports yet.</div>';
   ys.forEach(function(y){
     var yk=p.id+'|'+y, byM={}; byY[y].forEach(function(r){ (byM[r.date.slice(5,7)]=byM[r.date.slice(5,7)]||[]).push(r); });
