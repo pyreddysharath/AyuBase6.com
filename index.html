@@ -25305,6 +25305,18 @@ html body #lab-results .lb-x{background:#fff;color:#475569;box-shadow:0 0 0 1px 
 html body #lab-results#lab-results{margin-top:16px;padding-top:16px;border-top:3px solid #155e75;border-image:linear-gradient(90deg,#155e75,#a5f3fc 70%,transparent) 1}
 html body #lab-results#lab-results .lb-person{padding-bottom:14px;margin-bottom:14px;border-bottom:3px solid transparent;border-image:linear-gradient(90deg,var(--bar),transparent) 1}
 html body #lab-results#lab-results .lb-person:last-child{border-image:none;border-bottom:0;margin-bottom:0;padding-bottom:0}
+/* v7 */
+html body #lab-results#lab-results{border:0;border-image:none;margin-top:6px;padding-top:0}
+html body #lab-results#lab-results .lb-person{border:0;border-image:none;padding-bottom:0;margin-bottom:14px}
+html body #lab-results .lb-hd{font-weight:800;font-size:1rem;color:#155e75;padding:4px 2px 6px;border-bottom:3px solid transparent;border-image:linear-gradient(90deg,#155e75,#a5f3fc) 1}
+html body #lab-results #lab-upload-status{font-size:.72rem;margin:6px 2px 10px;min-height:0;color:#0e7490}
+html body #lab-results #lab-upload-status:empty{display:none}
+html body #lab-results .lb-phdr{padding:4px 10px;border-radius:9px}
+html body #lab-results .lb-pn{font-size:.86rem}
+html body #lab-results .lb-pc{font-size:.66rem;padding:1px 8px}
+html body #lab-results .lb-phdr .lb-ib{min-width:26px;min-height:26px}
+html body #lab-results .lb-phdr .lb-ib svg{width:13px;height:13px}
+html body #lab-results .lb-year>summary,html body #lab-results .lb-month>summary,html body #lab-results .lb-rep>summary{cursor:default}
 </style>
 <script id="lab-reports-20261122-js">
 (function(){
@@ -25706,18 +25718,18 @@ function repBody(p,r){
   rt.tables.forEach(function(t){ h+=tableHtml(t); });
   (r.lines||[]).forEach(function(b){
     var inner='<ul class="lb-ul">'+b.t.filter(function(x){ return String(x).replace(/[^A-Za-z0-9]/g,'').length>1; }).map(function(s){ return '<li>'+esc(s)+'</li>'; }).join('')+'</ul>';
-    h+=b.fold?'<details class="lb-fold"><summary>'+esc(b.h)+chev()+'</summary>'+inner+'</details>':'<div class="lb-blk"><div class="lb-bh">'+esc(b.h)+'</div>'+inner+'</div>';
+    h+='<div class="lb-blk"><div class="lb-bh">'+esc(b.h)+'</div>'+inner+'</div>';
   });
   return h;
 }
 function repHtml(p,r){
-  var s=labStatus(r), ed=editing&&editing.k==='r'&&editing.id===r.id, open=(openRep[r.id]||ed)?' open':'', c=counts(r), sc=dotCls(s);
+  var s=labStatus(r), ed=editing&&editing.k==='r'&&editing.id===r.id, open=' open', c=counts(r), sc=dotCls(s);
   var bt=c||ST[s];
   return '<details class="lb-rep lb-s-'+sc+'" data-rid="'+r.id+'"'+open+'><summary><span class="lb-rmain"><span class="lb-rn">'+esc(r.title)+'</span>'
     +'<span class="lb-rsub">'+esc(shortDate(r.date))+'<span class="lb-badge '+sc+'">'+esc(bt)+'</span></span></span>'
     +'<span class="lb-acts"><button type="button" class="lb-ib" data-act="edit-r" data-id="'+r.id+'" aria-label="Edit" title="Edit">'+PEN+'</button>'
     +(urls[r.id]?'<a class="lb-ib lb-file" href="'+esc(urls[r.id])+'" target="_blank" rel="noopener" aria-label="Open file" title="Open file">'+FILE+'</a>':'')
-    +'<button type="button" class="lb-ib lb-del" data-act="del-r" data-id="'+r.id+'" aria-label="Delete report" title="Delete">'+TRASH+'</button></span>'+chev()+'</summary><div class="lb-rbody">'+repBody(p,r)+'</div></details>';
+    +'<button type="button" class="lb-ib lb-del" data-act="del-r" data-id="'+r.id+'" aria-label="Delete report" title="Delete">'+TRASH+'</button></span></summary><div class="lb-rbody">'+repBody(p,r)+'</div></details>';
 }
 function personHtml(p){
   var ed=editing&&editing.k==='p'&&editing.id===p.id, byY={}, ys;
@@ -25729,21 +25741,24 @@ function personHtml(p){
   if(!p.reports.length) h+='<div class="lab-card-note">No reports yet.</div>';
   ys.forEach(function(y){
     var yk=p.id+'|'+y, byM={}; byY[y].forEach(function(r){ (byM[r.date.slice(5,7)]=byM[r.date.slice(5,7)]||[]).push(r); });
-    h+='<details class="lb-year" data-k="'+yk+'"'+(closed[yk]?'':' open')+'><summary><span>'+y+'</span>'+chev()+'</summary>';
+    h+='<details class="lb-year" data-k="'+yk+'" open><summary><span>'+y+'</span></summary>';
     Object.keys(byM).sort(function(a,b){ return b-a; }).forEach(function(m){
       var mk=yk+'|'+m;
-      h+='<details class="lb-month" data-k="'+mk+'"'+(closed[mk]?'':' open')+'><summary><span>'+MONTHS[+m-1]+'</span>'+chev()+'</summary>'
+      h+='<details class="lb-month" data-k="'+mk+'" open><summary><span>'+MONTHS[+m-1]+'</span></summary>'
         +byM[m].sort(function(a,b){ return a.date<b.date?1:a.date>b.date?-1:b.added-a.added; }).map(function(r){ return repHtml(p,r); }).join('')+'</details>';
     });
     h+='</details>';
   });
   return h+'</div></details>';
 }
+var stEl=$('lab-upload-status');
 function render(){
   var wrap=$('lab-results'); if(!wrap) return;
   labParkForm();
-  wrap.innerHTML=store.people.map(personHtml).join('');
+  var anchor=$('lab-pane-manual'); if(stEl&&anchor&&stEl.parentNode===wrap) anchor.parentNode.insertBefore(stEl,anchor);
+  wrap.innerHTML=(store.people.length?'<div class="lb-hd">My Reports</div>':'')+store.people.map(personHtml).join('');
   [].forEach.call(wrap.querySelectorAll('.lab-sec-chev'),function(c){ c.innerHTML=CHEV; });
+  var hd=wrap.querySelector('.lb-hd'); if(hd&&stEl) hd.parentNode.insertBefore(stEl,hd.nextSibling);
   if(labManualOpen){ var slot=$('lab-form-slot'), pane=$('lab-pane-manual'); if(slot&&pane){ slot.appendChild(pane); pane.style.display=''; } }
   try{ if(window.ayuLabRefreshReset) window.ayuLabRefreshReset(); }catch(e){}
 }
@@ -25788,6 +25803,7 @@ if(host){
   var fresh=host.cloneNode(false); host.parentNode.replaceChild(fresh,host); host=fresh;   // the old list handlers go with the old element
   host.addEventListener('click',function(e){
     var t=e.target, a=t.closest('[data-act]');
+    var sm=t.closest('summary'); if(sm && !t.closest('button,a,input,select') && sm.parentNode.matches('.lb-year,.lb-month,.lb-rep')){ e.preventDefault(); return; }
     if(a){
       var act=a.getAttribute('data-act'), id=a.getAttribute('data-id');
       if(act==='edit-p'||act==='edit-r'){ e.preventDefault(); e.stopPropagation(); if(act==='edit-r') openRep[id]=true; editing={k:act==='edit-p'?'p':'r',id:id}; render(); var i=document.querySelector('#lab-results .lb-in'); if(i){ i.focus(); i.select(); } return; }
