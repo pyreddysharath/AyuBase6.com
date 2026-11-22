@@ -23766,6 +23766,15 @@ html body .ayu-bgchk ul{margin:0;padding-left:18px}
 html body .ayu-bgchk li{margin:3px 0}
 html body .ayu-bgchk .bg-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 html body .ayu-bgchk .bg-btns button{border:1.5px solid #b45309;background:#fff;color:#92400e;border-radius:10px;padding:5px 12px;font:inherit;font-weight:700;font-size:.8rem;cursor:pointer}
+/* Allow / Test notifications: solid buttons in the section's colour, the same size, side by side */
+html body .ayu-bgchk{--bgc:#b45309}
+html body #alerts-panel .ayu-bgchk:not(#ayu-x1){--bgc:var(--tl-0f766e,#0f766e)}
+html body #routines-panel .ayu-bgchk:not(#ayu-x1){--bgc:#e8607a;background:#fff1f3;border-color:#f9b4c0;color:#6e0f2c}
+html body #routines-panel .ayu-bgchk .bg-x:not(#ayu-x1){color:#e8607a}
+html body .ayu-bgchk .bg-btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0;align-items:stretch}
+html body .ayu-bgchk .bg-btns.bg-li{margin:6px 0 4px}
+html body .ayu-bgchk .bg-btns button:not(#ayu-x1):not(#ayu-x2){flex:0 1 auto;min-height:34px;padding:6px 14px;border:0;border-radius:10px;background:var(--bgc);color:#fff;font:inherit;font-size:.82rem;font-weight:700;line-height:1.2;text-align:center;cursor:pointer}
+html body .ayu-bgchk .bg-btns button:not(#ayu-x1):not(#ayu-x2):active{filter:brightness(.92)}
 html body .ayu-bgchk .bg-x{position:absolute;top:2px;right:4px;border:0;background:none;font-size:22px;line-height:1;color:#92400e;cursor:pointer;padding:2px 8px}
 /* 40. Daily Checklist: edit, add or remove activities */
 html body #ayu-checklist .ayu-cl-edit{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:rgb(232,96,122);cursor:pointer;margin-left:auto}
@@ -23878,8 +23887,8 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
       if(!el){ el=document.createElement('div'); el.className='ayu-bgchk'; el.setAttribute('role','status'); page.insertBefore(el,page.firstChild); }
       if(el.dataset.sig===sig) return; el.dataset.sig=sig;
       var LBL={exact:'Allow',full:'Allow',battery:'Open battery settings',notif:'Open notification settings'};
-      el.innerHTML='<b class="t">⚠ '+(p.length===1 ? p[0][0] : p.length+' settings stop AyuBase6 from reminding you')+'</b><ul>'+p.map(function(x,i){ return '<li>'+(p.length===1 ? '' : x[0]+'. ')+x[1]+(x[2] ? ' <button type="button" class="bg-fix" data-a="'+x[2]+'">'+(LBL[x[2]]||'Open')+'</button>' : '')+'</li>'; }).join('')+'</ul>'
-        +'<div class="bg-btns"><button type="button" data-a="test">Test notifications</button></div>'
+      el.innerHTML='<b class="t">⚠ '+(p.length===1 ? p[0][0] : p.length+' settings stop AyuBase6 from reminding you')+'</b><ul>'+p.map(function(x,i){ return '<li>'+(p.length===1 ? '' : x[0]+'. ')+x[1]+(x[2] && p.length>1 ? '<div class="bg-btns bg-li"><button type="button" class="bg-fix" data-a="'+x[2]+'">'+(LBL[x[2]]||'Open')+'</button></div>' : '')+'</li>'; }).join('')+'</ul>'
+        +'<div class="bg-btns">'+(p.length===1 && p[0][2] ? '<button type="button" class="bg-fix" data-a="'+p[0][2]+'">'+(LBL[p[0][2]]||'Open')+'</button>' : '')+'<button type="button" data-a="test">Test notifications</button></div>'
         +'<button type="button" class="bg-x" aria-label="Close" title="Close">×</button>';
       el.querySelector('.bg-x').addEventListener('click',function(){ S(KC,{sig:sig,at:Date.now()}); bgPaint(p); });
       el.querySelectorAll('.bg-btns button, .bg-fix').forEach(function(b){ b.addEventListener('click',function(e){ e.stopPropagation(); var n=window.ayuNative||{}, a=b.dataset.a;
@@ -24058,7 +24067,6 @@ html body #routines-panel #chk-sound-mute:not(#ayu-x1):not(#ayu-x2){color:transp
 html body #alerts-panel .ayu-lowvol:not(#ayu-x1){background:var(--tl-f0fdfa,#f0fdfa);border-color:var(--tl-5eead4,#5eead4);color:var(--tl-134e4a,#134e4a)}
 html body #alerts-panel .ayu-lowvol .lv-x:not(#ayu-x1){color:var(--tl-0f766e,#0f766e)}
 html body #alerts-panel .ayu-bgchk:not(#ayu-x1){background:var(--tl-f0fdfa,#f0fdfa);border-color:var(--tl-5eead4,#5eead4);color:var(--tl-134e4a,#134e4a)}
-html body #alerts-panel .ayu-bgchk .bg-btns button:not(#ayu-x1){border-color:var(--tl-0f766e,#0f766e);color:var(--tl-0f766e,#0f766e)}
 html body #alerts-panel .ayu-bgchk .bg-x:not(#ayu-x1){color:var(--tl-0f766e,#0f766e)}
 /* Reminders: no expand / collapse-all chevron above the sections */
 html body #alerts-panel .ayu-rem-group > .ayu-part-title:not(#ayu-x1):not(#ayu-x2){display:none !important}
