@@ -25035,25 +25035,30 @@ body.to-dragging{cursor:grabbing}
   }
   // drag a row by its handle in Settings > Tab Order
   function listDrag(box){
-    box.addEventListener('pointerdown',function(e){
-      var g=e.target.closest('.to-grip'); if(!g) return; var row=g.closest('.to-row'); if(!row) return;
-      e.preventDefault();
-      var rows=[].slice.call(box.querySelectorAll('.to-row')), from=rows.indexOf(row), y0=e.clientY, R=rows.map(function(r){ return r.getBoundingClientRect(); }), to=from;
-      row.classList.add('to-lifted');
-      function mv(ev){
-        var dy=ev.clientY-y0; row.style.transform='translateY('+dy+'px)';
-        var cur=R[from].top+R[from].height/2+dy; to=0; rows.forEach(function(r,i){ if(i!==from && cur>R[i].top+R[i].height/2) to++; });
-        var step=R[1].top-R[0].top;
-        rows.forEach(function(r,i){ if(i===from) return; var sh=0; if(from<to && i>from && i<=to) sh=-step; if(from>to && i>=to && i<from) sh=step; r.style.transform=sh?'translateY('+sh+'px)':''; });
-      }
-      function up(){
-        window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up); window.removeEventListener('pointercancel',up);
-        rows.forEach(function(r){ r.style.transform=''; r.classList.remove('to-lifted'); });
-        if(to!==from){ var a=load(), k=a.splice(from,1)[0]; a.splice(to,0,k); save(a); apply(a); }
-        render();
-      }
-      window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up);
-    });
+    var cur=null;
+    function down(x,y,target){
+      var g=target.closest&&target.closest('.to-grip'); if(!g) return false; var row=g.closest('.to-row'); if(!row) return false;
+      var rows=[].slice.call(box.querySelectorAll('.to-row')), from=rows.indexOf(row), R=rows.map(function(r){ return r.getBoundingClientRect(); });
+      cur={row:row,rows:rows,from:from,to:from,y0:y,R:R}; row.classList.add('to-lifted'); return true;
+    }
+    function move(y){
+      var c=cur, dy=y-c.y0; c.row.style.transform='translateY('+dy+'px)';
+      var mid=c.R[c.from].top+c.R[c.from].height/2+dy, to=0; c.rows.forEach(function(r,i){ if(i!==c.from && mid>c.R[i].top+c.R[i].height/2) to++; }); c.to=to;
+      var step=c.R[1].top-c.R[0].top;
+      c.rows.forEach(function(r,i){ if(i===c.from) return; var sh=0; if(c.from<to && i>c.from && i<=to) sh=-step; if(c.from>to && i>=to && i<c.from) sh=step; r.style.transform=sh?'translateY('+sh+'px)':''; });
+    }
+    function up(){
+      var c=cur; if(!c) return; cur=null;
+      c.rows.forEach(function(r){ r.style.transform=''; r.classList.remove('to-lifted'); });
+      if(c.to!==c.from){ var a=load(), k=a.splice(c.from,1)[0]; a.splice(c.to,0,k); save(a); apply(a); }
+      render();
+    }
+    box.addEventListener('pointerdown',function(e){ if(e.pointerType==='touch') return; if(down(e.clientX,e.clientY,e.target)) e.preventDefault(); });
+    window.addEventListener('pointermove',function(e){ if(cur && e.pointerType!=='touch') move(e.clientY); });
+    window.addEventListener('pointerup',function(e){ if(e.pointerType!=='touch') up(); });
+    box.addEventListener('touchstart',function(e){ var t=e.touches[0]; if(t && down(t.clientX,t.clientY,e.target)) e.preventDefault(); },{passive:false});
+    window.addEventListener('touchmove',function(e){ if(!cur) return; e.preventDefault(); move(e.touches[0].clientY); },{passive:false});
+    window.addEventListener('touchend',up); window.addEventListener('touchcancel',up);
   }
   // ── drag and drop on the tab bar: press and hold, move, let go. The other tabs never move; a line shows where it will land ──
   var dr=null, justDragged=0;
@@ -25095,21 +25100,23 @@ body.to-dragging{cursor:grabbing}
     var b=bar(); if(!b || b.__toDrag) return; b.__toDrag=1;
     var hold=null, pend=null;
     function clear(){ clearTimeout(hold); hold=null; pend=null; }
-    b.addEventListener('pointerdown',function(e){
-      var t=e.target.closest('.tab-btn'); if(!t || (e.pointerType==='mouse' && e.button!==0)) return;
-      pend={t:t,x:e.clientX,y:e.clientY,type:e.pointerType,e:e};
-      if(e.pointerType!=='mouse') hold=setTimeout(function(){ if(pend){ var p=pend; pend=null; startDrag(p.t,{clientX:p.e.clientX,clientY:p.e.clientY}); } },300);
-    });
-    window.addEventListener('pointermove',function(e){
-      if(dr){ e.preventDefault(); place(e); return; }
+    function down(x,y,t,type){ pend={t:t,x:x,y:y,type:type}; if(type==='touch') hold=setTimeout(function(){ if(pend){ var p=pend; pend=null; startDrag(p.t,{clientX:p.x,clientY:p.y}); } },300); }
+    function move(x,y,ev){
+      if(dr){ ev.preventDefault(); place({clientX:x,clientY:y}); return; }
       if(!pend) return;
-      var mv=Math.hypot(e.clientX-pend.x,e.clientY-pend.y);
-      if(pend.type==='mouse'){ if(mv>8){ var p=pend; pend=null; startDrag(p.t,{clientX:p.x,clientY:p.y}); place(e); } }
+      var mv=Math.hypot(x-pend.x,y-pend.y);
+      if(pend.type==='mouse'){ if(mv>8){ var p=pend; pend=null; startDrag(p.t,{clientX:p.x,clientY:p.y}); place({clientX:x,clientY:y}); } }
       else if(mv>12){ clear(); }
-    },{passive:false});
-    window.addEventListener('pointerup',function(){ if(dr) endDrag(true); clear(); });
-    window.addEventListener('pointercancel',function(){ if(dr) endDrag(true); clear(); });
-    window.addEventListener('blur',function(){ if(dr) endDrag(false); clear(); });
+    }
+    function end(ok){ if(dr) endDrag(ok); clear(); }
+    b.addEventListener('pointerdown',function(e){ if(e.pointerType!=='mouse' || e.button!==0) return; var t=e.target.closest('.tab-btn'); if(t) down(e.clientX,e.clientY,t,'mouse'); });
+    window.addEventListener('pointermove',function(e){ if(e.pointerType==='mouse') move(e.clientX,e.clientY,e); },{passive:false});
+    window.addEventListener('pointerup',function(e){ if(e.pointerType==='mouse') end(true); });
+    b.addEventListener('touchstart',function(e){ var t=e.target.closest('.tab-btn'), f=e.touches[0]; if(t && f && e.touches.length===1) down(f.clientX,f.clientY,t,'touch'); else end(false); },{passive:true});
+    window.addEventListener('touchmove',function(e){ var f=e.touches[0]; if(f) move(f.clientX,f.clientY,e); },{passive:false});
+    window.addEventListener('touchend',function(){ end(true); });
+    window.addEventListener('touchcancel',function(){ end(true); });
+    window.addEventListener('blur',function(){ end(false); });
     b.addEventListener('contextmenu',function(e){ if(dr || pend) e.preventDefault(); });
     b.addEventListener('click',function(e){ if(Date.now()-justDragged<400){ e.preventDefault(); e.stopImmediatePropagation(); } },true);
   }
