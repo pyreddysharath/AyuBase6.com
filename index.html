@@ -25366,6 +25366,28 @@ html body .lab-actions-row{margin-bottom:46px}
 .lb-card{background:#eaf8fb;border:1px solid #a5dcea}
 .lb-card .lb-ckl{color:#0b4254}
 .lb-btns button.pri{background:#0e7490;border-color:#0e7490}
+/* v12: year count, compact section-coloured edit controls */
+html body #lab-results .lb-yc{display:inline-block;font-style:normal;margin-left:8px;font-size:.66rem;font-weight:700;color:#fff;background:#0e7490;border-radius:20px;padding:1px 8px;vertical-align:.1em}
+html body #lab-results .lb-in{font-size:.85rem;line-height:1.2;height:30px;min-height:0;padding:0 8px;border:1px solid #7fd3e3;border-radius:7px;background:#f0fbfe;color:#0b4254;box-sizing:border-box;color-scheme:light;accent-color:#0e7490}
+html body #lab-results .lb-phdr .lb-in{background:#f0fbfe;color:#0b4254}
+html body #lab-results .lb-in:focus{outline:2px solid #0e7490;outline-offset:0;border-color:#0e7490}
+html body #lab-results .lb-in option{background:#eaf8fb;color:#0b4254}
+html body #lab-results .lb-ed-date{min-width:0}
+html body #lab-results .lb-editf{gap:6px;margin:2px 0 8px;padding:8px;background:#eaf8fb;border-radius:10px}
+html body #lab-results .lb-editf .lb-in{flex:1 1 120px}
+html body #lab-results .lb-ebtn{gap:5px}
+html body #lab-results .lb-ok,html body #lab-results .lb-x{min-width:28px;min-height:28px;width:28px;height:28px;font-size:.8rem;border-radius:7px}
+html body #lab-results .lb-ok{background:#0e7490;color:#fff}
+html body #lab-results .lb-x{background:#f0fbfe;color:#0e7490;box-shadow:0 0 0 1px #7fd3e3}
+html body #lab-results .lb-x:hover{background:#fee2e2;color:#dc2626}
+html body #lab-results .lb-editf .lb-ed-date{flex:0 0 122px}
+html body #lab-results .lb-editf .lb-ed-move{flex:1 1 80px}
+html body #lab-results .lab-edit-ui{display:inline-flex;flex-wrap:nowrap;align-items:center;gap:5px;max-width:100%}
+html body #lab-results .lab-edit-ui .lab-edit-input{width:72px;min-width:0;height:28px;min-height:0;padding:0 8px;font-size:.85rem;border:1px solid #7fd3e3;border-radius:7px;background:#f0fbfe;color:#0b4254;box-sizing:border-box;accent-color:#0e7490;color-scheme:light}
+html body #lab-results .lab-edit-ui .lab-edit-act{width:26px;height:26px;min-width:26px;min-height:26px;padding:0;border-radius:7px;border:0;background:#f0fbfe;color:#0e7490;box-shadow:0 0 0 1px #7fd3e3;font-size:.8rem;display:inline-flex;align-items:center;justify-content:center}
+html body #lab-results .lab-edit-ui .lab-edit-act.save{background:#0e7490;color:#fff;box-shadow:none}
+html body #lab-results .lab-edit-ui .lab-edit-act svg{width:14px;height:14px}
+html body #lab-results#lab-results .lab-edit-ui .lab-edit-input{background:#f0fbfe !important;color:#0b4254 !important;height:26px !important;font-size:.82rem !important;width:64px !important;border-radius:7px !important}
 </style>
 <script id="lab-reports-20261122-js">
 (function(){
@@ -25786,11 +25808,11 @@ function personHtml(p){
   ys=Object.keys(byY).sort(function(a,b){ return b-a; });
   var nm=ed?'<span class="lb-edit"><input class="lb-in" value="'+esc(p.name)+'" data-in="p" data-id="'+p.id+'" aria-label="Name"><button type="button" class="lb-ok" data-act="save-edit" aria-label="Save">✓</button><button type="button" class="lb-x" data-act="cancel-edit" aria-label="Cancel">✕</button></span>'
     : '<span class="lb-pn">'+esc(p.name)+'</span><button type="button" class="lb-ib" data-act="edit-p" data-id="'+p.id+'" aria-label="Edit name" title="Edit name">'+PEN+'</button>';
-  var altN=0, h='<details class="lb-person '+(store.people.indexOf(p)%2?'lb-l':'lb-d')+'" data-pid="'+p.id+'"'+((openP[p.id]||ed)?' open':'')+'><summary class="lb-phdr">'+nm+'<span class="lb-pc">'+p.reports.length+'</span><button type="button" class="lb-ib lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">'+TRASH+'</button>'+chev()+'</summary><div class="lb-pbody">';
+  var altN=0, h='<details class="lb-person '+(store.people.indexOf(p)%2?'lb-l':'lb-d')+'" data-pid="'+p.id+'"'+((openP[p.id]||ed)?' open':'')+'><summary class="lb-phdr">'+nm+'<button type="button" class="lb-ib lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">'+TRASH+'</button>'+chev()+'</summary><div class="lb-pbody">';
   if(!p.reports.length) h+='<div class="lab-card-note">No reports yet.</div>';
   ys.forEach(function(y){
     var yk=p.id+'|'+y, byM={}; byY[y].forEach(function(r){ (byM[r.date.slice(5,7)]=byM[r.date.slice(5,7)]||[]).push(r); });
-    h+='<details class="lb-year" data-k="'+yk+'"'+(closed[yk]?'':' open')+'><summary><span>'+y+'</span>'+chev()+'</summary>';
+    h+='<details class="lb-year" data-k="'+yk+'"'+(closed[yk]?'':' open')+'><summary><span>'+y+'<i class="lb-yc">'+byY[y].length+'</i></span>'+chev()+'</summary>';
     Object.keys(byM).sort(function(a,b){ return b-a; }).forEach(function(m){
       var mk=yk+'|'+m;
       h+='<details class="lb-month" data-k="'+mk+'"'+(closed[mk]?'':' open')+'><summary><span>'+MONTHS[+m-1]+'</span>'+chev()+'</summary>'
