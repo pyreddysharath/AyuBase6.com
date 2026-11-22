@@ -25317,6 +25317,22 @@ html body #lab-results .lb-pc{font-size:.66rem;padding:1px 8px}
 html body #lab-results .lb-phdr .lb-ib{min-width:26px;min-height:26px}
 html body #lab-results .lb-phdr .lb-ib svg{width:13px;height:13px}
 html body #lab-results .lb-year>summary,html body #lab-results .lb-month>summary,html body #lab-results .lb-rep>summary{cursor:default}
+/* v8 */
+html body #lab-results .lb-hd{font-size:16px;font-weight:600;color:#155e75;margin-bottom:12px}
+html body #lab-results #lab-upload-status{margin:-6px 2px 12px}
+html body #lab-results .lb-year>summary,html body #lab-results .lb-month>summary,html body #lab-results .lb-rep>summary{cursor:pointer}
+html body #lab-results .lb-rep.lb-a{background:#d6f3f9}
+html body #lab-results .lb-rep.lb-b{background:#c1e9f2}
+html body #lab-results .lb-rep{box-shadow:none}
+html body #lab-results .lb-tbl tbody tr:nth-child(even)>*{background:rgba(255,255,255,.5)}
+html body #lab-results .lb-tbl thead th{border-bottom-color:#7dd3e8}
+html body .lab-bottom-row{margin-top:26px !important}
+.lb-ckl{max-height:55vh;overflow:auto;margin-bottom:12px;font-size:.9rem;color:#0f172a}
+.lb-ckg label{display:flex;align-items:center;gap:8px;padding:6px 2px;cursor:pointer}
+.lb-ckg input[type=checkbox]{width:18px;height:18px;accent-color:#0e7490;flex:none}
+.lb-ckc{padding-left:20px}
+.lb-ckg small{color:#64748b}
+.lb-btns button:disabled{opacity:.45;cursor:default}
 </style>
 <script id="lab-reports-20261122-js">
 (function(){
@@ -25722,14 +25738,14 @@ function repBody(p,r){
   });
   return h;
 }
-function repHtml(p,r){
-  var s=labStatus(r), ed=editing&&editing.k==='r'&&editing.id===r.id, open=' open', c=counts(r), sc=dotCls(s);
+function repHtml(p,r,alt){
+  var s=labStatus(r), ed=editing&&editing.k==='r'&&editing.id===r.id, open=(openRep[r.id]===false&&!ed)?'':' open', c=counts(r), sc=dotCls(s);
   var bt=c||ST[s];
-  return '<details class="lb-rep lb-s-'+sc+'" data-rid="'+r.id+'"'+open+'><summary><span class="lb-rmain"><span class="lb-rn">'+esc(r.title)+'</span>'
+  return '<details class="lb-rep lb-s-'+sc+(alt?' lb-b':' lb-a')+'" data-rid="'+r.id+'"'+open+'><summary><span class="lb-rmain"><span class="lb-rn">'+esc(r.title)+'</span>'
     +'<span class="lb-rsub">'+esc(shortDate(r.date))+'<span class="lb-badge '+sc+'">'+esc(bt)+'</span></span></span>'
     +'<span class="lb-acts"><button type="button" class="lb-ib" data-act="edit-r" data-id="'+r.id+'" aria-label="Edit" title="Edit">'+PEN+'</button>'
     +(urls[r.id]?'<a class="lb-ib lb-file" href="'+esc(urls[r.id])+'" target="_blank" rel="noopener" aria-label="Open file" title="Open file">'+FILE+'</a>':'')
-    +'<button type="button" class="lb-ib lb-del" data-act="del-r" data-id="'+r.id+'" aria-label="Delete report" title="Delete">'+TRASH+'</button></span></summary><div class="lb-rbody">'+repBody(p,r)+'</div></details>';
+    +'<button type="button" class="lb-ib lb-del" data-act="del-r" data-id="'+r.id+'" aria-label="Delete report" title="Delete">'+TRASH+'</button></span>'+chev()+'</summary><div class="lb-rbody">'+repBody(p,r)+'</div></details>';
 }
 function personHtml(p){
   var ed=editing&&editing.k==='p'&&editing.id===p.id, byY={}, ys;
@@ -25737,15 +25753,15 @@ function personHtml(p){
   ys=Object.keys(byY).sort(function(a,b){ return b-a; });
   var nm=ed?'<span class="lb-edit"><input class="lb-in" value="'+esc(p.name)+'" data-in="p" data-id="'+p.id+'" aria-label="Name"><button type="button" class="lb-ok" data-act="save-edit" aria-label="Save">✓</button><button type="button" class="lb-x" data-act="cancel-edit" aria-label="Cancel">✕</button></span>'
     : '<span class="lb-pn">'+esc(p.name)+'</span><button type="button" class="lb-ib" data-act="edit-p" data-id="'+p.id+'" aria-label="Edit name" title="Edit name">'+PEN+'</button>';
-  var h='<details class="lb-person '+(store.people.indexOf(p)%2?'lb-l':'lb-d')+'" data-pid="'+p.id+'"'+((openP[p.id]||ed)?' open':'')+'><summary class="lb-phdr">'+nm+'<span class="lb-pc">'+p.reports.length+'</span><button type="button" class="lb-ib lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">'+TRASH+'</button>'+chev()+'</summary><div class="lb-pbody">';
+  var altN=0, h='<details class="lb-person '+(store.people.indexOf(p)%2?'lb-l':'lb-d')+'" data-pid="'+p.id+'"'+((openP[p.id]||ed)?' open':'')+'><summary class="lb-phdr">'+nm+'<span class="lb-pc">'+p.reports.length+'</span><button type="button" class="lb-ib lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">'+TRASH+'</button>'+chev()+'</summary><div class="lb-pbody">';
   if(!p.reports.length) h+='<div class="lab-card-note">No reports yet.</div>';
   ys.forEach(function(y){
     var yk=p.id+'|'+y, byM={}; byY[y].forEach(function(r){ (byM[r.date.slice(5,7)]=byM[r.date.slice(5,7)]||[]).push(r); });
-    h+='<details class="lb-year" data-k="'+yk+'" open><summary><span>'+y+'</span></summary>';
+    h+='<details class="lb-year" data-k="'+yk+'"'+(closed[yk]?'':' open')+'><summary><span>'+y+'</span>'+chev()+'</summary>';
     Object.keys(byM).sort(function(a,b){ return b-a; }).forEach(function(m){
       var mk=yk+'|'+m;
-      h+='<details class="lb-month" data-k="'+mk+'" open><summary><span>'+MONTHS[+m-1]+'</span></summary>'
-        +byM[m].sort(function(a,b){ return a.date<b.date?1:a.date>b.date?-1:b.added-a.added; }).map(function(r){ return repHtml(p,r); }).join('')+'</details>';
+      h+='<details class="lb-month" data-k="'+mk+'"'+(closed[mk]?'':' open')+'><summary><span>'+MONTHS[+m-1]+'</span>'+chev()+'</summary>'
+        +byM[m].sort(function(a,b){ return a.date<b.date?1:a.date>b.date?-1:b.added-a.added; }).map(function(r){ return repHtml(p,r,(altN++)%2); }).join('')+'</details>';
     });
     h+='</details>';
   });
@@ -25803,7 +25819,6 @@ if(host){
   var fresh=host.cloneNode(false); host.parentNode.replaceChild(fresh,host); host=fresh;   // the old list handlers go with the old element
   host.addEventListener('click',function(e){
     var t=e.target, a=t.closest('[data-act]');
-    var sm=t.closest('summary'); if(sm && !t.closest('button,a,input,select') && sm.parentNode.matches('.lb-year,.lb-month,.lb-rep')){ e.preventDefault(); return; }
     if(a){
       var act=a.getAttribute('data-act'), id=a.getAttribute('data-id');
       if(act==='edit-p'||act==='edit-r'){ e.preventDefault(); e.stopPropagation(); if(act==='edit-r') openRep[id]=true; editing={k:act==='edit-p'?'p':'r',id:id}; render(); var i=document.querySelector('#lab-results .lb-in'); if(i){ i.focus(); i.select(); } return; }
@@ -25888,13 +25903,56 @@ window.resetLabToDefault=function(){
     labSay(''); render();
   }
 };
-// Download PDF: every saved lab report, one section each.
+// Download PDF: pick what goes in (everything is selected to begin with).
 var oldDl=window.downloadLabPDF;
-window.downloadLabPDF=function(){
-  var pf=labFiles, pr=labRows, any=false;
+function pdfPicker(){
+  return new Promise(function(res){
+    var h='', n=0;
+    store.people.forEach(function(p){
+      var ys={}; p.reports.forEach(function(r){ if(r.type==='lab'&&(r.rows.length||r.other.length)){ var y=r.date.slice(0,4), m=r.date.slice(5,7); ((ys[y]=ys[y]||{})[m]=ys[y][m]||[]).push(r); n++; } });
+      var yk=Object.keys(ys).sort(function(a,b){ return b-a; }); if(!yk.length) return;
+      h+='<div class="lb-ckg"><label><input type="checkbox" checked> <b>'+esc(p.name)+'</b></label><div class="lb-ckc">';
+      yk.forEach(function(y){
+        h+='<div class="lb-ckg"><label><input type="checkbox" checked> '+y+'</label><div class="lb-ckc">';
+        Object.keys(ys[y]).sort(function(a,b){ return b-a; }).forEach(function(m){
+          h+='<div class="lb-ckg"><label><input type="checkbox" checked> '+MONTHS[+m-1]+'</label><div class="lb-ckc">';
+          ys[y][m].forEach(function(r){ h+='<div class="lb-ckg"><label><input type="checkbox" checked data-rid="'+r.id+'"> '+esc(r.title)+' <small>'+esc(shortDate(r.date))+'</small></label></div>'; });
+          h+='</div></div>';
+        });
+        h+='</div></div>';
+      });
+      h+='</div></div>';
+    });
+    if(!n) return res(null);
+    var ov=document.createElement('div'); ov.className='lb-modal'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.innerHTML='<div class="lb-card"><div class="lb-q"><b>Download PDF</b></div><div class="lb-ckl"><div class="lb-ckg lb-all"><label><input type="checkbox" checked> <b>Select all</b></label><div class="lb-ckc lb-ckroot">'+h+'</div></div></div><div class="lb-btns"><button type="button" class="pri" data-go="1">Download</button><button type="button" data-go="0">Cancel</button></div></div>';
+    document.body.appendChild(ov);
+    var go=ov.querySelector('[data-go="1"]');
+    function sync(){
+      var gs=[].slice.call(ov.querySelectorAll('.lb-ckg')).reverse();
+      gs.forEach(function(g){ var c=g.querySelector(':scope > .lb-ckc'); if(!c) return; var leaves=[].slice.call(c.querySelectorAll('input[data-rid]')), on=leaves.filter(function(x){ return x.checked; }).length, box=g.querySelector(':scope > label > input'); box.checked=on===leaves.length&&on>0; box.indeterminate=on>0&&on<leaves.length; });
+      go.disabled=!ov.querySelector('input[data-rid]:checked');
+    }
+    ov.addEventListener('change',function(e){
+      var box=e.target; if(box.type!=='checkbox') return; var g=box.closest('.lb-ckg');
+      [].forEach.call(g.querySelectorAll('input'),function(x){ x.checked=box.checked; x.indeterminate=false; }); sync();
+    });
+    ov.addEventListener('click',function(e){
+      var b=e.target.closest('button[data-go]'); if(!b||b.disabled) return;
+      var ids=b.getAttribute('data-go')==='1'?[].map.call(ov.querySelectorAll('input[data-rid]:checked'),function(x){ return x.getAttribute('data-rid'); }):[];
+      ov.remove(); res(ids);
+    });
+    sync();
+  });
+}
+window.downloadLabPDF=async function(){
+  var ids=await pdfPicker();
+  if(ids===null){ alert('Add a lab report or a value first.'); return; }
+  if(!ids.length) return;
+  var pf=labFiles, pr=labRows;
   labFiles=[]; labRows=[];
-  store.people.forEach(function(p){ p.reports.forEach(function(r){ if(r.type==='lab'&&(r.rows.length||r.other.length)){ any=true; labFiles.push({name:p.name+' \u2013 '+r.title+' ('+shortDate(r.date)+')',rows:r.rows,other:r.other}); } }); });
-  try{ if(!any){ alert('Add a lab report or a value first.'); } else oldDl(); } finally{ labFiles=pf; labRows=pr; }
+  store.people.forEach(function(p){ p.reports.forEach(function(r){ if(ids.indexOf(r.id)>=0) labFiles.push({name:p.name+' – '+r.title+' ('+shortDate(r.date)+')',rows:r.rows,other:r.other}); }); });
+  try{ oldDl(); } finally{ labFiles=pf; labRows=pr; }
 };
 
 /* file input: several PDFs / photos at once. Done after the page has loaded so it replaces the older single-file reader. */
