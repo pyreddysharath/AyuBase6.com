@@ -23876,7 +23876,7 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
       if(c.importance===0) p.push(['<b>'+esc(c.name)+'</b> notifications are turned off','Phone <b>Settings → Apps → AyuBase6 → Notifications → '+esc(c.name)+'</b>: turn it on.','notif']);
       else if(c.importance<3 || !c.sound) p.push(['<b>'+esc(c.name)+'</b> notifications are silent','Phone <b>Settings → Apps → AyuBase6 → Notifications → '+esc(c.name)+'</b>: choose <b>Alert / Make sound</b>.','notif']); });
     var alarms=false; try{ alarms=!!(window.ayuAlarmList && window.ayuAlarmList().length); }catch(e){}
-    if(r.fullScreen===false && alarms) p.push(['<b>Full-screen alarms</b> are off','The alarm screen cannot open over a locked phone, so an alarm shows only as a notification. Allow full-screen notifications for AyuBase6.','full']);
+    if(r.fullScreen===false && alarms) p.push(['<b>Full-screen alarms</b> are off','On a locked phone, alarms show only as a notification. Allow full-screen alarms.','full']);
     return p;
   }
   function bgPaint(p){
