@@ -25181,52 +25181,69 @@ body.to-picking{cursor:grabbing}
 })();
 </script>
 <style id="lab-reports-20261122">
-html body #lab-results .lb-person{margin:0 0 14px}
-html body #lab-results .lb-phdr{display:flex;align-items:center;gap:8px;padding:8px 4px 6px;border-bottom:2px solid color-mix(in srgb,var(--lab-c,#0d9488) 55%,#fff)}
+html body #lab-results .lb-person{margin:0 0 16px}
+html body #lab-results .lb-phdr{display:flex;align-items:center;gap:6px;padding:8px 2px 6px;border-bottom:2px solid color-mix(in srgb,var(--lab-c,#0d9488) 55%,#fff)}
 html body #lab-results .lb-pn{font-size:1.1rem;font-weight:700;color:#0f172a;min-width:0;overflow-wrap:anywhere}
-html body #lab-results .lb-pc{margin-left:auto;font-size:.78rem;color:#64748b;white-space:nowrap}
-html body #lab-results .lb-pen,html body #lab-results .lb-del,html body #lab-results .lb-ok,html body #lab-results .lb-x{border:0;background:transparent;cursor:pointer;font:inherit;line-height:1;min-width:30px;min-height:30px;border-radius:8px;color:#64748b;padding:0}
-html body #lab-results .lb-del{font-size:1.3rem}
+html body #lab-results .lb-pc{margin-left:auto;font-size:.74rem;font-weight:700;color:#475569;background:#e2e8f0;border-radius:20px;padding:2px 9px}
+html body #lab-results .lb-ib,html body #lab-results .lb-ok,html body #lab-results .lb-x{border:0;background:transparent;cursor:pointer;font:inherit;line-height:1;min-width:30px;min-height:30px;border-radius:8px;color:#64748b;padding:0;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;flex:none}
 html body #lab-results .lb-del:hover,html body #lab-results .lb-x:hover{color:#dc2626;background:#fee2e2}
-html body #lab-results .lb-pen:hover{color:#0d9488;background:#ccfbf1}
-html body #lab-results .lb-ok{color:#fff;background:#0d9488}
+html body #lab-results .lb-ib:hover{background:rgba(71,85,105,.12)}
+html body #lab-results .lb-ok{color:#fff;background:#0d9488;font-size:1rem}
+html body #lab-results .lb-x{font-size:1rem}
 html body #lab-results .lb-edit{display:flex;gap:6px;align-items:center;flex:1;min-width:0}
-html body #lab-results .lb-in{flex:1;min-width:0;font:inherit;font-size:1rem;padding:6px 8px;border:1px solid #94a3b8;border-radius:8px}
+html body #lab-results .lb-in{flex:1;min-width:0;font:inherit;font-size:1rem;padding:6px 8px;border:1px solid #94a3b8;border-radius:8px;background:#fff}
 html body #lab-results .lb-year,html body #lab-results .lb-month{margin:8px 0 0}
-html body #lab-results .lb-year>summary,html body #lab-results .lb-month>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:700;color:#334155;padding:7px 6px}
-html body #lab-results .lb-year>summary::-webkit-details-marker,html body #lab-results .lb-month>summary::-webkit-details-marker,html body #lab-results .lb-rep>summary::-webkit-details-marker{display:none}
+html body #lab-results .lb-year>summary,html body #lab-results .lb-month>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:700;color:#334155;padding:8px 12px}
+html body #lab-results summary::-webkit-details-marker{display:none}
 html body #lab-results .lb-year>summary{font-size:1rem;background:#f1f5f9;border-radius:10px}
-html body #lab-results .lb-month>summary{font-size:.92rem;color:#475569}
-html body #lab-results .lb-month{margin-left:8px}
-html body #lab-results .lb-chev{transition:transform .15s;color:#64748b}
+html body #lab-results .lb-month>summary{font-size:.92rem;color:#475569;padding:8px 4px}
+html body #lab-results .lb-chev{display:inline-flex;align-items:center;flex:none;transition:transform .15s;color:#64748b}
 html body #lab-results details[open]>summary>.lb-chev{transform:rotate(180deg)}
-html body #lab-results .lb-rep{margin:6px 0 6px 6px;border:1px solid #e2e8f0;border-radius:12px;background:#fff}
-html body #lab-results .lb-rep>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 10px}
-html body #lab-results .lb-rmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
-html body #lab-results .lb-rn{font-weight:600;color:#0f172a;overflow-wrap:anywhere}
-html body #lab-results .lb-rmain small{color:#64748b;font-size:.78rem}
-html body #lab-results .lb-rn{display:flex;align-items:center;gap:2px}
-html body #lab-results .lb-rmain .lb-pen{min-width:24px;min-height:24px;font-size:.9rem;margin-left:4px}
-html body #lab-results .lb-dot{flex:none;width:14px;height:14px;border-radius:50%;background:#94a3b8;box-shadow:0 0 0 3px color-mix(in srgb,#94a3b8 25%,#fff)}
-html body #lab-results .lb-dot.ok{background:#16a34a;box-shadow:0 0 0 3px #dcfce7}
-html body #lab-results .lb-dot.bad{background:#dc2626;box-shadow:0 0 0 3px #fee2e2}
-html body #lab-results .lb-dot.warn{background:#f59e0b;box-shadow:0 0 0 3px #fef3c7}
-html body #lab-results .lb-rbody{padding:4px 10px 12px}
-html body #lab-results .lb-meta{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:4px 0 10px;font-size:.82rem;color:#475569}
-html body #lab-results .lb-meta label{display:flex;align-items:center;gap:6px}
-html body #lab-results .lb-meta input,html body #lab-results .lb-meta select{font:inherit;font-size:.85rem;padding:4px 6px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;max-width:100%}
-html body #lab-results .lb-file{color:#0d9488;font-weight:600}
-html body #lab-results .lb-items{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
-html body #lab-results .lb-it{display:flex;align-items:center;gap:9px;padding:6px 4px;border-bottom:1px solid #f1f5f9}
-html body #lab-results .lb-il{flex:1 1 50%;min-width:0;display:flex;flex-direction:column}
-html body #lab-results .lb-il small{color:#64748b;font-size:.74rem}
-html body #lab-results .lb-iv{flex:0 1 46%;font-weight:600;color:#0f172a;text-align:right;font-size:.9rem}
-html body #lab-results .lb-blk,html body #lab-results .lb-fold{margin:8px 0;background:#f8fafc;border-radius:10px;padding:8px 10px}
-html body #lab-results .lb-bh,html body #lab-results .lb-fold>summary{font-weight:700;font-size:.85rem;color:#334155;cursor:pointer}
+html body #lab-results .lb-rep{margin:6px 0;border:1px solid;border-left-width:5px;border-radius:12px;overflow:hidden}
+html body #lab-results .lb-s-ok{background:#ecfdf5;border-color:#86efac;border-left-color:#16a34a;--lc:#166534}
+html body #lab-results .lb-s-bad{background:#fef2f2;border-color:#fca5a5;border-left-color:#dc2626;--lc:#991b1b}
+html body #lab-results .lb-s-warn{background:#fffbeb;border-color:#fcd34d;border-left-color:#f59e0b;--lc:#92400e}
+html body #lab-results .lb-s-na{background:#f1f5f9;border-color:#cbd5e1;border-left-color:#94a3b8;--lc:#475569}
+html body #lab-results .lb-rep>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 10px 10px 12px}
+html body #lab-results .lb-rmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+html body #lab-results .lb-rtop{display:flex;align-items:center;flex-wrap:wrap;gap:0 2px}
+html body #lab-results .lb-rn{font-weight:700;font-size:.92rem;color:var(--lc);overflow-wrap:anywhere}
+html body #lab-results .lb-rtop .lb-ib{min-width:26px;min-height:26px}
+html body #lab-results .lb-rsub{font-size:.74rem;color:#64748b}
+html body #lab-results .lb-badge{flex:none;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.2px}
+html body #lab-results .lb-badge.ok{background:#dcfce7;color:#166534}
+html body #lab-results .lb-badge.bad{background:#fee2e2;color:#b91c1c}
+html body #lab-results .lb-badge.warn{background:#fef3c7;color:#92400e}
+html body #lab-results .lb-badge.na{background:#e2e8f0;color:#475569}
+html body #lab-results .lb-rbody{padding:2px 10px 12px 12px}
+html body #lab-results .lb-editf{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 10px}
+html body #lab-results .lb-editf .lb-in{flex:1 1 140px}
+html body #lab-results .lb-editf>.lb-in:first-child{flex:1 1 100%}
+html body #lab-results .lb-ebtn{display:flex;gap:6px;margin-left:auto}
+html body #lab-results .lb-tw{margin:6px 0 10px}
+html body #lab-results .lb-th{font-weight:700;font-size:.82rem;color:var(--lc);margin-bottom:4px}
+html body #lab-results .lb-scroll{overflow-x:auto;border-radius:10px;background:#fff;border:1px solid rgba(100,116,139,.25)}
+html body #lab-results .lb-tbl{width:100%;border-collapse:collapse;font-size:.82rem}
+html body #lab-results .lb-tbl th,html body #lab-results .lb-tbl td{padding:7px 9px;text-align:left;border-bottom:1px solid #eef2f6;vertical-align:top}
+html body #lab-results .lb-tbl thead th{background:#f1f5f9;color:#475569;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.2px}
+html body #lab-results .lb-tbl tbody th{font-weight:600;color:#0f172a}
+html body #lab-results .lb-tbl tr:last-child>*{border-bottom:0}
+html body #lab-results .lb-tbl tbody tr>:first-child{border-left:4px solid transparent}
+html body #lab-results .lb-tbl .s-ok>:first-child{border-left-color:#16a34a}
+html body #lab-results .lb-tbl .s-bad>:first-child{border-left-color:#dc2626}
+html body #lab-results .lb-tbl .s-warn>:first-child{border-left-color:#f59e0b}
+html body #lab-results .lb-tbl .s-na>:first-child{border-left-color:#94a3b8}
+html body #lab-results .lb-tbl .s-ok>td:nth-child(2){color:#166534;font-weight:700}
+html body #lab-results .lb-tbl .s-bad>td:nth-child(2){color:#b91c1c;font-weight:700}
+html body #lab-results .lb-tbl .s-warn>td:nth-child(2){color:#92400e;font-weight:700}
+html body #lab-results .lb-blk,html body #lab-results .lb-fold{margin:8px 0;background:rgba(255,255,255,.7);border-radius:10px;padding:8px 10px}
+html body #lab-results .lb-bh,html body #lab-results .lb-fold>summary{font-weight:700;font-size:.85rem;color:var(--lc);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between}
 html body #lab-results .lb-ul{margin:6px 0 0;padding-left:18px;font-size:.86rem;line-height:1.45;color:#334155}
+html body #lab-results .lab-sec-chev{display:inline-flex;align-items:center}
 .lb-modal{position:fixed;inset:0;z-index:2147483000;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px}
 .lb-card{background:#fff;border-radius:16px;max-width:380px;width:100%;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
-.lb-q{font-size:.98rem;line-height:1.5;color:#0f172a;margin-bottom:14px}
+.lb-q{font-size:1rem;line-height:1.4;color:#0f172a;margin-bottom:12px;overflow-wrap:anywhere}
+.lb-pick,.lb-pick-name{display:block;width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;margin-bottom:10px}
 .lb-btns{display:flex;flex-direction:column;gap:8px}
 .lb-btns button{font:inherit;font-weight:600;padding:10px 12px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;color:#0f172a;cursor:pointer;text-align:center}
 .lb-btns button.pri{background:#0d9488;border-color:#0d9488;color:#fff}
@@ -25441,19 +25458,21 @@ function parseImaging(text,lines,title){
   var out=[];
   // lines wrapped in the PDF are joined back into sentences
   findLines.forEach(function(s){ if(out.length && !/[.:]$/.test(out[out.length-1]) && /^[a-z(]/.test(s)) out[out.length-1]+=' '+s; else out.push(s); });
-  var st='na', agat=/Total\s*(?:calcium)?\s*score\s*(?:of)?\s*(\d+(?:\.\d+)?)|Total\s+\d+\s+\d+\s+\d+\s+(\d+(?:\.\d+)?)/i.exec(text);
+  var tables=[], st='na', agat=/Total\s*(?:calcium)?\s*score\s*(?:of)?\s*(\d+(?:\.\d+)?)|Total\s+\d+\s+\d+\s+\d+\s+(\d+(?:\.\d+)?)/i.exec(text);
   if(/calcium score/i.test(title+' '+text)){
     var a=agat?num(agat[1]||agat[2]):null;
     if(a!=null){ var lvl=a===0?['None','ok','Low']:a<=10?['Minimal','ok','Low']:a<=100?['Small','warn','Moderate']:a<=400?['Moderate','warn','Moderate to high']:['Extensive','bad','High'];
       it.push(item('Total calcium (Agatston) score',String(a),lvl[1],'0 = none; 1–10 minimal; 11–100 small; 101–400 moderate; over 400 extensive'));
       it.push(item('Amount of plaque',lvl[0],lvl[1],'')); it.push(item('Risk level',lvl[2],lvl[1],'')); st=lvl[1]; }
-    ['RCA','LM','LAD','LCX','D'].forEach(function(s){ var mm=new RegExp('\\b'+s+'\\s+(\\d+)\\s+\\d+(?:\\.\\d+)?\\s+\\d+(?:\\.\\d+)?\\s+(\\d+(?:\\.\\d+)?)','i').exec(text); if(mm) it.push(item(s+' score',mm[2],num(mm[2])>0?'warn':'ok','')); });
+    var NUM='(\\d+(?:\\.\\d+)?)', crow=[];
+    ['RCA','LM','LAD','LCX','D','Total'].forEach(function(s){ var mm=new RegExp('\\b'+s+'\\s+'+NUM+'\\s+'+NUM+'\\s+'+NUM+'\\s+'+NUM+'(?:\\s+'+NUM+')?','i').exec(text); if(mm) crow.push([s].concat(mm.slice(1,6).map(function(x){ return x==null?'\u2013':x; }))); });
+    if(crow.length>=2) tables.push({h:'Calcium score by artery',cols:['Site','Count','Volume (mm\u00B3)','Mass (mg)','Agatston score','Volume score'],rows:crow});
   }
   if(st==='na' && impr){ st=BAD_WORDS.test(impr)?'bad':WARN_WORDS.test(impr)&&!/\bnormal study\b/i.test(impr)?'warn':OK_WORDS.test(impr)?'ok':'na'; }
   if(st==='na' && out.length){ var all=out.join(' '); st=BAD_WORDS.test(all)?'bad':WARN_WORDS.test(all)?'warn':'na'; }
-  var ls=[]; if(impr) ls.push({h:'Impression',t:[impr]}); if(out.length) ls.push({h:/observation/i.test(text)&&!/findings/i.test(text)?'Observations':'Findings',t:out,fold:true});
+  var ls=[]; if(impr) ls.push({h:'Impression',t:[impr]}); if(out.length && !tables.length) ls.push({h:/observation/i.test(text)&&!/findings/i.test(text)?'Observations':'Findings',t:out,fold:true});
   if(!ls.length){ var first=lines.map(function(s){ return String(s).replace(/\s+/g,' ').trim(); }).filter(function(s){ return s.length>3; }).slice(0,30); ls.push({h:'Text found in the report',t:first,fold:true}); }
-  return {type:'scan',title:title,items:it,lines:ls,st:st};
+  return {type:'scan',title:title,items:it,tables:tables,lines:ls,st:st};
 }
 function findTitle(lines){
   var L=lines.map(function(s){ return String(s).replace(/\s+/g,' ').trim(); });
@@ -25522,23 +25541,32 @@ function ask(html,buttons){
 }
 function lev(a,b){ var d=[],i,j; for(i=0;i<=a.length;i++){ d[i]=[i]; } for(j=1;j<=b.length;j++) d[0][j]=j; for(i=1;i<=a.length;i++) for(j=1;j<=b.length;j++) d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)); return d[a.length][b.length]; }
 function sameFirst(a,b){ return a===b || (a.length>=4 && b.length>=4 && lev(a,b)<=1); }   // Sarath / Sharath
-async function resolvePerson(name,asked){
-  if(!name){
-    if(lastPid && person(lastPid)) return person(lastPid);
-    if(store.people.length===1) return store.people[0];
-    var u=store.people.filter(function(p){ return p.name==='Name not found'; })[0]; if(u) return u;
-    var p0={id:uid('p'),name:'Name not found',aliases:[],reports:[]}; store.people.push(p0); return p0;
-  }
-  var k=nameKey(name), i, p;
-  for(i=0;i<store.people.length;i++){ p=store.people[i]; if(nameKey(p.name)===k || (p.aliases||[]).some(function(a){ return nameKey(a)===k; })) return p; }
+function askPerson(name,fname,defId){
+  return new Promise(function(res){
+    var ov=document.createElement('div'); ov.className='lb-modal'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    var opts=store.people.map(function(p){ return '<option value="'+p.id+'"'+(p.id===defId?' selected':'')+'>'+esc(p.name)+'</option>'; }).join('')+'<option value="__new"'+(defId?'':' selected')+'>Create new</option>';
+    ov.innerHTML='<div class="lb-card"><div class="lb-q"><b>'+esc(name||fname||'Report')+'</b></div><select class="lb-pick" aria-label="Add to">'+opts+'</select><input class="lb-pick-name" type="text" aria-label="New name" value="'+esc(name||'')+'" placeholder="Name"><div class="lb-btns"><button type="button" class="pri">Add</button></div></div>';
+    var sel=ov.querySelector('select'), inp=ov.querySelector('.lb-pick-name');
+    function sync(){ inp.style.display=sel.value==='__new'?'':'none'; }
+    sel.addEventListener('change',sync); sync();
+    ov.querySelector('button').addEventListener('click',function(){ var v=sel.value, n=inp.value; ov.remove(); res({id:v,name:n}); });
+    document.body.appendChild(ov);
+  });
+}
+function lev(a,b){ var d=[],i,j; for(i=0;i<=a.length;i++){ d[i]=[i]; } for(j=1;j<=b.length;j++) d[0][j]=j; for(i=1;i<=a.length;i++) for(j=1;j<=b.length;j++) d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)); return d[a.length][b.length]; }
+function sameFirst(a,b){ return a===b || (a.length>=4 && b.length>=4 && lev(a,b)<=1); }   // Sarath / Sharath
+async function resolvePerson(name,fname,asked){
+  var k=name?nameKey(name):'*', i, p;
+  if(name) for(i=0;i<store.people.length;i++){ p=store.people[i]; if(nameKey(p.name)===k || (p.aliases||[]).some(function(a){ return nameKey(a)===k; })) return p; }
   if(asked[k]) return asked[k];
-  var first=k.split(' ')[0], cands=store.people.filter(function(p){ return sameFirst(nameKey(p.name).split(' ')[0],first); });
-  if(cands.length){
-    var btns=cands.map(function(c){ return {t:'Add to '+c.name,cls:'pri'}; }); btns.push({t:'Create new: '+name});
-    var ix=await ask('The report says <b>'+esc(name)+'</b>.<br>You already have <b>'+cands.map(function(c){ return esc(c.name); }).join('</b> and <b>')+'</b>. Is this the same person?',btns);
-    if(ix<cands.length){ var c=cands[ix]; c.aliases=c.aliases||[]; c.aliases.push(name); asked[k]=c; return c; }
-  }
-  var np={id:uid('p'),name:name,aliases:[],reports:[]}; store.people.push(np); asked[k]=np; return np;
+  if(!store.people.length){ var p0={id:uid('p'),name:name||'Name not found',aliases:[],reports:[]}; store.people.push(p0); asked[k]=p0; return p0; }
+  var def='', first=name?k.split(' ')[0]:'';
+  if(name){ var c=store.people.filter(function(q){ return sameFirst(nameKey(q.name).split(' ')[0],first); })[0]; if(c) def=c.id; }
+  else def=(lastPid&&person(lastPid)?lastPid:store.people[0].id);
+  var ch=await askPerson(name,fname,def), r;
+  if(ch.id!=='__new'){ r=person(ch.id); if(name && nameKey(name)!==nameKey(r.name)){ r.aliases=r.aliases||[]; r.aliases.push(name); } }
+  else{ var nn=cleanName(ch.name||'')||'Name not found'; r=store.people.filter(function(q){ return nameKey(q.name)===nameKey(nn); })[0]; if(!r){ r={id:uid('p'),name:nn,aliases:[],reports:[]}; store.people.push(r); } }
+  asked[k]=r; return r;
 }
 
 /* ───────── adding files ───────── */
@@ -25553,7 +25581,7 @@ async function ingest(files){
       try{
         var text=await fileText(f);
         if(text.replace(/\s/g,'').length<20){ failed.push(f.name+' (no text found)'); continue; }
-        var rep=build(text,f), p=await resolvePerson(rep.name,asked);
+        var rep=build(text,f), p=await resolvePerson(rep.name,f.name,asked);
         delete rep.name; p.reports.push(rep); lastPid=p.id; urls[rep.id]=URL.createObjectURL(f);
         var y=rep.date.slice(0,4), mo=rep.date.slice(5,7);
         closed[p.id+'|'+y]=false; closed[p.id+'|'+y+'|'+mo]=false; openRep[rep.id]=files.length===1;
@@ -25570,6 +25598,11 @@ async function ingest(files){
 
 /* ───────── drawing ───────── */
 var ST={ok:'Normal',low:'Low',high:'High',warn:'Check',bad:'Check',na:'Info'};
+var CHEV='<svg viewBox="0 0 12 8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg>';
+var PEN='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+var FILE='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
+var TRASH='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg>';
+function chev(){ return '<span class="lb-chev" aria-hidden="true">'+CHEV+'</span>'; }
 function dotCls(s){ return s==='ok'?'ok':s==='bad'?'bad':s==='warn'?'warn':'na'; }
 function shortDate(d){ var p=d.split('-'); return +p[2]+' '+MONTHS[+p[1]-1].slice(0,3)+' '+p[0]; }
 function labItems(r){
@@ -25579,44 +25612,68 @@ function labItems(r){
   var order={bad:0,ok:1,na:2}; items.sort(function(a,b){ return order[a.kind]-order[b.kind]; });
   return items;
 }
+function tableHtml(t){
+  return '<div class="lb-tw">'+(t.h?'<div class="lb-th">'+esc(t.h)+'</div>':'')+'<div class="lb-scroll"><table class="lb-tbl"><thead><tr>'+t.cols.map(function(c){ return '<th>'+esc(c)+'</th>'; }).join('')+'</tr></thead><tbody>'
+    +t.rows.map(function(row,i){ return '<tr'+(t.st&&t.st[i]?' class="s-'+dotCls(t.st[i])+'"':'')+'>'+row.map(function(c,j){ return j===0?'<th scope="row">'+esc(c)+'</th>':'<td>'+esc(c)+'</td>'; }).join('')+'</tr>'; }).join('')+'</tbody></table></div></div>';
+}
+function itemsTable(items){
+  var any=items.some(function(x){ return x.normal; });
+  return tableHtml({cols:any?['Test','Result','Normal']:['Test','Result'],st:items.map(function(x){ return x.st; }),rows:items.map(function(x){ return any?[x.label,x.value,x.normal||'–']:[x.label,x.value]; })});
+}
+function repTables(r){
+  var tabs=(r.tables||[]).slice(), items=(r.items||[]).slice();
+  if(!tabs.length){   // reports saved before the table view
+    var sites=items.filter(function(x){ return /^(RCA|LM|LAD|LCX|D) score$/.test(x.label); });
+    if(sites.length){ items=items.filter(function(x){ return sites.indexOf(x)<0; }); tabs.push({h:'Calcium score by artery',cols:['Site','Agatston score'],rows:sites.map(function(x){ return [x.label.replace(' score',''),x.value]; })}); }
+  }
+  return {items:items,tables:tabs};
+}
 function repBody(p,r){
-  var h='<div class="lb-meta"><label>Date <input type="date" class="lb-date" data-rid="'+r.id+'" value="'+esc(r.date)+'"></label>'
-    +'<label>Move to <select class="lb-move" data-rid="'+r.id+'"><option value="">Choose…</option>'+store.people.filter(function(q){ return q.id!==p.id; }).map(function(q){ return '<option value="'+q.id+'">'+esc(q.name)+'</option>'; }).join('')+'<option value="__new">New person…</option></select></label>'
-    +(urls[r.id]?'<a class="lb-file" href="'+esc(urls[r.id])+'" target="_blank" rel="noopener">Open file</a>':'')+'</div>';
+  var h='', ed=editing&&editing.k==='r'&&editing.id===r.id;
+  if(ed){
+    h+='<div class="lb-editf"><input class="lb-in" value="'+esc(r.title)+'" data-in="r" data-id="'+r.id+'" aria-label="Report name"><input type="date" class="lb-in lb-ed-date" value="'+esc(r.date)+'" aria-label="Date">'
+      +'<select class="lb-in lb-ed-move" aria-label="Person"><option value="'+p.id+'">'+esc(p.name)+'</option>'+store.people.filter(function(q){ return q.id!==p.id; }).map(function(q){ return '<option value="'+q.id+'">'+esc(q.name)+'</option>'; }).join('')+'<option value="__new">New person…</option></select>'
+      +'<span class="lb-ebtn"><button type="button" class="lb-ok" data-act="save-edit" aria-label="Save">✓</button><button type="button" class="lb-x" data-act="cancel-edit" aria-label="Cancel">✕</button></span></div>';
+  }
   if(r.type==='lab'){
     h+=labItems(r).map(labSectionHtml).join('');
     if(r.manual) h+=(labManualOpen?'<div id="lab-form-slot" class="lab-form-slot"></div>':'<div class="lab-plus-row"><button type="button" class="lab-plus" onclick="labOpenManual()" aria-label="Add a value">+</button><span id="lab-plus-note" class="lab-plus-note"></span></div>');
-    if(!r.rows.length && !r.other.length && !r.manual) h+='<div class="lab-card-note">No test values were found in this report.</div>';
+    if(!r.rows.length && !r.other.length && !r.manual) h+='<div class="lab-card-note">No test values were found.</div>';
     return h;
   }
-  if(r.items&&r.items.length) h+='<div class="lb-items">'+r.items.map(function(x,i){ var c=dotCls(x.st); return '<div class="lb-it"><span class="lb-dot '+c+'"></span><span class="lb-il"><b>'+esc(x.label)+'</b>'+(x.normal?'<small>Normal: '+esc(x.normal)+'</small>':'')+'</span><span class="lb-iv">'+esc(x.value)+'</span></div>'; }).join('')+'</div>';
+  var rt=repTables(r);
+  if(rt.items.length) h+=itemsTable(rt.items);
+  rt.tables.forEach(function(t){ h+=tableHtml(t); });
   (r.lines||[]).forEach(function(b){
     var inner='<ul class="lb-ul">'+b.t.map(function(s){ return '<li>'+esc(s)+'</li>'; }).join('')+'</ul>';
-    h+=b.fold?'<details class="lb-fold"><summary>'+esc(b.h)+'</summary>'+inner+'</details>':'<div class="lb-blk"><div class="lb-bh">'+esc(b.h)+'</div>'+inner+'</div>';
+    h+=b.fold?'<details class="lb-fold"><summary>'+esc(b.h)+chev()+'</summary>'+inner+'</details>':'<div class="lb-blk"><div class="lb-bh">'+esc(b.h)+'</div>'+inner+'</div>';
   });
-  h+='<div class="lab-card-note">Read automatically from the report. Compare it with the original and check with your doctor.</div>';
   return h;
 }
 function repHtml(p,r){
-  var s=labStatus(r), open=openRep[r.id]?' open':'', ed=editing&&editing.k==='r'&&editing.id===r.id, c=counts(r);
-  var nm=ed?'<span class="lb-edit"><input class="lb-in" value="'+esc(r.title)+'" data-in="r" data-id="'+r.id+'" aria-label="Report name"><button type="button" class="lb-ok" data-act="save-edit" aria-label="Save">\u2713</button><button type="button" class="lb-x" data-act="cancel-edit" aria-label="Cancel">\u2715</button></span>'
-    : '<span class="lb-rn">'+esc(r.title)+'<button type="button" class="lb-pen" data-act="edit-r" data-id="'+r.id+'" aria-label="Rename report" title="Rename">\u270E</button></span>';
-  return '<details class="lb-rep" data-rid="'+r.id+'"'+open+'><summary><span class="lb-dot '+dotCls(s)+'" title="'+(s==='ok'?'All normal':s==='bad'?'Something is out of range':s==='warn'?'Worth a look':'No reading to compare')+'"></span><span class="lb-rmain">'+nm+'<small>'+esc(shortDate(r.date))+(c?' · '+esc(c):'')+'</small></span><button type="button" class="lb-del" data-act="del-r" data-id="'+r.id+'" aria-label="Delete report" title="Delete">\u00D7</button><span class="lb-chev">\u25BE</span></summary><div class="lb-rbody">'+repBody(p,r)+'</div></details>';
+  var s=labStatus(r), ed=editing&&editing.k==='r'&&editing.id===r.id, open=(openRep[r.id]||ed)?' open':'', c=counts(r), sc=dotCls(s);
+  var bt=c||ST[s];
+  return '<details class="lb-rep lb-s-'+sc+'" data-rid="'+r.id+'"'+open+'><summary><span class="lb-rmain"><span class="lb-rtop"><span class="lb-rn">'+esc(r.title)+'</span>'
+    +'<button type="button" class="lb-ib" data-act="edit-r" data-id="'+r.id+'" aria-label="Edit name and date" title="Edit">'+PEN+'</button>'
+    +(urls[r.id]?'<a class="lb-ib lb-file" href="'+esc(urls[r.id])+'" target="_blank" rel="noopener" aria-label="Open file" title="Open file">'+FILE+'</a>':'')
+    +'</span><span class="lb-rsub">'+esc(shortDate(r.date))+'</span></span>'
+    +'<span class="lb-badge '+sc+'">'+esc(bt)+'</span>'
+    +'<button type="button" class="lb-ib lb-del" data-act="del-r" data-id="'+r.id+'" aria-label="Delete report" title="Delete">'+TRASH+'</button>'+chev()+'</summary><div class="lb-rbody">'+repBody(p,r)+'</div></details>';
 }
 function personHtml(p){
   var ed=editing&&editing.k==='p'&&editing.id===p.id, byY={}, ys;
   p.reports.forEach(function(r){ var y=r.date.slice(0,4); (byY[y]=byY[y]||[]).push(r); });
   ys=Object.keys(byY).sort(function(a,b){ return b-a; });
-  var nm=ed?'<span class="lb-edit"><input class="lb-in" value="'+esc(p.name)+'" data-in="p" data-id="'+p.id+'" aria-label="Name"><button type="button" class="lb-ok" data-act="save-edit" aria-label="Save">\u2713</button><button type="button" class="lb-x" data-act="cancel-edit" aria-label="Cancel">\u2715</button></span>'
-    : '<span class="lb-pn">'+esc(p.name)+'</span><button type="button" class="lb-pen" data-act="edit-p" data-id="'+p.id+'" aria-label="Edit name" title="Edit name">\u270E</button>';
-  var h='<div class="lb-person" data-pid="'+p.id+'"><div class="lb-phdr">'+nm+'<span class="lb-pc">'+p.reports.length+' report'+(p.reports.length===1?'':'s')+'</span><button type="button" class="lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">\u00D7</button></div>';
+  var nm=ed?'<span class="lb-edit"><input class="lb-in" value="'+esc(p.name)+'" data-in="p" data-id="'+p.id+'" aria-label="Name"><button type="button" class="lb-ok" data-act="save-edit" aria-label="Save">✓</button><button type="button" class="lb-x" data-act="cancel-edit" aria-label="Cancel">✕</button></span>'
+    : '<span class="lb-pn">'+esc(p.name)+'</span><button type="button" class="lb-ib" data-act="edit-p" data-id="'+p.id+'" aria-label="Edit name" title="Edit name">'+PEN+'</button>';
+  var h='<div class="lb-person" data-pid="'+p.id+'"><div class="lb-phdr">'+nm+'<span class="lb-pc">'+p.reports.length+'</span><button type="button" class="lb-ib lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">'+TRASH+'</button></div>';
   if(!p.reports.length) h+='<div class="lab-card-note">No reports yet.</div>';
   ys.forEach(function(y){
     var yk=p.id+'|'+y, byM={}; byY[y].forEach(function(r){ (byM[r.date.slice(5,7)]=byM[r.date.slice(5,7)]||[]).push(r); });
-    h+='<details class="lb-year" data-k="'+yk+'"'+(closed[yk]?'':' open')+'><summary><span>'+y+'</span><span class="lb-chev">\u25BE</span></summary>';
+    h+='<details class="lb-year" data-k="'+yk+'"'+(closed[yk]?'':' open')+'><summary><span>'+y+'</span>'+chev()+'</summary>';
     Object.keys(byM).sort(function(a,b){ return b-a; }).forEach(function(m){
       var mk=yk+'|'+m;
-      h+='<details class="lb-month" data-k="'+mk+'"'+(closed[mk]?'':' open')+'><summary><span>'+MONTHS[+m-1]+'</span><span class="lb-chev">\u25BE</span></summary>'
+      h+='<details class="lb-month" data-k="'+mk+'"'+(closed[mk]?'':' open')+'><summary><span>'+MONTHS[+m-1]+'</span>'+chev()+'</summary>'
         +byM[m].sort(function(a,b){ return a.date<b.date?1:a.date>b.date?-1:b.added-a.added; }).map(function(r){ return repHtml(p,r); }).join('')+'</details>';
     });
     h+='</details>';
@@ -25627,6 +25684,7 @@ function render(){
   var wrap=$('lab-results'); if(!wrap) return;
   labParkForm();
   wrap.innerHTML=store.people.map(personHtml).join('');
+  [].forEach.call(wrap.querySelectorAll('.lab-sec-chev'),function(c){ c.innerHTML=CHEV; });
   if(labManualOpen){ var slot=$('lab-form-slot'), pane=$('lab-pane-manual'); if(slot&&pane){ slot.appendChild(pane); pane.style.display=''; } }
   try{ if(window.ayuLabRefreshReset) window.ayuLabRefreshReset(); }catch(e){}
 }
@@ -25655,9 +25713,16 @@ function moveReport(rid,to){
 }
 function saveEdit(){
   if(!editing) return; var inp=document.querySelector('#lab-results .lb-in'); var v=(inp&&inp.value||'').trim(); if(!v){ if(inp) inp.focus(); return; }
-  if(editing.k==='p'){ var p=person(editing.id); if(p){ p.name=cleanName(v)||v; } }
-  else{ var f=findRep(editing.id); if(f) f.r.title=v.slice(0,80); }
-  editing=null; save(); render();
+  if(editing.k==='p'){ var p=person(editing.id); if(p){ p.name=cleanName(v)||v; } editing=null; save(); render(); return; }
+  var f=findRep(editing.id), mv='';
+  if(f){
+    f.r.title=v.slice(0,80);
+    var d=document.querySelector('#lab-results .lb-ed-date'); if(d&&/^\d{4}-\d{2}-\d{2}$/.test(d.value)){ f.r.date=d.value; var y=d.value.slice(0,4), m=d.value.slice(5,7); closed[f.p.id+'|'+y]=false; closed[f.p.id+'|'+y+'|'+m]=false; }
+    var sl=document.querySelector('#lab-results .lb-ed-move'); if(sl&&sl.value!==f.p.id) mv=sl.value;
+    openRep[f.r.id]=true;
+  }
+  var rid=editing.id; editing=null; save();
+  if(mv) moveReport(rid,mv); else render();
 }
 var host=$('lab-results');
 if(host){
@@ -25666,13 +25731,14 @@ if(host){
     var t=e.target, a=t.closest('[data-act]');
     if(a){
       var act=a.getAttribute('data-act'), id=a.getAttribute('data-id');
-      if(act==='edit-p'||act==='edit-r'){ e.preventDefault(); editing={k:act==='edit-p'?'p':'r',id:id}; render(); var i=document.querySelector('#lab-results .lb-in'); if(i){ i.focus(); i.select(); } return; }
+      if(act==='edit-p'||act==='edit-r'){ e.preventDefault(); e.stopPropagation(); if(act==='edit-r') openRep[id]=true; editing={k:act==='edit-p'?'p':'r',id:id}; render(); var i=document.querySelector('#lab-results .lb-in'); if(i){ i.focus(); i.select(); } return; }
       if(act==='save-edit'){ e.preventDefault(); saveEdit(); return; }
       if(act==='cancel-edit'){ e.preventDefault(); editing=null; render(); return; }
       if(act==='del-r'){ e.preventDefault(); e.stopPropagation(); delReport(id); return; }
       if(act==='del-p'){ e.preventDefault(); e.stopPropagation(); delPerson(id); return; }
     }
-    if(t.closest('.lab-edit-ui, .lab-edit-btn, .lb-edit, .lb-pen')) e.preventDefault();
+    if(t.closest('.lb-file')){ e.stopPropagation(); return; }
+    if(t.closest('.lab-edit-ui, .lab-edit-btn, .lb-edit, .lb-ib')) e.preventDefault();
     var eb=t.closest('[data-lab-edit]');
     if(eb){ labEditing=eb.getAttribute('data-lab-edit'); render(); var ii=document.querySelector('#lab-results .lab-edit-input'); if(ii){ ii.focus(); ii.select(); } return; }
     var sb=t.closest('[data-lab-save]'); if(sb){ saveValue(sb.getAttribute('data-lab-save')); return; }
@@ -25764,7 +25830,7 @@ function boot(){
     var lab=document.querySelector('label[for="lab-pdf-input"]'); if(lab){ var ts=lab.querySelectorAll('.lub-t > span'); if(ts.length>1){ ts[0].textContent='Upload Reports'; ts[1].textContent='PDFs or Photos'; } else lab.textContent='Upload Reports'; }
     var link=$('lab-file-link'); if(link) link.style.display='none';
   }
-  var info=$('lab-info-panel'); if(info) info.textContent='Upload one or many lab reports, 2D Echo, TMT or scan reports (PDF or a clear photo), or add values yourself. Reports are kept under the person\u2019s name by year and month. The colour dot shows how the readings look; tap a report for the details. Everything stays on this device unless you use Backup & Restore.';
+  var info=$('lab-info-panel'); if(info) info.textContent='Upload one or many lab reports, 2D Echo, TMT or scan reports (PDF or a clear photo), or add values yourself. Reports are kept under the person\u2019s name by year and month. The colour shows how the readings look; tap a report for the details. Everything stays on this device unless you use Backup & Restore.';
   render();
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ setTimeout(boot,0); }); else setTimeout(boot,0);
