@@ -20949,7 +20949,7 @@ html body #sec-bkp .ayu-gb .master-switch input:checked:not(#ayu-x1){background:
     st.classList.toggle('warn',w);
     st.textContent = !enabled() ? 'Off. Nothing is backed up to your Google account.'
       : w ? 'Not backed up for 2 days. Check that Google backup is on in your phone\u2019s settings, or save a file below.'
-      : l ? 'Last backed up: '+when(l)+(p>l?' · newer changes go with the next backup':'')
+      : l ? 'Last backed up: '+when(l)
       : p ? 'Waiting for Android to back up. It usually does within a day, while the phone charges on Wi-Fi.'
       : 'Backs up your data a few seconds after each change.';
   }
