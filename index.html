@@ -5725,7 +5725,7 @@ function scrollLabInsightsToTop(){
 }
 function downloadLabPDF(){
   const groups=[];
-  labFiles.forEach(g=>groups.push({title:'Upload: '+g.name,rows:g.rows,other:g.other}));
+  labFiles.forEach(g=>groups.push({title:g.person?g.name:'Upload: '+g.name,person:g.person,rows:g.rows,other:g.other}));
   if(labRows.length) groups.push({title:'Manual',rows:labRows,other:[],seq:labManualSeq||9999});
   if(!groups.length){ alert('Add a report or a value first.'); return; }
   if(!window.jspdf){ alert('The PDF tool could not be loaded. Please check your internet connection and try again.'); return; }
@@ -5744,14 +5744,16 @@ function downloadLabPDF(){
   const d=new Date(), pad=n=>String(n).padStart(2,'0');
   write('Generated on '+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' | Reference ranges: adult '+(labSex()==='female'?'women':'men'),9,'normal',GREY,2);
   write('Educational information only - not a diagnosis or medical advice. Ranges are general adult reference ranges and may differ from your lab\'s; please review your results with a doctor.',8,'normal',GREY,10);
+  let lastPerson=null;
   groups.forEach(g=>{
     const items=[];
     g.rows.forEach(r=>{ const ref=LAB_REF.find(x=>x.id===r.refId); if(!ref) return; const rg=labRange(ref); const st=r.value<rg.low?'low':r.value>rg.high?'high':'ok'; items.push({kind:st==='ok'?'ok':'bad',ref,rg,val:r.value,st}); });
     g.other.forEach(o=>items.push({kind:'na',o}));
     const order={bad:0,ok:1,na:2}; items.sort((a,b)=>order[a.kind]-order[b.kind]);
     if(y+60>H-M){ doc.addPage(); y=M; }
-    doc.setDrawColor(190,220,228); doc.line(M,y,W-M,y); y+=8;
-    write(g.title,13,'bold',TEAL,6);
+    if(g.person&&g.person!==lastPerson){ lastPerson=g.person; if(y+90>H-M){ doc.addPage(); y=M; } doc.setFillColor(21,94,117); doc.roundedRect(M,y,W-2*M,24,5,5,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255); doc.text(clean(g.person),M+10,y+16.5); y+=34; }
+    else if(!g.person){ doc.setDrawColor(190,220,228); doc.line(M,y,W-M,y); y+=8; }
+    write(g.title,12,'bold',TEAL,6);
     items.forEach(it=>{
       if(y+70>H-M){ doc.addPage(); y=M; }
       if(it.kind==='na'){
@@ -25343,6 +25345,18 @@ html body #lab-results .lb-hd[aria-expanded="true"] .lb-chev{transform:rotate(18
 html body #lab-results.lb-col .lb-hd{margin-bottom:0}
 html body #lab-results#lab-results{margin-bottom:20px}
 html body #lab-results .lab-bottom-row{margin:6px 0 0 !important;justify-content:center;padding-top:16px;border-top:1px solid #a5dcea}
+
+/* v10: same-height buttons, lighter alternating names, no vertical bars, undo row */
+html body #lab-insights-card .lab-actions-row .lab-upload-btn:not(#ayu-x1):not(#ayu-x2){height:38px !important;min-height:0 !important;padding:0 16px !important;font-size:.9rem !important}
+html body #lab-results .lb-d{--hb:#7fd3e3;--ht:#0b4254;--bar:#0891b2;--cnt:#155e75;--cntt:#fff}
+html body #lab-results .lb-l{--hb:#b9eaf2;--ht:#0b4254;--bar:#0891b2;--cnt:#155e75;--cntt:#fff}
+html body #lab-results .lb-year>summary>span:first-child::before,html body #lab-results .lb-month>summary>span:first-child::before,html body #lab-results .lb-th::before,html body #lab-results .lb-bh::before,html body #lab-results .lb-fold>summary::before{content:none;display:none}
+html body #lab-results .lb-year>summary{background:rgba(8,145,178,.12);border-radius:8px;padding:7px 10px;margin:6px 0 2px;font-size:.9rem;font-weight:700;color:#0e7490}
+html body #lab-results .lb-month>summary{margin:2px 0 0 14px;padding:5px 6px;font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748b;border-bottom:1px dashed #a5dcea;border-radius:0}
+html body #lab-results .lb-month>summary .lb-chev{color:#64748b}
+html body #lab-results .lb-th,html body #lab-results .lb-bh{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#0e7490}
+html body #lab-results .ayu-undo-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;padding:9px 12px 9px 14px;border-radius:14px;background:#334155;color:#fff;font-size:.88rem}
+html body #lab-results .ayu-undo-row button{border:0;background:none;color:#5eead4;font:inherit;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;padding:4px 6px}
 </style>
 <script id="lab-reports-20261122-js">
 (function(){
@@ -25795,15 +25809,22 @@ function render(){
 window.renderLabResults=render;
 
 /* ───────── actions ───────── */
-function undoDelete(msg,restore){ if(window.ayuUndoAt){ try{ window.ayuUndoAt($('lab-results'),null,msg,restore); return; }catch(e){} } }
+var undoRow=null;
+function undoBar(msg,restore){
+  if(undoRow){ undoRow.remove(); undoRow=null; }
+  var wrap=$('lab-results'); if(!wrap||!window.ayuUndoAt){ labSay(msg); return; }
+  var hd=wrap.querySelector('.lb-hd');
+  var row=window.ayuUndoAt(hd?hd.parentNode:wrap, hd?hd.nextSibling:wrap.firstChild, msg, function(){ undoRow=null; restore(); });
+  undoRow=row; if(row) setTimeout(function(){ if(undoRow===row) undoRow=null; },5100);
+}
 function delReport(id){
   var f=findRep(id); if(!f) return; if(!confirm('Delete "'+f.r.title+'"?')) return;
-  var at=f.p.reports.indexOf(f.r); f.p.reports.splice(at,1); save(); render(); labSay('Report deleted');
+  var at=f.p.reports.indexOf(f.r), pp=f.p, rr=f.r; pp.reports.splice(at,1); save(); render(); undoBar('Report deleted',function(){ if(store.people.indexOf(pp)<0) return; pp.reports.splice(Math.min(at,pp.reports.length),0,rr); save(); render(); });
 }
 function delPerson(id){
   var p=person(id); if(!p) return;
   if(!confirm('Delete '+p.name+(p.reports.length?' and the '+p.reports.length+' report'+(p.reports.length===1?'':'s')+' under it':'')+'?')) return;
-  store.people=store.people.filter(function(q){ return q!==p; }); if(lastPid===id) lastPid=null; save(); render(); labSay('Deleted '+p.name);
+  var pat=store.people.indexOf(p); store.people=store.people.filter(function(q){ return q!==p; }); if(lastPid===id) lastPid=null; save(); render(); undoBar('Deleted '+p.name,function(){ store.people.splice(Math.min(pat,store.people.length),0,p); save(); render(); });
 }
 function moveReport(rid,to){
   var f=findRep(rid); if(!f||!to) return; var dest;
@@ -25909,6 +25930,7 @@ window.labCloseManual=function(){
 window.labHasData=function(){ return store.people.length>0; };
 // The Reset button (Lab Insights) deletes every saved report.
 window.resetLabToDefault=function(){
+  var snap=store.people.length?JSON.stringify(store):null;
   {
     Object.keys(urls).forEach(function(k){ try{ URL.revokeObjectURL(urls[k]); }catch(e){} }); urls={};
     store={people:[]}; closed={}; openRep={}; editing=null; labEditing=null; labManualOpen=false; lastPid=null; save();
@@ -25918,6 +25940,7 @@ window.resetLabToDefault=function(){
     if(window.labSelectShowPlaceholder) window.labSelectShowPlaceholder();
     labSay(''); render();
   }
+  if(snap) undoBar('Reports reset',function(){ try{ store=JSON.parse(snap); }catch(e){ return; } save(); render(); });
 };
 // Download PDF: pick what goes in (everything is selected to begin with).
 var oldDl=window.downloadLabPDF;
@@ -25967,7 +25990,7 @@ window.downloadLabPDF=async function(){
   if(!ids.length) return;
   var pf=labFiles, pr=labRows;
   labFiles=[]; labRows=[];
-  store.people.forEach(function(p){ p.reports.forEach(function(r){ if(ids.indexOf(r.id)>=0) labFiles.push({name:p.name+' – '+r.title+' ('+shortDate(r.date)+')',rows:r.rows,other:r.other}); }); });
+  store.people.forEach(function(p){ p.reports.slice().sort(function(x,y){ return x.date<y.date?1:x.date>y.date?-1:0; }).forEach(function(r){ if(ids.indexOf(r.id)>=0) labFiles.push({person:p.name,name:shortDate(r.date)+' – '+r.title,rows:r.rows,other:r.other}); }); });
   try{ oldDl(); } finally{ labFiles=pf; labRows=pr; }
 };
 
