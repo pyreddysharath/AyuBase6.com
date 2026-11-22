@@ -11142,7 +11142,8 @@ function drawNudgeLotus(ctx, cx, cy, scale, fill, alpha){
 const _nudgeArt={};
 const NUDGE_THEMES={
   reminders:{g0:'#f0fdfa',g1:'#ccfbf1',gi:'#99f6e4',big:'#5eead4',deep:'#0d9488',ic0:'#12998c',ic1:'#08766e'},
-  routines:{g0:'#fff1f3',g1:'#fcd5dc',gi:'#f9b4c0',big:'#f4a0b0',deep:'#e8607a',ic0:'#e8607a',ic1:'#c94862'}
+  routines:{g0:'#fff1f3',g1:'#fcd5dc',gi:'#f9b4c0',big:'#f4a0b0',deep:'#e8607a',ic0:'#e8607a',ic1:'#c94862'},
+  logo:{g0:'#e9edff',g1:'#fde4ee',gi:'#c7d2fe',big:'#5eead4',deep:'#6d7cf0',ic0:'#818cf8',ic1:'#e8607a'}   // the logo's blue, pink and teal (Test notification)
 };
 function nudgeArt(kind,theme){
   const T=NUDGE_THEMES[theme]||NUDGE_THEMES.reminders, ck=kind+':'+(theme||'reminders');
@@ -16188,7 +16189,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
   var GROUPS=[
     {id:'body',label:'Body',keys:['ayuBase6-body-choices']},
     {id:'food',label:'Food',keys:['ayuBase6-food-choices','ayuBase6-food-fasting','ayuBase6-food-cuisine']},
-    {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1']},
+    {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1','ayu_lab_reports_v1']},
     {id:'checks',label:'Checks',keys:['ayuBase6WakeUpTime','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-muted','ayuBase6-routine-days','ayuBase6-routine-alarm','ayuBase6-routine-edits']},
     {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-rem-alarm','ayuBase6-rem-alarms','ayuBase6-timer','ayuBase6-world']}
   ];
@@ -16344,11 +16345,11 @@ document.addEventListener('touchstart',function(e){
 (function(){
   function trackerHas(){ try{ var o=JSON.parse(localStorage.getItem('ayu_vitals_tracker_v1')||'{}'); return Object.keys(o||{}).some(function(k){ var v=o[k]; return Array.isArray(v)?v.length>0:!!v; }); }catch(e){ return false; } }
   function bmiHas(){ try{ return !!(calcHeightTouched||calcWeightTouched); }catch(e){ return false; } }
-  function labHas(){ try{ return labRows.length>0||labOther.length>0||labFiles.length>0; }catch(e){ return false; } }
+  function labHas(){ try{ return labRows.length>0||labOther.length>0||labFiles.length>0||!!(window.labHasData&&window.labHasData()); }catch(e){ return false; } }
   var DEF=[['Reset Tracker',trackerHas],['Reset BMI',bmiHas],['Reset Lab Insights',labHas]];
   function sync(){
     DEF.forEach(function(d){
-      var b=document.querySelector('#calculator-panel button[aria-label="'+d[0]+'"]'); if(!b) return;
+      var b=document.querySelector('#calculator-panel button[aria-label="'+d[0]+'"]'); if(!b && d[0]==='Reset Lab Insights') b=document.getElementById('lab-reset-btn'); if(!b) return;
       var has=d[1](); if(d[0]==='Reset Lab Insights'){ b.style.visibility=''; var rw=b.closest('.page-reset-row'); if(rw) rw.classList.toggle('lab-empty',!has); } if(b.disabled===!has) { if(!b.disabled) b.title=d[0]; return; }
       b.disabled=!has; b.title=has?d[0]:'Nothing to reset'; b.setAttribute('aria-disabled',has?'false':'true');
     });
@@ -17705,7 +17706,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     steps.push({k:'test',label:'Test notification and sound',human:true,fn:async function(){
       if(!granted()) return skip('Needs notifications allowed');
       try{ if(!alertState.break.muted) playAlertPreset(alertState.break.sound); }catch(e){}
-      var shown=showNudgeNotification('Test notification','If you can see and hear this, reminders can reach you.',{key:'test',theme:sectionTheme()});
+      var shown=showNudgeNotification('Test notification','If you can see and hear this, reminders can reach you.',{key:'test',theme:'logo'});
       return shown ? ok('Tap i if it didn\'t arrive') : bad('Could not show a notification','The browser refused to show the notification. Tap Test again; if it keeps failing, close and reopen the app.'); },
       info:['Didn\'t arrive?','You should see a notification and hear the reminder sound. If not, open your phone <b>Settings → Apps → AyuBase6 (or Chrome) → Notifications</b>: allowed, sound on, not silent. Also check Do Not Disturb and battery saver.']});
     steps.forEach(function(s){
@@ -18401,11 +18402,11 @@ html body #sec-help .footer-subtabs:has(#subtab-app) .footer-subtab{flex:1 1 aut
     var T=window.Tesseract; if(!T || T.__ayu) return !!T;
     window.__ayuTesseract=T;
     window.Tesseract=Object.assign({},T,{ __ayu:true,
-      recognize:async function(image){
+      recognize:async function(image,lang,opts){
         clearTimeout(idle);
-        var w=await getWorker();
-        try{ return await w.recognize(image); }
-        finally{ clearTimeout(idle); idle=setTimeout(release,60000); }
+        var w=await getWorker(), psm=opts&&opts.psm;
+        try{ if(psm) await w.setParameters({tessedit_pageseg_mode:String(psm)}); return await w.recognize(image); }
+        finally{ if(psm) release(); clearTimeout(idle); idle=setTimeout(release,60000); }
       }
     });
     return true;
@@ -25032,7 +25033,7 @@ body.to-picking{cursor:grabbing}
     var box=document.getElementById('sec-taborder'); if(!box) return;
     var a=load(), h='<p class="to-note">Drag \u2630 to reorder.</p>';
     a.forEach(function(t,i){
-      h+='<div class="to-row" data-t="'+t+'" style="background:color-mix(in srgb,'+colour(t)+' 13%,#fff);border-color:color-mix(in srgb,'+colour(t)+' 40%,#fff)"><span class="to-grip" aria-hidden="true">\u2630</span><i class="to-dot" style="background:'+colour(t)+'"></i><span class="to-nm">'+label(t)+'</span>'
+      h+='<div class="to-row" data-t="'+t+'" style="background:color-mix(in srgb,'+colour(t)+' 38%,#fff);border-color:color-mix(in srgb,'+colour(t)+' 80%,#fff)"><span class="to-grip" aria-hidden="true">\u2630</span><i class="to-dot" style="background:'+colour(t)+'"></i><span class="to-nm">'+label(t)+'</span>'
        +'</div>';
     });
     h+='<button type="button" class="to-reset"'+(a.join()===DEF.join()?' disabled':'')+'>Reset To Default</button>';
@@ -25160,6 +25161,599 @@ body.to-picking{cursor:grabbing}
   var n=0, iv=setInterval(function(){ if(build() || ++n>40) clearInterval(iv); },250);
   window.addEventListener('load',function(){ try{ apply(load()); }catch(e){} });
 })();
+</script>
+<style id="lab-reports-20261122">
+html body #lab-results .lb-person{margin:0 0 14px}
+html body #lab-results .lb-phdr{display:flex;align-items:center;gap:8px;padding:8px 4px 6px;border-bottom:2px solid color-mix(in srgb,var(--lab-c,#0d9488) 55%,#fff)}
+html body #lab-results .lb-pn{font-size:1.1rem;font-weight:700;color:#0f172a;min-width:0;overflow-wrap:anywhere}
+html body #lab-results .lb-pc{margin-left:auto;font-size:.78rem;color:#64748b;white-space:nowrap}
+html body #lab-results .lb-pen,html body #lab-results .lb-del,html body #lab-results .lb-ok,html body #lab-results .lb-x{border:0;background:transparent;cursor:pointer;font:inherit;line-height:1;min-width:30px;min-height:30px;border-radius:8px;color:#64748b;padding:0}
+html body #lab-results .lb-del{font-size:1.3rem}
+html body #lab-results .lb-del:hover,html body #lab-results .lb-x:hover{color:#dc2626;background:#fee2e2}
+html body #lab-results .lb-pen:hover{color:#0d9488;background:#ccfbf1}
+html body #lab-results .lb-ok{color:#fff;background:#0d9488}
+html body #lab-results .lb-edit{display:flex;gap:6px;align-items:center;flex:1;min-width:0}
+html body #lab-results .lb-in{flex:1;min-width:0;font:inherit;font-size:1rem;padding:6px 8px;border:1px solid #94a3b8;border-radius:8px}
+html body #lab-results .lb-year,html body #lab-results .lb-month{margin:8px 0 0}
+html body #lab-results .lb-year>summary,html body #lab-results .lb-month>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:700;color:#334155;padding:7px 6px}
+html body #lab-results .lb-year>summary::-webkit-details-marker,html body #lab-results .lb-month>summary::-webkit-details-marker,html body #lab-results .lb-rep>summary::-webkit-details-marker{display:none}
+html body #lab-results .lb-year>summary{font-size:1rem;background:#f1f5f9;border-radius:10px}
+html body #lab-results .lb-month>summary{font-size:.92rem;color:#475569}
+html body #lab-results .lb-month{margin-left:8px}
+html body #lab-results .lb-chev{transition:transform .15s;color:#64748b}
+html body #lab-results details[open]>summary>.lb-chev{transform:rotate(180deg)}
+html body #lab-results .lb-rep{margin:6px 0 6px 6px;border:1px solid #e2e8f0;border-radius:12px;background:#fff}
+html body #lab-results .lb-rep>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 10px}
+html body #lab-results .lb-rmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+html body #lab-results .lb-rn{font-weight:600;color:#0f172a;overflow-wrap:anywhere}
+html body #lab-results .lb-rmain small{color:#64748b;font-size:.78rem}
+html body #lab-results .lb-rn{display:flex;align-items:center;gap:2px}
+html body #lab-results .lb-rmain .lb-pen{min-width:24px;min-height:24px;font-size:.9rem;margin-left:4px}
+html body #lab-results .lb-dot{flex:none;width:14px;height:14px;border-radius:50%;background:#94a3b8;box-shadow:0 0 0 3px color-mix(in srgb,#94a3b8 25%,#fff)}
+html body #lab-results .lb-dot.ok{background:#16a34a;box-shadow:0 0 0 3px #dcfce7}
+html body #lab-results .lb-dot.bad{background:#dc2626;box-shadow:0 0 0 3px #fee2e2}
+html body #lab-results .lb-dot.warn{background:#f59e0b;box-shadow:0 0 0 3px #fef3c7}
+html body #lab-results .lb-rbody{padding:4px 10px 12px}
+html body #lab-results .lb-meta{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:4px 0 10px;font-size:.82rem;color:#475569}
+html body #lab-results .lb-meta label{display:flex;align-items:center;gap:6px}
+html body #lab-results .lb-meta input,html body #lab-results .lb-meta select{font:inherit;font-size:.85rem;padding:4px 6px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;max-width:100%}
+html body #lab-results .lb-file{color:#0d9488;font-weight:600}
+html body #lab-results .lb-items{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+html body #lab-results .lb-it{display:flex;align-items:center;gap:9px;padding:6px 4px;border-bottom:1px solid #f1f5f9}
+html body #lab-results .lb-il{flex:1 1 50%;min-width:0;display:flex;flex-direction:column}
+html body #lab-results .lb-il small{color:#64748b;font-size:.74rem}
+html body #lab-results .lb-iv{flex:0 1 46%;font-weight:600;color:#0f172a;text-align:right;font-size:.9rem}
+html body #lab-results .lb-blk,html body #lab-results .lb-fold{margin:8px 0;background:#f8fafc;border-radius:10px;padding:8px 10px}
+html body #lab-results .lb-bh,html body #lab-results .lb-fold>summary{font-weight:700;font-size:.85rem;color:#334155;cursor:pointer}
+html body #lab-results .lb-ul{margin:6px 0 0;padding-left:18px;font-size:.86rem;line-height:1.45;color:#334155}
+.lb-modal{position:fixed;inset:0;z-index:2147483000;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.lb-card{background:#fff;border-radius:16px;max-width:380px;width:100%;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.lb-q{font-size:.98rem;line-height:1.5;color:#0f172a;margin-bottom:14px}
+.lb-btns{display:flex;flex-direction:column;gap:8px}
+.lb-btns button{font:inherit;font-weight:600;padding:10px 12px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;color:#0f172a;cursor:pointer;text-align:center}
+.lb-btns button.pri{background:#0d9488;border-color:#0d9488;color:#fff}
+</style>
+<script id="lab-reports-20261122-js">
+(function(){
+'use strict';
+/* Lab Insights v2: saved reports grouped by person → year → month → report.
+   Reads PDFs and photos (labs, 2D Echo, TMT, scans). Kept in this browser (and in Backup & Restore → Vitals). */
+var KEY='ayu_lab_reports_v1';
+var $=function(id){ return document.getElementById(id); };
+var esc=function(s){ return labEsc(s); };
+var pad=function(n){ return (n<10?'0':'')+n; };
+var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var MON3=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+
+/* ───────── store ───────── */
+var store=load();
+function load(){ try{ var o=JSON.parse(localStorage.getItem(KEY)||'null'); if(o&&Array.isArray(o.people)) return o; }catch(e){} return {people:[]}; }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(e){} }
+function uid(p){ return p+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function person(id){ return store.people.filter(function(p){ return p.id===id; })[0]; }
+function findRep(rid){ for(var i=0;i<store.people.length;i++){ var p=store.people[i]; for(var j=0;j<p.reports.length;j++) if(p.reports[j].id===rid) return {p:p,r:p.reports[j]}; } return null; }
+var urls={};            // report id → object URL of the file (this session only)
+var closed={}, openRep={}, editing=null, lastPid=null;
+
+/* ───────── names and dates ───────── */
+var TITLE_RE=/^(mr|mrs|ms|miss|master|smt|shri|sri|dr|prof)\b\.?\s*/i;
+function cleanName(s){
+  s=String(s||'').replace(/[,;|]+/g,' ').replace(/[^A-Za-z.'\- ]/g,' ').replace(/\s+/g,' ').trim();
+  for(var g=0;g<2;g++) s=s.replace(TITLE_RE,'').trim();
+  s=s.replace(/\s+\.+$/,'');
+  return s.split(' ').filter(Boolean).map(function(w){ return w.length<=2 && /\./.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase()+w.slice(1).toLowerCase(); }).join(' ');
+}
+var NAME_STOP=/\b(study date|age|sex|gender|date|reported|report|uhid|patient id|patient|referr?ed|referring|ref|dob|collected|sample|mrn|op no|encounter|bill|ward|doctor|dr)\b/i;
+function cutName(s){ var m=NAME_STOP.exec(s); if(m && m.index>0) s=s.slice(0,m.index); return s.replace(/[:\-]+\s*$/,'').trim(); }
+function findName(lines){
+  var L=lines.map(function(x){ return String(x).replace(/\s+/g,' ').trim(); }), i, m, n;
+  for(i=0;i<L.length;i++){
+    m=/patient\s*name\s*[:\-]?\s*(.*)$/i.exec(L[i]);
+    if(m){ n=cutName(m[1]); if(n.length>=3){ n=extendName(L,i,n,m[1]); return cleanName(n); } }
+  }
+  for(i=0;i<L.length;i++){
+    m=/^(?:patient\s*)?name\s*[:\-]\s*(.*)$/i.exec(L[i]);
+    if(m){ n=cutName(m[1]); if(n.length>=3) return cleanName(n); }
+  }
+  for(i=0;i<Math.min(L.length,40);i++){
+    m=/^(?:mr|mrs|ms|miss|master|smt|shri)\.?\s+([A-Za-z][A-Za-z.' ]{2,45})/i.exec(L[i]);
+    if(m){ n=cutName(m[1]); n=n.replace(/\s+\d.*$/,''); n=sameCase(n); if(n.split(' ').length<=6 && n.length>=3) return cleanName(n); }
+  }
+  return '';
+}
+// A long name can wrap: "MR. SARATH KUMAR REDDY" / "PYREDDY" on the next line.
+function extendName(L,i,n,raw){
+  var nx=(L[i+1]||'').trim(), m=/^([A-Z][A-Za-z.']{2,20})(?=\s|$)/.exec(nx);
+  if(m && !NAME_STOP.test(m[1]) && /^[A-Z]+$/.test(m[1]) && !/[:\d]/.test(nx.split(/\s{2,}/)[0]) && nx.split(' ').length<=3) return n+' '+m[1];
+  return n;
+}
+function sameCase(n){ var w=n.split(' ').filter(Boolean), up=w[0]===w[0].toUpperCase(), out=[]; for(var i=0;i<w.length;i++){ var x=w[i]; if(x.length<3&&i>0) break; if((x===x.toUpperCase())!==up) break; out.push(x); if(out.length>=5) break; } return out.join(' '); }
+function monthIdx(s){ return MON3.indexOf(String(s).slice(0,3).toLowerCase()); }
+function ymd(y,m,d){ if(y<100) y+=2000; if(y<1990||y>2100||m<1||m>12||d<1||d>31) return ''; return y+'-'+pad(m)+'-'+pad(d); }
+function parseDateStr(s){
+  var m;
+  if((m=/(\d{1,2})[\-\/. ]([A-Za-z]{3,9})[\-\/., ]+(\d{4})/.exec(s))){ var mi=monthIdx(m[2]); if(mi>=0) return ymd(+m[3],mi+1,+m[1]); }
+  if((m=/([A-Za-z]{3,9})\.? (\d{1,2}),? (\d{4})/.exec(s))){ var mj=monthIdx(m[1]); if(mj>=0) return ymd(+m[3],mj+1,+m[2]); }
+  if((m=/(\d{4})[\-\/](\d{1,2})[\-\/](\d{1,2})/.exec(s))) return ymd(+m[1],+m[2],+m[3]);
+  if((m=/(\d{1,2})[\-\/.](\d{1,2})[\-\/.](\d{2,4})/.exec(s))){ var a=+m[1], b=+m[2], y=+m[3]; return b>12 ? ymd(y,a,b) : ymd(y,b,a); }   // 19/11/2026 is day first; 11/19/2026 month first
+  return '';
+}
+function findDate(text){
+  var d0=findDate0(text); if(d0) return d0;
+  var m=/(\d{1,2}\/\d{1,2}\/20\d{2})/.exec(text); return m?parseDateStr(m[1]):'';
+}
+function findDate0(text){
+  var L=String(text).split('\n'), pri=[/(study|collect|sample|test|exam|procedure|scan)\w*\s*date/i,/date\s*of\s*(study|collection|test|exam)/i,/reported\s*date/i,/report\s*date/i,/\bdate\b/i], k, i, d;
+  for(k=0;k<pri.length;k++) for(i=0;i<L.length;i++) if(pri[k].test(L[i])){ d=parseDateStr(L[i].replace(pri[k],' ')); if(d) return d; d=parseDateStr((L[i]+' '+(L[i+1]||''))); if(d) return d; }
+  return '';
+}
+function todayStr(){ var d=new Date(); return ymd(d.getFullYear(),d.getMonth()+1,d.getDate()); }
+
+/* ───────── reading files ───────── */
+function setStatus(t){ labSay(t); }
+async function pdfText(file){
+  if(typeof pdfjsLib==='undefined') throw new Error('The PDF reader could not be loaded');
+  pdfjsLib.GlobalWorkerOptions.workerSrc=new URL('lib/pdfjs/pdf.worker.min.js', document.baseURI).href;
+  var buf=await file.arrayBuffer(), pdf;
+  try{ pdf=await pdfjsLib.getDocument({data:new Uint8Array(buf), isEvalSupported:false}).promise; }
+  catch(e){ pdf=await pdfjsLib.getDocument({data:new Uint8Array(buf), disableWorker:true, isEvalSupported:false}).promise; }
+  var text='', i, page, content, items, lineText;
+  for(i=1;i<=pdf.numPages;i++){
+    page=await pdf.getPage(i); items=[];
+    try{
+      content=await page.getTextContent({includeMarkedContent:false});
+      (content.items||[]).forEach(function(it){ var s=(it.str||'').trim(); if(s) items.push({x:(it.transform&&it.transform[4])||0,y:(it.transform&&it.transform[5])||0,str:s}); });
+    }catch(e){ items=[]; }
+    lineText=labClusterLines(items).join('\n');
+    if(lineText.replace(/\s/g,'').length<12 && typeof Tesseract!=='undefined'){
+      setStatus('Reading page '+i+' with OCR…');
+      var vp=page.getViewport({scale:2}), cv=document.createElement('canvas'); cv.width=Math.ceil(vp.width); cv.height=Math.ceil(vp.height);
+      await page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
+      var r=await Tesseract.recognize(cv,'eng'); lineText=(r.data&&r.data.text)||'';
+    }
+    text+=lineText+'\n';
+  }
+  return text;
+}
+function loadImage(file){
+  return new Promise(function(res,rej){ var u=URL.createObjectURL(file), im=new Image(); im.onload=function(){ URL.revokeObjectURL(u); res(im); }; im.onerror=function(){ URL.revokeObjectURL(u); rej(new Error('That image could not be opened')); }; im.src=u; });
+}
+function drawRot(im,deg,maxSide){
+  var w=im.naturalWidth, h=im.naturalHeight, s=Math.min(2,maxSide/Math.max(w,h)); w=Math.round(w*s); h=Math.round(h*s);
+  var cv=document.createElement('canvas'), q=deg%180!==0; cv.width=q?h:w; cv.height=q?w:h;
+  var c=cv.getContext('2d'); c.fillStyle='#fff'; c.fillRect(0,0,cv.width,cv.height); c.translate(cv.width/2,cv.height/2); c.rotate(deg*Math.PI/180);
+  c.drawImage(im,-w/2,-h/2,w,h);
+  try{ var id=c.getImageData(0,0,cv.width,cv.height), d=id.data, i, g;   // red channel only: pink grid lines on ECG paper disappear, dark text stays
+    for(i=0;i<d.length;i+=4){ g=d[i]; g=(g-40)*255/175; g=g<0?0:g>255?255:g; d[i]=d[i+1]=d[i+2]=g; }
+    c.putImageData(id,0,0); }catch(e){}
+  return cv;
+}
+function goodWords(d){ var w=d.words||[], n=0; w.forEach(function(x){ if(x.confidence>75 && /^[A-Za-z]{4,}$/.test(x.text||'')) n++; }); return n; }
+var ALT='\n\u0001ALT\n';
+async function imageText(file){
+  if(typeof Tesseract==='undefined') throw new Error('The photo reader could not be loaded');
+  var im=await loadImage(file), best=0, bs=-1, degs=[0,270,90,180], k;
+  setStatus('Reading the photo…');
+  for(k=0;k<degs.length;k++){                      // find the way up at a small size first
+    var q=await Tesseract.recognize(drawRot(im,degs[k],1800),'eng'), sc=goodWords(q.data||{});
+    console.log('ORI',degs[k],sc); if(sc>bs){ bs=sc; best=degs[k]; }
+    if(sc>=60 || (k===2 && bs>=8)) break;
+  }
+  setStatus('Reading the photo…');
+  var cv=drawRot(im,best,3600), r=await Tesseract.recognize(cv,'eng'), t=(r.data&&r.data.text)||'';
+  setStatus('Reading the photo (second pass)…');
+  try{ var r2=await Tesseract.recognize(cv,'eng',{psm:11}); t+=ALT+((r2.data&&r2.data.text)||''); }catch(e){}
+  return t;
+}
+async function fileText(file){
+  var isPdf=/pdf$/i.test(file.type)||/\.pdf$/i.test(file.name);
+  return isPdf ? pdfText(file) : imageText(file);
+}
+
+/* ───────── understanding the text ───────── */
+function num(s){ var v=parseFloat(String(s).replace(/,/g,'')); return isFinite(v)?v:null; }
+function pick(text,re){ var m=re.exec(text); return m?m:null; }
+function rate(v,lo,hi){ return v==null?'na':(lo!=null&&v<lo)?'low':(hi!=null&&v>hi)?'high':'ok'; }
+function item(label,value,st,normal,note){ return {label:label,value:value,st:st||'na',normal:normal||'',note:note||''}; }
+function titleCase(s){ return String(s).toLowerCase().replace(/\b([a-z])/g,function(m){ return m.toUpperCase(); }).replace(/\b(Ct|Mri|Usg|Ecg|Ekg|Tmt|Pa|Ap)\b/g,function(m){ return m.toUpperCase(); }).replace(/\b2d\b/i,'2D').replace(/\bX-ray\b/i,'X-ray'); }
+
+function parseEcho(text,lines){
+  var T=text.replace(/\s+/g,' '), it=[], m, v, ef=null;
+  if((m=/\bEF\s*[:\-]?\s*(\d{2})\s*%/i.exec(T))){ ef=num(m[1]); it.push(item('Ejection fraction (EF)',ef+' %',ef>=55?'ok':ef>=41?'warn':'bad','55–70 %')); }
+  var fixd=function(x,hi){ return (x!=null && x>hi*2.5 && x<hi*30) ? Math.round(x)/10 : x; };   // photos often lose the decimal point (45 for 4.5)
+  var cm=function(label,re,lo,hi,normal){ var mm=re.exec(T); if(!mm) return; var x=fixd(num(mm[1]),hi); if(x==null) return; var st=rate(x,lo,hi); it.push(item(label,x+' cm',st==='ok'?'ok':(st==='na'?'na':'warn'),normal)); };
+  cm('Left atrium',/LEFT ATRIUM\s*:?\s*(\d+(?:\.\d+)?)\s*cm/i,1.9,4.0,'1.9–4.0 cm');
+  cm('LV end-diastolic size (EDD)',/EDD\s*:?\s*(\d+(?:\.\d+)?)\s*cm/i,3.9,5.9,'3.9–5.9 cm');
+  cm('LV end-systolic size (ESD)',/ESD\s*:?\s*(\d+(?:\.\d+)?)\s*cm/i,2.0,4.0,'2.0–4.0 cm');
+  cm('Septum thickness (IVSD)',/IVSD\s*:?\s*(\d+(?:\.\d+)?)\s*cm/i,0.6,1.1,'0.6–1.1 cm');
+  cm('Posterior wall (PWD)',/PWD\s*:?\s*(\d+(?:\.\d+)?)\s*cm/i,0.6,1.1,'0.6–1.1 cm');
+  cm('Aorta',/AORTA\s*:?\s*(\d+(?:\.\d+)?)\s*cm/i,2.0,3.7,'2.0–3.7 cm');
+  if((m=/E\s*\/\s*E\s*prime\s*:?\s*(\d+(?:\.\d+)?)/i.exec(T))){ v=num(m[1]); var st=v<8?'ok':v<=14?'warn':'bad'; it.push(item('E/e′ ratio',String(v),st,'below 8 (8–14 borderline)')); }
+  if((m=/\bE\s*=\s*(\d+(?:\.\d+)?)\s*m\/s(?:ec)?/i.exec(T))) it.push(item('Mitral E velocity',num(m[1])+' m/s','na','0.6–1.3 m/s'));
+  if((m=/\bA\s*=\s*(\d+(?:\.\d+)?)\s*m\/s(?:ec)?/i.exec(T))){ var av=num(m[1]); if(av>=3&&/^0?\d$/.test(m[1])) av=av/10; else if(av>=10) av=av/100; it.push(item('Mitral A velocity',av+' m/s','na','')); }
+  if((m=/EDT\s*=\s*(\d+)\s*msec/i.exec(T))){ v=num(m[1]); var s2=rate(v,160,240); it.push(item('Deceleration time (EDT)',v+' ms',s2==='ok'?'ok':'warn','160–240 ms')); }
+  if((m=/AORTIC\s*[:i{|]?\s*V\s*MAX\s*=\s*(\d+(?:\.\d+)?)/i.exec(T))){ v=fixd(num(m[1]),2.0); it.push(item('Aortic valve peak velocity',v+' m/s',v<=2.0?'ok':'warn','up to 2.0 m/s')); }
+  if((m=/PULMONARY\s*[:i{|]?\s*V\s*MAX\s*=\s*(\d+(?:\.\d+)?)/i.exec(T))){ v=fixd(num(m[1]),1.0); it.push(item('Pulmonary valve peak velocity',v+' m/s',v<=1.0?'ok':'warn','up to 1.0 m/s')); }
+  var valves=[], vn=['MITRAL VALVE','AORTIC VALVE','TRICUSPID VALVE','PULMONARY VALVE','RIGHT ATRIUM','RIGHT VENTRICLE','LEFT ATRIUM','PULMONARY ARTERY','PERICARDIUM','PULMONARY VEINS'];
+  vn.forEach(function(n){ var mm=new RegExp(n+'\\s*:?\\s*(NORMAL|ABNORMAL|THICKENED|MILD|MODERATE|SEVERE|DILATED)','i').exec(T); if(mm){ var nm=/normal/i.test(mm[1]); it.push(item(titleCase(n),titleCase(mm[1]),nm?'ok':'warn','Normal')); } });
+  var lines2=[];
+  var dx=/ECHO DIAGNOSIS\s*(.*?)(?:[\*\+]+\s*End Of Report|\bCARDIOLOGIST\b|\bARDIOLOGIST\b|$)/i.exec(T), dxText='';
+  if(dx){ dxText=dx[1].replace(/\s+(?=NO |NORMAL |GRADE|MILD|MODERATE|SEVERE|MITRAL|AORTIC|TRICUSPID|PULMONARY|LV |RV |LA |RA )/g,'\n'); dxText.split('\n').forEach(function(s){ s=s.replace(/\s+/g,' ').trim(); if(s) lines2.push(s); }); }
+  var bad=lines2.some(function(s){ return /severe|moderate\b(?! .*normal)|reduced|\bEF\b.*(\d)|LV systolic dysfunction|regurgitation|stenosis|hypertroph|dilat/i.test(s) && !/\bnormal\b/i.test(s); });
+  var warn=lines2.some(function(s){ return /dysfu|diastol|grade\s*-?\s*(i|1|ii|2|iii|3)\b|mild|diastolic dysfunction|effusion|clot|vegetation/i.test(s) && !/\bno\s+(pericardial\s+effusion|clot|vegetation)/i.test(s); });
+  var lowEf=ef!=null&&ef<40;
+  var st=lowEf||bad?'bad':(warn||it.some(function(x){ return x.st==='warn'||x.st==='bad'; })?'warn':(it.length?'ok':'na'));
+  return {type:'echo',title:'2D Echo Cardiogram',items:it,lines:lines2.length?[{h:'Echo diagnosis',t:lines2}]:[],st:st};
+}
+
+function parseTmt(text){
+  var T=text.replace(/\s+/g,' '), it=[], m, v, flags=[];
+  if((m=/(BRUCE|MODIFIED BRUCE|NAUGHTON)[^A-Za-z]{0,3}\s*:?\s*Exercise\s*Time\s*:?\s*(\d{1,2}[:.]\d{2})/i.exec(T))){ it.push(item('Protocol',titleCase(m[1]),'na','')); it.push(item('Exercise time',m[2].replace('.',':')+' min','na','')); }
+  else if((m=/Exercise\s*Time\s*:?\s*(\d{1,2}[:.]\d{2})/i.exec(T))) it.push(item('Exercise time',m[1].replace('.',':')+' min','na',''));
+  var hrOk=null, mx=/Max\.?\s*HR\s*:?\s*(\d{2,3})\W{0,3}\s*bpm\s*(\d{2,3})\s*%/i.exec(T);
+  if(mx){ var pct=num(mx[2]); hrOk=pct>=85; it.push(item('Max heart rate',mx[1]+' bpm ('+mx[2]+'% of predicted)',hrOk?'ok':'warn','at least 85% of predicted')); }
+  else if((m=/Max\.?\s*HR\s*:?\s*(\d{2,3})\W{0,3}\s*bpm/i.exec(T))) it.push(item('Max heart rate',m[1]+' bpm','na',''));
+  if((m=/HR at rest\s*:?\s*(\d{2,3})/i.exec(T))) it.push(item('Heart rate at rest',m[1]+' bpm',rate(num(m[1]),50,100)==='ok'?'ok':'warn','50–100 bpm'));
+  if((m=/\bBP\s*:\s*(\d{2,3})\s*\/\s*(\d{2,3})/i.exec(T))){ var s=num(m[1]), d=num(m[2]); it.push(item('Max blood pressure',s+'/'+d+' mmHg',(s>230||d>115)?'bad':(s>210||d>105)?'warn':'ok','below 210/105 during exercise')); }
+  if((m=/BP\.?\s*at\s*rest\s*:?\s*(\d{2,3})\s*\/\s*(\d{2,3})/i.exec(T))){ var sr=num(m[1]), dr=num(m[2]); it.push(item('Blood pressure at rest',sr+'/'+dr+' mmHg',(sr<=120&&dr<=80)?'ok':(sr<140&&dr<90)?'warn':'bad','up to 120/80')); }
+  if((m=/Workload\s*:?\W{0,4}(\d{1,2}(?:[.,]\d+)?)\s*METS?/i.exec(T))){ v=num(m[1].replace(',','.')); it.push(item('Workload (fitness)',v+' METs',v>=10?'ok':v>=7?'warn':'bad','10 METs or more is good for most adults')); }
+  if((m=/Max\.?\s*ST\s*:?\s*(-?\s*\d+\.\d+)\s*mV/i.exec(T))){ v=num(m[1].replace(/\s/g,'')); var dep=v<=-0.1; it.push(item('Largest ST change',v+' mV',dep?'bad':'ok','ST depression below −0.1 mV is a concern')); }
+  var cls=[], conc=/Conclusion\s*:?\s*(.*?)(?:\b(?:Room|Location)\b|\d{1,3}\s*%\s*THR|$)/i.exec(T);
+  if(conc && conc[1].trim()) cls.push(conc[1].trim().replace(/\.$/,''));
+  if(/\d{2,3}\s*%\s*THR\s*AC/i.test(T)) cls.push((/(\d{2,3})\s*%\s*THR\s*AC/i.exec(T)[1])+'% target heart rate achieved');
+  if((m=/Chest\s*Pain\W{0,3}\s*(no[a-z]*|present|yes)/i.exec(T))){ var cp=/none|no/i.test(m[1]); it.push(item('Chest pain',cp?'None':'Present',cp?'ok':'bad','None')); }
+  if((m=/Arrhythmias\W{0,3}\s*(no[a-z]*|present|yes)/i.exec(T))){ var ar=/none|no/i.test(m[1]); it.push(item('Arrhythmias',ar?'None':'Present',ar?'ok':'bad','None')); }
+  var res=/Resting ECG\s*:?\s*(normal|abnormal)/i.exec(T); if(res) it.push(item('Resting ECG',titleCase(res[1]),/normal/i.test(res[1])?'ok':'warn','Normal'));
+  var posi=/positive for|ischemi|ischaem|abnormal response|ST depression/i.test(conc?conc[1]:'') && !/\bnegative|no (ischemi|ischaem)/i.test(conc?conc[1]:'');
+  var good=/good|normal|negative|adequate/i.test(conc?conc[1]:'');
+  var st=posi||it.some(function(x){ return x.st==='bad'; })?'bad':(it.some(function(x){ return x.st==='warn'; })?'warn':((good||it.length>=3)?'ok':'na'));
+  return {type:'tmt',title:'Treadmill Stress Test (TMT)',items:it,lines:cls.length?[{h:'Conclusion',t:cls}]:[],st:st};
+}
+
+var BAD_WORDS=/\b(mass|tumou?r|malignan|carcinoma|fracture|severe|obstruct|infarct|aneurysm|haemorrhage|hemorrhage|metasta|cirrhosis|consolidation|pneumonia|effusion\b(?!\s*\/))/i;
+var WARN_WORDS=/\b(grade\s*-?\s*(i{1,3}|[123])|fatty|steatosis|calcul|stone|cyst|polyp|fibroid|hernia|thicken|enlarged|dilat|mild|moderate|hydronephrosis|lesion|nodule|bulky|degenerat|spondyl|osteophyt|prominent|echogenic|haemangioma|hemangioma)/i;
+var OK_WORDS=/\b(normal study|normal|unremarkable|no abnormalit|no significant|low risk)/i;
+function section(text,names,stops){
+  var re=new RegExp('(?:'+names+')\\s*:?\\s*([\\s\\S]*?)(?=(?:\\n\\s*(?:'+stops+')\\b)|$)','i'), m=re.exec(text); return m?m[1].trim():'';
+}
+function parseImaging(text,lines,title){
+  var impr=section(text,'IMPRESSION|CONCLUSION|OPINION','FOR CLINICAL|Coronary calcium scan|\\d+\\s*$|Page \\d|Patient (?:ID|Name)|Referred'), find=section(text,'FINDINGS|OBSERVATIONS?','IMPRESSION|CONCLUSION|OPINION|FOR CLINICAL');
+  impr=impr.replace(/[\uE000-\uF8FF\u2022\u25CF]/g,'').replace(/\s+\./g,'.').replace(/\s*\n\s*/g,' ').replace(/\s{2,}/g,' ').replace(/For clinical correlation.*$/i,'').trim();
+  var it=[], parts=[], findLines=find.split('\n').map(function(s){ return s.replace(/\s+/g,' ').trim(); }).filter(function(s){ return s&&!/^\d+$/.test(s); });
+  var out=[];
+  // lines wrapped in the PDF are joined back into sentences
+  findLines.forEach(function(s){ if(out.length && !/[.:]$/.test(out[out.length-1]) && /^[a-z(]/.test(s)) out[out.length-1]+=' '+s; else out.push(s); });
+  var st='na', agat=/Total\s*(?:calcium)?\s*score\s*(?:of)?\s*(\d+(?:\.\d+)?)|Total\s+\d+\s+\d+\s+\d+\s+(\d+(?:\.\d+)?)/i.exec(text);
+  if(/calcium score/i.test(title+' '+text)){
+    var a=agat?num(agat[1]||agat[2]):null;
+    if(a!=null){ var lvl=a===0?['None','ok','Low']:a<=10?['Minimal','ok','Low']:a<=100?['Small','warn','Moderate']:a<=400?['Moderate','warn','Moderate to high']:['Extensive','bad','High'];
+      it.push(item('Total calcium (Agatston) score',String(a),lvl[1],'0 = none; 1–10 minimal; 11–100 small; 101–400 moderate; over 400 extensive'));
+      it.push(item('Amount of plaque',lvl[0],lvl[1],'')); it.push(item('Risk level',lvl[2],lvl[1],'')); st=lvl[1]; }
+    ['RCA','LM','LAD','LCX','D'].forEach(function(s){ var mm=new RegExp('\\b'+s+'\\s+(\\d+)\\s+\\d+(?:\\.\\d+)?\\s+\\d+(?:\\.\\d+)?\\s+(\\d+(?:\\.\\d+)?)','i').exec(text); if(mm) it.push(item(s+' score',mm[2],num(mm[2])>0?'warn':'ok','')); });
+  }
+  if(st==='na' && impr){ st=BAD_WORDS.test(impr)?'bad':WARN_WORDS.test(impr)&&!/\bnormal study\b/i.test(impr)?'warn':OK_WORDS.test(impr)?'ok':'na'; }
+  if(st==='na' && out.length){ var all=out.join(' '); st=BAD_WORDS.test(all)?'bad':WARN_WORDS.test(all)?'warn':'na'; }
+  var ls=[]; if(impr) ls.push({h:'Impression',t:[impr]}); if(out.length) ls.push({h:/observation/i.test(text)&&!/findings/i.test(text)?'Observations':'Findings',t:out,fold:true});
+  if(!ls.length){ var first=lines.map(function(s){ return String(s).replace(/\s+/g,' ').trim(); }).filter(function(s){ return s.length>3; }).slice(0,30); ls.push({h:'Text found in the report',t:first,fold:true}); }
+  return {type:'scan',title:title,items:it,lines:ls,st:st};
+}
+function findTitle(lines){
+  var L=lines.map(function(s){ return String(s).replace(/\s+/g,' ').trim(); });
+  for(var i=0;i<L.length;i++){
+    var s=L[i]; if(/^(ULTRASOUND|USG|X-?RAY|CT\b|MRI|MR\b|MAMMOGRAPHY|2D ECHO|ECHO|EXERCISE|TREADMILL|TMT|DOPPLER|ECG|EEG|DEXA|BONE DENSITY|CARDIAC|CORONARY|ANGIO|PET)/i.test(s) && s.length<90 && !/:/.test(s.slice(0,6))) return titleCase(s.replace(/\s*[\/|].*$/,'').trim());
+  }
+  return '';
+}
+function labTitleFrom(file,lines){
+  var L=lines.map(function(s){ return String(s).replace(/\s+/g,' ').trim(); }), hit=null;
+  var re=/^(complete blood (count|picture)|cbc|lipid profile|liver function test|lft|kidney function test|renal function test|rft|thyroid (profile|function test)|tsh|hba1c|glycosylated|diabetes|vitamin|iron studies|urine (routine|analysis)|electrolytes|full body|master health|health check|comprehensive|blood (sugar|glucose))/i;
+  for(var i=0;i<L.length && !hit;i++) if(re.test(L[i]) && L[i].length<70) hit=L[i];
+  if(hit) return titleCase(hit);
+  var base=String(file&&file.name||'Lab report').replace(/\.[a-z0-9]+$/i,'').replace(/[_\-]+/g,' ').replace(/\s+/g,' ').trim();
+  return base&&!/^(img|image|photo|scan|document|\d+)/i.test(base)?base:'Lab report';
+}
+function weak(r){ return !r || (r.type==='echo'&&r.items.length<6) || (r.type==='tmt'&&r.items.length<5) || (r.type==='lab'&&(r.rows||[]).length<2) || (r.type==='scan'&&!r.items.length&&!(r.lines||[]).some(function(b){ return b.h==='Impression'; })); }
+function build(text,file){
+  var parts=String(text).split(ALT), rep=classify(parts[0],file), used=parts[0];
+  if(parts[1] && weak(rep)){ var both=parts[0]+'\n'+parts[1], r2=classify(both,file); if(!rep || (r2.items||[]).length+(r2.rows||[]).length>(rep.items||[]).length+(rep.rows||[]).length || (rep.type==='scan'&&r2.type!=='scan')){ rep=r2; used=both; } }
+  return finish(rep,used,file);
+}
+function classify(text,file){
+  var lines=text.split('\n'), T=text, rep;
+  var isEcho=/ECHO\s*CARDIOGRAM|ECHO DIAGNOSIS|2D ECHO/i.test(T) && /(LEFT VENTRICLE|MITRAL|AORTIC|DOPPLER|EF\b)/i.test(T);
+  var isTmt=!isEcho && /(treadmill|tabular summary|exercise test|BRUCE|METS?\b|THR ACHIEVED)/i.test(T) && /(Max\.?\s*HR|Workload|BRUCE|Exercise Time)/i.test(T);
+  var isScan=!isEcho && !isTmt && /(ultrasound|sonograph|x-?ray|radiograph|\bCT\b|\bMRI\b|mammogra|DEXA|angiogra)/i.test(T) && /(IMPRESSION|FINDINGS|OBSERVATION|CONCLUSION)/i.test(T);
+  if(isEcho) rep=parseEcho(T,lines); else if(isTmt) rep=parseTmt(T); else if(isScan) rep=parseImaging(T,lines,findTitle(lines)||'Scan report');
+  else{
+    var ex=labExtractFromText(T), seen=new Map(); ex.rows.forEach(function(r){ seen.set(r.refId,r.value); });
+    var rows=[]; seen.forEach(function(v,k){ rows.push({refId:k,value:v}); });
+    if(rows.length||(ex.other||[]).length) rep={type:'lab',title:labTitleFrom(file,lines),rows:rows,other:ex.other||[],items:[],lines:[],st:'na'};
+    else rep=parseImaging(T,lines,findTitle(lines)||labTitleFrom(file,lines));
+  }
+  return rep;
+}
+function finish(rep,T,file){
+  var lines=T.split('\n');
+  if(rep.type==='echo') rep.title='2D Echo Cardiogram';
+  if(rep.type==='tmt') rep.title='Treadmill Stress Test (TMT)';
+  rep.id=uid('r'); rep.file=file?file.name:''; rep.date=findDate(T)||todayStr(); rep.name=findName(lines); rep.added=Date.now();
+  if(rep.type==='lab'){ rep.rows=rep.rows||[]; rep.other=rep.other||[]; }
+  return rep;
+}
+function labStatus(r){
+  if(r.type!=='lab') return r.st||'na';
+  var bad=false, any=false;
+  r.rows.forEach(function(x){ var ref=LAB_REF.filter(function(q){ return q.id===x.refId; })[0]; if(!ref) return; any=true; var rg=labRange(ref); if(x.value<rg.low||x.value>rg.high) bad=true; });
+  return bad?'bad':any?'ok':'na';
+}
+function counts(r){
+  if(r.type!=='lab'){ var n=(r.items||[]).filter(function(x){ return x.st==='bad'||x.st==='warn'||x.st==='low'||x.st==='high'; }).length; return n?n+' to check':''; }
+  var hi=0, lo=0; r.rows.forEach(function(x){ var ref=LAB_REF.filter(function(q){ return q.id===x.refId; })[0]; if(!ref) return; var rg=labRange(ref); if(x.value>rg.high) hi++; else if(x.value<rg.low) lo++; });
+  return (hi?hi+' high':'')+(hi&&lo?' · ':'')+(lo?lo+' low':'');
+}
+
+/* ───────── choosing the person ───────── */
+function nameKey(n){ return String(n||'').toLowerCase().replace(/[^a-z ]/g,'').replace(/\s+/g,' ').trim(); }
+function ask(html,buttons){
+  return new Promise(function(res){
+    var ov=document.createElement('div'); ov.className='lb-modal'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.innerHTML='<div class="lb-card"><div class="lb-q">'+html+'</div><div class="lb-btns">'+buttons.map(function(b,i){ return '<button type="button" data-i="'+i+'" class="'+(b.cls||'')+'">'+esc(b.t)+'</button>'; }).join('')+'</div></div>';
+    ov.addEventListener('click',function(e){ var b=e.target.closest('button[data-i]'); if(!b) return; ov.remove(); res(+b.getAttribute('data-i')); });
+    document.body.appendChild(ov);
+  });
+}
+function lev(a,b){ var d=[],i,j; for(i=0;i<=a.length;i++){ d[i]=[i]; } for(j=1;j<=b.length;j++) d[0][j]=j; for(i=1;i<=a.length;i++) for(j=1;j<=b.length;j++) d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)); return d[a.length][b.length]; }
+function sameFirst(a,b){ return a===b || (a.length>=4 && b.length>=4 && lev(a,b)<=1); }   // Sarath / Sharath
+async function resolvePerson(name,asked){
+  if(!name){
+    if(lastPid && person(lastPid)) return person(lastPid);
+    if(store.people.length===1) return store.people[0];
+    var u=store.people.filter(function(p){ return p.name==='Name not found'; })[0]; if(u) return u;
+    var p0={id:uid('p'),name:'Name not found',aliases:[],reports:[]}; store.people.push(p0); return p0;
+  }
+  var k=nameKey(name), i, p;
+  for(i=0;i<store.people.length;i++){ p=store.people[i]; if(nameKey(p.name)===k || (p.aliases||[]).some(function(a){ return nameKey(a)===k; })) return p; }
+  if(asked[k]) return asked[k];
+  var first=k.split(' ')[0], cands=store.people.filter(function(p){ return sameFirst(nameKey(p.name).split(' ')[0],first); });
+  if(cands.length){
+    var btns=cands.map(function(c){ return {t:'Add to '+c.name,cls:'pri'}; }); btns.push({t:'Create new: '+name});
+    var ix=await ask('The report says <b>'+esc(name)+'</b>.<br>You already have <b>'+cands.map(function(c){ return esc(c.name); }).join('</b> and <b>')+'</b>. Is this the same person?',btns);
+    if(ix<cands.length){ var c=cands[ix]; c.aliases=c.aliases||[]; c.aliases.push(name); asked[k]=c; return c; }
+  }
+  var np={id:uid('p'),name:name,aliases:[],reports:[]}; store.people.push(np); asked[k]=np; return np;
+}
+
+/* ───────── adding files ───────── */
+var busy=false;
+async function ingest(files){
+  if(busy){ setStatus('Still reading the earlier files — please wait.'); return; }
+  busy=true; var added=[], failed=[], asked={}, i;
+  try{
+    for(i=0;i<files.length;i++){
+      var f=files[i], tag=(files.length>1?'File '+(i+1)+' of '+files.length+': ':'');
+      setStatus(tag+'Reading '+f.name+'…');
+      try{
+        var text=await fileText(f);
+        if(text.replace(/\s/g,'').length<20){ failed.push(f.name+' (no text found)'); continue; }
+        var rep=build(text,f), p=await resolvePerson(rep.name,asked);
+        delete rep.name; p.reports.push(rep); lastPid=p.id; urls[rep.id]=URL.createObjectURL(f);
+        var y=rep.date.slice(0,4), mo=rep.date.slice(5,7);
+        closed[p.id+'|'+y]=false; closed[p.id+'|'+y+'|'+mo]=false; openRep[rep.id]=files.length===1;
+        added.push(rep); save(); render();
+      }catch(e){ console.warn('Lab file failed',f.name,e); failed.push(f.name+(e&&e.message?' ('+e.message+')':'')); }
+    }
+  }finally{ busy=false; }
+  render();
+  var msg=added.length?('\u2713 '+added.length+' report'+(added.length===1?'':'s')+' added'):'No report could be read';
+  if(failed.length) msg+=' · could not read: '+failed.join(', ');
+  setStatus(msg);
+  if(added.length) scrollLabInsightsToTop();
+}
+
+/* ───────── drawing ───────── */
+var ST={ok:'Normal',low:'Low',high:'High',warn:'Check',bad:'Check',na:'Info'};
+function dotCls(s){ return s==='ok'?'ok':s==='bad'?'bad':s==='warn'?'warn':'na'; }
+function shortDate(d){ var p=d.split('-'); return +p[2]+' '+MONTHS[+p[1]-1].slice(0,3)+' '+p[0]; }
+function labItems(r){
+  var items=[];
+  r.rows.forEach(function(x){ var ref0=LAB_REF.filter(function(q){ return q.id===x.refId; })[0]; if(!ref0) return; var rg=labRange(ref0), st=x.value<rg.low?'low':x.value>rg.high?'high':'ok', ref=Object.assign({},ref0,{id:r.id+'|'+ref0.id}); items.push({key:ref.id,kind:st==='ok'?'ok':'bad',ref:ref,rg:rg,val:x.value,st:st}); });
+  r.other.forEach(function(o,i){ items.push({key:r.id+'|other:'+i,kind:'na',o:o}); });
+  var order={bad:0,ok:1,na:2}; items.sort(function(a,b){ return order[a.kind]-order[b.kind]; });
+  return items;
+}
+function repBody(p,r){
+  var h='<div class="lb-meta"><label>Date <input type="date" class="lb-date" data-rid="'+r.id+'" value="'+esc(r.date)+'"></label>'
+    +'<label>Move to <select class="lb-move" data-rid="'+r.id+'"><option value="">Choose…</option>'+store.people.filter(function(q){ return q.id!==p.id; }).map(function(q){ return '<option value="'+q.id+'">'+esc(q.name)+'</option>'; }).join('')+'<option value="__new">New person…</option></select></label>'
+    +(urls[r.id]?'<a class="lb-file" href="'+esc(urls[r.id])+'" target="_blank" rel="noopener">Open file</a>':'')+'</div>';
+  if(r.type==='lab'){
+    h+=labItems(r).map(labSectionHtml).join('');
+    if(r.manual) h+=(labManualOpen?'<div id="lab-form-slot" class="lab-form-slot"></div>':'<div class="lab-plus-row"><button type="button" class="lab-plus" onclick="labOpenManual()" aria-label="Add a value">+</button><span id="lab-plus-note" class="lab-plus-note"></span></div>');
+    if(!r.rows.length && !r.other.length && !r.manual) h+='<div class="lab-card-note">No test values were found in this report.</div>';
+    return h;
+  }
+  if(r.items&&r.items.length) h+='<div class="lb-items">'+r.items.map(function(x,i){ var c=dotCls(x.st); return '<div class="lb-it"><span class="lb-dot '+c+'"></span><span class="lb-il"><b>'+esc(x.label)+'</b>'+(x.normal?'<small>Normal: '+esc(x.normal)+'</small>':'')+'</span><span class="lb-iv">'+esc(x.value)+'</span></div>'; }).join('')+'</div>';
+  (r.lines||[]).forEach(function(b){
+    var inner='<ul class="lb-ul">'+b.t.map(function(s){ return '<li>'+esc(s)+'</li>'; }).join('')+'</ul>';
+    h+=b.fold?'<details class="lb-fold"><summary>'+esc(b.h)+'</summary>'+inner+'</details>':'<div class="lb-blk"><div class="lb-bh">'+esc(b.h)+'</div>'+inner+'</div>';
+  });
+  h+='<div class="lab-card-note">Read automatically from the report. Compare it with the original and check with your doctor.</div>';
+  return h;
+}
+function repHtml(p,r){
+  var s=labStatus(r), open=openRep[r.id]?' open':'', ed=editing&&editing.k==='r'&&editing.id===r.id, c=counts(r);
+  var nm=ed?'<span class="lb-edit"><input class="lb-in" value="'+esc(r.title)+'" data-in="r" data-id="'+r.id+'" aria-label="Report name"><button type="button" class="lb-ok" data-act="save-edit" aria-label="Save">\u2713</button><button type="button" class="lb-x" data-act="cancel-edit" aria-label="Cancel">\u2715</button></span>'
+    : '<span class="lb-rn">'+esc(r.title)+'<button type="button" class="lb-pen" data-act="edit-r" data-id="'+r.id+'" aria-label="Rename report" title="Rename">\u270E</button></span>';
+  return '<details class="lb-rep" data-rid="'+r.id+'"'+open+'><summary><span class="lb-dot '+dotCls(s)+'" title="'+(s==='ok'?'All normal':s==='bad'?'Something is out of range':s==='warn'?'Worth a look':'No reading to compare')+'"></span><span class="lb-rmain">'+nm+'<small>'+esc(shortDate(r.date))+(c?' · '+esc(c):'')+'</small></span><button type="button" class="lb-del" data-act="del-r" data-id="'+r.id+'" aria-label="Delete report" title="Delete">\u00D7</button><span class="lb-chev">\u25BE</span></summary><div class="lb-rbody">'+repBody(p,r)+'</div></details>';
+}
+function personHtml(p){
+  var ed=editing&&editing.k==='p'&&editing.id===p.id, byY={}, ys;
+  p.reports.forEach(function(r){ var y=r.date.slice(0,4); (byY[y]=byY[y]||[]).push(r); });
+  ys=Object.keys(byY).sort(function(a,b){ return b-a; });
+  var nm=ed?'<span class="lb-edit"><input class="lb-in" value="'+esc(p.name)+'" data-in="p" data-id="'+p.id+'" aria-label="Name"><button type="button" class="lb-ok" data-act="save-edit" aria-label="Save">\u2713</button><button type="button" class="lb-x" data-act="cancel-edit" aria-label="Cancel">\u2715</button></span>'
+    : '<span class="lb-pn">'+esc(p.name)+'</span><button type="button" class="lb-pen" data-act="edit-p" data-id="'+p.id+'" aria-label="Edit name" title="Edit name">\u270E</button>';
+  var h='<div class="lb-person" data-pid="'+p.id+'"><div class="lb-phdr">'+nm+'<span class="lb-pc">'+p.reports.length+' report'+(p.reports.length===1?'':'s')+'</span><button type="button" class="lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">\u00D7</button></div>';
+  if(!p.reports.length) h+='<div class="lab-card-note">No reports yet.</div>';
+  ys.forEach(function(y){
+    var yk=p.id+'|'+y, byM={}; byY[y].forEach(function(r){ (byM[r.date.slice(5,7)]=byM[r.date.slice(5,7)]||[]).push(r); });
+    h+='<details class="lb-year" data-k="'+yk+'"'+(closed[yk]?'':' open')+'><summary><span>'+y+'</span><span class="lb-chev">\u25BE</span></summary>';
+    Object.keys(byM).sort(function(a,b){ return b-a; }).forEach(function(m){
+      var mk=yk+'|'+m;
+      h+='<details class="lb-month" data-k="'+mk+'"'+(closed[mk]?'':' open')+'><summary><span>'+MONTHS[+m-1]+'</span><span class="lb-chev">\u25BE</span></summary>'
+        +byM[m].sort(function(a,b){ return a.date<b.date?1:a.date>b.date?-1:b.added-a.added; }).map(function(r){ return repHtml(p,r); }).join('')+'</details>';
+    });
+    h+='</details>';
+  });
+  return h+'</div>';
+}
+function render(){
+  var wrap=$('lab-results'); if(!wrap) return;
+  labParkForm();
+  wrap.innerHTML=store.people.map(personHtml).join('');
+  if(labManualOpen){ var slot=$('lab-form-slot'), pane=$('lab-pane-manual'); if(slot&&pane){ slot.appendChild(pane); pane.style.display=''; } }
+  try{ if(window.ayuLabRefreshReset) window.ayuLabRefreshReset(); }catch(e){}
+}
+window.renderLabResults=render;
+
+/* ───────── actions ───────── */
+function undoDelete(msg,restore){ if(window.ayuUndoAt){ try{ window.ayuUndoAt($('lab-results'),null,msg,restore); return; }catch(e){} } }
+function delReport(id){
+  var f=findRep(id); if(!f) return; if(!confirm('Delete "'+f.r.title+'"?')) return;
+  var at=f.p.reports.indexOf(f.r); f.p.reports.splice(at,1); save(); render(); labSay('Report deleted');
+}
+function delPerson(id){
+  var p=person(id); if(!p) return;
+  if(!confirm('Delete '+p.name+(p.reports.length?' and the '+p.reports.length+' report'+(p.reports.length===1?'':'s')+' under it':'')+'?')) return;
+  store.people=store.people.filter(function(q){ return q!==p; }); if(lastPid===id) lastPid=null; save(); render(); labSay('Deleted '+p.name);
+}
+function moveReport(rid,to){
+  var f=findRep(rid); if(!f||!to) return; var dest;
+  if(to==='__new'){ var n=prompt('Name for the new person?',''); n=cleanName(n||''); if(!n) { render(); return; } dest=store.people.filter(function(q){ return nameKey(q.name)===nameKey(n); })[0]; if(!dest){ dest={id:uid('p'),name:n,aliases:[],reports:[]}; store.people.push(dest); } }
+  else dest=person(to);
+  if(!dest||dest===f.p) return;
+  f.p.reports.splice(f.p.reports.indexOf(f.r),1); dest.reports.push(f.r); lastPid=dest.id;
+  var y=f.r.date.slice(0,4), m=f.r.date.slice(5,7); closed[dest.id+'|'+y]=false; closed[dest.id+'|'+y+'|'+m]=false; openRep[f.r.id]=true;
+  if(!f.p.reports.length && f.p.name==='Name not found') store.people=store.people.filter(function(q){ return q!==f.p; });
+  save(); render(); labSay('Moved to '+dest.name);
+}
+function saveEdit(){
+  if(!editing) return; var inp=document.querySelector('#lab-results .lb-in'); var v=(inp&&inp.value||'').trim(); if(!v){ if(inp) inp.focus(); return; }
+  if(editing.k==='p'){ var p=person(editing.id); if(p){ p.name=cleanName(v)||v; } }
+  else{ var f=findRep(editing.id); if(f) f.r.title=v.slice(0,80); }
+  editing=null; save(); render();
+}
+var host=$('lab-results');
+if(host){
+  var fresh=host.cloneNode(false); host.parentNode.replaceChild(fresh,host); host=fresh;   // the old list handlers go with the old element
+  host.addEventListener('click',function(e){
+    var t=e.target, a=t.closest('[data-act]');
+    if(a){
+      var act=a.getAttribute('data-act'), id=a.getAttribute('data-id');
+      if(act==='edit-p'||act==='edit-r'){ e.preventDefault(); editing={k:act==='edit-p'?'p':'r',id:id}; render(); var i=document.querySelector('#lab-results .lb-in'); if(i){ i.focus(); i.select(); } return; }
+      if(act==='save-edit'){ e.preventDefault(); saveEdit(); return; }
+      if(act==='cancel-edit'){ e.preventDefault(); editing=null; render(); return; }
+      if(act==='del-r'){ e.preventDefault(); e.stopPropagation(); delReport(id); return; }
+      if(act==='del-p'){ e.preventDefault(); e.stopPropagation(); delPerson(id); return; }
+    }
+    if(t.closest('.lab-edit-ui, .lab-edit-btn, .lb-edit, .lb-pen')) e.preventDefault();
+    var eb=t.closest('[data-lab-edit]');
+    if(eb){ labEditing=eb.getAttribute('data-lab-edit'); render(); var ii=document.querySelector('#lab-results .lab-edit-input'); if(ii){ ii.focus(); ii.select(); } return; }
+    var sb=t.closest('[data-lab-save]'); if(sb){ saveValue(sb.getAttribute('data-lab-save')); return; }
+    var db=t.closest('[data-lab-del]'); if(db){ e.preventDefault(); e.stopPropagation(); delEntry(db.getAttribute('data-lab-del')); return; }
+    if(t.closest('[data-lab-cancel]')){ labEditing=null; render(); }
+  });
+  host.addEventListener('keydown',function(e){
+    var li=e.target.closest&&e.target.closest('.lb-in');
+    if(li){ if(e.key==='Enter'){ e.preventDefault(); saveEdit(); } else if(e.key==='Escape'){ editing=null; render(); } else if(e.key===' '){ e.stopPropagation(); } return; }
+    var inp=e.target.closest&&e.target.closest('.lab-edit-input'); if(!inp) return;
+    if(e.key==='Enter'){ e.preventDefault(); saveValue(inp.getAttribute('data-lab-input')); } else if(e.key==='Escape'){ labEditing=null; render(); } else if(e.key===' '){ e.preventDefault(); }
+  });
+  host.addEventListener('keyup',function(e){ if(e.target.closest&&e.target.closest('.lb-in')&&e.key===' ') e.stopPropagation(); });
+  host.addEventListener('change',function(e){
+    var d=e.target.closest('.lb-date'); if(d){ var f=findRep(d.getAttribute('data-rid')); if(f&&/^\d{4}-\d{2}-\d{2}$/.test(d.value)){ f.r.date=d.value; var y=d.value.slice(0,4), m=d.value.slice(5,7); closed[f.p.id+'|'+y]=false; closed[f.p.id+'|'+y+'|'+m]=false; openRep[f.r.id]=true; save(); render(); } return; }
+    var mv=e.target.closest('.lb-move'); if(mv && mv.value) moveReport(mv.getAttribute('data-rid'),mv.value);
+  });
+  host.addEventListener('toggle',function(e){
+    var d=e.target; if(!d||!d.classList) return;
+    if(d.classList.contains('lb-year')||d.classList.contains('lb-month')){ closed[d.getAttribute('data-k')]=!d.open; }
+    else if(d.classList.contains('lb-rep')){ openRep[d.getAttribute('data-rid')]=d.open; }
+    else if(d.classList.contains('lab-sec')){ var k=d.getAttribute('data-key'); if(d.open) labOpen.add(k); else labOpen['delete'](k); }
+  },true);
+}
+function saveValue(key){
+  var inp=document.querySelector('#lab-results .lab-edit-input'), v=parseFloat(inp&&inp.value);
+  if(!isFinite(v)||v<0){ if(inp){ inp.classList.add('bad'); inp.focus(); } return; }
+  var pr=String(key).split('|'), f=findRep(pr[0]); if(!f) return; var row=f.r.rows.filter(function(x){ return x.refId===pr[1]; })[0]; if(row) row.value=v;
+  labEditing=null; save(); render();
+}
+function delEntry(key){
+  var k=String(key), bar=k.indexOf('|'), rid=k.slice(0,bar), rest=k.slice(bar+1), f=findRep(rid); if(!f) return;
+  if(rest.indexOf('other:')===0) f.r.other.splice(+rest.slice(6),1); else f.r.rows=f.r.rows.filter(function(x){ return x.refId!==rest; });
+  if(labEditing===k) labEditing=null; save(); render();
+}
+
+/* old entry points used by other parts of the page */
+window.labDeleteEntry=function(k){ delEntry(k); };
+function manualReport(){
+  var p=lastPid&&person(lastPid)||store.people[0];
+  if(!p){ p={id:uid('p'),name:'Me',aliases:[],reports:[]}; store.people.push(p); }
+  var r=p.reports.filter(function(x){ return x.manual; })[0];
+  if(!r){ r={id:uid('r'),type:'lab',manual:true,title:'Values typed in',date:todayStr(),file:'',rows:[],other:[],items:[],lines:[],st:'na',added:Date.now()}; p.reports.push(r); }
+  openRep[r.id]=true; closed[p.id+'|'+r.date.slice(0,4)]=false; closed[p.id+'|'+r.date.slice(0,4)+'|'+r.date.slice(5,7)]=false; return r;
+}
+window.addLabRow=function(refId,value){
+  if(refId==null||value==null||isNaN(value)) return;
+  var r=manualReport(), ex=r.rows.filter(function(x){ return x.refId===refId; })[0];
+  if(ex) ex.value=value; else r.rows.push({refId:refId,value:value});
+  save(); render();
+};
+window.labOpenManual=function(){
+  manualReport(); labManualOpen=true; var m=$('lab-form-msg'); if(m) m.textContent=''; save(); render();
+  var slot=$('lab-form-slot'), sel=$('lab-test-select'); if(slot) slot.scrollIntoView({block:'nearest',behavior:'smooth'}); if(sel) try{ sel.focus({preventScroll:true}); }catch(e){}
+};
+window.labCloseManual=function(){
+  labManualOpen=false; var v=$('lab-test-value'); if(v) v.value=''; if(window.labSelectShowPlaceholder) window.labSelectShowPlaceholder();
+  store.people.forEach(function(p){ p.reports=p.reports.filter(function(r){ return !(r.manual && !r.rows.length); }); });
+  save(); render();
+};
+window.labHasData=function(){ return store.people.length>0; };
+// The Reset button (Lab Insights) deletes every saved report.
+window.resetLabToDefault=function(){
+  {
+    Object.keys(urls).forEach(function(k){ try{ URL.revokeObjectURL(urls[k]); }catch(e){} }); urls={};
+    store={people:[]}; closed={}; openRep={}; editing=null; labEditing=null; labManualOpen=false; lastPid=null; save();
+    labFiles=[]; labRows=[]; labOther=[]; labOpen.clear();
+    var cp=$('calculator-panel'); if(cp) cp.style.minHeight='';
+    var m=document.querySelector('input[name="lab-sex"][value="male"]'); if(m) m.checked=true;
+    if(window.labSelectShowPlaceholder) window.labSelectShowPlaceholder();
+    labSay(''); render();
+  }
+};
+// Download PDF: every saved lab report, one section each.
+var oldDl=window.downloadLabPDF;
+window.downloadLabPDF=function(){
+  var pf=labFiles, pr=labRows, any=false;
+  labFiles=[]; labRows=[];
+  store.people.forEach(function(p){ p.reports.forEach(function(r){ if(r.type==='lab'&&(r.rows.length||r.other.length)){ any=true; labFiles.push({name:p.name+' \u2013 '+r.title+' ('+shortDate(r.date)+')',rows:r.rows,other:r.other}); } }); });
+  try{ if(!any){ alert('Add a lab report or a value first.'); } else oldDl(); } finally{ labFiles=pf; labRows=pr; }
+};
+
+/* file input: several PDFs / photos at once. Done after the page has loaded so it replaces the older single-file reader. */
+function boot(){
+  var inp=$('lab-pdf-input');
+  if(inp){
+    var ni=inp.cloneNode(false); ni.multiple=true; ni.setAttribute('accept','application/pdf,image/*,.pdf'); inp.parentNode.replaceChild(ni,inp);
+    ni.addEventListener('change',function(e){ var fs=[].slice.call(e.target.files||[]); e.target.value=''; if(fs.length) ingest(fs); });
+    var lab=document.querySelector('label[for="lab-pdf-input"]'); if(lab){ var ts=lab.querySelectorAll('.lub-t > span'); if(ts.length>1){ ts[0].textContent='Upload Reports'; ts[1].textContent='PDFs or Photos'; } else lab.textContent='Upload Reports'; }
+    var link=$('lab-file-link'); if(link) link.style.display='none';
+  }
+  var info=$('lab-info-panel'); if(info) info.textContent='Upload one or many lab reports, 2D Echo, TMT or scan reports (PDF or a clear photo), or add values yourself. Reports are kept under the person\u2019s name by year and month. The colour dot shows how the readings look; tap a report for the details. Everything stays on this device unless you use Backup & Restore.';
+  render();
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ setTimeout(boot,0); }); else setTimeout(boot,0);
+window.ayuLabs={store:function(){ return store; },build:build,fileText:fileText,findName:findName,findDate:findDate,ingest:ingest,render:render};
+render();
+})();
+
 </script>
 </body>
 
