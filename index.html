@@ -27611,10 +27611,10 @@ html body #alerts-panel:has(.alert-page[data-remtab="breaks"]) .alert-card > .se
 </style>
 <style id="care-autodismiss-20261121">
 /* Settings → Notifications → Care: Auto-close after [time], on one line */
-html body .ayu-care-ad{margin:2px 0 4px;padding:4px 2px 6px;border-radius:0;background:none;border:0;border-bottom:1px solid color-mix(in srgb,var(--footer-accent,#2563eb) 28%,#fff);color:#334155}
+html body .ayu-care-ad{margin:2px 0 4px;padding:4px 2px 0;margin-bottom:18px;border-radius:0;background:none;border:0;color:#334155}
 html body .ayu-care-ad .ad-chev{flex:0 0 auto;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:transparent;color:var(--footer-accent,#2563eb);cursor:pointer;padding:0;transition:transform .2s}
-html body .ayu-care-ad .ad-chev svg{width:18px;height:18px}
-html body .ayu-care-ad:not(.ad-on) .ad-chev{visibility:hidden;pointer-events:none}
+html body .ayu-care-ad .ad-chev svg{width:14px;height:10px}
+html body .ayu-care-ad:not(.ad-on) .ad-chev{opacity:.3;pointer-events:none}
 html body .ayu-care-ad.ad-on.ad-open .ad-chev{transform:rotate(180deg)}
 html body .ayu-care-ad .ad-row{display:flex;align-items:center;gap:8px;min-height:30px}
 html body .ayu-care-ad .ad-t{flex:1 1 auto;font-weight:800;font-size:.9rem;line-height:1.2;color:var(--footer-accent,#2563eb)}
@@ -27637,7 +27637,7 @@ html body #sec-notifications .na-g{border-left:0 !important;padding-left:4px !im
   var el=null, open=null;
   function mk(){
     var d=document.createElement('div'); d.className='ayu-care-ad';
-    d.innerHTML='<div class="ad-row"><span class="ad-t">Auto-close after</span><button type="button" class="ad-chev" aria-label="Show or hide the times" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><label class="master-switch" title="Auto-close Care notifications"><input type="checkbox" aria-label="Auto-close Care notifications"></label></div>'
+    d.innerHTML='<div class="ad-row"><span class="ad-t">Auto-close after</span><label class="master-switch" title="Auto-close Care notifications"><input type="checkbox" aria-label="Auto-close Care notifications"></label><button type="button" class="ad-chev" aria-label="Show or hide the times" aria-expanded="false"><svg viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg></button></div>'
       +'<div class="ad-chips" role="radiogroup" aria-label="Auto-close after">'+OPTS.map(function(m){ return '<button type="button" role="radio" data-m="'+m+'">'+(m===60?'1 hour':m+(m===1?' min':' min'))+'</button>'; }).join('')+'</div>';
     d.querySelector('input').addEventListener('change',function(e){ var o=load(); o.on=e.target.checked; open=o.on; save(o); });
     d.querySelector('.ad-chev').addEventListener('click',function(){ open=!open; paint(); });
