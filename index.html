@@ -25388,6 +25388,23 @@ html body #lab-results .lab-edit-ui .lab-edit-act{width:26px;height:26px;min-wid
 html body #lab-results .lab-edit-ui .lab-edit-act.save{background:#0e7490;color:#fff;box-shadow:none}
 html body #lab-results .lab-edit-ui .lab-edit-act svg{width:14px;height:14px}
 html body #lab-results#lab-results .lab-edit-ui .lab-edit-input{background:#f0fbfe !important;color:#0b4254 !important;height:26px !important;font-size:.82rem !important;width:64px !important;border-radius:7px !important}
+/* v13: full names wrap; plain icons float into the gap on the last text line */
+html body #lab-results .lb-phdr.lb-wrap{display:flow-root;padding:9px 6px 9px 12px}
+html body #lab-results .lb-phdr.lb-wrap .lb-pn{display:inline;flex:none;overflow:visible;white-space:normal;text-overflow:clip;font-size:1rem;line-height:1.25;overflow-wrap:anywhere}
+html body #lab-results .lb-pa{float:right;display:inline-flex;align-items:center;gap:2px;margin:-5px 0 -5px 6px;white-space:nowrap}
+html body #lab-results .lb-pa .lb-ib{background:transparent;box-shadow:none;min-width:30px;min-height:30px;width:30px;height:30px}
+html body #lab-results .lb-pa .lb-ib:hover{background:rgba(255,255,255,.45)}
+html body #lab-results .lb-rep>summary{display:flow-root;padding:9px 6px 9px 12px}
+html body #lab-results .lb-rtop{display:flow-root}
+html body #lab-results .lb-rtop .lb-rn{display:inline;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3;overflow-wrap:anywhere}
+html body #lab-results .lb-rep .lb-pa{margin-top:-4px;margin-bottom:-6px}
+html body #lab-results .lb-rep .lb-pa .lb-ib{background:transparent}
+html body #lab-results .lb-rep .lb-acts{gap:2px}
+html body #lab-results .lb-rep>summary>.lb-rsub{margin-top:3px}
+html body #lab-results details[open]>summary>.lb-pa>.lb-chev,html body #lab-results details[open]>summary>.lb-rtop>.lb-pa>.lb-chev{transform:rotate(180deg)}
+html body #lab-results .lb-rep>summary{font-size:.84rem}
+html body #lab-results .lb-rtop .lb-rn{font-size:.84rem}
+html body #lab-results .lb-pa .lb-chev{width:30px;height:30px;padding:8px 6px;box-sizing:border-box}
 </style>
 <script id="lab-reports-20261122-js">
 (function(){
@@ -25796,19 +25813,19 @@ function repBody(p,r){
 function repHtml(p,r,alt){
   var s=labStatus(r), ed=editing&&editing.k==='r'&&editing.id===r.id, open=(openRep[r.id]===false&&!ed)?'':' open', c=counts(r), sc=dotCls(s);
   var bt=c||ST[s];
-  return '<details class="lb-rep lb-s-'+sc+(alt?' lb-b':' lb-a')+'" data-rid="'+r.id+'"'+open+'><summary><span class="lb-rmain"><span class="lb-rn">'+esc(r.title)+'</span>'
-    +'<span class="lb-rsub">'+esc(shortDate(r.date))+'<span class="lb-badge '+sc+'">'+esc(bt)+'</span></span></span>'
-    +'<span class="lb-acts"><button type="button" class="lb-ib" data-act="edit-r" data-id="'+r.id+'" aria-label="Edit" title="Edit">'+PEN+'</button>'
+  return '<details class="lb-rep lb-s-'+sc+(alt?' lb-b':' lb-a')+'" data-rid="'+r.id+'"'+open+'><summary><span class="lb-rtop"><span class="lb-rn">'+esc(r.title)+'</span>'
+    +'<span class="lb-pa"><span class="lb-acts"><button type="button" class="lb-ib" data-act="edit-r" data-id="'+r.id+'" aria-label="Edit" title="Edit">'+PEN+'</button>'
     +(urls[r.id]?'<a class="lb-ib lb-file" href="'+esc(urls[r.id])+'" target="_blank" rel="noopener" aria-label="Open file" title="Open file">'+FILE+'</a>':'')
-    +'<button type="button" class="lb-ib lb-del" data-act="del-r" data-id="'+r.id+'" aria-label="Delete report" title="Delete">'+TRASH+'</button></span>'+chev()+'</summary><div class="lb-rbody">'+repBody(p,r)+'</div></details>';
+    +'<button type="button" class="lb-ib lb-del" data-act="del-r" data-id="'+r.id+'" aria-label="Delete report" title="Delete">'+TRASH+'</button></span>'+chev()+'</span></span>'
+    +'<span class="lb-rsub">'+esc(shortDate(r.date))+'<span class="lb-badge '+sc+'">'+esc(bt)+'</span></span></summary><div class="lb-rbody">'+repBody(p,r)+'</div></details>';
 }
 function personHtml(p){
   var ed=editing&&editing.k==='p'&&editing.id===p.id, byY={}, ys;
   p.reports.forEach(function(r){ var y=r.date.slice(0,4); (byY[y]=byY[y]||[]).push(r); });
   ys=Object.keys(byY).sort(function(a,b){ return b-a; });
   var nm=ed?'<span class="lb-edit"><input class="lb-in" value="'+esc(p.name)+'" data-in="p" data-id="'+p.id+'" aria-label="Name"><button type="button" class="lb-ok" data-act="save-edit" aria-label="Save">✓</button><button type="button" class="lb-x" data-act="cancel-edit" aria-label="Cancel">✕</button></span>'
-    : '<span class="lb-pn">'+esc(p.name)+'</span><button type="button" class="lb-ib" data-act="edit-p" data-id="'+p.id+'" aria-label="Edit name" title="Edit name">'+PEN+'</button>';
-  var altN=0, h='<details class="lb-person '+(store.people.indexOf(p)%2?'lb-l':'lb-d')+'" data-pid="'+p.id+'"'+((openP[p.id]||ed)?' open':'')+'><summary class="lb-phdr">'+nm+'<button type="button" class="lb-ib lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">'+TRASH+'</button>'+chev()+'</summary><div class="lb-pbody">';
+    : '<span class="lb-pn">'+esc(p.name)+'</span><span class="lb-pa"><button type="button" class="lb-ib" data-act="edit-p" data-id="'+p.id+'" aria-label="Edit name" title="Edit name">'+PEN+'</button>';
+  var altN=0, h='<details class="lb-person '+(store.people.indexOf(p)%2?'lb-l':'lb-d')+'" data-pid="'+p.id+'"'+((openP[p.id]||ed)?' open':'')+'><summary class="lb-phdr'+(ed?'':' lb-wrap')+'">'+nm+'<button type="button" class="lb-ib lb-del" data-act="del-p" data-id="'+p.id+'" aria-label="Delete this person and their reports" title="Delete">'+TRASH+'</button>'+chev()+(ed?'':'</span>')+'</summary><div class="lb-pbody">';
   if(!p.reports.length) h+='<div class="lab-card-note">No reports yet.</div>';
   ys.forEach(function(y){
     var yk=p.id+'|'+y, byM={}; byY[y].forEach(function(r){ (byM[r.date.slice(5,7)]=byM[r.date.slice(5,7)]||[]).push(r); });
