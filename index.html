@@ -25018,7 +25018,7 @@ body.to-picking{cursor:grabbing}
   function save(a){ try{ if(a.join()===DEF.join()) localStorage.removeItem(KEY); else localStorage.setItem(KEY,JSON.stringify(a)); }catch(e){} }
   function apply(a){
     var b=bar(), u=document.getElementById('tab-underline'); if(!b) return;
-    a.forEach(function(t){ var e=btn(t); if(e) b.insertBefore(e,u||null); });
+    a.forEach(function(t,i){ var e=btn(t); if(e){ b.insertBefore(e,u||null); e.style.order=String(i+1); } });   // the page's own CSS gives every tab a fixed 'order', so set it here too
     try{ var act=document.querySelector('#tab-btns .tab-btn.active'); if(act && typeof positionTabUnderline==='function') positionTabUnderline(act); }catch(e){}
   }
   function label(t){ var e=btn(t); return e ? e.textContent.replace(/\s+/g,' ').trim() : t; }
