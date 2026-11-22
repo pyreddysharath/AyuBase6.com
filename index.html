@@ -23064,6 +23064,7 @@ html body #sec-app .au-line .au-ic{display:inline-flex;align-items:center;justif
 html body #sec-app .au-line .au-tx{text-align:left;line-height:1.25}
 html body #sec-app .au-line .au-tx small{display:block;font-weight:500;font-size:.72rem;color:#64748b}
 html body #sec-app .au-note:not(#ayu-x1){text-align:center}
+html body #sec-app .au-auto-note:not(#ayu-x1){text-align:left;margin-left:2px;margin-right:0}
 </style>
 <style id="app-request-20261110">
 /* Download App: request the Android app (name + email); sent like Feedback, marked "App install request" */
@@ -25014,7 +25015,7 @@ body.to-dragging{cursor:grabbing}
   function colour(t){ return COL[t]||'#64748b'; }
   function render(){
     var box=document.getElementById('sec-taborder'); if(!box) return;
-    var a=load(), h='<p class="to-note">Drag \u2630 to reorder. The first tab opens at start.</p>';
+    var a=load(), h='<p class="to-note">Drag \u2630 to reorder.</p>';
     a.forEach(function(t,i){
       h+='<div class="to-row" data-t="'+t+'"><span class="to-grip" aria-hidden="true">\u2630</span><i class="to-dot" style="background:'+colour(t)+'"></i><span class="to-nm">'+label(t)+(i===0?'<span class="to-first">Opens first</span>':'')+'</span>'
        +'</div>';
@@ -25055,20 +25056,19 @@ body.to-dragging{cursor:grabbing}
     document.body.classList.add('to-dragging'); b.classList.add('to-lift');
     try{ if(navigator.vibrate) navigator.vibrate(15); }catch(x){}
   }
-  function slots(order){   // the position each tab would take for this order
-    var o={}, pos=dr.vert ? dr.R[0].top : dr.R[0].left;
-    order.forEach(function(i){ var sz=dr.vert ? dr.R[i].height : dr.R[i].width; o[i]=pos; pos+=sz+dr.gap; });
-    return o;
-  }
   function moveDrag(e){
     var d=dr, v=d.vert, pt=v ? e.clientY : e.clientX, dx=pt-(v ? d.y0 : d.x0);
+    function cen(k){ return v ? d.R[k].top+d.R[k].height/2 : d.R[k].left+d.R[k].width/2; }
     d.b.style.transform=(v?'translateY(':'translateX(')+dx+'px) scale(1.06)';
-    var cur=(v ? d.R[d.from].top+d.R[d.from].height/2 : d.R[d.from].left+d.R[d.from].width/2)+dx, to=0;
-    d.bs.forEach(function(b,i){ if(i===d.from) return; var c=v ? d.R[i].top+d.R[i].height/2 : d.R[i].left+d.R[i].width/2; if(cur>c) to++; });
+    var cur=cen(d.from)+dx, to=0;
+    d.bs.forEach(function(b,i){ if(i!==d.from && cur>=cen(i)) to++; });
     d.to=to;
-    var order=[]; d.bs.forEach(function(b,i){ if(i!==d.from) order.push(i); }); order.splice(to,0,d.from);
-    var sl=slots(order);
-    d.bs.forEach(function(b,i){ if(i===d.from) return; var base=v ? d.R[i].top : d.R[i].left, sh=sl[i]-base; b.style.transform=sh?(v?'translateY(':'translateX(')+sh+'px)':''; });
+    // only the tabs between the old and the new place move, each into its neighbour's place; the rest stay still
+    d.bs.forEach(function(b,i){
+      if(i===d.from) return; var k=i;
+      if(d.from<to && i>d.from && i<=to) k=i-1; else if(d.from>to && i>=to && i<d.from) k=i+1;
+      var sh=cen(k)-cen(i); b.style.transform=sh?(v?'translateY(':'translateX(')+sh+'px)':'';
+    });
   }
   function endDrag(ok){
     var d=dr; if(!d) return; dr=null;
@@ -25096,7 +25096,7 @@ body.to-dragging{cursor:grabbing}
       if(pend.type==='mouse'){ if(mv>8){ var p=pend; pend=null; startDrag(p.t,{clientX:p.x,clientY:p.y,pointerId:e.pointerId}); moveDrag(e); } }
       else if(mv>10){ clear(); }
     });
-    ['pointerup','pointercancel'].forEach(function(n){ b.addEventListener(n,function(e){ if(dr) endDrag(n==='pointerup'); clear(); }); });
+    ['pointerup','pointercancel'].forEach(function(n){ b.addEventListener(n,function(e){ if(dr) endDrag(true); clear(); }); });
     b.addEventListener('lostpointercapture',function(){ if(dr) endDrag(true); });
     b.addEventListener('contextmenu',function(e){ if(dr || pend) e.preventDefault(); });
     b.addEventListener('click',function(e){ if(Date.now()-justDragged<400){ e.preventDefault(); e.stopImmediatePropagation(); } },true);
