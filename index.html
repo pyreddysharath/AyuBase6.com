@@ -21592,11 +21592,11 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
       if(N && typeof N.updateChecksGet==='function'){
         N.updateChecksGet().then(function(n){
           var card=sec.querySelector('.au-card'); if(!card || $('au-auto')) return;
-          card.insertAdjacentHTML('afterend','<div class="au-auto-row"><span class="au-auto-l">Check automatically</span><label class="master-switch" title="Check automatically"><input type="checkbox" id="au-auto" aria-label="Check for updates automatically"></label></div><div class="au-note au-auto-note">Every 2 hours from 10 AM to 8 PM, with a quiet notification.</div>');
+          card.insertAdjacentHTML('afterend','<div class="au-auto-row"><span class="au-auto-l">Check automatically</span><label class="master-switch" title="Check automatically"><input type="checkbox" id="au-auto" aria-label="Check for updates automatically"></label></div><div class="au-note au-auto-note">Every 2 hours, 10 AM to 8 PM.</div>');
           var sw=$('au-auto'); sw.checked=(isNaN(n)?2:n)>0;
           sw.addEventListener('change',function(){ N.updateChecksSet(sw.checked?2:0).catch(function(){}); });
           if(typeof N.autoUpdateGet==='function' && !$('au-autoinst')){
-            sec.querySelector('.au-auto-note').insertAdjacentHTML('afterend','<div class="au-auto-row au-inst-row"><span class="au-auto-l">Update automatically</span><label class="master-switch" title="Update automatically"><input type="checkbox" id="au-autoinst" aria-label="Update automatically"></label></div><div class="au-note au-auto-note au-inst-row">New versions download by themselves, then Android asks you to confirm.</div>');
+            sec.querySelector('.au-auto-note').insertAdjacentHTML('afterend','<div class="au-auto-row au-inst-row"><span class="au-auto-l">Update automatically</span><label class="master-switch" title="Update automatically"><input type="checkbox" id="au-autoinst" aria-label="Update automatically"></label></div><div class="au-note au-auto-note au-inst-row">Downloads itself; you confirm to install.</div>');
             var si=$('au-autoinst'); si.checked=!!N.autoUpdateGet();
             si.addEventListener('change',function(){ N.autoUpdateSet(si.checked); });
             window.addEventListener('ayu-update-info',function(){ if(si.checked!==!!N.autoUpdateGet()) si.checked=!!N.autoUpdateGet(); });
