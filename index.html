@@ -24986,7 +24986,10 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:#4a3a96;lin
 #tab-btns .tab-btn.to-lift{position:relative;z-index:5;box-shadow:0 10px 22px rgba(0,0,0,.28);background:#fff;transition:none !important}
 body.to-dragging #tab-btns .tab-btn:not(.to-lift){transition:transform .15s ease !important}
 body.to-dragging{cursor:grabbing}
-#sec-taborder .to-ar{display:none}
+#sec-taborder .to-ar{display:flex;gap:6px;flex:none}
+#sec-taborder .to-grip{color:#94a3b8;font-size:1.1rem;cursor:grab;touch-action:none;padding:4px 4px 4px 0;user-select:none;-webkit-user-select:none}
+#sec-taborder .to-row.to-lifted{position:relative;z-index:3;box-shadow:0 8px 18px rgba(0,0,0,.22);transition:none}
+#sec-taborder .to-row{transition:transform .15s ease}
 #sec-taborder .to-ar button{width:30px;height:30px;border-radius:9px;border:0;background:color-mix(in srgb,var(--footer-accent,#2563eb) 12%,#fff);color:var(--footer-accent,#2563eb);font-size:.8rem;font-weight:800;cursor:pointer;padding:0}
 #sec-taborder .to-ar button:disabled{opacity:.3;cursor:default}
 #sec-taborder .to-reset{display:block;width:100%;margin-top:8px;padding:9px 12px;border-radius:10px;border:1.5px solid var(--footer-accent,#2563eb);background:#fff;color:var(--footer-accent,#2563eb);font:inherit;font-weight:800;font-size:.92rem;cursor:pointer}
@@ -25010,13 +25013,36 @@ body.to-dragging{cursor:grabbing}
   function colour(t){ return COL[t]||'#64748b'; }
   function render(){
     var box=document.getElementById('sec-taborder'); if(!box) return;
-    var a=load(), h='<p class="to-note">Press and hold a top tab, then drag it to a new place. The first tab opens when the app starts.</p>';
+    var a=load(), h='<p class="to-note">Drag \u2630 or tap \u25B2 \u25BC. The first tab opens at start.</p>';
     a.forEach(function(t,i){
-      h+='<div class="to-row" data-t="'+t+'"><i class="to-dot" style="background:'+colour(t)+'"></i><span class="to-nm">'+label(t)+(i===0?'<span class="to-first">Opens first</span>':'')+'</span>'
-       +'</div>';
+      h+='<div class="to-row" data-t="'+t+'"><span class="to-grip" aria-hidden="true">\u2630</span><i class="to-dot" style="background:'+colour(t)+'"></i><span class="to-nm">'+label(t)+(i===0?'<span class="to-first">Opens first</span>':'')+'</span>'
+       +'<span class="to-ar"><button type="button" data-d="-1" aria-label="Move '+label(t)+' up"'+(i===0?' disabled':'')+'>\u25B2</button><button type="button" data-d="1" aria-label="Move '+label(t)+' down"'+(i===a.length-1?' disabled':'')+'>\u25BC</button></span></div>';
     });
     h+='<button type="button" class="to-reset"'+(a.join()===DEF.join()?' disabled':'')+'>Reset to default</button>';
     box.innerHTML=h;
+  }
+  function move(t,d){ var a=load(), i=a.indexOf(t), j=i+d; if(i<0||j<0||j>=a.length) return; a.splice(i,1); a.splice(j,0,t); save(a); apply(a); render(); }
+  // drag a row by its handle in Settings > Tab Order
+  function listDrag(box){
+    box.addEventListener('pointerdown',function(e){
+      var g=e.target.closest('.to-grip'); if(!g) return; var row=g.closest('.to-row'); if(!row) return;
+      e.preventDefault();
+      var rows=[].slice.call(box.querySelectorAll('.to-row')), from=rows.indexOf(row), y0=e.clientY, R=rows.map(function(r){ return r.getBoundingClientRect(); }), to=from;
+      row.classList.add('to-lifted');
+      function mv(ev){
+        var dy=ev.clientY-y0; row.style.transform='translateY('+dy+'px)';
+        var cur=R[from].top+R[from].height/2+dy; to=0; rows.forEach(function(r,i){ if(i!==from && cur>R[i].top+R[i].height/2) to++; });
+        var step=R[1].top-R[0].top;
+        rows.forEach(function(r,i){ if(i===from) return; var sh=0; if(from<to && i>from && i<=to) sh=-step; if(from>to && i>=to && i<from) sh=step; r.style.transform=sh?'translateY('+sh+'px)':''; });
+      }
+      function up(){
+        window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up); window.removeEventListener('pointercancel',up);
+        rows.forEach(function(r){ r.style.transform=''; r.classList.remove('to-lifted'); });
+        if(to!==from){ var a=load(), k=a.splice(from,1)[0]; a.splice(to,0,k); save(a); apply(a); }
+        render();
+      }
+      window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up);
+    });
   }
   // ── drag and drop on the tab bar: press and hold (touch) or drag (mouse), move, let go ──
   var dr=null, justDragged=0;
@@ -25078,12 +25104,14 @@ body.to-dragging{cursor:grabbing}
   function build(){
     var sec=document.getElementById('sec-settings'), tabs=sec && sec.querySelector(':scope > .footer-subtabs'); if(!tabs) return false;
     if(document.getElementById('sec-taborder')) return true;
-    var b=document.createElement('button'); b.type='button'; b.className='footer-subtab'; b.id='subtab-taborder'; b.setAttribute('role','tab'); b.setAttribute('onclick',"showFooterSub('settings','taborder')"); b.innerHTML='Tab order<i class="fs-dot"></i>';
+    var b=document.createElement('button'); b.type='button'; b.className='footer-subtab'; b.id='subtab-taborder'; b.setAttribute('role','tab'); b.setAttribute('onclick',"showFooterSub('settings','taborder')"); b.innerHTML='Tab Order<i class="fs-dot"></i>';
     tabs.appendChild(b);
     var d=document.createElement('div'); d.className='footer-sub'; d.id='sec-taborder'; d.style.display='none'; sec.appendChild(d);
+    listDrag(d);
     d.addEventListener('click',function(e){
       var x=e.target.closest('button'); if(!x) return;
       if(x.classList.contains('to-reset')){ save(DEF.slice()); apply(DEF); render(); return; }
+      var r=x.closest('.to-row'); if(r && x.dataset.d){ move(r.dataset.t,+x.dataset.d); return; }
     });
     try{ FOOTER_SUBS.settings.push('taborder'); }catch(e){}
     var o=window.showFooterSub;
