@@ -24872,9 +24872,16 @@ html body #mind-panel #mind-alert-card:not(.mt-on) .mt-opts{display:none}
 html body #mind-panel .mt-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
 html body #mind-panel .mt-row .mt-lbl{font-weight:700;min-width:70px;font-size:.9rem;color:var(--mind-1,#3730a3)}
 html body #mind-panel .mt-row .mt-lbl::before{content:'•';margin-right:6px;color:var(--mind-2,#6250b3);font-weight:800}
-html body #mind-panel .mt-row select{flex:1 1 140px;min-width:0;border:1.5px solid var(--mind-2,#6250b3);border-radius:10px;padding:8px 10px;font:inherit;background:#fff;color:var(--mind-1,#3730a3)}
-html body #mind-panel .mt-row .mt-time{border:1.5px solid var(--mind-2,#6250b3);border-radius:10px;background:#fff;color:var(--mind-1,#3730a3);font:inherit;font-weight:700;padding:8px 14px;cursor:pointer}
-html body #mind-panel .mt-row .mt-play{border:0;background:transparent;color:var(--mind-2,#6250b3);font-size:15px;cursor:pointer;padding:4px 8px}
+html body #mind-panel .mt-row select{flex:1 1 140px;min-width:0;border:1.5px solid var(--mind-2,#6250b3);border-radius:10px;padding:3px 8px;min-height:0 !important;height:auto !important;font:inherit;line-height:1.3;background:#fff;color:var(--mind-1,#3730a3)}
+html body #mind-panel .mt-row .mt-time{border:1.5px solid var(--mind-2,#6250b3);border-radius:10px;background:#fff;color:var(--mind-1,#3730a3);font:inherit;font-weight:700;line-height:1.3;padding:3px 12px;cursor:pointer}
+html body #mind-panel .mt-row .mt-play{border:0;background:transparent;color:var(--mind-2,#6250b3);font-size:15px;line-height:1;cursor:pointer;padding:3px 7px}
+html body #mind-panel .mt-row .mt-mute{border:1.5px solid var(--mind-2,#6250b3);border-radius:8px;padding:2px 6px;font-size:14px}
+html body #mind-panel .mt-row .mt-mute.muted{background:var(--mind-2,#6250b3);color:#fff}
+.tp-overlay.mind-tp .tp-dialog{--tp-accent:var(--mind-2,#6250b3)}
+.tp-overlay.mind-tp{--alert-2:var(--mind-2,#6250b3);--tl-0d9488:var(--mind-2,#6250b3);--tl-134e4a:var(--mind-1,#3730a3)}
+.tp-overlay.mind-tp .tp-dial circle:first-child{fill:color-mix(in srgb,var(--mind-2,#6250b3) 12%,#fff)}
+.tp-overlay.mind-tp .tp-dial text:not([fill="#fff"]){fill:var(--mind-1,#3730a3)}
+.tp-overlay.mind-tp .tp-seg:not(.on){background:color-mix(in srgb,var(--mind-2,#6250b3) 16%,#fff)}
 html body #mind-panel .mt-row .master-switch{margin-left:auto}
 html body #mind-panel .master-switch input:checked:not(#ayu-x1){background:var(--mind-2,#6250b3) !important;border-color:var(--mind-2,#6250b3) !important}
 html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:#4a3a96;line-height:1.4}
@@ -24951,16 +24958,18 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:#4a3a96;lin
     var pg=document.querySelector('#mind-panel .mind-page'); if(!pg || $('mind-alert-card')) return !!$('mind-alert-card');
     var o=load(), c=document.createElement('div'); c.className='mind-card'; c.id='mind-alert-card';
     c.innerHTML='<div class="mind-card-hdr"><span class="mind-icon">🔔</span><h2>Daily Thought</h2><label class="master-switch" title="Daily thought alert"><input type="checkbox" id="mind-on" aria-label="Daily thought alert"></label></div>'
-      +'<div class="mt-opts"><p class="mt-note">One thought a day, in turn, at the time you choose (Android app).</p>'
+      +'<div class="mt-opts">'
       +'<div class="mt-row"><span class="mt-lbl">Time</span><button type="button" class="mt-time" id="mind-time"></button></div>'
-      +'<div class="mt-row"><span class="mt-lbl">Sound</span><select id="mind-sound" aria-label="Sound"></select><button type="button" class="mt-play" id="mind-play" title="Play" aria-label="Play the sound">▶</button></div>'
+      +'<div class="mt-row"><span class="mt-lbl">Sound</span><select id="mind-sound" aria-label="Sound"></select><button type="button" class="mt-play" id="mind-play" title="Play" aria-label="Play the sound">▶</button><button type="button" class="mt-play mt-mute" id="mind-mute" title="Mute" aria-label="Mute">🔊</button></div>'
       +'<div class="mt-row mt-vib"><span class="mt-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" id="mind-vib" aria-label="Vibrate"></label></div></div>';
     pg.insertBefore(c,pg.firstChild);
-    var on=$('mind-on'), tm=$('mind-time'), sd=$('mind-sound'), vb=$('mind-vib');
+    var on=$('mind-on'), tm=$('mind-time'), sd=$('mind-sound'), vb=$('mind-vib'), mu=$('mind-mute');
+    function paintMute(m){ mu.classList.toggle('muted',!!m); mu.textContent=m?'🔇':'🔊'; mu.title=m?'Unmute':'Mute'; sd.disabled=!!m; }
     sd.innerHTML=toneList(); if(!sd.querySelector('option[value="'+o.sound+'"]')) o.sound='xylophone';
-    on.checked=o.on; c.classList.toggle('mt-on',o.on); tm.textContent=fmt(hm(o.at)); sd.value=o.sound; vb.checked=o.vibrate;
+    on.checked=o.on; c.classList.toggle('mt-on',o.on); tm.textContent=fmt(hm(o.at)); sd.value=o.sound; vb.checked=o.vibrate; paintMute(o.muted);
+    mu.addEventListener('click',function(){ var x=load(); x.muted=!x.muted; save(x); paintMute(x.muted); });
     on.addEventListener('change',function(){ var x=load(); x.on=on.checked; c.classList.toggle('mt-on',x.on); save(x); });
-    tm.addEventListener('click',function(){ var pk=window.openTimePicker; if(typeof pk!=='function') return; var x=load(); pk('custom',hm(x.at),function(v){ var m=mm(v); if(m===null) return; var y=load(); y.at=m; save(y); tm.textContent=fmt(hm(m)); },'Daily thought — time'); });
+    tm.addEventListener('click',function(){ var pk=window.openTimePicker; if(typeof pk!=='function') return; var x=load(); pk('custom',hm(x.at),function(v){ var m=mm(v); if(m===null) return; var y=load(); y.at=m; save(y); tm.textContent=fmt(hm(m)); },'Daily thought — time'); var ov=document.querySelectorAll('.tp-overlay'); if(ov.length) ov[ov.length-1].classList.add('mind-tp'); });
     sd.addEventListener('change',function(){ var x=load(); x.sound=sd.value; save(x); });
     $('mind-play').addEventListener('click',function(){ try{ var v=sd.value; playAlertPreset(/^[a-z]{1,12}$/.test(v)&&v!=='phone' ? v : 'xylophone'); }catch(e){} });
     vb.addEventListener('change',function(){ var x=load(); x.vibrate=vb.checked; save(x); });
@@ -24971,7 +24980,7 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:#4a3a96;lin
     var o=load(); if(!o.on) return null;
     var items=[]; lists().forEach(function(ul){ if(!ul) return; [].forEach.call(ul.children,function(li){ if(li.hidden||li.style.display==='none'&&!li.classList.contains('mt-editing')) return; var t=(li.querySelector('.mt-txt')||li).textContent.trim(); if(t) items.push(t.slice(0,300)); }); });
     if(!items.length) return null;
-    return { on:true, at:o.at, sound:/^[a-z]{1,12}$/.test(o.sound)?o.sound:'xylophone', vibrate:!!o.vibrate, items:items };
+    return { on:true, at:o.at, sound:o.muted?'none':(/^[a-z]{1,12}$/.test(o.sound)?o.sound:'xylophone'), vibrate:!!o.vibrate, items:items };
   };
   function go(){ tag(); addButtons(); apply(); alertCard(); }
   var n=0, iv=setInterval(function(){ go(); if(++n>20) clearInterval(iv); },300); go();
@@ -24985,8 +24994,9 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:#4a3a96;lin
 #sec-taborder .to-nm{flex:1;min-width:0;text-transform:none}
 #sec-taborder .to-first{font-size:.68rem;font-weight:800;color:var(--footer-accent,#2563eb);background:color-mix(in srgb,var(--footer-accent,#2563eb) 14%,#fff);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:middle}
 #tab-btns .tab-btn{touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
-#tab-btns .tab-btn.to-lift{position:relative;z-index:5;box-shadow:0 10px 22px rgba(0,0,0,.28);background:#fff;transition:none !important}
-body.to-dragging #tab-btns .tab-btn:not(.to-lift){transition:transform .15s ease !important}
+#tab-btns .tab-btn.to-src{opacity:.3}
+.tab-btn.to-ghost{position:fixed !important;margin:0 !important;z-index:100001;pointer-events:none;background:#fff !important;box-shadow:0 10px 22px rgba(0,0,0,.3);border-radius:12px;transform:scale(1.05);transition:none !important}
+.to-mark{position:fixed;z-index:100000;pointer-events:none;border-radius:3px;background:var(--footer-accent,#2563eb)}
 body.to-dragging{cursor:grabbing}
 #sec-taborder .to-ar{display:none}
 #sec-taborder .to-grip{color:#94a3b8;font-size:1.1rem;cursor:grab;touch-action:none;padding:4px 4px 4px 0;user-select:none;-webkit-user-select:none}
@@ -25045,37 +25055,38 @@ body.to-dragging{cursor:grabbing}
       window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up);
     });
   }
-  // ── drag and drop on the tab bar: press and hold (touch) or drag (mouse), move, let go ──
+  // ── drag and drop on the tab bar: press and hold, move, let go. The other tabs never move; a line shows where it will land ──
   var dr=null, justDragged=0;
-  function rects(bs){ return bs.map(function(b){ return b.getBoundingClientRect(); }); }
   function startDrag(b,e){
-    var bs=[].slice.call(document.querySelectorAll('#tab-btns .tab-btn')), R=rects(bs); if(bs.length<2) return;
-    var vert=R[1].top-R[0].top > R[0].height*0.5, gap=vert ? R[1].top-R[0].bottom : R[1].left-R[0].right;
-    dr={b:b,bs:bs,R:R,vert:vert,gap:gap,from:bs.indexOf(b),to:bs.indexOf(b),x0:e.clientX,y0:e.clientY,id:e.pointerId};
-    try{ b.setPointerCapture(e.pointerId); }catch(x){}
-    document.body.classList.add('to-dragging'); b.classList.add('to-lift');
+    var bs=[].slice.call(document.querySelectorAll('#tab-btns .tab-btn')); if(bs.length<2) return;
+    var R=bs.map(function(x){ return x.getBoundingClientRect(); }), r=R[bs.indexOf(b)];
+    var vert=R[1].top-R[0].top > R[0].height*0.5;
+    var g=b.cloneNode(true); g.removeAttribute('id'); g.classList.add('to-ghost'); g.style.cssText='left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;height:'+r.height+'px';
+    document.body.appendChild(g);
+    var m=document.createElement('div'); m.className='to-mark'; document.body.appendChild(m);
+    dr={b:b,bs:bs,R:R,vert:vert,from:bs.indexOf(b),to:bs.indexOf(b),x0:e.clientX,y0:e.clientY,g:g,m:m,l0:r.left,t0:r.top,moved:false};
+    b.classList.add('to-src'); document.body.classList.add('to-dragging');
     try{ if(navigator.vibrate) navigator.vibrate(15); }catch(x){}
+    place(e);
   }
-  function moveDrag(e){
-    var d=dr, v=d.vert, pt=v ? e.clientY : e.clientX, dx=pt-(v ? d.y0 : d.x0);
-    function cen(k){ return v ? d.R[k].top+d.R[k].height/2 : d.R[k].left+d.R[k].width/2; }
-    d.b.style.transform=(v?'translateY(':'translateX(')+dx+'px) scale(1.06)';
-    var cur=cen(d.from)+dx, to=0;
-    d.bs.forEach(function(b,i){ if(i!==d.from && cur>=cen(i)) to++; });
-    d.to=to;
-    // only the tabs between the old and the new place move, each into its neighbour's place; the rest stay still
-    d.bs.forEach(function(b,i){
-      if(i===d.from) return; var k=i;
-      if(d.from<to && i>d.from && i<=to) k=i-1; else if(d.from>to && i>=to && i<d.from) k=i+1;
-      var sh=cen(k)-cen(i); b.style.transform=sh?(v?'translateY(':'translateX(')+sh+'px)':'';
-    });
+  function place(e){
+    var d=dr, v=d.vert, dx=e.clientX-d.x0, dy=e.clientY-d.y0;
+    if(Math.hypot(dx,dy)>6) d.moved=true;
+    d.g.style.left=(d.l0+(v?0:dx))+'px'; d.g.style.top=(d.t0+(v?dy:0))+'px';
+    var pt=v?e.clientY:e.clientX, k=0, others=[];
+    d.bs.forEach(function(b,i){ if(i!==d.from){ others.push(i); var c=v?d.R[i].top+d.R[i].height/2:d.R[i].left+d.R[i].width/2; if(pt>c) k++; } });
+    d.to=k;   // the place among the other tabs
+    var m=d.m, a=others[k-1], z=others[k], pos;
+    if(k===0) pos=v?d.R[z].top:d.R[z].left; else if(k===others.length) pos=v?d.R[a].bottom:d.R[a].right; else pos=v?(d.R[a].bottom+d.R[z].top)/2:(d.R[a].right+d.R[z].left)/2;
+    var ref=d.R[others[0]], last=d.R[others[others.length-1]];
+    if(v){ m.style.cssText='left:'+ref.left+'px;width:'+ref.width+'px;top:'+(pos-1.5)+'px;height:3px'; }
+    else { m.style.cssText='top:'+Math.min(ref.top,last.top)+'px;height:'+ref.height+'px;left:'+(pos-1.5)+'px;width:3px'; }
   }
   function endDrag(ok){
     var d=dr; if(!d) return; dr=null;
-    d.bs.forEach(function(b){ b.style.transform=''; b.classList.remove('to-lift'); });
-    document.body.classList.remove('to-dragging');
-    justDragged=Date.now();
-    if(ok && d.to!==d.from){
+    d.g.remove(); d.m.remove(); d.b.classList.remove('to-src'); document.body.classList.remove('to-dragging');
+    if(d.moved) justDragged=Date.now();
+    if(ok && d.moved && d.to!==d.from){
       var keys=d.bs.map(function(b){ return DEF.filter(function(t){ return b.classList.contains(t); })[0]; });
       var k=keys.splice(d.from,1)[0]; keys.splice(d.to,0,k); save(keys); apply(keys); try{ render(); }catch(x){}
     }
@@ -25087,17 +25098,18 @@ body.to-dragging{cursor:grabbing}
     b.addEventListener('pointerdown',function(e){
       var t=e.target.closest('.tab-btn'); if(!t || (e.pointerType==='mouse' && e.button!==0)) return;
       pend={t:t,x:e.clientX,y:e.clientY,type:e.pointerType,e:e};
-      if(e.pointerType!=='mouse') hold=setTimeout(function(){ if(pend){ startDrag(pend.t,pend.e); pend=null; } },450);
+      if(e.pointerType!=='mouse') hold=setTimeout(function(){ if(pend){ var p=pend; pend=null; startDrag(p.t,{clientX:p.e.clientX,clientY:p.e.clientY}); } },300);
     });
-    b.addEventListener('pointermove',function(e){
-      if(dr){ e.preventDefault(); moveDrag(e); return; }
+    window.addEventListener('pointermove',function(e){
+      if(dr){ e.preventDefault(); place(e); return; }
       if(!pend) return;
       var mv=Math.hypot(e.clientX-pend.x,e.clientY-pend.y);
-      if(pend.type==='mouse'){ if(mv>8){ var p=pend; pend=null; startDrag(p.t,{clientX:p.x,clientY:p.y,pointerId:e.pointerId}); moveDrag(e); } }
-      else if(mv>10){ clear(); }
-    });
-    ['pointerup','pointercancel'].forEach(function(n){ b.addEventListener(n,function(e){ if(dr) endDrag(true); clear(); }); });
-    b.addEventListener('lostpointercapture',function(){ if(dr) endDrag(true); });
+      if(pend.type==='mouse'){ if(mv>8){ var p=pend; pend=null; startDrag(p.t,{clientX:p.x,clientY:p.y}); place(e); } }
+      else if(mv>12){ clear(); }
+    },{passive:false});
+    window.addEventListener('pointerup',function(){ if(dr) endDrag(true); clear(); });
+    window.addEventListener('pointercancel',function(){ if(dr) endDrag(true); clear(); });
+    window.addEventListener('blur',function(){ if(dr) endDrag(false); clear(); });
     b.addEventListener('contextmenu',function(e){ if(dr || pend) e.preventDefault(); });
     b.addEventListener('click',function(e){ if(Date.now()-justDragged<400){ e.preventDefault(); e.stopImmediatePropagation(); } },true);
   }
