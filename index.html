@@ -24590,6 +24590,11 @@ html body #sec-notifications .na-g:not(#ayu-x1){border-left:0;padding:0;margin:1
 html body #sec-notifications .na-row:not(#ayu-x1){border-bottom:0}
 html body #sec-notifications .notif-help-card:not(#ayu-x1){margin-top:4px}
 </style>
+<style id="notif-section-gap-20261122">
+/* System / App / Test notifications: a soft fading line sits in the middle of the gap between sections (none after the last). */
+html body #sec-notifications #notif-all > .ns-h:not(#ayu-x1),html body #sec-notifications #ns-test:not(#ayu-x1){position:relative;margin-top:36px}
+html body #sec-notifications #notif-all > .ns-h:not(#ayu-x1)::before,html body #sec-notifications #ns-test:not(#ayu-x1)::before{content:"";position:absolute;left:0;right:0;top:-18px;height:2px;background:linear-gradient(90deg,transparent,var(--footer-accent,#0d9488),transparent);opacity:.6;pointer-events:none}
+</style>
 <style id="notif-cookie-type-20261114">
 html body #sec-notifications .ns-h:not(#ayu-x1){font-size:.84rem;line-height:1.6;font-weight:800;color:#2d2b23}
 html body #sec-notifications .na-n:not(#ayu-x1){font-size:.84rem}
