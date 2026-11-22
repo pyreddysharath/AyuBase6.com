@@ -24982,7 +24982,11 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:#4a3a96;lin
 #sec-taborder .to-dot{width:12px;height:12px;border-radius:50%;flex:none}
 #sec-taborder .to-nm{flex:1;min-width:0;text-transform:none}
 #sec-taborder .to-first{font-size:.68rem;font-weight:800;color:var(--footer-accent,#2563eb);background:color-mix(in srgb,var(--footer-accent,#2563eb) 14%,#fff);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:middle}
-#sec-taborder .to-ar{display:flex;gap:6px;flex:none}
+#tab-btns .tab-btn{touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+#tab-btns .tab-btn.to-lift{position:relative;z-index:5;box-shadow:0 10px 22px rgba(0,0,0,.28);background:#fff;transition:none !important}
+body.to-dragging #tab-btns .tab-btn:not(.to-lift){transition:transform .15s ease !important}
+body.to-dragging{cursor:grabbing}
+#sec-taborder .to-ar{display:none}
 #sec-taborder .to-ar button{width:30px;height:30px;border-radius:9px;border:0;background:color-mix(in srgb,var(--footer-accent,#2563eb) 12%,#fff);color:var(--footer-accent,#2563eb);font-size:.8rem;font-weight:800;cursor:pointer;padding:0}
 #sec-taborder .to-ar button:disabled{opacity:.3;cursor:default}
 #sec-taborder .to-reset{display:block;width:100%;margin-top:8px;padding:9px 12px;border-radius:10px;border:1.5px solid var(--footer-accent,#2563eb);background:#fff;color:var(--footer-accent,#2563eb);font:inherit;font-weight:800;font-size:.92rem;cursor:pointer}
@@ -25006,15 +25010,71 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:#4a3a96;lin
   function colour(t){ return COL[t]||'#64748b'; }
   function render(){
     var box=document.getElementById('sec-taborder'); if(!box) return;
-    var a=load(), h='<p class="to-note">Choose the order of the top tabs. The first one opens when the app starts.</p>';
+    var a=load(), h='<p class="to-note">Press and hold a top tab, then drag it to a new place. The first tab opens when the app starts.</p>';
     a.forEach(function(t,i){
       h+='<div class="to-row" data-t="'+t+'"><i class="to-dot" style="background:'+colour(t)+'"></i><span class="to-nm">'+label(t)+(i===0?'<span class="to-first">Opens first</span>':'')+'</span>'
-       +'<span class="to-ar"><button type="button" data-d="-1" aria-label="Move '+label(t)+' up"'+(i===0?' disabled':'')+'>\u25B2</button><button type="button" data-d="1" aria-label="Move '+label(t)+' down"'+(i===a.length-1?' disabled':'')+'>\u25BC</button></span></div>';
+       +'</div>';
     });
     h+='<button type="button" class="to-reset"'+(a.join()===DEF.join()?' disabled':'')+'>Reset to default</button>';
     box.innerHTML=h;
   }
-  function move(t,d){ var a=load(), i=a.indexOf(t), j=i+d; if(i<0||j<0||j>=a.length) return; a.splice(i,1); a.splice(j,0,t); save(a); apply(a); render(); }
+  // ── drag and drop on the tab bar: press and hold (touch) or drag (mouse), move, let go ──
+  var dr=null, justDragged=0;
+  function rects(bs){ return bs.map(function(b){ return b.getBoundingClientRect(); }); }
+  function startDrag(b,e){
+    var bs=[].slice.call(document.querySelectorAll('#tab-btns .tab-btn')), R=rects(bs); if(bs.length<2) return;
+    var vert=R[1].top-R[0].top > R[0].height*0.5, gap=vert ? R[1].top-R[0].bottom : R[1].left-R[0].right;
+    dr={b:b,bs:bs,R:R,vert:vert,gap:gap,from:bs.indexOf(b),to:bs.indexOf(b),x0:e.clientX,y0:e.clientY,id:e.pointerId};
+    try{ b.setPointerCapture(e.pointerId); }catch(x){}
+    document.body.classList.add('to-dragging'); b.classList.add('to-lift');
+    try{ if(navigator.vibrate) navigator.vibrate(15); }catch(x){}
+  }
+  function slots(order){   // the position each tab would take for this order
+    var o={}, pos=dr.vert ? dr.R[0].top : dr.R[0].left;
+    order.forEach(function(i){ var sz=dr.vert ? dr.R[i].height : dr.R[i].width; o[i]=pos; pos+=sz+dr.gap; });
+    return o;
+  }
+  function moveDrag(e){
+    var d=dr, v=d.vert, pt=v ? e.clientY : e.clientX, dx=pt-(v ? d.y0 : d.x0);
+    d.b.style.transform=(v?'translateY(':'translateX(')+dx+'px) scale(1.06)';
+    var cur=(v ? d.R[d.from].top+d.R[d.from].height/2 : d.R[d.from].left+d.R[d.from].width/2)+dx, to=0;
+    d.bs.forEach(function(b,i){ if(i===d.from) return; var c=v ? d.R[i].top+d.R[i].height/2 : d.R[i].left+d.R[i].width/2; if(cur>c) to++; });
+    d.to=to;
+    var order=[]; d.bs.forEach(function(b,i){ if(i!==d.from) order.push(i); }); order.splice(to,0,d.from);
+    var sl=slots(order);
+    d.bs.forEach(function(b,i){ if(i===d.from) return; var base=v ? d.R[i].top : d.R[i].left, sh=sl[i]-base; b.style.transform=sh?(v?'translateY(':'translateX(')+sh+'px)':''; });
+  }
+  function endDrag(ok){
+    var d=dr; if(!d) return; dr=null;
+    d.bs.forEach(function(b){ b.style.transform=''; b.classList.remove('to-lift'); });
+    document.body.classList.remove('to-dragging');
+    justDragged=Date.now();
+    if(ok && d.to!==d.from){
+      var keys=d.bs.map(function(b){ return DEF.filter(function(t){ return b.classList.contains(t); })[0]; });
+      var k=keys.splice(d.from,1)[0]; keys.splice(d.to,0,k); save(keys); apply(keys); try{ render(); }catch(x){}
+    }
+  }
+  function wire(){
+    var b=bar(); if(!b || b.__toDrag) return; b.__toDrag=1;
+    var hold=null, pend=null;
+    function clear(){ clearTimeout(hold); hold=null; pend=null; }
+    b.addEventListener('pointerdown',function(e){
+      var t=e.target.closest('.tab-btn'); if(!t || (e.pointerType==='mouse' && e.button!==0)) return;
+      pend={t:t,x:e.clientX,y:e.clientY,type:e.pointerType,e:e};
+      if(e.pointerType!=='mouse') hold=setTimeout(function(){ if(pend){ startDrag(pend.t,pend.e); pend=null; } },450);
+    });
+    b.addEventListener('pointermove',function(e){
+      if(dr){ e.preventDefault(); moveDrag(e); return; }
+      if(!pend) return;
+      var mv=Math.hypot(e.clientX-pend.x,e.clientY-pend.y);
+      if(pend.type==='mouse'){ if(mv>8){ var p=pend; pend=null; startDrag(p.t,{clientX:p.x,clientY:p.y,pointerId:e.pointerId}); moveDrag(e); } }
+      else if(mv>10){ clear(); }
+    });
+    ['pointerup','pointercancel'].forEach(function(n){ b.addEventListener(n,function(e){ if(dr) endDrag(n==='pointerup'); clear(); }); });
+    b.addEventListener('lostpointercapture',function(){ if(dr) endDrag(true); });
+    b.addEventListener('contextmenu',function(e){ if(dr || pend) e.preventDefault(); });
+    b.addEventListener('click',function(e){ if(Date.now()-justDragged<400){ e.preventDefault(); e.stopImmediatePropagation(); } },true);
+  }
   function build(){
     var sec=document.getElementById('sec-settings'), tabs=sec && sec.querySelector(':scope > .footer-subtabs'); if(!tabs) return false;
     if(document.getElementById('sec-taborder')) return true;
@@ -25024,13 +25084,13 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:#4a3a96;lin
     d.addEventListener('click',function(e){
       var x=e.target.closest('button'); if(!x) return;
       if(x.classList.contains('to-reset')){ save(DEF.slice()); apply(DEF); render(); return; }
-      var r=x.closest('.to-row'); if(r && x.dataset.d) move(r.dataset.t,+x.dataset.d);
     });
     try{ FOOTER_SUBS.settings.push('taborder'); }catch(e){}
     var o=window.showFooterSub;
     window.showFooterSub=function(p,s){ var r=o.apply(this,arguments); if(p==='settings' && s==='taborder') render(); return r; };
     return true;
   }
+  wire();
   var a0=load(); apply(a0);
   // the first tab opens at start (unless a notification or a link asked for a section)
   try{ if(a0[0]!=='activity' && !/[?&#](section|tab|nudge)=/.test(location.search+location.hash) && typeof switchTab==='function') switchTab(a0[0]); }catch(e){}
