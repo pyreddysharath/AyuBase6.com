@@ -20525,9 +20525,10 @@ html body #sec-bkp .backup-pick-title .backup-info-btn{margin-left:6px !importan
 .media-offline-ask .oa-yes{border:0;background:#2563eb;color:#fff}
 .media-offline-ask .oa-no{border:1.5px solid #2563eb;background:#fff;color:#2563eb}
 html body #sec-help .footer-subtabs .footer-subtab{flex:1 1 auto}
-#sec-offline .off-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(15,23,42,.08)}
+#sec-offline .off-row{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:8px 10px;padding:10px 0;border-bottom:1px solid rgba(15,23,42,.08)}   /* two buttons (Remove + Save the rest) drop under the text instead of squeezing it */
 #sec-offline .off-row:last-of-type{border-bottom:0}
-#sec-offline .off-main{flex:1 1 auto;min-width:0}
+#sec-offline .off-main{flex:1 1 180px;min-width:0}
+#sec-offline .off-row:has(.off-btn.rm + .off-btn) .off-main{flex-basis:100%}
 #sec-offline .off-name{display:block;font-weight:700;color:#1e293b;border-left:4px solid var(--footer-accent,var(--tl-0d9488,#0d9488));padding:1px 0 1px 9px;margin-left:0}
 #sec-offline .off-sub{padding-left:13px}
 #sec-offline .off-sub{display:block;font-size:.82rem;color:#475569;margin-top:2px}
