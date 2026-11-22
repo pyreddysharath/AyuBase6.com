@@ -16469,7 +16469,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   tab('calculator','.tab-btn.calculator',C.vit,'Your numbers in one place.');
   sec('calculator','.ayu-vit-tabs',0,C.vit,'<b>Three sections</b>: BMI, Lab Insights and Tracker. Tap an icon to open one.');
   sec('calculator','#calculator-panel .calc-card',0,C.vit,'<b>BMI</b>: set height and weight to see your BMI.');
-  sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload a lab report (a PDF or a photo) or type values in, to see what is in or out of range. The download button by the title (<b>Enable offline reading</b>) reads photos and scanned reports without internet.');
+  sec('calculator','#lab-insights-card',0,C.vit,'<b>Lab Insights</b>: upload one or many reports (lab, 2D Echo, TMT or scans, as PDFs or photos), or type values in. Reports are kept under each person by year and month, with a colour dot for how the readings look. The download button by the title (<b>Enable offline reading</b>) reads photos and scanned reports without internet.');
   sec('calculator','#tracker-card',0,C.vit,'<b>Tracker</b>: save readings over time and download them as a PDF.');
   // Footer: each icon, then the parts under it, one by one
   var FC='var(--footer-accent,#2563eb)';
@@ -17225,8 +17225,16 @@ html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opa
     var pid=panel.id; if(pid==='alerts-panel' && panel.querySelector('.alert-page[data-remtab="breaks"]')) pid='routines-panel';   // Health Breaks: the same pictures as My Day Plan
     var layer=panel.querySelector(':scope > .sec-bg-layer');
     if(!layer){ layer=document.createElement('div'); layer.className='sec-bg-layer'; layer.setAttribute('aria-hidden','true'); panel.appendChild(layer); }
+    // Nothing moved or resized since the pictures were last placed: keep them (re-placing them on every tab switch was the lag)
+    var P0=panel.getBoundingClientRect(), gsig='';
+    if(P0.width>=200 && P0.height>=200){
+      gsig=Math.round(P0.width)+'x'+Math.round(P0.height)+'|'+pid+'|'+[].map.call(panel.querySelectorAll(SEL),function(c){ if(!c.offsetParent) return 0; var r=c.getBoundingClientRect(); return Math.round(r.top-P0.top)+','+Math.round(r.height)+','+Math.round(r.width); }).join(';')
+        +'|'+(panel.querySelector('#body-week-section,#results')&&panel.querySelector('#body-week-section,#results').offsetParent?1:0)+'|'+(panel.querySelector('.bf-inline-reset')&&panel.querySelector('.bf-inline-reset').offsetParent?Math.round(panel.querySelector('.bf-inline-reset').getBoundingClientRect().top-P0.top):0);
+      if(layer.firstChild && panel._gsig===gsig) return;
+    }
     layer.innerHTML='';
     var P=panel.getBoundingClientRect(); if(P.width<200||P.height<200) return;
+    panel._gsig=gsig;
     panel._sig=Math.round(P.width)+'x'+Math.round(P.height)+'|'+pid;
     if(getComputedStyle(panel).position==='static') panel.style.position='relative';
     var cs=cardsOf(panel); if(cs.length<1) return;
