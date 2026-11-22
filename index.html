@@ -11133,8 +11133,9 @@ const NUDGE_LOTUS_PETAL='M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 
 function drawNudgeLotus(ctx, cx, cy, scale, fill, alpha){
   // Same six-petal lotus as the Nudges tab; (cx,cy) is the point where the petals meet.
   const petal=new Path2D(NUDGE_LOTUS_PETAL);
-  ctx.save(); ctx.globalAlpha=alpha; ctx.fillStyle=fill;
-  [-75,-45,-15,15,45,75].forEach(a=>{
+  ctx.save(); ctx.globalAlpha=alpha; ctx.fillStyle=Array.isArray(fill)?fill[0]:fill;
+  [-75,-45,-15,15,45,75].forEach((a,i)=>{
+    if(Array.isArray(fill)) ctx.fillStyle=fill[i];   // the logo: one colour per petal
     ctx.save(); ctx.translate(cx,cy); ctx.rotate(a*Math.PI/180); ctx.scale(scale,scale); ctx.fill(petal); ctx.restore();
   });
   ctx.restore();
@@ -11143,7 +11144,7 @@ const _nudgeArt={};
 const NUDGE_THEMES={
   reminders:{g0:'#f0fdfa',g1:'#ccfbf1',gi:'#99f6e4',big:'#5eead4',deep:'#0d9488',ic0:'#12998c',ic1:'#08766e'},
   routines:{g0:'#fff1f3',g1:'#fcd5dc',gi:'#f9b4c0',big:'#f4a0b0',deep:'#e8607a',ic0:'#e8607a',ic1:'#c94862'},
-  logo:{g0:'#e9edff',g1:'#fde4ee',gi:'#c7d2fe',big:'#5eead4',deep:'#6d7cf0',ic0:'#818cf8',ic1:'#e8607a'}   // the logo's blue, pink and teal (Test notification)
+  logo:{g0:'#ffffff',g1:'#eef2ff',gi:'#c7d2fe',big:['#60a5fa','#86efac','#a5b4fc','#67e8f9','#fb7a98','#5eead4'],deep:'#6d7cf0',ic0:'#ffffff',ic1:'#eef2ff',icLotus:['#60a5fa','#86efac','#a5b4fc','#67e8f9','#fb7a98','#5eead4']}   // the logo: six petals, six colours (Test notification)
 };
 function nudgeArt(kind,theme){
   const T=NUDGE_THEMES[theme]||NUDGE_THEMES.reminders, ck=kind+':'+(theme||'reminders');
@@ -11157,7 +11158,7 @@ function nudgeArt(kind,theme){
       g.addColorStop(0,T.g0); g.addColorStop(1,T.g1);
       x.fillStyle=g; x.fillRect(0,0,720,360);
       drawNudgeLotus(x, 470, 335, 14.5, T.big, .55);
-      drawNudgeLotus(x, 150, 360, 6.5,  T.deep, .22);
+      drawNudgeLotus(x, 150, 360, 6.5,  Array.isArray(T.big)?'#94a3b8':T.deep, .22);
     }else if(kind==='badge'){
       c.width=96; c.height=96;
       drawNudgeLotus(x, 48, 76, 2.0, '#000', 1);
@@ -11166,7 +11167,7 @@ function nudgeArt(kind,theme){
       const g=x.createLinearGradient(0,0,192,192);
       g.addColorStop(0,T.ic0); g.addColorStop(1,T.ic1);   // solid section colour (Reminders teal, Checks amber) with a white lotus
       x.fillStyle=g; x.fillRect(0,0,192,192);
-      drawNudgeLotus(x, 96, 142, 3.7, '#ffffff', .96);
+      drawNudgeLotus(x, 96, 142, 3.7, T.icLotus||'#ffffff', T.icLotus?1:.96);
     }
     url=c.toDataURL('image/png');
   }catch(e){ url=undefined; }
