@@ -21623,14 +21623,14 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     var bg=ph==='checking' && !!u.checkedAt; if(bg) ph='';   // a new check runs in the background: the last result stays, only the button says Checking…
     if(Date.now()<hold && u.store!=='play' && ph!=='downloading' && ph!=='allow' && ph!=='installing'){ ph='checking'; bg=false; L=null; }
     var wv=+(window.ayuNative && window.ayuNative.wwwVersion)||0;   // the version the screens were packed in: shown only when it is not the app's
-    $('au-ver').textContent='App version'+(mine&&mine.name?' '+mine.name:'')+(wv && mine && mine.code && wv!==mine.code ? ' (screens from 0.1.'+wv+')' : '');
-    var cls='', txt='', b='Check for update', alt=true, dis=false, nt='', pct=-1;
+    $('au-ver').textContent='Current version'+(mine&&mine.name?' '+mine.name:'')+(wv && mine && mine.code && wv!==mine.code ? ' (screens from 0.1.'+wv+')' : '');
+    var cls='', txt='', b='Check for update', alt=true, dis=false, nt='', pct=-1, ic=false, sub='';
     if(u.store==='play'){ cls='ok'; txt='Google Play keeps AyuBase6 up to date.'; b='Open Google Play'; alt=true; dis=false; }   // the Google Play version
     else if(ph==='downloading'){ cls='busy'; txt='Downloading the update… '+(u.pct||0)+'%'; b='Downloading…'; dis=true; alt=false; pct=u.pct||0; }
     else if(ph==='allow'){ cls='new'; txt='Allow AyuBase6 to install updates'; b='Allow'; alt=false; nt='Turn on “Allow from this source”, then come back: the update continues by itself. Android asks only the first time.'; }
     else if(ph==='installing'){ cls='new'; txt='Finish in Android’s screen: tap Update'; b='Update'; alt=false; nt='Your data stays.'; }
     else if(ph==='checking'){ cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
-    else if(L){ cls='new'; txt='A new version is ready'; b='Download'; alt=false; nt=u.viaBrowser ? 'Download opens it in your browser. Then open the downloaded file and tap Update. Your data stays.' : 'Android asks you to confirm; your data stays.'; }
+    else if(L){ cls='new'; txt='Update available'; ic=true; b='Download'; alt=false; sub=u.viaBrowser ? 'Download and install.' : ''; }   // same words as the update popup
     else if(u.error==='download'){ cls='err'; txt='The download didn’t finish. Check your internet and try again.'; b='Check for update'; }
     else if(u.error==='install'){ cls='err'; txt='Android’s install screen didn’t open. Try again.'; }
     else if(u.error==='offline'){ cls='err'; txt='You’re offline. Connect to the internet and try again.'; }
@@ -21641,6 +21641,7 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     if(bg && !L && u.store!=='play'){ b='Checking…'; dis=true; }
     document.querySelectorAll('#sec-app .au-auto-row,#sec-app .au-inst-row').forEach(function(ar){ ar.hidden=u.store==='play'; });   // Google Play checks by itself
     line.className='au-line '+cls; line.textContent=txt; note.textContent=nt;
+    if(ic){ line.textContent=''; var si=document.createElement('span'); si.className='au-ic'; si.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 20h14"/></svg>'; var tx=document.createElement('span'); tx.className='au-tx'; tx.appendChild(document.createTextNode(txt)); if(sub){ var sm=document.createElement('small'); sm.textContent=sub; tx.appendChild(sm); } line.appendChild(si); line.appendChild(tx); }
     btn.textContent=b; btn.disabled=dis; btn.classList.toggle('alt',alt);
     $('au-barrow').hidden=pct<0; $('au-x').hidden=!(window.ayuNative && window.ayuNative.updateCancel); if(pct>=0) bar.firstChild.style.width=pct+'%';
     window.ayuAppDotsPaint();
@@ -23051,6 +23052,17 @@ html body #sec-app .au-auto-row{order:5}
 html body #sec-app .au-auto-note{order:6}
 html body #sec-app .au-line.new{color:var(--footer-accent,#2563eb) !important}
 @media (max-width:340px){html body #sec-app .au-card{padding:12px}html body #sec-app #au-note,html body #sec-app .au-auto-note{font-size:11px}}
+</style>
+<style id="au-center-20261122">
+/* App Updates: text centred like the update popup (icon on the left, small line under the title), a soft fading line under the version */
+html body #sec-app .au-row > div:not(#ayu-x1){width:100%;text-align:center}
+html body #sec-app .au-ver:not(#ayu-x1){position:relative;margin-bottom:22px}
+html body #sec-app .au-ver:not(#ayu-x1)::after{content:"";position:absolute;left:0;right:0;bottom:-11px;height:2px;background:linear-gradient(90deg,transparent,var(--footer-accent,#2563eb),transparent);opacity:.55}
+html body #sec-app .au-line:not(#ayu-x1){display:flex;align-items:center;justify-content:center;gap:10px;margin-top:0;text-align:center}
+html body #sec-app .au-line .au-ic{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--footer-accent,#2563eb) 16%,#fff);color:var(--footer-accent,#2563eb);flex:none}
+html body #sec-app .au-line .au-tx{text-align:left;line-height:1.25}
+html body #sec-app .au-line .au-tx small{display:block;font-weight:500;font-size:.72rem;color:#64748b}
+html body #sec-app .au-note:not(#ayu-x1){text-align:center}
 </style>
 <style id="app-request-20261110">
 /* Download App: request the Android app (name + email); sent like Feedback, marked "App install request" */
