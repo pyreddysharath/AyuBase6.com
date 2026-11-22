@@ -11280,6 +11280,7 @@ function nudgeInPageFallback(key){
 // - vibrates, so it gets noticed on the lock screen as well as while the phone is in use
 function showNudgeNotification(title, body, o){
   o=o||{};
+  if(!o.theme && /^(preview-)?(break|walk|drink|posture|stretch|breathe|eyeex)$/.test(o.key||'')) o.theme='routines';   // Health Breaks belong to Care: coral pink
   if(typeof Notification==='undefined' || Notification.permission!=='granted') return false;
   const key=o.key||'nudge';
   // A "fresh" notification (a reminder or a preview) must pop up again even if an
@@ -11559,6 +11560,7 @@ function nudgeMeasureH(title,msg,timer,W,hasVideo,o){
 }
 function openNudgePopup(key, title, msg, o){
   o=Object.assign({}, nudgeDefaultHandlers(key), o||{}, {popKey:key});
+  if(!o.theme && /^(preview-)?(break|walk|drink|posture|stretch|breathe|eyeex)$/.test(key||'')) o.theme='routines';   // Health Breaks belong to Care: coral pink
   const timer=!!o.timer;
   // Size each popup to its own title/body instead of giving every reminder a large fixed window.
   const msgLen=String(msg||'').length, titleLen=String(title||'').length, textLen=msgLen+titleLen;
