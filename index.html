@@ -20571,7 +20571,7 @@ html body #calculator-panel .ayu-undo-row button{border:0;background:none;color:
   };
 
   // ── footer: Download App and Save Offline move next to Backup & Restore ──
-  var TABS=[['bkp','Backup & Restore'],['offline','Save Offline'],['app','Download App']];
+  var TABS=[['app','Download App'],['bkp','Backup & Restore'],['offline','Save Offline']];   // Download App (App Updates in the phone app) comes first
   function setupFooter(){
     var sec=$('sec-backup'); if(!sec) return false;
     if(sec.querySelector(':scope > .footer-subtabs')) return true;
@@ -20618,10 +20618,10 @@ html body #calculator-panel .ayu-undo-row button{border:0;background:none;color:
     var sec=$('sec-backup'), bar=sec && sec.querySelector(':scope > .footer-subtabs'), app=$('sec-app'); if(!bar || !app) return false;
     if(app.parentNode!==sec){
       var b=$('subtab-app'); if(!b){ b=document.createElement('button'); b.type='button'; b.className='footer-subtab'; b.id='subtab-app'; b.setAttribute('role','tab'); b.innerHTML='Download App<i class="fs-dot"></i>'; }
-      b.setAttribute('onclick',"showFooterSub('backup','app')"); bar.appendChild(b);
+      b.setAttribute('onclick',"showFooterSub('backup','app')"); bar.insertBefore(b,bar.firstChild);
       app.style.display='none'; sec.appendChild(app);
       try{
-        if(FOOTER_SUBS.backup.indexOf('app')<0) FOOTER_SUBS.backup.push('app');
+        if(FOOTER_SUBS.backup.indexOf('app')<0) FOOTER_SUBS.backup.unshift('app');
         FOOTER_SUBS.help=FOOTER_SUBS.help.filter(function(s){ return s!=='app'; });
         if(footerSubNow.help==='app') delete footerSubNow.help;
         FOOTER_ALIAS.app=['backup','app']; FOOTER_ALIAS.download=['backup','app'];
