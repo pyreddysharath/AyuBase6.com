@@ -21835,7 +21835,7 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     else { cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
     if(L && (u.error==='download'||u.error==='install')){ b='Download'; alt=false; }
     if(bg && !L && u.store!=='play'){ b='Checking…'; dis=true; }
-    document.querySelectorAll('#sec-app .au-auto-row,#sec-app .au-inst-row').forEach(function(ar){ ar.hidden=u.store==='play'; });   // Google Play checks by itself
+    document.querySelectorAll('#sec-app .au-auto-row').forEach(function(ar){ ar.hidden=u.store==='play'; });   // Google Play checks by itself
     line.className='au-line '+cls; line.textContent=txt; note.textContent=nt;
     if(ic){ line.textContent=''; var si=document.createElement('span'); si.className='au-ic'; si.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 20h14"/></svg>'; var tx=document.createElement('span'); tx.className='au-tx'; tx.appendChild(document.createTextNode(txt)); if(sub){ var sm=document.createElement('small'); sm.textContent=sub; tx.appendChild(sm); } line.appendChild(si); line.appendChild(tx); }
     btn.textContent=b; btn.disabled=dis; btn.classList.toggle('alt',alt);
@@ -24937,13 +24937,6 @@ html body .ayu-scale.h .as-tag.t3{left:4px;top:5px}
 html body .ayu-scale.h .as-tag.t4{left:4px;top:24px;opacity:.8}
 html body .ayu-scale.v .as-tag.t1{left:3px;top:3px}
 html body .ayu-scale.v .as-tag.t2{left:28px;top:3px;opacity:.8}
-</style>
-<style id="auto-update-20261115">
-/* Update automatically: the switch under the Update button in the update banner */
-.ayu-upd-banner .appb-auto{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0 0;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.88);color:#3b2a14;font-size:.8rem;font-weight:800;line-height:1.25}
-.ayu-upd-banner .appb-auto .master-switch{flex:0 0 auto;margin:0}
-.ayu-upd-banner .appb-auto .master-switch input:checked:not(#ayu-x1){background:var(--appb-c,var(--fg-16a34a,#16a34a)) !important}
-html body #sec-app .au-inst-row.au-auto-row{margin-top:10px !important}
 </style>
 <style id="bmi-unit-colour-20261115">
 /* The second unit (lb, cm) and the unit tags take the section colour: green in Food, teal in Vitals */
