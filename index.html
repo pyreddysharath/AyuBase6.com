@@ -17531,15 +17531,15 @@ html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opa
 
     // Vitals (BMI, Lab Insights, Tracker): each page is one tall box, so it gets a few more images along its left and right edges,
     // spaced down its height, kept clear of text and controls (same rules as the plan edges below).
-    if(pid==='calculator-panel') cs.forEach(function(c,i){
+    if(pid==='calculator-panel'||(pid==='alerts-panel'&&layer.children.length<2)) cs.forEach(function(c,i){   // Reminders pages with almost no images (Timer, Stopwatch, World Clock) too
       var R=rects[i], hgt=R.b-R.t; if(hgt<260) return;
-      var n=Math.max(2,Math.min(desk?4:5,Math.floor(hgt/(desk?340:400)))), w=Math.round((desk?190:130)*VAR.sm[vi]), h=Math.round(w*K), vv=Math.round(w*.5), obs=obstacles(c,P);
+      var al2=pid==='alerts-panel', n=Math.max(al2?3:2,Math.min(desk?4:5,Math.floor(hgt/(desk?340:400)))), w=Math.round((desk?190:(al2?110:130))*VAR.sm[vi]), h=Math.round(w*K), vv=Math.round(w*.5), obs=obstacles(c,P);
       for(var k=0;k<n;k++){
         var cy=R.t+(k+.5)*hgt/n, done=false, pref=((k+vi)%2===0)?'R':'L';
-        [0,-60,60,-120,120,-180,180].forEach(function(dy){ if(done) return; [pref,pref==='R'?'L':'R'].forEach(function(side){ if(done) return;
+        [0,-60,60,-120,120,-180,180,-240,240].forEach(function(dy){ if(done) return; [pref,pref==='R'?'L':'R'].forEach(function(side){ if(done) return;
           var tp=cy-h/2+dy; if(tp<R.t-h*.3||tp+h>R.b+h*.3) return;
           var inb=side==='R'?{l:R.r-vv,r:R.r,t:tp,b:tp+h}:{l:R.l,r:R.l+vv,t:tp,b:tp+h}, bad=false;
-          for(var j=0;j<obs.length;j++) if(hit(inb,obs[j],8)){ bad=true; break; } if(bad||!clear(inb,24)) return;
+          for(var j=0;j<obs.length;j++) if(hit(inb,obs[j],al2?4:8)){ bad=true; break; } if(bad||!clear(inb,al2?14:24)) return;
           done=true; add(side==='R'?R.r-vv:R.l-(w-vv),tp,w,h,VAR.flip[vi]&&side==='L',inb); }); });
       }
     });
