@@ -11040,11 +11040,11 @@ function switchTab(tab) {
   logo.classList.toggle('mind-mode', tab === 'mind');
 
   // Footer icons pick up the active tab's accent colour too.
-  const FOOTER_ACCENTS = { activity:'#3272ab', nutrition:'#5a9326', calculator:'var(--calc-2)', alerts:'var(--alert-2)', routines:'var(--rout-2)', mind:'var(--mind-2)' };
+  const FOOTER_ACCENTS = { activity:'var(--act-2)', nutrition:'var(--nut-2)', calculator:'var(--calc-2)', alerts:'var(--alert-2)', routines:'var(--rout-2)', mind:'var(--mind-2)' };
   document.documentElement.style.setProperty('--footer-accent', FOOTER_ACCENTS[tab] || FOOTER_ACCENTS.activity);
   // Lighter counterpart — mirrors the "Base6" half of the logo (per-tab),
   // used for the Our Other Sites links.
-  const FOOTER_ACCENTS_LIGHT = { activity:'#519ed6', nutrition:'#b9e392', calculator:'var(--calc-3)', alerts:'var(--alert-3)', routines:'var(--rout-3)', mind:'var(--mind-3)' };
+  const FOOTER_ACCENTS_LIGHT = { activity:'var(--act-3)', nutrition:'var(--nut-3)', calculator:'var(--calc-3)', alerts:'var(--alert-3)', routines:'var(--rout-3)', mind:'var(--mind-3)' };
   document.documentElement.style.setProperty('--footer-accent-light', FOOTER_ACCENTS_LIGHT[tab] || FOOTER_ACCENTS_LIGHT.activity);
 
   // Browser UI theme-color (disabled — meta tag commented out in <head>)
@@ -11237,15 +11237,13 @@ function onAlertNotifyChange(key){
 //  NUDGE NOTIFICATIONS — lotus artwork, stay-until-closed, and the
 //  20-20-20 countdown that runs inside the notification itself.
 // ════════════════════════════════════════════════
-const NUDGE_LOTUS_PETAL='M 0 -1 C -3.01 -5.00, -9.40 -10.50, 0.00 -21.00 C 9.40 -10.50, 3.01 -5.00, 0 -1 Z';
+// The lotus-and-drop mark: 5 shapes (drop, two petals, two leaves); x from the centre, y from the bottom; 244.2 wide.
+const NUDGE_MARK=['M-0.1 -143.5 L-1.1 -142.5 L-4.4 -134.0 L-7.2 -128.4 L-18.1 -110.0 L-22.6 -101.3 L-25.5 -93.5 L-26.6 -84.7 L-25.6 -77.2 L-24.9 -74.8 L-22.6 -70.0 L-19.9 -66.4 L-15.7 -62.4 L-11.7 -59.8 L-4.7 -57.3 L-1.4 -56.8 L3.9 -57.1 L10.3 -59.1 L14.3 -61.3 L17.3 -63.8 L20.9 -67.7 L23.4 -71.7 L25.5 -78.0 L26.3 -83.3 L25.6 -91.8 L23.1 -99.8 L18.2 -109.5 L7.4 -127.7 L4.9 -132.7 L0.7 -142.8Z', 'M-120.9 -68.2 L-121.1 -67.2 L-120.6 -64.7 L-118.6 -57.8 L-116.0 -50.7 L-111.1 -40.5 L-104.8 -30.7 L-99.7 -24.4 L-91.4 -16.7 L-84.4 -11.7 L-75.7 -7.2 L-67.9 -4.2 L-58.9 -1.9 L-47.7 -1.0 L-42.4 -1.1 L-34.6 -1.9 L-25.1 -4.2 L-17.4 -7.0 L-8.4 -11.7 L-5.1 -13.9 L-3.9 -15.2 L-4.1 -16.3 L-5.6 -16.9 L-19.4 -17.7 L-32.4 -20.5 L-38.1 -22.5 L-43.2 -24.8 L-48.6 -27.8 L-57.8 -34.8 L-61.5 -38.3 L-65.5 -42.7 L-72.0 -51.8 L-77.8 -63.5 L-79.7 -65.1 L-84.6 -67.1 L-91.9 -69.1 L-101.1 -70.2 L-107.1 -70.3 L-114.7 -69.9 L-119.5 -69.2Z', 'M120.9 -68.2 L120.3 -68.8 L119.4 -69.2 L113.6 -69.9 L106.3 -70.3 L98.8 -70.1 L92.4 -69.2 L84.6 -67.0 L80.1 -65.1 L78.9 -64.3 L78.0 -63.3 L72.4 -52.5 L66.4 -44.0 L58.6 -35.8 L51.1 -29.8 L43.6 -25.2 L37.9 -22.7 L32.3 -20.6 L19.1 -17.7 L13.0 -17.3 L12.4 -16.9 L12.4 -16.3 L13.3 -15.3 L17.2 -12.7 L18.4 -11.6 L20.1 -8.0 L19.9 -6.5 L20.3 -6.1 L24.9 -4.2 L35.1 -1.9 L47.6 -1.2 L58.1 -2.0 L69.3 -4.9 L74.1 -6.7 L79.6 -9.2 L87.6 -14.1 L94.6 -19.5 L101.5 -26.5 L106.9 -33.5 L111.9 -41.7 L116.6 -52.0 L119.4 -60.5 L121.1 -66.8Z', 'M-81.6 -108.2 L-82.1 -107.1 L-82.2 -105.2 L-81.6 -96.8 L-80.5 -89.3 L-78.1 -79.5 L-75.5 -71.5 L-72.9 -65.5 L-67.9 -56.5 L-63.6 -50.3 L-57.2 -43.0 L-48.6 -35.9 L-44.4 -33.1 L-39.6 -30.4 L-29.1 -26.0 L-20.4 -24.0 L-17.8 -23.9 L-16.8 -24.3 L-16.9 -25.4 L-18.7 -27.9 L-18.6 -28.4 L-17.8 -28.4 L-4.9 -19.1 L6.8 -11.8 L12.8 -9.0 L15.3 -8.5 L18.1 -7.4 L19.5 -7.5 L19.6 -8.1 L18.6 -10.7 L17.5 -12.3 L10.9 -17.1 L4.2 -20.6 L-2.9 -25.9 L-6.8 -29.6 L-10.9 -34.8 L-13.9 -39.7 L-16.4 -45.2 L-20.3 -56.0 L-26.3 -62.8 L-30.7 -70.7 L-32.0 -75.3 L-33.2 -82.3 L-34.0 -83.8 L-35.6 -85.6 L-44.8 -93.6 L-50.4 -97.5 L-56.2 -100.7 L-61.4 -103.1 L-73.9 -107.3 L-76.7 -108.1 L-80.1 -108.5Z', 'M81.4 -108.1 L80.6 -108.4 L78.4 -108.3 L73.9 -107.3 L66.6 -105.0 L55.9 -100.5 L50.4 -97.5 L44.4 -93.4 L36.0 -85.8 L33.7 -83.2 L32.7 -81.5 L31.3 -73.2 L28.9 -67.2 L25.3 -61.7 L20.2 -56.3 L17.0 -46.5 L12.6 -37.3 L8.4 -31.3 L4.2 -27.0 L3.8 -26.2 L4.1 -25.7 L5.9 -25.4 L9.8 -26.3 L17.4 -30.4 L22.1 -33.6 L23.3 -34.1 L23.7 -33.7 L23.1 -32.6 L19.1 -28.2 L16.1 -25.4 L15.7 -24.7 L15.7 -24.1 L16.8 -23.8 L19.9 -24.0 L29.4 -26.2 L35.9 -28.7 L44.8 -33.4 L50.9 -37.7 L55.3 -41.3 L58.6 -44.7 L63.8 -50.7 L68.6 -57.5 L73.4 -66.5 L76.0 -72.7 L78.5 -80.7 L80.6 -90.3 L81.7 -100.2 L81.9 -106.3Z'];
+const NUDGE_MARK_K=40.6/244.2;   // scale 1 = about 40 px wide
 function drawNudgeLotus(ctx, cx, cy, scale, fill, alpha){
-  // Same six-petal lotus as the Nudges tab; (cx,cy) is the point where the petals meet.
-  const petal=new Path2D(NUDGE_LOTUS_PETAL);
-  ctx.save(); ctx.globalAlpha=alpha; ctx.fillStyle=Array.isArray(fill)?fill[0]:fill;
-  [-75,-45,-15,15,45,75].forEach((a,i)=>{
-    if(Array.isArray(fill)) ctx.fillStyle=fill[i];   // the logo: one colour per petal
-    ctx.save(); ctx.translate(cx,cy); ctx.rotate(a*Math.PI/180); ctx.scale(scale,scale); ctx.fill(petal); ctx.restore();
-  });
+  // The AyuBase6 mark; (cx,cy) is its bottom centre. fill: one colour, or an array of 5 (drop, petal, petal, leaf, leaf).
+  ctx.save(); ctx.globalAlpha=alpha; ctx.translate(cx,cy); ctx.scale(scale*NUDGE_MARK_K,scale*NUDGE_MARK_K);
+  NUDGE_MARK.forEach((d,i)=>{ ctx.fillStyle=Array.isArray(fill)?fill[i]:fill; ctx.fill(new Path2D(d)); });
   ctx.restore();
 }
 const _nudgeArt={};
@@ -11253,7 +11251,7 @@ const NUDGE_THEMES={
   reminders:{g0:'#f8faf3',g1:'#eaf2d5',gi:'#d4e3ac',big:'#bee068',deep:'#799e1b',ic0:'#8db529',ic1:'#73961b'},
   routines:{g0:'#f2fafe',g1:'#d8eff9',gi:'#b9e2f4',big:'#a6d9ee',deep:'#41aad4',ic0:'#41aad4',ic1:'#3c85a2'},
   mind:{g0:'#f1f4ff',g1:'#dfe5ff',gi:'#d0e2f5',big:'#b4d0ed',deep:'#35489b',ic0:'#35489b',ic1:'#2f45a2'},
-  logo:{g0:'#ffffff',g1:'#f1f7fc',gi:'#d0e2f5',big:['#519ed6','#b9e392','#b4d0ed','#49e4bd','#84d3f1','#bee068'],deep:'#5c91ce',ic0:'#ffffff',ic1:'#f1f7fc',icLotus:['#519ed6','#b9e392','#b4d0ed','#49e4bd','#84d3f1','#bee068']}   // the logo: six petals, six colours (Test notification)
+  logo:{g0:'#ffffff',g1:'#f1f7fc',gi:'#d0e2f5',big:['#5aa6dc','#4c9be4','#4590c8','#86b84a','#8cbd4c'],deep:'#5c91ce',ic0:'#ffffff',ic1:'#f1f7fc',icLotus:['#5aa6dc','#4c9be4','#4590c8','#86b84a','#8cbd4c']}   // the logo: six petals, six colours (Test notification)
 };
 function nudgeArt(kind,theme){
   const T=NUDGE_THEMES[theme]||NUDGE_THEMES.reminders, ck=kind+':'+(theme||'reminders');
@@ -11266,7 +11264,7 @@ function nudgeArt(kind,theme){
       const g=x.createLinearGradient(0,0,720,360);
       g.addColorStop(0,T.g0); g.addColorStop(1,T.g1);
       x.fillStyle=g; x.fillRect(0,0,720,360);
-      drawNudgeLotus(x, 470, 335, 14.5, T.big, .55);
+      drawNudgeLotus(x, 480, 342, 13.2, T.big, .55);
       drawNudgeLotus(x, 150, 360, 6.5,  Array.isArray(T.big)?'#94a3b8':T.deep, .22);
     }else if(kind==='badge'){
       c.width=96; c.height=96;
@@ -11557,7 +11555,7 @@ function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
   const doc=win.document;
   if(!doc.body) doc.documentElement.appendChild(doc.createElement('body'));
   const T=o.theme==='routines'?{bg:'linear-gradient(135deg,#f2fbfe,#d1eefa)',lotus:'#a6d9ee',text:'#165367',accent:'#41aad4'}:{bg:'linear-gradient(135deg,#f8faf3,#eaf2d5)',lotus:'#bee068',text:'#5a6e26',accent:'#799e1b'};
-  const lotus=[-75,-45,-15,15,45,75].map(a=>'<path d="'+NUDGE_LOTUS_PETAL+'" transform="translate(32 34) rotate('+a+')"/>').join('');
+  const lotus=NUDGE_MARK.map(d=>'<path d="'+d+'" transform="translate(32 40) scale('+NUDGE_MARK_K+')"/>').join('');
   const css='html,body{margin:0;height:100%}'
     +'body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:'+T.text+';background:'+T.bg+';position:relative;overflow:hidden}'
     +'svg.bg{position:absolute;right:-8px;bottom:-14px;width:75%;height:auto;opacity:.6;fill:'+T.lotus+'}'
@@ -11578,7 +11576,7 @@ function nudgePopupContent(win, title, msg, withTimer, exerciseVideoSrc, o){
     +'.c.expanded{max-height:90vh;overflow:auto}'
     +'.c.expanded .ex-video{display:block}';
   doc.head.innerHTML='<meta charset="utf-8"><title>'+nudgeEsc(title)+'</title><style>'+css+'</style>';   // the title must be set after the head is rebuilt, or the window is called "about:blank"
-  doc.body.innerHTML='<svg class="bg" viewBox="9.5 11.5 45 27" aria-hidden="true">'+lotus+'</svg>'
+  doc.body.innerHTML='<svg class="bg" viewBox="9.5 14 45 27" aria-hidden="true">'+lotus+'</svg>'
     +'<div class="c"><h1>'+nudgeEsc(title)+'</h1>'+nudgePosturePic(o)+'<p>'+nudgeEsc(msg).replace(/\n/g,'<br>')+'</p>'+nudgePopupButtons(o)
     +(withTimer?'<div class="t" id="n" title="Click to start the timer">\u25B6 '+(o.timerSecs||EYE_TIMER_SECS)+'s</div>':'')
     +(title==='Eye Exercise' && exerciseVideoSrc?'<button type="button" class="ex-toggle" id="ex-toggle" aria-expanded="false" title="Expand guided eye exercise video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Exercise video</span></button><video class="ex-video" id="ex-video" controls playsinline muted preload="metadata" src="'+exerciseVideoSrc.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></video>':'')+nudgePopupIcons(o)+'</div>';
@@ -16541,7 +16539,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
 <script id="site-tour-20261101-js">
 (function(){
   var SEEN='ayuBase6-tour-seen';
-  var C={body:'#3272ab',food:'#70b334',checks:'var(--rout-2)',rem:'var(--alert-2)',mind:'var(--mind-2)',vit:'var(--calc-2)'};
+  var C={body:'var(--act-2)',food:'var(--nut-2)',checks:'var(--rout-2)',rem:'var(--alert-2)',mind:'var(--mind-2)',vit:'var(--calc-2)'};
   var STEPS=[];
   function tab(tab,sel,c,text,x){ var o={tab:tab,sel:sel,c:c,html:'<p>'+text+'</p>',kind:'tab'}; if(x) for(var k in x) o[k]=x[k]; STEPS.push(o); }
   function sec(tab,sel,idx,c,text,x){ var o={tab:tab,sel:sel,idx:idx||0,c:c,html:'<p>'+text+'</p>',kind:'sec'}; if(x) for(var k in x) o[k]=x[k]; STEPS.push(o); }
@@ -16631,7 +16629,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   q('activity','.tab-btn.activity',C.body,'<b>Body</b>: a weekly exercise or yoga plan for your age.');
   q('nutrition','.tab-btn.nutrition',C.food,'<b>Food</b>: a weekly food plan, with a shopping cart and recipes.');
   q('routines','.tab-btn.routines',C.checks,'<b>Care</b>: your day from morning to night with a wake-up alarm and checklist, plus gentle health breaks.');
-  q('alerts','.tab-btn.alerts',C.rem,'<b>Reminders</b>: your own reminders, alarms, a timer, a stopwatch and a world clock.');
+  q('alerts','.tab-btn.alerts',C.rem,'<b>Alerts</b>: your own reminders, alarms, a timer, a stopwatch and a world clock.');
   q('mind','.tab-btn.mind',C.mind,'<b>Mind</b>: short thoughts for a calmer day.');
   q('calculator','.tab-btn.calculator',C.vit,'<b>Vitals</b>: BMI, lab report insights and a tracker for your readings.');
   q(null,'.footer-tabs-icons',FC,'<b>At the bottom</b>: Backup &amp; Restore, Settings, Announcements, Help, Legal and Other sites.');
@@ -18291,7 +18289,7 @@ body:has(#calculator-panel[style*="block"]) #app-nav::before{left:46%;top:-6%}
     document.querySelectorAll('.ayu-appb').forEach(function(e){ e.remove(); });
     document.querySelectorAll('.tab-panel').forEach(function(p){
       var b=document.createElement('div'); b.className='ayu-appb'; b.setAttribute('role','status');
-      var tabName=(p.id||'').replace(/-panel$/,''), ACC={activity:'#3272ab',nutrition:'#5a9326',calculator:'var(--calc-2)',alerts:'var(--alert-2)',routines:'var(--rout-2)',mind:'var(--mind-2)'};
+      var tabName=(p.id||'').replace(/-panel$/,''), ACC={activity:'var(--act-2)',nutrition:'var(--nut-2)',calculator:'var(--calc-2)',alerts:'var(--alert-2)',routines:'var(--rout-2)',mind:'var(--mind-2)'};
       if(ACC[tabName]) b.style.setProperty('--appb-c',ACC[tabName]);   // each tab's own colour, also before the first tab switch
       b.innerHTML='<div class="appb-tx"><span class="appb-t">Get the AyuBase6 app</span>'
         +'<span>Reminders arrive on time even when the app is closed.</span>'
@@ -19778,8 +19776,8 @@ html body #start-my-day-card .wake-range-ends .ayu-time-btn{margin-top:7px}
 <script id="accent-on-load-20261104">
 /* The section colour (--footer-accent) is set when a tab is switched; set it at load too, so banners and buttons match the first tab. */
 (function(){
-  var ACC={activity:'#3272ab',nutrition:'#5a9326',calculator:'var(--calc-2)',alerts:'var(--alert-2)',routines:'var(--rout-2)',mind:'var(--mind-2)'};
-  var LIGHT={activity:'#519ed6',nutrition:'#b9e392',calculator:'var(--calc-3)',alerts:'var(--alert-3)',routines:'var(--rout-3)',mind:'var(--mind-3)'};
+  var ACC={activity:'var(--act-2)',nutrition:'var(--nut-2)',calculator:'var(--calc-2)',alerts:'var(--alert-2)',routines:'var(--rout-2)',mind:'var(--mind-2)'};
+  var LIGHT={activity:'var(--act-3)',nutrition:'var(--nut-3)',calculator:'var(--calc-3)',alerts:'var(--alert-3)',routines:'var(--rout-3)',mind:'var(--mind-3)'};
   function set(){
     var r=document.documentElement; if(r.style.getPropertyValue('--footer-accent')) return;
     var p=document.querySelector('.tab-panel.active')||[].filter.call(document.querySelectorAll('.tab-panel'),function(x){ return x.style.display!=='none'; })[0];
