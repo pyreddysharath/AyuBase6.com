@@ -16609,6 +16609,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   fsec('settings','notifications','<b>Notifications</b>: <b>System notifications</b> is the permission, <b>App notifications</b> has every reminder and alarm with its switch and Turn all off, and <b>Test notifications</b> is a quick check if notifications don\'t arrive.');
   fsec('settings','cookies','<b>Cookies</b>: choose which cookies you allow.');
   fsec('settings','taborder','<b>Tab Order</b>: choose the order of the main tabs. Press and hold a tab, then tap or drop it on the place you want. The footer menu follows the same order.');
+  fsec('settings','resetall','<b>Reset</b>: <b>Reset all settings</b> puts every setting back to its default and keeps your records. <b>Erase all data</b> is a factory reset of everything on this device.');
   ficon('announcements','<b>Announcements</b>: news and tips from us. Its dot means something new.');
   fsec('announcements',null,'<b>Announcements</b>: the latest messages, newest first.');
   ficon('help','<b>Help</b>: its dot means a notification problem was found.');
@@ -25380,6 +25381,84 @@ body.to-picking{cursor:grabbing}
   window.addEventListener('load',function(){ try{ apply(load()); }catch(e){} });
 })();
 </script>
+<style id="reset-all-20261123">
+#sec-resetall .ra-note{font-size:.86rem;color:#64748b;margin:2px 0 10px;text-align:center}
+#sec-resetall .ra-card{background:#fff;border:1px solid var(--fb-dbe4f5,#dbe4f5);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+#sec-resetall .ra-card h4{margin:0 0 4px;font-size:.95rem;font-weight:800;color:var(--footer-accent,var(--fb-2563eb,#2563eb))}
+#sec-resetall .ra-card p{margin:0 0 8px;font-size:.82rem;line-height:1.4;color:#475569}
+#sec-resetall .ra-btn{display:block;width:100%;padding:6px 12px;min-height:0 !important;border-radius:10px;border:0;font:inherit;font-weight:800;font-size:.9rem;color:#fff;background:var(--footer-accent,var(--fb-2563eb,#2563eb));cursor:pointer}
+#sec-resetall .ra-btn.ra-danger{background:#be123c}
+#sec-resetall .ra-btn.ra-ghost{background:#fff;color:#334155;border:1.5px solid #cbd5e1}
+#sec-resetall .ra-btn:disabled{opacity:.45;cursor:default}
+#sec-resetall .ra-ask{margin-top:6px;padding:8px 10px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0}
+#sec-resetall .ra-ask p{margin:0 0 6px;color:#334155;font-weight:700}
+#sec-resetall .ra-ask input{width:100%;box-sizing:border-box;margin:0 0 6px;padding:6px 8px;border:1.5px solid #cbd5e1;border-radius:8px;font:inherit;font-size:.9rem;text-transform:uppercase}
+#sec-resetall .ra-row{display:flex;gap:8px}
+#sec-resetall .ra-row .ra-btn{flex:1}
+#sec-resetall .ra-link{background:none;border:0;padding:0;margin:0 0 6px;font:inherit;font-size:.8rem;font-weight:800;color:var(--footer-accent,var(--fb-2563eb,#2563eb));text-decoration:underline;cursor:pointer}
+#sec-resetall .ra-done{margin-top:8px;text-align:center;font-weight:800;color:var(--footer-accent,var(--fb-2563eb,#2563eb))}
+</style>
+<script id="reset-all-20261123-js">
+(function(){
+  // Settings -> Reset. "Reset all settings" puts every setting back to its default (reminder and alarm times, switches, tones,
+  // tab order, cookie choices) and keeps the person's records. "Erase all data" is a factory reset: everything stored on the device.
+  var KEEP=['ayu_vitals_tracker_v1','ayu_lab_reports_v1','ayuBase6-med-log','ayuBase6-tour-seen'];   // records, kept by "Reset all settings"
+  function stopPhone(){
+    var n=window.ayuNative; if(!n) return Promise.resolve();
+    var jobs=[];
+    try{ if(typeof n.clockSet==='function') jobs.push(Promise.resolve(n.clockSet({timer:{},stopwatch:{},world:{}})).catch(function(){})); }catch(e){}
+    return Promise.all(jobs);
+  }
+  function syncPhone(){ try{ var n=window.ayuNative; if(n && typeof n.sync==='function') n.sync(); }catch(e){} }
+  function clearSettings(){
+    try{ Object.keys(localStorage).forEach(function(k){ if(KEEP.indexOf(k)<0) localStorage.removeItem(k); }); }catch(e){}
+    try{ sessionStorage.clear(); }catch(e){}
+  }
+  function clearAll(){
+    try{ localStorage.clear(); }catch(e){} try{ sessionStorage.clear(); }catch(e){}
+    var jobs=[];
+    try{ if(window.indexedDB && indexedDB.databases) jobs.push(indexedDB.databases().then(function(l){ return Promise.all((l||[]).map(function(d){ return new Promise(function(r){ try{ var q=indexedDB.deleteDatabase(d.name); q.onsuccess=q.onerror=q.onblocked=function(){ r(); }; }catch(e){ r(); } }); })); }).catch(function(){})); }catch(e){}
+    try{ if(window.caches) jobs.push(caches.keys().then(function(l){ return Promise.all(l.map(function(k){ return caches.delete(k); })); }).catch(function(){})); }catch(e){}
+    return Promise.all(jobs);
+  }
+  function finish(box,msg){
+    box.innerHTML='<p class="ra-done">'+msg+'</p>';
+    setTimeout(function(){ try{ location.reload(); }catch(e){} },1100);
+  }
+  function render(box){
+    box.innerHTML='<p class="ra-note">Start again, from one place.</p>'
+     +'<div class="ra-card" id="ra-c1"><h4>Reset all settings</h4><p>Puts every setting back to its default in all sections: reminder and alarm times, switches, tones, tab order and cookie choices. Your Lab Insights reports, Tracker readings and medicine log stay.</p><button type="button" class="ra-btn" data-a="s1">Reset all settings</button><div class="ra-box"></div></div>'
+     +'<div class="ra-card" id="ra-c2"><h4>Erase all data</h4><p>A factory reset. Removes everything AyuBase6 keeps on this device: settings, reminders, reports, readings, people and saved offline pages. It cannot be undone.</p><button type="button" class="ra-btn ra-danger" data-a="e1">Erase all data</button><div class="ra-box"></div></div>';
+  }
+  function ask(card,kind){
+    var b=card.querySelector('.ra-box'), erase=kind==='e';
+    b.innerHTML='<div class="ra-ask"><p>'+(erase?'Erase everything on this device?':'Reset all settings to default?')+'</p>'
+      +(erase?'<button type="button" class="ra-link" data-a="bk">Back up first</button><input type="text" id="ra-word" placeholder="Type ERASE to confirm" autocomplete="off" autocapitalize="characters" aria-label="Type ERASE to confirm">':'')
+      +'<div class="ra-row"><button type="button" class="ra-btn ra-ghost" data-a="no">Cancel</button><button type="button" class="ra-btn'+(erase?' ra-danger':'')+'" data-a="'+(erase?'e2':'s2')+'"'+(erase?' disabled':'')+'>'+(erase?'Erase':'Reset')+'</button></div></div>';
+    var w=b.querySelector('#ra-word'); if(w){ w.addEventListener('input',function(){ b.querySelector('[data-a=e2]').disabled=w.value.trim().toUpperCase()!=='ERASE'; }); w.focus(); }
+  }
+  function build(){
+    var sec=document.getElementById('sec-settings'), tabs=sec && sec.querySelector(':scope > .footer-subtabs'); if(!tabs) return false;
+    if(document.getElementById('sec-resetall')) return true;
+    var b=document.createElement('button'); b.type='button'; b.className='footer-subtab'; b.id='subtab-resetall'; b.setAttribute('role','tab'); b.setAttribute('onclick',"showFooterSub('settings','resetall')"); b.innerHTML='Reset<i class="fs-dot"></i>';
+    tabs.appendChild(b);
+    var d=document.createElement('div'); d.className='footer-sub'; d.id='sec-resetall'; d.style.display='none'; sec.appendChild(d);
+    d.addEventListener('click',function(e){
+      var x=e.target.closest('button'); if(!x||!x.dataset.a) return; var a=x.dataset.a, card=x.closest('.ra-card');
+      if(a==='s1') ask(card,'s'); else if(a==='e1') ask(card,'e'); else if(a==='no') card.querySelector('.ra-box').innerHTML='';
+      else if(a==='bk'){ try{ showFooterSection('backup'); }catch(err){} }
+      else if(a==='s2'){ x.disabled=true; stopPhone().then(function(){ clearSettings(); syncPhone(); finish(d,'Settings reset. Restarting\u2026'); }); }
+      else if(a==='e2'){ x.disabled=true; stopPhone().then(function(){ return clearAll(); }).then(function(){ syncPhone(); finish(d,'All data erased. Restarting\u2026'); }); }
+    });
+    try{ FOOTER_SUBS.settings.push('resetall'); }catch(err){}
+    var o=window.showFooterSub;
+    window.showFooterSub=function(p,s){ var r=o.apply(this,arguments); if(p==='settings' && s==='resetall') render(d); return r; };
+    return true;
+  }
+  var n=0, iv=setInterval(function(){ if(build() || ++n>40) clearInterval(iv); },250);
+})();
+</script>
+
 <style id="lab-reports-20261122">
 html body #lab-results .lb-person{margin:0 0 16px}
 html body #lab-results .lb-phdr{display:flex;align-items:center;gap:6px;padding:8px 2px 6px;border-bottom:2px solid color-mix(in srgb,var(--lab-c,#0d9488) 55%,#fff)}
