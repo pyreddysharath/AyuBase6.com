@@ -16489,10 +16489,10 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('routines','#start-my-day-card',0,C.checks,'<b>My Day Plan</b>: set your wake-up time, any time in 24 hours: slide the bar, or tap the time under it for a clock. Every check below is timed from it. Outside 4–10 AM it becomes a shift schedule, with meals, light and sleep adjusted.',{care:'checks'});
   sec('routines','#chk-alarm',0,C.checks,'<b>Wake-up Alarm</b>: rings at your wake-up time on the days you choose (or Once), with its sound, vibrate, ring time and snooze. <b>Preview notification</b> shows exactly how it rings.',{care:'checks'});
   sec('routines','#routines-notify-card',0,C.checks,'<b>Notify Me</b>: reminders for each check: when to remind you, on which days, the sound (or mute), Read aloud and Vibrate.',{care:'checks'});
-  sec('routines','#ayu-checklist',0,C.checks,'<b>Daily Checklist</b>: your checks for the day, in three parts.',{care:'checks'});
+  sec('routines','#ayu-checklist',0,C.checks,'<b>Daily Checklist</b>: your checks for the day, in four parts.',{care:'checks'});
   sec('routines','#ayu-checklist .ayu-cl-part',0,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.',{care:'checks'});
-  sec('routines','#ayu-checklist .ayu-cl-part',1,C.checks,'<b>Afternoon</b>: the same ticks and tips for the middle of the day.',{care:'checks'});
-  sec('routines','#ayu-checklist .ayu-cl-part',2,C.checks,'<b>Evening</b>: dinner and a light walk after it.',{care:'checks'});
+  sec('routines','#ayu-checklist .ayu-cl-part',1,C.checks,'<b>Afternoon</b>: fruits and lunch, with the same ticks and tips.',{care:'checks'});
+  sec('routines','#ayu-checklist .ayu-cl-part',2,C.checks,'<b>Evening</b>: snacks, hobby or play time, exercise or outdoor play, dinner, a light walk after it, and family time.',{care:'checks'});
   sec('routines','#ayu-checklist .ayu-cl-part',3,C.checks,'<b>Night</b>: checks to wind down, including <b>Wind-down breathing (4-7-8)</b> before sleep. Ticks start fresh each day.',{care:'checks'});
   sec('routines','#alerts-panel .ayu-sub-tabs.care',0,C.checks,'<b>Health Breaks</b>: gentle nudges through the day. Each part has its own switch.',{care:'hb'});
   sec('routines','#alert-card-break',0,C.rem,'<b>Health Breaks → Eyes (20-20-20)</b>: a short eye break at regular intervals. Each part has its own switch, hours, days, sound, Read aloud and Vibrate.',{care:'hb'});
@@ -16505,7 +16505,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   // Reminders
   tab('alerts','.tab-btn.alerts',C.rem,'Gentle nudges, alarms and timers through the day.');
   sec('alerts','#alerts-panel .ayu-sub-tabs.rem5',0,C.rem,'<b>Five parts</b>: Personal, Alarm, Timer, Stopwatch and World Clock. Tap one to open it.');
-  sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: your own reminders. Tap <b>+</b> to add one: at set times, every so often, or on chosen dates.');
+  sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: tap <b>+</b> to add a <b>Medicine</b> (doses with Taken, Snooze and Skip, and a history table) or a <b>Reminder</b>: at set times, every so often, or on chosen dates.');
   sec('alerts','#rem-alarm-card .clk-now',0,C.rem,'<b>Clock</b>: the time and date now, above Alarm, Timer, Stopwatch and World Clock.');
   sec('alerts','#rem-tap-row',0,C.rem,'<b>Phone’s time opens</b>: your phone’s Clock app or AyuBase6, while an AyuBase6 alarm is next.');
   sec('alerts','#rem-alarm-card .ayu-add-row',0,C.rem,'<b>Alarm</b>: add an alarm, set it and tap <b>Save</b>. Each has its own time, days (or Once), sound, vibrate and snooze. Expired ones show in amber at the top.');
@@ -16533,7 +16533,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   fsec('backup','offline','<b>Save Offline</b>: keep pages and videos on this device to use AyuBase6 without internet.');
   fsec('backup','app',window.AYU_ANDROID?'<b>App Updates</b>: your app version, Check for update, <b>Download</b> when a new version is ready, and whether to update automatically. A new version is also shown every 2 hours until you download it.':'<b>Download App</b>: the Android app, which sends reminders and alarms with the app closed.');
   ficon('settings','<b>Settings</b>: its dot means notifications or advertising cookies are on.');
-  fsec('settings','notifications','<b>Notifications</b>: every reminder and alarm with its switch in one place, Turn all off, the permission, and a quick check if notifications don\'t arrive.');
+  fsec('settings','notifications','<b>Notifications</b>: tap a title to open it. <b>System notifications</b> is the permission, <b>App notifications</b> has every reminder and alarm with its switch and Turn all off,'+(window.AYU_ANDROID?' <b>Notification look</b> sets how the text of a reminder looks (soft panel, side bar or coloured title),':'')+' and <b>Test notifications</b> is a quick check if notifications don\'t arrive.');
   fsec('settings','cookies','<b>Cookies</b>: choose which cookies you allow.');
   fsec('settings','taborder','<b>Tab Order</b>: choose the order of the main tabs. Press and hold a tab, then tap or drop it on the place you want. The footer menu follows the same order.');
   ficon('announcements','<b>Announcements</b>: news and tips from us. Its dot means something new.');
@@ -26147,14 +26147,11 @@ html body #sec-notifications #ns-look-box > .ns-h:not(#ayu-x1):not(#ayu-x2)::bef
 .lk-s .t{font-weight:700;font-size:.8rem;color:#08766e}
 .lk-s .pn{background:#ccfbf1;border-radius:10px;padding:6px 8px}
 .lk-s .br{border-left:4px solid #0d9488;padding-left:8px}
-.lk-prev{--ayu-prev:var(--footer-accent,#2563eb);--ayu-prev-t:var(--footer-accent,#2563eb);display:flex;flex-wrap:wrap;justify-content:center;gap:6px 8px;margin:12px 0 4px}
-.lk-prev .ayu-prev-btn{border:1.5px solid color-mix(in srgb,var(--footer-accent,#2563eb) 55%,#fff);color:var(--footer-accent,#2563eb);background:transparent;border-radius:12px;padding:8px 18px;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer}
-.lk-prev .ayu-prev-msg{flex-basis:100%;text-align:center;font-size:.8rem;color:#a8344d}
 </style>
 <script id="notif-fold-20261123-js">
 (function(){
   function $(i){ return document.getElementById(i); }
-  var K='ayuNsOpen', DEF={sys:1,app:0,look:0,test:0}, LKEY={panel:'Soft panel',bar:'Side bar',title:'Coloured title'}, look='panel', looked=false;
+  var K='ayuNsOpen', DEF={sys:0,app:0,look:0,test:0}, LKEY={panel:'Soft panel',bar:'Side bar',title:'Coloured title'}, look='panel', looked=false;
   function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){} return null; }
   function st(){ var o={}; try{ o=JSON.parse(ls(K)||'{}')||{}; }catch(e){} return {sys:'sys' in o?o.sys:DEF.sys,app:'app' in o?o.app:DEF.app,look:'look' in o?o.look:DEF.look,test:'test' in o?o.test:DEF.test}; }
   function N(){ var n=window.ayuNative; return n && n.native && typeof n.lookGet==='function' ? n : null; }
@@ -26172,16 +26169,11 @@ html body #sec-notifications #ns-look-box > .ns-h:not(#ayu-x1):not(#ayu-x2)::bef
     box.innerHTML='<div class="ns-h ns-fold" data-k="look" id="ns-look">Notification look</div><div class="ns-b ns-b-look">'
       +'<p class="feedback-note-small">How reminder notifications look on this phone. The line with the app name stays Android’s.</p>'
       +opt('panel','Soft panel','',true)+opt('bar','Side bar','',false)+opt('title','Coloured title','',false)
-      +'<div class="ayu-prev-row lk-prev" id="ns-look-prev"><button type="button" class="alert-preview-btn ayu-prev-btn">Preview notification</button><span class="ayu-prev-msg" hidden></span></div></div>';
+      +'</div>';
     var wrap=$('notif-all'), test=$('ns-test');
     if(wrap) wrap.after(box); else if(test) sec.insertBefore(box,test); else sec.appendChild(box);
     box.querySelectorAll('input[name="ns-look"]').forEach(function(r){ r.addEventListener('change',function(){
       look=r.value; mark(); var n=N(); if(n) n.lookSet(look).catch(function(){}); apply(); }); });
-    $('ns-look-prev').querySelector('button').addEventListener('click',function(){
-      if(typeof window.ayuPreviewNote!=='function') return;
-      var a=window.ayuPreviewNote('Time for your medicine','Take your 8:00 AM tablet. Did you take it?','reminders','preview-look-a',[]);
-      setTimeout(function(){ try{ window.ayuPreviewNote('Drink water','A glass of water now keeps you fresh.','routines','preview-look-b',[]); }catch(e){} },350);
-    });
     var n=N(); if(n) n.lookGet().then(function(v){ look=v||'panel'; looked=true; mark(); apply(); }).catch(function(){ looked=true; mark(); });
     mark();
   }
@@ -28750,6 +28742,7 @@ html body #routines-panel #chk-alarm #wake-al-body #wake-alarm-days .day-chips:n
 html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row select:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){flex:1 1 140px !important;min-width:0 !important;height:34px !important;padding:7px 30px 7px 12px !important;font-size:14px !important;border:1px solid #f2a8b6 !important;border-radius:10px !important;background-color:transparent !important;color:rgb(36,52,72) !important}
 html body #routines-panel #chk-alarm #wake-al-body .ayu-al-play:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){width:30px !important;height:30px !important;font-size:14.4px !important;border:1px solid rgba(232,96,122,.55) !important;border-radius:10px !important}
 html body #routines-panel #routines-notify-card #ayu-cl-prev:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){margin-bottom:16px !important}
+html body #routines-panel #chk-alarm #wake-al-body #wake-alarm-days .day-quick:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){margin-top:12px !important}
 </style>
 <style id="medicine-20261123">
 /* Medicine in Personal Reminders: the Medicine / Reminder choice, the medicine form with its doses, the two list sections and the history table */

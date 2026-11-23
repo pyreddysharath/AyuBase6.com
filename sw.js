@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'ayubase6-pwa-v58';   // v13: new index.html replaces the saved copy
+const CACHE_NAME = 'ayubase6-pwa-v60';   // v13: new index.html replaces the saved copy
 // Videos and preview images from content/ are kept here the first time they are used.
 // Separate from CACHE_NAME so an app update does not throw the videos away.
 const MEDIA_CACHE = 'ayubase6-media-v2';
