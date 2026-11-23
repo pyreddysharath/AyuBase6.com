@@ -17509,7 +17509,7 @@ html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opa
   var raf=0;
   var ro=window.ResizeObserver?new ResizeObserver(queue):null;
   PANELS.forEach(function(id){ var p=document.getElementById(id); if(!p) return; if(ro) ro.observe(p);
-    new MutationObserver(function(ms){ if(ms.every(function(m){ return m.target.closest&&m.target.closest('.sec-lotus-layer,.sec-bg-layer'); })) return; if(ms.some(function(m){ return m.target===p&&m.attributeName==='class'; })){ clearTimeout(timer); var q0=p.getBoundingClientRect(), pd=p.id; if(pd==='alerts-panel'&&p.querySelector('.alert-page[data-remtab="breaks"]')) pd='routines-panel'; if(p._sig && p._sig===Math.round(q0.width)+'x'+Math.round(q0.height)+'|'+pd && p.querySelector(':scope > .sec-bg-layer > *')) return; run(); return; } queue(); }).observe(p,{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden','style']}); });
+    new MutationObserver(function(ms){ if(ms.every(function(m){ return m.target.closest&&m.target.closest('.sec-lotus-layer,.sec-bg-layer'); })) return; if(ms.some(function(m){ return m.target===p&&m.attributeName==='class'; })){ clearTimeout(timer); var q0=p.getBoundingClientRect(), pd=p.id; if(pd==='alerts-panel'&&p.querySelector('.alert-page[data-remtab="breaks"]')) pd='routines-panel'; if(p._sig && p._sig===Math.round(q0.width)+'x'+Math.round(q0.height)+'|'+pd && p.querySelector(':scope > .sec-bg-layer > *')) return; requestAnimationFrame(function(){ clearTimeout(timer); timer=setTimeout(run,0); }); return; } queue(); }).observe(p,{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden','style']}); });
   function reveal(){ document.documentElement.classList.add('lotus-ready'); }
   window.addEventListener('resize',queue);
   document.addEventListener('click',function(){ clearTimeout(timer); timer=setTimeout(run,120); setTimeout(run,520); },true);
@@ -19161,6 +19161,17 @@ html body #rem-alarm-card.alert-card{background-color:var(--tl-5eead4,#5eead4) !
     var sel=$('wake-al-tone'), row=sel && sel.closest('.ayu-al-row'); if(!row || $('wake-al-vib')) return;
     var vr=document.createElement('div'); vr.className='ayu-al-row ayu-vib-only'; vr.innerHTML='<span class="ayu-al-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" id="wake-al-vib" aria-label="Vibrate"></label>';
     var nx=row.nextElementSibling; while(nx && (nx.classList.contains('ayu-al-msg') || nx.tagName==='INPUT')) nx=nx.nextElementSibling; row.parentNode.insertBefore(vr,nx);
+    // Mute: "No sound (vibrate only)", and back to the sound it had
+    var pl=$('wake-al-play'); if(pl && !$('wake-al-mute')){
+      var mb=document.createElement('button'); mb.type='button'; mb.id='wake-al-mute'; var ON='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>', OFF='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
+      var paint=function(){ var m=sel.value==='none'; mb.innerHTML=m?OFF:ON; mb.title=m?'Unmute':'Mute'; mb.setAttribute('aria-label',mb.title); mb.classList.toggle('muted',m); };
+      mb.addEventListener('click',function(){
+        if(sel.value==='none'){ var pv='rise'; try{ pv=localStorage.getItem('ayuWakeTonePrev')||'rise'; }catch(e){} sel.value=pv; if(sel.value!==pv) sel.selectedIndex=0; }
+        else { try{ localStorage.setItem('ayuWakeTonePrev',sel.value); }catch(e){} sel.value='none'; }
+        sel.dispatchEvent(new Event('change',{bubbles:true})); paint();
+      });
+      sel.addEventListener('change',paint); pl.after(mb); paint();
+    }
     var vi=$('wake-al-vib'); vi.checked=vibOn('wake');
     vi.addEventListener('change',function(){ var c=get('wake'); c.vibrate=vi.checked; put('wake',c); });
   }
@@ -26151,6 +26162,15 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .re
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .rf-mute svg{display:block}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .rf-mute.muted{background:var(--alert-2,#0d9488) !important;color:#fff !important;border-color:var(--alert-2,#0d9488) !important}
 </style>
+<style id="care-sections-20261123">
+/* My Day Plan: Wake-Up Alarm and Notify Me without boxes, each title with its own line under it */
+html body #start-my-day-card #chk-alarm:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4),html body #start-my-day-card #routines-notify-card:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){border:0 !important;border-radius:0 !important;background:transparent !important;box-shadow:none !important;margin:0 0 22px !important;padding-left:0 !important;padding-right:0 !important}
+html body #start-my-day-card #chk-alarm .ayu-sub-hdr:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4),html body #start-my-day-card #routines-notify-card > :first-child:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){border-bottom:2px solid transparent !important;border-image:linear-gradient(90deg,#e8607a,rgba(232,96,122,.08)) 1 !important;padding-bottom:8px !important;margin-bottom:10px !important}
+/* Wake-up time: set by tapping the time (the clock opens); the slider only shows it, so scrolling the page cannot change it */
+html body #start-my-day-card #wake-time-slider:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){pointer-events:none !important;touch-action:auto !important}
+html body #start-my-day-card .wake-range-ends .ayu-time-btn:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){border:2px solid var(--rout-2,#e8607a) !important;background:#fff !important;border-radius:16px !important;padding:6px 18px !important;display:inline-flex;align-items:center;gap:8px}
+html body #start-my-day-card .wake-range-ends .ayu-time-btn:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4)::before{content:"";width:18px;height:18px;flex:0 0 18px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c94862' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") no-repeat center/contain}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
@@ -28682,8 +28702,18 @@ html body #routines-panel #routines-notify-card .rout-card-hdr h2 .rout-info-btn
 html body #routines-panel #start-my-day-card #chk-alarm:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){margin-top:26px !important}
 html body #routines-panel #start-my-day-card #routines-notify-card.ayu-closed:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){padding-bottom:8px !important}
 /* Wake-Up Alarm fields laid out like Notify Me: a dot before each label (bold, same colour), the label above its field, the same field and button looks; and a gap under Notify Me's Preview button */
-html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row:not(.ayu-prev-row):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){flex-wrap:wrap !important;gap:6px 10px !important}
-html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row:not(.ayu-prev-row):not(.ayu-vib-only) > .ayu-al-lbl:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){flex:0 0 100% !important;min-width:0 !important;margin:0 !important}
+html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row:not(.ayu-prev-row):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){flex-wrap:nowrap !important;gap:8px !important}
+html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row:not(.ayu-prev-row):not(.ayu-vib-only) > .ayu-al-lbl:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){flex:0 0 104px !important;min-width:0 !important;margin:0 !important}
+@media(max-width:380px){html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row:not(.ayu-prev-row):not(.ayu-vib-only) > .ayu-al-lbl:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){flex-basis:100px !important}}
+html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row .reminder-custom-select-trigger:not(#ayu-x1):not(#ayu-x2){white-space:nowrap !important;padding-left:10px !important;padding-right:26px !important}
+html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row .reminder-trigger-label:not(#ayu-x1):not(#ayu-x2){white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important;display:block}
+html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row .reminder-custom-select-wrap:not(#ayu-x1):not(#ayu-x2){flex:1 1 0 !important;min-width:0 !important}
+html body #routines-panel #wake-al-mute:not(#ayu-x1):not(#ayu-x2){width:30px;height:30px;min-width:30px;flex:0 0 30px;padding:0;border-radius:10px;border:1px solid color-mix(in srgb,rgb(232,96,122) 55%,#fff);background:transparent;color:rgb(232,96,122);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+html body #routines-panel #wake-al-mute.muted:not(#ayu-x1):not(#ayu-x2){background:rgb(232,96,122);color:#fff}
+html body #routines-panel #wake-al-mute svg{display:block}
+html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row:has(#wake-al-tone):not(#ayu-x1):not(#ayu-x2){gap:6px !important}
+html body #routines-panel #chk-alarm #wake-al-body #wake-al-tone:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){height:30px !important;font-size:13px !important;padding-left:8px !important;padding-right:20px !important}
+html body #routines-panel #chk-alarm #wake-al-body #wake-al-play:not(#ayu-x1):not(#ayu-x2),html body #routines-panel #wake-al-mute:not(#ayu-x1):not(#ayu-x2){width:28px !important;min-width:28px !important;flex-basis:28px !important;height:30px !important}
 html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row:not(.ayu-prev-row) > .ayu-al-lbl:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3),html body #routines-panel #chk-alarm #wake-al-body #wake-alarm-days .otd-title:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){font-size:13px !important;font-weight:600 !important;color:#b8304f !important;text-transform:none !important}
 html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row:not(.ayu-prev-row) > .ayu-al-lbl:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3)::before,html body #routines-panel #chk-alarm #wake-al-body #wake-alarm-days .otd-title:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3)::before{content:"•" !important;display:inline-block;width:10px;margin-right:6px;text-align:center;font-size:16px !important;font-weight:800 !important;line-height:1;color:var(--rout-2,#e8607a) !important}
 html body #routines-panel #chk-alarm #wake-al-body .ayu-vib-only > .ayu-al-lbl:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){flex:0 0 auto !important;min-width:78px !important}
@@ -28691,7 +28721,7 @@ html body #routines-panel #chk-alarm #wake-al-body .ayu-vib-only .master-switch:
 html body #routines-panel #chk-alarm #wake-al-body #wake-alarm-days.otd-row:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){display:block !important}
 html body #routines-panel #chk-alarm #wake-al-body #wake-alarm-days .otd-title:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){margin:0 0 6px !important}
 html body #routines-panel #chk-alarm #wake-al-body #wake-alarm-days .day-chips:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){width:100% !important}
-html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row select:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){flex:1 1 140px !important;min-width:0 !important;height:34px !important;padding:7px 30px 7px 12px !important;font-size:14px !important;border:1px solid #f2a8b6 !important;border-radius:10px !important;background-color:transparent !important;color:rgb(36,52,72) !important}
+html body #routines-panel #chk-alarm #wake-al-body .ayu-al-row select:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){flex:1 1 0 !important;width:0 !important;min-width:0 !important;height:34px !important;padding:7px 22px 7px 10px !important;background-position:right 6px center !important;background-size:14px !important;white-space:nowrap !important;text-overflow:ellipsis !important;font-size:14px !important;border:1px solid #f2a8b6 !important;border-radius:10px !important;background-color:transparent !important;color:rgb(36,52,72) !important}
 html body #routines-panel #chk-alarm #wake-al-body .ayu-al-play:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){width:30px !important;height:30px !important;font-size:14.4px !important;border:1px solid rgba(232,96,122,.55) !important;border-radius:10px !important}
 html body #routines-panel #routines-notify-card #ayu-cl-prev:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){margin-bottom:16px !important}
 html body #routines-panel #chk-alarm #wake-al-body #wake-alarm-days .day-quick:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){margin-top:12px !important}
