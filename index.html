@@ -26846,6 +26846,21 @@ html body #alerts-panel .per-reminder-schedule .per-reminder-schedule-times > bu
   display: inline-block; width: 10px; text-align: center; font-size: 16px !important; font-weight: 800 !important;
   line-height: 1; color: #087e75 !important; margin-right: -4px !important;
 }
+/* Health Breaks belong to Care: their dots are Care coral, not Reminders teal */
+html body #alerts-panel .alert-page[data-remtab="breaks"] .dotted-lbl::before,
+html body #alerts-panel .alert-page[data-remtab="breaks"] .per-reminder-schedule-times > .per-reminder-from::before,
+html body #alerts-panel .alert-page[data-remtab="breaks"] .alert-preview-row .row-dot,
+html body #alerts-panel .alert-page[data-remtab="breaks"] .row-dot,
+html body #alerts-panel .alert-page[data-remtab="breaks"] #alert-card-break-ex .eye-ex-wrap > .alert-row > .alert-row-lbl.dotted-lbl::before,
+html body #alerts-panel .alert-page[data-remtab="breaks"] #alert-card-break-ex .eye-ex-wrap > .alert-row.alert-preview-row > .row-dot { color: #e8607a !important; }
+html body #alerts-panel .alert-page[data-remtab="breaks"] .per-reminder-from::before,
+html body #alerts-panel .alert-page[data-remtab="breaks"] .otd-title::before,
+html body #alerts-panel .alert-page[data-remtab="breaks"] .alert-fixed-frequency::before,
+html body #alerts-panel .alert-page[data-remtab="breaks"] .ayu-speak-lbl::before { color: #e8607a !important; }
+html body #alerts-panel .alert-page[data-remtab="breaks"] .otd-title { color: #7a2d40 !important; }
+html body #alerts-panel .alert-page[data-remtab="breaks"] .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from::before,
+html body #alerts-panel .alert-page[data-remtab="breaks"] #alert-card-drink .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from::before,
+html body #alerts-panel .alert-page[data-remtab="breaks"] #alert-card-break-ex .per-reminder-schedule .per-reminder-schedule-times > .per-reminder-from::before { color: #e8607a !important; }
 
 /* ---- Reminders: Enable All | Install | Reset on one row ---- */
 #reminders-notif-banner .master-notif-row {
