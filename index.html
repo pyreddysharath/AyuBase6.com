@@ -3791,6 +3791,19 @@ html body #app-logo-wrap{gap:6px;zoom:.85}
 @media(max-width:899px){html body #app-logo-wrap:not(#ayu-x1):not(#ayu-x2){flex-direction:row !important;align-items:center !important;justify-content:center !important;gap:10px !important;zoom:.9}
 html body #app-logo-wrap #app-logo-mark:not(#ayu-x1):not(#ayu-x2){margin:0 !important;flex:none !important;width:52px !important;max-width:52px !important}
 html body #app-logo-wrap #app-logo:not(#ayu-x1):not(#ayu-x2){margin:0 !important;width:auto !important;flex:none !important}}
+/* Vitals tab icon: stethoscope (outline, as thick as the solid icons) */
+html body #tab-btns .tab-btn.calculator .tab-btn-icon.ayu-steth:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){fill:none !important;stroke:currentColor !important;stroke-width:2.4 !important;stroke-linecap:round;stroke-linejoin:round}
+html body #tab-btns .tab-btn.calculator .tab-btn-icon.ayu-steth *:not(#ayu-x1):not(#ayu-x2){fill:none !important;stroke:currentColor !important;stroke-width:2.4 !important}
+
+/* tab bar: equal widths, band only (no small bar) */
+html body #tab-btns .tab-btn:not(#ayu-x1):not(#ayu-x2){flex:1 1 0 !important;min-width:0 !important;padding-left:2px !important;padding-right:2px !important}
+html body #tab-underline:not(#ayu-x1):not(#ayu-x2){display:none !important}
+
+/* the footer reads as its own raised panel in the open section's colour */
+html body .app-footer:not(#ayu-x1):not(#ayu-x2){margin-top:20px !important;border-radius:22px 22px 0 0 !important;box-shadow:0 -6px 20px rgba(15,23,42,.14) !important;background:color-mix(in srgb,var(--footer-accent,#2563eb) 7%,#fff) !important;border-top:2px solid color-mix(in srgb,var(--footer-accent,#2563eb) 40%,#fff) !important}
+/* the lines inside the Food leaf and Mind brain are white; on the selected (white-icon) tab they take the tab's own colour so they stay visible */
+html body #tab-btns .tab-btn.nutrition.active .tab-btn-icon path[stroke="white"]:not(#ayu-x1):not(#ayu-x2){stroke:var(--tabpill-nutrition) !important}
+html body #tab-btns .tab-btn.mind.active .tab-btn-icon path[stroke="white"]:not(#ayu-x1):not(#ayu-x2){stroke:var(--tabpill-mind) !important}
 </style>
 </head>
 <body>
@@ -29059,19 +29072,6 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
 .med-hist .mh-pdf{padding:8px 18px;border:0;border-radius:10px;background:var(--mh);color:#fff;font:inherit;font-weight:700;cursor:pointer}
 .med-hist .mh-close{padding:8px 18px;border:1.5px solid var(--mh);border-radius:10px;background:#fff;color:var(--mh);font:inherit;font-weight:700;cursor:pointer}
 
-/* Vitals tab icon: stethoscope (outline, as thick as the solid icons) */
-html body #tab-btns .tab-btn.calculator .tab-btn-icon.ayu-steth:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){fill:none !important;stroke:currentColor !important;stroke-width:2.4 !important;stroke-linecap:round;stroke-linejoin:round}
-html body #tab-btns .tab-btn.calculator .tab-btn-icon.ayu-steth *:not(#ayu-x1):not(#ayu-x2){fill:none !important;stroke:currentColor !important;stroke-width:2.4 !important}
-
-/* tab bar: equal widths, band only (no small bar) */
-html body #tab-btns .tab-btn:not(#ayu-x1):not(#ayu-x2){flex:1 1 0 !important;min-width:0 !important;padding-left:2px !important;padding-right:2px !important}
-html body #tab-underline:not(#ayu-x1):not(#ayu-x2){display:none !important}
-
-/* the footer reads as its own raised panel in the open section's colour */
-html body .app-footer:not(#ayu-x1):not(#ayu-x2){margin-top:20px !important;border-radius:22px 22px 0 0 !important;box-shadow:0 -6px 20px rgba(15,23,42,.14) !important;background:color-mix(in srgb,var(--footer-accent,#2563eb) 7%,#fff) !important;border-top:2px solid color-mix(in srgb,var(--footer-accent,#2563eb) 40%,#fff) !important}
-/* the lines inside the Food leaf and Mind brain are white; on the selected (white-icon) tab they take the tab's own colour so they stay visible */
-html body #tab-btns .tab-btn.nutrition.active .tab-btn-icon path[stroke="white"]:not(#ayu-x1):not(#ayu-x2){stroke:var(--tabpill-nutrition) !important}
-html body #tab-btns .tab-btn.mind.active .tab-btn-icon path[stroke="white"]:not(#ayu-x1):not(#ayu-x2){stroke:var(--tabpill-mind) !important}
 </style>
 <script id="medicine-20261123-js">
 (function(){
