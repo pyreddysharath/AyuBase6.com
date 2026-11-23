@@ -11292,8 +11292,8 @@ function showNudgeNotification(title, body, o){
   // earlier one with the same tag is still on screen; silent updates (the
   // countdown) just replace the text in place.
   const fresh=!o.silent;
-  const opts={ body:body, tag:'nudge-'+key, requireInteraction:true, silent:!!o.silent, renotify:fresh, data:{key:key, section:(/^routine-/.test(key)?'routines':'alerts'), previewLike:o.previewLike||''}, timestamp:Date.now() };
-  if(fresh) opts.vibrate=(window.ayuVibrate && !window.ayuVibrate.on(key)) ? [] : [200,100,200,100,200];
+  const opts={ body:body, tag:'nudge-'+key, requireInteraction:true, silent:!!o.silent, renotify:fresh, data:{key:key, section:((o.theme==='routines'||/^(preview-)?routine-/.test(key))?'routines':'alerts'), previewLike:o.previewLike||''}, timestamp:Date.now() };
+  if(fresh) opts.vibrate=(window.ayuVibrate && !window.ayuVibrate.on(key.replace(/^preview-/,''))) ? [] : [200,100,200,100,200];
   const icon=nudgeArt('icon',o.theme), badge=nudgeArt('badge',o.theme);
   if(icon) opts.icon=icon; if(badge) opts.badge=badge;
   if(key==='posture'||key==='preview-posture'){ const pi=document.getElementById('posture-pic'); if(pi && pi.src && /^data:/.test(pi.src)) opts.image=pi.src; }   // posture check shows the sitting picture
@@ -20443,7 +20443,7 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
   // key of a notification: "break" "walk" "drink" "eyeex", "routine-…", "custom-<id>"
   window.ayuVibrate={
     can:CAN,
-    on:function(key){ key=String(key||''); if(/^routine/.test(key)) return on('chk'); if(HB.indexOf(key)>=0) return on(key); var m=key.match(/^custom-?(.+)$/); if(m) return customOn(m[1]); return true; },
+    on:function(key){ key=String(key||'').replace(/^preview-/,''); if(key==='mind'){ try{ var mr=window.ayuMindRules&&window.ayuMindRules(); return mr?!!mr.vibrate:true; }catch(e){ return true; } } if(/^routine/.test(key)) return on('chk'); if(HB.indexOf(key)>=0) return on(key); var m=key.match(/^custom-?(.+)$/); if(m) return customOn(m[1]); return true; },
     chk:function(){ return on('chk'); },
     wake:function(){ return on('wake'); },   // Checks → Wake-up Alarm: its own Vibrate
     set:function(k,v){ set(String(k),v); }
