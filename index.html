@@ -16609,7 +16609,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   fsec('settings','notifications','<b>Notifications</b>: <b>System notifications</b> is the permission, <b>App notifications</b> has every reminder and alarm with its switch and Turn all off, and <b>Test notifications</b> is a quick check if notifications don\'t arrive.');
   fsec('settings','cookies','<b>Cookies</b>: choose which cookies you allow.');
   fsec('settings','taborder','<b>Tab Order</b>: choose the order of the main tabs. Press and hold a tab, then tap or drop it on the place you want. The footer menu follows the same order.');
-  fsec('settings','resetall','<b>Reset</b>: <b>Reset all settings</b> puts every setting back to its default and keeps your records. <b>Erase all data</b> is a factory reset of everything on this device.');
+  fsec('settings','resetall','<b>Reset</b>: <b>Reset all settings</b> puts every setting back to its default and keeps your records. <b>Erase all data</b> is a factory reset. Both let you choose which sections.');
   ficon('announcements','<b>Announcements</b>: news and tips from us. Its dot means something new.');
   fsec('announcements',null,'<b>Announcements</b>: the latest messages, newest first.');
   ficon('help','<b>Help</b>: its dot means a notification problem was found.');
@@ -25396,26 +25396,45 @@ body.to-picking{cursor:grabbing}
 #sec-resetall .ra-row{display:flex;gap:8px}
 #sec-resetall .ra-row .ra-btn{flex:1}
 #sec-resetall .ra-link{background:none;border:0;padding:0;margin:0 0 6px;font:inherit;font-size:.8rem;font-weight:800;color:var(--footer-accent,var(--fb-2563eb,#2563eb));text-decoration:underline;cursor:pointer}
+#sec-resetall .ra-list{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin:0 0 8px}
+#sec-resetall .ra-opt{display:flex;align-items:center;gap:6px;font-size:.88rem;font-weight:700;color:#1e293b;cursor:pointer;min-height:0 !important}
+#sec-resetall .ra-opt input{width:18px;height:18px;margin:0;flex:none;accent-color:var(--footer-accent,#2563eb)}
+#sec-resetall .ra-opt i{width:10px;height:10px;border-radius:50%;flex:none}
+#sec-resetall .ra-opt small{font-weight:600;color:#64748b;font-size:.72rem}
+#sec-resetall .ra-opt:last-child{grid-column:1/-1}
 #sec-resetall .ra-done{margin-top:8px;text-align:center;font-weight:800;color:var(--footer-accent,var(--fb-2563eb,#2563eb))}
 </style>
 <script id="reset-all-20261123-js">
 (function(){
-  // Settings -> Reset. "Reset all settings" puts every setting back to its default (reminder and alarm times, switches, tones,
-  // tab order, cookie choices) and keeps the person's records. "Erase all data" is a factory reset: everything stored on the device.
-  var KEEP=['ayu_vitals_tracker_v1','ayu_lab_reports_v1','ayuBase6-med-log','ayuBase6-tour-seen'];   // records, kept by "Reset all settings"
-  function stopPhone(){
-    var n=window.ayuNative; if(!n) return Promise.resolve();
-    var jobs=[];
-    try{ if(typeof n.clockSet==='function') jobs.push(Promise.resolve(n.clockSet({timer:{},stopwatch:{},world:{}})).catch(function(){})); }catch(e){}
-    return Promise.all(jobs);
+  // Settings -> Reset. Each section can be chosen (all ticked at first). "Reset all settings" puts that section's settings back to their
+  // defaults (times, switches, tones...) and keeps its records. "Erase all data" is a factory reset of the chosen sections.
+  // To move a stored item to another section, edit SECTIONS below; anything not listed belongs to "App".
+  var SECTIONS=[
+    {id:'activity',label:'Body',c:'#2b6aa6',keys:['ayuBase6-body-choices']},
+    {id:'nutrition',label:'Food',c:'#4f8a22',keys:[/^ayuBase6-food-/]},
+    {id:'mind',label:'Mind',c:'#364ca8',keys:['ayuBase6-mind']},
+    {id:'calculator',label:'Vitals',c:'#13806c',keys:['ayu_vitals_tracker_v1','ayu_lab_reports_v1','ayuBmiView'],records:['ayu_vitals_tracker_v1','ayu_lab_reports_v1']},
+    {id:'routines',label:'Care',c:'#1a86b5',keys:['ayuBase6WakeUpTime','ayuBase6-hb-v2','ayuBase6-care-autodismiss','ayuBase6-speak','ayuBase6-speak-last','ayuBase6-vibrate',/^ayuBase6-routine-/,/^ayuWake/,'ayuAlarmTap']},
+    {id:'alerts',label:'Alerts',c:'#6f9a1c',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-med-log','ayuBase6-rem-alarm','ayuBase6-rem-alarms','ayuBase6-timer','ayuBase6-stopwatch','ayuBase6-world','ayuClockTab'],records:['ayuBase6-med-log']},
+    {id:'app',label:'App',c:'#475569',note:'tab order, cookies, notifications, offline pages',keys:[],rest:true,records:['ayuBase6-tour-seen']}
+  ];
+  function inSec(s,k){ return s.keys.some(function(m){ return typeof m==='string'?m===k:m.test(k); }); }
+  function owner(k){ for(var i=0;i<SECTIONS.length;i++) if(!SECTIONS[i].rest && inSec(SECTIONS[i],k)) return SECTIONS[i]; return SECTIONS[SECTIONS.length-1]; }
+  function chosen(box){ return [].slice.call(box.querySelectorAll('.ra-list input:checked')).map(function(i){ return i.value; }); }
+  function stopPhone(ids){
+    var n=window.ayuNative; if(!n||ids.indexOf('alerts')<0) return Promise.resolve();
+    try{ if(typeof n.clockSet==='function') return Promise.resolve(n.clockSet({timer:{},stopwatch:{},world:{}})).catch(function(){}); }catch(e){}
+    return Promise.resolve();
   }
   function syncPhone(){ try{ var n=window.ayuNative; if(n && typeof n.sync==='function') n.sync(); }catch(e){} }
-  function clearSettings(){
-    try{ Object.keys(localStorage).forEach(function(k){ if(KEEP.indexOf(k)<0) localStorage.removeItem(k); }); }catch(e){}
-    try{ sessionStorage.clear(); }catch(e){}
+  function clearKeys(ids,erase){
+    try{ Object.keys(localStorage).forEach(function(k){
+      var s=owner(k); if(ids.indexOf(s.id)<0) return;
+      if(!erase && s.records && s.records.indexOf(k)>=0) return;   // a settings reset keeps records
+      localStorage.removeItem(k); }); }catch(e){}
+    try{ if(ids.indexOf('app')>=0) sessionStorage.clear(); }catch(e){}
   }
-  function clearAll(){
-    try{ localStorage.clear(); }catch(e){} try{ sessionStorage.clear(); }catch(e){}
+  function clearStores(){
     var jobs=[];
     try{ if(window.indexedDB && indexedDB.databases) jobs.push(indexedDB.databases().then(function(l){ return Promise.all((l||[]).map(function(d){ return new Promise(function(r){ try{ var q=indexedDB.deleteDatabase(d.name); q.onsuccess=q.onerror=q.onblocked=function(){ r(); }; }catch(e){ r(); } }); })); }).catch(function(){})); }catch(e){}
     try{ if(window.caches) jobs.push(caches.keys().then(function(l){ return Promise.all(l.map(function(k){ return caches.delete(k); })); }).catch(function(){})); }catch(e){}
@@ -25427,15 +25446,18 @@ body.to-picking{cursor:grabbing}
   }
   function render(box){
     box.innerHTML='<p class="ra-note">Start again, from one place.</p>'
-     +'<div class="ra-card" id="ra-c1"><h4>Reset all settings</h4><p>Puts every setting back to its default in all sections: reminder and alarm times, switches, tones, tab order and cookie choices. Your Lab Insights reports, Tracker readings and medicine log stay.</p><button type="button" class="ra-btn" data-a="s1">Reset all settings</button><div class="ra-box"></div></div>'
-     +'<div class="ra-card" id="ra-c2"><h4>Erase all data</h4><p>A factory reset. Removes everything AyuBase6 keeps on this device: settings, reminders, reports, readings, people and saved offline pages. It cannot be undone.</p><button type="button" class="ra-btn ra-danger" data-a="e1">Erase all data</button><div class="ra-box"></div></div>';
+     +'<div class="ra-card" id="ra-c1"><h4>Reset all settings</h4><p>Puts the settings back to their defaults: reminder and alarm times, switches, tones and choices. Your Lab Insights reports, Tracker readings and medicine log stay.</p><button type="button" class="ra-btn" data-a="s1">Reset settings…</button><div class="ra-box"></div></div>'
+     +'<div class="ra-card" id="ra-c2"><h4>Erase all data</h4><p>A factory reset. Removes what AyuBase6 keeps on this device for the sections you choose, including reports, readings and reminders. It cannot be undone.</p><button type="button" class="ra-btn ra-danger" data-a="e1">Erase data…</button><div class="ra-box"></div></div>';
   }
   function ask(card,kind){
     var b=card.querySelector('.ra-box'), erase=kind==='e';
-    b.innerHTML='<div class="ra-ask"><p>'+(erase?'Erase everything on this device?':'Reset all settings to default?')+'</p>'
+    var list=SECTIONS.map(function(s){ return '<label class="ra-opt"><input type="checkbox" value="'+s.id+'" checked><i style="background:'+s.c+'"></i><span>'+s.label+(s.note?' <small>('+s.note+')</small>':'')+'</span></label>'; }).join('');
+    b.innerHTML='<div class="ra-ask"><p>'+(erase?'Erase the data of:':'Reset the settings of:')+'</p><div class="ra-list">'+list+'</div>'
       +(erase?'<button type="button" class="ra-link" data-a="bk">Back up first</button><input type="text" id="ra-word" placeholder="Type ERASE to confirm" autocomplete="off" autocapitalize="characters" aria-label="Type ERASE to confirm">':'')
       +'<div class="ra-row"><button type="button" class="ra-btn ra-ghost" data-a="no">Cancel</button><button type="button" class="ra-btn'+(erase?' ra-danger':'')+'" data-a="'+(erase?'e2':'s2')+'"'+(erase?' disabled':'')+'>'+(erase?'Erase':'Reset')+'</button></div></div>';
-    var w=b.querySelector('#ra-word'); if(w){ w.addEventListener('input',function(){ b.querySelector('[data-a=e2]').disabled=w.value.trim().toUpperCase()!=='ERASE'; }); w.focus(); }
+    var go=b.querySelector('[data-a='+(erase?'e2':'s2')+']'), w=b.querySelector('#ra-word');
+    function upd(){ go.disabled=!chosen(b).length || (w && w.value.trim().toUpperCase()!=='ERASE'); }
+    b.querySelectorAll('.ra-list input').forEach(function(i){ i.addEventListener('change',upd); }); if(w){ w.addEventListener('input',upd); w.focus(); }
   }
   function build(){
     var sec=document.getElementById('sec-settings'), tabs=sec && sec.querySelector(':scope > .footer-subtabs'); if(!tabs) return false;
@@ -25444,11 +25466,11 @@ body.to-picking{cursor:grabbing}
     tabs.appendChild(b);
     var d=document.createElement('div'); d.className='footer-sub'; d.id='sec-resetall'; d.style.display='none'; sec.appendChild(d);
     d.addEventListener('click',function(e){
-      var x=e.target.closest('button'); if(!x||!x.dataset.a) return; var a=x.dataset.a, card=x.closest('.ra-card');
+      var x=e.target.closest('button'); if(!x||!x.dataset.a) return; var a=x.dataset.a, card=x.closest('.ra-card'), ids=card?chosen(card):[];
       if(a==='s1') ask(card,'s'); else if(a==='e1') ask(card,'e'); else if(a==='no') card.querySelector('.ra-box').innerHTML='';
       else if(a==='bk'){ try{ showFooterSection('backup'); }catch(err){} }
-      else if(a==='s2'){ x.disabled=true; stopPhone().then(function(){ clearSettings(); syncPhone(); finish(d,'Settings reset. Restarting\u2026'); }); }
-      else if(a==='e2'){ x.disabled=true; stopPhone().then(function(){ return clearAll(); }).then(function(){ syncPhone(); finish(d,'All data erased. Restarting\u2026'); }); }
+      else if(a==='s2'){ if(!ids.length) return; x.disabled=true; stopPhone(ids).then(function(){ clearKeys(ids,false); syncPhone(); finish(d,'Settings reset. Restarting…'); }); }
+      else if(a==='e2'){ if(!ids.length) return; x.disabled=true; stopPhone(ids).then(function(){ clearKeys(ids,true); return ids.indexOf('app')>=0?clearStores():null; }).then(function(){ syncPhone(); finish(d,'Data erased. Restarting…'); }); }
     });
     try{ FOOTER_SUBS.settings.push('resetall'); }catch(err){}
     var o=window.showFooterSub;
