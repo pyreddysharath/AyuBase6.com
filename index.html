@@ -25416,6 +25416,9 @@ body.to-picking{cursor:grabbing}
 #sec-resetall .ra-opt small{font-weight:600;color:#64748b;font-size:.72rem}
 #sec-resetall .ra-opt:last-child{grid-column:1/-1}
 #sec-resetall .ra-done{margin-top:8px;text-align:center;font-weight:800;color:var(--footer-accent,var(--fb-2563eb,#2563eb))}
+html body .ra-count{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#0f172a;color:#fff;border-radius:14px;padding:12px 14px}
+html body .ra-count p{margin:0;font-size:.92rem;line-height:1.4;flex:1 1 0;min-width:0;color:#fff}
+html body .ra-count .ra-btn{background:#fff;color:#0f172a;flex:none;width:auto !important;min-width:84px;margin:0 !important}
 </style>
 <script id="reset-all-20261123-js">
 (function(){
@@ -25457,20 +25460,32 @@ body.to-picking{cursor:grabbing}
     box.innerHTML='<p class="ra-done">'+msg+'</p>';
     setTimeout(function(){ try{ location.reload(); }catch(e){} },1100);
   }
+  var tm=0;
+  // Nothing is touched for 5 seconds; Undo inside that time cancels it, so no typed confirmation is needed.
+  function countdown(box,ids,erase){
+    var left=5, what=erase?'Erasing the data of':'Resetting the settings of', names=SECTIONS.filter(function(s){ return ids.indexOf(s.id)>=0; }).map(function(s){ return s.label; }).join(', ');
+    function draw(){ box.innerHTML='<div class="ra-count"><p>'+what+' <b>'+names+'</b> in <b>'+left+'</b>…</p><button type="button" class="ra-btn" data-a="undo">Undo</button></div>'; }
+    draw(); if(tm) clearInterval(tm);
+    tm=setInterval(function(){
+      left--; if(left>0){ draw(); return; }
+      clearInterval(tm); tm=0; box.innerHTML='<p class="ra-done">Working…</p>';
+      stopPhone(ids).then(function(){ clearKeys(ids,erase); return erase&&ids.indexOf('app')>=0?clearStores():null; }).then(function(){ syncPhone(); finish(box,erase?'Data erased. Restarting…':'Settings reset. Restarting…'); });
+    },1000);
+  }
   function render(box){
     box.innerHTML='<p class="ra-note">Start again, from one place.</p>'
      +'<div class="ra-card" id="ra-c1"><h4>Reset all settings</h4><p>Puts the settings back to their defaults: reminder and alarm times, switches, tones and choices. Your Lab Insights reports, Tracker readings and medicine log stay.</p><button type="button" class="ra-btn" data-a="s1">Reset settings…</button><div class="ra-box"></div></div>'
-     +'<div class="ra-card" id="ra-c2"><h4>Erase all data</h4><p>A factory reset. Removes what AyuBase6 keeps on this device for the sections you choose, including reports, readings and reminders. It cannot be undone.</p><button type="button" class="ra-btn ra-danger" data-a="e1">Erase data…</button><div class="ra-box"></div></div>';
+     +'<div class="ra-card" id="ra-c2"><h4>Erase all data</h4><p>A factory reset. Removes what AyuBase6 keeps on this device for the sections you choose, including reports, readings and reminders. You get 5 seconds to undo.</p><button type="button" class="ra-btn ra-danger" data-a="e1">Erase data…</button><div class="ra-box"></div></div>';
   }
   function ask(card,kind){
     var b=card.querySelector('.ra-box'), erase=kind==='e';
     var list=SECTIONS.map(function(s){ return '<label class="ra-opt"><input type="checkbox" value="'+s.id+'" checked><i style="background:'+s.c+'"></i><span>'+s.label+(s.note?' <small>('+s.note+')</small>':'')+'</span></label>'; }).join('');
     b.innerHTML='<div class="ra-ask"><p>'+(erase?'Erase the data of:':'Reset the settings of:')+'</p><div class="ra-list">'+list+'</div>'
-      +(erase?'<button type="button" class="ra-link" data-a="bk">Back up first</button><input type="text" id="ra-word" placeholder="Type ERASE to confirm" autocomplete="off" autocapitalize="characters" aria-label="Type ERASE to confirm">':'')
-      +'<div class="ra-row"><button type="button" class="ra-btn ra-ghost" data-a="no">Cancel</button><button type="button" class="ra-btn'+(erase?' ra-danger':'')+'" data-a="'+(erase?'e2':'s2')+'"'+(erase?' disabled':'')+'>'+(erase?'Erase':'Reset')+'</button></div></div>';
-    var go=b.querySelector('[data-a='+(erase?'e2':'s2')+']'), w=b.querySelector('#ra-word');
-    function upd(){ go.disabled=!chosen(b).length || (w && w.value.trim().toUpperCase()!=='ERASE'); }
-    b.querySelectorAll('.ra-list input').forEach(function(i){ i.addEventListener('change',upd); }); if(w){ w.addEventListener('input',upd); w.focus(); }
+      +(erase?'<button type="button" class="ra-link" data-a="bk">Back up first</button>':'')
+      +'<div class="ra-row"><button type="button" class="ra-btn ra-ghost" data-a="no">Cancel</button><button type="button" class="ra-btn'+(erase?' ra-danger':'')+'" data-a="'+(erase?'e2':'s2')+'"'+'>'+(erase?'Erase':'Reset')+'</button></div></div>';
+    var go=b.querySelector('[data-a='+(erase?'e2':'s2')+']');
+    function upd(){ go.disabled=!chosen(b).length; }
+    b.querySelectorAll('.ra-list input').forEach(function(i){ i.addEventListener('change',upd); }); upd();
   }
   function build(){
     var sec=document.getElementById('sec-settings'), tabs=sec && sec.querySelector(':scope > .footer-subtabs'); if(!tabs) return false;
@@ -25482,8 +25497,9 @@ body.to-picking{cursor:grabbing}
       var x=e.target.closest('button'); if(!x||!x.dataset.a) return; var a=x.dataset.a, card=x.closest('.ra-card'), ids=card?chosen(card):[];
       if(a==='s1') ask(card,'s'); else if(a==='e1') ask(card,'e'); else if(a==='no') card.querySelector('.ra-box').innerHTML='';
       else if(a==='bk'){ try{ showFooterSection('backup'); }catch(err){} }
-      else if(a==='s2'){ if(!ids.length) return; x.disabled=true; stopPhone(ids).then(function(){ clearKeys(ids,false); syncPhone(); finish(d,'Settings reset. Restarting…'); }); }
-      else if(a==='e2'){ if(!ids.length) return; x.disabled=true; stopPhone(ids).then(function(){ clearKeys(ids,true); return ids.indexOf('app')>=0?clearStores():null; }).then(function(){ syncPhone(); finish(d,'Data erased. Restarting…'); }); }
+      else if(a==='s2'){ if(!ids.length) return; countdown(d,ids,false); }
+      else if(a==='e2'){ if(!ids.length) return; countdown(d,ids,true); }
+      else if(a==='undo'){ if(tm){ clearInterval(tm); tm=0; } render(d); }
     });
     try{ FOOTER_SUBS.settings.push('resetall'); }catch(err){}
     var o=window.showFooterSub;
