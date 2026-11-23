@@ -25004,7 +25004,7 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:#4a3a96;lin
     $('mind-prev').addEventListener('click',function(){   // the real notification, with today's thought
       var th='Take a slow breath. You don’t have to solve everything today.';
       try{ var r=window.ayuMindRules&&window.ayuMindRules(); if(r&&r.items&&r.items.length){ var d=Math.floor((Date.now()-new Date().getTimezoneOffset()*-60000)/86400000); th=r.items[((d%r.items.length)+r.items.length)%r.items.length]; } }catch(e){}
-      if(window.ayuPreviewNote) window.ayuPreviewNote('',th,'mind','preview-mind',[],'mind');
+      if(window.ayuPreviewNote) window.ayuPreviewNote('Mind',th,'mind','preview-mind',[],'mind');
     });
     return true;
   }
