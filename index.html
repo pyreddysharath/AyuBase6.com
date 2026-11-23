@@ -4511,6 +4511,10 @@ html.lotus-ready .tab-panel{transition:opacity .3s ease-out}
       <div class="calc-task rout-info-panel" id="rout-info-lunch" style="display:none">
         <strong>Why it helps</strong><ul><li>Your main meal while digestion is strong, giving steady energy for the afternoon.</li><li>Eating at a regular time keeps hunger and cravings in check.</li></ul><strong>Watch out</strong><ul><li>A very heavy or oily lunch makes you drowsy in the afternoon.</li><li>Eating at your desk or on your phone leads to eating more without noticing.</li><li>Skipping lunch often leads to overeating at night.</li></ul><strong>Tips</strong><ul><li>Fill half your plate with vegetables or salad, add a protein such as lentils, beans, fish or eggs, and keep rice, bread or pasta moderate.</li><li>Chew slowly, and take a 5–10 minute walk afterwards.</li></ul>
       </div>
+    </div>
+
+    <div class="rout-card">
+      <h2>🌆 Evening</h2>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="snacks"> <span>Snacks <span class="rout-time" id="rt-snacks">(4:00 – 5:00 PM)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('snacks')" title="Why?">i</button>
@@ -4518,10 +4522,20 @@ html.lotus-ready .tab-panel{transition:opacity .3s ease-out}
       <div class="calc-task rout-info-panel" id="rout-info-snacks" style="display:none">
         <strong>Why it helps</strong><ul><li>Stops late-afternoon hunger so you don't overeat at dinner.</li><li>Keeps energy and focus steady until the evening.</li></ul><strong>Watch out</strong><ul><li>Chips, biscuits, sweets and fried snacks add salt, sugar and unhealthy fat.</li><li>Snacking out of habit or boredom adds extra calories.</li><li>A big snack too close to dinner spoils your appetite.</li></ul><strong>Tips</strong><ul><li>Choose a handful of nuts, fruit, yogurt, or roasted chickpeas.</li><li>Keep the portion small, and finish about two hours before dinner.</li></ul>
       </div>
-    </div>
-
-    <div class="rout-card">
-      <h2>🌆 Evening</h2>
+      <div class="rout-row">
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="evhobby"> <span>Hobby or play time (a game, reading, music, drawing) <span class="rout-time" id="rt-evhobby">(5:00 – 5:30 PM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('evhobby')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-evhobby" style="display:none">
+        <strong>Why it helps</strong><ul><li>A screen-free break you enjoy lowers stress after a long day.</li><li>Keeps your mind active and gives you something to look forward to.</li></ul><strong>Watch out</strong><ul><li>Keep it away from the phone if you can, so it is a real break.</li><li>A short session is enough; do not let it run into dinner time.</li></ul>
+      </div>
+      <div class="rout-row">
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="evexercise"> <span>Exercise or outdoor play <span class="rout-time" id="rt-evexercise">(5:30 – 6:30 PM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('evexercise')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-evexercise" style="display:none">
+        <strong>Why it helps</strong><ul><li>Evening movement uses up the day’s energy and helps you sleep better.</li><li>Outdoor light and fresh air lift your mood.</li></ul><strong>Watch out</strong><ul><li>Finish at least 30 minutes before dinner and cool down first.</li><li>Drink water, and keep it easy if you feel tired or unwell.</li></ul>
+      </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="dinner"> <span>Dinner <span class="rout-time" id="rt-dinner">(7:00 – 8:00 PM)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('dinner')" title="Why?">i</button>
@@ -4535,6 +4549,13 @@ html.lotus-ready .tab-panel{transition:opacity .3s ease-out}
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-evwalk" style="display:none">
         <strong>Why it helps</strong><ul><li>A gentle 10–15 minute walk after dinner helps digestion and keeps blood sugar steadier.</li><li>It is a calm way to move after a day of sitting.</li></ul><strong>Watch out</strong><ul><li>Keep it easy. Fast exercise right after a meal can cause discomfort.</li></ul>
+      </div>
+      <div class="rout-row">
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="evfamily"> <span>Family time or tidy up <span class="rout-time" id="rt-evfamily">(8:00 – 8:30 PM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('evfamily')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-evfamily" style="display:none">
+        <strong>Why it helps</strong><ul><li>Talking with family, or a quick tidy of your space, is a calm way to close the day.</li><li>A tidy room and an easy mind make it simpler to wind down at night.</li></ul><strong>Watch out</strong><ul><li>Keep the lights and the noise low as bedtime comes closer.</li></ul>
       </div>
     </div>
 
@@ -11641,7 +11662,10 @@ const ROUTINE_NOTIFY_ITEMS={
   lunch:{title:'Lunch',body:'It’s time for lunch.'},
   snacks:{title:'Snacks',body:'It’s time for your snack.'},
   dinner:{title:'Dinner',body:'It’s time for dinner.'},
+  evhobby:{title:'Hobby or Play Time',body:'Take a screen-free break: a game, a book, music or drawing.'},
+  evexercise:{title:'Exercise or Outdoor Play',body:'Move for a while outdoors or at home, and finish before dinner.'},
   evwalk:{title:'Evening Walk',body:'Take a gentle 10–15 minute walk after dinner.'},
+  evfamily:{title:'Family Time',body:'Spend a calm half hour with family or tidy up before bed.'},
   nomobile:{title:'Screen Break',body:'Put your mobile away for the evening.'},
   bedprep:{title:'Get Ready for Bed',body:'Brush your teeth and get ready for bed.'},
   windbreath:{title:'Wind-down Breathing',body:'Breathe in for 4, hold for 7, out for 8. Repeat 4 times.'},
@@ -12530,7 +12554,10 @@ const WAKE_OFFSETS = {
   lunch:     [360, 420],
   snacks:    [570, 630],
   dinner:    [720, 780],
+  evhobby:   [630, 660],
+  evexercise:[660, 720],
   evwalk:    [780, 810],
+  evfamily:  [810, 840],
   nomobile:  [870, 930],
   bedprep:   [900, 915],
   windbreath:[915, 930],
@@ -18707,6 +18734,11 @@ html body #rem-alarm-card.alert-card{background-color:var(--tl-5eead4,#5eead4) !
     lunch:{label:'Main meal', title:'Main Meal', body:'It’s time for your main meal.'},
     snacks:{label:'Snack', title:'Snack', body:'It’s time for a light snack.'},
     dinner:{label:'Light meal', title:'Light Meal', body:'It’s time for a light meal.'},
+    evexercise:{label:function(start){ return daylight(start) ? 'Exercise or outdoor play' : 'Light exercise or stretching indoors'; },
+         title:function(start){ return daylight(start) ? 'Exercise or Outdoor Play' : 'Light Exercise'; },
+         body:function(start){ return daylight(start) ? 'Move for a while outdoors or at home, and finish before your meal.' : 'Do some light exercise or stretching indoors, and finish before your meal.'; }},
+    evwalk:{label:'Light walk after your meal', title:'Walk After Your Meal', body:'Take a gentle 10–15 minute walk after your meal (indoors is fine).'},
+    evfamily:{label:'Family time or tidy up', title:'Family Time', body:'Spend a calm half hour with family or tidy up before you sleep.'},
     nomobile:{label:'Screens off, dim the lights', title:'Wind Down', body:'Put screens away and dim the lights before sleep.'},
     sleep:{label:'Sleep (dark, quiet, cool room)', title:'Sleep', body:'Time to sleep. A dark, quiet, cool room helps.'}
   };
