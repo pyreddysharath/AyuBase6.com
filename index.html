@@ -25215,7 +25215,7 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:var(--fi-4a
 #sec-taborder .to-row .to-grip{padding:2px 4px 2px 0 !important;line-height:1}
 #sec-taborder .to-dot{width:12px;height:12px;border-radius:50%;flex:none}
 #sec-taborder .to-nm{flex:1;min-width:0;text-transform:none}
-#sec-taborder .to-first{font-size:.68rem;font-weight:800;color:var(--footer-accent,var(--fb-2563eb,#2563eb));background:color-mix(in srgb,var(--footer-accent,var(--fb-2563eb,#2563eb)) 14%,#fff);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+#sec-taborder .to-first{font-size:.68rem;font-weight:800;color:#fff;background:rgba(255,255,255,.24);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:middle}
 #tab-btns .tab-btn{touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 #tab-btns .tab-btn.to-tgt{outline:2px dashed var(--to-c,var(--fb-2563eb,#2563eb));outline-offset:-3px;border-radius:12px}
 #tab-btns .tab-btn.to-tgt.to-over{outline-style:solid;background:color-mix(in srgb,var(--to-c,var(--fb-2563eb,#2563eb)) 14%,#fff)}
@@ -25223,7 +25223,7 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:var(--fi-4a
 .tab-btn.to-ghost{position:fixed !important;margin:0 !important;z-index:100001;pointer-events:none;background:#fff !important;box-shadow:0 10px 22px rgba(0,0,0,.3);border-radius:12px;transform:scale(1.05);transition:none !important}
 body.to-picking{cursor:grabbing}
 #sec-taborder .to-ar{display:none}
-#sec-taborder .to-grip{color:#94a3b8;font-size:1.1rem;cursor:grab;touch-action:none;padding:4px 4px 4px 0;user-select:none;-webkit-user-select:none}
+#sec-taborder .to-grip{color:rgba(255,255,255,.85);font-size:1.1rem;cursor:grab;touch-action:none;padding:4px 4px 4px 0;user-select:none;-webkit-user-select:none}
 #sec-taborder .to-row.to-lifted{position:relative;z-index:3;box-shadow:0 8px 18px rgba(0,0,0,.22);transition:none}
 #sec-taborder .to-row{transition:transform .15s ease}
 #sec-taborder .to-ar button{width:30px;height:30px;border-radius:9px;border:0;background:color-mix(in srgb,var(--footer-accent,var(--fb-2563eb,#2563eb)) 12%,#fff);color:var(--footer-accent,var(--fb-2563eb,#2563eb));font-size:.8rem;font-weight:800;cursor:pointer;padding:0}
@@ -25245,13 +25245,13 @@ body.to-picking{cursor:grabbing}
     try{ var act=document.querySelector('#tab-btns .tab-btn.active'); if(act && typeof positionTabUnderline==='function') positionTabUnderline(act); }catch(e){}
   }
   function label(t){ var e=btn(t); return e ? e.textContent.replace(/\s+/g,' ').trim() : t; }
-  var COL={activity:'#3272ab',nutrition:'#5d9230',mind:'#35489b',calculator:'#1b836d',routines:'#41aad4',alerts:'#73961b'};
+  var COL={activity:'#2b6aa6',nutrition:'#4f8a22',mind:'#364ca8',calculator:'#13806c',routines:'#1a86b5',alerts:'#6f9a1c'};   // the deep shade of each section
   function colour(t){ return COL[t]||'#64748b'; }
   function render(){
     var box=document.getElementById('sec-taborder'); if(!box) return;
     var a=load(), h='<p class="to-note">Drag \u2630 to reorder.</p>';
     a.forEach(function(t,i){
-      h+='<div class="to-row" data-t="'+t+'" style="background:color-mix(in srgb,'+colour(t)+' 38%,#fff);border-color:color-mix(in srgb,'+colour(t)+' 80%,#fff)"><span class="to-grip" aria-hidden="true">\u2630</span><i class="to-dot" style="background:'+colour(t)+'"></i><span class="to-nm">'+label(t)+'</span>'
+      h+='<div class="to-row" data-t="'+t+'" style="background:'+colour(t)+';border-color:'+colour(t)+';color:#fff"><span class="to-grip" aria-hidden="true">\u2630</span><i class="to-dot" style="background:#fff"></i><span class="to-nm">'+label(t)+'</span>'
        +'</div>';
     });
     h+='<button type="button" class="to-reset"'+(a.join()===DEF.join()?' disabled':'')+'>Reset To Default</button>';
