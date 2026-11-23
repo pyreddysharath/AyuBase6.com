@@ -17528,6 +17528,21 @@ html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opa
       if(desk) add(tx, gy0-Math.round(th*.62), tw, th, true);
     })();
 
+    // Vitals (BMI, Lab Insights, Tracker): each page is one tall box, so it gets a few more images along its left and right edges,
+    // spaced down its height, kept clear of text and controls (same rules as the plan edges below).
+    if(pid==='calculator-panel') cs.forEach(function(c,i){
+      var R=rects[i], hgt=R.b-R.t; if(hgt<260) return;
+      var n=Math.max(2,Math.min(desk?4:5,Math.floor(hgt/(desk?340:400)))), w=Math.round((desk?190:130)*VAR.sm[vi]), h=Math.round(w*K), vv=Math.round(w*.5), obs=obstacles(c,P);
+      for(var k=0;k<n;k++){
+        var cy=R.t+(k+.5)*hgt/n, done=false, pref=((k+vi)%2===0)?'R':'L';
+        [0,-60,60,-120,120,-180,180].forEach(function(dy){ if(done) return; [pref,pref==='R'?'L':'R'].forEach(function(side){ if(done) return;
+          var tp=cy-h/2+dy; if(tp<R.t-h*.3||tp+h>R.b+h*.3) return;
+          var inb=side==='R'?{l:R.r-vv,r:R.r,t:tp,b:tp+h}:{l:R.l,r:R.l+vv,t:tp,b:tp+h}, bad=false;
+          for(var j=0;j<obs.length;j++) if(hit(inb,obs[j],8)){ bad=true; break; } if(bad||!clear(inb,24)) return;
+          done=true; add(side==='R'?R.r-vv:R.l-(w-vv),tp,w,h,VAR.flip[vi]&&side==='L',inb); }); });
+      }
+    });
+
     // 7. when a plan has been worked out (Body: the weekly plan; Food: Nutrients & Food, Plan, Recipes), images along its edges
     (function(){
       var q=pid==='activity-panel'?'#body-week-section':pid==='nutrition-panel'?'#results':null, el=q&&panel.querySelector(q);
@@ -17547,6 +17562,18 @@ html:not(.lotus-ready) .sec-lotus-layer,html:not(.lotus-ready) .sec-bg-layer{opa
       var last=rects[rects.length-1], rr=panel.querySelector('.bf-inline-reset'), cb=last.b; if(rr&&rr.offsetParent) cb=Math.max(cb,rr.getBoundingClientRect().bottom-P.top);
       var free=P.height-cb;
       if(free>=sh+24){ var side2=count('L')<=count('R')?'L':'R', bx=side2==='R'?P.width-sw-14:14, top2=cb+Math.min(40,(free-sh)/2), b2={l:bx,r:bx+sw,t:top2,b:top2+sh}; if(clear(b2,24)) add(bx,top2,sw,sh,false,b2); }
+    }
+    // Vitals and Reminders pages are short boxes on a tall page: fill the empty page below the last box with a few more images,
+    // staggered left and right, each kept clear of everything else.
+    if((pid==='calculator-panel'||pid==='alerts-panel')&&rects.length){
+      var lb=rects[rects.length-1], rr3=panel.querySelector('.bf-inline-reset'), cb3=lb.b; if(rr3&&rr3.offsetParent) cb3=Math.max(cb3,rr3.getBoundingClientRect().bottom-P.top);
+      var w7=Math.round((desk?200:150)*VAR.sm[vi]), h7=Math.round(w7*K), lim=Math.max(P.height-14, cb3+40), got=0, y7=cb3+(desk?30:20);
+      for(var g=0;g<14&&got<(desk?3:3);g++,y7+=Math.round(h7*.45)){
+        if(y7+h7>lim) break;
+        var sd=count('L')<=count('R')?'L':'R', bl7=sd==='R'?P.width-Math.round(w7*.82):-Math.round(w7*.18), bx7={l:Math.max(0,bl7),r:Math.min(P.width,bl7+w7),t:y7,b:y7+h7};
+        if(!clear(bx7,26)){ sd=sd==='R'?'L':'R'; bl7=sd==='R'?P.width-Math.round(w7*.82):-Math.round(w7*.18); bx7={l:Math.max(0,bl7),r:Math.min(P.width,bl7+w7),t:y7,b:y7+h7}; if(!clear(bx7,26)) continue; }
+        add(bl7,y7,w7,h7,VAR.flip[vi]&&sd==='L',bx7); got++; y7+=Math.round(h7*.7);
+      }
     }
   }
   function buildFooter(){
