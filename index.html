@@ -16604,7 +16604,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   ficon('backup','<b>Backup &amp; Restore</b>: the first icon at the bottom. Its dot means a backup is due.');
   fsec('backup','bkp','<b>Backup &amp; Restore</b>: save your data to a file and restore it later or on another device.'+(window.AYU_ANDROID?' The app can also back up to your Google account by itself.':''));
   fsec('backup','offline','<b>Save Offline</b>: keep pages and videos on this device to use AyuBase6 without internet.');
-  fsec('backup','app',window.AYU_ANDROID?'<b>App Updates</b>: your app version, Check for update, <b>Download</b> when a new version is ready, and whether to update automatically. A new version is also shown every 2 hours until you download it.':'<b>Download App</b>: the Android app, which sends reminders and alarms with the app closed.');
+  fsec('backup','app',window.AYU_ANDROID?'<b>App Updates</b>: your app version, Check for update, <b>Download</b> when a new version is ready. A new version is also shown every 2 hours until you download it.':'<b>Download App</b>: the Android app, which sends reminders and alarms with the app closed.');
   ficon('settings','<b>Settings</b>: its dot means notifications or advertising cookies are on.');
   fsec('settings','notifications','<b>Notifications</b>: <b>System notifications</b> is the permission, <b>App notifications</b> has every reminder and alarm with its switch and Turn all off, and <b>Test notifications</b> is a quick check if notifications don\'t arrive.');
   fsec('settings','cookies','<b>Cookies</b>: choose which cookies you allow.');
@@ -21797,12 +21797,6 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
           card.insertAdjacentHTML('afterend','<div class="au-auto-row"><span class="au-auto-l">Check automatically</span><label class="master-switch" title="Check automatically"><input type="checkbox" id="au-auto" aria-label="Check for updates automatically"></label></div><div class="au-note au-auto-note">Every 2 hours, 10 AM to 8 PM.</div>');
           var sw=$('au-auto'); sw.checked=(isNaN(n)?2:n)>0;
           sw.addEventListener('change',function(){ N.updateChecksSet(sw.checked?2:0).catch(function(){}); });
-          if(typeof N.autoUpdateGet==='function' && !$('au-autoinst')){
-            sec.querySelector('.au-auto-note').insertAdjacentHTML('afterend','<div class="au-auto-row au-inst-row"><span class="au-auto-l">Update automatically</span><label class="master-switch" title="Update automatically"><input type="checkbox" id="au-autoinst" aria-label="Update automatically"></label></div><div class="au-note au-auto-note au-inst-row">Downloads itself; you confirm to install.</div>');
-            var si=$('au-autoinst'); si.checked=!!N.autoUpdateGet();
-            si.addEventListener('change',function(){ N.autoUpdateSet(si.checked); });
-            window.addEventListener('ayu-update-info',function(){ if(si.checked!==!!N.autoUpdateGet()) si.checked=!!N.autoUpdateGet(); });
-          }
         }).catch(function(){});
       }
     }
