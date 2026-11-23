@@ -10777,7 +10777,7 @@ const RECIPES_DATA = [
   <div class="footer-acc-body" id="sec-settings" style="display:none">
     <div class="footer-subtabs" role="tablist"><button type="button" class="footer-subtab" id="subtab-notifications" role="tab" onclick="showFooterSub('settings','notifications')">Notifications<i class="fs-dot"></i></button><button type="button" class="footer-subtab" id="subtab-cookies" role="tab" onclick="showFooterSub('settings','cookies')">Cookies<i class="fs-dot"></i></button></div>
     <div class="footer-sub" id="sec-notifications" style="display:none">
-    <div class="ns-h ns-fold" data-k="sys" id="ns-sys">System notifications</div>
+    <div class="ns-h" id="ns-sys">System notifications</div>
     <p id="notif-status-text" class="feedback-note-small ns-b ns-b-sys">Checking permission status…</p>
     <div class="feedback-form-section ns-b ns-b-sys" style="flex-direction:row; gap:10px;">
       <button id="notif-enable-btn" onclick="ayuSysNotifBtn()">Allow notifications</button>
@@ -10790,7 +10790,7 @@ const RECIPES_DATA = [
       Notifications are blocked in your browser. To turn them on, open your browser's site settings for this
       page and allow notifications, then reload.
     </p>
-    <div class="ns-h ns-fold" data-k="test" id="ns-test">Test notifications</div>
+    <div class="ns-h" id="ns-test">Test notifications</div>
     <button type="button" class="notif-help-card ns-b ns-b-test" onclick="showFooterSection('check');setTimeout(function(){ if(window.ayuRunCheck) ayuRunCheck(); },400)">
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/><path d="M10.6 8.3a1.5 1.5 0 0 1 2.9.5c0 1-1.5 1.4-1.5 2.2"/><path d="M12 13.2h.01"/></svg>
       <span class="nhc-t"><b>Run a quick check</b><span>Run a quick check of sound, volume and alarms</span></span><span class="nhc-go" aria-hidden="true">›</span>
@@ -16541,7 +16541,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   fsec('backup','offline','<b>Save Offline</b>: keep pages and videos on this device to use AyuBase6 without internet.');
   fsec('backup','app',window.AYU_ANDROID?'<b>App Updates</b>: your app version, Check for update, <b>Download</b> when a new version is ready, and whether to update automatically. A new version is also shown every 2 hours until you download it.':'<b>Download App</b>: the Android app, which sends reminders and alarms with the app closed.');
   ficon('settings','<b>Settings</b>: its dot means notifications or advertising cookies are on.');
-  fsec('settings','notifications','<b>Notifications</b>: tap a title to open it. <b>System notifications</b> is the permission, <b>App notifications</b> has every reminder and alarm with its switch and Turn all off,'+(window.AYU_ANDROID?' <b>Notification look</b> sets how the text of a reminder looks (soft panel, side bar or coloured title),':'')+' and <b>Test notifications</b> is a quick check if notifications don\'t arrive.');
+  fsec('settings','notifications','<b>Notifications</b>: <b>System notifications</b> is the permission, <b>App notifications</b> has every reminder and alarm with its switch and Turn all off, and <b>Test notifications</b> is a quick check if notifications don\'t arrive.');
   fsec('settings','cookies','<b>Cookies</b>: choose which cookies you allow.');
   fsec('settings','taborder','<b>Tab Order</b>: choose the order of the main tabs. Press and hold a tab, then tap or drop it on the place you want. The footer menu follows the same order.');
   ficon('announcements','<b>Announcements</b>: news and tips from us. Its dot means something new.');
@@ -22961,7 +22961,7 @@ html body #start-my-day-card #chk-alarm.ayu-sub:not(#ayu-x1){margin-bottom:0 !im
     if(remOn) document.querySelectorAll('#custom-reminders-list .custom-reminder-item').forEach(function(item){
       try{
         var d = JSON.parse(item.dataset.reminder||'{}'); if(!d.name || d.sound==='none' || d.on===false || d.kind==='medicine') return;
-        var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode }; if(d.muted) c.sound='none';   // muted: the phone vibrates only var dt = window.ayuNotesText ? window.ayuNotesText(d.notes) : ''; if(dt) c.notes = dt.slice(0,1000);
+        var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode }; if(d.muted) c.sound='none'; var dt = window.ayuNotesText ? window.ayuNotesText(d.notes) : ''; if(dt) c.notes = dt.slice(0,1000);
         if(Array.isArray(d.days) && d.days.length && d.days.length<7) c.days = d.days.filter(function(n){ return n>=0 && n<=6; });
         if(d.mode==='regular'){ c.every = Math.max(1, Number(d.duration)||1); c.anchor = Number(item.dataset.startedAt)||Date.now(); }
         else if(d.mode==='dates'){ c.sched = d.sched||'once'; if(d.date) c.date = d.date; if(Array.isArray(d.mdays)) c.mdays = d.mdays.slice(); if(c.sched!=='weekly') delete c.days; c.times = (d.times||[]).map(toMin).filter(function(m){ return m!==null; }); }
@@ -23534,7 +23534,7 @@ html body .notif-off-ask .noa-list li{margin:2px 0}
       var hc=$('ns-test')||sec.querySelector('.notif-help-card'); sec.insertBefore(wrap, hc && hc.parentNode===sec ? hc : null); }
     var ORD=['Care › My Day Plan','Care › Health Breaks','Reminders › Personal','Reminders › Alarms'];
     list=items().map(function(x,i){ return [x,i]; }).sort(function(a,b){ return (ORD.indexOf(a[0][0])-ORD.indexOf(b[0][0])) || (a[1]-b[1]); }).map(function(x){ return x[0]; });
-    var g='', sec='', h='<div class="ns-h ns-fold" data-k="app" id="ns-app">App notifications</div>';
+    var g='', sec='', h='<div class="ns-h" id="ns-app">App notifications</div>';
     if(!list.length) h+='<p class="na-none">No reminders or alarms yet.</p>';
     h+='<div class="na-sec care">Care</div><div id="na-care-ad"></div>';   // Care first, with Auto-close under its title
     sec='Care';
@@ -26136,79 +26136,6 @@ window.ayuLabs={store:function(){ return store; },build:build,fileText:fileText,
 render();
 })();
 
-</script>
-<style id="notif-fold-20261123">
-/* Settings → Notifications: each title folds with a chevron and a short summary; the Notification look choice (app only) */
-html body #sec-notifications .ns-fold:not(#ayu-x1):not(#ayu-x2){display:flex;align-items:center;cursor:pointer;padding-right:30px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 6px center/16px;-webkit-tap-highlight-color:transparent}
-html body #sec-notifications:not(.ns-shut-sys) .ns-fold[data-k="sys"]:not(#ayu-x1):not(#ayu-x2),html body #sec-notifications:not(.ns-shut-app) .ns-fold[data-k="app"]:not(#ayu-x1):not(#ayu-x2),html body #sec-notifications:not(.ns-shut-look) .ns-fold[data-k="look"]:not(#ayu-x1):not(#ayu-x2),html body #sec-notifications:not(.ns-shut-test) .ns-fold[data-k="test"]:not(#ayu-x1):not(#ayu-x2){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 15l6-6 6 6'/%3E%3C/svg%3E")}
-html body #sec-notifications .ns-fold:not(#ayu-x1):not(#ayu-x2)::after{content:attr(data-sum);margin-left:auto;font-weight:500;font-size:.76rem;color:#64748b}
-html body #sec-notifications.ns-shut-sys .ns-b-sys:not(#ayu-x1):not(#ayu-x2),html body #sec-notifications.ns-shut-look .ns-b-look:not(#ayu-x1):not(#ayu-x2),html body #sec-notifications.ns-shut-test .ns-b-test:not(#ayu-x1):not(#ayu-x2),html body #sec-notifications.ns-shut-app #notif-all > :not(#ns-app):not(#ayu-x1):not(#ayu-x2){display:none !important}
-html body #sec-notifications #ns-look-box{margin:0}
-html body #sec-notifications #ns-look-box > .ns-h:not(#ayu-x1):not(#ayu-x2){position:relative;margin-top:36px}
-html body #sec-notifications #ns-look-box > .ns-h:not(#ayu-x1):not(#ayu-x2)::before{content:"";position:absolute;left:0;right:0;top:-18px;height:2px;background:linear-gradient(90deg,transparent,var(--footer-accent,#0d9488),transparent);opacity:.6;pointer-events:none}
-.lk-opt{display:block;border:1.5px solid color-mix(in srgb,var(--footer-accent,#2563eb) 30%,#fff);border-radius:14px;padding:10px 12px;margin:8px 0;background:#fff;cursor:pointer}
-.lk-opt.on{border-color:var(--footer-accent,#2563eb);box-shadow:0 0 0 2px color-mix(in srgb,var(--footer-accent,#2563eb) 18%,transparent)}
-.lk-top{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.9rem;color:#1e293b}
-.lk-top small{font-weight:500;color:#64748b;font-size:.74rem}
-.lk-top input{accent-color:var(--footer-accent,#2563eb);margin:0}
-.lk-def{margin-left:auto;font-size:.7rem;font-weight:700;color:var(--footer-accent,#2563eb);background:color-mix(in srgb,var(--footer-accent,#2563eb) 14%,#fff);border-radius:999px;padding:2px 8px}
-.lk-s{margin-top:8px;border-radius:12px;padding:8px 10px;background:#f1f3f4;color:#1f1f1f;font-size:.76rem;line-height:1.35}
-.lk-s .h{display:flex;align-items:center;gap:6px;font-size:.68rem;color:#5f6368;margin-bottom:4px}
-.lk-s .i{width:14px;height:14px;border-radius:50%;background:#0d9488;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:8px}
-.lk-s .t{font-weight:700;font-size:.8rem;color:#08766e}
-.lk-s .pn{background:#ccfbf1;border-radius:10px;padding:6px 8px}
-.lk-s .br{border-left:4px solid #0d9488;padding-left:8px}
-</style>
-<script id="notif-fold-20261123-js">
-(function(){
-  function $(i){ return document.getElementById(i); }
-  var K='ayuNsOpen', DEF={sys:0,app:0,look:0,test:0}, LKEY={panel:'Soft panel',bar:'Side bar',title:'Coloured title'}, look='panel', looked=false;
-  function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){} return null; }
-  function st(){ var o={}; try{ o=JSON.parse(ls(K)||'{}')||{}; }catch(e){} return {sys:'sys' in o?o.sys:DEF.sys,app:'app' in o?o.app:DEF.app,look:'look' in o?o.look:DEF.look,test:'test' in o?o.test:DEF.test}; }
-  function N(){ var n=window.ayuNative; return n && n.native && typeof n.lookGet==='function' ? n : null; }
-  function sample(kind){
-    var inner='<div class="t">Time for your medicine</div>Take your 8:00 AM tablet. Did you take it?';
-    if(kind==='panel') inner='<div class="pn">'+inner+'</div>'; else if(kind==='bar') inner='<div class="br">'+inner+'</div>';
-    return '<div class="lk-s"><div class="h"><span class="i">✿</span>AyuBase6 · now</div>'+inner+'</div>';
-  }
-  function opt(k,name,note,def){
-    return '<label class="lk-opt" data-k="'+k+'"><div class="lk-top"><input type="radio" name="ns-look" value="'+k+'"> '+name+(note?' <small>'+note+'</small>':'')+(def?'<span class="lk-def">Default</span>':'')+'</div>'+sample(k)+'</label>';
-  }
-  function buildLook(){
-    var sec=$('sec-notifications'); if(!sec || $('ns-look-box') || !N()) return;
-    var box=document.createElement('div'); box.id='ns-look-box';
-    box.innerHTML='<div class="ns-h ns-fold" data-k="look" id="ns-look">Notification look</div><div class="ns-b ns-b-look">'
-      +'<p class="feedback-note-small">How reminder notifications look on this phone. The line with the app name stays Android’s.</p>'
-      +opt('panel','Soft panel','',true)+opt('bar','Side bar','',false)+opt('title','Coloured title','',false)
-      +'</div>';
-    var wrap=$('notif-all'), test=$('ns-test');
-    if(wrap) wrap.after(box); else if(test) sec.insertBefore(box,test); else sec.appendChild(box);
-    box.querySelectorAll('input[name="ns-look"]').forEach(function(r){ r.addEventListener('change',function(){
-      look=r.value; mark(); var n=N(); if(n) n.lookSet(look).catch(function(){}); apply(); }); });
-    var n=N(); if(n) n.lookGet().then(function(v){ look=v||'panel'; looked=true; mark(); apply(); }).catch(function(){ looked=true; mark(); });
-    mark();
-  }
-  function mark(){
-    document.querySelectorAll('#ns-look-box .lk-opt').forEach(function(l){ var on=l.dataset.k===look; l.classList.toggle('on',on); var r=l.querySelector('input'); if(r) r.checked=on; });
-  }
-  function blocked(){ var s=$('notif-status-text'); return !!(s && /blocked/i.test(s.textContent)); }
-  function apply(){
-    var sec=$('sec-notifications'); if(!sec) return;
-    var s=st(), bl=blocked();
-    ['sys','app','look','test'].forEach(function(k){ var open=!!s[k] || (k==='sys' && bl); sec.classList.toggle('ns-shut-'+k,!open);
-      var h=sec.querySelector('.ns-fold[data-k="'+k+'"]'); if(h){ h.setAttribute('role','button'); h.setAttribute('tabindex','0'); h.setAttribute('aria-expanded',open?'true':'false'); } });
-    function sum(k,t){ var h=sec.querySelector('.ns-fold[data-k="'+k+'"]'); if(h && h.getAttribute('data-sum')!==t) h.setAttribute('data-sum',t); }
-    var stx=$('notif-status-text'); sum('sys', !stx ? '' : bl ? 'Blocked' : /allowed\./i.test(stx.textContent) && !/not allowed/i.test(stx.textContent) ? 'Allowed' : /not allowed/i.test(stx.textContent) ? 'Not allowed yet' : '');
-    var w=$('notif-all'); if(w){ var rows=w.querySelectorAll('input[data-i]'), on=w.querySelectorAll('input[data-i]:checked').length; sum('app', rows.length ? (on ? on+' on' : 'All off') : ''); }
-    sum('look', N() ? LKEY[look] : ''); sum('test','');
-    var box=$('ns-look-box'); if(box && w && w.nextElementSibling!==box) w.after(box);
-  }
-  function toggle(h){ var k=h.getAttribute('data-k'); if(!k) return; var s=st(); s[k]=s[k]?0:1; ls(K,JSON.stringify(s)); apply();
-    if(k==='sys' && blocked()) apply(); }
-  document.addEventListener('click',function(e){ var h=e.target.closest && e.target.closest('#sec-notifications .ns-fold'); if(h) toggle(h); });
-  document.addEventListener('keydown',function(e){ if((e.key==='Enter'||e.key===' ') && e.target.classList && e.target.classList.contains('ns-fold')){ e.preventDefault(); toggle(e.target); } });
-  setInterval(function(){ var s=$('sec-notifications'); if(!s || s.offsetParent===null) return; buildLook(); apply(); },700);
-})();
 </script>
 <style id="rem-form-20261123">
 /* Personal Reminders form: a dot before every field, and Sound drawn like Water's (list, then ▶) */
