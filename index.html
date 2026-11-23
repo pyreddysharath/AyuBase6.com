@@ -4521,7 +4521,7 @@ html.lotus-ready .tab-panel{transition:opacity .3s ease-out}
     </div>
 
     <div class="rout-card">
-      <h2>🌙 Evening &amp; Night</h2>
+      <h2>🌆 Evening</h2>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="dinner"> <span>Dinner <span class="rout-time" id="rt-dinner">(7:00 – 8:00 PM)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('dinner')" title="Why?">i</button>
@@ -4530,11 +4530,29 @@ html.lotus-ready .tab-panel{transition:opacity .3s ease-out}
         <strong>Why it helps</strong><ul><li>Eating early gives your body time to digest before sleep, which helps sleep and weight.</li><li>A lighter evening meal is easier on your stomach.</li></ul><strong>Watch out</strong><ul><li>A late or heavy dinner can cause acidity and poor sleep, and adds weight over time.</li><li>Eating too little can leave you hungry and wake you up at night.</li></ul><strong>Tips</strong><ul><li>Keep it light and easy to digest, such as whole grains with vegetables and lentils, or soup.</li><li>Finish at least 2–3 hours before bed, and take a short walk afterwards.</li></ul>
       </div>
       <div class="rout-row">
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="evwalk"> <span>Light walk after dinner <span class="rout-time" id="rt-evwalk">(7:30 – 8:00 PM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('evwalk')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-evwalk" style="display:none">
+        <strong>Why it helps</strong><ul><li>A gentle 10–15 minute walk after dinner helps digestion and keeps blood sugar steadier.</li><li>It is a calm way to move after a day of sitting.</li></ul><strong>Watch out</strong><ul><li>Keep it easy. Fast exercise right after a meal can cause discomfort.</li></ul>
+      </div>
+    </div>
+
+    <div class="rout-card">
+      <h2>🌙 Night</h2>
+      <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="nomobile"> <span>Do not use mobile <span class="rout-time" id="rt-nomobile">(9:00 – 10:00 PM)</span></span></label>
         <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('nomobile')" title="Why?">i</button>
       </div>
       <div class="calc-task rout-info-panel" id="rout-info-nomobile" style="display:none">
         <strong>Why it helps</strong><ul><li>Helps your mind wind down, so you fall asleep faster and sleep better.</li><li>Gives your eyes a rest after a day of screens.</li></ul><strong>Watch out</strong><ul><li>At first you may feel bored, or worry about missing a message.</li><li>The habit is hard to break, especially if the phone is also your alarm.</li></ul><strong>Tips</strong><ul><li>Charge the phone outside the bedroom, and use an alarm clock.</li><li>Set Do Not Disturb with a few allowed contacts for emergencies.</li><li>Replace scrolling with reading, light stretching or time with family.</li></ul>
+      </div>
+      <div class="rout-row">
+        <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="bedprep"> <span>Brush teeth and get ready for bed <span class="rout-time" id="rt-bedprep">(9:30 – 9:45 PM)</span></span></label>
+        <button type="button" class="calc-info-btn rout-info-btn" onclick="toggleRoutineInfo('bedprep')" title="Why?">i</button>
+      </div>
+      <div class="calc-task rout-info-panel" id="rout-info-bedprep" style="display:none">
+        <strong>Why it helps</strong><ul><li>A short, fixed routine tells your body that sleep is near.</li><li>Brushing at night protects your teeth.</li></ul><strong>Watch out</strong><ul><li>Avoid snacking after you brush.</li><li>Keep the lights dim while you get ready.</li></ul>
       </div>
       <div class="rout-row">
         <label class="rout-check"><input type="checkbox" class="rout-cb" data-key="windbreath"> <span>Wind-down breathing (4-7-8) <span class="rout-time" id="rt-windbreath">(9:45 – 10:00 PM)</span></span></label>
@@ -11623,7 +11641,9 @@ const ROUTINE_NOTIFY_ITEMS={
   lunch:{title:'Lunch',body:'It’s time for lunch.'},
   snacks:{title:'Snacks',body:'It’s time for your snack.'},
   dinner:{title:'Dinner',body:'It’s time for dinner.'},
+  evwalk:{title:'Evening Walk',body:'Take a gentle 10–15 minute walk after dinner.'},
   nomobile:{title:'Screen Break',body:'Put your mobile away for the evening.'},
+  bedprep:{title:'Get Ready for Bed',body:'Brush your teeth and get ready for bed.'},
   windbreath:{title:'Wind-down Breathing',body:'Breathe in for 4, hold for 7, out for 8. Repeat 4 times.'},
   sleep:{title:'Sleep',body:'It’s time to prepare for sleep.'}
 };
@@ -12510,7 +12530,9 @@ const WAKE_OFFSETS = {
   lunch:     [360, 420],
   snacks:    [570, 630],
   dinner:    [720, 780],
+  evwalk:    [780, 810],
   nomobile:  [870, 930],
+  bedprep:   [900, 915],
   windbreath:[915, 930],
   sleep:     [930, 960],
 };
@@ -16443,7 +16465,8 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('routines','#ayu-checklist',0,C.checks,'<b>Daily Checklist</b>: your checks for the day, in three parts.',{care:'checks'});
   sec('routines','#ayu-checklist .ayu-cl-part',0,C.checks,'<b>Morning</b>: tick each check off. Tap the i for how to do it and why.',{care:'checks'});
   sec('routines','#ayu-checklist .ayu-cl-part',1,C.checks,'<b>Afternoon</b>: the same ticks and tips for the middle of the day.',{care:'checks'});
-  sec('routines','#ayu-checklist .ayu-cl-part',2,C.checks,'<b>Evening &amp; Night</b>: checks to wind down, including <b>Wind-down breathing (4-7-8)</b> before sleep. Ticks start fresh each day.',{care:'checks'});
+  sec('routines','#ayu-checklist .ayu-cl-part',2,C.checks,'<b>Evening</b>: dinner and a light walk after it.',{care:'checks'});
+  sec('routines','#ayu-checklist .ayu-cl-part',3,C.checks,'<b>Night</b>: checks to wind down, including <b>Wind-down breathing (4-7-8)</b> before sleep. Ticks start fresh each day.',{care:'checks'});
   sec('routines','#alerts-panel .ayu-sub-tabs.care',0,C.checks,'<b>Health Breaks</b>: gentle nudges through the day. Each part has its own switch.',{care:'hb'});
   sec('routines','#alert-card-break',0,C.rem,'<b>Health Breaks → Eyes (20-20-20)</b>: a short eye break at regular intervals. Each part has its own switch, hours, days, sound, Read aloud and Vibrate.',{care:'hb'});
   sec('routines','#alert-card-walk',0,C.rem,'<b>Walk</b>: a reminder to get up and move.',{care:'hb'});
@@ -18711,7 +18734,7 @@ html body #rem-alarm-card.alert-card{background-color:var(--tl-5eead4,#5eead4) !
     if(n.innerHTML!==html) n.innerHTML=html;
     return n;
   }
-  var H2={ '☀️ Morning':'🌅 After waking', '🌤️ Afternoon':'☀️ Middle of the day', '🌙 Evening & Night':'🌙 Before sleep' };
+  var H2={ '☀️ Morning':'🌅 After waking', '🌤️ Afternoon':'☀️ Middle of the day', '🌆 Evening':'🌆 Later in the day', '🌙 Night':'🌙 Before sleep' };
   function applyMode(){
     var w=wake(), md=mode(w), shift=md!=='morning';
     // section titles
@@ -22822,7 +22845,7 @@ html body #rem-alarm-card #clk-t-start:disabled{opacity:.45;cursor:default}
 html body #rem-alarm-days .day-chips.ayu-days-once .day-chip{opacity:.38;cursor:default;pointer-events:none}
 </style>
 <style id="checklist-20261109">
-/* Checks: one "Daily Checklist" box — Notify Me first, then Morning / Afternoon / Evening & Night as parts (no boxes inside a box) */
+/* Checks: one "Daily Checklist" box — Notify Me first, then Morning / Afternoon / Evening / Night as parts (no boxes inside a box) */
 html body #ayu-checklist .ayu-cl-part{background:transparent !important;border:0 !important;box-shadow:none !important;border-radius:0 !important;padding:0 !important;margin:22px 0 0 !important;overflow:visible}
 html body #ayu-checklist .ayu-cl-part::before,html body #ayu-checklist .ayu-cl-part::after{display:none !important}
 html body #ayu-checklist .ayu-cl-part > .sec-lotus-layer{display:none !important}
@@ -22964,7 +22987,7 @@ html body #ayu-checklist.ayu-cl-closed > .ayu-cl-part:not(.ayu-cl-part ~ .ayu-cl
 })();
 </script>
 <style id="checklist-bands-20261110">
-/* Daily Checklist: Morning / Afternoon / Evening & Night (and the shift titles) on a light band, so they read as parts of the box, not as its title */
+/* Daily Checklist: Morning / Afternoon / Evening / Night (and the shift titles) on a light band, so they read as parts of the box, not as its title */
 html body #ayu-checklist .ayu-cl-part > h2:not(#ayu-x1){background:color-mix(in srgb,#e8607a 13%,#fff) !important;background-image:none !important;border:0 !important;border-radius:10px;padding:7px 12px !important;margin-bottom:6px !important;font-size:.98rem !important}
 html body #ayu-checklist .ayu-cl-part > h2::after,html body #ayu-checklist .ayu-cl-part > h2::before{display:none}
 </style>
@@ -28595,4 +28618,8 @@ html body #routines-panel #start-my-day-card:not(#ayu-x1):not(#ayu-x2){padding-b
 html body #routines-panel #start-my-day-card #chk-alarm:not(#ayu-x1):not(#ayu-x2){margin:14px 0 0 !important;padding:8px 10px !important;border:1px solid rgba(232,96,122,.3) !important;border-bottom:0 !important;border-radius:12px 12px 0 0 !important;background:rgba(255,241,243,.85) !important}
 html body #routines-panel #start-my-day-card #routines-notify-card:not(#ayu-x1):not(#ayu-x2){margin:0 !important;padding:8px 10px !important;border:1px solid rgba(232,96,122,.3) !important;border-top:1px solid rgba(232,96,122,.18) !important;border-radius:0 0 12px 12px !important;background:rgba(255,241,243,.85) !important}
 /* Notify Me: the i right after the title */
-html body #routines-panel #routines-notify-card .rout-card-hdr h2 .rout-info-btn:not(#ayu-x1):not(#ayu-x2){margin-left:-3px !important}</style>
+html body #routines-panel #routines-notify-card .rout-card-hdr h2 .rout-info-btn:not(#ayu-x1):not(#ayu-x2){margin-left:-3px !important}
+/* more space above Wake-up Alarm; Notify Me (closed) gets the same space under its title as Wake-up Alarm */
+html body #routines-panel #start-my-day-card #chk-alarm:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){margin-top:26px !important}
+html body #routines-panel #start-my-day-card #routines-notify-card.ayu-closed:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){padding-bottom:8px !important}
+</style>
