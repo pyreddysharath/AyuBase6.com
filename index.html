@@ -16217,7 +16217,7 @@ html body #tracker-card #tracker-select { padding-right:38px !important; }
     {id:'food',label:'Food',keys:['ayuBase6-food-choices','ayuBase6-food-fasting','ayuBase6-food-cuisine']},
     {id:'vitals',label:'Vitals',keys:['ayu_vitals_tracker_v1','ayu_lab_reports_v1']},
     {id:'checks',label:'Checks',keys:['ayuBase6WakeUpTime','ayuBase6-routine-remind-mode','ayuBase6-routine-notifications-muted','ayuBase6-routine-days','ayuBase6-routine-alarm','ayuBase6-routine-edits']},
-    {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-rem-alarm','ayuBase6-rem-alarms','ayuBase6-timer','ayuBase6-world']}
+    {id:'reminders',label:'Reminders',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-med-log','ayuBase6-rem-alarm','ayuBase6-rem-alarms','ayuBase6-timer','ayuBase6-world']}
   ];
   var FP_KEY='ayu-backup-fingerprints', MAX_BYTES=2*1024*1024;
   window.ayuBackupGroups=GROUPS;   // also used by the app's backup to the Google account
@@ -22920,7 +22920,7 @@ html body #start-my-day-card #chk-alarm.ayu-sub:not(#ayu-x1){margin-bottom:0 !im
     }
     if(remOn) document.querySelectorAll('#custom-reminders-list .custom-reminder-item').forEach(function(item){
       try{
-        var d = JSON.parse(item.dataset.reminder||'{}'); if(!d.name || d.sound==='none' || d.on===false) return;
+        var d = JSON.parse(item.dataset.reminder||'{}'); if(!d.name || d.sound==='none' || d.on===false || d.kind==='medicine') return;
         var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode }; var dt = window.ayuNotesText ? window.ayuNotesText(d.notes) : ''; if(dt) c.notes = dt.slice(0,1000);
         if(Array.isArray(d.days) && d.days.length && d.days.length<7) c.days = d.days.filter(function(n){ return n>=0 && n<=6; });
         if(d.mode==='regular'){ c.every = Math.max(1, Number(d.duration)||1); c.anchor = Number(item.dataset.startedAt)||Date.now(); }
@@ -28623,3 +28623,538 @@ html body #routines-panel #routines-notify-card .rout-card-hdr h2 .rout-info-btn
 html body #routines-panel #start-my-day-card #chk-alarm:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){margin-top:26px !important}
 html body #routines-panel #start-my-day-card #routines-notify-card.ayu-closed:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){padding-bottom:8px !important}
 </style>
+<style id="medicine-20261123">
+/* Medicine in Personal Reminders: the Medicine / Reminder choice, the medicine form with its doses, the two list sections and the history table */
+html body #alerts-panel #custom-reminders-list:has(> .med-item){display:flex;flex-direction:column}
+html body #alerts-panel #custom-reminders-list > .med-sec-h{order:1}
+html body #alerts-panel #custom-reminders-list > .med-item{order:2}
+html body #alerts-panel #custom-reminders-list > .med-sec-h.med-h-rem{order:3}
+html body #alerts-panel #custom-reminders-list > .custom-reminder-item:not(.med-item){order:4}
+html body #alerts-panel #custom-reminders-list > .med-choose, html body #alerts-panel #custom-reminders-list > .med-form, html body #alerts-panel #custom-reminders-list > .custom-reminder-form{order:9}
+html body #alerts-panel #custom-reminders-list > .ayu-undo-row{order:2}
+html body #alerts-panel #custom-reminders-list > .med-sec-h[hidden]{display:none}
+html body #alerts-panel #custom-reminders-list > .med-sec-h{display:flex;align-items:center;gap:8px;margin:10px 0 8px;font-weight:800;font-size:.95rem;color:var(--alert-1,#0f766e)}
+html body #alerts-panel #custom-reminders-list > .med-sec-h::before{content:'';width:4px;height:18px;border-radius:3px;background:var(--alert-2,#0d9488);flex:none}
+html body #alerts-panel #custom-reminders-list > .med-sec-h:first-child{margin-top:2px}
+html body #alerts-panel .med-hist-btn{margin-left:auto;border:1.5px solid var(--alert-2,#0d9488);background:#fff;color:var(--alert-2,#0d9488);border-radius:99px;padding:3px 12px;font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}
+/* Medicine / Reminder: two simple buttons in one row */
+html body #alerts-panel .med-choose{display:flex;gap:8px;margin:4px 0 10px}
+html body #alerts-panel .med-choose .mc-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;border:1.5px solid var(--alert-2,#0d9488);border-radius:11px;padding:9px 6px;background:color-mix(in srgb,var(--alert-2,#0d9488) 8%,#fff);color:var(--alert-2,#0d9488);font:inherit;font-size:.9rem;font-weight:800;cursor:pointer}
+html body #alerts-panel .med-choose .mc-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* the form */
+html body #alerts-panel .med-form{--mca:var(--alert-2,#0d9488);--mcb:#e8f7f3;--mcbd:#b7e0d9;border:1px solid rgba(var(--tlr-13-148-136,13,148,136),.28);border-radius:14px;background:#e6fffa;padding:12px;margin:0 0 10px;order:9}
+html body #alerts-panel .med-form .md-lbl{font-weight:700;font-size:.82rem;color:var(--mca)}
+html body #alerts-panel .med-form .md-lbl::before{content:'•';margin-right:6px;font-weight:800}
+html body #alerts-panel .med-form .md-ctl{box-sizing:border-box;min-height:34px;border:1.5px solid var(--mcbd);border-radius:9px;background:var(--mcb);color:#134e4a;font:inherit;font-size:.86rem;padding:5px 10px;width:100%}
+html body #alerts-panel .med-form .med-name{display:grid;grid-template-columns:70px 1fr;align-items:center;gap:8px}
+html body #alerts-panel .med-form .med-hint{font-size:.76rem;opacity:.75;margin:4px 0 10px 78px}
+html body #alerts-panel .med-form .med-dose{--mca:#0d9488;--mcb:#e8f7f3;--mcbd:#b7e0d9;border:1px solid #b7e0d9;border-radius:12px;background:#fff;padding:10px 10px 8px;margin:0 0 10px}
+html body #alerts-panel .med-form .med-dose.md-c1{--mca:#b45309;--mcb:#ffe9cc;--mcbd:#f3cf9f;background:#fff4e6;border-color:#f3cf9f}
+html body #alerts-panel .med-form .med-dose.md-c2{--mca:#6250b3;--mcb:#e9e4fb;--mcbd:#cfc4f3;background:#f4f1ff;border-color:#cfc4f3}
+html body #alerts-panel .med-form .med-dose.md-c3{--mca:#be3455;--mcb:#fde2e8;--mcbd:#f4c2cc;background:#fff0f3;border-color:#f4c2cc}
+html body #alerts-panel .med-form .md-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+html body #alerts-panel .med-form .md-h strong{color:var(--mca);font-size:.95rem}
+html body #alerts-panel .med-form .md-x{border:0;background:none;color:#b91c1c;font-size:1rem;font-weight:800;cursor:pointer;padding:2px 6px}
+html body #alerts-panel .med-form .md-row{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:8px;margin:8px 0}
+html body #alerts-panel .med-form .md-row[hidden]{display:none}
+html body #alerts-panel .med-form .md-time{text-align:left;cursor:pointer}
+html body #alerts-panel .med-form .md-days{display:flex;gap:4px}
+html body #alerts-panel .med-form .md-chip{flex:1;max-width:34px;aspect-ratio:1;border-radius:50%;border:0;background:var(--mcb);color:var(--mca);font:inherit;font-size:.78rem;font-weight:700;padding:0;cursor:pointer}
+html body #alerts-panel .med-form .md-chip[aria-pressed=true]{background:var(--mca);color:#fff}
+html body #alerts-panel .md-seg{display:flex;gap:4px}
+html body #alerts-panel .med-form .md-seg button{flex:1;border:0;border-radius:9px;padding:7px 4px;background:var(--mcb);color:var(--mca);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer}
+html body #alerts-panel .med-form .md-seg button[aria-pressed=true]{background:var(--mca);color:#fff}
+html body #alerts-panel .med-form .md-till{display:flex;gap:6px;align-items:center}
+html body #alerts-panel .med-form .md-till .md-seg{flex:0 0 118px}
+html body #alerts-panel .med-form .md-till .md-ctl{flex:1;min-width:0}
+html body #alerts-panel .med-form .md-till .md-ctl[hidden]{display:none}
+html body #alerts-panel .med-form .md-vib{appearance:none;-webkit-appearance:none;width:38px;height:21px;border:0;border-radius:20px;background:#94a3b8;position:relative;margin:0;cursor:pointer}
+html body #alerts-panel .med-form .md-vib:checked{background:var(--mca)}
+html body #alerts-panel .med-form .md-prev-row{display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:6px}
+html body #alerts-panel .med-form .md-prev{border:1.5px solid var(--mca);background:#fff;color:var(--mca);border-radius:10px;padding:7px 18px;font:inherit;font-size:.84rem;font-weight:700;cursor:pointer;width:100%}
+html body #alerts-panel .med-form .med-add-dose{display:flex;align-items:center;gap:9px;border:0;background:none;color:var(--mca);font:inherit;font-size:.86rem;font-weight:700;cursor:pointer;padding:2px 0;margin:0 0 8px}
+html body #alerts-panel .med-form .med-plus{width:34px;height:34px;border-radius:50%;border:2px solid var(--mca);display:flex;align-items:center;justify-content:center;font-size:1.3rem;line-height:1}
+html body #alerts-panel .med-form .med-msg{color:#b91c1c;font-size:.82rem;font-weight:700;margin:4px 0 8px}
+html body #alerts-panel .med-form .med-msg[hidden]{display:none}
+html body #alerts-panel .med-form .reminder-form-actions{display:flex;justify-content:center;gap:10px;margin-top:10px}
+html body #alerts-panel .med-form .save-reminder{padding:9px 22px;border:0;border-radius:10px;background:var(--tl-0f766e,#0f766e);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+html body #alerts-panel .med-form .cancel-reminder{padding:9px 18px;border:1.5px solid var(--tl-0f766e,#0f766e);border-radius:10px;background:#fff;color:var(--tl-0f766e,#0f766e);font:inherit;font-weight:600;cursor:pointer}
+html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
+/* the history table */
+.med-hist{--mh:#0d9488;max-width:min(96vw,1100px);width:100%;max-height:92vh;overflow:auto;box-sizing:border-box;padding:14px;color:#134e4a}
+.med-hist .mh-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.med-hist .mh-title{font-weight:800;font-size:1.05rem;color:var(--mh)}
+.med-hist .mh-x{border:0;background:none;font-size:1.1rem;color:var(--mh);cursor:pointer}
+.med-hist .mh-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.med-hist .mh-nav{border:0;border-radius:8px;background:#ccfbf1;color:#0f766e;font-size:1.1rem;font-weight:800;width:32px;height:30px;cursor:pointer}
+.med-hist .mh-lab{font-weight:700;font-size:.9rem;min-width:7.5em;text-align:center}
+.med-hist .md-seg{margin-left:auto}
+.med-hist .md-seg button{border:0;border-radius:9px;padding:6px 10px;background:#ccfbf1;color:#0f766e;font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}
+.med-hist .md-seg button[aria-pressed=true]{background:var(--mh);color:#fff}
+.med-hist .mh-m{font-weight:800;font-size:.84rem;color:var(--mh);margin:8px 0 4px}
+.med-hist .mh-wrap{overflow-x:auto}
+.med-hist table.mh-t{border-collapse:separate;border-spacing:2px;font-size:.75rem;min-width:100%}
+.med-hist .mh-t th.mh-nm{position:sticky;left:0;z-index:1;background:#fff;text-align:left;font-size:.78rem;padding:2px 8px 2px 0;min-width:96px;max-width:130px;white-space:normal;line-height:1.2}
+.med-hist .mh-t th.mh-nm small{display:block;color:#4b7f78;font-weight:400;font-size:.68rem}
+.med-hist .mh-t th.mh-d{font-size:.68rem;color:#0f766e;padding:1px 0;font-weight:700;min-width:24px}
+.med-hist .mh-t th.mh-d small{display:block;font-weight:400;color:#7aa8a1;font-size:.58rem}
+.med-hist .mh-t th.mh-d.td{background:var(--mh);color:#fff;border-radius:6px}.med-hist .mh-t th.mh-d.td small{color:#d5f5ef}
+.med-hist .mh-t td{height:28px;min-width:24px;text-align:center;border-radius:6px;font-weight:800;padding:0}
+.med-hist .mh-t td.ok{background:#ccfbf1;color:#0f766e;cursor:pointer}.med-hist .mh-t td.sk{background:#fef3c7;color:#b45309;cursor:pointer}.med-hist .mh-t td.ms{background:#fee2e2;color:#b91c1c;cursor:pointer}.med-hist .mh-t td.f{background:#eef6f5;color:#9bbcb7}.med-hist .mh-t td.n{background:#f7fafa}
+.med-hist .mh-t td.mh-p,.med-hist .mh-t th.mh-p{background:none;min-width:36px;font-size:.74rem;color:#0f766e}
+.med-hist .mh-lg{display:flex;flex-wrap:wrap;gap:12px;font-size:.76rem;margin-top:10px;color:#4b7f78}
+.med-hist .mh-lg b{display:inline-block;width:13px;height:13px;border-radius:4px;vertical-align:-2px;margin-right:4px}
+.med-hist .mh-lg b.ok{background:#ccfbf1}.med-hist .mh-lg b.sk{background:#fef3c7}.med-hist .mh-lg b.ms{background:#fee2e2}.med-hist .mh-lg b.f{background:#eef6f5}
+.med-hist .mh-note{font-size:.74rem;opacity:.8;margin-top:6px}
+.med-hist .mh-none{text-align:center;padding:18px 0;font-size:.88rem}
+.med-hist .mh-act{display:flex;justify-content:center;gap:10px;margin-top:12px}
+.med-hist .mh-pdf{padding:8px 18px;border:0;border-radius:10px;background:var(--mh);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.med-hist .mh-close{padding:8px 18px;border:1.5px solid var(--mh);border-radius:10px;background:#fff;color:var(--mh);font:inherit;font-weight:700;cursor:pointer}
+</style>
+<script id="medicine-20261123-js">
+(function(){
+  var LK='ayuBase6-med-log';
+  var DAY_ORDER=[1,2,3,4,5,6,0], DAY_LETTER={1:'M',2:'T',3:'W',4:'T',5:'F',6:'S',0:'S'}, DAY_FULL={1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday',6:'Saturday',0:'Sunday'};
+  var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], MONF=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var PILL='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 20.5a4.95 4.95 0 0 1-7-7l10-10a4.95 4.95 0 0 1 7 7z"/><path d="M8.5 8.5l7 7"/></svg>';
+  var CLOCK='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M5 3.5L2.5 6M19 3.5L21.5 6"/></svg>';
+  function $(i){ return document.getElementById(i); }
+  function p2(n){ return String(n).padStart(2,'0'); }
+  function iso(d){ d=d||new Date(); return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()); }
+  function list(){ return $('custom-reminders-list'); }
+  function R(){ return window.__ayuRem; }
+  function dataOf(it){ try{ return JSON.parse(it.dataset.reminder||'{}'); }catch(e){ return {}; } }
+  function isMed(d){ return !!d && d.kind==='medicine'; }
+  function clock(t){ var R_=R(); return R_ ? R_.formatClock(t) : t; }
+  function toMin(t){ var m=/^(\d{1,2}):(\d{2})$/.exec(t||''); return m ? (+m[1])*60+(+m[2]) : null; }
+  function newMid(){ var s=''; while(s.length<5) s+=Math.random().toString(36).slice(2); return 'x'+s.slice(0,5); }
+  function fmtDate(s){ var p=String(s||'').split('-').map(Number); return p.length<3 ? '' : p[2]+' '+MON[p[1]-1]; }
+  function addDays(s,n){ var d=new Date(s+'T00:00:00'); d.setDate(d.getDate()+n); return iso(d); }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function items(){ return [].filter.call((list()||document.createElement('div')).children,function(c){ return c.classList.contains('custom-reminder-item'); }); }
+  function meds(){ return items().filter(function(it){ return isMed(dataOf(it)); }); }
+
+  // ── when is a dose due ──
+  function doseOn(d,ds,dow,start){
+    if(d.rep==='once') return d.date===ds;
+    if(start && ds<start) return false;
+    if(d.until && ds>d.until) return false;
+    return !Array.isArray(d.days) || !d.days.length || d.days.indexOf(dow)>=0;
+  }
+  function untilOf(d,start){
+    if(d.rep==='once') return '';
+    if(d.till==='date') return d.untilDate||'';
+    var n=Math.max(1,Math.min(365,Math.floor(+d.tillDays||30)));
+    return addDays(start,n-1);
+  }
+  function findDose(key){
+    var m=/^(?:preview-)?(?:med)?(x[a-z0-9]{4,6})d(\d+)$/.exec(String(key||'')); if(!m) return null;
+    var out=null; meds().forEach(function(it){ var d=dataOf(it); if(d.mid===m[1]) (d.doses||[]).forEach(function(x){ if(String(x.n)===m[2]) out={item:it,data:d,dose:x}; }); });
+    return out;
+  }
+
+  // ── history log: { "<mid>d<n>": { "yyyy-mm-dd": "t" | "s" } } ──
+  function logLoad(){ try{ var o=JSON.parse(localStorage.getItem(LK)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
+  function logSet(mid,n,day,st){
+    var L=logLoad(), k=mid+'d'+n; L[k]=L[k]||{};
+    if(st) L[k][day]=st; else delete L[k][day];
+    try{ localStorage.setItem(LK,JSON.stringify(L)); }catch(e){}
+  }
+  window.ayuMedAct=function(key,action,day,at){
+    var m=/^med(x[a-z0-9]{4,6})d(\d+)$/.exec(String(key||'')); if(!m) return false;
+    var d=day || iso(at ? new Date(+at) : new Date());
+    if(action==='taken') logSet(m[1],m[2],d,'t');
+    else if(action==='skipped') logSet(m[1],m[2],d,'s');
+    else if(action==='snooze10'){ var f=findDose(key); if(f) setTimeout(function(){ fire(f.data,f.dose); },10*60000); }
+    return true;
+  };
+
+  // ── on the website: ring at the dose time ──
+  var ACTS=[{action:'taken',title:'✓ Taken'},{action:'snooze10',title:'Snooze 10 min'},{action:'skipped',title:'Skip'}];
+  function bodyText(dose){ return 'Time for your medicine. Did you take it?'; }
+  function fire(data,dose){
+    try{
+      if(window.ayuLeader===false) return;
+      if(!('Notification' in window) || Notification.permission!=='granted') return;
+      if(typeof showNudgeNotification==='function') showNudgeNotification(data.name,bodyText(dose),{key:'med'+data.mid+'d'+dose.n,theme:'reminders',actions:ACTS});
+    }catch(e){}
+  }
+  function stopMed(item){ if(item._medT){ clearInterval(item._medT); item._medT=null; } }
+  function startMed(item){
+    var data=dataOf(item); stopMed(item); if(!data.name || data.on===false) return;
+    item.dataset.startedAt=item.dataset.startedAt||String(Date.now());
+    item._medLast=item._medLast||{};
+    item._medT=setInterval(function(){
+      var d=dataOf(item); if(d.on===false) return;
+      var n=new Date(), hm=p2(n.getHours())+':'+p2(n.getMinutes()), ds=iso(n);
+      (d.doses||[]).forEach(function(x){
+        if(x.time!==hm || !doseOn(x,ds,n.getDay(),d.start)) return;
+        var k=ds+hm+x.n; if(item._medLast[k]) return; item._medLast[k]=1; fire(d,x);
+      });
+    },15000);
+  }
+  function patchRem(){
+    var r=R(); if(!r || r._medPatched) return !!(r && r._medPatched);
+    var oStart=r.startReminder, oStop=r.stopReminderTimers;
+    r.startReminder=function(item){ if(item && isMed(dataOf(item))){ startMed(item); return; } return oStart.apply(this,arguments); };
+    r.stopReminderTimers=function(item){ if(item) stopMed(item); return oStop.apply(this,arguments); };
+    r._medPatched=true;
+    // medicines already on the page (painted before this ran) start now
+    meds().forEach(function(it){ startMed(it); });
+    return true;
+  }
+
+  // ── the list: names, and "Medicine" / "Reminders" sections ──
+  function medSub(d){
+    var ds=d.doses||[], seen={}, times=[];
+    ds.slice().sort(function(a,b){ return (toMin(a.time)||0)-(toMin(b.time)||0); }).forEach(function(x){ if(!seen[x.time]){ seen[x.time]=1; times.push(clock(x.time)); } });
+    var s=times.join(' · '), weekly=ds.filter(function(x){ return x.rep!=='once'; });
+    if(!weekly.length){ var dts=ds.map(function(x){ return fmtDate(x.date); }).filter(Boolean); return s+' · '+(dts.length ? dts[0]+' · ' : '')+'only once'; }
+    var days=weekly[0].days||[], same=weekly.every(function(x){ return JSON.stringify((x.days||[]).slice().sort())===JSON.stringify(days.slice().sort()); });
+    var dl=(same && R()) ? R().daysLabel(days) : ''; if(dl) s+=dl; else s+=same ? ' · every day' : '';
+    var ends=weekly.map(function(x){ return x.until; }).filter(Boolean).sort();
+    if(ends.length) s+=' · till '+fmtDate(ends[ends.length-1]);
+    return s;
+  }
+  function sections(){
+    var l=list(); if(!l) return;
+    var nm=0, nr=0; items().forEach(function(it){ if(it.classList.contains('med-item')) nm++; else nr++; });
+    var hm=l.querySelector(':scope > .med-sec-h.med-h-med'), hr=l.querySelector(':scope > .med-sec-h.med-h-rem');
+    if(!hm){
+      hm=document.createElement('div'); hm.className='med-sec-h med-h-med'; hm.innerHTML='<span>Medicine</span><button type="button" class="med-hist-btn">History</button>'; l.prepend(hm);
+      hm.querySelector('button').addEventListener('click',function(){ openHistory(); });
+      hr=document.createElement('div'); hr.className='med-sec-h med-h-rem'; hr.innerHTML='<span>Reminders</span>'; hm.after(hr);
+    }
+    hm.hidden=!nm; hr.hidden=!(nm && nr);
+  }
+  var oPaint=window.ayuRemPaint;
+  if(typeof oPaint==='function') window.ayuRemPaint=function(item,data){
+    oPaint.apply(this,arguments);
+    var m=isMed(data); item.classList.toggle('med-item',m);
+    if(m){ var sub=item.querySelector('.cri-sub'); if(sub) sub.textContent=medSub(data); }
+    sections();
+  };
+
+  // ── Add: Medicine or Reminder ──
+  function closeForms(){
+    var l=list(); if(!l) return;
+    l.querySelectorAll('.med-choose').forEach(function(c){ c.remove(); });
+    l.querySelectorAll('.custom-reminder-form,.med-form').forEach(function(f){ var b=f.querySelector('.cancel-reminder'); if(b) b.click(); else f.remove(); });
+  }
+  var oAdd=window.addCustomReminderForm;
+  window.addCustomReminderForm=function(editItem){
+    var l=list(); if(!l) return;
+    if(editItem && editItem.nodeType===1){
+      if(isMed(dataOf(editItem))){ openForm(editItem); return; }
+      return oAdd.apply(this,arguments);
+    }
+    var ch=l.querySelector(':scope > .med-choose');
+    if(ch){ ch.remove(); return; }
+    closeForms();
+    ch=document.createElement('div'); ch.className='med-choose'; ch.setAttribute('role','group'); ch.setAttribute('aria-label','What do you want to add?');
+    ch.innerHTML='<button type="button" class="mc-btn" data-t="med">'+PILL+'<span>Medicine</span></button><button type="button" class="mc-btn" data-t="rem">'+CLOCK+'<span>Reminder</span></button>';
+    l.append(ch);
+    ch.querySelector('[data-t="med"]').addEventListener('click',function(){ ch.remove(); openForm(null); });
+    ch.querySelector('[data-t="rem"]').addEventListener('click',function(){ ch.remove(); oAdd.call(window); });
+  };
+
+  // ── the Medicine form ──
+  var SOUND_OPTS=function(){ return (typeof window.ayuToneOptions==='function' ? window.ayuToneOptions().replace(/<optgroup label="Your own">[\s\S]*?<\/optgroup>/,'').replace(/<option value="none">[^<]*<\/option>/,'') : '<option value="xylophone">Xylophone</option><option value="chime">Chime</option><option value="drop">Water Drop</option><option value="drum">Drum</option>'); };
+  function newDose(n,prev){
+    var t='08:00'; if(prev){ var m=toMin(prev.time)||480; t=p2(Math.floor(((m+(n===1?720:240))%1440)/60))+':'+p2((m+(n===1?720:240))%60); }
+    return {n:n,time:t,rep:'week',days:[0,1,2,3,4,5,6],date:iso(),till:'days',tillDays:30,until:'',untilDate:'',sound:prev ? prev.sound : 'xylophone',vibrate:prev ? prev.vibrate!==false : true};
+  }
+  function openForm(existing){
+    var l=list(); if(!l) return;
+    closeForms();
+    if(existing) stopMed(existing);
+    var saved=existing ? dataOf(existing) : {};
+    var doses=(saved.doses||[]).map(function(x){ return JSON.parse(JSON.stringify(x)); });
+    if(!doses.length) doses=[newDose(0,null)];
+    var form=document.createElement('form'); form.className='med-form'; form.noValidate=true;
+    form.innerHTML='<label class="med-name"><span class="md-lbl">Name</span><input class="md-ctl" name="name" maxlength="80" autocomplete="off" placeholder="e.g. Metformin — Amma, Eye drops"></label>'
+      +'<div class="med-hint">Add the medicine, and the person or treatment if you like.</div>'
+      +'<div class="med-doses"></div>'
+      +'<button type="button" class="med-add-dose"><span class="med-plus" aria-hidden="true">+</span><span>Add another dose</span></button>'
+      +'<div class="med-msg" role="alert" hidden></div>'
+      +'<div class="reminder-form-actions"><button class="save-reminder" type="submit">Save</button><button class="cancel-reminder" type="button">Cancel</button></div>';
+    form.elements.name.value=saved.name||'';
+    var box=form.querySelector('.med-doses');
+    function msg(t){ var m=form.querySelector('.med-msg'); m.textContent=t||''; m.hidden=!t; }
+    function draw(){
+      box.innerHTML='';
+      doses.forEach(function(d,i){ box.append(doseBlock(d,i)); });
+    }
+    function doseBlock(d,i){
+      var b=document.createElement('div'); b.className='med-dose md-c'+(i%4);
+      var weekly=d.rep!=='once';
+      b.innerHTML='<div class="md-h"><strong>Dose '+(i+1)+'</strong>'+(doses.length>1 ? '<button type="button" class="md-x" aria-label="Remove dose '+(i+1)+'" title="Remove dose">✕</button>' : '')+'</div>'
+        +'<div class="md-row"><span class="md-lbl">Time</span><button type="button" class="md-ctl md-time duration-clock-trigger"></button></div>'
+        +'<div class="md-row md-r-days" '+(weekly?'':'hidden')+'><span class="md-lbl">On days</span><div class="md-days" role="group" aria-label="On days"></div></div>'
+        +'<div class="md-row"><span class="md-lbl">Repeat</span><div class="md-seg md-rep" role="group" aria-label="Repeat"><button type="button" data-v="once">Only once</button><button type="button" data-v="week">Every week</button></div></div>'
+        +'<div class="md-row md-r-date" '+(weekly?'hidden':'')+'><span class="md-lbl">On</span><input type="date" class="md-ctl md-date" aria-label="Date"></div>'
+        +'<div class="md-row md-r-till" '+(weekly?'':'hidden')+'><span class="md-lbl">Till</span><div class="md-till"><div class="md-seg md-tm" role="group" aria-label="Till"><button type="button" data-v="days">Days</button><button type="button" data-v="date">Date</button></div><input type="number" min="1" max="365" inputmode="numeric" class="md-ctl md-tdays" aria-label="Number of days"><input type="date" class="md-ctl md-tdate" aria-label="Last day"></div></div>'
+        +'<div class="md-row"><span class="md-lbl">Sound</span><select class="md-ctl md-sound">'+SOUND_OPTS()+'</select></div>'
+        +'<div class="md-row ayu-vib-only"><span class="md-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" class="md-vib" aria-label="Vibrate"></label></div>'
+        +'<div class="md-prev-row"><button type="button" class="alert-preview-btn ayu-prev-btn md-prev">Preview notification</button><span class="ayu-prev-msg" hidden></span></div>';
+      var tb=b.querySelector('.md-time'); function showT(){ tb.textContent=clock(d.time); } showT();
+      tb.addEventListener('click',function(){ if(typeof openTimePicker==='function') openTimePicker('custom',d.time,function(v){ d.time=v; showT(); },'Select time'); });
+      var dayBox=b.querySelector('.md-days');
+      function drawDays(){
+        dayBox.innerHTML='';
+        DAY_ORDER.forEach(function(x){
+          var c=document.createElement('button'); c.type='button'; c.className='md-chip'; c.textContent=DAY_LETTER[x]; c.setAttribute('aria-label',DAY_FULL[x]); c.setAttribute('aria-pressed',String(d.days.indexOf(x)>=0));
+          c.addEventListener('click',function(){ if(d.days.indexOf(x)>=0){ if(d.days.length>1) d.days=d.days.filter(function(y){ return y!==x; }); } else d.days=d.days.concat([x]); drawDays(); });
+          dayBox.append(c);
+        });
+      }
+      drawDays();
+      function seg(sel,get,set,after){
+        var s=b.querySelector(sel); function paint(){ s.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-pressed',String(x.dataset.v===get())); }); }
+        paint(); s.querySelectorAll('button').forEach(function(x){ x.addEventListener('click',function(){ set(x.dataset.v); paint(); if(after) after(); }); });
+      }
+      function layout(){
+        var wk=d.rep!=='once';
+        b.querySelector('.md-r-days').hidden=!wk; b.querySelector('.md-r-till').hidden=!wk; b.querySelector('.md-r-date').hidden=wk;
+        b.querySelector('.md-tdays').hidden=d.till!=='days'; b.querySelector('.md-tdate').hidden=d.till!=='date';
+      }
+      seg('.md-rep',function(){ return d.rep==='once' ? 'once' : 'week'; },function(v){ d.rep=v; },layout);
+      seg('.md-tm',function(){ return d.till; },function(v){ d.till=v; if(v==='date' && !d.untilDate) d.untilDate=addDays(iso(),+d.tillDays>0 ? +d.tillDays-1 : 29); },layout);
+      var dt=b.querySelector('.md-date'); dt.value=d.date||iso(); dt.addEventListener('change',function(){ if(dt.value) d.date=dt.value; });
+      var td=b.querySelector('.md-tdays'); td.value=d.tillDays; td.addEventListener('input',function(){ d.tillDays=td.value; });
+      var te=b.querySelector('.md-tdate'); te.value=d.untilDate||''; te.addEventListener('change',function(){ d.untilDate=te.value; });
+      layout();
+      var sn=b.querySelector('.md-sound'); sn.value=d.sound||'xylophone'; if(!sn.value) sn.value='xylophone'; d.sound=sn.value; sn.addEventListener('change',function(){ d.sound=sn.value; });
+      var vb=b.querySelector('.md-vib'); vb.checked=d.vibrate!==false; vb.addEventListener('change',function(){ d.vibrate=vb.checked; });
+      var rm=b.querySelector('.md-x'); if(rm) rm.addEventListener('click',function(){ doses.splice(i,1); draw(); });
+      b.querySelector('.md-prev').addEventListener('click',function(){
+        var nm=String(form.elements.name.value).trim()||'Medicine';
+        if(typeof window.ayuPreviewNote==='function') window.ayuPreviewNote(nm,bodyText(d),'reminders','preview-medpv',ACTS,d.vibrate!==false ? 'medpv-on' : 'medpv-off');
+      });
+      return b;
+    }
+    draw();
+    form.querySelector('.med-add-dose').addEventListener('click',function(){
+      var n=doses.reduce(function(a,x){ return Math.max(a,x.n); },-1)+1;
+      doses.push(newDose(n,doses[doses.length-1])); draw();
+      var last=box.lastElementChild; if(last) try{ last.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
+    });
+    function close(){
+      form.remove();
+      if(existing){ existing.classList.remove('open'); var h=existing.querySelector('.cri-hdr'); if(h) h.setAttribute('aria-expanded','false'); startMed(existing); }
+    }
+    form.querySelector('.cancel-reminder').addEventListener('click',close);
+    form.addEventListener('submit',function(e){
+      e.preventDefault(); msg('');
+      var name=String(form.elements.name.value).trim();
+      if(!name){ msg('Enter a name for the medicine.'); form.elements.name.focus(); return; }
+      var today=iso(), start=saved.start||today, out=[];
+      for(var i=0;i<doses.length;i++){
+        var d=doses[i], x={n:d.n,time:d.time,rep:d.rep==='once'?'once':'week',sound:d.sound||'xylophone',vibrate:d.vibrate!==false};
+        if(!/^\d{2}:\d{2}$/.test(x.time)){ msg('Choose a time for dose '+(i+1)+'.'); return; }
+        if(x.rep==='once'){ if(!/^\d{4}-\d{2}-\d{2}$/.test(d.date||'')){ msg('Choose the date for dose '+(i+1)+'.'); return; } x.date=d.date; x.until=''; }
+        else {
+          x.days=(d.days||[]).slice().sort(function(a,b){ return a-b; }); if(!x.days.length) x.days=[0,1,2,3,4,5,6];
+          x.till=d.till==='date'?'date':'days';
+          if(x.till==='days'){ var nd=Math.floor(+d.tillDays); if(!(nd>=1 && nd<=365)){ msg('Dose '+(i+1)+': enter 1 to 365 days.'); return; } x.tillDays=nd; }
+          else { if(!/^\d{4}-\d{2}-\d{2}$/.test(d.untilDate||'')){ msg('Dose '+(i+1)+': choose the last day.'); return; } if(d.untilDate<today){ msg('Dose '+(i+1)+': the last day is already past.'); return; } x.untilDate=d.untilDate; x.tillDays=+d.tillDays>0 ? Math.floor(+d.tillDays) : 30; }
+          x.until=untilOf(x,start);
+        }
+        out.push(x);
+      }
+      var all=[]; out.forEach(function(x){ if(all.indexOf(x.time)<0) all.push(x.time); });
+      var data={kind:'medicine',mid:saved.mid||newMid(),name:name,mode:'selected',times:all.sort(),days:[0,1,2,3,4,5,6],start:start,doses:out,sound:out[0].sound,vibrate:out[0].vibrate};
+      if(saved.on===false) data.on=false;
+      var item=existing;
+      if(!item){
+        item=document.createElement('div'); item.className='custom-reminder-item';
+        var mx=0; items().forEach(function(it){ mx=Math.max(mx,+it.dataset.reminderId||0); }); item.dataset.reminderId=String(mx+1); try{ R().bump(mx+1); }catch(_){}
+      }
+      stopMed(item); item.classList.remove('open'); form.remove();
+      item.dataset.reminder=JSON.stringify(data);
+      window.ayuRemPaint(item,data);
+      if(!existing) l.append(item);
+      startMed(item); sections();
+      if('Notification' in window && Notification.permission==='default') Notification.requestPermission().catch(function(){});
+    });
+    if(existing){ existing.classList.add('open'); var h=existing.querySelector('.cri-hdr'); if(h) h.setAttribute('aria-expanded','true'); (existing.querySelector('.cri-body')||existing).append(form); }
+    else { l.append(form); form.elements.name.focus(); }
+  }
+
+  // ── History: every medicine and day in one table ──
+  function cellState(it,dose,ds,L,now){
+    var d=dataOf(it), dt=new Date(ds+'T00:00:00');
+    if(!doseOn(dose,ds,dt.getDay(),d.start)) return 'n';
+    var st=(L[d.mid+'d'+dose.n]||{})[ds];
+    if(st==='t') return 'ok'; if(st==='s') return 'sk';
+    var due=new Date(ds+'T'+dose.time+':00');
+    return due>now ? 'f' : 'ms';
+  }
+  function rowsOf(){
+    var out=[]; meds().forEach(function(it){ var d=dataOf(it); (d.doses||[]).forEach(function(x){ out.push({it:it,d:d,x:x}); }); });
+    out.sort(function(a,b){ return a.d.name.localeCompare(b.d.name) || (toMin(a.x.time)||0)-(toMin(b.x.time)||0); });
+    return out;
+  }
+  var SYM={ok:'✓',sk:'–',ms:'✕',f:'·',n:''};
+  function monthTable(y,m,L,now){
+    var last=new Date(y,m+1,0).getDate(), rows=rowsOf();
+    var h='<div class="mh-m">'+MONF[m]+' '+y+'</div><div class="mh-wrap"><table class="mh-t"><thead><tr><th class="mh-nm"></th>';
+    for(var d=1;d<=last;d++){ var dw=new Date(y,m,d).getDay(), ds=y+'-'+p2(m+1)+'-'+p2(d); h+='<th class="mh-d'+(ds===iso(now)?' td':'')+'">'+d+'<small>'+'SMTWTFS'[dw]+'</small></th>'; }
+    h+='<th class="mh-p">%</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      var ok=0,tot=0, cells='';
+      for(var d=1;d<=last;d++){
+        var ds=y+'-'+p2(m+1)+'-'+p2(d), s=cellState(r.it,r.x,ds,L,now);
+        if(s==='ok'){ ok++; tot++; } else if(s==='sk'||s==='ms') tot++;
+        cells+='<td class="mh-c '+s+'"'+((s==='ok'||s==='sk'||s==='ms') ? ' data-k="'+r.d.mid+'d'+r.x.n+'" data-d="'+ds+'" role="button" tabindex="0" aria-label="'+esc(r.d.name)+' '+clock(r.x.time)+' '+ds+'"' : '')+'>'+SYM[s]+'</td>';
+      }
+      h+='<tr><th class="mh-nm">'+esc(r.d.name)+'<small>'+clock(r.x.time)+'</small></th>'+cells+'<td class="mh-p">'+(tot ? Math.round(ok*100/tot)+'%' : '–')+'</td></tr>';
+    });
+    return h+'</tbody></table></div>';
+  }
+  function weekTable(end,L,now){
+    var rows=rowsOf(), days=[]; for(var i=6;i>=0;i--) days.push(addDays(end,-i));
+    var h='<div class="mh-m">'+fmtDate(days[0])+' – '+fmtDate(days[6])+'</div><div class="mh-wrap"><table class="mh-t mh-wk"><thead><tr><th class="mh-nm"></th>';
+    days.forEach(function(ds){ var dt=new Date(ds+'T00:00:00'); h+='<th class="mh-d'+(ds===iso(now)?' td':'')+'">'+dt.getDate()+'<small>'+'SMTWTFS'[dt.getDay()]+'</small></th>'; });
+    h+='<th class="mh-p">%</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      var ok=0,tot=0,cells='';
+      days.forEach(function(ds){ var s=cellState(r.it,r.x,ds,L,now); if(s==='ok'){ ok++; tot++; } else if(s==='sk'||s==='ms') tot++;
+        cells+='<td class="mh-c '+s+'"'+((s==='ok'||s==='sk'||s==='ms') ? ' data-k="'+r.d.mid+'d'+r.x.n+'" data-d="'+ds+'" role="button" tabindex="0" aria-label="'+esc(r.d.name)+' '+clock(r.x.time)+' '+ds+'"' : '')+'>'+SYM[s]+'</td>'; });
+      h+='<tr><th class="mh-nm">'+esc(r.d.name)+'<small>'+clock(r.x.time)+'</small></th>'+cells+'<td class="mh-p">'+(tot ? Math.round(ok*100/tot)+'%' : '–')+'</td></tr>';
+    });
+    return h+'</tbody></table></div>';
+  }
+  function openHistory(){
+    var now=new Date(), view='month', ym=now.getFullYear()*12+now.getMonth(), wend=iso(now);
+    var ov=document.createElement('div'); ov.className='tp-overlay';
+    ov.innerHTML='<div class="tp-dialog med-hist" role="dialog" aria-modal="true" aria-label="Medicine history"><div class="mh-top"><div class="mh-title">Medicine history</div><button type="button" class="mh-x" aria-label="Close">✕</button></div>'
+      +'<div class="mh-bar"><button type="button" class="mh-nav" data-s="-1" aria-label="Earlier">‹</button><span class="mh-lab"></span><button type="button" class="mh-nav" data-s="1" aria-label="Later">›</button>'
+      +'<div class="md-seg mh-views" role="group" aria-label="Range"><button type="button" data-v="week">Week</button><button type="button" data-v="month">Month</button><button type="button" data-v="three">3 months</button></div></div>'
+      +'<div class="mh-body"></div>'
+      +'<div class="mh-lg"><span><b class="ok"></b>Taken</span><span><b class="sk"></b>Skipped</span><span><b class="ms"></b>Missed</span><span><b class="f"></b>Not due yet</span></div>'
+      +'<div class="mh-note">Tap a coloured box to change it. A dose that was due and not marked counts as missed. % is taken out of the doses due so far.</div>'
+      +'<div class="mh-act"><button type="button" class="mh-pdf">Download PDF</button><button type="button" class="mh-close">Close</button></div></div>';
+    var body=ov.querySelector('.mh-body'), lab=ov.querySelector('.mh-lab');
+    function render(){
+      var L=logLoad(), now2=new Date(), rows=rowsOf();
+      ov.querySelectorAll('.mh-views button').forEach(function(b){ b.setAttribute('aria-pressed',String(b.dataset.v===view)); });
+      if(!rows.length){ body.innerHTML='<p class="mh-none">No medicines yet. Add one with + in Personal Reminders.</p>'; lab.textContent=''; return; }
+      if(view==='week'){ lab.textContent=fmtDate(addDays(wend,-6))+' – '+fmtDate(wend); body.innerHTML=weekTable(wend,L,now2); }
+      else if(view==='month'){ var y=Math.floor(ym/12), m=ym%12; lab.textContent=MONF[m]+' '+y; body.innerHTML=monthTable(y,m,L,now2); }
+      else { lab.textContent=MON[(ym-2+1200)%12]+' – '+MON[ym%12]+' '+Math.floor(ym/12); var s=''; for(var k=2;k>=0;k--){ var q=ym-k; s+=monthTable(Math.floor(q/12),q%12,L,now2); } body.innerHTML=s; }
+      body.querySelectorAll('.mh-wrap').forEach(function(w){ var t=w.querySelector('th.td'); if(t) w.scrollLeft=Math.max(0,t.offsetLeft-w.clientWidth+90); });
+    }
+    function step(s){
+      if(view==='week') wend=addDays(wend,7*s); else ym+=(view==='three'?3:1)*s;
+    }
+    ov.querySelectorAll('.mh-nav').forEach(function(b){ b.addEventListener('click',function(){ step(+b.dataset.s); render(); }); });
+    ov.querySelectorAll('.mh-views button').forEach(function(b){ b.addEventListener('click',function(){ view=b.dataset.v; render(); }); });
+    function cycle(c){
+      var k=c.dataset.k, d=c.dataset.d, m=/^(x[a-z0-9]+)d(\d+)$/.exec(k); if(!m) return;
+      var cur=(logLoad()[k]||{})[d]; var nx=cur==='t' ? 's' : (cur==='s' ? '' : 't');
+      logSet(m[1],m[2],d,nx); render();
+    }
+    body.addEventListener('click',function(e){ var c=e.target.closest && e.target.closest('.mh-c[data-k]'); if(c) cycle(c); });
+    body.addEventListener('keydown',function(e){ if(e.key!=='Enter' && e.key!==' ') return; var c=e.target.closest && e.target.closest('.mh-c[data-k]'); if(c){ e.preventDefault(); cycle(c); } });
+    function close(){ ov.remove(); document.removeEventListener('keydown',esc,true); }
+    function esc(e){ if(e.key==='Escape'){ e.stopPropagation(); close(); } }
+    ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
+    ov.querySelector('.mh-x').addEventListener('click',close); ov.querySelector('.mh-close').addEventListener('click',close); document.addEventListener('keydown',esc,true);
+    ov.querySelector('.mh-pdf').addEventListener('click',function(){ pdf(view==='week' ? 'week' : 'month',ym,wend); });
+    document.body.append(ov); render();
+  }
+  function pdf(view,ym,wend){
+    if(!window.jspdf){ alert('The PDF tool could not be loaded. Please check your internet connection and try again.'); return; }
+    var rows=rowsOf(); if(!rows.length) return;
+    var doc=new window.jspdf.jsPDF({unit:'pt',format:'a4',orientation:'landscape'}), W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=36;
+    var L=logLoad(), now=new Date(), days=[], title;
+    if(view==='week'){ for(var i=6;i>=0;i--) days.push(addDays(wend,-i)); title=fmtDate(days[0])+' – '+fmtDate(days[6])+' '+(new Date(days[6]+'T00:00:00')).getFullYear(); }
+    else { var y=Math.floor(ym/12), m=ym%12, last=new Date(y,m+1,0).getDate(); for(var d=1;d<=last;d++) days.push(y+'-'+p2(m+1)+'-'+p2(d)); title=MONF[m]+' '+y; }
+    var nameW=150, pctW=34, cw=Math.min(24,(W-2*M-nameW-pctW)/days.length), rh=24, y0=M;
+    function head(){
+      doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(15,118,110); doc.text('Medicine history · '+title,M,y0+12);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(90,110,106); doc.text('AyuBase6 · Taken = green, Skipped = amber, Missed = red, grey = not due',M,y0+26);
+      y0+=40; doc.setFontSize(7); doc.setTextColor(15,118,110);
+      days.forEach(function(ds,i){ var dt=new Date(ds+'T00:00:00'); doc.text(String(dt.getDate()),M+nameW+i*cw+cw/2,y0+7,{align:'center'}); doc.text('SMTWTFS'[dt.getDay()],M+nameW+i*cw+cw/2,y0+15,{align:'center'}); });
+      doc.text('%',M+nameW+days.length*cw+pctW/2,y0+10,{align:'center'}); y0+=20;
+    }
+    head();
+    rows.forEach(function(r){
+      if(y0+rh>H-M){ doc.addPage(); y0=M; head(); }
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(19,78,74); var nm=doc.splitTextToSize(r.d.name,nameW-8)[0]; doc.text(nm,M,y0+10);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(90,110,106); doc.text(clock(r.x.time),M,y0+19);
+      var ok=0,tot=0;
+      days.forEach(function(ds,i){
+        var s=cellState(r.it,r.x,ds,L,now); if(s==='ok'){ ok++; tot++; } else if(s==='sk'||s==='ms') tot++;
+        var col={ok:[204,251,241],sk:[254,243,199],ms:[254,226,226],f:[238,246,245],n:[248,250,250]}[s]; doc.setFillColor(col[0],col[1],col[2]); doc.rect(M+nameW+i*cw+1,y0+1,cw-2,rh-3,'F');
+        if(SYM[s]==='✓'||SYM[s]==='✕'||SYM[s]==='–'){ doc.setFontSize(8); doc.setTextColor(s==='ok'?15:(s==='ms'?185:180),s==='ok'?118:(s==='ms'?28:83),s==='ok'?110:(s==='ms'?28:9)); doc.text(s==='ok'?'Y':(s==='ms'?'X':'-'),M+nameW+i*cw+cw/2,y0+13,{align:'center'}); }
+      });
+      doc.setFontSize(8); doc.setTextColor(15,118,110); doc.text(tot ? Math.round(ok*100/tot)+'%' : '-',M+nameW+days.length*cw+pctW/2,y0+13,{align:'center'});
+      y0+=rh;
+    });
+    doc.save('medicine-history-'+(view==='week'?wend:title.replace(/\s+/g,'-').toLowerCase())+'.pdf');
+  }
+  window.ayuMedHistory=openHistory;
+
+  // ── what the phone is told ──
+  function wrapRules(){
+    var P=window.ayuPush; if(!P || P._med) return !!(P && P._med);
+    var bp=P.buildRules;
+    P.buildRules=function(){
+      var r=bp.apply(this,arguments); if(!r) return r;
+      try{
+        var remOn=typeof isMasterNotifyOn==='function' && isMasterNotifyOn(); if(!remOn) return r;
+        var today=iso();
+        meds().forEach(function(it){
+          var d=dataOf(it); if(!d.name || d.on===false) return;
+          (d.doses||[]).forEach(function(x){
+            var at=toMin(x.time); if(at===null) return;
+            if(x.rep==='once' ? (x.date<today) : (x.until && x.until<today)) return;
+            var c={id:d.mid+'d'+x.n,name:d.name,mode:'dates',med:true,times:[at],sound:x.sound||'xylophone',vibrate:x.vibrate!==false};
+            if(x.rep==='once'){ c.sched='once'; c.date=x.date; }
+            else { c.sched='weekly'; if(Array.isArray(x.days) && x.days.length && x.days.length<7) c.days=x.days.slice(); if(x.until) c.until=x.until; }
+            r.custom.push(c);
+          });
+        });
+      }catch(e){}
+      return r;
+    };
+    P._med=true; return true;
+  }
+  function wrapVib(){
+    var V=window.ayuVibrate; if(!V || V._med) return !!(V && V._med);
+    var o=V.on;
+    V.on=function(k){
+      k=String(k||'').replace(/^preview-/,'');
+      if(k==='medpv-off') return false; if(k==='medpv-on') return true;
+      if(/^med/.test(k)){ var f=findDose(k); return f ? f.dose.vibrate!==false : true; }
+      return o.apply(this,arguments);
+    };
+    V._med=true;
+    var va=window.ayuVibrateApply;
+    if(typeof va==='function') window.ayuVibrateApply=function(r){
+      r=va.apply(this,arguments); if(!r) return r;
+      (r.custom||[]).forEach(function(x){ if(x.med){ var f=findDose('med'+x.id); if(f){ x.vibrate=f.dose.vibrate!==false; x.sound=f.dose.sound||'xylophone'; } } });
+      return r;
+    };
+    return true;
+  }
+  // a notification button tapped while the website is open
+  function wrapClick(){
+    var h=window.handleNudgeClick; if(typeof h!=='function' || h._med) return typeof h==='function';
+    window.handleNudgeClick=function(key,action){
+      if(/^med/.test(String(key||'')) && window.ayuMedAct(key,action)) return;
+      return h.apply(this,arguments);
+    };
+    window.handleNudgeClick._med=true; return true;
+  }
+  (function(){ var b=$('custom-reminder-add'); if(b){ b.title='Add a medicine or reminder'; b.setAttribute('aria-label','Add a medicine or reminder'); } })();
+  var n=0, iv=setInterval(function(){
+    var ab=$('custom-reminder-add'), sp=ab && ab.querySelector('span:last-child'); if(sp && sp.textContent==='Add a reminder') sp.textContent='Add a medicine or reminder';
+    var a=patchRem(), b=wrapRules(), c=wrapVib(), d=wrapClick(); sections();
+    if((a&&b&&c&&d && list() && list().querySelector(':scope > .med-sec-h')) || ++n>60) clearInterval(iv);
+  },250);
+  if(list()) new MutationObserver(function(){ sections(); }).observe(list(),{childList:true});
+})();
+</script>
