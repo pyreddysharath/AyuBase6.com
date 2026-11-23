@@ -11146,6 +11146,7 @@ const _nudgeArt={};
 const NUDGE_THEMES={
   reminders:{g0:'#f0fdfa',g1:'#ccfbf1',gi:'#99f6e4',big:'#5eead4',deep:'#0d9488',ic0:'#12998c',ic1:'#08766e'},
   routines:{g0:'#fff1f3',g1:'#fcd5dc',gi:'#f9b4c0',big:'#f4a0b0',deep:'#e8607a',ic0:'#e8607a',ic1:'#c94862'},
+  mind:{g0:'#f3f1ff',g1:'#e5dfff',gi:'#c7d2fe',big:'#a5b4fc',deep:'#6250b3',ic0:'#6250b3',ic1:'#4a3a96'},
   logo:{g0:'#ffffff',g1:'#eef2ff',gi:'#c7d2fe',big:['#60a5fa','#86efac','#a5b4fc','#67e8f9','#fb7a98','#5eead4'],deep:'#6d7cf0',ic0:'#ffffff',ic1:'#eef2ff',icLotus:['#60a5fa','#86efac','#a5b4fc','#67e8f9','#fb7a98','#5eead4']}   // the logo: six petals, six colours (Test notification)
 };
 function nudgeArt(kind,theme){
@@ -24891,6 +24892,8 @@ html body #mind-panel #mind-alert-card .mind-card-hdr{margin-bottom:0}
 html body #mind-panel #mind-alert-card .mind-card-hdr h2{flex:1 1 auto}
 html body #mind-panel #mind-alert-card .master-switch{flex:0 0 auto;margin:0}
 html body #mind-panel #mind-alert-card .mt-opts{margin-top:10px}
+html body #mind-panel #mind-alert-card .alert-preview-btn{border-style:solid;border-color:#a5b4fc;color:#6250b3;background:#fff}
+html body #mind-panel #mind-alert-card .alert-preview-row{display:flex !important;justify-content:center !important;margin:14px 0 2px !important;padding:0 !important}
 html body #mind-panel #mind-alert-card:not(.mt-on) .mt-opts{display:none}
 html body #mind-panel .mt-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
 html body #mind-panel .mt-row .mt-lbl{font-weight:700;min-width:70px;font-size:.9rem;color:var(--mind-1,#3730a3)}
@@ -24985,7 +24988,8 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:#4a3a96;lin
       +'<div class="mt-opts">'
       +'<div class="mt-row"><span class="mt-lbl">Time</span><button type="button" class="mt-time" id="mind-time"></button></div>'
       +'<div class="mt-row"><span class="mt-lbl">Sound</span><select id="mind-sound" aria-label="Sound"></select><button type="button" class="mt-play" id="mind-play" title="Play" aria-label="Play the sound">▶</button><button type="button" class="mt-play mt-mute" id="mind-mute" title="Mute" aria-label="Mute">🔊</button></div>'
-      +'<div class="mt-row mt-vib"><span class="mt-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" id="mind-vib" aria-label="Vibrate"></label></div></div>';
+      +'<div class="mt-row mt-vib"><span class="mt-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" id="mind-vib" aria-label="Vibrate"></label></div>'
+      +'<div class="alert-row alert-preview-row"><button type="button" class="alert-preview-btn ayu-prev-btn" id="mind-prev">Preview notification</button><span class="ayu-prev-msg" hidden></span></div></div>';
     pg.insertBefore(c,pg.firstChild);
     var on=$('mind-on'), tm=$('mind-time'), sd=$('mind-sound'), vb=$('mind-vib'), mu=$('mind-mute');
     function paintMute(m){ mu.classList.toggle('muted',!!m); mu.textContent=m?'🔇':'🔊'; mu.title=m?'Unmute':'Mute'; sd.disabled=!!m; }
@@ -24997,6 +25001,11 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:#4a3a96;lin
     sd.addEventListener('change',function(){ var x=load(); x.sound=sd.value; save(x); });
     $('mind-play').addEventListener('click',function(){ try{ var v=sd.value; playAlertPreset(/^[a-z]{1,12}$/.test(v)&&v!=='phone' ? v : 'xylophone'); }catch(e){} });
     vb.addEventListener('change',function(){ var x=load(); x.vibrate=vb.checked; save(x); });
+    $('mind-prev').addEventListener('click',function(){   // the real notification, with today's thought
+      var th='Take a slow breath. You don’t have to solve everything today.';
+      try{ var r=window.ayuMindRules&&window.ayuMindRules(); if(r&&r.items&&r.items.length){ var d=Math.floor((Date.now()-new Date().getTimezoneOffset()*-60000)/86400000); th=r.items[((d%r.items.length)+r.items.length)%r.items.length]; } }catch(e){}
+      if(window.ayuPreviewNote) window.ayuPreviewNote('',th,'mind','preview-mind',[],'mind');
+    });
     return true;
   }
   // for the phone: the alert's time, sound, vibration and every thought that is showing
