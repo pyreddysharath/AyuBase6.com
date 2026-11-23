@@ -18851,12 +18851,12 @@ html body #rem-alarm-card.alert-card{background-color:var(--tl-5eead4,#5eead4) !
       sl.addEventListener('input',applyMode); sl.addEventListener('change',applyMode);
       // Locked until the person taps the lock, so a scroll or a stray touch cannot change the time; it locks again after 10 seconds
       if(!$('wake-lock')){
-        var LK='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path class="lk-sh" d="M8 11V8a4 4 0 018 0v3"/></svg>';
+        var LK='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>', LKO='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 017.5-2"/></svg>';
         var lk=document.createElement('button'); lk.type='button'; lk.id='wake-lock'; lk.className='wake-lock';
         var lt=0, wc=card.querySelector('.wake-control');
         var setLock=function(on){ clearTimeout(lt); sl.disabled=on; lk.classList.toggle('open',!on); wc.classList.toggle('ayu-wake-locked',on);
           lk.setAttribute('aria-pressed',String(!on)); lk.setAttribute('aria-label',on?'Wake-up time is locked. Tap to change it':'Wake-up time can be changed. Tap to lock it');
-          lk.innerHTML=LK; if(!on) lt=setTimeout(function(){ setLock(true); },10000); };
+          lk.innerHTML=on?LK:LKO; if(!on) lt=setTimeout(function(){ setLock(true); },10000); };
         lk.addEventListener('click',function(){ setLock(!sl.disabled); });
         var bump=function(){ if(!sl.disabled){ clearTimeout(lt); lt=setTimeout(function(){ setLock(true); },10000); } };
         sl.addEventListener('input',bump); sl.addEventListener('change',bump);
@@ -26320,7 +26320,6 @@ html body #start-my-day-card .wake-lock.open:not(#ayu-x1):not(#ayu-x2):not(#ayu-
 html body #start-my-day-card .wake-control:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4)::after{content:"";display:block;width:44px;height:3px;border-radius:2px;background:var(--rout-2,#e8607a);margin:16px auto 0}
 html body #start-my-day-card .wake-lock svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 html body #start-my-day-card .wake-lock:not(.open) .lk-sh{}
-html body #start-my-day-card .wake-lock.open .lk-sh{transform:translateY(-2px)}
 html body #start-my-day-card .wake-range-ends .ayu-time-btn:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){border:2px solid var(--rout-2,#e8607a) !important;background:#fff !important;border-radius:16px !important;padding:6px 18px !important;display:inline-flex;align-items:center;gap:8px}
 html body #start-my-day-card .wake-range-ends .ayu-time-btn:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4)::before{content:"";width:18px;height:18px;flex:0 0 18px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c94862' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") no-repeat center/contain}
 /* Care: My Day Plan and Health Breaks as two separate chips, the open one filled */
