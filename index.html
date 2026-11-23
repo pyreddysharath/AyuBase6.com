@@ -15203,7 +15203,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       '<label class="wide"><span class="rf-l">Frequency</span><select name="frequency-mode"><option value="once">Only Once</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option>'+(saved.mode==='regular'?'<option value="regular">Every few minutes or hours</option>':'')+'</select></label>'+ 
       '<div class="wide reminder-frequency-fields"></div>'+ 
       '<div class="wide repeat-on"><div class="repeat-on-title rf-l">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Daily</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div></div>'+
-      '<label class="rf-sound"><span class="rf-l">Sound</span><span class="rf-snd"><select name="sound">'+(typeof window.ayuToneOptions==='function'?window.ayuToneOptions().replace(/<optgroup label="Your own">[\s\S]*?<\/optgroup>/,'').replace(/<option value="none">[^<]*<\/option>/,''):'<option value="xylophone">Xylophone</option><option value="chime">Chime</option><option value="drop">Water Drop</option><option value="drum">Drum</option>')+'</select><button type="button" class="alert-icon-btn rf-play" title="Preview sound" aria-label="Preview sound">\u25B6</button></span></label>'+ 
+      '<label class="rf-sound"><span class="rf-l">Sound</span><span class="rf-snd"><select name="sound">'+(typeof window.ayuToneOptions==='function'?window.ayuToneOptions().replace(/<optgroup label="Your own">[\s\S]*?<\/optgroup>/,'').replace(/<option value="none">[^<]*<\/option>/,''):'<option value="xylophone">Xylophone</option><option value="chime">Chime</option><option value="drop">Water Drop</option><option value="drum">Drum</option>')+'</select><button type="button" class="alert-icon-btn rf-play" title="Preview sound" aria-label="Preview sound">\u25B6</button><button type="button" class="alert-icon-btn rf-mute" title="Mute" aria-label="Mute"></button></span></label>'+ 
       '<div class="wide reminder-form-actions"><button class="save-reminder" type="submit">Save</button><button class="cancel-reminder" type="button">Cancel</button></div>';
     const freq=form.querySelector('[name="frequency-mode"]'), fields=form.querySelector('.reminder-frequency-fields');
     // Frequency: Only Once · Daily · Weekly · Monthly · Yearly. Stored as before: Daily = "selected" times every day, the others = "dates" with their schedule.
@@ -15271,8 +15271,11 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     // an open reminder: Save stays grey until something is changed
     const saveBtn=form.querySelector('.save-reminder');
     form.querySelector('.rf-play').addEventListener('click',()=>{try{playAlertPreset(form.elements.sound.value)}catch(e){}});
+    let muted=!!saved.muted; const muteBtn=form.querySelector('.rf-mute'), SPK_ON='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>', SPK_OFF='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
+    const paintMute=()=>{muteBtn.classList.toggle('muted',muted);muteBtn.innerHTML=muted?SPK_OFF:SPK_ON;muteBtn.title=muted?'Unmute':'Mute';muteBtn.setAttribute('aria-label',muteBtn.title)}; paintMute();
+    muteBtn.addEventListener('click',()=>{muted=!muted;paintMute()});
     (()=>{const snd=form.elements.sound&&form.elements.sound.closest('label');if(!snd||form.querySelector('.ayu-vib-fld'))return;const v=document.createElement('div');v.className='ayu-vib-fld ayu-vib-only';v.innerHTML='<span>Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" name="vibrate" aria-label="Vibrate"></label>';const sv=existing?JSON.parse(existing.dataset.reminder||'{}'):{};v.querySelector('input').checked=('vibrate' in sv)?sv.vibrate!==false:(typeof isMasterNotifyOn==='function'&&!!isMasterNotifyOn());snd.after(v)})();
-    const stateNow=()=>JSON.stringify([form.elements.speak?[form.elements.speak.checked,form.elements.speak.checked?form.elements.voice.value:'',form.elements.speak.checked&&form.elements.speakLang?form.elements.speakLang.value:'']:[!!saved.speak,saved.speak?(saved.voice||''):'',saved.speak?(saved.speakLang||''):''],mode.value==='dates'?[sched,onDay,mdays.join(',')]:0,String(form.elements.name.value).trim(),String(form.elements.notes.value).trim(),mode.value,mode.value==='regular'?duration:0,mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],form.elements.sound.value,[...days].sort((a,b)=>a-b),form.elements.vibrate?form.elements.vibrate.checked:true]);
+    const stateNow=()=>JSON.stringify([form.elements.speak?[form.elements.speak.checked,form.elements.speak.checked?form.elements.voice.value:'',form.elements.speak.checked&&form.elements.speakLang?form.elements.speakLang.value:'']:[!!saved.speak,saved.speak?(saved.voice||''):'',saved.speak?(saved.speakLang||''):''],mode.value==='dates'?[sched,onDay,mdays.join(',')]:0,String(form.elements.name.value).trim(),String(form.elements.notes.value).trim(),mode.value,mode.value==='regular'?duration:0,mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],form.elements.sound.value,[...days].sort((a,b)=>a-b),form.elements.vibrate?form.elements.vibrate.checked:true,muted]);
     const stateStart=stateNow();
     const checkDirty=()=>{if(existing)saveBtn.disabled=stateNow()===stateStart};
     ['input','change','click'].forEach(ev=>form.addEventListener(ev,()=>setTimeout(checkDirty,0)));
@@ -15283,6 +15286,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       stopReminderTimers(item);
       const data={speak:form.elements.speak?form.elements.speak.checked:false,voice:form.elements.voice?form.elements.voice.value:'',speakLang:form.elements.speakLang?form.elements.speakLang.value:'',name:String(d.get('name')).trim(),notes:notesText(String(d.get('notes')||''))?notesClean(d.get('notes')):'',mode:mode.value,duration:duration,times:mode.value!=='regular'?[...new Set(mode.value==='dates'&&sched==='once'?chosenTimes.slice(0,1):chosenTimes)].sort():[],sound:d.get('sound'),days:(freq.value==='weekly'||freq.value==='regular')?[...days].sort((a,b)=>a-b):[0,1,2,3,4,5,6],vibrate:form.elements.vibrate?form.elements.vibrate.checked:true};
       if(mode.value==='dates'){data.sched=sched;if(sched==='once'||sched==='yearly')data.date=onDay;if(sched==='monthly')data.mdays=mdays.slice().sort((a,b)=>a-b)}
+      if(muted)data.muted=true;
       if(saved.on===false)data.on=false;
       item.dataset.reminder=JSON.stringify(data);
       item.classList.remove('open');form.remove();window.ayuRemPaint(item,data);
@@ -22957,7 +22961,7 @@ html body #start-my-day-card #chk-alarm.ayu-sub:not(#ayu-x1){margin-bottom:0 !im
     if(remOn) document.querySelectorAll('#custom-reminders-list .custom-reminder-item').forEach(function(item){
       try{
         var d = JSON.parse(item.dataset.reminder||'{}'); if(!d.name || d.sound==='none' || d.on===false || d.kind==='medicine') return;
-        var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode }; var dt = window.ayuNotesText ? window.ayuNotesText(d.notes) : ''; if(dt) c.notes = dt.slice(0,1000);
+        var c = { id:item.dataset.reminderId||'', name:d.name, mode:d.mode }; if(d.muted) c.sound='none';   // muted: the phone vibrates only var dt = window.ayuNotesText ? window.ayuNotesText(d.notes) : ''; if(dt) c.notes = dt.slice(0,1000);
         if(Array.isArray(d.days) && d.days.length && d.days.length<7) c.days = d.days.filter(function(n){ return n>=0 && n<=6; });
         if(d.mode==='regular'){ c.every = Math.max(1, Number(d.duration)||1); c.anchor = Number(item.dataset.startedAt)||Date.now(); }
         else if(d.mode==='dates'){ c.sched = d.sched||'once'; if(d.date) c.date = d.date; if(Array.isArray(d.mdays)) c.mdays = d.mdays.slice(); if(c.sched!=='weekly') delete c.days; c.times = (d.times||[]).map(toMin).filter(function(m){ return m!==null; }); }
@@ -24961,9 +24965,11 @@ html body #mind-panel .mt-row .mt-lbl{font-weight:700;min-width:70px;font-size:.
 html body #mind-panel .mt-row .mt-lbl::before{content:'•';margin-right:6px;color:var(--mind-2,#6250b3);font-weight:800}
 html body #mind-panel .mt-row select{flex:1 1 140px;min-width:0;border:1.5px solid var(--mind-2,#6250b3);border-radius:10px;padding:3px 8px;min-height:0 !important;height:auto !important;font:inherit;font-size:.8rem !important;font-weight:400;line-height:1.3;background:#fff;color:var(--mind-1,#3730a3)}
 html body #mind-panel .mt-row .mt-time{border:1.5px solid var(--mind-2,#6250b3);border-radius:10px;background:#fff;color:var(--mind-1,#3730a3);font:inherit;font-size:.8125rem;font-weight:400;line-height:1.3;padding:3px 12px;cursor:pointer}
-html body #mind-panel .mt-row .mt-play{width:34px;height:34px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border:1.5px solid color-mix(in srgb,var(--mind-2,#6250b3) 45%,#fff);border-radius:10px;background:#fff;color:var(--mind-2,#6250b3);font-size:.9rem;line-height:1;cursor:pointer;padding:0}
+html body #mind-panel .mt-row .mt-play{width:30px;height:30px;box-sizing:border-box;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border:1.5px solid color-mix(in srgb,var(--mind-2,#6250b3) 45%,#fff);border-radius:10px;background:#fff;color:var(--mind-2,#6250b3);font-size:.9rem;line-height:1;cursor:pointer;padding:0}
 html body #mind-panel .mt-row:has(#mind-sound){flex-wrap:nowrap}
 html body #mind-panel .mt-row:has(#mind-sound) select{flex:1 1 0}
+html body #mind-panel .mt-row select#mind-sound{height:30px !important;box-sizing:border-box}
+html body #mind-panel .mt-row .mt-mute svg{display:block}
 html body #mind-panel .mt-row .mt-mute.muted{background:var(--mind-2,#6250b3);color:#fff;border-color:var(--mind-2,#6250b3)}
 .tp-overlay.mind-tp .tp-dialog{--tp-accent:var(--mind-2,#6250b3)}
 .tp-overlay.mind-tp{--alert-2:var(--mind-2,#6250b3);--tl-0d9488:var(--mind-2,#6250b3);--tl-134e4a:var(--mind-1,#3730a3)}
@@ -25048,12 +25054,13 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:#4a3a96;lin
     c.innerHTML='<div class="mind-card-hdr"><span class="mind-icon">🔔</span><h2>Daily Thought</h2><label class="master-switch" title="Daily thought alert"><input type="checkbox" id="mind-on" aria-label="Daily thought alert"></label></div>'
       +'<div class="mt-opts">'
       +'<div class="mt-row"><span class="mt-lbl">Time</span><button type="button" class="mt-time" id="mind-time"></button></div>'
-      +'<div class="mt-row"><span class="mt-lbl">Sound</span><select id="mind-sound" aria-label="Sound"></select><button type="button" class="mt-play" id="mind-play" title="Play" aria-label="Play the sound">▶</button><button type="button" class="mt-play mt-mute" id="mind-mute" title="Mute" aria-label="Mute">🔊</button></div>'
+      +'<div class="mt-row"><span class="mt-lbl">Sound</span><select id="mind-sound" aria-label="Sound"></select><button type="button" class="mt-play" id="mind-play" title="Play" aria-label="Play the sound">▶</button><button type="button" class="mt-play mt-mute" id="mind-mute" title="Mute" aria-label="Mute"></button></div>'
       +'<div class="mt-row mt-vib"><span class="mt-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" id="mind-vib" aria-label="Vibrate"></label></div>'
       +'<div class="alert-row alert-preview-row"><button type="button" class="alert-preview-btn ayu-prev-btn" id="mind-prev">Preview notification</button><span class="ayu-prev-msg" hidden></span></div></div>';
     pg.insertBefore(c,pg.firstChild);
     var on=$('mind-on'), tm=$('mind-time'), sd=$('mind-sound'), vb=$('mind-vib'), mu=$('mind-mute');
-    function paintMute(m){ mu.classList.toggle('muted',!!m); mu.textContent=m?'🔇':'🔊'; mu.title=m?'Unmute':'Mute'; sd.disabled=!!m; }
+    var SPK_ON='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>', SPK_OFF='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
+    function paintMute(m){ mu.classList.toggle('muted',!!m); mu.innerHTML=m?SPK_OFF:SPK_ON; mu.title=m?'Unmute':'Mute'; sd.disabled=!!m; }
     sd.innerHTML=toneList(); if(!sd.querySelector('option[value="'+o.sound+'"]')) o.sound='xylophone';
     on.checked=o.on; c.classList.toggle('mt-on',o.on); tm.textContent=fmt(hm(o.at)); sd.value=o.sound; vb.checked=o.vibrate; paintMute(o.muted);
     mu.addEventListener('click',function(){ var x=load(); x.muted=!x.muted; save(x); paintMute(x.muted); });
@@ -26212,7 +26219,10 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-f
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-vib-fld > span:not(#ayu-x1):not(#ayu-x2)::before{content:"\2022";color:var(--alert-2,#0d9488);margin-right:6px;font-weight:800}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd{display:flex;align-items:center;gap:8px;min-width:0}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .reminder-custom-select-wrap{flex:1 1 0 !important;min-width:0}
-html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .rf-play{flex:0 0 40px;width:40px;height:40px;min-width:40px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .alert-icon-btn{flex:0 0 30px;width:30px;height:30px;min-width:30px;min-height:30px;padding:0;color:var(--alert-2,#0d9488);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .reminder-custom-select-trigger:not(#ayu-x1):not(#ayu-x2){height:30px !important;min-height:30px !important;box-sizing:border-box}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .rf-mute svg{display:block}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .rf-mute.muted{background:var(--alert-2,#0d9488) !important;color:#fff !important;border-color:var(--alert-2,#0d9488) !important}
 </style>
 </body>
 
