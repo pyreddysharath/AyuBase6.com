@@ -16494,7 +16494,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   // Checks
   tab('routines','.tab-btn.routines',C.checks,'<b>Care</b>: your day, and your health breaks.',{care:'checks'});
   sec('routines','#routines-panel .ayu-sub-tabs.care',0,C.checks,'<b>Two parts</b>: My Day Plan and Health Breaks. Tap one to open it.',{care:'checks'});
-  sec('routines','#start-my-day-card',0,C.checks,'<b>My Day Plan</b>: set your wake-up time, any time in 24 hours: slide the bar, or tap the time under it for a clock. Every check below is timed from it. Outside 4–10 AM it becomes a shift schedule, with meals, light and sleep adjusted.',{care:'checks'});
+  sec('routines','#start-my-day-card',0,C.checks,'<b>My Day Plan</b>: set your wake-up time, any time in 24 hours: tap the lock, then slide the bar. It locks again by itself. Every check below is timed from it. Outside 4–10 AM it becomes a shift schedule, with meals, light and sleep adjusted.',{care:'checks'});
   sec('routines','#chk-alarm',0,C.checks,'<b>Wake-up Alarm</b>: rings at your wake-up time on the days you choose (or Once), with its sound, vibrate, ring time and snooze. <b>Preview notification</b> shows exactly how it rings.',{care:'checks'});
   sec('routines','#routines-notify-card',0,C.checks,'<b>Notify Me</b>: reminders for each check: when to remind you, on which days, the sound (or mute), Read aloud and Vibrate.',{care:'checks'});
   sec('routines','#ayu-checklist',0,C.checks,'<b>Daily Checklist</b>: your checks for the day, in four parts.',{care:'checks'});
@@ -18844,12 +18844,24 @@ html body #rem-alarm-card.alert-card{background-color:var(--tl-5eead4,#5eead4) !
         val.style.display='none';
         var lb=document.createElement('span'); lb.className='wake-bar-lbl'; lb.id='wake-bar-lbl'; lb.textContent='Wake-up time'; hdr.appendChild(lb);
         sl.setAttribute('aria-labelledby','wake-bar-lbl');
-        var tb=document.createElement('button'); tb.type='button'; tb.className='ayu-time-btn'; tb.id='ayu-wake-time'; tb.setAttribute('aria-label','Wake-up time: choose it on a clock');
-        tb.addEventListener('click',function(){ pickTime(wake(), +sl.step||15, 'var(--rout-2,#e8607a)', function(v){ setWake(v); }); });
+        var tb=document.createElement('button'); tb.type='button'; tb.className='ayu-time-btn'; tb.id='ayu-wake-time'; tb.setAttribute('aria-hidden','true'); tb.tabIndex=-1;
       }
       var ends=card.querySelector('.wake-range-ends');
       if(ends){ ends.innerHTML='<span>12:00 AM</span><span>11:45 PM</span>'; if(tb) ends.insertBefore(tb, ends.lastChild); }
       sl.addEventListener('input',applyMode); sl.addEventListener('change',applyMode);
+      // Locked until the person taps the lock, so a scroll or a stray touch cannot change the time; it locks again after 10 seconds
+      if(!$('wake-lock')){
+        var LK='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path class="lk-sh" d="M8 11V8a4 4 0 018 0v3"/></svg>';
+        var lk=document.createElement('button'); lk.type='button'; lk.id='wake-lock'; lk.className='wake-lock';
+        var lt=0, wc=card.querySelector('.wake-control');
+        var setLock=function(on){ clearTimeout(lt); sl.disabled=on; lk.classList.toggle('open',!on); wc.classList.toggle('ayu-wake-locked',on);
+          lk.setAttribute('aria-pressed',String(!on)); lk.setAttribute('aria-label',on?'Wake-up time is locked. Tap to change it':'Wake-up time can be changed. Tap to lock it');
+          lk.innerHTML=LK+'<span>'+(on?'Locked':'Unlocked')+'</span>'; if(!on) lt=setTimeout(function(){ setLock(true); },10000); };
+        lk.addEventListener('click',function(){ setLock(!sl.disabled); });
+        var bump=function(){ if(!sl.disabled){ clearTimeout(lt); lt=setTimeout(function(){ setLock(true); },10000); } };
+        sl.addEventListener('input',bump); sl.addEventListener('change',bump);
+        var hh=card.querySelector('.wake-control-hdr'); (hh||wc).after(lk); setLock(true);
+      }
     }
     // Alarm, then Notify Me, inside the same section
     var ctl=card.querySelector('.wake-control');
@@ -26290,8 +26302,16 @@ html[data-petal-card="e"] #nutrition-panel #sec-gender::after {
 /* My Day Plan: Wake-Up Alarm and Notify Me without boxes, each title with its own line under it */
 html body #start-my-day-card #chk-alarm:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4),html body #start-my-day-card #routines-notify-card:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){border:0 !important;border-radius:0 !important;background:transparent !important;box-shadow:none !important;margin:0 0 22px !important;padding-left:0 !important;padding-right:0 !important}
 html body #start-my-day-card #chk-alarm .ayu-sub-hdr:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4),html body #start-my-day-card #routines-notify-card > :first-child:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){border-bottom:2px solid transparent !important;border-image:linear-gradient(90deg,#e8607a,rgba(232,96,122,.08)) 1 !important;padding-bottom:8px !important;margin-bottom:10px !important}
-/* Wake-up time: set by tapping the time (the clock opens); the slider only shows it, so scrolling the page cannot change it */
-html body #start-my-day-card #wake-time-slider:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){pointer-events:none !important;touch-action:auto !important}
+/* Wake-up time: the slider is locked until the lock is tapped, so scrolling the page cannot change it */
+html body #start-my-day-card #wake-time-slider:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){touch-action:auto}
+html body #start-my-day-card .wake-control.ayu-wake-locked #wake-time-slider:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){pointer-events:none !important;opacity:.5;filter:grayscale(.6)}
+html body #start-my-day-card .wake-range-ends .ayu-time-btn:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4):not(#ayu-x5):not(#ayu-x6){pointer-events:none !important;border:0 !important;background:transparent !important;padding:6px 0 0 !important;font-weight:800 !important;font-size:15px !important}
+html body #start-my-day-card .wake-range-ends .ayu-time-btn:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4):not(#ayu-x5):not(#ayu-x6)::before{display:none !important}
+html body #start-my-day-card .wake-lock:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){display:flex;align-items:center;gap:6px;margin:6px auto 2px;padding:5px 14px;border:2px solid var(--rout-2,#e8607a);border-radius:999px;background:#fff;color:var(--rout-2,#e8607a);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+html body #start-my-day-card .wake-lock.open:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){background:var(--rout-2,#e8607a);color:#fff}
+html body #start-my-day-card .wake-lock svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+html body #start-my-day-card .wake-lock:not(.open) .lk-sh{}
+html body #start-my-day-card .wake-lock.open .lk-sh{transform:translateY(-2px)}
 html body #start-my-day-card .wake-range-ends .ayu-time-btn:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){border:2px solid var(--rout-2,#e8607a) !important;background:#fff !important;border-radius:16px !important;padding:6px 18px !important;display:inline-flex;align-items:center;gap:8px}
 html body #start-my-day-card .wake-range-ends .ayu-time-btn:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4)::before{content:"";width:18px;height:18px;flex:0 0 18px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c94862' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") no-repeat center/contain}
 /* Care: My Day Plan and Health Breaks as two separate chips, the open one filled */
