@@ -15198,15 +15198,17 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     const existing=editItem||null; if(existing)stopReminderTimers(existing);
     const saved=existing?JSON.parse(existing.dataset.reminder||'{}'):{};
     const form=document.createElement('form');form.className='custom-reminder-form';
-    form.innerHTML='<label class="wide">Reminder name<input name="name" required maxlength="80" placeholder="e.g. Medicines, school pickup"></label>'+ 
-      '<div class="wide rem-notes"><span class="rd-lbl">Notes</span><div class="rd-box"><div class="rd-bar"><button type="button" data-c="bold" aria-label="Bold" title="Bold"><b>B</b></button><button type="button" data-c="italic" aria-label="Italic" title="Italic"><i>I</i></button><button type="button" data-c="underline" aria-label="Underline" title="Underline"><u>U</u></button><button type="button" data-c="insertUnorderedList" aria-label="Bullet list" title="Bullet list">•≡</button><button type="button" class="rd-pop" aria-label="Show the notes in a pop-up" title="Show in a pop-up"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="rd-ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Notes" data-ph="Optional, e.g. dose or place"></div></div><input type="hidden" name="notes"></div>'+ 
-      '<label class="wide">Frequency<select name="frequency-mode"><option value="regular">At regular times</option><option value="selected">At selected times</option><option value="dates">On chosen dates</option></select></label>'+ 
+    form.innerHTML='<label class="wide"><span class="rf-l">Reminder name</span><input name="name" required maxlength="80" placeholder="e.g. Medicines, school pickup"></label>'+ 
+      '<div class="wide rem-notes"><span class="rd-lbl rf-l">Notes</span><div class="rd-box"><div class="rd-bar"><button type="button" data-c="bold" aria-label="Bold" title="Bold"><b>B</b></button><button type="button" data-c="italic" aria-label="Italic" title="Italic"><i>I</i></button><button type="button" data-c="underline" aria-label="Underline" title="Underline"><u>U</u></button><button type="button" data-c="insertUnorderedList" aria-label="Bullet list" title="Bullet list">•≡</button><button type="button" class="rd-pop" aria-label="Show the notes in a pop-up" title="Show in a pop-up"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="rd-ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Notes" data-ph="Optional, e.g. dose or place"></div></div><input type="hidden" name="notes"></div>'+ 
+      '<label class="wide"><span class="rf-l">Frequency</span><select name="frequency-mode"><option value="once">Only Once</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option>'+(saved.mode==='regular'?'<option value="regular">Every few minutes or hours</option>':'')+'</select></label>'+ 
       '<div class="wide reminder-frequency-fields"></div>'+ 
-      '<div class="wide repeat-on"><div class="repeat-on-title">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Daily</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div></div>'+
-      '<label>Sound<select name="sound">'+(typeof window.ayuToneOptions==='function'?window.ayuToneOptions().replace(/<optgroup label="Your own">[\s\S]*?<\/optgroup>/,'').replace(/<option value="none">[^<]*<\/option>/,''):'<option value="xylophone">Xylophone</option><option value="chime">Chime</option><option value="drop">Water Drop</option><option value="drum">Drum</option>')+'</select></label>'+ 
+      '<div class="wide repeat-on"><div class="repeat-on-title rf-l">On these days</div><div class="day-chips" role="group" aria-label="On these days"></div><div class="day-quick"><button type="button" data-q="all">Daily</button><button type="button" data-q="week">Weekdays</button><button type="button" data-q="wkend">Weekends</button></div></div>'+
+      '<label class="rf-sound"><span class="rf-l">Sound</span><span class="rf-snd"><select name="sound">'+(typeof window.ayuToneOptions==='function'?window.ayuToneOptions().replace(/<optgroup label="Your own">[\s\S]*?<\/optgroup>/,'').replace(/<option value="none">[^<]*<\/option>/,''):'<option value="xylophone">Xylophone</option><option value="chime">Chime</option><option value="drop">Water Drop</option><option value="drum">Drum</option>')+'</select><button type="button" class="alert-icon-btn rf-play" title="Preview sound" aria-label="Preview sound">\u25B6</button></span></label>'+ 
       '<div class="wide reminder-form-actions"><button class="save-reminder" type="submit">Save</button><button class="cancel-reminder" type="button">Cancel</button></div>';
-    const mode=form.querySelector('[name="frequency-mode"]'), fields=form.querySelector('.reminder-frequency-fields');
-    form.elements.name.value=saved.name||''; form.elements.notes.value=notesClean(saved.notes); form.elements.sound.value=saved.sound||'xylophone'; if(!form.elements.sound.value) form.elements.sound.value='xylophone'; mode.value=saved.mode||'selected';
+    const freq=form.querySelector('[name="frequency-mode"]'), fields=form.querySelector('.reminder-frequency-fields');
+    // Frequency: Only Once · Daily · Weekly · Monthly · Yearly. Stored as before: Daily = "selected" times every day, the others = "dates" with their schedule.
+    const mode={get value(){return freq.value==='regular'?'regular':freq.value==='daily'?'selected':'dates'},addEventListener(a,b){freq.addEventListener(a,b)}};
+    form.elements.name.value=saved.name||''; form.elements.notes.value=notesClean(saved.notes); form.elements.sound.value=saved.sound||'xylophone'; if(!form.elements.sound.value) form.elements.sound.value='xylophone'; freq.value=saved.mode==='regular'?'regular':saved.mode==='dates'?(['once','weekly','monthly','yearly'].indexOf(saved.sched)>=0?saved.sched:'once'):((Array.isArray(saved.days)&&saved.days.length&&saved.days.length<7)?'weekly':'daily');
     (function(){ const ed=form.querySelector('.rd-ed'), hid=form.elements.notes, MAXD=1000; ed.innerHTML=hid.value; let last=ed.innerHTML;
       const warn=()=>{ let w=form.querySelector('.rd-warn'); if(!w){ w=document.createElement('div'); w.className='rd-warn'; w.setAttribute('role','alert'); ed.closest('.rd-box').insertAdjacentElement('afterend',w); } w.textContent='Notes are limited to 1000 characters. The extra text was removed.'; };
       const unwarn=()=>{ const w=form.querySelector('.rd-warn'); if(w) w.remove(); };
@@ -15234,7 +15236,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     const todayISO=()=>{const t=new Date();return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')};
     let sched=['once','weekly','monthly','yearly'].indexOf(saved.sched)>=0?saved.sched:'once', onDay=saved.date||todayISO(), mdays=Array.isArray(saved.mdays)&&saved.mdays.length?saved.mdays.filter(n=>n>=1&&n<=31):[new Date().getDate()];
     const repeatOn=form.querySelector('.repeat-on');
-    const schedHtml=()=>'<label>Schedule<select name="sched"><option value="once">Only once</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></label><div class="sched-extra"></div>';
+    const schedHtml=()=>'<div class="sched-extra"></div>';
     function drawSched(){
       const ex=fields.querySelector('.sched-extra'); if(!ex)return;
       if(repeatOn)repeatOn.hidden=sched!=='weekly';
@@ -15249,7 +15251,8 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
       } else ex.innerHTML='';
     }
     function renderFrequency(){
-      if(repeatOn)repeatOn.hidden=mode.value==='dates'&&sched!=='weekly';
+      if(['once','weekly','monthly','yearly'].indexOf(freq.value)>=0)sched=freq.value;
+      if(repeatOn)repeatOn.hidden=!(freq.value==='weekly'||freq.value==='regular');
       if(mode.value==='regular'){
         fields.innerHTML='<label>Time <button type="button" class="duration-clock-trigger" aria-haspopup="dialog"></button></label>';
         const btn=fields.querySelector('.duration-clock-trigger');
@@ -15257,7 +15260,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
         btn.addEventListener('click',()=>openDurationPicker(duration,v=>{duration=v;showDuration()}));
       } else {
         fields.innerHTML=(mode.value==='dates'?schedHtml():'')+'<div class="selected-times-wrap"><span class="st-lbl">Time</span><div class="st-col"><div class="selected-times-list"></div><button type="button" class="add-selected-time"><b class="plus-t">+</b> Add time</button></div></div>';
-        if(mode.value==='dates'){const sc=fields.querySelector('[name="sched"]');sc.value=sched;sc.addEventListener('change',()=>{sched=sc.value;drawSched();if(fields._once)fields._once()});drawSched()}
+        if(mode.value==='dates')drawSched();
         const timesList=fields.querySelector('.selected-times-list');
         function drawTimes(){timesList.innerHTML='';chosenTimes.forEach((t,i)=>{const row=document.createElement('div');row.className='selected-time-row';const b=document.createElement('button');b.type='button';b.className='duration-clock-trigger selected-time-btn';b.textContent=formatClock(t);b.addEventListener('click',()=>openTimePicker('custom',t,v=>{chosenTimes[i]=v;drawTimes()},'Select time'));const rm=document.createElement('button');rm.type='button';rm.className='remove-selected-time';rm.textContent='×';rm.setAttribute('aria-label','Remove time');rm.disabled=chosenTimes.length===1;rm.addEventListener('click',()=>{chosenTimes.splice(i,1);drawTimes()});row.append(b,rm);timesList.append(row)})}
         fields._once=function(){const one=mode.value==='dates'&&sched==='once';if(one&&chosenTimes.length>1)chosenTimes=chosenTimes.slice(0,1);fields.querySelector('.add-selected-time').hidden=one;drawTimes()};fields._once();fields.querySelector('.add-selected-time').addEventListener('click',()=>{chosenTimes.push('09:00');drawTimes();const b=timesList.lastElementChild?.querySelector('button');if(b)b.click()});
@@ -15267,6 +15270,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     form.querySelector('.cancel-reminder').addEventListener('click',()=>{form.remove();if(existing){existing.classList.remove('open');const h=existing.querySelector('.cri-hdr');if(h)h.setAttribute('aria-expanded','false');startReminder(existing)}});
     // an open reminder: Save stays grey until something is changed
     const saveBtn=form.querySelector('.save-reminder');
+    form.querySelector('.rf-play').addEventListener('click',()=>{try{playAlertPreset(form.elements.sound.value)}catch(e){}});
     (()=>{const snd=form.elements.sound&&form.elements.sound.closest('label');if(!snd||form.querySelector('.ayu-vib-fld'))return;const v=document.createElement('div');v.className='ayu-vib-fld ayu-vib-only';v.innerHTML='<span>Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" name="vibrate" aria-label="Vibrate"></label>';const sv=existing?JSON.parse(existing.dataset.reminder||'{}'):{};v.querySelector('input').checked=('vibrate' in sv)?sv.vibrate!==false:(typeof isMasterNotifyOn==='function'&&!!isMasterNotifyOn());snd.after(v)})();
     const stateNow=()=>JSON.stringify([form.elements.speak?[form.elements.speak.checked,form.elements.speak.checked?form.elements.voice.value:'',form.elements.speak.checked&&form.elements.speakLang?form.elements.speakLang.value:'']:[!!saved.speak,saved.speak?(saved.voice||''):'',saved.speak?(saved.speakLang||''):''],mode.value==='dates'?[sched,onDay,mdays.join(',')]:0,String(form.elements.name.value).trim(),String(form.elements.notes.value).trim(),mode.value,mode.value==='regular'?duration:0,mode.value!=='regular'?[...new Set(chosenTimes)].sort():[],form.elements.sound.value,[...days].sort((a,b)=>a-b),form.elements.vibrate?form.elements.vibrate.checked:true]);
     const stateStart=stateNow();
@@ -15277,7 +15281,7 @@ if(document.fonts && document.fonts.ready){ document.fonts.ready.then(resyncTabU
     form.addEventListener('submit',function(e){
       e.preventDefault();const d=new FormData(form);const item=existing||document.createElement('div');if(!existing){item.className='custom-reminder-item';item.dataset.reminderId=String(++customReminderCounter)}
       stopReminderTimers(item);
-      const data={speak:form.elements.speak?form.elements.speak.checked:false,voice:form.elements.voice?form.elements.voice.value:'',speakLang:form.elements.speakLang?form.elements.speakLang.value:'',name:String(d.get('name')).trim(),notes:notesText(String(d.get('notes')||''))?notesClean(d.get('notes')):'',mode:mode.value,duration:duration,times:mode.value!=='regular'?[...new Set(mode.value==='dates'&&sched==='once'?chosenTimes.slice(0,1):chosenTimes)].sort():[],sound:d.get('sound'),days:(mode.value==='dates'&&sched!=='weekly')?[0,1,2,3,4,5,6]:[...days].sort((a,b)=>a-b),vibrate:form.elements.vibrate?form.elements.vibrate.checked:true};
+      const data={speak:form.elements.speak?form.elements.speak.checked:false,voice:form.elements.voice?form.elements.voice.value:'',speakLang:form.elements.speakLang?form.elements.speakLang.value:'',name:String(d.get('name')).trim(),notes:notesText(String(d.get('notes')||''))?notesClean(d.get('notes')):'',mode:mode.value,duration:duration,times:mode.value!=='regular'?[...new Set(mode.value==='dates'&&sched==='once'?chosenTimes.slice(0,1):chosenTimes)].sort():[],sound:d.get('sound'),days:(freq.value==='weekly'||freq.value==='regular')?[...days].sort((a,b)=>a-b):[0,1,2,3,4,5,6],vibrate:form.elements.vibrate?form.elements.vibrate.checked:true};
       if(mode.value==='dates'){data.sched=sched;if(sched==='once'||sched==='yearly')data.date=onDay;if(sched==='monthly')data.mdays=mdays.slice().sort((a,b)=>a-b)}
       if(saved.on===false)data.on=false;
       item.dataset.reminder=JSON.stringify(data);
@@ -16505,7 +16509,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   // Reminders
   tab('alerts','.tab-btn.alerts',C.rem,'Gentle nudges, alarms and timers through the day.');
   sec('alerts','#alerts-panel .ayu-sub-tabs.rem5',0,C.rem,'<b>Five parts</b>: Personal, Alarm, Timer, Stopwatch and World Clock. Tap one to open it.');
-  sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: tap <b>+</b> to add a <b>Medicine</b> (doses with Taken, Snooze and Skip, and a history table) or a <b>Reminder</b>: at set times, every so often, or on chosen dates.');
+  sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: tap <b>+</b> to add a <b>Medicine</b> (doses with Taken, Snooze and Skip, and a history table) or a <b>Reminder</b> with a Frequency of Only Once, Daily, Weekly, Monthly or Yearly.');
   sec('alerts','#rem-alarm-card .clk-now',0,C.rem,'<b>Clock</b>: the time and date now, above Alarm, Timer, Stopwatch and World Clock.');
   sec('alerts','#rem-tap-row',0,C.rem,'<b>Phone’s time opens</b>: your phone’s Clock app or AyuBase6, while an AyuBase6 alarm is next.');
   sec('alerts','#rem-alarm-card .ayu-add-row',0,C.rem,'<b>Alarm</b>: add an alarm, set it and tap <b>Save</b>. Each has its own time, days (or Once), sound, vibrate and snooze. Expired ones show in amber at the top.');
@@ -20817,8 +20821,8 @@ html body #calculator-panel .calc-page > .calc-card h2 .ayu-i{margin-left:6px !i
 (function(){
   function $(id){ return document.getElementById(id); }
   var PERSONAL_INFO='<ul><li>Add your own reminders with <b>+ Add a reminder</b>: a name, how often or at set times, the days and the sound.</li>'
-    +'<li><b>Frequency</b>: <b>At regular times</b> (every few minutes or hours), <b>At selected times</b> (clock times each day) or <b>On chosen dates</b>.</li>'
-    +'<li><b>On chosen dates</b> has a <b>Schedule</b>: <b>Only once</b> (on one date), <b>Weekly</b> (every week on the days you pick), <b>Monthly</b> (on the days of the month you pick; a day the month does not have, like the 31st, reminds on its last day) or <b>Yearly</b> (the same day every year, today by default). Add one or more times for it.</li>'
+    +'<li><b>Frequency</b>: <b>Only Once</b>, <b>Daily</b>, <b>Weekly</b>, <b>Monthly</b> or <b>Yearly</b>.</li>'
+    +'<li><b>Weekly</b> reminds every week on the days you pick; <b>Monthly</b> on the days of the month you pick (a day the month does not have, like the 31st, reminds on its last day); <b>Yearly</b> on the same day every year. Add one or more times for it.</li>'
     +'<li>Tap a reminder to open and change it; × deletes it (Undo for 5 seconds).</li>'
     +'<li>On the website they arrive while AyuBase6 is open; the Android app sends them even when it is closed.</li></ul>';
   function title(host, tabBtn, name){
@@ -26199,6 +26203,17 @@ html body #sec-notifications #ns-look-box > .ns-h:not(#ayu-x1):not(#ayu-x2)::bef
   setInterval(function(){ var s=$('sec-notifications'); if(!s || s.offsetParent===null) return; buildLook(); apply(); },700);
 })();
 </script>
+<style id="rem-form-20261123">
+/* Personal Reminders form: a dot before every field, and Sound drawn like Water's (list, then ▶) */
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-l:not(#ayu-x1):not(#ayu-x2)::before,
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-frequency-fields .st-lbl:not(#ayu-x1):not(#ayu-x2)::before,
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-frequency-fields .sched-date > span:not(#ayu-x1):not(#ayu-x2)::before,
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-frequency-fields > label > span:not(.sched-date):not(#ayu-x1):not(#ayu-x2)::before,
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .ayu-vib-fld > span:not(#ayu-x1):not(#ayu-x2)::before{content:"\2022";color:var(--alert-2,#0d9488);margin-right:6px;font-weight:800}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd{display:flex;align-items:center;gap:8px;min-width:0}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .reminder-custom-select-wrap{flex:1 1 0 !important;min-width:0}
+html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .rf-play{flex:0 0 40px;width:40px;height:40px;min-width:40px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
