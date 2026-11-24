@@ -28988,6 +28988,8 @@ html body #alerts-panel .alert-page[data-remtab="breaks"] button.eye-ex-time-ite
 })();
 </script>
 <style id="care-ac-note-20261124">
+/* Notify Me i: filled only while its text is open (touch screens keep :hover / :focus after a tap) */
+html body #routines-panel #routines-notify-card .rout-card-hdr .ayu-sec-i:not(.active):not(#ayu-x1):not(#ayu-x2){background:#fff !important;color:var(--rout-2,#41aad4) !important;border-color:var(--rout-3,#a6d9ee) !important}
 html body .ayu-ac-note{margin:8px 0 0 18px}
 html body .ayu-ac-note .ayu-ac-h{font-weight:800;color:#1a6585;margin-bottom:2px}
 html body #routines-panel #routines-notify-card.ayu-in-day.ayu-closed > #rout-info-notify[style*="block"]:not(#ayu-x1):not(#ayu-x2){display:block !important;margin:8px 0 4px !important}
@@ -29058,7 +29060,7 @@ html body .ayu-care-bt .bt-n{margin:5px 0 0;font-size:.76rem;line-height:1.35;co
 /* Notify Me i: the text always opens right under the title (also when the section is open); the i fills while it shows, a second tap clears it */
 (function(){
   function place(){ var c=document.getElementById('routines-notify-card'), n=document.getElementById('rout-info-notify'); if(!c||!n) return; var h=c.querySelector('.rout-card-hdr'); if(h && n.previousElementSibling!==h) h.after(n); }
-  document.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('#routines-notify-card .ayu-sec-i'); if(b) place(); },true);
+  document.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('#routines-notify-card .ayu-sec-i'); if(b){ place(); setTimeout(function(){ try{ b.blur(); }catch(x){} },0); } },true);
   place(); setInterval(place,1000);
 })();
 </script>
