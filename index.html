@@ -20000,7 +20000,7 @@ html body #start-my-day-card .rout-info-panel .mdp-sec > b.mdp-t{color:var(--fp-
       +'<div class="mdp-sec"><b class="mdp-t">Notify Me</b><ul>'
       +'<li>Notifications for every check. <b>Start time</b>: when it begins. <b>Start time + before end time</b>: also 15 minutes before it closes.</li><li><b>Sound</b> and <b>Vibrate</b> are for these notifications only; the Wake-up Alarm has its own.</li>'
       +'<li><b>On these days</b> picks the days. Each notification has <b>Done</b> and <b>Not yet</b>.</li>'
-      +'<li><b>Auto-close</b> and <b>Just remind me</b> (no buttons) are in Settings → Notifications → Care.</li>'
+      +'<li><b>Auto-close</b> (Settings → Notifications → Care) closes Care notifications by itself.</li>'
       +(APP?'<li>They arrive even when AyuBase6 is closed, with or without internet.</li>'
            :'<li>They arrive while AyuBase6 is open (any tab or the app window); the computer must stay awake.</li>')
       +'</ul></div>';
@@ -28763,7 +28763,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       +'<ul style="margin:4px 0 8px 18px;padding:0"><li><b>At start:</b> one notification when an activity begins.</li>'
       +'<li><b>Start + before end:</b> also a reminder 15 minutes before its window closes (activities shorter than 15 minutes get only the start).</li>'
       +'<li>Each notification has <b>Done</b> (ticks it) and <b>Not yet</b>.</li>'
-      +'<li><b>Auto-close</b> and <b>Just remind me</b> (no buttons) are in Settings → Notifications → Care.</li></ul>'
+      +'<li><b>Auto-close</b> (Settings → Notifications → Care) closes Care notifications by itself.</li></ul>'
       +'<strong>On a computer</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Notifications work whenever AyuBase6 is open in a browser tab or the app window. It does not need to be in front, so you can use other tabs and windows. They work without internet too. The computer must stay awake.</li></ul><strong>On a phone</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Notifications come only from the open app, so keep it open, with or without internet. This can’t be guaranteed: a phone may pause a locked or background app.</li><li><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</li><li><b>iPhone:</b> open the app from its Home Screen icon. Check that Settings → Notifications → AyuBase6 is allowed. If notifications are late, turn off Low Power Mode and any Focus that silences the app.</li></ul><strong>Good to know</strong><ul style="margin:4px 0 0 18px;padding:0">'
       +'<li><b>To install:</b> see <b>Backup & Restore → Download App</b>.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li></ul>'; }
@@ -29018,27 +29018,8 @@ html body .ayu-care-bt .bt-chips button.on{background:var(--footer-accent,var(--
 html body .ayu-care-bt .bt-n{margin:5px 0 0;font-size:.76rem;line-height:1.35;color:#64748b}
 </style>
 <script id="care-buttons-20261124-js">
-(function(){
-  var K='ayuBase6-care-buttons';
-  function on(){ try{ return localStorage.getItem(K)!=='off'; }catch(e){ return true; } }
-  window.ayuCareButtons=on;
-  var el=null;
-  function paint(){ if(!el) return; var v=on(); [].forEach.call(el.querySelectorAll('button[data-b]'),function(b){ var m=(b.dataset.b==='1')===v; b.classList.toggle('on',m); b.setAttribute('aria-checked',m?'true':'false'); }); el.querySelector('.bt-n').textContent=v?'The notification has Done and Not yet.':'No buttons: just the reminder. Tick the item in the app. Turn on Auto-close so the notification goes away by itself.'; }
-  function mk(){
-    var d=document.createElement('div'); d.className='ayu-care-bt';
-    d.innerHTML='<div class="bt-t">Day Plan buttons</div><div class="bt-chips" role="radiogroup" aria-label="Day Plan buttons"><button type="button" role="radio" data-b="1">Done / Not yet</button><button type="button" role="radio" data-b="0">Just remind me</button></div><p class="bt-n"></p>';
-    d.querySelector('.bt-chips').addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('button[data-b]'); if(!b) return; try{ if(b.dataset.b==='1') localStorage.removeItem(K); else localStorage.setItem(K,'off'); }catch(x){} try{ if(window.ayuNative && window.ayuNative.sync) setTimeout(window.ayuNative.sync,200); }catch(x){} paint(); });
-    return d;
-  }
-  function place(){
-    var slot=document.getElementById('na-care-ad'); if(!slot) return;
-    if(!el) el=mk();
-    var ad=slot.querySelector('.ayu-care-ad');
-    if(el.parentNode!==slot || (ad && ad.nextSibling!==el)){ if(ad) ad.after(el); else slot.appendChild(el); }
-    paint();
-  }
-  setInterval(place,1000);
-})();
+/* Day Plan notifications always have Done / Not yet (the "Day Plan buttons" choice was removed) */
+(function(){ try{ localStorage.removeItem('ayuBase6-care-buttons'); }catch(e){} window.ayuCareButtons=function(){ return true; }; })();
 </script>
 <script id="last-tab-20261124-js">
 /* The app opens on the tab used last (not always Body) */
