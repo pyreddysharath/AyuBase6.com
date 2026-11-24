@@ -29268,6 +29268,34 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
 .med-hist .mh-pdf{padding:8px 18px;border:0;border-radius:10px;background:var(--mh);color:#fff;font:inherit;font-weight:700;cursor:pointer}
 .med-hist .mh-close{padding:8px 18px;border:1.5px solid var(--mh);border-radius:10px;background:#fff;color:var(--mh);font:inherit;font-weight:700;cursor:pointer}
 
+/* Medicine redesign 20261124: flat layout, one box only */
+html body #alerts-panel .med-form .med-dose,html body #alerts-panel .med-form .med-dose.md-c1{border:0;background:none;border-radius:0;padding:0 0 4px;margin:0 0 10px}
+html body #alerts-panel .med-form .med-dose + .med-dose{border-top:1px dashed #c3cfa3;padding-top:10px}
+html body #alerts-panel .med-form .med-name{margin-bottom:8px}
+html body #alerts-panel .med-item.open > .cri-hdr{display:none}
+html body #alerts-panel .med-item.open .med-form{border:0;background:none;padding:0;margin:0}
+html body #alerts-panel .med-form .md-seg{flex-wrap:wrap}
+html body #alerts-panel .med-form .md-seg button{flex:1 1 auto;padding:6px 8px;font-size:.76rem;white-space:nowrap}
+html body #alerts-panel .med-form .md-till{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px}
+html body #alerts-panel .med-form .md-till .md-seg{flex:none;flex-wrap:nowrap}
+html body #alerts-panel .med-form .md-till .md-seg button{flex:none;padding:6px 9px}
+html body #alerts-panel .med-form .md-till .md-ctl{width:100%;min-width:0;padding:5px 6px;font-size:.8rem}
+html body #alerts-panel .med-form .md-snd{display:flex;align-items:center;gap:6px;min-width:0}
+html body #alerts-panel .med-form .md-snd .md-sound{flex:1;min-width:0}
+html body #alerts-panel .med-form .md-ic{flex:0 0 32px;width:32px;height:32px;border-radius:10px;border:1.5px solid var(--mcbd);background:var(--mcb);color:var(--mca);display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+html body #alerts-panel .med-form .md-ic.muted{background:var(--mca);color:#fff;border-color:var(--mca)}
+/* history */
+.med-hist .mh-t th.mh-corner{font-size:.72rem;color:#8a9964;font-weight:700;vertical-align:bottom}
+.med-hist .mh-t th.mh-nm{vertical-align:middle;min-width:110px}
+.med-hist .mh-t td,.med-hist .mh-t th.mh-d{width:28px}
+.med-hist .mh-wk td,.med-hist .mh-wk th.mh-d{width:auto}
+.med-hist .mh-act{flex-wrap:wrap}
+.med-hist .mh-t td.ok{background:#c9df8f;color:#4d6b0a}
+.med-hist .mh-lg b.ok{background:#c9df8f}
+.med-hist .mh-lg b.f{background:#e3e7da}
+.med-hist .mh-t td.f{background:#e8ebe1}
+.med-hist .mh-clear{padding:8px 16px;border:1.5px solid #b91c1c;border-radius:10px;background:#fff;color:#b91c1c;font:inherit;font-weight:700;cursor:pointer}
+.med-hist .mh-clear.sure{background:#b91c1c;color:#fff}
 </style>
 <script id="medicine-20261123-js">
 (function(){
@@ -29329,7 +29357,7 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
 
   // ── on the website: ring at the dose time ──
   var ACTS=[{action:'taken',title:'✓ Taken'},{action:'snooze10',title:'Snooze 10 min'},{action:'skipped',title:'Skip'}];
-  function bodyText(dose){ var m=String(dose&&dose.med||'').trim(); return m ? 'Time to take '+m+'. Did you take it?' : 'Time for your medicine. Did you take it?'; }
+  function bodyText(dose){ return String(dose&&dose.med||'').trim() || 'Medicine'; }
   function fire(data,dose){
     try{
       if(window.ayuLeader===false) return;
@@ -29364,6 +29392,11 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
 
   // ── the list: names, and "Medicine" / "Reminders" sections ──
   function medSub(d){
+    var names=[]; (d.doses||[]).forEach(function(x){ var m=String(x.med||'').trim(); if(m && names.indexOf(m)<0) names.push(m); });
+    var nm=names.length>2 ? names.slice(0,2).join(', ')+' +'+(names.length-2) : names.join(', ');
+    var t=timesSub(d); return nm ? nm+' · '+t : t;
+  }
+  function timesSub(d){
     var ds=d.doses||[], seen={}, times=[];
     ds.slice().sort(function(a,b){ return (toMin(a.time)||0)-(toMin(b.time)||0); }).forEach(function(x){ if(!seen[x.time]){ seen[x.time]=1; times.push(clock(x.time)); } });
     var s=times.join(' · '), weekly=ds.filter(function(x){ return x.rep!=='once'; });
@@ -29418,10 +29451,16 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
 
   // ── the Medicine form ──
   var SOUND_OPTS=function(){ return (typeof window.ayuToneOptions==='function' ? window.ayuToneOptions().replace(/<optgroup label="Your own">[\s\S]*?<\/optgroup>/,'').replace(/<option value="none">[^<]*<\/option>/,'') : '<option value="xylophone">Xylophone</option><option value="chime">Chime</option><option value="drop">Water Drop</option><option value="drum">Drum</option>'); };
-  function newDose(n,prev){
-    var t='08:00'; if(prev){ var m=toMin(prev.time)||480; t=p2(Math.floor(((m+(n===1?720:240))%1440)/60))+':'+p2((m+(n===1?720:240))%60); }
-    return {n:n,med:'',time:t,rep:'week',days:[0,1,2,3,4,5,6],date:iso(),till:'days',tillDays:30,until:'',untilDate:'',sound:prev ? prev.sound : 'xylophone',vibrate:prev ? prev.vibrate!==false : true};
+  var WHEN_T={morning:'08:00',noon:'13:00',evening:'18:00',night:'21:00'}, FREQ_T={1:['08:00'],2:['08:00','20:00'],3:['08:00','14:00','21:00']};
+  function whenOf(t){ var m=toMin(t); if(m===null) return ''; return m>=300&&m<720 ? 'morning' : m>=720&&m<1020 ? 'noon' : m>=1020&&m<1260 ? 'evening' : 'night'; }
+  function newDose(n,prev,g){
+    var t='08:00'; if(prev){ var m=toMin(prev.time)||480; t=p2(Math.floor(((m+720)%1440)/60))+':'+p2((m+720)%60); }
+    return {n:n,g:g||('g'+n),med:'',time:t,rep:'week',days:[0,1,2,3,4,5,6],date:iso(),till:'days',tillDays:30,until:'',untilDate:'',food:'',muted:prev ? !!prev.muted : false,sound:prev ? prev.sound : 'xylophone',vibrate:prev ? prev.vibrate!==false : true};
   }
+  var FOODS=[['before','Before food'],['after','After food'],['with','With food'],['empty','Empty stomach']];
+  var SPKON='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  var SPKOFF='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
+  var PLAY='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>';
   function openForm(existing){
     var l=list(); if(!l) return;
     closeForms();
@@ -29430,34 +29469,60 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
     var doses=(saved.doses||[]).map(function(x){ return JSON.parse(JSON.stringify(x)); });
     if(!doses.length) doses=[newDose(0,null)];
     var form=document.createElement('form'); form.className='med-form'; form.noValidate=true;
-    form.innerHTML='<label class="med-name"><span class="md-lbl">Name</span><input class="md-ctl" name="name" maxlength="80" autocomplete="off" placeholder="Person or treatment"></label>'
-      +'<div class="med-hint">Person name or treatment or both</div>'
+    form.innerHTML='<label class="med-name"><span class="md-lbl">Name</span><input class="md-ctl" name="name" maxlength="80" autocomplete="off" ></label>'
       +'<div class="med-doses"></div>'
-      +'<button type="button" class="med-add-dose"><span class="med-plus" aria-hidden="true">+</span><span>Add another dose</span></button>'
+      +'<button type="button" class="med-add-dose"><span class="med-plus" aria-hidden="true">+</span><span>Add another</span></button>'
       +'<div class="med-msg" role="alert" hidden></div>'
       +'<div class="reminder-form-actions"><button class="save-reminder" type="submit">Save</button><button class="cancel-reminder" type="button">Cancel</button></div>';
     form.elements.name.value=saved.name||'';
     var box=form.querySelector('.med-doses');
     function msg(t){ var m=form.querySelector('.med-msg'); m.textContent=t||''; m.hidden=!t; }
+    function gid(d){ return d.g!=null ? String(d.g) : 'n'+d.n; }
+    function groups(){ var o=[],seen={}; doses.forEach(function(d){ var k=gid(d); if(!seen[k]){ seen[k]=[]; o.push(seen[k]); } seen[k].push(d); }); return o; }
     function draw(){
       box.innerHTML='';
-      doses.forEach(function(d,i){ box.append(doseBlock(d,i)); });
+      groups().forEach(function(g){ box.append(doseBlock(g)); });
     }
-    function doseBlock(d,i){
-      var b=document.createElement('div'); b.className='med-dose md-c'+(i%2);
+    function setFreq(g,N){
+      var d=g[0], k=gid(d);
+      while(g.length>N){ var x=g.pop(); doses.splice(doses.indexOf(x),1); }
+      while(g.length<N){
+        var n=doses.reduce(function(a,y){ return Math.max(a,y.n); },-1)+1, c=newDose(n,d,k);
+        c.time=(FREQ_T[N]||FREQ_T[3])[g.length]; c.days=d.days.slice(); c.sound=d.sound; c.muted=d.muted; c.vibrate=d.vibrate;
+        doses.splice(doses.indexOf(g[g.length-1])+1,0,c); g.push(c);
+      }
+      draw();
+    }
+    function doseBlock(g){
+      var d=g[0], b=document.createElement('div'); b.className='med-dose';
       var weekly=d.rep!=='once';
-      b.innerHTML='<div class="md-row md-r-med"><span class="md-lbl">Medicine</span><div class="md-medbox"><input class="md-ctl md-med" maxlength="80" autocomplete="off" placeholder="Medicine name or treatment" aria-label="Medicine name or treatment">'+(doses.length>1 ? '<button type="button" class="md-x" aria-label="Remove this medicine" title="Remove">✕</button>' : '')+'</div></div>'
-        +'<div class="md-row"><span class="md-lbl">Time</span><button type="button" class="md-ctl md-time duration-clock-trigger"></button></div>'
+      b.innerHTML='<div class="md-row md-r-med"><span class="md-lbl">Medicine</span><div class="md-medbox"><input class="md-ctl md-med" maxlength="80" autocomplete="off" aria-label="Medicine">'+(groups().length>1 ? '<button type="button" class="md-x" aria-label="Remove this medicine">✕</button>' : '')+'</div></div>'
+        +'<div class="md-row"><span class="md-lbl">Frequency</span><div class="md-seg md-freq" role="group" aria-label="Frequency"><button type="button" data-v="1">Once a day</button><button type="button" data-v="2">Twice</button><button type="button" data-v="3">3 times</button></div></div>'
+        +'<div class="md-times"></div>'
+        +'<div class="md-row"><span class="md-lbl">Food</span><div class="md-seg md-food" role="group" aria-label="Food">'+FOODS.map(function(f){ return '<button type="button" data-v="'+f[0]+'">'+f[1]+'</button>'; }).join('')+'</div></div>'
         +'<div class="md-row md-r-days" '+(weekly?'':'hidden')+'><span class="md-lbl">On days</span><div class="md-days" role="group" aria-label="On days"></div></div>'
-        +'<div class="md-row"><span class="md-lbl">Repeat</span><div class="md-seg md-rep" role="group" aria-label="Repeat"><button type="button" data-v="once">Only once</button><button type="button" data-v="week">Every week</button></div></div>'
         +'<div class="md-row md-r-date" '+(weekly?'hidden':'')+'><span class="md-lbl">On</span><input type="date" class="md-ctl md-date" aria-label="Date"></div>'
         +'<div class="md-row md-r-till" '+(weekly?'':'hidden')+'><span class="md-lbl">Till</span><div class="md-till"><div class="md-seg md-tm" role="group" aria-label="Till"><button type="button" data-v="days">Days</button><button type="button" data-v="date">Date</button></div><input type="number" min="1" max="365" inputmode="numeric" class="md-ctl md-tdays" aria-label="Number of days"><input type="date" class="md-ctl md-tdate" aria-label="Last day"></div></div>'
-        +'<div class="md-row"><span class="md-lbl">Sound</span><select class="md-ctl md-sound">'+SOUND_OPTS()+'</select></div>'
+        +'<div class="md-row"><span class="md-lbl">Sound</span><span class="md-snd"><select class="md-ctl md-sound">'+SOUND_OPTS()+'</select><button type="button" class="md-ic md-play" aria-label="Play sound" title="Play">'+PLAY+'</button><button type="button" class="md-ic md-mute" title="Mute"></button></span></div>'
         +'<div class="md-row ayu-vib-only"><span class="md-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" class="md-vib" aria-label="Vibrate"></label></div>'
         +'<div class="md-prev-row"><button type="button" class="alert-preview-btn ayu-prev-btn md-prev">Preview notification</button><span class="ayu-prev-msg" hidden></span></div>';
+      var fq=b.querySelector('.md-freq'); fq.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-pressed',String(+x.dataset.v===g.length)); x.addEventListener('click',function(){ if(+x.dataset.v!==g.length) setFreq(g,+x.dataset.v); }); });
+      var tbox=b.querySelector('.md-times');
+      g.forEach(function(m,k){
+        var r=document.createElement('div');
+        r.innerHTML='<div class="md-row"><span class="md-lbl">'+(g.length>1 ? 'Time '+(k+1) : 'Time')+'</span><button type="button" class="md-ctl md-time duration-clock-trigger"></button></div>'
+          +'<div class="md-row md-r-when"><span class="md-lbl">When</span><div class="md-seg md-when" role="group" aria-label="When"><button type="button" data-v="morning">Morning</button><button type="button" data-v="noon">Noon</button><button type="button" data-v="evening">Evening</button><button type="button" data-v="night">Night</button></div></div>';
+        var tb=r.querySelector('.md-time'), wb=r.querySelectorAll('.md-when button');
+        function showT(){ tb.textContent=clock(m.time); wb.forEach(function(x){ x.setAttribute('aria-pressed',String(x.dataset.v===whenOf(m.time))); }); } showT();
+        tb.addEventListener('click',function(){ if(typeof openTimePicker==='function') openTimePicker('custom',m.time,function(v){ m.time=v; showT(); },'Select time'); });
+        wb.forEach(function(x){ x.addEventListener('click',function(){ m.time=WHEN_T[x.dataset.v]; showT(); }); });
+        tbox.append(r);
+      });
+      b.querySelectorAll('.md-food button').forEach(function(x){
+        x.setAttribute('aria-pressed',String(d.food===x.dataset.v));
+        x.addEventListener('click',function(){ d.food=d.food===x.dataset.v ? '' : x.dataset.v; b.querySelectorAll('.md-food button').forEach(function(y){ y.setAttribute('aria-pressed',String(d.food===y.dataset.v)); }); });
+      });
       var mi=b.querySelector('.md-med'); mi.value=d.med||''; mi.addEventListener('input',function(){ d.med=mi.value; });
-      var tb=b.querySelector('.md-time'); function showT(){ tb.textContent=clock(d.time); } showT();
-      tb.addEventListener('click',function(){ if(typeof openTimePicker==='function') openTimePicker('custom',d.time,function(v){ d.time=v; showT(); },'Select time'); });
       var dayBox=b.querySelector('.md-days');
       function drawDays(){
         dayBox.innerHTML='';
@@ -29477,7 +29542,6 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
         b.querySelector('.md-r-days').hidden=!wk; b.querySelector('.md-r-till').hidden=!wk; b.querySelector('.md-r-date').hidden=wk;
         b.querySelector('.md-tdays').hidden=d.till!=='days'; b.querySelector('.md-tdate').hidden=d.till!=='date';
       }
-      seg('.md-rep',function(){ return d.rep==='once' ? 'once' : 'week'; },function(v){ d.rep=v; },layout);
       seg('.md-tm',function(){ return d.till; },function(v){ d.till=v; if(v==='date' && !d.untilDate) d.untilDate=addDays(iso(),+d.tillDays>0 ? +d.tillDays-1 : 29); },layout);
       var dt=b.querySelector('.md-date'); dt.value=d.date||iso(); dt.addEventListener('change',function(){ if(dt.value) d.date=dt.value; });
       var td=b.querySelector('.md-tdays'); td.value=d.tillDays; td.addEventListener('input',function(){ d.tillDays=td.value; });
@@ -29485,7 +29549,11 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
       layout();
       var sn=b.querySelector('.md-sound'); sn.value=d.sound||'xylophone'; if(!sn.value) sn.value='xylophone'; d.sound=sn.value; sn.addEventListener('change',function(){ d.sound=sn.value; });
       var vb=b.querySelector('.md-vib'); vb.checked=d.vibrate!==false; vb.addEventListener('change',function(){ d.vibrate=vb.checked; });
-      var rm=b.querySelector('.md-x'); if(rm) rm.addEventListener('click',function(){ doses.splice(i,1); draw(); });
+      var mu=b.querySelector('.md-mute');
+      function paintMu(){ mu.classList.toggle('muted',!!d.muted); mu.innerHTML=d.muted ? SPKOFF : SPKON; mu.title=d.muted ? 'Unmute' : 'Mute'; mu.setAttribute('aria-label',mu.title); } paintMu();
+      mu.addEventListener('click',function(){ d.muted=!d.muted; paintMu(); });
+      b.querySelector('.md-play').addEventListener('click',function(){ if(typeof playAlertPreset==='function') playAlertPreset(d.sound||'xylophone'); });
+      var rm=b.querySelector('.md-x'); if(rm) rm.addEventListener('click',function(){ g.forEach(function(x){ doses.splice(doses.indexOf(x),1); }); draw(); });
       b.querySelector('.md-prev').addEventListener('click',function(){
         var nm=String(form.elements.name.value).trim()||'Medicine';
         if(typeof window.ayuPreviewNote==='function') window.ayuPreviewNote(nm,bodyText(d),'reminders','preview-medpv',ACTS,d.vibrate!==false ? 'medpv-on' : 'medpv-off');
@@ -29494,8 +29562,8 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
     }
     draw();
     form.querySelector('.med-add-dose').addEventListener('click',function(){
-      var n=doses.reduce(function(a,x){ return Math.max(a,x.n); },-1)+1;
-      doses.push(newDose(n,doses[doses.length-1])); draw();
+      var n=doses.reduce(function(a,x){ return Math.max(a,x.n); },-1)+1, gs=groups(), lastG=gs[gs.length-1];
+      var nd=newDose(n,lastG[0]); nd.time='08:00'; doses.push(nd); draw();
       var last=box.lastElementChild; if(last) try{ last.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
     });
     function close(){
@@ -29506,24 +29574,29 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
     form.addEventListener('submit',function(e){
       e.preventDefault(); msg('');
       var name=String(form.elements.name.value).trim();
-      if(!name){ msg('Enter a person or treatment name.'); form.elements.name.focus(); return; }
+      if(!name){ msg('Enter a name.'); form.elements.name.focus(); return; }
       var today=iso(), start=saved.start||today, out=[];
-      for(var i=0;i<doses.length;i++){
-        var d=doses[i], x={n:d.n,med:String(d.med||'').trim(),time:d.time,rep:d.rep==='once'?'once':'week',sound:d.sound||'xylophone',vibrate:d.vibrate!==false};
-        if(!x.med){ msg('Enter the medicine name'+(doses.length>1 ? ' for entry '+(i+1) : '')+'.'); var mf=box.querySelectorAll('.md-med')[i]; if(mf) mf.focus(); return; }
-        if(!/^\d{2}:\d{2}$/.test(x.time)){ msg('Choose a time for '+x.med+'.'); return; }
-        if(x.rep==='once'){ if(!/^\d{4}-\d{2}-\d{2}$/.test(d.date||'')){ msg('Choose the date for '+x.med+'.'); return; } x.date=d.date; x.until=''; }
+      var gs=groups();
+      for(var gi=0;gi<gs.length;gi++){
+        var g=gs[gi], d=g[0];
+        if(!String(d.med||'').trim()){ msg('Enter the medicine name'+(gs.length>1 ? ' for entry '+(gi+1) : '')+'.'); var mf=box.querySelectorAll('.md-med')[gi]; if(mf) mf.focus(); return; }
+        var base={g:gid(d),med:String(d.med).trim(),rep:d.rep==='once'?'once':'week',food:d.food||'',muted:!!d.muted,sound:d.sound||'xylophone',vibrate:d.vibrate!==false};
+        if(base.rep==='once'){ if(!/^\d{4}-\d{2}-\d{2}$/.test(d.date||'')){ msg('Choose the date for '+base.med+'.'); return; } base.date=d.date; base.until=''; }
         else {
-          x.days=(d.days||[]).slice().sort(function(a,b){ return a-b; }); if(!x.days.length) x.days=[0,1,2,3,4,5,6];
-          x.till=d.till==='date'?'date':'days';
-          if(x.till==='days'){ var nd=Math.floor(+d.tillDays); if(!(nd>=1 && nd<=365)){ msg(x.med+': enter 1 to 365 days.'); return; } x.tillDays=nd; }
-          else { if(!/^\d{4}-\d{2}-\d{2}$/.test(d.untilDate||'')){ msg(x.med+': choose the last day.'); return; } if(d.untilDate<today){ msg(x.med+': the last day is already past.'); return; } x.untilDate=d.untilDate; x.tillDays=+d.tillDays>0 ? Math.floor(+d.tillDays) : 30; }
-          x.until=untilOf(x,start);
+          base.days=(d.days||[]).slice().sort(function(a,b){ return a-b; }); if(!base.days.length) base.days=[0,1,2,3,4,5,6];
+          base.till=d.till==='date'?'date':'days';
+          if(base.till==='days'){ var nd=Math.floor(+d.tillDays); if(!(nd>=1 && nd<=365)){ msg(base.med+': enter 1 to 365 days.'); return; } base.tillDays=nd; }
+          else { if(!/^\d{4}-\d{2}-\d{2}$/.test(d.untilDate||'')){ msg(base.med+': choose the last day.'); return; } if(d.untilDate<today){ msg(base.med+': the last day is already past.'); return; } base.untilDate=d.untilDate; base.tillDays=+d.tillDays>0 ? Math.floor(+d.tillDays) : 30; }
         }
-        out.push(x);
+        for(var k=0;k<g.length;k++){
+          if(!/^\d{2}:\d{2}$/.test(g[k].time)){ msg('Choose a time for '+base.med+'.'); return; }
+          var x=JSON.parse(JSON.stringify(base)); x.n=g[k].n; x.time=g[k].time;
+          if(x.rep!=='once') x.until=untilOf(x,start);
+          out.push(x);
+        }
       }
       var all=[]; out.forEach(function(x){ if(all.indexOf(x.time)<0) all.push(x.time); });
-      var data={kind:'medicine',mid:saved.mid||newMid(),name:name,mode:'selected',times:all.sort(),days:[0,1,2,3,4,5,6],start:start,doses:out,sound:out[0].sound,vibrate:out[0].vibrate};
+      var data={kind:'medicine',mid:saved.mid||newMid(),name:name,mode:'selected',times:all.sort(),days:[0,1,2,3,4,5,6],start:start,doses:out,sound:out[0].sound,vibrate:out[0].vibrate};  // sound/vibrate of the first entry for older phone code
       if(saved.on===false) data.on=false;
       var item=existing;
       if(!item){
@@ -29558,7 +29631,7 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
   var SYM={ok:'✓',sk:'–',ms:'✕',f:'·',n:''};
   function monthTable(y,m,L,now){
     var last=new Date(y,m+1,0).getDate(), rows=rowsOf();
-    var h='<div class="mh-m">'+MONF[m]+' '+y+'</div><div class="mh-wrap"><table class="mh-t"><thead><tr><th class="mh-nm"></th>';
+    var h='<div class="mh-m">'+MONF[m]+' '+y+'</div><div class="mh-wrap"><table class="mh-t"><thead><tr><th class="mh-nm mh-corner">Medicine</th>';
     for(var d=1;d<=last;d++){ var dw=new Date(y,m,d).getDay(), ds=y+'-'+p2(m+1)+'-'+p2(d); h+='<th class="mh-d'+(ds===iso(now)?' td':'')+'">'+d+'<small>'+'SMTWTFS'[dw]+'</small></th>'; }
     h+='<th class="mh-p">%</th></tr></thead><tbody>';
     rows.forEach(function(r){
@@ -29574,7 +29647,7 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
   }
   function weekTable(end,L,now){
     var rows=rowsOf(), days=[]; for(var i=6;i>=0;i--) days.push(addDays(end,-i));
-    var h='<div class="mh-m">'+fmtDate(days[0])+' – '+fmtDate(days[6])+'</div><div class="mh-wrap"><table class="mh-t mh-wk"><thead><tr><th class="mh-nm"></th>';
+    var h='<div class="mh-m">'+fmtDate(days[0])+' – '+fmtDate(days[6])+'</div><div class="mh-wrap"><table class="mh-t mh-wk"><thead><tr><th class="mh-nm mh-corner">Medicine</th>';
     days.forEach(function(ds){ var dt=new Date(ds+'T00:00:00'); h+='<th class="mh-d'+(ds===iso(now)?' td':'')+'">'+dt.getDate()+'<small>'+'SMTWTFS'[dt.getDay()]+'</small></th>'; });
     h+='<th class="mh-p">%</th></tr></thead><tbody>';
     rows.forEach(function(r){
@@ -29586,15 +29659,14 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
     return h+'</tbody></table></div>';
   }
   function openHistory(){
-    var now=new Date(), view='month', ym=now.getFullYear()*12+now.getMonth(), wend=iso(now);
+    var now=new Date(), view=(window.innerWidth<700 ? 'week' : 'month'), ym=now.getFullYear()*12+now.getMonth(), wend=iso(now);
     var ov=document.createElement('div'); ov.className='tp-overlay';
     ov.innerHTML='<div class="tp-dialog med-hist" role="dialog" aria-modal="true" aria-label="Medicine history"><div class="mh-top"><div class="mh-title">Medicine history</div><button type="button" class="mh-x" aria-label="Close">✕</button></div>'
       +'<div class="mh-bar"><button type="button" class="mh-nav" data-s="-1" aria-label="Earlier">‹</button><span class="mh-lab"></span><button type="button" class="mh-nav" data-s="1" aria-label="Later">›</button>'
       +'<div class="md-seg mh-views" role="group" aria-label="Range"><button type="button" data-v="week">Week</button><button type="button" data-v="month">Month</button><button type="button" data-v="three">3 months</button></div></div>'
       +'<div class="mh-body"></div>'
       +'<div class="mh-lg"><span><b class="ok"></b>Taken</span><span><b class="sk"></b>Skipped</span><span><b class="ms"></b>Missed</span><span><b class="f"></b>Not due yet</span></div>'
-      +'<div class="mh-note">Tap a coloured box to change it. A dose that was due and not marked counts as missed. % is taken out of the doses due so far.</div>'
-      +'<div class="mh-act"><button type="button" class="mh-pdf">Download PDF</button><button type="button" class="mh-close">Close</button></div></div>';
+      +'<div class="mh-act"><button type="button" class="mh-pdf">Download PDF</button><button type="button" class="mh-clear">Clear history</button><button type="button" class="mh-close">Close</button></div></div>';
     var body=ov.querySelector('.mh-body'), lab=ov.querySelector('.mh-lab');
     function render(){
       var L=logLoad(), now2=new Date(), rows=rowsOf();
@@ -29621,6 +29693,11 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
     function esc(e){ if(e.key==='Escape'){ e.stopPropagation(); close(); } }
     ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
     ov.querySelector('.mh-x').addEventListener('click',close); ov.querySelector('.mh-close').addEventListener('click',close); document.addEventListener('keydown',esc,true);
+    var clr=ov.querySelector('.mh-clear'), clrT=0;
+    clr.addEventListener('click',function(){
+      if(!clr.classList.contains('sure')){ clr.classList.add('sure'); clr.textContent='Tap again to clear'; clrT=setTimeout(function(){ clr.classList.remove('sure'); clr.textContent='Clear history'; },4000); return; }
+      clearTimeout(clrT); try{ localStorage.removeItem(LK); }catch(e){} clr.classList.remove('sure'); clr.textContent='Clear history'; render();
+    });
     ov.querySelector('.mh-pdf').addEventListener('click',function(){ pdf(view==='week' ? 'week' : 'month',ym,wend); });
     document.body.append(ov); render();
   }
@@ -29671,7 +29748,7 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
           (d.doses||[]).forEach(function(x){
             var at=toMin(x.time); if(at===null) return;
             if(x.rep==='once' ? (x.date<today) : (x.until && x.until<today)) return;
-            var c={id:d.mid+'d'+x.n,name:d.name,mode:'dates',med:true,notes:bodyText(x),times:[at],sound:x.sound||'xylophone',vibrate:x.vibrate!==false};
+            var c={id:d.mid+'d'+x.n,name:d.name,mode:'dates',med:true,notes:bodyText(x),times:[at],sound:x.muted ? 'none' : (x.sound||'xylophone'),vibrate:x.vibrate!==false};
             if(x.rep==='once'){ c.sched='once'; c.date=x.date; }
             else { c.sched='weekly'; if(Array.isArray(x.days) && x.days.length && x.days.length<7) c.days=x.days.slice(); if(x.until) c.until=x.until; }
             r.custom.push(c);
@@ -29695,7 +29772,7 @@ html:not(.ayu-can-vib) body .med-form .ayu-vib-only{display:none !important}
     var va=window.ayuVibrateApply;
     if(typeof va==='function') window.ayuVibrateApply=function(r){
       r=va.apply(this,arguments); if(!r) return r;
-      (r.custom||[]).forEach(function(x){ if(x.med){ var f=findDose('med'+x.id); if(f){ x.vibrate=f.dose.vibrate!==false; x.sound=f.dose.sound||'xylophone'; } } });
+      (r.custom||[]).forEach(function(x){ if(x.med){ var f=findDose('med'+x.id); if(f){ x.vibrate=f.dose.vibrate!==false; x.sound=f.dose.muted ? 'none' : (f.dose.sound||'xylophone'); } } });
       return r;
     };
     return true;
