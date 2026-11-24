@@ -16555,6 +16555,10 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
 .tour-choose button small{display:block;font-size:.78rem;font-weight:600;opacity:.92;margin-top:2px}
 .tour-choose .q{background:var(--tc,var(--fb-2563eb,#2563eb));color:#fff}
 .tour-choose .f{background:#fff !important;color:color-mix(in srgb,var(--tc,var(--fb-2563eb,#2563eb)) 78%,#000)}
+/* the tour start: the logo's two colours, Quick tour blue and Full tour green */
+.tour-choose .q{background:#3a7fc4}
+.tour-choose .f{background:#6cb33f !important;color:#fff}
+.tour-choose.one .q{background:#6cb33f}
 #tour-root.choose #tour-dim{background:rgba(var(--fbr-15-23-42,15,23,42),.93)}
 .tour-choose.one{justify-content:flex-start;margin-top:12px}.tour-choose.one button{flex:0 1 auto;padding:9px 18px}
 #tour-again{display:inline-block;margin-top:0;font-size:.66rem;font-weight:700;color:var(--footer-accent,var(--act-2));border:1.5px solid currentColor;border-radius:999px;padding:2px 9px;cursor:pointer;background:none;font-family:inherit;text-align:left;line-height:1.4}
@@ -16612,7 +16616,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   // Reminders
   tab('alerts','.tab-btn.alerts',C.rem,'Gentle nudges, alarms and timers through the day.');
   sec('alerts','#alerts-panel .ayu-sub-tabs.rem5',0,C.rem,'<b>Five parts</b>: Personal, Alarm, Timer, Stopwatch and World Clock. Tap one to open it.');
-  sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: tap <b>+</b> to add a <b>Medicine</b> (doses with Taken, Snooze and Skip, and a history table) or a <b>Reminder</b> with a Frequency of Only Once, Daily, Weekly, Monthly or Yearly.');
+  sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: tap <b>Add medicine</b> (a name, its medicines with times, food and days; Taken, Snooze and Skip on the notification; a history table) or <b>Add reminder</b> with a Frequency of Only Once, Daily, Weekly, Monthly or Yearly.');
   sec('alerts','#rem-alarm-card .clk-now',0,C.rem,'<b>Clock</b>: the time and date now, above Alarm, Timer, Stopwatch and World Clock.');
   sec('alerts','#rem-tap-row',0,C.rem,'<b>Phone’s time opens</b>: your phone’s Clock app or AyuBase6, while an AyuBase6 alarm is next.');
   sec('alerts','#rem-alarm-card .ayu-add-row',0,C.rem,'<b>Alarm</b>: add an alarm, set it and tap <b>Save</b>. Each has its own time, days (or Once), sound, vibrate and snooze. Expired ones show in amber at the top.');
@@ -20980,7 +20984,8 @@ html body #calculator-panel .calc-page > .calc-card h2 .ayu-i{margin-left:6px !i
 <script id="tab-titles-20261105-js">
 (function(){
   function $(id){ return document.getElementById(id); }
-  var PERSONAL_INFO='<ul><li>Add your own reminders with <b>+ Add a reminder</b>: a name, how often or at set times, the days and the sound.</li>'
+  var PERSONAL_INFO='<ul><li><b>Add medicine</b>: a name (a person or a treatment), then each medicine with its times, food (before, after, with, empty stomach), days and how long. The bell sets the sound and vibration and turns the notifications on or off. The notification shows the name and the medicine; Taken, Snooze and Skip are on it. <b>History</b> shows what was taken, with Download PDF and Clear history (Undo for 5 seconds).</li>'
+    +'<li><b>Add reminder</b>: your own reminder with a name, how often or at set times, the days and the sound.</li>'
     +'<li><b>Frequency</b>: <b>Only Once</b>, <b>Daily</b>, <b>Weekly</b>, <b>Monthly</b> or <b>Yearly</b>.</li>'
     +'<li><b>Weekly</b> reminds every week on the days you pick; <b>Monthly</b> on the days of the month you pick (a day the month does not have, like the 31st, reminds on its last day); <b>Yearly</b> on the same day every year. Add one or more times for it.</li>'
     +'<li>Tap a reminder to open and change it; × deletes it (Undo for 5 seconds).</li>'
