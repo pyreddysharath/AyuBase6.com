@@ -11847,6 +11847,7 @@ function routineAction(key, action){
 }
 function routineButtons(nk,key){
   key=key||nk;
+  if(window.ayuCareButtons && !window.ayuCareButtons()) return { actions:[], buttons:[], onAction:act=>routineAction(key,act) };   // Care: "Just remind me" = no buttons
   return { actions:[{action:'done',title:'✓ Done'},{action:'not-yet',title:'Not yet'}],
            buttons:[{act:'done',label:'Done',primary:true},{act:'not-yet',label:'Not yet'}],
            onAction:act=>routineAction(key,act) };
@@ -23113,6 +23114,7 @@ html body #start-my-day-card #chk-alarm.ayu-sub:not(#ayu-x1){margin-bottom:0 !im
     });
     if(mindR) rules.mind = mindR;
     try{ var adm=window.ayuCareAutoMin ? window.ayuCareAutoMin() : 0; if(adm>0) rules.autoDismissMin=adm; }catch(e){}
+    try{ if(window.ayuCareButtons && !window.ayuCareButtons()) rules.routineButtons=false; }catch(e){}
     return rules;
   }
   window.ayuPush = { active:false, api:'', error:'', buildRules:buildRules, sync:function(){}, repair:function(){ return Promise.resolve({ sub:false, server:false }); } };
@@ -23242,7 +23244,7 @@ html body #ayu-checklist #ayu-cl-prev{margin:12px 0 0 16px}
       $('ayu-cl-prev').querySelector('button').addEventListener('click',function(){
         var I=(typeof ROUTINE_NOTIFY_ITEMS!=='undefined' && ROUTINE_NOTIFY_ITEMS) || {}, it=I.water || I[Object.keys(I)[0]] || {title:'Drink Water',body:'Time for a glass of water.'};
         try{ var sel=nc.querySelector('select[id$="sound"]'); if(sel && sel.value && sel.value!=='none' && typeof playAlertPreset==='function') playAlertPreset(sel.value); }catch(e){}
-        window.ayuPreviewNote(it.title, it.body, 'routines', 'routine-x-preview', [{action:'done',title:'✓ Done'},{action:'not-yet',title:'Not yet'}], 'routine-x');
+        window.ayuPreviewNote(it.title, it.body, 'routines', 'routine-x-preview', (window.ayuCareButtons && !window.ayuCareButtons()) ? [] : [{action:'done',title:'✓ Done'},{action:'not-yet',title:'Not yet'}], 'routine-x');
       });
     }
     if($('ayu-cl-prev')) done++;
@@ -25430,7 +25432,7 @@ html body .ra-count .ra-btn{background:#fff;color:#0f172a;flex:none;width:auto !
     {id:'nutrition',label:'Food',c:'#4f8a22',keys:[/^ayuBase6-food-/]},
     {id:'mind',label:'Mind',c:'#364ca8',keys:['ayuBase6-mind']},
     {id:'calculator',label:'Vitals',c:'#13806c',keys:['ayu_vitals_tracker_v1','ayu_lab_reports_v1','ayuBmiView'],records:['ayu_vitals_tracker_v1','ayu_lab_reports_v1']},
-    {id:'routines',label:'Care',c:'#1a86b5',keys:['ayuBase6WakeUpTime','ayuBase6-hb-v2','ayuBase6-care-autodismiss','ayuBase6-speak','ayuBase6-speak-last','ayuBase6-vibrate',/^ayuBase6-routine-/,/^ayuWake/,'ayuAlarmTap']},
+    {id:'routines',label:'Care',c:'#1a86b5',keys:['ayuBase6WakeUpTime','ayuBase6-hb-v2','ayuBase6-care-autodismiss','ayuBase6-care-buttons','ayuBase6-speak','ayuBase6-speak-last','ayuBase6-vibrate',/^ayuBase6-routine-/,/^ayuWake/,'ayuAlarmTap']},
     {id:'alerts',label:'Alerts',c:'#6f9a1c',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-med-log','ayuBase6-rem-alarm','ayuBase6-rem-alarms','ayuBase6-timer','ayuBase6-stopwatch','ayuBase6-world','ayuClockTab'],records:['ayuBase6-med-log']},
     {id:'app',label:'App',c:'#475569',note:'tab order, cookies, notifications, offline pages',keys:[],rest:true,records:['ayuBase6-tour-seen']}
   ];
@@ -28954,6 +28956,54 @@ html body #sec-notifications .na-g{border-left:0 !important;padding-left:4px !im
   }
   window.ayuPlaceCareAd=place;
   setInterval(place,1000);
+})();
+</script>
+<style id="care-buttons-20261124">
+/* Settings → Notifications → Care: Done / Not yet buttons, or just a reminder */
+html body .ayu-care-bt{margin:0 0 18px;padding:0 2px;color:#334155}
+html body .ayu-care-bt .bt-t{font-weight:800;font-size:.9rem;line-height:1.2;color:var(--footer-accent,var(--fb-2563eb,#2563eb));margin-bottom:5px}
+html body .ayu-care-bt .bt-chips{display:flex;flex-wrap:wrap;gap:5px}
+html body .ayu-care-bt .bt-chips button{padding:3px 10px;border-radius:999px;border:1.5px solid var(--footer-accent,var(--fb-2563eb,#2563eb));background:#fff;color:var(--footer-accent,var(--fb-2563eb,#2563eb));font:inherit;font-size:.8rem;line-height:1.25;cursor:pointer}
+html body .ayu-care-bt .bt-chips button.on{background:var(--footer-accent,var(--fb-2563eb,#2563eb));color:#fff;font-weight:800}
+html body .ayu-care-bt .bt-n{margin:5px 0 0;font-size:.76rem;line-height:1.35;color:#64748b}
+</style>
+<script id="care-buttons-20261124-js">
+(function(){
+  var K='ayuBase6-care-buttons';
+  function on(){ try{ return localStorage.getItem(K)!=='off'; }catch(e){ return true; } }
+  window.ayuCareButtons=on;
+  var el=null;
+  function paint(){ if(!el) return; var v=on(); [].forEach.call(el.querySelectorAll('button[data-b]'),function(b){ var m=(b.dataset.b==='1')===v; b.classList.toggle('on',m); b.setAttribute('aria-checked',m?'true':'false'); }); el.querySelector('.bt-n').textContent=v?'The notification has Done and Not yet.':'No buttons: just the reminder. Tick the item in the app. Turn on Auto-close so the notification goes away by itself.'; }
+  function mk(){
+    var d=document.createElement('div'); d.className='ayu-care-bt';
+    d.innerHTML='<div class="bt-t">Day Plan buttons</div><div class="bt-chips" role="radiogroup" aria-label="Day Plan buttons"><button type="button" role="radio" data-b="1">Done / Not yet</button><button type="button" role="radio" data-b="0">Just remind me</button></div><p class="bt-n"></p>';
+    d.querySelector('.bt-chips').addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('button[data-b]'); if(!b) return; try{ if(b.dataset.b==='1') localStorage.removeItem(K); else localStorage.setItem(K,'off'); }catch(x){} try{ if(window.ayuNative && window.ayuNative.sync) setTimeout(window.ayuNative.sync,200); }catch(x){} paint(); });
+    return d;
+  }
+  function place(){
+    var slot=document.getElementById('na-care-ad'); if(!slot) return;
+    if(!el) el=mk();
+    var ad=slot.querySelector('.ayu-care-ad');
+    if(el.parentNode!==slot || (ad && ad.nextSibling!==el)){ if(ad) ad.after(el); else slot.appendChild(el); }
+    paint();
+  }
+  setInterval(place,1000);
+})();
+</script>
+<script id="last-tab-20261124-js">
+/* The app opens on the tab used last (not always Body) */
+(function(){
+  var K='ayuBase6-last-tab', OK=['activity','nutrition','mind','calculator','routines','alerts'];
+  function go(){
+    var s=null; try{ s=localStorage.getItem(K); }catch(e){}
+    if(s && s!=='activity' && OK.indexOf(s)>=0 && typeof switchTab==='function'){ try{ switchTab(s); }catch(e){} }
+    var o=window.switchTab;
+    if(typeof o==='function' && !o.__lt){
+      var w=function(tab){ var r=o.apply(this,arguments); try{ var tr=document.getElementById('tour-root'); if(OK.indexOf(tab)>=0 && !(tr && tr.classList.contains('on'))) localStorage.setItem(K,tab); }catch(e){} return r; };
+      w.__lt=1; window.switchTab=w;
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
 })();
 </script>
 <style id="chk-items-20261121">
