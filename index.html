@@ -20000,7 +20000,6 @@ html body #start-my-day-card .rout-info-panel .mdp-sec > b.mdp-t{color:var(--fp-
       +'<div class="mdp-sec"><b class="mdp-t">Notify Me</b><ul>'
       +'<li>Notifications for every check. <b>Start time</b>: when it begins. <b>Start time + before end time</b>: also 15 minutes before it closes.</li><li><b>Sound</b> and <b>Vibrate</b> are for these notifications only; the Wake-up Alarm has its own.</li>'
       +'<li><b>On these days</b> picks the days. Each notification has <b>Done</b> and <b>Not yet</b>.</li>'
-      +'<li><b>Auto-close</b> (Settings → Notifications → Care) closes Care notifications by itself.</li>'
       +(APP?'<li>They arrive even when AyuBase6 is closed, with or without internet.</li>'
            :'<li>They arrive while AyuBase6 is open (any tab or the app window); the computer must stay awake.</li>')
       +'</ul></div>';
@@ -28763,7 +28762,8 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       +'<ul style="margin:4px 0 8px 18px;padding:0"><li><b>At start:</b> one notification when an activity begins.</li>'
       +'<li><b>Start + before end:</b> also a reminder 15 minutes before its window closes (activities shorter than 15 minutes get only the start).</li>'
       +'<li>Each notification has <b>Done</b> (ticks it) and <b>Not yet</b>.</li>'
-      +'<li><b>Auto-close</b> (Settings → Notifications → Care) closes Care notifications by itself.</li></ul>'
+      +'</ul>'
+      +'<div class="ayu-ac-note"><div class="ayu-ac-h">Closes by itself?</div><div>Auto-close applies to all Care notifications. To turn it on, go to Settings → Notifications → Care → Auto-close after.</div></div>'
       +'<strong>On a computer</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Notifications work whenever AyuBase6 is open in a browser tab or the app window. It does not need to be in front, so you can use other tabs and windows. They work without internet too. The computer must stay awake.</li></ul><strong>On a phone</strong><ul style="margin:4px 0 0 18px;padding:0"><li>Notifications come only from the open app, so keep it open, with or without internet. This can’t be guaranteed: a phone may pause a locked or background app.</li><li><b>Android:</b> set Battery to Unrestricted (Settings → Apps → AyuBase6 → Battery).</li><li><b>iPhone:</b> open the app from its Home Screen icon. Check that Settings → Notifications → AyuBase6 is allowed. If notifications are late, turn off Low Power Mode and any Focus that silences the app.</li></ul><strong>Good to know</strong><ul style="margin:4px 0 0 18px;padding:0">'
       +'<li><b>To install:</b> see <b>Backup & Restore → Download App</b>.</li>'
       +'<li>The install tip and any “notifications blocked” warning appear when you switch the toggle on, then disappear together after a while. Everything they say is here.</li></ul>'; }
@@ -28990,15 +28990,17 @@ html body #alerts-panel .alert-page[data-remtab="breaks"] button.eye-ex-time-ite
 <style id="care-ac-note-20261124">
 /* Notify Me i: filled only while its text is open (touch screens keep :hover / :focus after a tap) */
 html body #routines-panel #routines-notify-card .rout-card-hdr .ayu-sec-i:not(.active):not(#ayu-x1):not(#ayu-x2){background:#fff !important;color:var(--rout-2,#41aad4) !important;border-color:var(--rout-3,#a6d9ee) !important}
-html body .ayu-ac-note{margin:8px 0 0 18px}
-html body .ayu-ac-note .ayu-ac-h{font-weight:800;color:#1a6585;margin-bottom:2px}
+html body .ayu-ac-note{margin:8px 0 6px;padding-left:18px;position:relative}
+html body .ayu-ac-note .ayu-ac-h{font-weight:800;color:#336374;margin-bottom:2px}
+html body .ayu-ac-note .ayu-ac-h::before{content:'\2022';position:absolute;left:4px;font-weight:700;font-size:1.25em;line-height:1.1}
+html body #routines-panel #rout-info-notify .ayu-ac-note .ayu-ac-h{color:#1a6585 !important}
 html body #routines-panel #routines-notify-card.ayu-in-day.ayu-closed > #rout-info-notify[style*="block"]:not(#ayu-x1):not(#ayu-x2){display:block !important;margin:8px 0 4px !important}
 html body #routines-panel #rout-info-wake > strong,html body #routines-panel #rout-info-notify > strong{color:#1a6585 !important;border-left-color:var(--rout-2,#41aad4) !important}
 </style>
 <script id="care-ac-note-20261124-js">
 (function(){
   var IDS=['alert-break-task','alert-walk-task','alert-drink-task','alert-posture-task','alert-stretch-task','alert-breathe-task','alert-break-ex-task'];
-  var TXT='Auto-close applies to all Care notifications: Settings → Notifications → Care → Auto-close after.';
+  var TXT='Auto-close applies to all Care notifications. To turn it on, go to Settings → Notifications → Care → Auto-close after.';
   function add(){ IDS.forEach(function(id){ var e=document.getElementById(id); if(!e||e.querySelector('.ayu-ac-note')) return;
     var hs=[].filter.call(e.querySelectorAll('strong'),function(x){ return /^\s*Notifications\s*$/.test(x.textContent); })[0]; if(!hs) return;
     var ul=hs.nextElementSibling; while(ul && ul.tagName!=='UL') ul=ul.nextElementSibling; if(!ul) return;
