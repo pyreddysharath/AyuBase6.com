@@ -30067,3 +30067,15 @@ html body #alerts-panel .med-item .cri-hdr .cri-chev::before{content:"";display:
 html body #alerts-panel .med-form .md-x{box-sizing:border-box !important;width:16px !important;height:16px !important;min-width:16px !important;min-height:16px !important;padding:0 !important;margin:0 !important;display:inline-flex !important;align-items:center;justify-content:center;font-size:0 !important;line-height:0 !important;flex:none}
 html body #alerts-panel .med-form .md-x::before{content:"";display:block;width:16px;height:16px;background:currentColor;-webkit-mask:var(--med-x) center/contain no-repeat;mask:var(--med-x) center/contain no-repeat}
 </style>
+
+<style id="med-groups-20261124j">
+/* each medicine: side stripe + number badge + a deeper tint, all in the section green */
+html body #alerts-panel .med-form{counter-reset:mgn}
+html body #alerts-panel .med-form .mg{counter-increment:mgn;border-left:8px solid var(--mgs);padding-left:8px}
+html body #alerts-panel .med-form .mg.mc0{--mgbg:#f1f6e2;--mgc:#4f7410;--mgs:#4f7410}
+html body #alerts-panel .med-form .mg.mc1{--mgbg:#dfeab8;--mgc:#4f7410;--mgs:#6f9a1c}
+html body #alerts-panel .med-form .mg.mc2{--mgbg:#c8dd8f;--mgc:#3f6208;--mgs:#8fb83a}
+html body #alerts-panel .med-form .mg > .mg-hr .mg-h::before{content:counter(mgn);flex:none;width:24px;height:24px;box-sizing:border-box;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;line-height:1;border:2px solid #4f7410;background:#4f7410;color:#fff}
+html body #alerts-panel .med-form .mg.mc1 > .mg-hr .mg-h::before{background:#fff;color:#4f7410;border-color:#6f9a1c}
+html body #alerts-panel .med-form .mg.mc2 > .mg-hr .mg-h::before{background:#f1f6e2;color:#3f6208;border-color:#3f6208}
+</style>
