@@ -29440,6 +29440,21 @@ html body #alerts-panel .med-form .mf-notif .md-row{grid-template-columns:60px m
 html body #alerts-panel .med-form .mf-notif .md-snd{gap:5px}
 html body #alerts-panel .med-form .mf-notif .md-snd .md-sound{width:100%;min-width:0;padding:4px 6px;font-size:.84rem;text-overflow:ellipsis}
 html body #alerts-panel .med-form .mf-notif .md-ic{flex:0 0 28px;width:28px;height:28px;border-radius:9px}
+/* Closed medicine row 20261124h: the bell is the only icon, in the name row; the line runs under the name */
+html body #alerts-panel .med-item .cri-hdr{display:grid !important;grid-template-columns:minmax(0,1fr) auto auto auto;align-items:center;column-gap:4px;row-gap:0}
+html body #alerts-panel .med-item .cri-main{display:contents}
+html body #alerts-panel .med-item .cri-main strong{grid-column:1;grid-row:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body #alerts-panel .med-item .cri-hdr .master-switch{display:none !important}
+html body #alerts-panel .med-item .med-bell{grid-column:2;grid-row:1}
+html body #alerts-panel .med-item .cri-hdr .custom-reminder-delete{grid-column:3;grid-row:1;background:none !important;border:0 !important;color:#6f9a1c !important;width:auto !important;padding:0 4px !important;font-size:.9rem !important;font-weight:800}
+html body #alerts-panel .med-item .cri-hdr .cri-chev{grid-column:4;grid-row:1;color:#6f9a1c}
+html body #alerts-panel .med-item .cri-sub.med-lines{grid-column:1 / -1;grid-row:2;border-top:2px solid transparent;border-image:linear-gradient(90deg,#759523,rgba(117,149,35,0)) 1;padding-top:3px;margin-top:3px}
+html body #alerts-panel .med-item.med-off .cri-main strong,html body #alerts-panel .med-item.med-off .cri-sub{opacity:.5}
+html body #alerts-panel .med-bell,html body #alerts-panel .med-form .mf-del{border:0;background:none;color:#6f9a1c;padding:4px;display:inline-flex;align-items:center;cursor:pointer;font:inherit}
+html body #alerts-panel .med-bell svg{width:18px;height:18px}
+html body #alerts-panel .med-form .mf-del{font-size:.8rem;font-weight:800;padding:4px}
+html body #alerts-panel .med-form .mf-bell.off{opacity:1}
+html body #alerts-panel .med-item.open > .cri-hdr{display:none !important}
 </style>
 <script id="medicine-20261123-js">
 (function(){
@@ -29570,12 +29585,13 @@ html body #alerts-panel .med-form .mf-notif .md-ic{flex:0 0 28px;width:28px;heig
       hr=document.createElement('div'); hr.className='med-sec-h med-h-rem'; hr.innerHTML='<span>Reminders</span>'; hm.after(hr);
     }
     hm.hidden=!nm; hr.hidden=!(nm && nr);
+    meds().forEach(function(it){ var sub=it.querySelector('.cri-sub'); if(sub && !sub.classList.contains('med-lines')){ sub.innerHTML=medLines(dataOf(it)); sub.classList.add('med-lines'); } ensureBell(it); });
   }
   var oPaint=window.ayuRemPaint;
   if(typeof oPaint==='function') window.ayuRemPaint=function(item,data){
     oPaint.apply(this,arguments);
     var m=isMed(data); item.classList.toggle('med-item',m);
-    if(m){ var sub=item.querySelector('.cri-sub'); if(sub){ sub.innerHTML=medLines(data); sub.classList.add('med-lines'); } }
+    if(m){ var sub=item.querySelector('.cri-sub'); if(sub){ sub.innerHTML=medLines(data); sub.classList.add('med-lines'); } ensureBell(item); }
     sections();
   };
 
@@ -29616,6 +29632,22 @@ html body #alerts-panel .med-form .mf-notif .md-ic{flex:0 0 28px;width:28px;heig
   var PLAY='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>';
   var BELL='<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6c0 6-3 8-3 8h18s-3-2-3-8a6 6 0 0 0-6-6zM10 19a2 2 0 0 0 4 0z"/></svg>';
   var CHEV='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  var BELLOFF='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2a6 6 0 0 0-6 6c0 6-3 8-3 8h18s-3-2-3-8a6 6 0 0 0-6-6zM10 19a2 2 0 0 0 4 0z"/><path d="M3 3l18 18" fill="none" stroke="#f4f9e6" stroke-width="5" stroke-linecap="round"/><path d="M3 3l18 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+  function paintBell(item){
+    var hdr=item.querySelector('.cri-hdr'), b=hdr && hdr.querySelector('.med-bell'), cb=hdr && hdr.querySelector('.master-switch input'); if(!b) return;
+    var on=cb ? cb.checked : true;
+    b.innerHTML=on ? BELL : BELLOFF; b.setAttribute('aria-pressed',String(on)); b.title=on ? 'Notifications on: tap to turn off' : 'Notifications off: tap to turn on'; b.setAttribute('aria-label',b.title);
+    item.classList.toggle('med-off',!on);
+  }
+  function ensureBell(item){
+    var hdr=item.querySelector('.cri-hdr'), sw=hdr && hdr.querySelector('.master-switch'); if(!hdr || !sw) return;
+    if(!hdr.querySelector('.med-bell')){
+      var b=document.createElement('button'); b.type='button'; b.className='med-bell'; sw.after(b);
+      b.addEventListener('click',function(e){ e.stopPropagation(); var cb=sw.querySelector('input'); if(cb) cb.click(); setTimeout(function(){ paintBell(item); },0); });
+      b.addEventListener('keydown',function(e){ e.stopPropagation(); });
+    }
+    paintBell(item);
+  }
   function foodName(v){ for(var i=0;i<FOODS.length;i++) if(FOODS[i][0]===v) return FOODS[i][1]; return ''; }
   function openForm(existing){
     var l=list(); if(!l) return;
@@ -29623,13 +29655,14 @@ html body #alerts-panel .med-form .mf-notif .md-ic{flex:0 0 28px;width:28px;heig
     if(existing) stopMed(existing);
     var saved=existing ? dataOf(existing) : {};
     var doses=(saved.doses||[]).map(function(x){ return JSON.parse(JSON.stringify(x)); });
-    var snd={sound:'xylophone',muted:false,vibrate:true};
+    var snd={sound:'xylophone',muted:false,vibrate:true,on:saved.on!==false};
     if(doses.length){ snd.sound=doses[0].sound||'xylophone'; snd.muted=!!doses[0].muted; snd.vibrate=doses[0].vibrate!==false; }
     else doses=[newDose(0,null)];
     doses.forEach(function(d){ if(d.food==null) d.food=''; });
     var form=document.createElement('form'); form.className='med-form'; form.noValidate=true;
-    form.innerHTML='<div class="mf-top"><input class="mf-name" name="name" maxlength="80" autocomplete="off" placeholder="Name" aria-label="Name"><button type="button" class="mf-bell" aria-expanded="false" aria-label="Notification" title="Notification">'+BELL+'</button><button type="button" class="mf-chev" aria-label="Close" title="Close"><span class="mg-c">'+CHEV+'</span></button></div>'
+    form.innerHTML='<div class="mf-top"><input class="mf-name" name="name" maxlength="80" autocomplete="off" placeholder="Name" aria-label="Name"><button type="button" class="mf-bell" aria-expanded="false" aria-label="Notification" title="Notification">'+BELL+'</button>'+(existing ? '<button type="button" class="mf-del" aria-label="Delete" title="Delete">✕</button>' : '')+'<button type="button" class="mf-chev" aria-label="Close" title="Close"><span class="mg-c">'+CHEV+'</span></button></div>'
       +'<div class="mf-notif" hidden>'
+        +'<div class="md-row"><span class="md-lbl">Notify</span><label class="master-switch" title="Notifications on or off"><input type="checkbox" class="md-notify" aria-label="Notifications on or off"></label></div>'
         +'<div class="md-row"><span class="md-lbl">Sound</span><span class="md-snd"><select class="md-ctl md-sound">'+SOUND_OPTS()+'</select><button type="button" class="md-ic md-play" aria-label="Play sound" title="Play">'+PLAY+'</button><button type="button" class="md-ic md-mute" title="Mute"></button></span></div>'
         +'<div class="md-row ayu-vib-only"><span class="md-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" class="md-vib" aria-label="Vibrate"></label></div>'
         +'<div class="md-prev-row"><button type="button" class="alert-preview-btn ayu-prev-btn md-prev">Preview notification</button><span class="ayu-prev-msg" hidden></span></div>'
@@ -29646,7 +29679,10 @@ html body #alerts-panel .med-form .mf-notif .md-ic{flex:0 0 28px;width:28px;heig
     if(!existing) openG[gid(doses[0])]=true;   // a new medicine opens its first section to type in; a saved one starts collapsed
     // the notification block (Sound, Vibrate, Preview): once for the name
     var bell=form.querySelector('.mf-bell'), np=form.querySelector('.mf-notif');
+    function paintFormBell(){ bell.innerHTML=snd.on ? BELL : BELLOFF; bell.classList.toggle('off',!snd.on); }
     bell.addEventListener('click',function(){ var o=np.hidden; np.hidden=!o; bell.classList.toggle('on',o); bell.setAttribute('aria-expanded',String(o)); });
+    var nf=form.querySelector('.md-notify'); nf.checked=snd.on; nf.addEventListener('change',function(){ snd.on=nf.checked; paintFormBell(); }); paintFormBell();
+    var dl=form.querySelector('.mf-del'); if(dl) dl.addEventListener('click',function(){ var d=existing.querySelector('.custom-reminder-delete'); if(d) d.click(); });
     var sn=form.querySelector('.md-sound'); sn.value=snd.sound; if(!sn.value) sn.value='xylophone'; snd.sound=sn.value; sn.addEventListener('change',function(){ snd.sound=sn.value; });
     var vb=form.querySelector('.md-vib'); vb.checked=snd.vibrate; vb.addEventListener('change',function(){ snd.vibrate=vb.checked; });
     var mu=form.querySelector('.md-mute');
@@ -29778,7 +29814,7 @@ html body #alerts-panel .med-form .mf-notif .md-ic{flex:0 0 28px;width:28px;heig
       }
       var all=[]; out.forEach(function(x){ if(all.indexOf(x.time)<0) all.push(x.time); });
       var data={kind:'medicine',mid:saved.mid||newMid(),name:name,mode:'selected',times:all.sort(),days:[0,1,2,3,4,5,6],start:start,doses:out,sound:snd.sound,vibrate:snd.vibrate};
-      if(saved.on===false) data.on=false;
+      if(!snd.on) data.on=false;
       var item=existing;
       if(!item){
         item=document.createElement('div'); item.className='custom-reminder-item';
