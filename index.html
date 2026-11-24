@@ -20485,7 +20485,7 @@ html body #alerts-panel #custom-reminders-card > .alert-card-sub:empty{display:n
 /* Personal Reminders and Reminders → Alarm: each item is a section with a chevron (tap to change it),
    alternate colours, × deletes with Undo for 5 seconds, and "+ Add …" after the list. */
 html body #alerts-panel .ayu-list .custom-reminder-item{display:block !important;position:relative !important;padding:0 !important;margin:0 0 10px !important;border:1px solid rgba(var(--tlr-13-148-136,137,177,35),.28) !important;border-radius:14px !important;background:#f6faeb !important;box-shadow:none !important}
-html body #alerts-panel .ayu-list .custom-reminder-item.alt{background:var(--fb-e0f2fe,#e0f2fe) !important;border-color:rgba(var(--fbr-2-132-199,2,132,199),.3) !important}
+html body #alerts-panel .ayu-list .custom-reminder-item.alt{background:#edf4d9 !important;border-color:rgba(115,150,27,.3) !important}
 html body #alerts-panel .ayu-list .cri-hdr{display:flex;align-items:center;gap:10px;padding:11px 10px 11px 14px;cursor:pointer;border-radius:14px}
 html body #alerts-panel .ayu-list .cri-hdr:focus-visible{outline:2px solid var(--tl-0d9488,#799e1b);outline-offset:2px}
 html body #alerts-panel .ayu-list .cri-main{flex:1 1 auto;min-width:0}
@@ -29038,6 +29038,57 @@ html body .ayu-care-bt .bt-n{margin:5px 0 0;font-size:.76rem;line-height:1.35;co
     }
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
+})();
+</script>
+<style id="dp-20261124">
+.tp-overlay.dp-ov .dp{background:#fff;border-radius:24px;padding:16px 14px 12px;width:min(340px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.28);--dpc:var(--tl-0d9488,#73961b);font-family:inherit}
+.dp-hd{display:flex;align-items:center;justify-content:space-between;margin:0 2px 8px}
+.dp-hd b{font-size:1.05rem;color:color-mix(in srgb,var(--dpc) 70%,#000)}
+.dp-hd button{width:36px;height:36px;border-radius:50%;border:0;background:color-mix(in srgb,var(--dpc) 14%,#fff);color:var(--dpc);font-size:1.2rem;font-weight:800;cursor:pointer}
+.dp-g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.dp-g i{font-style:normal;font-size:.72rem;font-weight:800;color:color-mix(in srgb,var(--dpc) 70%,#000);padding:4px 0}
+.dp-g button{height:38px;border:0;border-radius:50%;background:transparent;font:inherit;font-size:.95rem;color:#1f2937;cursor:pointer}
+.dp-g button.today{box-shadow:inset 0 0 0 1.5px var(--dpc)}
+.dp-g button.sel{background:var(--dpc);color:#fff;font-weight:800}
+.dp-g button:disabled{opacity:.3}
+.dp-ft{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+.dp-ft button{border:0;border-radius:14px;padding:10px 18px;font:inherit;font-weight:800;cursor:pointer;background:transparent;color:var(--dpc)}
+.dp-ft button.ok{background:var(--dpc);color:#fff}
+</style>
+<script id="dp-20261124-js">
+/* Personal reminders: the Date field opens a calendar in the section colour instead of the phone's own date picker */
+(function(){
+  var MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function p2(n){ return (n<10?'0':'')+n; }
+  function iso(y,m,d){ return y+'-'+p2(m+1)+'-'+p2(d); }
+  function parse(v){ var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v||''); return m?{y:+m[1],m:+m[2]-1,d:+m[3]}:null; }
+  function open(inp){
+    var t=new Date(), cur=parse(inp.value)||{y:t.getFullYear(),m:t.getMonth(),d:t.getDate()}, vy=cur.y, vm=cur.m, sel=iso(cur.y,cur.m,cur.d), min=inp.min||'', max=inp.max||'';
+    var ov=document.createElement('div'); ov.className='tp-overlay dp-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    var box=document.createElement('div'); box.className='dp'; ov.appendChild(box);
+    function draw(){
+      var first=new Date(vy,vm,1).getDay(), days=new Date(vy,vm+1,0).getDate(), h='';
+      h+='<div class="dp-hd"><button type="button" data-n="-1" aria-label="Previous month">‹</button><b>'+MN[vm]+' '+vy+'</b><button type="button" data-n="1" aria-label="Next month">›</button></div><div class="dp-g">';
+      ['S','M','T','W','T','F','S'].forEach(function(x){ h+='<i>'+x+'</i>'; });
+      for(var i=0;i<first;i++) h+='<span></span>';
+      for(var d=1;d<=days;d++){ var k=iso(vy,vm,d), c=(k===sel?' sel':'')+(k===iso(t.getFullYear(),t.getMonth(),t.getDate())?' today':''), off=((min&&k<min)||(max&&k>max))?' disabled':''; h+='<button type="button" class="'+c.trim()+'" data-d="'+k+'"'+off+'>'+d+'</button>'; }
+      h+='</div><div class="dp-ft"><button type="button" data-a="c">Cancel</button><button type="button" class="ok" data-a="ok">OK</button></div>';
+      box.innerHTML=h;
+    }
+    function close(){ ov.remove(); }
+    ov.addEventListener('click',function(e){
+      if(e.target===ov){ close(); return; }
+      var b=e.target.closest('button'); if(!b) return;
+      if(b.dataset.n){ vm+=+b.dataset.n; if(vm<0){ vm=11; vy--; } if(vm>11){ vm=0; vy++; } draw(); }
+      else if(b.dataset.d){ sel=b.dataset.d; draw(); }
+      else if(b.dataset.a==='c') close();
+      else if(b.dataset.a==='ok'){ inp.value=sel; inp.dispatchEvent(new Event('input',{bubbles:true})); inp.dispatchEvent(new Event('change',{bubbles:true})); close(); }
+    });
+    draw(); document.body.appendChild(ov);
+  }
+  function hit(e){ var i=e.target.closest&&e.target.closest('#custom-reminders-card input[type=date]'); if(!i) return null; return i; }
+  document.addEventListener('click',function(e){ var i=hit(e); if(!i) return; e.preventDefault(); e.stopPropagation(); open(i); },true);
+  document.addEventListener('keydown',function(e){ var i=hit(e); if(!i) return; if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(i); } },true);
 })();
 </script>
 <script id="notify-i-20261124-js">
