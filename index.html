@@ -29040,6 +29040,39 @@ html body .ayu-care-bt .bt-n{margin:5px 0 0;font-size:.76rem;line-height:1.35;co
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
 })();
 </script>
+<style id="slider-lock-20261124">
+.ayu-sl-row{display:flex;align-items:center;gap:10px}
+.ayu-sl-row>input[type=range]{flex:1 1 0;min-width:0;width:auto}
+.ayu-sl-lock{flex:0 0 30px;width:30px;height:30px;padding:0;margin:0;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--lkc,#3982c3);border-radius:50%;background:#fff;color:var(--lkc,#3982c3);cursor:pointer}
+.ayu-sl-lock.open{background:var(--lkc,#3982c3);color:#fff}
+.ayu-sl-lock svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ayu-sl-row>input[type=range]:disabled{pointer-events:none;opacity:.5;filter:grayscale(.6)}
+#activity-panel{--lkc:var(--act-2,#3982c3)}
+#nutrition-panel{--lkc:var(--nut-2,#73b13b)}
+#calculator-panel{--lkc:var(--calc-2,#1fa088)}
+</style>
+<script id="slider-lock-20261124-js">
+/* Age, height and weight sliders (Body, Food, Vitals) start locked, like Wake-up time: tap the lock to change, it locks again after 10 seconds */
+(function(){
+  var IDS=['body-age-slider','food-age-slider','height-slider','weight-slider','calc-height-slider','calc-weight-slider'];
+  var LK='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>', LKO='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 017.5-2"/></svg>';
+  function setup(id){
+    var sl=document.getElementById(id); if(!sl || sl.dataset.lk) return; sl.dataset.lk='1';
+    var nm=/age/.test(id)?'Age':/height/.test(id)?'Height':'Weight', lt=0;
+    var row=document.createElement('div'); row.className='ayu-sl-row'; sl.before(row); row.appendChild(sl);
+    var lk=document.createElement('button'); lk.type='button'; lk.className='ayu-sl-lock'; row.appendChild(lk);
+    function set(on){ clearTimeout(lt); sl.disabled=on; lk.classList.toggle('open',!on); lk.innerHTML=on?LK:LKO;
+      lk.setAttribute('aria-pressed',String(!on)); lk.setAttribute('aria-label',on?nm+' is locked. Tap to change it':nm+' can be changed. Tap to lock it');
+      if(!on) lt=setTimeout(function(){ set(true); },10000); }
+    function bump(){ if(!sl.disabled){ clearTimeout(lt); lt=setTimeout(function(){ set(true); },10000); } }
+    lk.addEventListener('click',function(){ set(!sl.disabled); });
+    sl.addEventListener('input',bump); sl.addEventListener('change',bump);
+    set(true);
+  }
+  function run(){ IDS.forEach(setup); }
+  run(); if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); setInterval(run,1500);
+})();
+</script>
 <style id="dp-20261124">
 .tp-overlay.dp-ov .dp{background:#fff;border-radius:24px;padding:16px 14px 12px;width:min(340px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.28);--dpc:var(--tl-0d9488,#73961b);font-family:inherit}
 .dp-hd{display:flex;align-items:center;justify-content:space-between;margin:0 2px 8px}
