@@ -30069,13 +30069,12 @@ html body #alerts-panel .med-form .md-x::before{content:"";display:block;width:1
 </style>
 
 <style id="med-groups-20261124j">
-/* each medicine: side stripe + number badge + a deeper tint, all in the section green */
+/* each medicine: flat tint + clear green edge + a solid number circle, all in the section green */
 html body #alerts-panel .med-form{counter-reset:mgn}
-html body #alerts-panel .med-form .mg{counter-increment:mgn;border-left:8px solid var(--mgs);padding-left:8px}
-html body #alerts-panel .med-form .mg.mc0{--mgbg:#f1f6e2;--mgc:#4f7410;--mgs:#4f7410}
-html body #alerts-panel .med-form .mg.mc1{--mgbg:#dfeab8;--mgc:#4f7410;--mgs:#6f9a1c}
-html body #alerts-panel .med-form .mg.mc2{--mgbg:#c8dd8f;--mgc:#3f6208;--mgs:#8fb83a}
-html body #alerts-panel .med-form .mg > .mg-hr .mg-h::before{content:counter(mgn);flex:none;width:24px;height:24px;box-sizing:border-box;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;line-height:1;border:2px solid #4f7410;background:#4f7410;color:#fff}
-html body #alerts-panel .med-form .mg.mc1 > .mg-hr .mg-h::before{background:#fff;color:#4f7410;border-color:#6f9a1c}
-html body #alerts-panel .med-form .mg.mc2 > .mg-hr .mg-h::before{background:#f1f6e2;color:#3f6208;border-color:#3f6208}
+html body #alerts-panel .med-form .mg{counter-increment:mgn;border:1.5px solid var(--mgs);padding:5px 11px}
+html body #alerts-panel .med-form .mg.mc0{--mgbg:#e9f1cf;--mgc:#4f7410;--mgs:#a6c45a;--mgn:#4f7410}
+html body #alerts-panel .med-form .mg.mc1{--mgbg:#dae8b3;--mgc:#4f7410;--mgs:#8db738;--mgn:#6f9a1c}
+html body #alerts-panel .med-form .mg.mc2{--mgbg:#c9dd95;--mgc:#3f6208;--mgs:#759f22;--mgn:#8fb83a}
+html body #alerts-panel .med-form .mg > .mg-hr .mg-h::before{content:counter(mgn);flex:none;width:26px;height:26px;box-sizing:border-box;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:800;line-height:1;background:var(--mgn);color:#fff;border:0}
+html body #alerts-panel .med-form .mg.mc2 > .mg-hr .mg-h::before{color:#1f3504}
 </style>
