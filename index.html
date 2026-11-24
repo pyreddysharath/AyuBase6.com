@@ -29400,6 +29400,13 @@ html body #alerts-panel .med-form .ts-b{padding:0 0 4px}
 html body #alerts-panel .med-form .mg .mg-c svg{width:16px;height:16px}
 html body #alerts-panel .med-form .md-x{font-size:.72rem;padding:0 4px;line-height:1;min-width:0;min-height:0;width:auto;height:auto}
 html body #alerts-panel .med-form .md-addtime{margin:0 0 2px}
+/* Medicine form 20261124e: smaller Save / Cancel (shown after a change), chevron after the bell */
+html body #alerts-panel .med-form .reminder-form-actions[hidden]{display:none}
+html body #alerts-panel .med-form .save-reminder,html body #alerts-panel .med-form .cancel-reminder{padding:6px 16px;font-size:.84rem;border-radius:9px}
+html body #alerts-panel .med-form .mf-top{gap:6px}
+html body #alerts-panel .med-form .mf-chev{flex:none;border:0;background:none;padding:4px;margin:0;cursor:pointer;color:#6f9a1c;display:inline-flex}
+html body #alerts-panel .med-form .mf-chev .mg-c{transform:rotate(180deg)}
+html body #alerts-panel .med-form .mf-bell svg,html body #alerts-panel .med-form .mf-chev svg{width:18px;height:18px}
 </style>
 <script id="medicine-20261123-js">
 (function(){
@@ -29565,7 +29572,7 @@ html body #alerts-panel .med-form .md-addtime{margin:0 0 2px}
   var SPKON='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
   var SPKOFF='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
   var PLAY='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>';
-  var BELL='<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6c0 6-3 8-3 8h18s-3-2-3-8a6 6 0 0 0-6-6zM10 19a2 2 0 0 0 4 0z"/></svg>';
+  var BELL='<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6c0 6-3 8-3 8h18s-3-2-3-8a6 6 0 0 0-6-6zM10 19a2 2 0 0 0 4 0z"/></svg>';
   var CHEV='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
   function foodName(v){ for(var i=0;i<FOODS.length;i++) if(FOODS[i][0]===v) return FOODS[i][1]; return ''; }
   function openForm(existing){
@@ -29579,7 +29586,7 @@ html body #alerts-panel .med-form .md-addtime{margin:0 0 2px}
     else doses=[newDose(0,null)];
     doses.forEach(function(d){ if(d.food==null) d.food=''; });
     var form=document.createElement('form'); form.className='med-form'; form.noValidate=true;
-    form.innerHTML='<div class="mf-top"><input class="mf-name" name="name" maxlength="80" autocomplete="off" placeholder="Name" aria-label="Name"><button type="button" class="mf-bell" aria-expanded="false" aria-label="Notification" title="Notification">'+BELL+'</button></div>'
+    form.innerHTML='<div class="mf-top"><input class="mf-name" name="name" maxlength="80" autocomplete="off" placeholder="Name" aria-label="Name"><button type="button" class="mf-bell" aria-expanded="false" aria-label="Notification" title="Notification">'+BELL+'</button><button type="button" class="mf-chev" aria-label="Close" title="Close"><span class="mg-c">'+CHEV+'</span></button></div>'
       +'<div class="mf-notif" hidden>'
         +'<div class="md-row"><span class="md-lbl">Sound</span><span class="md-snd"><select class="md-ctl md-sound">'+SOUND_OPTS()+'</select><button type="button" class="md-ic md-play" aria-label="Play sound" title="Play">'+PLAY+'</button><button type="button" class="md-ic md-mute" title="Mute"></button></span></div>'
         +'<div class="md-row ayu-vib-only"><span class="md-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" class="md-vib" aria-label="Vibrate"></label></div>'
@@ -29699,6 +29706,11 @@ html body #alerts-panel .med-form .md-addtime{margin:0 0 2px}
       if(existing){ existing.classList.remove('open'); var h=existing.querySelector('.cri-hdr'); if(h) h.setAttribute('aria-expanded','false'); startMed(existing); }
     }
     form.querySelector('.cancel-reminder').addEventListener('click',close);
+    form.querySelector('.mf-chev').addEventListener('click',close);
+    // Save and Cancel only show once something has been changed
+    var acts=form.querySelector('.reminder-form-actions'), base=JSON.stringify([form.elements.name.value,doses,snd]);
+    acts.hidden=true;
+    var dirtyT=setInterval(function(){ if(!form.isConnected){ clearInterval(dirtyT); return; } acts.hidden=(JSON.stringify([form.elements.name.value,doses,snd])===base); },300);
     form.addEventListener('submit',function(e){
       e.preventDefault(); msg('');
       var name=String(form.elements.name.value).trim();
