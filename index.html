@@ -29418,6 +29418,14 @@ html body #alerts-panel #custom-reminders-list:has(.med-form,.custom-reminder-fo
 html body #alerts-panel .med-form .mg.mc0{--mgbg:#e3edc6}
 html body #alerts-panel .med-form .mg.mc1{--mgbg:#d5e3b0}
 html body #alerts-panel .med-form .mg.mc2{--mgbg:#c8da98}
+/* Add buttons 20261124g: shorter, filled icons, still shown while a saved reminder is open */
+html body #alerts-panel #custom-reminders-list:has(.med-form,.custom-reminder-form,.med-choose) ~ .med-addrow{display:flex}
+html body #alerts-panel #custom-reminders-list:has(> .med-form,> .custom-reminder-form,> .med-choose) ~ .med-addrow{display:none}
+html body #alerts-panel .med-addrow .ma-btn{padding:5px 6px;font-size:.86rem;border-radius:10px;gap:6px}
+html body #alerts-panel .med-addrow .ma-btn svg{width:17px;height:17px;stroke:none;fill:none}
+html body #alerts-panel .med-addrow .ma-btn svg .f{fill:#6f9a1c;stroke:#6f9a1c;stroke-width:1}
+html body #alerts-panel .med-addrow .ma-btn svg .g{fill:none;stroke:#f4f9e6;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+html body #alerts-panel .med-addrow .ma-btn svg .e{fill:none;stroke:#6f9a1c;stroke-width:2.2;stroke-linecap:round}
 </style>
 <script id="medicine-20261123-js">
 (function(){
@@ -29947,7 +29955,8 @@ html body #alerts-panel .med-form .mg.mc2{--mgbg:#c8da98}
   function ensureRow(){
     var l=list(); if(!l || document.querySelector('.med-addrow')) return;
     var row=document.createElement('div'); row.className='med-addrow';
-    row.innerHTML='<button type="button" class="ma-btn" data-t="med">'+PILL+'<span>Add medicine</span></button><button type="button" class="ma-btn" data-t="rem">'+CLOCK+'<span>Add reminder</span></button>';
+    var PILLF='<svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M10.5 20.5a4.95 4.95 0 0 1-7-7l10-10a4.95 4.95 0 0 1 7 7z"/><path class="g" d="M8.5 8.5l7 7"/></svg>', CLOCKF='<svg viewBox="0 0 24 24" aria-hidden="true"><circle class="f" cx="12" cy="13" r="8"/><path class="g" d="M12 9v4l2.5 2"/><path class="e" d="M5 3.5L2.5 6M19 3.5L21.5 6"/></svg>';
+    row.innerHTML='<button type="button" class="ma-btn" data-t="med">'+PILLF+'<span>Add medicine</span></button><button type="button" class="ma-btn" data-t="rem">'+CLOCKF+'<span>Add reminder</span></button>';
     var ab=$('custom-reminder-add'); (ab && ab.parentNode===l.parentNode ? ab : l).after(row);
     row.querySelector('[data-t=med]').addEventListener('click',function(){ closeForms(); openForm(null); });
     row.querySelector('[data-t=rem]').addEventListener('click',function(){ closeForms(); oAdd.call(window); });
