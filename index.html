@@ -29407,6 +29407,13 @@ html body #alerts-panel .med-form .mf-top{gap:6px}
 html body #alerts-panel .med-form .mf-chev{flex:none;border:0;background:none;padding:4px;margin:0;cursor:pointer;color:#6f9a1c;display:inline-flex}
 html body #alerts-panel .med-form .mf-chev .mg-c{transform:rotate(180deg)}
 html body #alerts-panel .med-form .mf-bell svg,html body #alerts-panel .med-form .mf-chev svg{width:18px;height:18px}
+/* Add medicine / Add reminder: two buttons, always there; hidden while a form is open */
+html body #alerts-panel #custom-reminders-card #custom-reminder-add{display:none !important}
+html body #alerts-panel .med-addrow{display:flex;gap:8px;margin:10px 0 4px}
+html body #alerts-panel .med-addrow .ma-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;border:1.5px solid #6f9a1c;border-radius:11px;padding:9px 6px;background:#f4f9e6;color:#4d6b0a;font:inherit;font-size:.9rem;font-weight:800;cursor:pointer;white-space:nowrap}
+html body #alerts-panel .med-addrow .ma-btn svg{width:18px;height:18px;stroke:#6f9a1c;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+html body #alerts-panel .med-addrow .ma-btn:active{background:#e4edc9}
+html body #alerts-panel #custom-reminders-list:has(.med-form,.custom-reminder-form,.med-choose) ~ .med-addrow{display:none}
 </style>
 <script id="medicine-20261123-js">
 (function(){
@@ -29932,7 +29939,17 @@ html body #alerts-panel .med-form .mf-bell svg,html body #alerts-panel .med-form
     window.handleNudgeClick._med=true; return true;
   }
   (function(){ var b=$('custom-reminder-add'); if(b){ b.title='Add a medicine or reminder'; b.setAttribute('aria-label','Add a medicine or reminder'); } })();
+  // two always-visible buttons: Add medicine, Add reminder
+  function ensureRow(){
+    var l=list(); if(!l || document.querySelector('.med-addrow')) return;
+    var row=document.createElement('div'); row.className='med-addrow';
+    row.innerHTML='<button type="button" class="ma-btn" data-t="med">'+PILL+'<span>Add medicine</span></button><button type="button" class="ma-btn" data-t="rem">'+CLOCK+'<span>Add reminder</span></button>';
+    var ab=$('custom-reminder-add'); (ab && ab.parentNode===l.parentNode ? ab : l).after(row);
+    row.querySelector('[data-t=med]').addEventListener('click',function(){ closeForms(); openForm(null); });
+    row.querySelector('[data-t=rem]').addEventListener('click',function(){ closeForms(); oAdd.call(window); });
+  }
   var n=0, iv=setInterval(function(){
+    ensureRow();
     var ab=$('custom-reminder-add'), sp=ab && ab.querySelector('span:last-child'); if(sp && sp.textContent==='Add a reminder') sp.textContent='Add a medicine or reminder';
     var a=patchRem(), b=wrapRules(), c=wrapVib(), d=wrapClick(); sections();
     if((a&&b&&c&&d && list() && list().querySelector(':scope > .med-sec-h')) || ++n>60) clearInterval(iv);
