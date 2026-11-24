@@ -12632,6 +12632,7 @@ function toggleRoutineInfo(key){
   if(!panel) return;
   const isOpen=panel.style.display!=='none';
   panel.style.display=isOpen?'none':'block';
+  document.querySelectorAll('.rout-info-btn[onclick*="toggleRoutineInfo(\''+key+'\')"]').forEach(function(b){ b.classList.toggle('active',!isOpen); });
 }
 initRoutinesChecklist();
 
@@ -30036,5 +30037,20 @@ html body #alerts-panel .med-item.open > .cri-hdr{display:none !important}
     if((a&&b&&c&&d && list() && list().querySelector(':scope > .med-sec-h')) || ++n>60) clearInterval(iv);
   },250);
   if(list()) new MutationObserver(function(){ sections(); }).observe(list(),{childList:true});
+})();
+</script>
+
+<style id="i-open-fill-20261124">
+/* every i: filled only while its text/section is open; a touch screen keeps :hover after a tap, so there it never fills on its own */
+@media (hover:none){
+html body :is(.calc-info-btn,.reminder-hours-info-btn,.ayu-desc-btn,.alert-info-btn,.notif-info-btn,.backup-info-btn,.othersites-info-btn,.ayu-sec-i,.ayu-i):is(:hover,:focus,:active):not(.active):not([aria-expanded="true"]):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){background:#fff !important;color:var(--ii-c,var(--rout-2,#41aad4)) !important;border-color:color-mix(in srgb,var(--ii-c,var(--rout-2,#41aad4)) 55%,#fff) !important}
+}
+html body :is(.calc-info-btn,.reminder-hours-info-btn,.ayu-desc-btn,.alert-info-btn,.notif-info-btn,.backup-info-btn,.ayu-sec-i,.ayu-i):is(.active,[aria-expanded="true"]):not(.othersites-info-btn):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){background:var(--ii-c,var(--rout-2,#41aad4)) !important;color:#fff !important;border-color:var(--ii-c,var(--rout-2,#41aad4)) !important}
+html body :is(.calc-info-btn,.reminder-hours-info-btn,.ayu-desc-btn,.alert-info-btn,.notif-info-btn,.backup-info-btn,.ayu-sec-i,.ayu-i):is(:focus,:focus-visible):not(:hover):not(.active):not([aria-expanded="true"]):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){outline:none}
+</style>
+<script id="i-open-fill-20261124-js">
+(function(){
+  var SEL='.calc-info-btn,.reminder-hours-info-btn,.ayu-desc-btn,.alert-info-btn,.notif-info-btn,.backup-info-btn,.othersites-info-btn,.ayu-sec-i,.ayu-i';
+  document.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest(SEL); if(b) setTimeout(function(){ try{ b.blur(); }catch(x){} },0); },true);
 })();
 </script>
