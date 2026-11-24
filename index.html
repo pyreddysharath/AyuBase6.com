@@ -28958,6 +28958,26 @@ html body #sec-notifications .na-g{border-left:0 !important;padding-left:4px !im
   setInterval(place,1000);
 })();
 </script>
+<style id="care-fields-20261124">
+/* Care: the time picker opens in Care's sky blue (it was lime), and the From / to time fields use the same text and border as the other fields (Sound, Every ...) */
+.tp-overlay.care-tp .tp-dialog{--tp-accent:var(--rout-2,#41aad4)}
+.tp-overlay.care-tp{--alert-2:var(--rout-2,#41aad4);--tl-0d9488:var(--rout-2,#41aad4);--tl-134e4a:color-mix(in srgb,var(--rout-2,#41aad4) 62%,#000)}
+.tp-overlay.care-tp .tp-dial circle:first-child{fill:color-mix(in srgb,var(--rout-2,#41aad4) 12%,#fff)}
+.tp-overlay.care-tp .tp-dial text:not([fill="#fff"]){fill:color-mix(in srgb,var(--rout-2,#41aad4) 62%,#000)}
+.tp-overlay.care-tp .tp-seg:not(.on){background:color-mix(in srgb,var(--rout-2,#41aad4) 16%,#fff)}
+html body #alerts-panel .alert-page[data-remtab="breaks"] button.eye-ex-time-item:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){color:#336374 !important;border-color:#cbd5e1 !important}
+</style>
+<script id="care-fields-20261124-js">
+(function(){
+  // a time picker opened while Care is open takes Care's colour
+  new MutationObserver(function(ms){
+    ms.forEach(function(m){ [].forEach.call(m.addedNodes,function(n){
+      if(!n.classList || !n.classList.contains('tp-overlay') || n.classList.contains('mind-tp')) return;
+      var a=document.querySelector('.tab-btn.active'); if(a && a.classList.contains('routines')){ n.classList.add('care-tp'); setTimeout(function(){ try{ var d=n.querySelector('.tp-dialog'), k=n.querySelector('.tp-ok'); if(d && k) d.style.setProperty('--ayu-kb-c',getComputedStyle(k).backgroundColor); }catch(e){} },80); }
+    }); });
+  }).observe(document.body,{childList:true});
+})();
+</script>
 <style id="care-buttons-20261124">
 /* Settings → Notifications → Care: Done / Not yet buttons, or just a reminder */
 html body .ayu-care-bt{margin:0 0 18px;padding:0 2px;color:#334155}
