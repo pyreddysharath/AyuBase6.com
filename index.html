@@ -28491,6 +28491,7 @@ html body .trk-redorange::before { background:linear-gradient(180deg,#b91c1c 50%
       card0.after(card);
     }
     var hdr=card.querySelector('.rout-card-hdr');
+    var nip=$('rout-info-notify'); if(hdr && nip && nip.previousElementSibling!==hdr) hdr.after(nip);
     if(hdr && !$('routines-master-toggle')){
       var l=document.createElement('label'); l.className='master-switch rout-master-switch'; l.title='Turn Checks notifications on or off';
       l.innerHTML='<input type="checkbox" id="routines-master-toggle" aria-label="Turn Checks notifications on or off">';
@@ -28981,13 +28982,15 @@ html body #alerts-panel .alert-page[data-remtab="breaks"] button.eye-ex-time-ite
 })();
 </script>
 <style id="care-ac-note-20261124">
-html body .ayu-ac-note{margin:8px 0 0;font-size:.85rem;line-height:1.4}
+html body li.ayu-ac-note{margin:4px 0 0}
+html body #routines-panel #routines-notify-card.ayu-in-day.ayu-closed > #rout-info-notify[style*="block"]:not(#ayu-x1):not(#ayu-x2){display:block !important;margin:8px 0 4px !important}
+html body #routines-panel #rout-info-wake > strong,html body #routines-panel #rout-info-notify > strong{color:#1a6585 !important;border-left-color:var(--rout-2,#41aad4) !important}
 </style>
 <script id="care-ac-note-20261124-js">
 (function(){
   var IDS=['alert-break-task','alert-walk-task','alert-drink-task','alert-posture-task','alert-stretch-task','alert-breathe-task','alert-break-ex-task'];
   var TXT='<b>Closes by itself?</b> Auto-close applies to all Care notifications: Settings → Notifications → Care → Auto-close after.';
-  function add(){ IDS.forEach(function(id){ var e=document.getElementById(id); if(e && !e.querySelector('.ayu-ac-note')){ var p=document.createElement('p'); p.className='ayu-ac-note'; p.innerHTML=TXT; e.appendChild(p); } }); }
+  function add(){ IDS.forEach(function(id){ var e=document.getElementById(id); if(e && !e.querySelector('.ayu-ac-note')){ var li=document.createElement('li'); li.className='ayu-ac-note'; li.innerHTML=TXT; var ul=e.querySelector('ul'); if(!ul){ ul=document.createElement('ul'); e.appendChild(ul); } ul.appendChild(li); } }); }
   add(); setInterval(add,1500);
 })();
 </script>
