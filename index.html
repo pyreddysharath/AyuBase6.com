@@ -26440,6 +26440,14 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .rf
   fix(); setInterval(fix,1500);
 })();
 </script>
+<script id="alert-tp-20261124-js">
+(function(){
+  new MutationObserver(function(ms){ ms.forEach(function(m){ [].forEach.call(m.addedNodes,function(n){
+    if(!n.classList || !n.classList.contains('tp-overlay') || n.classList.contains('mind-tp') || n.classList.contains('care-tp')) return;
+    var a=document.querySelector('.tab-btn.active'); if(a && a.classList.contains('alerts')) n.classList.add('alert-tp');
+  }); }); }).observe(document.body,{childList:true});
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
@@ -29325,6 +29333,40 @@ html body #alerts-panel .med-form .md-ic.muted{background:var(--mca);color:#fff;
 .med-hist .mh-t td.f{background:#e8ebe1}
 .med-hist .mh-clear{padding:8px 16px;border:1.5px solid #b91c1c;border-radius:10px;background:#fff;color:#b91c1c;font:inherit;font-weight:700;cursor:pointer}
 .med-hist .mh-clear.sure{background:#b91c1c;color:#fff}
+/* Medicine form 20261124b: name on top with the bell, a section per medicine, a section per time */
+html body #alerts-panel .med-form .mf-top{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+html body #alerts-panel .med-form .mf-name{flex:1;min-width:0;box-sizing:border-box;border:0;border-bottom:2px solid var(--mcbd);background:none;color:#4d6b0a;font:inherit;font-size:1.1rem;font-weight:800;padding:4px 2px;border-radius:0}
+html body #alerts-panel .med-form .mf-name:focus{outline:none;border-bottom-color:var(--mca)}
+html body #alerts-panel .med-form .mf-bell{flex:0 0 34px;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--mca);background:#fff;color:var(--mca);display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+html body #alerts-panel .med-form .mf-bell.on{background:var(--mca);color:#fff}
+html body #alerts-panel .med-form .mf-notif{border:1.5px solid #d1d8bf;border-radius:12px;background:#fff;padding:6px 10px 8px;margin:0 0 10px}
+html body #alerts-panel .med-form .mf-notif[hidden]{display:none}
+html body #alerts-panel .med-form .mg{border-top:1px dashed #c3cfa3;padding-top:6px;margin-top:6px}
+html body #alerts-panel .med-form .mg:first-child{border-top:0;margin-top:0}
+html body #alerts-panel .med-form .mg-hr,html body #alerts-panel .med-form .ts-hr{display:flex;align-items:center;gap:6px}
+html body #alerts-panel .med-form .mg-h,html body #alerts-panel .med-form .ts-h{flex:1;display:flex;align-items:center;gap:8px;border:0;background:none;color:#4d6b0a;font:inherit;font-weight:800;font-size:.95rem;text-align:left;padding:6px 0;cursor:pointer;min-width:0}
+html body #alerts-panel .med-form .ts-h{font-weight:700;font-size:.86rem}
+html body #alerts-panel .med-form .mg-t,html body #alerts-panel .med-form .ts-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body #alerts-panel .med-form .mg-c{flex:none;display:inline-flex;color:var(--mca);transition:transform .15s}
+html body #alerts-panel .med-form .mg.open > .mg-hr .mg-c,html body #alerts-panel .med-form .ts.open > .ts-hr .mg-c{transform:rotate(180deg)}
+html body #alerts-panel .med-form .mg-b[hidden],html body #alerts-panel .med-form .ts-b[hidden]{display:none}
+html body #alerts-panel .med-form .mg-b{padding:2px 0 4px}
+html body #alerts-panel .med-form .ts{border:1.5px solid #cfe0a0;border-radius:11px;background:#fbfdf4;padding:2px 10px;margin:7px 0}
+html body #alerts-panel .med-form .ts-b{padding:0 0 6px}
+html body #alerts-panel .med-form .md-addtime{display:flex;align-items:center;gap:8px;border:0;background:none;color:var(--mca);font:inherit;font-size:.84rem;font-weight:700;cursor:pointer;padding:2px 0;margin:2px 0 4px}
+html body #alerts-panel .med-form .md-addtime .med-plus{width:24px;height:24px;font-size:1.05rem;border-width:2px}
+html body #alerts-panel .med-form .md-x{flex:none}
+/* the time picker in Alerts: lime */
+.tp-overlay.alert-tp .tp-dialog{--tp-accent:#73961b}
+.tp-overlay.alert-tp{--alert-2:#73961b;--tl-0d9488:#73961b;--tl-134e4a:#4d6b0a}
+.tp-overlay.alert-tp .tp-dial circle:first-child{fill:#eef3dc}
+.tp-overlay.alert-tp .tp-dial text:not([fill="#fff"]){fill:#4d6b0a}
+.tp-overlay.alert-tp .tp-seg:not(.on){background:#e6efd0}
+/* clear history: undo */
+.med-hist{position:relative}
+.med-hist .mh-toast{position:sticky;bottom:0;margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#33401a;color:#fff;border-radius:10px;padding:9px 12px;font-size:.84rem}
+.med-hist .mh-undo{border:0;background:none;color:#d4ec8a;font:inherit;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.03em}
+.med-hist .mh-clear.sure{background:#fff;color:#b91c1c}
 </style>
 <script id="medicine-20261123-js">
 (function(){
@@ -29490,68 +29532,72 @@ html body #alerts-panel .med-form .md-ic.muted{background:var(--mca);color:#fff;
   var SPKON='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
   var SPKOFF='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
   var PLAY='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>';
+  var BELL='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
+  var CHEV='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  function foodName(v){ for(var i=0;i<FOODS.length;i++) if(FOODS[i][0]===v) return FOODS[i][1]; return ''; }
   function openForm(existing){
     var l=list(); if(!l) return;
     closeForms();
     if(existing) stopMed(existing);
     var saved=existing ? dataOf(existing) : {};
     var doses=(saved.doses||[]).map(function(x){ return JSON.parse(JSON.stringify(x)); });
-    if(!doses.length) doses=[newDose(0,null)];
+    var snd={sound:'xylophone',muted:false,vibrate:true};
+    if(doses.length){ snd.sound=doses[0].sound||'xylophone'; snd.muted=!!doses[0].muted; snd.vibrate=doses[0].vibrate!==false; }
+    else doses=[newDose(0,null)];
+    doses.forEach(function(d){ if(d.food==null) d.food=''; });
     var form=document.createElement('form'); form.className='med-form'; form.noValidate=true;
-    form.innerHTML='<label class="med-name"><span class="md-lbl">Name</span><input class="md-ctl" name="name" maxlength="80" autocomplete="off" ></label>'
+    form.innerHTML='<div class="mf-top"><input class="mf-name" name="name" maxlength="80" autocomplete="off" placeholder="Name" aria-label="Name"><button type="button" class="mf-bell" aria-expanded="false" aria-label="Notification" title="Notification">'+BELL+'</button></div>'
+      +'<div class="mf-notif" hidden>'
+        +'<div class="md-row"><span class="md-lbl">Sound</span><span class="md-snd"><select class="md-ctl md-sound">'+SOUND_OPTS()+'</select><button type="button" class="md-ic md-play" aria-label="Play sound" title="Play">'+PLAY+'</button><button type="button" class="md-ic md-mute" title="Mute"></button></span></div>'
+        +'<div class="md-row ayu-vib-only"><span class="md-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" class="md-vib" aria-label="Vibrate"></label></div>'
+        +'<div class="md-prev-row"><button type="button" class="alert-preview-btn ayu-prev-btn md-prev">Preview notification</button><span class="ayu-prev-msg" hidden></span></div>'
+      +'</div>'
       +'<div class="med-doses"></div>'
       +'<button type="button" class="med-add-dose"><span class="med-plus" aria-hidden="true">+</span><span>Add another</span></button>'
       +'<div class="med-msg" role="alert" hidden></div>'
       +'<div class="reminder-form-actions"><button class="save-reminder" type="submit">Save</button><button class="cancel-reminder" type="button">Cancel</button></div>';
     form.elements.name.value=saved.name||'';
-    var box=form.querySelector('.med-doses');
+    var box=form.querySelector('.med-doses'), openG={}, openT={};
     function msg(t){ var m=form.querySelector('.med-msg'); m.textContent=t||''; m.hidden=!t; }
     function gid(d){ return d.g!=null ? String(d.g) : 'n'+d.n; }
     function groups(){ var o=[],seen={}; doses.forEach(function(d){ var k=gid(d); if(!seen[k]){ seen[k]=[]; o.push(seen[k]); } seen[k].push(d); }); return o; }
-    function draw(){
-      box.innerHTML='';
-      groups().forEach(function(g){ box.append(doseBlock(g)); });
+    openG[gid(doses[0])]=true;
+    // the notification block (Sound, Vibrate, Preview): once for the name
+    var bell=form.querySelector('.mf-bell'), np=form.querySelector('.mf-notif');
+    bell.addEventListener('click',function(){ var o=np.hidden; np.hidden=!o; bell.classList.toggle('on',o); bell.setAttribute('aria-expanded',String(o)); });
+    var sn=form.querySelector('.md-sound'); sn.value=snd.sound; if(!sn.value) sn.value='xylophone'; snd.sound=sn.value; sn.addEventListener('change',function(){ snd.sound=sn.value; });
+    var vb=form.querySelector('.md-vib'); vb.checked=snd.vibrate; vb.addEventListener('change',function(){ snd.vibrate=vb.checked; });
+    var mu=form.querySelector('.md-mute');
+    function paintMu(){ mu.classList.toggle('muted',!!snd.muted); mu.innerHTML=snd.muted ? SPKOFF : SPKON; mu.title=snd.muted ? 'Unmute' : 'Mute'; mu.setAttribute('aria-label',mu.title); } paintMu();
+    mu.addEventListener('click',function(){ snd.muted=!snd.muted; paintMu(); });
+    form.querySelector('.md-play').addEventListener('click',function(){ if(typeof playAlertPreset==='function') playAlertPreset(snd.sound||'xylophone'); });
+    form.querySelector('.md-prev').addEventListener('click',function(){
+      var nm=String(form.elements.name.value).trim()||'Medicine';
+      if(typeof window.ayuPreviewNote==='function') window.ayuPreviewNote(nm,bodyText(doses[0]),'reminders','preview-medpv',ACTS,snd.vibrate ? 'medpv-on' : 'medpv-off');
+    });
+    function tsTitle(m,wk){
+      var t=clock(m.time), f=foodName(m.food); if(f) t+=' · '+f;
+      if(!wk){ if(m.date) t+=' · '+fmtDate(m.date); }
+      else if(m.till==='date'){ if(m.untilDate) t+=' · till '+fmtDate(m.untilDate); }
+      else if(+m.tillDays>0) t+=' · '+m.tillDays+' days';
+      return t;
     }
-    function setFreq(g,N){
-      var d=g[0], k=gid(d);
-      while(g.length>N){ var x=g.pop(); doses.splice(doses.indexOf(x),1); }
-      while(g.length<N){
-        var n=doses.reduce(function(a,y){ return Math.max(a,y.n); },-1)+1, c=newDose(n,d,k);
-        c.time=(FREQ_T[N]||FREQ_T[3])[g.length]; c.days=d.days.slice(); c.sound=d.sound; c.muted=d.muted; c.vibrate=d.vibrate;
-        doses.splice(doses.indexOf(g[g.length-1])+1,0,c); g.push(c);
-      }
-      draw();
-    }
-    function doseBlock(g){
-      var d=g[0], b=document.createElement('div'); b.className='med-dose';
-      var weekly=d.rep!=='once';
-      b.innerHTML='<div class="md-row md-r-med"><span class="md-lbl">Medicine</span><div class="md-medbox"><input class="md-ctl md-med" maxlength="80" autocomplete="off" aria-label="Medicine">'+(groups().length>1 ? '<button type="button" class="md-x" aria-label="Remove this medicine">✕</button>' : '')+'</div></div>'
-        +'<div class="md-row"><span class="md-lbl">Frequency</span><div class="md-seg md-freq" role="group" aria-label="Frequency"><button type="button" data-v="1">Once a day</button><button type="button" data-v="2">Twice</button><button type="button" data-v="3">3 times</button></div></div>'
-        +'<div class="md-times"></div>'
-        +'<div class="md-row"><span class="md-lbl">Food</span><div class="md-seg md-food" role="group" aria-label="Food">'+FOODS.map(function(f){ return '<button type="button" data-v="'+f[0]+'">'+f[1]+'</button>'; }).join('')+'</div></div>'
-        +'<div class="md-row md-r-days" '+(weekly?'':'hidden')+'><span class="md-lbl">On days</span><div class="md-days" role="group" aria-label="On days"></div></div>'
-        +'<div class="md-row md-r-date" '+(weekly?'hidden':'')+'><span class="md-lbl">On</span><input type="date" class="md-ctl md-date" aria-label="Date"></div>'
-        +'<div class="md-row md-r-till" '+(weekly?'':'hidden')+'><span class="md-lbl">Till</span><div class="md-till"><div class="md-seg md-tm" role="group" aria-label="Till"><button type="button" data-v="days">Days</button><button type="button" data-v="date">Date</button></div><input type="number" min="1" max="365" inputmode="numeric" class="md-ctl md-tdays" aria-label="Number of days"><input type="date" class="md-ctl md-tdate" aria-label="Last day"></div></div>'
-        +'<div class="md-row"><span class="md-lbl">Sound</span><span class="md-snd"><select class="md-ctl md-sound">'+SOUND_OPTS()+'</select><button type="button" class="md-ic md-play" aria-label="Play sound" title="Play">'+PLAY+'</button><button type="button" class="md-ic md-mute" title="Mute"></button></span></div>'
-        +'<div class="md-row ayu-vib-only"><span class="md-lbl">Vibrate</span><label class="master-switch" title="Vibrate"><input type="checkbox" class="md-vib" aria-label="Vibrate"></label></div>'
-        +'<div class="md-prev-row"><button type="button" class="alert-preview-btn ayu-prev-btn md-prev">Preview notification</button><span class="ayu-prev-msg" hidden></span></div>';
-      var fq=b.querySelector('.md-freq'); fq.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-pressed',String(+x.dataset.v===g.length)); x.addEventListener('click',function(){ if(+x.dataset.v!==g.length) setFreq(g,+x.dataset.v); }); });
-      var tbox=b.querySelector('.md-times');
-      g.forEach(function(m,k){
-        var r=document.createElement('div');
-        r.innerHTML='<div class="md-row"><span class="md-lbl">'+(g.length>1 ? 'Time '+(k+1) : 'Time')+'</span><button type="button" class="md-ctl md-time duration-clock-trigger"></button></div>'
-          +'<div class="md-row md-r-when"><span class="md-lbl">When</span><div class="md-seg md-when" role="group" aria-label="When"><button type="button" data-v="morning">Morning</button><button type="button" data-v="noon">Noon</button><button type="button" data-v="evening">Evening</button><button type="button" data-v="night">Night</button></div></div>';
-        var tb=r.querySelector('.md-time'), wb=r.querySelectorAll('.md-when button');
-        function showT(){ tb.textContent=clock(m.time); wb.forEach(function(x){ x.setAttribute('aria-pressed',String(x.dataset.v===whenOf(m.time))); }); } showT();
-        tb.addEventListener('click',function(){ if(typeof openTimePicker==='function') openTimePicker('custom',m.time,function(v){ m.time=v; showT(); },'Select time'); });
-        wb.forEach(function(x){ x.addEventListener('click',function(){ m.time=WHEN_T[x.dataset.v]; showT(); }); });
-        tbox.append(r);
-      });
-      b.querySelectorAll('.md-food button').forEach(function(x){
-        x.setAttribute('aria-pressed',String(d.food===x.dataset.v));
-        x.addEventListener('click',function(){ d.food=d.food===x.dataset.v ? '' : x.dataset.v; b.querySelectorAll('.md-food button').forEach(function(y){ y.setAttribute('aria-pressed',String(d.food===y.dataset.v)); }); });
-      });
-      var mi=b.querySelector('.md-med'); mi.value=d.med||''; mi.addEventListener('input',function(){ d.med=mi.value; });
+    function draw(){ box.innerHTML=''; groups().forEach(function(g){ box.append(groupBlock(g)); }); }
+    function toggle(head,body,flag,key,store){ head.addEventListener('click',function(){ var o=body.hidden; body.hidden=!o; head.setAttribute('aria-expanded',String(o)); head.parentNode.classList.toggle('open',o); store[key]=o; }); }
+    function groupBlock(g){
+      var d=g[0], k=gid(d), weekly=d.rep!=='once', multi=groups().length>1;
+      var b=document.createElement('div'); b.className='mg'+(openG[k]?' open':'');
+      b.innerHTML='<div class="mg-hr"><button type="button" class="mg-h" aria-expanded="'+(openG[k]?'true':'false')+'"><span class="mg-t"></span><span class="mg-c">'+CHEV+'</span></button>'+(multi ? '<button type="button" class="md-x" aria-label="Remove this medicine">✕</button>' : '')+'</div>'
+        +'<div class="mg-b"'+(openG[k]?'':' hidden')+'>'
+          +'<div class="md-row md-r-med"><span class="md-lbl">Medicine</span><input class="md-ctl md-med" maxlength="80" autocomplete="off" aria-label="Medicine"></div>'
+          +'<div class="md-row md-r-days" '+(weekly?'':'hidden')+'><span class="md-lbl">On days</span><div class="md-days" role="group" aria-label="On days"></div></div>'
+          +'<div class="md-times"></div>'
+          +'<button type="button" class="md-addtime"><span class="med-plus" aria-hidden="true">+</span><span>Add time</span></button>'
+        +'</div>';
+      var title=b.querySelector('.mg-t'); function paintTitle(){ title.textContent=d.med ? d.med : 'Medicine'; } paintTitle();
+      toggle(b.querySelector('.mg-h'),b.querySelector('.mg-b'),null,k,openG);
+      var mi=b.querySelector('.md-med'); mi.value=d.med||''; mi.addEventListener('input',function(){ d.med=mi.value; paintTitle(); });
+      var rm=b.querySelector('.md-x'); if(rm) rm.addEventListener('click',function(){ g.forEach(function(x){ doses.splice(doses.indexOf(x),1); }); draw(); });
       var dayBox=b.querySelector('.md-days');
       function drawDays(){
         dayBox.innerHTML='';
@@ -29562,37 +29608,50 @@ html body #alerts-panel .med-form .md-ic.muted{background:var(--mca);color:#fff;
         });
       }
       drawDays();
-      function seg(sel,get,set,after){
-        var s=b.querySelector(sel); function paint(){ s.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-pressed',String(x.dataset.v===get())); }); }
-        paint(); s.querySelectorAll('button').forEach(function(x){ x.addEventListener('click',function(){ set(x.dataset.v); paint(); if(after) after(); }); });
-      }
-      function layout(){
-        var wk=d.rep!=='once';
-        b.querySelector('.md-r-days').hidden=!wk; b.querySelector('.md-r-till').hidden=!wk; b.querySelector('.md-r-date').hidden=wk;
-        b.querySelector('.md-tdays').hidden=d.till!=='days'; b.querySelector('.md-tdate').hidden=d.till!=='date';
-      }
-      seg('.md-tm',function(){ return d.till; },function(v){ d.till=v; if(v==='date' && !d.untilDate) d.untilDate=addDays(iso(),+d.tillDays>0 ? +d.tillDays-1 : 29); },layout);
-      var dt=b.querySelector('.md-date'); dt.value=d.date||iso(); dt.addEventListener('change',function(){ if(dt.value) d.date=dt.value; });
-      var td=b.querySelector('.md-tdays'); td.value=d.tillDays; td.addEventListener('input',function(){ d.tillDays=td.value; });
-      var te=b.querySelector('.md-tdate'); te.value=d.untilDate||''; te.addEventListener('change',function(){ d.untilDate=te.value; });
-      layout();
-      var sn=b.querySelector('.md-sound'); sn.value=d.sound||'xylophone'; if(!sn.value) sn.value='xylophone'; d.sound=sn.value; sn.addEventListener('change',function(){ d.sound=sn.value; });
-      var vb=b.querySelector('.md-vib'); vb.checked=d.vibrate!==false; vb.addEventListener('change',function(){ d.vibrate=vb.checked; });
-      var mu=b.querySelector('.md-mute');
-      function paintMu(){ mu.classList.toggle('muted',!!d.muted); mu.innerHTML=d.muted ? SPKOFF : SPKON; mu.title=d.muted ? 'Unmute' : 'Mute'; mu.setAttribute('aria-label',mu.title); } paintMu();
-      mu.addEventListener('click',function(){ d.muted=!d.muted; paintMu(); });
-      b.querySelector('.md-play').addEventListener('click',function(){ if(typeof playAlertPreset==='function') playAlertPreset(d.sound||'xylophone'); });
-      var rm=b.querySelector('.md-x'); if(rm) rm.addEventListener('click',function(){ g.forEach(function(x){ doses.splice(doses.indexOf(x),1); }); draw(); });
-      b.querySelector('.md-prev').addEventListener('click',function(){
-        var nm=String(form.elements.name.value).trim()||'Medicine';
-        if(typeof window.ayuPreviewNote==='function') window.ayuPreviewNote(nm,bodyText(d),'reminders','preview-medpv',ACTS,d.vibrate!==false ? 'medpv-on' : 'medpv-off');
+      var tbox=b.querySelector('.md-times');
+      g.forEach(function(m){ tbox.append(timeBlock(g,m,weekly)); });
+      b.querySelector('.md-addtime').addEventListener('click',function(){
+        var last=g[g.length-1], n=doses.reduce(function(a,y){ return Math.max(a,y.n); },-1)+1, used=g.map(function(y){ return y.time; });
+        var c=JSON.parse(JSON.stringify(last)); c.n=n; c.food='';
+        var pick=['08:00','14:00','21:00','11:00','17:00','23:00'].filter(function(t){ return used.indexOf(t)<0; })[0]; c.time=pick||'12:00';
+        doses.splice(doses.indexOf(last)+1,0,c); openT[n]=true; openG[k]=true; draw();
       });
       return b;
+    }
+    function timeBlock(g,m,weekly){
+      var multi=g.length>1, open=!!openT[m.n];
+      var s=document.createElement('div'); s.className='ts'+(open?' open':'');
+      s.innerHTML='<div class="ts-hr"><button type="button" class="ts-h" aria-expanded="'+(open?'true':'false')+'"><span class="ts-t"></span><span class="mg-c">'+CHEV+'</span></button>'+(multi ? '<button type="button" class="md-x" aria-label="Remove this time">✕</button>' : '')+'</div>'
+        +'<div class="ts-b"'+(open?'':' hidden')+'>'
+          +'<div class="md-row"><span class="md-lbl">Time</span><button type="button" class="md-ctl md-time duration-clock-trigger"></button></div>'
+          +'<div class="md-row md-r-date" '+(weekly?'hidden':'')+'><span class="md-lbl">On</span><input type="date" class="md-ctl md-date" aria-label="Date"></div>'
+          +'<div class="md-row md-r-till" '+(weekly?'':'hidden')+'><span class="md-lbl">Till</span><div class="md-till"><div class="md-seg md-tm" role="group" aria-label="Till"><button type="button" data-v="days">Days</button><button type="button" data-v="date">Date</button></div><input type="number" min="1" max="365" inputmode="numeric" class="md-ctl md-tdays" aria-label="Number of days"><input type="date" class="md-ctl md-tdate" aria-label="Last day"></div></div>'
+          +'<div class="md-row"><span class="md-lbl">Food</span><div class="md-seg md-food" role="group" aria-label="Food">'+FOODS.map(function(f){ return '<button type="button" data-v="'+f[0]+'">'+f[1]+'</button>'; }).join('')+'</div></div>'
+        +'</div>';
+      var t=s.querySelector('.ts-t'); function paint(){ t.textContent=tsTitle(m,weekly); } paint();
+      toggle(s.querySelector('.ts-h'),s.querySelector('.ts-b'),null,m.n,openT);
+      var rm=s.querySelector('.md-x'); if(rm) rm.addEventListener('click',function(){ doses.splice(doses.indexOf(m),1); draw(); });
+      var tb=s.querySelector('.md-time'); function showT(){ tb.textContent=clock(m.time); paint(); } showT();
+      tb.addEventListener('click',function(){ if(typeof openTimePicker==='function') openTimePicker('custom',m.time,function(v){ m.time=v; showT(); },'Select time'); });
+      var dt=s.querySelector('.md-date'); dt.value=m.date||iso(); dt.addEventListener('change',function(){ if(dt.value){ m.date=dt.value; paint(); } });
+      function layout(){ s.querySelector('.md-tdays').hidden=m.till!=='days'; s.querySelector('.md-tdate').hidden=m.till!=='date'; }
+      s.querySelectorAll('.md-tm button').forEach(function(x){
+        function pr(){ s.querySelectorAll('.md-tm button').forEach(function(y){ y.setAttribute('aria-pressed',String(y.dataset.v===m.till)); }); } pr();
+        x.addEventListener('click',function(){ m.till=x.dataset.v; if(m.till==='date' && !m.untilDate) m.untilDate=addDays(iso(),+m.tillDays>0 ? +m.tillDays-1 : 29); te.value=m.untilDate||''; pr(); layout(); paint(); });
+      });
+      var td=s.querySelector('.md-tdays'); td.value=m.tillDays; td.addEventListener('input',function(){ m.tillDays=td.value; paint(); });
+      var te=s.querySelector('.md-tdate'); te.value=m.untilDate||''; te.addEventListener('change',function(){ m.untilDate=te.value; paint(); });
+      layout();
+      s.querySelectorAll('.md-food button').forEach(function(x){
+        x.setAttribute('aria-pressed',String(m.food===x.dataset.v));
+        x.addEventListener('click',function(){ m.food=m.food===x.dataset.v ? '' : x.dataset.v; s.querySelectorAll('.md-food button').forEach(function(y){ y.setAttribute('aria-pressed',String(m.food===y.dataset.v)); }); paint(); });
+      });
+      return s;
     }
     draw();
     form.querySelector('.med-add-dose').addEventListener('click',function(){
       var n=doses.reduce(function(a,x){ return Math.max(a,x.n); },-1)+1, gs=groups(), lastG=gs[gs.length-1];
-      var nd=newDose(n,lastG[0]); nd.time='08:00'; doses.push(nd); draw();
+      var nd=newDose(n,lastG[0]); nd.time='08:00'; doses.push(nd); openG[gid(nd)]=true; draw();
       var last=box.lastElementChild; if(last) try{ last.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
     });
     function close(){
@@ -29604,28 +29663,27 @@ html body #alerts-panel .med-form .md-ic.muted{background:var(--mca);color:#fff;
       e.preventDefault(); msg('');
       var name=String(form.elements.name.value).trim();
       if(!name){ msg('Enter a name.'); form.elements.name.focus(); return; }
-      var today=iso(), start=saved.start||today, out=[];
-      var gs=groups();
+      var today=iso(), start=saved.start||today, out=[], gs=groups();
+      function fail(t,gk,tn){ openG[gk]=true; if(tn!=null) openT[tn]=true; draw(); msg(t); }
       for(var gi=0;gi<gs.length;gi++){
-        var g=gs[gi], d=g[0];
-        if(!String(d.med||'').trim()){ msg('Enter the medicine name'+(gs.length>1 ? ' for entry '+(gi+1) : '')+'.'); var mf=box.querySelectorAll('.md-med')[gi]; if(mf) mf.focus(); return; }
-        var base={g:gid(d),med:String(d.med).trim(),rep:d.rep==='once'?'once':'week',food:d.food||'',muted:!!d.muted,sound:d.sound||'xylophone',vibrate:d.vibrate!==false};
-        if(base.rep==='once'){ if(!/^\d{4}-\d{2}-\d{2}$/.test(d.date||'')){ msg('Choose the date for '+base.med+'.'); return; } base.date=d.date; base.until=''; }
-        else {
-          base.days=(d.days||[]).slice().sort(function(a,b){ return a-b; }); if(!base.days.length) base.days=[0,1,2,3,4,5,6];
-          base.till=d.till==='date'?'date':'days';
-          if(base.till==='days'){ var nd=Math.floor(+d.tillDays); if(!(nd>=1 && nd<=365)){ msg(base.med+': enter 1 to 365 days.'); return; } base.tillDays=nd; }
-          else { if(!/^\d{4}-\d{2}-\d{2}$/.test(d.untilDate||'')){ msg(base.med+': choose the last day.'); return; } if(d.untilDate<today){ msg(base.med+': the last day is already past.'); return; } base.untilDate=d.untilDate; base.tillDays=+d.tillDays>0 ? Math.floor(+d.tillDays) : 30; }
-        }
+        var g=gs[gi], d=g[0], gk=gid(d), med=String(d.med||'').trim();
+        if(!med) return fail('Enter the medicine name'+(gs.length>1 ? ' for entry '+(gi+1) : '')+'.',gk);
         for(var k=0;k<g.length;k++){
-          if(!/^\d{2}:\d{2}$/.test(g[k].time)){ msg('Choose a time for '+base.med+'.'); return; }
-          var x=JSON.parse(JSON.stringify(base)); x.n=g[k].n; x.time=g[k].time;
-          if(x.rep!=='once') x.until=untilOf(x,start);
+          var m=g[k], x={n:m.n,g:gk,med:med,time:m.time,rep:d.rep==='once'?'once':'week',food:m.food||'',muted:!!snd.muted,sound:snd.sound||'xylophone',vibrate:snd.vibrate!==false};
+          if(!/^\d{2}:\d{2}$/.test(x.time)) return fail('Choose a time for '+med+'.',gk,m.n);
+          if(x.rep==='once'){ if(!/^\d{4}-\d{2}-\d{2}$/.test(m.date||'')) return fail('Choose the date for '+med+'.',gk,m.n); x.date=m.date; x.until=''; }
+          else {
+            x.days=(d.days||[]).slice().sort(function(a,b){ return a-b; }); if(!x.days.length) x.days=[0,1,2,3,4,5,6];
+            x.till=m.till==='date'?'date':'days';
+            if(x.till==='days'){ var nd=Math.floor(+m.tillDays); if(!(nd>=1 && nd<=365)) return fail(med+': enter 1 to 365 days.',gk,m.n); x.tillDays=nd; }
+            else { if(!/^\d{4}-\d{2}-\d{2}$/.test(m.untilDate||'')) return fail(med+': choose the last day.',gk,m.n); if(m.untilDate<today) return fail(med+': the last day is already past.',gk,m.n); x.untilDate=m.untilDate; x.tillDays=+m.tillDays>0 ? Math.floor(+m.tillDays) : 30; }
+            x.until=untilOf(x,start);
+          }
           out.push(x);
         }
       }
       var all=[]; out.forEach(function(x){ if(all.indexOf(x.time)<0) all.push(x.time); });
-      var data={kind:'medicine',mid:saved.mid||newMid(),name:name,mode:'selected',times:all.sort(),days:[0,1,2,3,4,5,6],start:start,doses:out,sound:out[0].sound,vibrate:out[0].vibrate};  // sound/vibrate of the first entry for older phone code
+      var data={kind:'medicine',mid:saved.mid||newMid(),name:name,mode:'selected',times:all.sort(),days:[0,1,2,3,4,5,6],start:start,doses:out,sound:snd.sound,vibrate:snd.vibrate};
       if(saved.on===false) data.on=false;
       var item=existing;
       if(!item){
@@ -29722,10 +29780,16 @@ html body #alerts-panel .med-form .md-ic.muted{background:var(--mca);color:#fff;
     function esc(e){ if(e.key==='Escape'){ e.stopPropagation(); close(); } }
     ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
     ov.querySelector('.mh-x').addEventListener('click',close); ov.querySelector('.mh-close').addEventListener('click',close); document.addEventListener('keydown',esc,true);
-    var clr=ov.querySelector('.mh-clear'), clrT=0;
+    var clr=ov.querySelector('.mh-clear'), undoT=0, backup=null;
+    function toast(){
+      var t=ov.querySelector('.mh-toast'); if(t) t.remove();
+      t=document.createElement('div'); t.className='mh-toast'; t.innerHTML='<span>History cleared</span><button type="button" class="mh-undo">Undo</button>';
+      ov.querySelector('.med-hist').append(t);
+      t.querySelector('.mh-undo').addEventListener('click',function(){ clearTimeout(undoT); try{ if(backup!=null) localStorage.setItem(LK,backup); }catch(e){} backup=null; t.remove(); render(); });
+      undoT=setTimeout(function(){ t.remove(); backup=null; },5000);
+    }
     clr.addEventListener('click',function(){
-      if(!clr.classList.contains('sure')){ clr.classList.add('sure'); clr.textContent='Tap again to clear'; clrT=setTimeout(function(){ clr.classList.remove('sure'); clr.textContent='Clear history'; },4000); return; }
-      clearTimeout(clrT); try{ localStorage.removeItem(LK); }catch(e){} clr.classList.remove('sure'); clr.textContent='Clear history'; render();
+      try{ backup=localStorage.getItem(LK); localStorage.removeItem(LK); }catch(e){} render(); toast();
     });
     ov.querySelector('.mh-pdf').addEventListener('click',function(){ pdf(view==='week' ? 'week' : 'month',ym,wend); });
     document.body.append(ov); render();
