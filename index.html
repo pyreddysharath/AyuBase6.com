@@ -25211,7 +25211,7 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:var(--fi-4a
     on.addEventListener('change',function(){ var x=load(); x.on=on.checked; c.classList.toggle('mt-on',x.on); save(x); });
     tm.addEventListener('click',function(){ var pk=window.openTimePicker; if(typeof pk!=='function') return; var x=load(); pk('custom',hm(x.at),function(v){ var m=mm(v); if(m===null) return; var y=load(); y.at=m; save(y); tm.textContent=fmt(hm(m)); },'Daily thought — time'); var ov=document.querySelectorAll('.tp-overlay'); if(ov.length) ov[ov.length-1].classList.add('mind-tp'); });
     sd.addEventListener('change',function(){ var x=load(); x.sound=sd.value; save(x); });
-    $('mind-play').addEventListener('click',function(){ try{ var v=sd.value; playAlertPreset(/^[a-z]{1,12}$/.test(v)&&v!=='phone' ? v : 'xylophone'); }catch(e){} });
+    $('mind-play').addEventListener('click',function(){ try{ var v=sd.value; playAlertPreset(/^([a-z]{1,12}|content:\/\/\S{1,300})$/.test(v) ? v : 'xylophone'); }catch(e){} });
     vb.addEventListener('change',function(){ var x=load(); x.vibrate=vb.checked; save(x); });
     $('mind-prev').addEventListener('click',function(){   // the real notification, with today's thought
       var th='Take a slow breath. You don’t have to solve everything today.';
@@ -25225,7 +25225,7 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:var(--fi-4a
     var o=load(); if(!o.on) return null;
     var items=[]; lists().forEach(function(ul){ if(!ul) return; [].forEach.call(ul.children,function(li){ if(li.hidden||li.style.display==='none'&&!li.classList.contains('mt-editing')) return; var t=(li.querySelector('.mt-txt')||li).textContent.trim(); if(t) items.push(t.slice(0,300)); }); });
     if(!items.length) return null;
-    return { on:true, at:o.at, sound:o.muted?'none':(/^[a-z]{1,12}$/.test(o.sound)?o.sound:'xylophone'), vibrate:!!o.vibrate, items:items };
+    return { on:true, at:o.at, sound:o.muted?'none':(/^([a-z]{1,12}|content:\/\/\S{1,300})$/.test(o.sound)?o.sound:'xylophone'), vibrate:!!o.vibrate, items:items };
   };
   function go(){ tag(); addButtons(); apply(); alertCard(); }
   var n=0, iv=setInterval(function(){ go(); if(++n>20) clearInterval(iv); },300); go();
@@ -26411,6 +26411,35 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .re
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .rf-mute svg{display:block}
 html body #alerts-panel #custom-reminders-card .custom-reminder-form .rf-snd .rf-mute.muted{background:var(--alert-2,#799e1b) !important;color:#fff !important;border-color:var(--alert-2,#799e1b) !important}
 </style>
+<script id="system-tones-20261124-js">
+(function(){
+  // The phone's own sounds in every notification Sound list (app only), and ▶ plays them
+  var APP=!!window.AYU_ANDROID;
+  var op=window.playAlertPreset;
+  if(typeof op==='function' && !op._sys) {
+    window.playAlertPreset=function(name){
+      var n=String(name||'');
+      if(window.ayuNative && window.ayuNative.previewTone && (n.indexOf('content://')===0 || n==='phone')){ try{ window.ayuNative.previewTone(n).catch(function(){}); }catch(e){} return; }
+      return op.apply(this,arguments);
+    };
+    window.playAlertPreset._sys=true;
+  }
+  function esc(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function group(){
+    var pt=[]; try{ pt=JSON.parse(localStorage.getItem('ayuPhoneTones')||'[]'); }catch(e){}
+    if(!Array.isArray(pt) || !pt.length) return '';
+    return '<optgroup label="System"><option value="phone">Phone’s default</option>'+pt.map(function(t){ return '<option value="'+esc(t.uri)+'">'+esc(t.title)+'</option>'; }).join('')+'</optgroup>';
+  }
+  function fix(){
+    if(!APP) return; var g=group(); if(!g) return;
+    document.querySelectorAll('select.alert-sound-select[id$="-sound"]:not(#eye-ex-count):not(#eye-ex-days), #chk-sound').forEach(function(s){
+      if(s.querySelector('optgroup[label="System"]')) return;
+      var v=s.value; s.insertAdjacentHTML('afterbegin',g); if(v) s.value=v;
+    });
+  }
+  fix(); setInterval(fix,1500);
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
