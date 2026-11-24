@@ -29414,6 +29414,10 @@ html body #alerts-panel .med-addrow .ma-btn{flex:1;display:flex;align-items:cent
 html body #alerts-panel .med-addrow .ma-btn svg{width:18px;height:18px;stroke:#6f9a1c;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 html body #alerts-panel .med-addrow .ma-btn:active{background:#e4edc9}
 html body #alerts-panel #custom-reminders-list:has(.med-form,.custom-reminder-form,.med-choose) ~ .med-addrow{display:none}
+/* Medicine form 20261124f: darker blocks */
+html body #alerts-panel .med-form .mg.mc0{--mgbg:#e3edc6}
+html body #alerts-panel .med-form .mg.mc1{--mgbg:#d5e3b0}
+html body #alerts-panel .med-form .mg.mc2{--mgbg:#c8da98}
 </style>
 <script id="medicine-20261123-js">
 (function(){
@@ -29608,7 +29612,7 @@ html body #alerts-panel #custom-reminders-list:has(.med-form,.custom-reminder-fo
     function msg(t){ var m=form.querySelector('.med-msg'); m.textContent=t||''; m.hidden=!t; }
     function gid(d){ return d.g!=null ? String(d.g) : 'n'+d.n; }
     function groups(){ var o=[],seen={}; doses.forEach(function(d){ var k=gid(d); if(!seen[k]){ seen[k]=[]; o.push(seen[k]); } seen[k].push(d); }); return o; }
-    openG[gid(doses[0])]=true;
+    if(!existing) openG[gid(doses[0])]=true;   // a new medicine opens its first section to type in; a saved one starts collapsed
     // the notification block (Sound, Vibrate, Preview): once for the name
     var bell=form.querySelector('.mf-bell'), np=form.querySelector('.mf-notif');
     bell.addEventListener('click',function(){ var o=np.hidden; np.hidden=!o; bell.classList.toggle('on',o); bell.setAttribute('aria-expanded',String(o)); });
