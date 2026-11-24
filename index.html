@@ -30078,3 +30078,51 @@ html body #alerts-panel .med-form .mg.mc2{--mgbg:#c9dd95;--mgc:#3f6208;--mgs:#75
 html body #alerts-panel .med-form .mg > .mg-hr .mg-h::before{content:counter(mgn);flex:none;width:26px;height:26px;box-sizing:border-box;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:800;line-height:1;background:var(--mgn);color:#fff;border:0}
 html body #alerts-panel .med-form .mg.mc2 > .mg-hr .mg-h::before{color:#1f3504}
 </style>
+
+<style id="med-compact-20261125">
+/* Medicine rows: as low as possible (name and time on one line), the X sits before the chevron (chevron last), like the name row */
+html body #alerts-panel .med-form .mg{padding:1px 10px}
+html body #alerts-panel .med-form .mg > .mg-hr .mg-h::before{width:20px;height:20px;font-size:.72rem}
+html body #alerts-panel .med-form .mg-h,html body #alerts-panel .med-form .ts-h{padding:1px 0 !important;line-height:1.15}
+html body #alerts-panel .med-form .mg-tt{flex-direction:row;align-items:baseline;gap:8px;overflow:hidden}
+html body #alerts-panel .med-form .mg-t{flex:0 1 auto;min-width:0;max-width:62%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body #alerts-panel .med-form .mg-sub{flex:1 1 0;min-width:0;line-height:1.15}
+html body #alerts-panel .med-form .ts{margin:4px 0}
+html body #alerts-panel .med-form .mg-hr,html body #alerts-panel .med-form .ts-hr{position:relative;gap:8px}
+html body #alerts-panel .med-form .mg-hr:has(> .md-x) .mg-tt,html body #alerts-panel .med-form .ts-hr:has(> .md-x) .ts-t{margin-right:26px}
+html body #alerts-panel .med-form .mg-hr > .md-x,html body #alerts-panel .med-form .ts-hr > .md-x{position:absolute !important;right:26px;top:50%;transform:translateY(-50%)}
+/* Name row (closed and open): bell, X and chevron are one group on the first row, top right, with the same spacing as the medicine rows;
+   a long name takes the next row and the icons stay where they are */
+html body #alerts-panel .med-item .cri-hdr{display:flex !important;flex-direction:row-reverse;flex-wrap:wrap;align-items:center;column-gap:0 !important;row-gap:0 !important}
+html body #alerts-panel .med-item .cri-hdr .cri-chev{order:1}
+html body #alerts-panel .med-item .cri-hdr .custom-reminder-delete{order:2}
+html body #alerts-panel .med-item .cri-hdr .med-bell{order:3}
+html body #alerts-panel .med-item .cri-hdr .cri-main strong{order:4;flex:1 1 auto;min-width:0;max-width:100%;text-align:left}
+html body #alerts-panel .med-item .cri-hdr .cri-sub.med-lines{order:5;flex:0 0 100%}
+html body #alerts-panel .med-form .mf-top{display:flex;flex-direction:row-reverse;flex-wrap:wrap;align-items:center;gap:0 !important}
+html body #alerts-panel .med-form .mf-top .mf-chev{order:1}
+html body #alerts-panel .med-form .mf-top .mf-del{order:2}
+html body #alerts-panel .med-form .mf-top .mf-bell{order:3}
+html body #alerts-panel .med-form .mf-top .mf-name{order:4;flex:1 1 0;min-width:0}
+html body #alerts-panel .med-form .mf-top.mf-wrap .mf-name{flex:0 0 100%}
+</style>
+<script id="med-compact-20261125-js">
+(function(){
+  // the name takes its own row only when it no longer fits beside the three icons
+  var cv=null;
+  function fit(top){
+    var inp=top.querySelector('.mf-name'); if(!inp||!top.clientWidth) return;
+    var cs=getComputedStyle(inp); cv=cv||document.createElement('canvas').getContext('2d');
+    cv.font=cs.fontStyle+' '+cs.fontWeight+' '+cs.fontSize+' '+cs.fontFamily;
+    var need=cv.measureText(inp.value||inp.placeholder||'').width+(parseFloat(cs.paddingLeft)||0)+(parseFloat(cs.paddingRight)||0)+(parseFloat(cs.borderLeftWidth)||0)+(parseFloat(cs.borderRightWidth)||0)+6;
+    var icons=top.querySelectorAll('.mf-bell,.mf-del,.mf-chev').length*26;
+    top.classList.toggle('mf-wrap', need>top.clientWidth-icons);
+  }
+  function all(){ document.querySelectorAll('.med-form .mf-top').forEach(fit); }
+  document.addEventListener('input',function(e){ var t=e.target; if(t&&t.classList&&t.classList.contains('mf-name')){ var top=t.closest('.mf-top'); if(top) fit(top); } },true);
+  window.addEventListener('resize',all);
+  var list=document.getElementById('custom-reminders-list')||document.getElementById('custom-reminders-card');
+  if(list) new MutationObserver(function(){ requestAnimationFrame(all); }).observe(list,{childList:true,subtree:true});
+  setTimeout(all,300);
+})();
+</script>
