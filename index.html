@@ -19986,7 +19986,7 @@ html body #start-my-day-card .rout-info-panel .mdp-sec > b.mdp-t{color:var(--fp-
     w.dataset.ux='1';   // the older long text is not put back
     var note=w.querySelector('.ayu-shift-note');
     w.innerHTML='<div class="mdp-sec"><b class="mdp-t">Wake-up time</b><ul>'
-      +'<li>🟢 5:30–7:30 AM healthy · 🟠 4:30–5:30 early, 7:30–8:30 later · 🔴 before 4:30 or after 8:30.</li>'
+      +'<li>🟢 5:30–7:30 AM healthy.</li><li>🟠 4:30–5:30 early, 7:30–8:30 later.</li><li>🔴 Before 4:30 or after 8:30.</li>'
       +'<li>No clock time is proven best: aim for 7+ hours of sleep, the same time every day and morning daylight.</li>'
       +'<li>Every check below follows it. Outside 4–10 AM it becomes a shift schedule.</li></ul>'
       +'<div class="mdp-src">Sources: AASM/SRS sleep consensus 2015; UK Biobank; Daghlas et al. 2021.</div></div>'
@@ -28996,6 +28996,10 @@ html body .ayu-ac-note .ayu-ac-h{font-weight:800;color:#336374;margin-bottom:2px
 html body .ayu-ac-note .ayu-ac-h::before{content:'\2022';position:absolute;left:4px;font-weight:700;font-size:1.25em;line-height:1.1}
 html body #routines-panel #rout-info-notify .ayu-ac-note .ayu-ac-h{color:#1a6585 !important}
 html body #routines-panel #routines-notify-card.ayu-in-day.ayu-closed > #rout-info-notify[style*="block"]:not(#ayu-x1):not(#ayu-x2){display:block !important;margin:8px 0 4px !important}
+/* Wake-up i: the vertical bar sits only beside each title, like the other i panels */
+html body #routines-panel #rout-info-wake .mdp-sec:not(#ayu-x1):not(#ayu-x2){border-left:0 !important;padding:0 !important;margin:0 0 6px !important}
+html body #routines-panel #rout-info-wake .mdp-sec > b.mdp-t:not(#ayu-x1):not(#ayu-x2){font-size:15px;color:#1a6585 !important;border-left:4px solid var(--rout-2,#41aad4);padding:1px 0 1px 9px;margin:10px 0 6px}
+html body #routines-panel #rout-info-wake > .mdp-sec:first-child > b.mdp-t:not(#ayu-x1):not(#ayu-x2){margin-top:0}
 html body #routines-panel #rout-info-wake > strong,html body #routines-panel #rout-info-notify > strong{color:#1a6585 !important;border-left-color:var(--rout-2,#41aad4) !important}
 </style>
 <script id="care-ac-note-20261124-js">
