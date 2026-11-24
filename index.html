@@ -29426,6 +29426,14 @@ html body #alerts-panel .med-addrow .ma-btn svg{width:17px;height:17px;stroke:no
 html body #alerts-panel .med-addrow .ma-btn svg .f{fill:#6f9a1c;stroke:#6f9a1c;stroke-width:1}
 html body #alerts-panel .med-addrow .ma-btn svg .g{fill:none;stroke:#f4f9e6;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 html body #alerts-panel .med-addrow .ma-btn svg .e{fill:none;stroke:#6f9a1c;stroke-width:2.2;stroke-linecap:round}
+/* the closed medicine row: one line per medicine, as small as it can be */
+html body #alerts-panel .med-item .cri-hdr{padding:6px 8px 6px 12px !important;min-height:0 !important;line-height:1.2 !important;gap:6px}
+html body #alerts-panel .med-item .cri-main strong{font-size:.95rem !important;line-height:1.25 !important}
+html body #alerts-panel .med-item .cri-sub.med-lines{font-size:.74rem !important;line-height:1.25 !important;margin-top:1px}
+html body #alerts-panel .med-item .cri-sub .ml{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body #alerts-panel .med-item .cri-sub .ml b{font-weight:800}
+html body #alerts-panel .med-item .cri-hdr .master-switch{transform:scale(.82);transform-origin:right center;margin:0 -3px}
+html body #alerts-panel .med-item .cri-hdr .custom-reminder-delete,html body #alerts-panel .med-item .cri-hdr .cri-chev{width:22px !important;height:22px !important;min-width:0 !important;min-height:0 !important;font-size:.8rem}
 </style>
 <script id="medicine-20261123-js">
 (function(){
@@ -29526,6 +29534,15 @@ html body #alerts-panel .med-addrow .ma-btn svg .e{fill:none;stroke:#6f9a1c;stro
     var nm=names.length>2 ? names.slice(0,2).join(', ')+' +'+(names.length-2) : names.join(', ');
     var t=timesSub(d); return nm ? nm+' · '+t : t;
   }
+  // the closed row: one line per medicine, with its times
+  function medLines(d){
+    var order=[], by={};
+    (d.doses||[]).forEach(function(x){ var k=String(x.med||'').trim() || 'Medicine'; if(!by[k]){ by[k]=[]; order.push(k); } by[k].push(x); });
+    return order.map(function(k){
+      var ts=by[k].slice().sort(function(a,b){ return (toMin(a.time)||0)-(toMin(b.time)||0); }).map(function(x){ return clock(x.time); });
+      return '<span class="ml"><b>'+esc(k)+'</b> · '+esc(ts.join(', '))+'</span>';
+    }).join('');
+  }
   function timesSub(d){
     var ds=d.doses||[], seen={}, times=[];
     ds.slice().sort(function(a,b){ return (toMin(a.time)||0)-(toMin(b.time)||0); }).forEach(function(x){ if(!seen[x.time]){ seen[x.time]=1; times.push(clock(x.time)); } });
@@ -29552,7 +29569,7 @@ html body #alerts-panel .med-addrow .ma-btn svg .e{fill:none;stroke:#6f9a1c;stro
   if(typeof oPaint==='function') window.ayuRemPaint=function(item,data){
     oPaint.apply(this,arguments);
     var m=isMed(data); item.classList.toggle('med-item',m);
-    if(m){ var sub=item.querySelector('.cri-sub'); if(sub) sub.textContent=medSub(data); }
+    if(m){ var sub=item.querySelector('.cri-sub'); if(sub){ sub.innerHTML=medLines(data); sub.classList.add('med-lines'); } }
     sections();
   };
 
