@@ -16637,7 +16637,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   // Reminders
   tab('alerts','.tab-btn.alerts',C.rem,'Gentle nudges, alarms and timers through the day.');
   sec('alerts','#alerts-panel .ayu-sub-tabs.rem5',0,C.rem,'<b>Five parts</b>: Personal, Alarm, Timer, Stopwatch and World Clock. Tap one to open it.');
-  sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: tap <b>Add medicine</b> (a name, its medicines with times, food and days; Taken, Snooze and Skip on the notification; a history table) or <b>Add reminder</b> with a Frequency of Only Once, Daily, Weekly, Monthly or Yearly.');
+  sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: tap <b>Add treatment</b> (a name, its medicines with times, food and days; Taken, Snooze and Skip on the notification; a history table) or <b>Add reminder</b> with a Frequency of Only Once, Daily, Weekly, Monthly or Yearly.');
   sec('alerts','#rem-alarm-card .clk-now',0,C.rem,'<b>Clock</b>: the time and date now, above Alarm, Timer, Stopwatch and World Clock.');
   sec('alerts','#rem-tap-row',0,C.rem,'<b>Phone’s time opens</b>: your phone’s Clock app or AyuBase6, while an AyuBase6 alarm is next.');
   sec('alerts','#rem-alarm-card .ayu-add-row',0,C.rem,'<b>Alarm</b>: add an alarm, set it and tap <b>Save</b>. Each has its own time, days (or Once), sound, vibrate and snooze. Expired ones show in amber at the top.');
@@ -21025,7 +21025,7 @@ html body #calculator-panel .calc-page > .calc-card h2 .ayu-i{margin-left:6px !i
 <script id="tab-titles-20261105-js">
 (function(){
   function $(id){ return document.getElementById(id); }
-  var PERSONAL_INFO='<ul><li><b>Add medicine</b>: a name (a person or a treatment), then each medicine with its times, food (before, after, with, empty stomach), days and how long. The bell sets the sound and vibration and turns the notifications on or off. The notification shows the name and the medicine; Taken, Snooze and Skip are on it. <b>History</b> shows what was taken, with Download PDF and Clear history (Undo for 5 seconds).</li>'
+  var PERSONAL_INFO='<ul><li><b>Add treatment</b>: a name (a person or a treatment), then each medicine with its times, food (before, after, with, empty stomach), days and how long. The bell sets the sound and vibration and turns the notifications on or off. The notification shows the name and the medicine; Taken, Snooze and Skip are on it. <b>History</b> shows what was taken, with Download PDF and Clear history (Undo for 5 seconds).</li>'
     +'<li><b>Add reminder</b>: your own reminder with a name, how often or at set times, the days and the sound.</li>'
     +'<li><b>Frequency</b>: <b>Only Once</b>, <b>Daily</b>, <b>Weekly</b>, <b>Monthly</b> or <b>Yearly</b>.</li>'
     +'<li><b>Weekly</b> reminds every week on the days you pick; <b>Monthly</b> on the days of the month you pick (a day the month does not have, like the 31st, reminds on its last day); <b>Yearly</b> on the same day every year. Add one or more times for it.</li>'
@@ -29660,9 +29660,10 @@ html body #alerts-panel .med-addrow .ma-btn svg .e{fill:none;stroke:#6f9a1c;stro
 html body #alerts-panel .med-item .cri-hdr{padding:6px 8px 6px 12px !important;min-height:0 !important;line-height:1.2 !important;gap:6px}
 html body #alerts-panel .med-item .cri-main strong{font-size:.95rem !important;line-height:1.25 !important}
 html body #alerts-panel .med-item .cri-sub.med-lines{font-size:.74rem !important;line-height:1.25 !important;margin-top:1px}
-html body #alerts-panel .med-item .cri-sub .ml{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.5em;min-width:0}   /* the name stays on one line; the times follow it, or drop to the next line when they do not fit */
-html body #alerts-panel .med-item .cri-sub .ml b{font-weight:800;min-width:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html body #alerts-panel .med-item .cri-sub .ml .mt{min-width:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body #alerts-panel .med-item .cri-sub .ml{display:block;min-width:0;margin:3px 0 4px}   /* a dot, the medicine name on one line, its times on the line below */
+html body #alerts-panel .med-item .cri-sub .ml b{display:block;font-weight:800;min-width:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body #alerts-panel .med-item .cri-sub .ml b::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:7px;vertical-align:middle;opacity:.85}
+html body #alerts-panel .med-item .cri-sub .ml .mt{display:block;margin-left:13px;min-width:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
 html body #alerts-panel .med-item .cri-hdr .master-switch{transform:scale(.82);transform-origin:right center;margin:0 -3px}
 html body #alerts-panel .med-item .cri-hdr .custom-reminder-delete,html body #alerts-panel .med-item .cri-hdr .cri-chev{width:22px !important;height:22px !important;min-width:0 !important;min-height:0 !important;font-size:.8rem}
 /* the bell panel: the Sound list gets the room */
@@ -29811,7 +29812,7 @@ html body #alerts-panel .med-item.open > .cri-hdr{display:none !important}
     var nm=0, nr=0; items().forEach(function(it){ if(it.classList.contains('med-item')) nm++; else nr++; });
     var hm=l.querySelector(':scope > .med-sec-h.med-h-med'), hr=l.querySelector(':scope > .med-sec-h.med-h-rem');
     if(!hm){
-      hm=document.createElement('div'); hm.className='med-sec-h med-h-med'; hm.innerHTML='<span>Medicine</span><button type="button" class="med-hist-btn">History</button>'; l.prepend(hm);
+      hm=document.createElement('div'); hm.className='med-sec-h med-h-med'; hm.innerHTML='<span>Treatment</span><button type="button" class="med-hist-btn">History</button>'; l.prepend(hm);
       hm.querySelector('button').addEventListener('click',function(){ openHistory(); });
       hr=document.createElement('div'); hr.className='med-sec-h med-h-rem'; hr.innerHTML='<span>Reminders</span>'; hm.after(hr);
     }
@@ -29843,7 +29844,7 @@ html body #alerts-panel .med-item.open > .cri-hdr{display:none !important}
     if(ch){ ch.remove(); return; }
     closeForms();
     ch=document.createElement('div'); ch.className='med-choose'; ch.setAttribute('role','group'); ch.setAttribute('aria-label','What do you want to add?');
-    ch.innerHTML='<button type="button" class="mc-btn" data-t="med">'+PILL+'<span>Medicine</span></button><button type="button" class="mc-btn" data-t="rem">'+CLOCK+'<span>Reminder</span></button>';
+    ch.innerHTML='<button type="button" class="mc-btn" data-t="med"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4.5V3h6v1.5M12 9v7M8.5 12.5h7"/></svg><span>Treatment</span></button><button type="button" class="mc-btn" data-t="rem">'+CLOCK+'<span>Reminder</span></button>';
     l.append(ch);
     ch.querySelector('[data-t="med"]').addEventListener('click',function(){ ch.remove(); openForm(null); });
     ch.querySelector('[data-t="rem"]').addEventListener('click',function(){ ch.remove(); oAdd.call(window); });
@@ -29891,7 +29892,7 @@ html body #alerts-panel .med-item.open > .cri-hdr{display:none !important}
     else doses=[newDose(0,null)];
     doses.forEach(function(d){ if(d.food==null) d.food=''; });
     var form=document.createElement('form'); form.className='med-form'; form.noValidate=true;
-    form.innerHTML='<div class="mf-top"><input class="mf-name" name="name" maxlength="80" autocomplete="off" placeholder="Name" aria-label="Name"><button type="button" class="mf-bell" aria-expanded="false" aria-label="Notification" title="Notification">'+BELL+'</button>'+(existing ? '<button type="button" class="mf-del" aria-label="Delete" title="Delete">✕</button>' : '')+'<button type="button" class="mf-chev" aria-label="Close" title="Close"><span class="mg-c">'+CHEV+'</span></button></div>'
+    form.innerHTML='<div class="mf-top"><input class="mf-name" name="name" maxlength="80" autocomplete="off" placeholder="Person or treatment name" aria-label="Person or treatment name"><button type="button" class="mf-bell" aria-expanded="false" aria-label="Notification" title="Notification">'+BELL+'</button>'+(existing ? '<button type="button" class="mf-del" aria-label="Delete" title="Delete">✕</button>' : '')+'<button type="button" class="mf-chev" aria-label="Close" title="Close"><span class="mg-c">'+CHEV+'</span></button></div>'
       +'<div class="mf-notif" hidden>'
         +'<div class="md-row"><span class="md-lbl">Notify</span><label class="master-switch" title="Notifications on or off"><input type="checkbox" class="md-notify" aria-label="Notifications on or off"></label></div>'
         +'<div class="md-row"><span class="md-lbl">Sound</span><span class="md-snd"><select class="md-ctl md-sound">'+SOUND_OPTS()+'</select><button type="button" class="md-ic md-play" aria-label="Play sound" title="Play">'+PLAY+'</button><button type="button" class="md-ic md-mute" title="Mute"></button></span></div>'
@@ -29936,7 +29937,7 @@ html body #alerts-panel .med-item.open > .cri-hdr{display:none !important}
     function groupBlock(g){
       var d=g[0], k=gid(d), weekly=d.rep!=='once', multi=groups().length>1;
       var b=document.createElement('div'); b.className='mg'+(openG[k]?' open':'');
-      b.innerHTML='<div class="mg-hr"><button type="button" class="mg-h" aria-expanded="'+(openG[k]?'true':'false')+'"><span class="mg-tt"><span class="mg-t"></span><span class="mg-sub"></span></span><span class="mg-c">'+CHEV+'</span></button>'+(multi ? '<button type="button" class="md-x" aria-label="Remove this medicine">✕</button>' : '')+'</div>'
+      b.innerHTML='<div class="mg-hr"><button type="button" class="mg-h" aria-expanded="'+(openG[k]?'true':'false')+'"><span class="mg-tt"><span class="mg-t"></span><span class="mg-sub"></span></span><span class="mg-c">'+CHEV+'</span></button>'+'<button type="button" class="md-x" aria-label="Remove this medicine">✕</button></div>'
         +'<div class="mg-b"'+(openG[k]?'':' hidden')+'>'
           +'<div class="md-row md-r-med"><span class="md-lbl">Medicine</span><input class="md-ctl md-med" maxlength="80" autocomplete="off" aria-label="Medicine"></div>'
           +'<div class="md-row md-r-days" '+(weekly?'':'hidden')+'><span class="md-lbl">On days</span><div class="md-days" role="group" aria-label="On days"></div></div>'
@@ -30023,8 +30024,9 @@ html body #alerts-panel .med-item.open > .cri-hdr{display:none !important}
     form.addEventListener('submit',function(e){
       e.preventDefault(); msg('');
       var name=String(form.elements.name.value).trim();
-      if(!name){ msg('Enter a name.'); form.elements.name.focus(); return; }
+      if(!name){ msg('Enter a person or treatment name.'); form.elements.name.focus(); return; }
       var today=iso(), start=saved.start||today, out=[], gs=groups();
+      if(!gs.length){ msg('Add at least one medicine.'); return; }
       function fail(t,gk,tn){ openG[gk]=true; if(tn!=null) openT[tn]=true; draw(); msg(t); }
       for(var gi=0;gi<gs.length;gi++){
         var g=gs[gi], d=g[0], gk=gid(d), med=String(d.med||'').trim();
@@ -30241,12 +30243,12 @@ html body #alerts-panel .med-item.open > .cri-hdr{display:none !important}
     window.handleNudgeClick._med=true; return true;
   }
   (function(){ var b=$('custom-reminder-add'); if(b){ b.title='Add a medicine or reminder'; b.setAttribute('aria-label','Add a medicine or reminder'); } })();
-  // two always-visible buttons: Add medicine, Add reminder
+  // two always-visible buttons: Add treatment, Add reminder
   function ensureRow(){
     var l=list(); if(!l || document.querySelector('.med-addrow')) return;
     var row=document.createElement('div'); row.className='med-addrow';
-    var PILLF='<svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M10.5 20.5a4.95 4.95 0 0 1-7-7l10-10a4.95 4.95 0 0 1 7 7z"/><path class="g" d="M8.5 8.5l7 7"/></svg>', CLOCKF='<svg viewBox="0 0 24 24" aria-hidden="true"><circle class="f" cx="12" cy="13" r="8"/><path class="g" d="M12 9v4l2.5 2"/><path class="e" d="M5 3.5L2.5 6M19 3.5L21.5 6"/></svg>';
-    row.innerHTML='<button type="button" class="ma-btn" data-t="med">'+PILLF+'<span>Add medicine</span></button><button type="button" class="ma-btn" data-t="rem">'+CLOCKF+'<span>Add reminder</span></button>';
+    var PILLF='<svg viewBox="0 0 24 24" aria-hidden="true"><rect class="f" x="5" y="4" width="14" height="17" rx="2.5"/><path class="f" d="M9 4.5V3h6v1.5"/><path class="g" d="M12 9v7M8.5 12.5h7"/></svg>', CLOCKF='<svg viewBox="0 0 24 24" aria-hidden="true"><circle class="f" cx="12" cy="13" r="8"/><path class="g" d="M12 9v4l2.5 2"/><path class="e" d="M5 3.5L2.5 6M19 3.5L21.5 6"/></svg>';
+    row.innerHTML='<button type="button" class="ma-btn" data-t="med">'+PILLF+'<span>Add treatment</span></button><button type="button" class="ma-btn" data-t="rem">'+CLOCKF+'<span>Add reminder</span></button>';
     var ab=$('custom-reminder-add'); (ab && ab.parentNode===l.parentNode ? ab : l).after(row);
     row.querySelector('[data-t=med]').addEventListener('click',function(){ closeForms(); openForm(null); });
     row.querySelector('[data-t=rem]').addEventListener('click',function(){ closeForms(); oAdd.call(window); });
@@ -30305,9 +30307,9 @@ html body #alerts-panel .med-form .mg.mc2 > .mg-hr .mg-h::before{color:#1f3504}
 html body #alerts-panel .med-form .mg{padding:1px 10px}
 html body #alerts-panel .med-form .mg > .mg-hr .mg-h::before{width:20px;height:20px;font-size:.72rem}
 html body #alerts-panel .med-form .mg-h,html body #alerts-panel .med-form .ts-h{padding:1px 0 !important;line-height:1.15}
-html body #alerts-panel .med-form .mg-tt{flex-direction:row;align-items:baseline;gap:8px;overflow:hidden}
-html body #alerts-panel .med-form .mg-t{flex:0 1 auto;min-width:0;max-width:62%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-html body #alerts-panel .med-form .mg-sub{flex:1 1 0;min-width:0;line-height:1.15}
+html body #alerts-panel .med-form .mg-tt{flex-direction:column;align-items:flex-start;gap:0;overflow:hidden}
+html body #alerts-panel .med-form .mg-t{flex:0 0 auto;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body #alerts-panel .med-form .mg-sub{flex:0 0 auto;min-width:0;max-width:100%;line-height:1.2}
 html body #alerts-panel .med-form .ts{margin:4px 0}
 html body #alerts-panel .med-form .mg-hr,html body #alerts-panel .med-form .ts-hr{position:relative;gap:8px}
 html body #alerts-panel .med-form .mg-hr:has(> .md-x) .mg-tt,html body #alerts-panel .med-form .ts-hr:has(> .md-x) .ts-t{margin-right:26px}
