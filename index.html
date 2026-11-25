@@ -24145,7 +24145,6 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
       else if(c.importance<3 || !c.sound) p.push(['<b>'+esc(c.name)+'</b> notifications are silent','Phone <b>Settings → Apps → AyuBase6 → Notifications → '+esc(c.name)+'</b>: choose <b>Alert / Make sound</b>.','notif']); });
     var alarms=false; try{ alarms=!!(window.ayuAlarmList && window.ayuAlarmList().length); }catch(e){}
     if(r.fullScreen===false && alarms) p.push(['<b>Full-screen alarms</b> are off','On a locked phone, alarms show only as a notification. Allow full-screen alarms.','full']);
-    if(r.overlay===false && alarms) p.push(['<b>Display over other apps</b> is off','While you use the phone, an alarm can show as a small notification instead of the full screen. Allow it so alarms always open full screen.','over']);
     return p;
   }
   function bgPaint(all){
@@ -24153,17 +24152,17 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
     var alarms=[]; try{ alarms=(window.ayuAlarmList && window.ayuAlarmList())||[]; }catch(e){}
     ['routines-panel','alerts-panel'].forEach(function(id){
       var sec=id==='alerts-panel'?'alerts':'routines';
-      var p=all.filter(function(x){ return (x[2]!=='full' && x[2]!=='over') || alarms.some(function(a){ return a.section===sec; }); });   // full-screen alarms: only where an alarm is set
+      var p=all.filter(function(x){ return x[2]!=='full' || alarms.some(function(a){ return a.section===sec; }); });   // full-screen alarms: only where an alarm is set
       var panel=$(id), page=panel && (panel.querySelector('.rout-page, .alert-page') || panel), el=panel && panel.querySelector('.ayu-bgchk');
       if(!p.length || !page){ if(el) el.remove(); return; }
       var sig=p.map(function(x){ return x[0]; }).join('|');
       if(!el){ el=document.createElement('div'); el.className='ayu-bgchk'; el.setAttribute('role','status'); page.insertBefore(el,page.firstChild); }
       if(el.dataset.sig===sig) return; el.dataset.sig=sig;
-      var LBL={exact:'Allow',full:'Allow',over:'Allow',battery:'Open battery settings',notif:'Open notification settings'};
+      var LBL={exact:'Allow',full:'Allow',battery:'Open battery settings',notif:'Open notification settings'};
       el.innerHTML='<b class="t">⚠ '+(p.length===1 ? p[0][0] : p.length+' settings stop AyuBase6 from reminding you')+'</b><ul>'+p.map(function(x,i){ return '<li>'+(p.length===1 ? '' : x[0]+'. ')+x[1]+(x[2] && p.length>1 ? '<div class="bg-btns bg-li"><button type="button" class="bg-fix" data-a="'+x[2]+'">'+(LBL[x[2]]||'Open')+'</button></div>' : '')+'</li>'; }).join('')+'</ul>'
         +'<div class="bg-btns">'+(p.length===1 && p[0][2] ? '<button type="button" class="bg-fix" data-a="'+p[0][2]+'">'+(LBL[p[0][2]]||'Open')+'</button>' : '')+'<button type="button" data-a="test">Test notifications</button></div>';
       el.querySelectorAll('.bg-btns button, .bg-fix').forEach(function(b){ b.addEventListener('click',function(e){ e.stopPropagation(); var n=window.ayuNative||{}, a=b.dataset.a;
-        if(a==='battery' && n.openBattery) n.openBattery(); else if(a==='notif' && n.openNotifSettings) n.openNotifSettings(); else if(a==='full' && n.openFullScreen) n.openFullScreen(); else if(a==='over' && n.openOverlay) n.openOverlay(); else if(a==='exact' && n.openExact) n.openExact(); else if(typeof showFooterSection==='function'){ showFooterSection('check'); setTimeout(function(){ if(window.ayuRunCheck) ayuRunCheck(); },400); } }); });
+        if(a==='battery' && n.openBattery) n.openBattery(); else if(a==='notif' && n.openNotifSettings) n.openNotifSettings(); else if(a==='full' && n.openFullScreen) n.openFullScreen(); else if(a==='exact' && n.openExact) n.openExact(); else if(typeof showFooterSection==='function'){ showFooterSection('check'); setTimeout(function(){ if(window.ayuRunCheck) ayuRunCheck(); },400); } }); });
     });
   }
   function bgCheck(){
