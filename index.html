@@ -25542,8 +25542,8 @@ html body .ra-count .ra-btn{background:var(--footer-accent,#2563eb);color:#fff;f
   var tm=0;
   // Nothing is touched for 5 seconds; Undo inside that time cancels it, so no typed confirmation is needed.
   function countdown(box,ids,erase){
-    var left=5, what=erase?'Data erased for':'Settings reset for', names=SECTIONS.filter(function(s){ return ids.indexOf(s.id)>=0; }).map(function(s){ return s.label; }).join(', ');
-    function draw(){ box.innerHTML='<div class="ra-count"><p>'+what+' <b>'+names+'</b></p><button type="button" class="ra-btn" data-a="undo">Undo</button></div>'; }
+    var left=5, what=erase?'Data erased':'Settings reset', names=SECTIONS.filter(function(s){ return ids.indexOf(s.id)>=0; }).map(function(s){ return s.label; }).join(', ');
+    function draw(){ box.innerHTML='<div class="ra-count"><p>'+what+'</p><button type="button" class="ra-btn" data-a="undo">Undo</button></div>'; }
     draw(); if(tm) clearInterval(tm);
     tm=setInterval(function(){
       left--; if(left>0){ draw(); return; }
