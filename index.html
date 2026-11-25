@@ -25495,9 +25495,9 @@ body.to-picking{cursor:grabbing}
 #sec-resetall .ra-opt small{font-weight:600;color:#64748b;font-size:.72rem}
 #sec-resetall .ra-opt:last-child{grid-column:1/-1}
 #sec-resetall .ra-done{margin-top:8px;text-align:center;font-weight:800;color:var(--footer-accent,var(--fb-2563eb,#2563eb))}
-html body .ra-count{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#0f172a;color:#fff;border-radius:14px;padding:12px 14px}
-html body .ra-count p{margin:0;font-size:.92rem;line-height:1.4;flex:1 1 0;min-width:0;color:#fff}
-html body .ra-count .ra-btn{background:#fff;color:#0f172a;flex:none;width:auto !important;min-width:84px;margin:0 !important}
+html body .ra-count{display:flex;align-items:center;justify-content:space-between;gap:12px;background:color-mix(in srgb,var(--footer-accent,#2563eb) 12%,#fff);color:var(--footer-accent,#2563eb);border:1.5px solid color-mix(in srgb,var(--footer-accent,#2563eb) 45%,#fff);border-radius:14px;padding:12px 14px}
+html body .ra-count p{margin:0;font-size:.92rem;line-height:1.4;flex:1 1 0;min-width:0;color:var(--footer-accent,#2563eb)}
+html body .ra-count .ra-btn{background:var(--footer-accent,#2563eb);color:#fff;flex:none;width:auto !important;min-width:84px;margin:0 !important}
 </style>
 <script id="reset-all-20261123-js">
 (function(){
@@ -25542,8 +25542,8 @@ html body .ra-count .ra-btn{background:#fff;color:#0f172a;flex:none;width:auto !
   var tm=0;
   // Nothing is touched for 5 seconds; Undo inside that time cancels it, so no typed confirmation is needed.
   function countdown(box,ids,erase){
-    var left=5, what=erase?'Erasing the data of':'Resetting the settings of', names=SECTIONS.filter(function(s){ return ids.indexOf(s.id)>=0; }).map(function(s){ return s.label; }).join(', ');
-    function draw(){ box.innerHTML='<div class="ra-count"><p>'+what+' <b>'+names+'</b> in <b>'+left+'</b>…</p><button type="button" class="ra-btn" data-a="undo">Undo</button></div>'; }
+    var left=5, what=erase?'Data erased for':'Settings reset for', names=SECTIONS.filter(function(s){ return ids.indexOf(s.id)>=0; }).map(function(s){ return s.label; }).join(', ');
+    function draw(){ box.innerHTML='<div class="ra-count"><p>'+what+' <b>'+names+'</b></p><button type="button" class="ra-btn" data-a="undo">Undo</button></div>'; }
     draw(); if(tm) clearInterval(tm);
     tm=setInterval(function(){
       left--; if(left>0){ draw(); return; }
