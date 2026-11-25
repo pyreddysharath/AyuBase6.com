@@ -2,10 +2,10 @@
   "_note": "Section background scenes. To change one: replace its file in config/bg/ and add 1 to its v. The app downloads only the pictures whose v changed and keeps them for offline use.",
   "tabs": {
     "body":   { "file": "bg/body.svg",   "v": 1 },
-    "food":   { "file": "bg/food.svg",   "v": 2 },
+    "food":   { "file": "bg/food.svg",   "v": 3 },
     "mind":   { "file": "bg/mind.svg",   "v": 1 },
-    "vitals": { "file": "bg/vitals.svg", "v": 1 },
+    "vitals": { "file": "bg/vitals.svg", "v": 2 },
     "care":   { "file": "bg/care.svg",   "v": 1 },
-    "alerts": { "file": "bg/alerts.svg", "v": 1 }
+    "alerts": { "file": "bg/alerts.svg", "v": 2 }
   }
 }
