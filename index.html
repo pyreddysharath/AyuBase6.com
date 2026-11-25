@@ -26634,7 +26634,7 @@ body.ayu-sb-nutrition-panel{--ayu-c:#4f8a22}body.ayu-sb-mind-panel{--ayu-c:#364c
   function scene(k){ return ls('ayuBgD_'+k) || uri(DEF[k]); }
   var cur='', wrap=null;
   function keyNow(){
-    var b=document.body; if(b.classList.contains('ayu-brk')) return 'vitals';
+    var b=document.body; if(b.classList.contains('ayu-brk')) return 'care';
     for(var c in MAP) if(b.classList.contains(c)) return MAP[c];
     return 'body';
   }
