@@ -23630,7 +23630,7 @@ html body #rem-alarm-card .clk-now .cn-d{font-size:.9rem;font-weight:600;color:v
     var el=title.querySelector('.clk-now');
     if(!el){ el=document.createElement('span'); el.className='clk-now'; el.setAttribute('aria-live','off');
       el.innerHTML='<span class="cn-hm"></span><span class="cn-s"></span><span class="cn-ap"></span><span class="cn-d"></span>'; name.after(el); }
-    var n=new Date(), h=n.getHours(), hm=(h%12||12)+':'+(n.getMinutes()<10?'0':'')+n.getMinutes(), sc=':'+(n.getSeconds()<10?'0':'')+n.getSeconds(), ap=h>=12?'PM':'AM', d=DAYS[n.getDay()].slice(0,3)+', '+n.getDate()+' '+MON[n.getMonth()].slice(0,3);
+    var n=new Date(), h=n.getHours(), hm=(h%12||12)+':'+(n.getMinutes()<10?'0':'')+n.getMinutes(), sc=':'+(n.getSeconds()<10?'0':'')+n.getSeconds(), ap=h>=12?'PM':'AM', d=DAYS[n.getDay()].slice(0,3)+', '+n.getDate()+' '+MON[n.getMonth()].slice(0,3)+' '+n.getFullYear();
     var a=el.querySelector('.cn-hm'), b=el.querySelector('.cn-ap'), c=el.querySelector('.cn-d'), e=el.querySelector('.cn-s');
     if(e.textContent!==sc) e.textContent=sc; if(a.textContent!==hm) a.textContent=hm; if(b.textContent!==ap) b.textContent=ap; if(c.textContent!==d) c.textContent=d;
   }
@@ -26677,6 +26677,32 @@ html body #alerts-panel #custom-reminders-card > .ayu-part-title{color:var(--tl-
 html body #alerts-panel .ayu-part-title .ayu-i:not([aria-expanded="true"]):not(#ayu-x1){color:var(--tl-0f766e,#73961b) !important;border-color:var(--tl-0f766e,#73961b) !important}
 html body :is(.ayu-i,.calc-info-btn,.reminder-hours-info-btn,.alert-info-btn,.notif-info-btn,.backup-info-btn,.othersites-info-btn,.ayu-sec-i,.ayu-desc-btn):not(#ayu-x1){filter:brightness(.78)}
 </style>
+<style id="clock-personal-20261125">
+/* Clock: time on the left, date and year on the right, the (i) at the end; no bell, no "Clock" word */
+html body #alerts-panel #rem-alarm-card > .ayu-part-title > svg:not(#ayu-x1), html body #alerts-panel #rem-alarm-card > .ayu-part-title > span:not(.clk-now):not(#ayu-x1){display:none !important}
+html body #alerts-panel #rem-alarm-card > .ayu-part-title .clk-now{flex:1 1 auto;margin-left:0 !important;font-size:1.12rem;font-weight:800}
+html body #alerts-panel #rem-alarm-card > .ayu-part-title .clk-now::before{content:none !important}
+html body #alerts-panel #rem-alarm-card > .ayu-part-title .clk-now .cn-d{margin-left:auto !important;font-size:.9rem;font-weight:700;opacity:.85}
+html body #alerts-panel #rem-alarm-card > .ayu-part-title .clk-now .cn-ap{font-size:.82rem}
+html body #alerts-panel #rem-alarm-card > .ayu-part-title .ayu-i:not(#ayu-x1){margin-left:8px !important;flex:0 0 auto}
+/* Personal: no title or line; the (i) sits at the end of the Add reminder button */
+html body #alerts-panel #custom-reminders-card > .ayu-part-title:not(#ayu-x1){display:none !important}
+html body #alerts-panel .med-addrow{position:relative}
+html body #alerts-panel .med-addrow > .ayu-i:not(#ayu-x1){position:absolute !important;right:10px;top:50% !important;transform:translateY(-50%);margin:0 !important;z-index:2}
+html body #alerts-panel .med-addrow .ma-btn[data-t="rem"]{padding-right:32px}
+</style>
+<script id="clock-personal-20261125-js">
+(function(){
+  function go(){
+    var row=document.querySelector('#alerts-panel .med-addrow'), ib=document.getElementById('custom-rem-info-btn'), info=document.getElementById('custom-rem-info');
+    if(!row||!ib) return false;
+    if(ib.parentNode!==row){ row.appendChild(ib); if(info) row.after(info); }
+    return true;
+  }
+  var n=0, iv=setInterval(function(){ if(go()||++n>80) clearInterval(iv); },250);
+  try{ new MutationObserver(function(){ var r=document.querySelector('#alerts-panel .med-addrow'), i=document.getElementById('custom-rem-info-btn'); if(r&&i&&i.parentNode!==r) go(); }).observe(document.getElementById('alerts-panel')||document.body,{childList:true,subtree:true}); }catch(e){}
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
