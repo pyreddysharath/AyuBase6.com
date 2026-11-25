@@ -3750,7 +3750,7 @@ var THEME={
  mind:  {panel:['#mind-panel'],      tab:'mind',      fam:'i',main:'#4a63c4',deep:'#364ca8',hue:229,spread:.35,sat:1.25,tokens:'mind'},
  vitals:{panel:['#calculator-panel'],tab:'calculator',fam:'c',main:'#1fa088',deep:'#13806c',hue:166,spread:.35,sat:.80,tokens:'calc'},
  care:  {panel:['#routines-panel','#alerts-panel:has(.alert-page[data-remtab="breaks"])'],tab:'routines',fam:'p',main:'#2aa7d9',deep:'#1a86b5',hue:198,spread:.40,sat:.85,tokens:'rout'},
- alerts:{panel:['#alerts-panel'],    tab:'alerts',    fam:'t',main:'#a3c93a',deep:'#6f9a1c',hue:77, spread:0,  sat:.80,tokens:'alert'}
+ alerts:{panel:['#alerts-panel'],    tab:'alerts',    fam:'t',main:'#8ea85a',deep:'#6f8a3a',hue:80, spread:0,  sat:.80,tokens:'alert'}
 };
 /* every literal colour used by each family in the stylesheet (so a page can re-colour them) */
 var FAM={"b":{"h":["0369a1","0b1220","0f172a","0f1f3d","1d4ed8","1e293b","1e3a6e","1e3a8a","1e40af","1f2937","255cc0","2563eb","3b82f6","5b7ab3","60a5fa","818cf8","93c5fd","9fb3d8","a5b4fc","bfdbfe","c7d4ec","cbd5e1","cedbf0","d6e6ff","dbe4f5","dbe9ff","dbeafe","e0e7ee","e0e7ff","e0f2fe","e2e8f0","e2eaff","e3e8ef","e4e9f0","e8f0fe","e8f0ff","e8f4ff","e9f2ff","eaf2fc","eaf3ff","eaf4ff","edf3ff","eff6ff","f0f4ff","f0f7ff","f0f8ff","f1f5f9","f3f7ff","f3f8ff","f4f8ff","f6f8fb","f7f9fd","f8fafc","f8faff","f8fbff"],"r":[[2,132,199],[15,23,42],[26,48,76],[27,46,70],[30,52,80],[30,58,110],[35,52,72],[36,52,72],[37,92,192],[37,99,235],[129,140,248],[165,180,252],[191,219,254],[226,234,255]]},"c":{"h":["06394a","083344","0891b2","0b4254","0c3d4d","0c7a8a","0e7490","155e75","164e63","18a2c5","22d3ee","234b57","38bdf8","4b7a87","4fd0e8","67e8f9","7fd3e3","a5dcea","cdeef5","cff4fb","cffafe","d3f4fa","d4f1f8","dff6fb","e6f7f8","e6f8fc","eaf8fb","ecfafd","ecfeff","f0fbfe","f6fdfe","f7fcfd","f8fcfd"],"r":[[8,145,178],[14,116,144],[21,94,117],[103,232,249]]},"g":{"h":["15803d","166534","16a34a","184c39","1a2e1e","1b4332","1d4a2c","1d5a43","1f4d36","1f6b45","204b38","22a35a","22c55e","23501a","243b2b","25704f","25915f","287a5a","2d5a23","2d6a4f","2d8c50","2e6b45","2f7d22","2f8a67","2fa36b","2fb585","335a1c","35692a","3d6b53","3d8b66","3dbb7e","4aa686","4ade80","518b3a","5b7f6c","5b9a42","74c99a","86bf9c","86efac","8fd6ae","9ccdb0","9fcbb0","a6d1b7","a7f3d0","a9e6be","b4dac3","b5d2a4","b9dcc8","bbf0d0","bddcb0","bde6a1","bfe8cf","c4dfb5","c5edd0","c8f0d4","c9ecb0","cdefdd","cfe9da","cfeedd","d3e8c6","d3eadb","d6e9dd","d6eee1","d6efe0","d8f3dc","d9eee1","d9f4e6","dcebdd","dcfce7","e1efe6","e3f2e9","e3f3ea","e4f3ea","e6f7ed","e6f9ec","eaf7f0","eaf9ee","eafaf1","ecfdf3","ecfdf5","edf7f0","eef8f2","eff8f1","effaf3","f0fbf4","f1f9f4","f8faf7","f8fcf9","fbfefa"],"r":[[34,197,94],[37,145,95],[45,106,79],[47,138,103],[47,163,107],[183,228,199]]},"p":{"h":["4a0d22","5a2d3a","6e0f2c","7a2d40","8a4a5a","a3173e","a8344d","b0566b","b8304f","c94862","e8607a","ee7d92","f08aa4","f2a8b6","f5aab9","f9b4c0","fbd3df","fcf8f9","fdeaee","fff0f3","fff1f3"],"r":[[168,52,77],[232,96,122],[255,241,243]]},"i":{"h":["3730a3","3f3f6b","4a3a96","6250b3","6366f1","8b5cf6","ede9fe","efedff","f1edfa","faf9fc","fbfaff"],"r":[[55,48,163],[73,59,127],[98,80,179],[139,92,246],[245,243,255]]}};
@@ -25350,7 +25350,7 @@ body.to-picking{cursor:grabbing}
     try{ var act=document.querySelector('#tab-btns .tab-btn.active'); if(act && typeof positionTabUnderline==='function') positionTabUnderline(act); }catch(e){}
   }
   function label(t){ var e=btn(t); return e ? e.textContent.replace(/\s+/g,' ').trim() : t; }
-  var COL={activity:'#2b6aa6',nutrition:'#4f8a22',mind:'#364ca8',calculator:'#13806c',routines:'#1a86b5',alerts:'#6f9a1c'};   // the deep shade of each section
+  var COL={activity:'#2b6aa6',nutrition:'#4f8a22',mind:'#364ca8',calculator:'#13806c',routines:'#1a86b5',alerts:'#6f8a3a'};   // the deep shade of each section
   function colour(t){ return COL[t]||'#64748b'; }
   function render(){
     var box=document.getElementById('sec-taborder'); if(!box) return;
@@ -25523,7 +25523,7 @@ html body .ra-count .ra-btn{background:#fff;color:#0f172a;flex:none;width:auto !
     {id:'mind',label:'Mind',c:'#364ca8',keys:['ayuBase6-mind']},
     {id:'calculator',label:'Vitals',c:'#13806c',keys:['ayu_vitals_tracker_v1','ayu_lab_reports_v1','ayuBmiView'],records:['ayu_vitals_tracker_v1','ayu_lab_reports_v1']},
     {id:'routines',label:'Care',c:'#1a86b5',keys:['ayuBase6WakeUpTime','ayuBase6-hb-v2','ayuBase6-care-autodismiss','ayuBase6-care-buttons','ayuBase6-speak','ayuBase6-speak-last','ayuBase6-vibrate',/^ayuBase6-routine-/,/^ayuWake/,'ayuAlarmTap']},
-    {id:'alerts',label:'Alerts',c:'#6f9a1c',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-med-log','ayuBase6-rem-alarm','ayuBase6-rem-alarms','ayuBase6-timer','ayuBase6-stopwatch','ayuBase6-world','ayuClockTab'],records:['ayuBase6-med-log']},
+    {id:'alerts',label:'Alerts',c:'#6f8a3a',keys:['ayuBase6-reminder-hours','ayubase6_reminder_section_states_v1','ayuBase6-my-reminders','ayuBase6-med-log','ayuBase6-rem-alarm','ayuBase6-rem-alarms','ayuBase6-timer','ayuBase6-stopwatch','ayuBase6-world','ayuClockTab'],records:['ayuBase6-med-log']},
     {id:'app',label:'App',c:'#475569',note:'tab order, cookies, notifications, offline pages',keys:[],rest:true,records:['ayuBase6-tour-seen']}
   ];
   function inSec(s,k){ return s.keys.some(function(m){ return typeof m==='string'?m===k:m.test(k); }); }
@@ -26614,7 +26614,7 @@ html[data-ayu-bg] :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-p
 html[data-ayu-bg] #nutrition-panel #page-bg:not(#ayu-x1):not(#ayu-x2){background:transparent !important}
 html[data-ayu-bg] body #app-nav:not(#ayu-x1):not(#ayu-x2){background-color:color-mix(in srgb,var(--ayu-c) 9%,rgba(255,255,255,.55)) !important}
 body{--ayu-c:#2b6aa6}
-body.ayu-sb-nutrition-panel{--ayu-c:#4f8a22}body.ayu-sb-mind-panel{--ayu-c:#364ca8}body.ayu-sb-calculator-panel{--ayu-c:#13806c}body.ayu-sb-routines-panel{--ayu-c:#1a86b5}body.ayu-sb-alerts-panel{--ayu-c:#6f9a1c}body.ayu-brk.ayu-brk{--ayu-c:#13806c}
+body.ayu-sb-nutrition-panel{--ayu-c:#4f8a22}body.ayu-sb-mind-panel{--ayu-c:#364ca8}body.ayu-sb-calculator-panel{--ayu-c:#13806c}body.ayu-sb-routines-panel{--ayu-c:#1a86b5}body.ayu-sb-alerts-panel{--ayu-c:#6f8a3a}body.ayu-brk.ayu-brk{--ayu-c:#13806c}
 #ayu-bgc{position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;overflow:hidden;z-index:-1;background:linear-gradient(170deg,color-mix(in srgb,var(--ayu-c) 10%,#fff),#F6F8FB 60%)}
 #ayu-bgc .row{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;justify-content:center;align-items:flex-end}
 #ayu-bgc .t{flex:0 0 auto;background-repeat:no-repeat;background-position:center bottom;background-size:100% 100%;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14%);mask-image:linear-gradient(to bottom,transparent 0,#000 14%)}
@@ -29601,7 +29601,7 @@ html body #alerts-panel .med-form .md-x{flex:none}
 /* Medicine form 20261124c: shaded blocks, no circles, section-coloured chevrons and X, filled bell */
 html body #alerts-panel .med-form .mg{border:0;margin:8px 0;padding:6px 12px;border-radius:14px;background:var(--mgbg);--mca:var(--mgc);--mcb:color-mix(in srgb,var(--mgc) 13%,#fff);--mcbd:color-mix(in srgb,var(--mgc) 38%,#fff)}
 html body #alerts-panel .med-form .mg:first-child{margin-top:0}
-html body #alerts-panel .med-form .mg.mc0{--mgc:#6f9a1c;--mgbg:#f1f6e2}
+html body #alerts-panel .med-form .mg.mc0{--mgc:#6f8a3a;--mgbg:#f1f6e2}
 html body #alerts-panel .med-form .mg.mc1{--mgc:#5f8714;--mgbg:#e4edc9}
 html body #alerts-panel .med-form .mg.mc2{--mgc:#4f7410;--mgbg:#d6e4ae}
 html body #alerts-panel .med-form .mg-tt{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -29610,12 +29610,12 @@ html body #alerts-panel .med-form .mg.open .mg-sub{display:none}
 html body #alerts-panel .med-form .mg-t{color:#3d5313;flex:none;max-width:100%}
 html body #alerts-panel .med-form .ts{background:rgba(255,255,255,.6);border-color:var(--mcbd)}
 html body #alerts-panel .med-form .ts-h{color:#3d5313}
-html body #alerts-panel .med-form .md-x{color:var(--mca,#6f9a1c)}
+html body #alerts-panel .med-form .md-x{color:var(--mca,#6f8a3a)}
 html body #alerts-panel .med-form .med-plus{border:0;width:auto;height:auto;font-size:1.5rem;font-weight:800;line-height:1;border-radius:0}
 html body #alerts-panel .med-form .md-addtime .med-plus{width:auto;height:auto;font-size:1.3rem;border:0}
-html body #alerts-panel .med-form .med-add-dose{gap:6px;color:#6f9a1c}
-html body #alerts-panel .med-form .mf-bell{flex:0 0 auto;width:auto;height:auto;border:0;background:none;border-radius:0;padding:4px;color:#6f9a1c}
-html body #alerts-panel .med-form .mf-bell.on{background:none;color:#6f9a1c;box-shadow:inset 0 -2px 0 #6f9a1c}
+html body #alerts-panel .med-form .med-add-dose{gap:6px;color:#6f8a3a}
+html body #alerts-panel .med-form .mf-bell{flex:0 0 auto;width:auto;height:auto;border:0;background:none;border-radius:0;padding:4px;color:#6f8a3a}
+html body #alerts-panel .med-form .mf-bell.on{background:none;color:#6f8a3a;box-shadow:inset 0 -2px 0 #6f8a3a}
 /* Medicine form 20261124d: compact sections, small X, the name underline like the section titles */
 html body #alerts-panel .med-form .mf-top{position:relative;padding-bottom:6px;margin:0 0 8px}
 html body #alerts-panel .med-form .mf-top::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,#759523,rgba(117,149,35,0))}
@@ -29635,14 +29635,14 @@ html body #alerts-panel .med-form .md-addtime{margin:0 0 2px}
 html body #alerts-panel .med-form .reminder-form-actions[hidden]{display:none}
 html body #alerts-panel .med-form .save-reminder,html body #alerts-panel .med-form .cancel-reminder{padding:6px 16px;font-size:.84rem;border-radius:9px}
 html body #alerts-panel .med-form .mf-top{gap:6px}
-html body #alerts-panel .med-form .mf-chev{flex:none;border:0;background:none;padding:4px;margin:0;cursor:pointer;color:#6f9a1c;display:inline-flex}
+html body #alerts-panel .med-form .mf-chev{flex:none;border:0;background:none;padding:4px;margin:0;cursor:pointer;color:#6f8a3a;display:inline-flex}
 html body #alerts-panel .med-form .mf-chev .mg-c{transform:rotate(180deg)}
 html body #alerts-panel .med-form .mf-bell svg,html body #alerts-panel .med-form .mf-chev svg{width:18px;height:18px}
 /* Add medicine / Add reminder: two buttons, always there; hidden while a form is open */
 html body #alerts-panel #custom-reminders-card #custom-reminder-add{display:none !important}
 html body #alerts-panel .med-addrow{display:flex;gap:8px;margin:10px 0 4px}
-html body #alerts-panel .med-addrow .ma-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;border:1.5px solid #6f9a1c;border-radius:11px;padding:9px 6px;background:#f4f9e6;color:#4d6b0a;font:inherit;font-size:.9rem;font-weight:800;cursor:pointer;white-space:nowrap}
-html body #alerts-panel .med-addrow .ma-btn svg{width:18px;height:18px;stroke:#6f9a1c;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+html body #alerts-panel .med-addrow .ma-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;border:1.5px solid #6f8a3a;border-radius:11px;padding:9px 6px;background:#f4f9e6;color:#4d6b0a;font:inherit;font-size:.9rem;font-weight:800;cursor:pointer;white-space:nowrap}
+html body #alerts-panel .med-addrow .ma-btn svg{width:18px;height:18px;stroke:#6f8a3a;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 html body #alerts-panel .med-addrow .ma-btn:active{background:#e4edc9}
 html body #alerts-panel #custom-reminders-list:has(.med-form,.custom-reminder-form,.med-choose) ~ .med-addrow{display:none}
 /* Medicine form 20261124f: darker blocks */
@@ -29654,9 +29654,9 @@ html body #alerts-panel #custom-reminders-list:has(.med-form,.custom-reminder-fo
 html body #alerts-panel #custom-reminders-list:has(> .med-form,> .custom-reminder-form,> .med-choose) ~ .med-addrow{display:none}
 html body #alerts-panel .med-addrow .ma-btn{padding:5px 6px;font-size:.86rem;border-radius:10px;gap:6px}
 html body #alerts-panel .med-addrow .ma-btn svg{width:17px;height:17px;stroke:none;fill:none}
-html body #alerts-panel .med-addrow .ma-btn svg .f{fill:#6f9a1c;stroke:#6f9a1c;stroke-width:1}
+html body #alerts-panel .med-addrow .ma-btn svg .f{fill:#6f8a3a;stroke:#6f8a3a;stroke-width:1}
 html body #alerts-panel .med-addrow .ma-btn svg .g{fill:none;stroke:#f4f9e6;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-html body #alerts-panel .med-addrow .ma-btn svg .e{fill:none;stroke:#6f9a1c;stroke-width:2.2;stroke-linecap:round}
+html body #alerts-panel .med-addrow .ma-btn svg .e{fill:none;stroke:#6f8a3a;stroke-width:2.2;stroke-linecap:round}
 /* the closed medicine row: one line per medicine, as small as it can be */
 html body #alerts-panel .med-item .cri-hdr{padding:6px 8px 6px 12px !important;min-height:0 !important;line-height:1.2 !important;gap:6px}
 html body #alerts-panel .med-item .cri-main strong{font-size:.95rem !important;line-height:1.25 !important}
@@ -29679,11 +29679,11 @@ html body #alerts-panel .med-item .cri-main{display:contents}
 html body #alerts-panel .med-item .cri-main strong{grid-column:1;grid-row:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 html body #alerts-panel .med-item .cri-hdr .master-switch{display:none !important}
 html body #alerts-panel .med-item .med-bell{grid-column:2;grid-row:1}
-html body #alerts-panel .med-item .cri-hdr .custom-reminder-delete{grid-column:3;grid-row:1;background:none !important;border:0 !important;color:#6f9a1c !important;width:auto !important;padding:0 4px !important;font-size:.9rem !important;font-weight:800}
-html body #alerts-panel .med-item .cri-hdr .cri-chev{grid-column:4;grid-row:1;color:#6f9a1c}
+html body #alerts-panel .med-item .cri-hdr .custom-reminder-delete{grid-column:3;grid-row:1;background:none !important;border:0 !important;color:#6f8a3a !important;width:auto !important;padding:0 4px !important;font-size:.9rem !important;font-weight:800}
+html body #alerts-panel .med-item .cri-hdr .cri-chev{grid-column:4;grid-row:1;color:#6f8a3a}
 html body #alerts-panel .med-item .cri-sub.med-lines{grid-column:1 / -1;grid-row:2;border-top:2px solid transparent;border-image:linear-gradient(90deg,#759523,rgba(117,149,35,0)) 1;padding-top:3px;margin-top:3px}
 html body #alerts-panel .med-item.med-off .cri-main strong,html body #alerts-panel .med-item.med-off .cri-sub{opacity:.5}
-html body #alerts-panel .med-bell,html body #alerts-panel .med-form .mf-del{border:0;background:none;color:#6f9a1c;padding:4px;display:inline-flex;align-items:center;cursor:pointer;font:inherit}
+html body #alerts-panel .med-bell,html body #alerts-panel .med-form .mf-del{border:0;background:none;color:#6f8a3a;padding:4px;display:inline-flex;align-items:center;cursor:pointer;font:inherit}
 html body #alerts-panel .med-bell svg{width:18px;height:18px}
 html body #alerts-panel .med-form .mf-del{font-size:.8rem;font-weight:800;padding:4px}
 html body #alerts-panel .med-form .mf-bell.off{opacity:1}
@@ -30282,7 +30282,7 @@ html body :is(.calc-info-btn,.reminder-hours-info-btn,.ayu-desc-btn,.alert-info-
 <style id="med-icons-20261124i">
 /* Name row: bell, X and chevron are the same 26px size and sit in the same place closed or open; the X is drawn like the chevron. Medicine/time rows: X = chevron size */
 html body #alerts-panel{--med-x:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");--med-c:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
-html body #alerts-panel .med-item .cri-hdr :is(.med-bell,.custom-reminder-delete,.cri-chev),html body #alerts-panel .med-form .mf-top :is(.mf-bell,.mf-del,.mf-chev){box-sizing:border-box !important;width:26px !important;height:26px !important;min-width:26px !important;min-height:26px !important;padding:0 !important;margin:0 !important;display:inline-flex !important;align-items:center;justify-content:center;border:0 !important;background:none !important;color:#6f9a1c !important;font-size:0 !important;line-height:0 !important;flex:none}
+html body #alerts-panel .med-item .cri-hdr :is(.med-bell,.custom-reminder-delete,.cri-chev),html body #alerts-panel .med-form .mf-top :is(.mf-bell,.mf-del,.mf-chev){box-sizing:border-box !important;width:26px !important;height:26px !important;min-width:26px !important;min-height:26px !important;padding:0 !important;margin:0 !important;display:inline-flex !important;align-items:center;justify-content:center;border:0 !important;background:none !important;color:#6f8a3a !important;font-size:0 !important;line-height:0 !important;flex:none}
 html body #alerts-panel .med-item .cri-hdr{column-gap:4px !important;padding:2px 12px 7px 12px !important}
 html body #alerts-panel .med-form .mf-top{gap:4px !important}
 html body #alerts-panel .med-item .cri-hdr .custom-reminder-delete::before,html body #alerts-panel .med-form .mf-del::before{content:"";display:block;width:18px;height:18px;background:currentColor;-webkit-mask:var(--med-x) center/contain no-repeat;mask:var(--med-x) center/contain no-repeat}
@@ -30297,7 +30297,7 @@ html body #alerts-panel .med-form .md-x::before{content:"";display:block;width:1
 html body #alerts-panel .med-form{counter-reset:mgn}
 html body #alerts-panel .med-form .mg{counter-increment:mgn;border:1.5px solid var(--mgs);padding:5px 11px}
 html body #alerts-panel .med-form .mg.mc0{--mgbg:#e9f1cf;--mgc:#4f7410;--mgs:#a6c45a;--mgn:#4f7410}
-html body #alerts-panel .med-form .mg.mc1{--mgbg:#dae8b3;--mgc:#4f7410;--mgs:#8db738;--mgn:#6f9a1c}
+html body #alerts-panel .med-form .mg.mc1{--mgbg:#dae8b3;--mgc:#4f7410;--mgs:#8db738;--mgn:#6f8a3a}
 html body #alerts-panel .med-form .mg.mc2{--mgbg:#c9dd95;--mgc:#3f6208;--mgs:#759f22;--mgn:#8fb83a}
 html body #alerts-panel .med-form .mg > .mg-hr .mg-h::before{content:counter(mgn);flex:none;width:26px;height:26px;box-sizing:border-box;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:800;line-height:1;background:var(--mgn);color:#fff;border:0}
 html body #alerts-panel .med-form .mg.mc2 > .mg-hr .mg-h::before{color:#1f3504}
