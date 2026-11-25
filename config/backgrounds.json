@@ -3,7 +3,7 @@
   "tabs": {
     "body": {
       "file": "bg/body.svg",
-      "v": 2
+      "v": 3
     },
     "food": {
       "file": "bg/food.svg",
@@ -11,11 +11,11 @@
     },
     "mind": {
       "file": "bg/mind.svg",
-      "v": 2
+      "v": 3
     },
     "vitals": {
       "file": "bg/vitals.svg",
-      "v": 3
+      "v": 4
     },
     "care": {
       "file": "bg/care.svg",
@@ -23,7 +23,31 @@
     },
     "alerts": {
       "file": "bg/alerts.svg",
-      "v": 3
+      "v": 4
+    },
+    "body_w": {
+      "file": "bg/body_w.svg",
+      "v": 2
+    },
+    "food_w": {
+      "file": "bg/food_w.svg",
+      "v": 1
+    },
+    "mind_w": {
+      "file": "bg/mind_w.svg",
+      "v": 2
+    },
+    "vitals_w": {
+      "file": "bg/vitals_w.svg",
+      "v": 2
+    },
+    "care_w": {
+      "file": "bg/care_w.svg",
+      "v": 1
+    },
+    "alerts_w": {
+      "file": "bg/alerts_w.svg",
+      "v": 2
     }
   }
 }
