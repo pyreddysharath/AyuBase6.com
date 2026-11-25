@@ -25458,6 +25458,7 @@ body.to-picking{cursor:grabbing}
 #sec-resetall .ra-ask p{margin:0 0 6px;color:#334155;font-weight:700}
 #sec-resetall .ra-ask input{width:100%;box-sizing:border-box;margin:0 0 6px;padding:6px 8px;border:1.5px solid #cbd5e1;border-radius:8px;font:inherit;font-size:.9rem;text-transform:uppercase}
 #sec-resetall .ra-row{display:flex;gap:8px}
+#sec-resetall .ra-row.ra-col{flex-direction:column}
 #sec-resetall .ra-row .ra-btn{flex:1}
 #sec-resetall .ra-link{background:none;border:0;padding:0;margin:0 0 6px;font:inherit;font-size:.8rem;font-weight:800;color:var(--footer-accent,var(--fb-2563eb,#2563eb));text-decoration:underline;cursor:pointer}
 #sec-resetall .ra-list{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin:0 0 8px}
@@ -25532,8 +25533,9 @@ html body .ra-count .ra-btn{background:#fff;color:#0f172a;flex:none;width:auto !
     var b=card.querySelector('.ra-box'), erase=kind==='e';
     var list=SECTIONS.map(function(s){ return '<label class="ra-opt"><input type="checkbox" value="'+s.id+'" checked><i style="background:'+s.c+'"></i><span>'+s.label+(s.note?' <small>('+s.note+')</small>':'')+'</span></label>'; }).join('');
     b.innerHTML='<div class="ra-ask"><p>'+(erase?'Erase the data of:':'Reset the settings of:')+'</p><div class="ra-list">'+list+'</div>'
-      +(erase?'<button type="button" class="ra-link" data-a="bk">Back up first</button>':'')
-      +'<div class="ra-row"><button type="button" class="ra-btn ra-ghost" data-a="no">Cancel</button><button type="button" class="ra-btn'+(erase?' ra-danger':'')+'" data-a="'+(erase?'e2':'s2')+'"'+'>'+(erase?'Erase':'Reset')+'</button></div></div>';
+      +(erase
+        ? '<div class="ra-row ra-col"><button type="button" class="ra-btn" data-a="bk">Back up first</button><button type="button" class="ra-btn ra-danger" data-a="e2">Erase</button><button type="button" class="ra-btn ra-ghost" data-a="no">Cancel</button></div></div>'
+        : '<div class="ra-row"><button type="button" class="ra-btn ra-ghost" data-a="no">Cancel</button><button type="button" class="ra-btn" data-a="s2">Reset</button></div></div>');
     var go=b.querySelector('[data-a='+(erase?'e2':'s2')+']');
     function upd(){ go.disabled=!chosen(b).length; }
     b.querySelectorAll('.ra-list input').forEach(function(i){ i.addEventListener('change',upd); }); upd();
