@@ -26599,6 +26599,55 @@ html body #app-logo-wrap #app-logo:not(#ayu-x1):not(#ayu-x2){font-family:'Lexend
 html body #app-logo-wrap #app-logo #logo-heal:not(#ayu-x1):not(#ayu-x2){font-style:normal;font-weight:800}
 html body #app-logo-wrap #app-logo #logo-thee:not(#ayu-x1):not(#ayu-x2){font-style:italic;font-weight:800;margin-left:.22em}
 </style>
+<style id="bg-circles-20261125">
+/* Section backgrounds: soft circles in the section's colour, fixed to the screen (they never move when sections open or close);
+   one is drawn faintly in front of the page. Long pages also get a few extra soft circles down the page.
+   Roll back: delete this block and the script after it (the old lotus pictures come back). */
+html[data-ayu-bg] .sec-bg-layer,html[data-ayu-bg] .sec-lotus-layer,html[data-ayu-bg] .lotus-extra-motif,html[data-ayu-bg] body #nav-lotus:not(#ayu-x1):not(#ayu-x2){display:none !important}
+/* the page wash moves into the fixed layer, and the header lets the circles show through */
+html[data-ayu-bg] :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel):not(#ayu-x1){background-image:none !important;background-color:transparent !important}
+html[data-ayu-bg] body #app-nav:not(#ayu-x1):not(#ayu-x2){background-color:color-mix(in srgb,var(--ayu-c) 9%,rgba(255,255,255,.55)) !important}
+html[data-ayu-bg][data-petal-card="e"] :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel) :is(.card,.body-age-section,.activity-type-section,.rout-card,.mind-card,.alert-card,.calc-card)::after{content:none !important;display:none !important}
+#ayu-bgc{position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;overflow:hidden;--c:#2563eb;z-index:-1;background:linear-gradient(145deg,color-mix(in srgb,var(--c) 7%,#fff),#F6F8FB 70%)}
+#ayu-bgc i{position:absolute;border-radius:50%;background:var(--c);transition:opacity .3s}
+#ayu-bgc .c1{width:min(50vw,300px);height:min(50vw,300px);opacity:.20}
+#ayu-bgc .c2{width:min(30vw,180px);height:min(30vw,180px);opacity:.26}
+#ayu-bgc .c3{width:min(54vw,320px);height:min(54vw,320px);opacity:.13;z-index:2147483000}
+#ayu-bgf{position:absolute;left:0;width:100%;pointer-events:none;z-index:-1;--c:#2563eb;
+  background:radial-gradient(circle at 0 18%,color-mix(in srgb,var(--c) 15%,transparent) 0 min(18vw,110px),transparent calc(min(18vw,110px) + 1px)) 0 0/100% 1100px repeat-y,
+  radial-gradient(circle at 100% 70%,color-mix(in srgb,var(--c) 19%,transparent) 0 min(22vw,140px),transparent calc(min(22vw,140px) + 1px)) 0 0/100% 1100px repeat-y}
+/* colour and places for each section */
+body{--ayu-c:#2563eb}
+body.ayu-sb-nutrition-panel{--ayu-c:#658849}body.ayu-sb-mind-panel{--ayu-c:#6366f1}body.ayu-sb-calculator-panel{--ayu-c:#0891b2}body.ayu-sb-routines-panel{--ayu-c:#e8607a}body.ayu-sb-alerts-panel{--ayu-c:#799e1b}body.ayu-brk.ayu-brk{--ayu-c:#0891b2}
+#ayu-bgc,#ayu-bgf{--c:var(--ayu-c)}
+/* Body (default) */
+#ayu-bgc .c1{top:-9%;left:-16%}#ayu-bgc .c2{top:40%;right:-10%}#ayu-bgc .c3{bottom:-16%;left:2%}
+/* Food */
+body.ayu-sb-nutrition-panel #ayu-bgc .c1{top:-9%;left:auto;right:-16%}body.ayu-sb-nutrition-panel #ayu-bgc .c2{top:44%;right:auto;left:-10%}body.ayu-sb-nutrition-panel #ayu-bgc .c3{bottom:-16%;left:auto;right:-4%}
+/* Mind */
+body.ayu-sb-mind-panel #ayu-bgc .c1{top:8%;left:-24%}body.ayu-sb-mind-panel #ayu-bgc .c2{top:-3%;right:-6%}body.ayu-sb-mind-panel #ayu-bgc .c3{bottom:-14%;left:auto;right:-8%}
+/* Vitals */
+body.ayu-sb-calculator-panel #ayu-bgc .c1{top:-14%;left:10%}body.ayu-sb-calculator-panel #ayu-bgc .c2{top:56%;right:-14%}body.ayu-sb-calculator-panel #ayu-bgc .c3{bottom:-16%;left:-6%}
+/* Care */
+body.ayu-sb-routines-panel #ayu-bgc .c1{top:-8%;left:auto;right:-12%}body.ayu-sb-routines-panel #ayu-bgc .c2{top:52%;right:auto;left:-12%}body.ayu-sb-routines-panel #ayu-bgc .c3{bottom:-18%;left:24%}
+/* Alerts */
+body.ayu-sb-alerts-panel #ayu-bgc .c1{top:14%;left:auto;right:-26%}body.ayu-sb-alerts-panel #ayu-bgc .c2{top:-2%;left:-4%;right:auto}body.ayu-sb-alerts-panel #ayu-bgc .c3{bottom:-16%;left:-14%}
+</style>
+<script id="bg-circles-20261125-js">
+(function(){
+  function go(){
+    if(document.getElementById('ayu-bgc')) return;
+    var b=document.createElement('div'); b.id='ayu-bgc'; b.setAttribute('aria-hidden','true'); b.innerHTML='<i class="c1"></i><i class="c2"></i><i class="c3"></i>';
+    document.body.insertBefore(b,document.body.firstChild);
+    var f=document.createElement('div'); f.id='ayu-bgf'; f.setAttribute('aria-hidden','true'); document.body.appendChild(f);
+    function size(){ var h=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight)-720; f.style.top='720px'; f.style.height=(h>0?h:0)+'px'; }
+    size(); try{ new ResizeObserver(size).observe(document.body); }catch(e){ setInterval(size,1500); }
+    window.addEventListener('resize',size);
+    document.documentElement.setAttribute('data-ayu-bg','circles');
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
