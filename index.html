@@ -29820,6 +29820,12 @@ html body #alerts-panel .med-item.open > .cri-hdr{display:none !important}
     hm.hidden=!nm; hr.hidden=!(nm && nr);
     meds().forEach(function(it){ var sub=it.querySelector('.cri-sub'); if(sub && !sub.classList.contains('med-lines')){ sub.innerHTML=medLines(dataOf(it)); sub.classList.add('med-lines'); } ensureBell(it); });
   }
+  // Each treatment is always open: the name with its medicines right under it (no chevron on the name). Not while a new treatment or reminder is being added.
+  function autoOpen(){
+    var l=list(); if(!l || l.querySelector(':scope > .med-form, :scope > .med-choose, :scope > .custom-reminder-form')) return;
+    meds().forEach(function(it){ if(!it.classList.contains('open') && !it.querySelector('.med-form')){ var h=it.querySelector('.cri-hdr'); if(h) h.click(); } });
+  }
+  setInterval(autoOpen,700);
   var oPaint=window.ayuRemPaint;
   if(typeof oPaint==='function') window.ayuRemPaint=function(item,data){
     oPaint.apply(this,arguments);
@@ -29884,7 +29890,8 @@ html body #alerts-panel .med-item.open > .cri-hdr{display:none !important}
   function foodName(v){ for(var i=0;i<FOODS.length;i++) if(FOODS[i][0]===v) return FOODS[i][1]; return ''; }
   function openForm(existing){
     var l=list(); if(!l) return;
-    closeForms();
+    if(existing){ l.querySelectorAll(':scope > .med-choose, :scope > .med-form, :scope > .custom-reminder-form').forEach(function(f){ f.remove(); }); }   // a treatment's own card can stay open next to the others
+    else closeForms();
     if(existing) stopMed(existing);
     var saved=existing ? dataOf(existing) : {};
     var doses=(saved.doses||[]).map(function(x){ return JSON.parse(JSON.stringify(x)); });
@@ -30325,6 +30332,7 @@ html body #alerts-panel .med-item .cri-hdr .cri-main strong{order:4;flex:1 1 aut
 html body #alerts-panel .med-item .cri-hdr .cri-sub.med-lines{order:5;flex:0 0 100%}
 html body #alerts-panel .med-form .mf-top{display:flex;flex-direction:row-reverse;flex-wrap:wrap;align-items:center;gap:0 !important}
 html body #alerts-panel .med-form .mf-top .mf-chev{order:1}
+html body #alerts-panel .med-item .cri-hdr .cri-chev,html body #alerts-panel .med-form .mf-top .mf-chev{display:none !important}
 html body #alerts-panel .med-form .mf-top .mf-del{order:2}
 html body #alerts-panel .med-form .mf-top .mf-bell{order:3}
 html body #alerts-panel .med-form .mf-top .mf-name{order:4;flex:1 1 0;min-width:0}
