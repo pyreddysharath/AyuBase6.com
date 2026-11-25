@@ -25525,8 +25525,8 @@ html body .ra-count .ra-btn{background:#fff;color:#0f172a;flex:none;width:auto !
   }
   function render(box){
     box.innerHTML='<p class="ra-note">Start again, from one place.</p>'
-     +'<div class="ra-card" id="ra-c1"><h4>Reset all settings</h4><p>Puts the settings back to their defaults: reminder and alarm times, switches, tones and choices. Your Lab Insights reports, Tracker readings and medicine log stay.</p><button type="button" class="ra-btn" data-a="s1">Reset settings…</button><div class="ra-box"></div></div>'
-     +'<div class="ra-card" id="ra-c2"><h4>Erase all data</h4><p>A factory reset. Removes what AyuBase6 keeps on this device for the sections you choose, including reports, readings and reminders. You get 5 seconds to undo.</p><button type="button" class="ra-btn ra-danger" data-a="e1">Erase data…</button><div class="ra-box"></div></div>';
+     +'<div class="ra-card" id="ra-c1"><h4>Reset all settings</h4><p>Puts the settings back to their defaults: reminder and alarm times, switches, tones and choices. Your Lab Insights reports, Tracker readings and medicine log stay.</p><button type="button" class="ra-btn" data-a="s1">Reset settings</button><div class="ra-box"></div></div>'
+     +'<div class="ra-card" id="ra-c2"><h4>Erase all data</h4><p>A factory reset. Removes what AyuBase6 keeps on this device for the sections you choose, including reports, readings and reminders. You get 5 seconds to undo.</p><button type="button" class="ra-btn ra-danger" data-a="e1">Erase data</button><div class="ra-box"></div></div>';
   }
   function ask(card,kind){
     var b=card.querySelector('.ra-box'), erase=kind==='e';
