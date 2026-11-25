@@ -26687,9 +26687,12 @@ html body #alerts-panel #rem-alarm-card > .ayu-part-title .clk-now .cn-ap{font-s
 html body #alerts-panel #rem-alarm-card > .ayu-part-title .ayu-i:not(#ayu-x1){margin-left:8px !important;flex:0 0 auto}
 /* Personal: no title or line; the (i) sits at the end of the Add reminder button */
 html body #alerts-panel #custom-reminders-card > .ayu-part-title:not(#ayu-x1){display:none !important}
-html body #alerts-panel .med-addrow{position:relative}
-html body #alerts-panel .med-addrow > .ayu-i:not(#ayu-x1){position:absolute !important;right:10px;top:50% !important;transform:translateY(-50%);margin:0 !important;z-index:2}
-html body #alerts-panel .med-addrow .ma-btn[data-t="rem"]{padding-right:32px}
+html body #alerts-panel .med-addrow{align-items:center}
+html body #alerts-panel .med-addrow > .ayu-i:not(#ayu-x1){position:static !important;transform:none !important;margin:0 0 0 2px !important;flex:0 0 auto}
+html body #alerts-panel .med-addrow .ma-btn{padding:2px 6px !important;font-size:.76rem !important;border-radius:9px !important;gap:5px !important;min-height:0 !important;line-height:1.2}
+html body #alerts-panel .med-addrow .ma-btn svg{width:14px !important;height:14px !important}
+/* Alerts (i): the section's own deep sage, on the section's light fill, the same on every (i) in the tab */
+html body #alerts-panel :is(.ayu-i,#rem-al-ibtn,.reminder-hours-info-btn):not(#ayu-x1){color:#4d6b0a !important;border-color:#5d7a20 !important;background:#f4f9e6 !important;filter:none !important;font-size:8.5px !important;font-weight:700;font-style:normal;opacity:1 !important}
 </style>
 <script id="clock-personal-20261125-js">
 (function(){
