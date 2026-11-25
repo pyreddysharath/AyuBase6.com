@@ -26686,22 +26686,34 @@ html body #alerts-panel #rem-alarm-card > .ayu-part-title .clk-now .cn-d{margin-
 html body #alerts-panel #rem-alarm-card > .ayu-part-title .clk-now .cn-ap{font-size:.82rem}
 html body #alerts-panel #rem-alarm-card > .ayu-part-title .ayu-i:not(#ayu-x1){margin-left:8px !important;flex:0 0 auto}
 /* Personal: no title or line; the (i) sits at the end of the Add reminder button */
-html body #alerts-panel #custom-reminders-card > .ayu-part-title:not(#ayu-x1){display:none !important}
+html body #alerts-panel #custom-reminders-card > .ayu-part-title > svg:not(#ayu-x1), html body #alerts-panel #custom-reminders-card > .ayu-part-title > span:not(.clk-now):not(#ayu-x1){display:none !important}
+html body #alerts-panel #custom-reminders-card > .ayu-part-title .clk-now{display:inline-flex;align-items:baseline;gap:3px;flex:1 1 auto;font-size:1.12rem;font-weight:800}
+html body #alerts-panel #custom-reminders-card > .ayu-part-title .clk-now .cn-ap{font-size:.82rem;font-weight:800}
+html body #alerts-panel #custom-reminders-card > .ayu-part-title .clk-now .cn-s{font-size:.82em;font-weight:700;opacity:.8;margin-left:-2px}
+html body #alerts-panel #custom-reminders-card > .ayu-part-title .clk-now .cn-d{margin-left:auto;font-size:.9rem;font-weight:700;opacity:.85}
 html body #alerts-panel .med-addrow{align-items:center}
 html body #alerts-panel .med-addrow > .ayu-i:not(#ayu-x1){position:static !important;transform:none !important;margin:0 0 0 2px !important;flex:0 0 auto}
-html body #alerts-panel .med-addrow .ma-btn{padding:2px 6px !important;font-size:.76rem !important;border-radius:9px !important;gap:5px !important;min-height:0 !important;line-height:1.2}
-html body #alerts-panel .med-addrow .ma-btn svg{width:14px !important;height:14px !important}
+html body #alerts-panel .med-addrow .ma-btn{padding:4px 6px !important;font-size:.82rem !important;border-radius:10px !important;gap:6px !important;min-height:0 !important;line-height:1.2}
+html body #alerts-panel .med-addrow .ma-btn svg{width:15px !important;height:15px !important}
+/* the info text under an (i): the same small size in every Alerts part, on the section's light sage */
+html body #alerts-panel .ayu-part-info:not(#ayu-x1){background:#e8f0d2 !important;font-size:.78rem !important;line-height:1.5 !important;color:#394620}
+html body #alerts-panel .ayu-part-info:not(#ayu-x1) :is(li,p,ul,b){font-size:inherit !important;line-height:inherit !important}
 /* Alerts (i): the section's own deep sage, on the section's light fill, the same on every (i) in the tab */
 html body #alerts-panel :is(.ayu-i,#rem-al-ibtn,.reminder-hours-info-btn):not(#ayu-x1){color:#4d6b0a !important;border-color:#5d7a20 !important;background:#f4f9e6 !important;filter:none !important;font-size:8.5px !important;font-weight:700;font-style:normal;opacity:1 !important}
 </style>
 <script id="clock-personal-20261125-js">
 (function(){
   function go(){
+    var tt=document.querySelector('#custom-reminders-card > .ayu-part-title'); if(tt && !tt.querySelector('.clk-now')){ var el=document.createElement('span'); el.className='clk-now'; el.setAttribute('aria-live','off'); el.innerHTML='<span class="cn-hm"></span><span class="cn-s"></span><span class="cn-ap"></span><span class="cn-d"></span>'; var sp=tt.querySelector(':scope > span'); (sp||tt.firstChild).after(el); }
     var row=document.querySelector('#alerts-panel .med-addrow'), ib=document.getElementById('custom-rem-info-btn'), info=document.getElementById('custom-rem-info');
     if(!row||!ib) return false;
     if(ib.parentNode!==row){ row.appendChild(ib); if(info) row.after(info); }
     return true;
   }
+  function paintP(){ var el=document.querySelector('#custom-reminders-card > .ayu-part-title .clk-now'); if(!el) return; var D=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], n=new Date(), hh=n.getHours();
+    var v={'.cn-hm':(hh%12||12)+':'+(n.getMinutes()<10?'0':'')+n.getMinutes(),'.cn-s':':'+(n.getSeconds()<10?'0':'')+n.getSeconds(),'.cn-ap':hh>=12?'PM':'AM','.cn-d':D[n.getDay()]+', '+n.getDate()+' '+M[n.getMonth()]+' '+n.getFullYear()};
+    for(var k in v){ var s=el.querySelector(k); if(s && s.textContent!==v[k]) s.textContent=v[k]; } }
+  setInterval(function(){ if(!document.hidden) paintP(); },1000); setTimeout(paintP,700);
   var n=0, iv=setInterval(function(){ if(go()||++n>80) clearInterval(iv); },250);
   try{ new MutationObserver(function(){ var r=document.querySelector('#alerts-panel .med-addrow'), i=document.getElementById('custom-rem-info-btn'); if(r&&i&&i.parentNode!==r) go(); }).observe(document.getElementById('alerts-panel')||document.body,{childList:true,subtree:true}); }catch(e){}
 })();
