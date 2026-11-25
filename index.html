@@ -26530,6 +26530,13 @@ html body #ayu-checklist .rout-row + .rout-info-panel{position:relative;margin-b
 html body #ayu-checklist .rout-row + .rout-info-panel::after{content:"";position:absolute;left:0;right:0;bottom:-10px;border-bottom:1px solid var(--line,var(--rout-4))}
 html body #ayu-checklist .rout-row + .rout-info-panel:last-child::after{display:none}
 </style>
+<style id="cl-compact-20261125">
+/* Daily Checklist: each check takes less height */
+html body #ayu-checklist .rout-row:not(#ayu-x1){padding:9px 0 !important}
+html body #ayu-checklist .rout-check:not(#ayu-x1){line-height:1.35 !important;font-size:.95rem !important;gap:9px}
+html body #ayu-checklist .rout-time:not(#ayu-x1){font-size:.8rem !important}
+html body #ayu-checklist .ayu-cl-part > .rout-row:not(:has(~ .rout-row)):not(#ayu-x1){border-bottom:0 !important}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
