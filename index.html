@@ -21202,20 +21202,7 @@ html body #sec-bkp .ayu-gb .master-switch input:checked:not(#ayu-x1){background:
     if(get(CHK)){ ready=true; saveNow(); syncLast(); return true; }
     var pr; try{ pr=Promise.resolve(n.backupLoad()); }catch(e){ ready=true; return true; }
     pr.then(function(r){
-      put(CHK,'1');
-      var v=(r && r.data && window.ayuBackupValidate) ? window.ayuBackupValidate(r.data) : null, o=null;
-      try{ o=JSON.parse(r && r.data || 'null'); }catch(e){}
-      if(v && !v.error && enabled()){
-        var ids=Object.keys(v.groups), has=keys().some(function(k){ return get(k)!==null && get(k)!==(o&&o.data&&o.data[k]); });
-        var w=when(v.savedAt);
-        if(!has || window.confirm('Restore your data from your Google account backup'+(w?' ('+w+')':'')+'? It replaces the data on this phone.')){
-          try{
-            ids.forEach(function(id){ var g=groups().filter(function(x){ return x.id===id; })[0]; g.keys.forEach(function(k){ localStorage.removeItem(k); }); Object.keys(v.groups[id]).forEach(function(k){ localStorage.setItem(k,v.groups[id][k]); }); });
-            try{ sessionStorage.setItem('ayu-restored',JSON.stringify({done:ids,skipped:[],google:1})); }catch(e){}
-            location.reload(); return;
-          }catch(e){}
-        }
-      }
+      put(CHK,'1');   // no restore: the phone's own data is always kept
       ready=true; saveNow();
     }).catch(function(){ ready=true; });
     return true;
@@ -21223,7 +21210,7 @@ html body #sec-bkp .ayu-gb .master-switch input:checked:not(#ayu-x1){background:
 
   // Backup & Restore: the switch, its i and the last-copied time.
   var INFO='Copies your data (the sections below) to your own Google account, privately and encrypted; nothing is sent to us. '+
-    'It is restored when you install the app again. Needs Google backup on in the phone\'s settings. Off: the copy is removed.';
+    'Needs Google backup on in the phone\'s settings. Off: the copy is removed.';
   function paint(){
     var st=document.getElementById('ayu-gb-st'), i=document.getElementById('ayu-gb-on'); if(!st) return;
     if(i) i.checked=enabled();
