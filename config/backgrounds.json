@@ -15,7 +15,7 @@
     },
     "vitals": {
       "file": "bg/vitals.svg",
-      "v": 5
+      "v": 6
     },
     "care": {
       "file": "bg/care.svg",
@@ -39,7 +39,7 @@
     },
     "vitals_w": {
       "file": "bg/vitals_w.svg",
-      "v": 2
+      "v": 3
     },
     "care_w": {
       "file": "bg/care_w.svg",
