@@ -2835,7 +2835,7 @@ html[data-petal-card="e"] #mind-panel .mind-topic-list li {
   -webkit-backdrop-filter:none !important;
 }
 html[data-petal-card="e"] #mind-panel .mind-card {
-  background:rgba(255,255,255,.72) !important;
+  background:rgba(255,255,255,.5) !important;
 }
 </style>
 
@@ -3030,11 +3030,11 @@ body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
   .tab-panel > .ayu-content-page-title::after {content:none !important;display:none !important;}
   /* Consistent, gently translucent content surfaces reveal lotus art. */
   .tab-panel :is(.card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section) {
-    background-color:rgba(255,255,255,.76) !important;
+    background-color:rgba(255,255,255,.5) !important;
     border-color:color-mix(in srgb,var(--accent,var(--fb-2563eb,#2563eb)) 16%,#e3e8ee) !important;
     box-shadow:0 3px 16px rgba(var(--fbr-27-46-70,27,46,70),.055) !important;
-    backdrop-filter:blur(2px);
-    -webkit-backdrop-filter:blur(2px);
+    backdrop-filter:blur(1px);
+    -webkit-backdrop-filter:blur(1px);
   }
   #app-nav .footer-tab-btn {border-radius:7px;transition:background-color .16s ease,transform .16s ease,opacity .16s ease;}
   #app-nav .footer-tab-btn:hover {background:rgba(255,255,255,.45);opacity:1;}
@@ -26593,7 +26593,7 @@ html body #app-logo-wrap #app-logo #logo-thee:not(#ayu-x1):not(#ayu-x2){font-sty
 /* Section backgrounds: one nature scene per tab, fixed to the screen (it never moves when sections open or close). The pictures live in
    config/bg/ on GitHub (list and versions in config/backgrounds.json) and are kept on the phone; the copies built in below are the first look and the fallback.
    Roll back: delete this block and the script after it (the old lotus pictures come back). */
-@media (max-width:899px){html[data-ayu-bg] .tab-panel :is(.card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section){background-color:rgba(255,255,255,.76) !important;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}}
+@media (max-width:899px){html[data-ayu-bg] .tab-panel :is(.card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section){background-color:rgba(255,255,255,.5) !important;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px)}}
 html[data-ayu-bg] .sec-bg-layer,html[data-ayu-bg] .sec-lotus-layer,html[data-ayu-bg] .lotus-extra-motif{display:none !important}
 html[data-ayu-bg] body #nav-lotus:not(#ayu-x1):not(#ayu-x2){display:none !important}
 html[data-ayu-bg][data-petal-card="e"] :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel) :is(.card,.body-age-section,.activity-type-section,.rout-card,.mind-card,.alert-card,.calc-card)::after{content:none !important;display:none !important}
