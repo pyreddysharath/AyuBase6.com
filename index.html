@@ -12650,6 +12650,7 @@ function toggleRoutineInfo(key){
   const isOpen=panel.style.display!=='none';
   panel.style.display=isOpen?'none':'block';
   document.querySelectorAll('.rout-info-btn[onclick*="toggleRoutineInfo(\''+key+'\')"]').forEach(function(b){ b.classList.toggle('active',!isOpen); });
+  var pr=panel.previousElementSibling; if(pr && pr.classList.contains('rout-row')) pr.classList.toggle('ri-open',!isOpen);   // the line under the check moves below its note
 }
 initRoutinesChecklist();
 
@@ -26522,6 +26523,13 @@ html body #routines-panel #chk-alarm .ayu-sec-hdr h3::before,html body #routines
   sync();
 })();
 </script>
+<style id="cl-info-line-20261125">
+/* Daily Checklist: when a check's note is open, the line sits under the note (not between the check and its note) */
+html body #ayu-checklist .rout-row.ri-open{border-bottom-color:transparent !important}
+html body #ayu-checklist .rout-row + .rout-info-panel{position:relative;margin-bottom:10px}
+html body #ayu-checklist .rout-row + .rout-info-panel::after{content:"";position:absolute;left:0;right:0;bottom:-10px;border-bottom:1px solid var(--line,var(--rout-4))}
+html body #ayu-checklist .rout-row + .rout-info-panel:last-child::after{display:none}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
