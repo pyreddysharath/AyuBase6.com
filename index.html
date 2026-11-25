@@ -24280,9 +24280,14 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
     if(isNew){ var part=partsOf()[partIdx], last=0; [].forEach.call(part.querySelectorAll('.rout-cb'),function(c){ var f=WAKE_OFFSETS[c.dataset.key]; if(f && !c.closest('.ayu-row-del')) last=Math.max(last,f[f.length-1]); }); off=[last,last+30]; }
     var f=document.createElement('div'); f.className='ayu-act-form';
     f.innerHTML='<label><span>Activity</span><input type="text" class="af-t" maxlength="60" placeholder="e.g. Take medicine"></label>'
-      +'<label><span>From</span><input type="time" class="af-a"></label><label><span>To</span><input type="time" class="af-b"></label>'
+      +'<div class="af-times"><span>From</span><input type="hidden" class="af-a"><button type="button" class="af-tb" data-w="a" aria-label="Start time"></button><span>to</span><input type="hidden" class="af-b"><button type="button" class="af-tb" data-w="b" aria-label="End time"></button></div>'
       +'<p class="af-note" hidden></p><p class="af-msg" hidden></p><div class="af-btns"><button type="button" class="af-save">Save</button><button type="button" class="af-no">Cancel</button></div>';
     f.querySelector('.af-t').value=txt; f.querySelector('.af-a').value=hhmm(wk+off[0]); f.querySelector('.af-b').value=hhmm(wk+off[off.length-1]);
+    function tlab(i){ var v=f.querySelector('.af-'+i).value, b=f.querySelector('.af-tb[data-w="'+i+'"]'); b.textContent=(v && typeof fmt12==='function') ? fmt12(v) : (v||'--:--'); }
+    ['a','b'].forEach(function(i){ tlab(i); f.querySelector('.af-tb[data-w="'+i+'"]').addEventListener('click',function(){
+      var inp=f.querySelector('.af-'+i); if(typeof openTimePicker!=='function') return;
+      openTimePicker('custom',inp.value||hhmm(wk),function(v){ inp.value=v; tlab(i); inp.dispatchEvent(new Event('input')); },i==='a'?'Start time':'End time');
+    }); });
     anchor.after(f); try{ f.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
     f.addEventListener('click',function(e){ e.stopPropagation(); });
     f.querySelector('.af-no').addEventListener('click',closeForm);
@@ -26536,6 +26541,15 @@ html body #ayu-checklist .rout-row:not(#ayu-x1){padding:9px 0 !important}
 html body #ayu-checklist .rout-check:not(#ayu-x1){line-height:1.35 !important;font-size:.95rem !important;gap:9px}
 html body #ayu-checklist .rout-time:not(#ayu-x1){font-size:.8rem !important}
 html body #ayu-checklist .ayu-cl-part > .rout-row:not(:has(~ .rout-row)):not(#ayu-x1){border-bottom:0 !important}
+</style>
+<style id="cl-edit-colour-20261125">
+/* Daily Checklist → edit: text in the Care colours; From / to use the same time buttons and clock pop-up as Health Breaks */
+html body #ayu-checklist .ayu-act-form label, html body #ayu-checklist .ayu-act-form .af-times > span{color:var(--rout-1,#0f4a63) !important}
+html body #ayu-checklist .ayu-act-form input.af-t{color:var(--rout-1,#0f4a63) !important;border-color:var(--rout-3,#a6d9ee) !important}
+html body #ayu-checklist .ayu-act-form .af-times{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:.84rem}
+html body #ayu-checklist .ayu-act-form .af-times > span:first-child{flex:0 0 46px}
+html body #ayu-checklist .ayu-act-form .af-tb{flex:1 1 0;min-width:0;padding:8px 10px;border:1.5px solid var(--rout-3,#a6d9ee);border-radius:9px;background:#fff;color:var(--rout-1,#0f4a63);font:inherit;font-size:.86rem;cursor:pointer}
+html body #ayu-checklist .ayu-act-form .af-note, html body #ayu-checklist .ayu-act-form .af-msg{color:var(--rout-1,#0f4a63)}
 </style>
 </body>
 
