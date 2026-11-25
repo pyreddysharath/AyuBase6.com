@@ -3,27 +3,27 @@
   "tabs": {
     "body": {
       "file": "bg/body.svg",
-      "v": 4
+      "v": 5
     },
     "food": {
       "file": "bg/food.svg",
-      "v": 6
+      "v": 7
     },
     "mind": {
       "file": "bg/mind.svg",
-      "v": 3
+      "v": 4
     },
     "vitals": {
       "file": "bg/vitals.svg",
-      "v": 4
+      "v": 5
     },
     "care": {
       "file": "bg/care.svg",
-      "v": 4
+      "v": 5
     },
     "alerts": {
       "file": "bg/alerts.svg",
-      "v": 4
+      "v": 5
     },
     "body_w": {
       "file": "bg/body_w.svg",
@@ -31,7 +31,7 @@
     },
     "food_w": {
       "file": "bg/food_w.svg",
-      "v": 4
+      "v": 5
     },
     "mind_w": {
       "file": "bg/mind_w.svg",
