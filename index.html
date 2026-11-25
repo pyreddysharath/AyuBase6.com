@@ -3985,6 +3985,7 @@ html body #tab-btns .tab-btn.mind.active .tab-btn-icon path[stroke="white"]:not(
     </div>
 
     <div class="calc-card calc-card-spaced" id="lab-insights-card">
+    <div class="lab-top-box">
       <div class="calc-card-hdr">
         <h2><span class="sec-logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.5L4.5 19a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3L14 9.5V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg></span><span>Lab Insights</span></h2>
         <span style="display:flex;align-items:center;gap:4px">
@@ -4023,8 +4024,11 @@ html body #tab-btns .tab-btn.mind.active .tab-btn-icon path[stroke="white"]:not(
       <div class="lab-form-actions"><button type="button" class="lab-form-save" id="lab-save-btn" onclick="labManualSave()">Save</button><button type="button" class="lab-form-close" id="lab-close-btn" onclick="labCloseManual()">Close</button></div>
       </div>
 
+    </div>
+    <div class="lab-rep-box">
       <div id="lab-results" class="lab-results"></div>
       <div class="page-reset-row lab-bottom-row" style="margin:14px 0 0"><button type="button" class="refresh-btn lab-upload-btn" id="lab-download-btn" onclick="downloadLabPDF()">Download PDF</button><button type="button" class="bf-reset-btn vit-sq" id="lab-reset-btn" title="Reset Lab Insights" aria-label="Reset Lab Insights" onclick="resetLabToDefault()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button></div>
+    </div>
     </div>
 
     <!-- TRACKER — log readings over time; one collapsed section per reading type -->
@@ -26678,6 +26682,16 @@ html body #alerts-panel .ayu-part-title .ayu-i:not([aria-expanded="true"]):not(#
 html body :is(.ayu-i,.calc-info-btn,.reminder-hours-info-btn,.alert-info-btn,.notif-info-btn,.backup-info-btn,.othersites-info-btn,.ayu-sec-i,.ayu-desc-btn):not(#ayu-x1){filter:brightness(.78)}
 </style>
 <style id="clock-personal-20261125">
+/* Lab Insights: two boxes (the tool, then My Reports), no extra space inside either */
+html body #calculator-panel #lab-insights-card.calc-card.ayu-vit-on:not(#ayu-x1){background:transparent !important;border:0 !important;box-shadow:none !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;padding:0 !important}
+html body #lab-insights-card .lab-top-box, html body #lab-insights-card .lab-rep-box{background-color:rgba(255,255,255,.5);border:1px solid color-mix(in srgb,var(--accent,#13806c) 22%,#dfe8e6);box-shadow:0 3px 14px rgba(27,46,70,.045);border-radius:15px;padding:14px;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px)}
+html body #lab-insights-card .lab-top-box{margin-bottom:12px}
+html body #lab-insights-card .lab-top-box .lab-actions-row:not(#ayu-x1){margin-bottom:0 !important}
+html body #lab-insights-card .lab-top-box #lab-pane-manual{margin-top:12px}
+html body #lab-insights-card #lab-upload-status:empty{display:none}
+html body #lab-insights-card .lab-rep-box #lab-results{margin-top:0 !important}
+html body #lab-insights-card .lab-rep-box:not(:has(#lab-results > *)){display:none}
+html body #lab-insights-card .lab-rep-box > :last-child:not(#ayu-x1){margin-bottom:0 !important}
 html body #mind-panel h1.ayu-content-page-title:not(#ayu-x1){color:#3b8460 !important}
 /* Vitals: BMI, Lab Insights and Tracker get the same box as the sections of the other tabs */
 html body #calculator-panel .calc-card.ayu-vit-on:not(#ayu-x1){background-color:rgba(255,255,255,.5) !important;border:1px solid color-mix(in srgb,var(--accent,#13806c) 22%,#dfe8e6) !important;box-shadow:0 3px 14px rgba(27,46,70,.045) !important;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);padding-top:14px !important;padding-left:14px !important;padding-right:14px !important}
