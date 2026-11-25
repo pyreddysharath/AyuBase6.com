@@ -29660,8 +29660,9 @@ html body #alerts-panel .med-addrow .ma-btn svg .e{fill:none;stroke:#6f9a1c;stro
 html body #alerts-panel .med-item .cri-hdr{padding:6px 8px 6px 12px !important;min-height:0 !important;line-height:1.2 !important;gap:6px}
 html body #alerts-panel .med-item .cri-main strong{font-size:.95rem !important;line-height:1.25 !important}
 html body #alerts-panel .med-item .cri-sub.med-lines{font-size:.74rem !important;line-height:1.25 !important;margin-top:1px}
-html body #alerts-panel .med-item .cri-sub .ml{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html body #alerts-panel .med-item .cri-sub .ml b{font-weight:800}
+html body #alerts-panel .med-item .cri-sub .ml{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.5em;min-width:0}   /* the name stays on one line; the times follow it, or drop to the next line when they do not fit */
+html body #alerts-panel .med-item .cri-sub .ml b{font-weight:800;min-width:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body #alerts-panel .med-item .cri-sub .ml .mt{min-width:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html body #alerts-panel .med-item .cri-hdr .master-switch{transform:scale(.82);transform-origin:right center;margin:0 -3px}
 html body #alerts-panel .med-item .cri-hdr .custom-reminder-delete,html body #alerts-panel .med-item .cri-hdr .cri-chev{width:22px !important;height:22px !important;min-width:0 !important;min-height:0 !important;font-size:.8rem}
 /* the bell panel: the Sound list gets the room */
@@ -29791,7 +29792,7 @@ html body #alerts-panel .med-item.open > .cri-hdr{display:none !important}
     (d.doses||[]).forEach(function(x){ var k=String(x.med||'').trim() || 'Medicine'; if(!by[k]){ by[k]=[]; order.push(k); } by[k].push(x); });
     return order.map(function(k){
       var ts=by[k].slice().sort(function(a,b){ return (toMin(a.time)||0)-(toMin(b.time)||0); }).map(function(x){ return clock(x.time); });
-      return '<span class="ml"><b>'+esc(k)+'</b> · '+esc(ts.join(', '))+'</span>';
+      return '<span class="ml"><b>'+esc(k)+'</b><span class="mt">'+esc(ts.join(', '))+'</span></span>';
     }).join('');
   }
   function timesSub(d){
