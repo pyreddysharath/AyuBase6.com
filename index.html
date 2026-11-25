@@ -26599,51 +26599,72 @@ html body #app-logo-wrap #app-logo:not(#ayu-x1):not(#ayu-x2){font-family:'Lexend
 html body #app-logo-wrap #app-logo #logo-heal:not(#ayu-x1):not(#ayu-x2){font-style:normal;font-weight:800}
 html body #app-logo-wrap #app-logo #logo-thee:not(#ayu-x1):not(#ayu-x2){font-style:italic;font-weight:800;margin-left:.22em}
 </style>
-<style id="bg-circles-20261125">
-/* Section backgrounds: soft circles in the section's colour, fixed to the screen (they never move when sections open or close);
-   one is drawn faintly in front of the page. Long pages also get a few extra soft circles down the page.
+<style id="bg-scenes-20261125">
+/* Section backgrounds: one nature scene per tab, fixed to the screen (it never moves when sections open or close). The pictures live in
+   config/bg/ on GitHub (list and versions in config/backgrounds.json) and are kept on the phone; the copies built in below are the first look and the fallback.
    Roll back: delete this block and the script after it (the old lotus pictures come back). */
-html[data-ayu-bg] .sec-bg-layer,html[data-ayu-bg] .sec-lotus-layer,html[data-ayu-bg] .lotus-extra-motif,html[data-ayu-bg] body #nav-lotus:not(#ayu-x1):not(#ayu-x2){display:none !important}
-/* the page wash moves into the fixed layer, and the header lets the circles show through */
+html[data-ayu-bg] .sec-bg-layer,html[data-ayu-bg] .sec-lotus-layer,html[data-ayu-bg] .lotus-extra-motif{display:none !important}
+html[data-ayu-bg] body #nav-lotus:not(#ayu-x1):not(#ayu-x2){display:none !important}
+html[data-ayu-bg][data-petal-card="e"] :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel) :is(.card,.body-age-section,.activity-type-section,.rout-card,.mind-card,.alert-card,.calc-card)::after{content:none !important;display:none !important}
 html[data-ayu-bg] :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel):not(#ayu-x1){background-image:none !important;background-color:transparent !important}
 html[data-ayu-bg] body #app-nav:not(#ayu-x1):not(#ayu-x2){background-color:color-mix(in srgb,var(--ayu-c) 9%,rgba(255,255,255,.55)) !important}
-html[data-ayu-bg][data-petal-card="e"] :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel) :is(.card,.body-age-section,.activity-type-section,.rout-card,.mind-card,.alert-card,.calc-card)::after{content:none !important;display:none !important}
-#ayu-bgc{position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;overflow:hidden;--c:#2563eb;z-index:-1;background:linear-gradient(145deg,color-mix(in srgb,var(--c) 7%,#fff),#F6F8FB 70%)}
-#ayu-bgc i{position:absolute;border-radius:50%;background:var(--c);transition:opacity .3s}
-#ayu-bgc .c1{width:min(50vw,300px);height:min(50vw,300px);opacity:.20}
-#ayu-bgc .c2{width:min(30vw,180px);height:min(30vw,180px);opacity:.26}
-#ayu-bgc .c3{width:min(54vw,320px);height:min(54vw,320px);opacity:.13;z-index:2147483000}
-#ayu-bgf{position:absolute;left:0;width:100%;pointer-events:none;z-index:-1;--c:#2563eb;
-  background:radial-gradient(circle at 0 18%,color-mix(in srgb,var(--c) 15%,transparent) 0 min(18vw,110px),transparent calc(min(18vw,110px) + 1px)) 0 0/100% 1100px repeat-y,
-  radial-gradient(circle at 100% 70%,color-mix(in srgb,var(--c) 19%,transparent) 0 min(22vw,140px),transparent calc(min(22vw,140px) + 1px)) 0 0/100% 1100px repeat-y}
-/* colour and places for each section */
 body{--ayu-c:#2563eb}
 body.ayu-sb-nutrition-panel{--ayu-c:#658849}body.ayu-sb-mind-panel{--ayu-c:#6366f1}body.ayu-sb-calculator-panel{--ayu-c:#0891b2}body.ayu-sb-routines-panel{--ayu-c:#e8607a}body.ayu-sb-alerts-panel{--ayu-c:#799e1b}body.ayu-brk.ayu-brk{--ayu-c:#0891b2}
-#ayu-bgc,#ayu-bgf{--c:var(--ayu-c)}
-/* Body (default) */
-#ayu-bgc .c1{top:-9%;left:-16%}#ayu-bgc .c2{top:40%;right:-10%}#ayu-bgc .c3{bottom:-16%;left:2%}
-/* Food */
-body.ayu-sb-nutrition-panel #ayu-bgc .c1{top:-9%;left:auto;right:-16%}body.ayu-sb-nutrition-panel #ayu-bgc .c2{top:44%;right:auto;left:-10%}body.ayu-sb-nutrition-panel #ayu-bgc .c3{bottom:-16%;left:auto;right:-4%}
-/* Mind */
-body.ayu-sb-mind-panel #ayu-bgc .c1{top:8%;left:-24%}body.ayu-sb-mind-panel #ayu-bgc .c2{top:-3%;right:-6%}body.ayu-sb-mind-panel #ayu-bgc .c3{bottom:-14%;left:auto;right:-8%}
-/* Vitals */
-body.ayu-sb-calculator-panel #ayu-bgc .c1{top:-14%;left:10%}body.ayu-sb-calculator-panel #ayu-bgc .c2{top:56%;right:-14%}body.ayu-sb-calculator-panel #ayu-bgc .c3{bottom:-16%;left:-6%}
-/* Care */
-body.ayu-sb-routines-panel #ayu-bgc .c1{top:-8%;left:auto;right:-12%}body.ayu-sb-routines-panel #ayu-bgc .c2{top:52%;right:auto;left:-12%}body.ayu-sb-routines-panel #ayu-bgc .c3{bottom:-18%;left:24%}
-/* Alerts */
-body.ayu-sb-alerts-panel #ayu-bgc .c1{top:14%;left:auto;right:-26%}body.ayu-sb-alerts-panel #ayu-bgc .c2{top:-2%;left:-4%;right:auto}body.ayu-sb-alerts-panel #ayu-bgc .c3{bottom:-16%;left:-14%}
+#ayu-bgc{position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;overflow:hidden;z-index:-1;background:linear-gradient(170deg,color-mix(in srgb,var(--ayu-c) 10%,#fff),#F6F8FB 60%)}
+#ayu-bgc .row{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;align-items:flex-end}
+#ayu-bgc .t{flex:0 0 auto;background-repeat:no-repeat;background-position:center bottom;background-size:cover}
+#ayu-bgc .t.f{transform:scaleX(-1)}
 </style>
-<script id="bg-circles-20261125-js">
+<script id="bg-scenes-20261125-js">
 (function(){
+  var BASE='https://raw.githubusercontent.com/pyreddysharath/AyuBase6.com/main/config/';
+  var DEF={"body":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 360\" preserveAspectRatio=\"xMidYMax slice\"><circle cx=\"150\" cy=\"80\" r=\"20\" fill=\"#f6c453\" opacity=\"0.35\"/><path d=\"M-5 360 L-5 205 L11 150 L28 205 L50 167 L73 205 L93 162 L113 205 L134 151 L156 205 L172 174 L188 205 L211 162 L234 205 L205 360Z\" fill=\"#b9cdf9\" opacity=\"1\"/><path d=\"M-5 360 L-5 235 L-5 255.1 L0 252.5 L5 249.4 L10 245.7 L15 241.6 L20 237.4 L25 233.1 L30 228.9 L35 225.0 L40 221.5 L45 218.6 L50 216.3 L55 214.7 L60 213.8 L65 213.5 L70 213.9 L75 214.7 L80 215.9 L85 217.4 L90 219.0 L95 220.5 L100 222.0 L105 223.2 L110 224.1 L115 224.6 L120 224.9 L125 224.9 L130 224.7 L135 224.4 L140 224.2 L145 224.0 L150 224.1 L155 224.5 L160 225.4 L165 226.8 L170 228.8 L175 231.3 L180 234.2 L185 237.6 L190 241.2 L195 245.0 L200 248.8 L205 252.4 L205 360Z\" fill=\"#d3e0fb\" opacity=\"1\"/><path d=\"M-5 360 L-5 270 L-5 251.2 L0 252.4 L5 253.9 L10 255.6 L15 257.4 L20 259.2 L25 260.8 L30 262.3 L35 263.5 L40 264.5 L45 265.1 L50 265.5 L55 265.7 L60 265.8 L65 265.8 L70 265.9 L75 266.1 L80 266.5 L85 267.2 L90 268.3 L95 269.8 L100 271.6 L105 273.8 L110 276.2 L115 278.8 L120 281.4 L125 284.1 L130 286.5 L135 288.6 L140 290.3 L145 291.6 L150 292.2 L155 292.2 L160 291.6 L165 290.3 L170 288.5 L175 286.2 L180 283.6 L185 280.7 L190 277.6 L195 274.6 L200 271.7 L205 269.1 L205 360Z\" fill=\"#c9d8cd\" opacity=\"1\"/><path d=\"M-5 345 C40 320 70 330 100 305 S150 285 205 262 L205 275 C150 298 120 318 95 335 S40 352 -5 360Z\" fill=\"#c8a77b\" opacity=\".55\"/><path d=\"M28 234.8 L20.8 252.4 H24.8 L18.4 266.8 H24.8 L16.799999999999997 281.2 H39.2 L31.2 266.8 H37.6 L31.2 252.4 H35.2 Z\" fill=\"#9bb7a4\"/><rect x=\"26.4\" y=\"281.2\" width=\"3.2\" height=\"6.4\" fill=\"#9bb7a4\"/><path d=\"M165 231.2 L158.7 246.6 H162.2 L156.6 259.2 H162.2 L155.2 271.8 H174.8 L167.8 259.2 H173.4 L167.8 246.6 H171.3 Z\" fill=\"#9bb7a4\"/><rect x=\"163.6\" y=\"271.8\" width=\"2.8\" height=\"5.6\" fill=\"#9bb7a4\"/><path d=\"M12 266 L3 288 H8 L0 306 H8 L-2 324 H26 L16 306 H24 L16 288 H21 Z\" fill=\"#8fae98\"/><rect x=\"10\" y=\"324\" width=\"4\" height=\"8\" fill=\"#8fae98\"/></svg>","food":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 360\" preserveAspectRatio=\"xMidYMax slice\"><circle cx=\"150\" cy=\"60\" r=\"22\" fill=\"#f6c453\" opacity=\"0.5\"/><path d=\"M-5 360 L-5 235 L-5 212.3 L0 210.3 L5 209.1 L10 208.7 L15 209.1 L20 210.1 L25 211.6 L30 213.5 L35 215.7 L40 218.0 L45 220.2 L50 222.2 L55 223.9 L60 225.2 L65 226.2 L70 226.9 L75 227.2 L80 227.3 L85 227.2 L90 227.2 L95 227.3 L100 227.6 L105 228.3 L110 229.5 L115 231.2 L120 233.4 L125 236.1 L130 239.3 L135 242.9 L140 246.6 L145 250.5 L150 254.2 L155 257.7 L160 260.7 L165 263.1 L170 264.8 L175 265.7 L180 265.7 L185 264.8 L190 263.1 L195 260.6 L200 257.5 L205 254.0 L205 360Z\" fill=\"#dde5d7\" opacity=\"1\"/><path d=\"M-5 360 L-5 275 L-5 287.0 L0 285.5 L5 283.6 L10 281.4 L15 279.0 L20 276.4 L25 273.8 L30 271.3 L35 269.0 L40 266.9 L45 265.2 L50 263.8 L55 262.8 L60 262.3 L65 262.1 L70 262.3 L75 262.8 L80 263.6 L85 264.4 L90 265.4 L95 266.3 L100 267.2 L105 267.9 L110 268.4 L115 268.8 L120 269.0 L125 269.0 L130 268.8 L135 268.7 L140 268.5 L145 268.4 L150 268.5 L155 268.7 L160 269.3 L165 270.1 L170 271.3 L175 272.8 L180 274.5 L185 276.5 L190 278.7 L195 281.0 L200 283.3 L205 285.4 L205 360Z\" fill=\"#cbd7c1\" opacity=\"1\"/><path d=\"M-5 300 Q100 278 205 298\" stroke=\"#aabe9b\" stroke-width=\"2.0\" fill=\"none\" opacity=\"0.7\"/><path d=\"M-5 314 Q100 292 205 312\" stroke=\"#aabe9b\" stroke-width=\"2.6\" fill=\"none\" opacity=\"0.7\"/><path d=\"M-5 328 Q100 306 205 326\" stroke=\"#aabe9b\" stroke-width=\"3.2\" fill=\"none\" opacity=\"0.7\"/><path d=\"M-5 342 Q100 320 205 340\" stroke=\"#aabe9b\" stroke-width=\"3.8\" fill=\"none\" opacity=\"0.7\"/><rect x=\"38.2\" y=\"222\" width=\"3.6\" height=\"16.2\" fill=\"#9a7650\"/><circle cx=\"40\" cy=\"218.4\" r=\"12.6\" fill=\"#b2c4a4\"/><circle cx=\"31.9\" cy=\"225.6\" r=\"8.1\" fill=\"#b2c4a4\"/><circle cx=\"48.1\" cy=\"225.6\" r=\"8.1\" fill=\"#b2c4a4\"/><rect x=\"158.4\" y=\"215\" width=\"3.2\" height=\"14.4\" fill=\"#9a7650\"/><circle cx=\"160\" cy=\"211.8\" r=\"11.200000000000001\" fill=\"#ecc095\"/><circle cx=\"152.8\" cy=\"218.2\" r=\"7.2\" fill=\"#ecc095\"/><circle cx=\"167.2\" cy=\"218.2\" r=\"7.2\" fill=\"#ecc095\"/></svg>","mind":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 360\" preserveAspectRatio=\"xMidYMax slice\"><rect width=\"200\" height=\"360\" fill=\"#e3e4fb\" opacity=\".0\"/><circle cx=\"140\" cy=\"90\" r=\"22\" fill=\"#fff\" opacity=\"0.9\"/><circle cx=\"65\" cy=\"87\" r=\"0.8\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"189\" cy=\"111\" r=\"1.1\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"44\" cy=\"33\" r=\"0.8\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"10\" cy=\"112\" r=\"1.5\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"79\" cy=\"25\" r=\"0.8\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"138\" cy=\"147\" r=\"1.1\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"75\" cy=\"54\" r=\"0.8\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"72\" cy=\"64\" r=\"0.8\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"169\" cy=\"76\" r=\"1.1\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"54\" cy=\"52\" r=\"1.1\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"79\" cy=\"170\" r=\"1.5\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"100\" cy=\"32\" r=\"1.5\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"91\" cy=\"181\" r=\"1.1\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"134\" cy=\"73\" r=\"0.8\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"68\" cy=\"131\" r=\"1.1\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"27\" cy=\"150\" r=\"1.1\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"6\" cy=\"84\" r=\"1.5\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"185\" cy=\"89\" r=\"1.5\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"54\" cy=\"115\" r=\"1.1\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"158\" cy=\"83\" r=\"1.1\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"120\" cy=\"51\" r=\"0.8\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"83\" cy=\"76\" r=\"0.8\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"25\" cy=\"21\" r=\"1.1\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"165\" cy=\"81\" r=\"1.5\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"141\" cy=\"175\" r=\"1.1\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"184\" cy=\"97\" r=\"0.8\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"177\" cy=\"60\" r=\"0.8\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"110\" cy=\"61\" r=\"1.5\" fill=\"#fff\" opacity=\".85\"/><path d=\"M-5 360 L-5 240 L-5 264.6 L0 260.9 L5 256.5 L10 251.5 L15 246.1 L20 240.5 L25 234.9 L30 229.6 L35 224.8 L40 220.6 L45 217.1 L50 214.5 L55 212.8 L60 212.0 L65 212.1 L70 212.8 L75 214.2 L80 215.9 L85 217.9 L90 220.0 L95 222.0 L100 223.8 L105 225.2 L110 226.2 L115 226.8 L120 227.1 L125 227.0 L130 226.7 L135 226.3 L140 226.0 L145 225.9 L150 226.2 L155 227.0 L160 228.5 L165 230.6 L170 233.4 L175 236.9 L180 241.0 L185 245.5 L190 250.3 L195 255.2 L200 260.1 L205 264.6 L205 360Z\" fill=\"#b9baf9\" opacity=\"1\"/><path d=\"M-5 360 L-5 285 L-5 276.0 L0 277.7 L5 279.2 L10 280.4 L15 281.3 L20 281.9 L25 282.3 L30 282.5 L35 282.6 L40 282.6 L45 282.8 L50 283.2 L55 283.7 L60 284.7 L65 285.9 L70 287.5 L75 289.4 L80 291.6 L85 294.0 L90 296.5 L95 299.0 L100 301.3 L105 303.4 L110 305.1 L115 306.3 L120 306.9 L125 306.9 L130 306.3 L135 305.1 L140 303.3 L145 301.0 L150 298.4 L155 295.4 L160 292.3 L165 289.1 L170 286.1 L175 283.2 L180 280.8 L185 278.7 L190 277.0 L195 275.8 L200 275.0 L205 274.7 L205 360Z\" fill=\"#a1a3f7\" opacity=\"1\"/><path d=\"M30 239.4 L21.9 259.2 H26.4 L19.2 275.4 H26.4 L17.4 291.6 H42.6 L33.6 275.4 H40.8 L33.6 259.2 H38.1 Z\" fill=\"#8b8cbc\"/><rect x=\"28.2\" y=\"291.6\" width=\"3.6\" height=\"7.2\" fill=\"#8b8cbc\"/><path d=\"M170 234.8 L162.8 252.4 H166.8 L160.4 266.8 H166.8 L158.8 281.2 H181.2 L173.2 266.8 H179.6 L173.2 252.4 H177.2 Z\" fill=\"#8b8cbc\"/><rect x=\"168.4\" y=\"281.2\" width=\"3.2\" height=\"6.4\" fill=\"#8b8cbc\"/></svg>","vitals":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 360\" preserveAspectRatio=\"xMidYMax slice\"><path d=\"M-5 360 L-5 215 L-5 196.4 L0 194.8 L5 193.8 L10 193.5 L15 193.8 L20 194.6 L25 195.9 L30 197.4 L35 199.2 L40 201.1 L45 202.9 L50 204.5 L55 205.9 L60 207.0 L65 207.8 L70 208.3 L75 208.6 L80 208.7 L85 208.6 L90 208.6 L95 208.7 L100 208.9 L105 209.5 L110 210.5 L115 211.9 L120 213.7 L125 215.9 L130 218.5 L135 221.4 L140 224.5 L145 227.7 L150 230.7 L155 233.6 L160 236.0 L165 238.0 L170 239.4 L175 240.1 L180 240.1 L185 239.4 L190 238.0 L195 236.0 L200 233.4 L205 230.5 L205 360Z\" fill=\"#cee9f0\" opacity=\"1\"/><path d=\"M-5 260 C40 230 80 250 110 290 S170 340 205 330 V360 H-5Z\" fill=\"#a1d5e2\"/><path d=\"M0 300 Q25 291 50 300 T100 300 T150 300 T200 300\" stroke=\"#fff\" stroke-width=\"2\" fill=\"none\" opacity=\"0.6\"/><path d=\"M0 320 Q25 311 50 320 T100 320 T150 320 T200 320\" stroke=\"#fff\" stroke-width=\"2\" fill=\"none\" opacity=\"0.6\"/><ellipse cx=\"38\" cy=\"236\" rx=\"14\" ry=\"7\" fill=\"#c3cbd6\"/><ellipse cx=\"62\" cy=\"244\" rx=\"9\" ry=\"5\" fill=\"#cfd6df\"/></svg>","care":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 360\" preserveAspectRatio=\"xMidYMax slice\"><circle cx=\"100\" cy=\"200\" r=\"34\" fill=\"#f6c453\" opacity=\"0.4\"/><path d=\"M-5 360 L-5 270 L-5 286.0 L0 284.9 L5 283.4 L10 281.4 L15 279.0 L20 276.3 L25 273.3 L30 270.3 L35 267.3 L40 264.5 L45 261.9 L50 259.7 L55 257.9 L60 256.5 L65 255.7 L70 255.3 L75 255.3 L80 255.7 L85 256.4 L90 257.4 L95 258.4 L100 259.5 L105 260.4 L110 261.3 L115 262.0 L120 262.5 L125 262.7 L130 262.7 L135 262.6 L140 262.4 L145 262.2 L150 262.0 L155 261.9 L160 262.1 L165 262.6 L170 263.4 L175 264.6 L180 266.2 L185 268.1 L190 270.4 L195 272.9 L200 275.5 L205 278.2 L205 360Z\" fill=\"#d0dfc5\" opacity=\"1\"/><rect x=\"93.2\" y=\"215\" width=\"13.6\" height=\"61.199999999999996\" fill=\"#8a6a45\"/><circle cx=\"100\" cy=\"201.4\" r=\"47.6\" fill=\"#bcd1ac\"/><circle cx=\"69.4\" cy=\"228.6\" r=\"30.599999999999998\" fill=\"#bcd1ac\"/><circle cx=\"130.6\" cy=\"228.6\" r=\"30.599999999999998\" fill=\"#bcd1ac\"/><path d=\"M-5 360 L-5 320 L-5 323.9 L0 324.8 L5 325.7 L10 326.7 L15 327.7 L20 328.6 L25 329.3 L30 329.9 L35 330.2 L40 330.2 L45 330.0 L50 329.4 L55 328.6 L60 327.4 L65 326.1 L70 324.6 L75 322.9 L80 321.2 L85 319.6 L90 318.0 L95 316.5 L100 315.3 L105 314.3 L110 313.5 L115 313.0 L120 312.7 L125 312.7 L130 312.8 L135 313.1 L140 313.5 L145 314.0 L150 314.4 L155 314.8 L160 315.1 L165 315.2 L170 315.3 L175 315.2 L180 315.1 L185 314.8 L190 314.5 L195 314.3 L200 314.1 L205 314.0 L205 360Z\" fill=\"#c3d6b5\" opacity=\"1\"/></svg>","alerts":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 360\" preserveAspectRatio=\"xMidYMax slice\"><ellipse cx=\"40\" cy=\"70\" rx=\"24\" ry=\"7\" fill=\"#fff\" opacity=\"0.75\"/><ellipse cx=\"54\" cy=\"65\" rx=\"15\" ry=\"7\" fill=\"#fff\" opacity=\"0.75\"/><ellipse cx=\"140\" cy=\"120\" rx=\"26.400000000000002\" ry=\"7.700000000000001\" fill=\"#fff\" opacity=\"0.75\"/><ellipse cx=\"155.4\" cy=\"114.5\" rx=\"16.5\" ry=\"7.700000000000001\" fill=\"#fff\" opacity=\"0.75\"/><path d=\"M30 150 q4 -5 8 0 q4 -5 8 0\" stroke=\"#64748b\" stroke-width=\"1.8\" fill=\"none\" opacity=\".6\"/><path d=\"M80 110 q4.8 -6.0 9.6 0 q4.8 -6.0 9.6 0\" stroke=\"#64748b\" stroke-width=\"1.8\" fill=\"none\" opacity=\".6\"/><path d=\"M150 60 q4 -5 8 0 q4 -5 8 0\" stroke=\"#64748b\" stroke-width=\"1.8\" fill=\"none\" opacity=\".6\"/><path d=\"M110 170 q3.2 -4.0 6.4 0 q3.2 -4.0 6.4 0\" stroke=\"#64748b\" stroke-width=\"1.8\" fill=\"none\" opacity=\".6\"/><circle cx=\"150\" cy=\"230\" r=\"28\" fill=\"#f6b23c\" opacity=\"0.4\"/><path d=\"M-5 360 L-5 265 L-5 273.1 L0 274.6 L5 276.0 L10 277.3 L15 278.5 L20 279.4 L25 280.0 L30 280.2 L35 280.0 L40 279.3 L45 278.1 L50 276.6 L55 274.7 L60 272.4 L65 270.0 L70 267.5 L75 264.9 L80 262.5 L85 260.2 L90 258.3 L95 256.6 L100 255.3 L105 254.4 L110 253.9 L115 253.7 L120 253.9 L125 254.3 L130 254.9 L135 255.5 L140 256.2 L145 256.9 L150 257.4 L155 257.8 L160 258.0 L165 258.0 L170 257.8 L175 257.6 L180 257.2 L185 256.8 L190 256.5 L195 256.4 L200 256.4 L205 256.7 L205 360Z\" fill=\"#d0ddaf\" opacity=\"1\"/></svg>"};
+  var KEYS=['body','food','mind','vitals','care','alerts'];
+  var MAP={'ayu-sb-activity-panel':'body','ayu-sb-nutrition-panel':'food','ayu-sb-mind-panel':'mind','ayu-sb-calculator-panel':'vitals','ayu-sb-routines-panel':'care','ayu-sb-alerts-panel':'alerts'};
+  function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } }
+  function uri(svg){ return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg); }
+  function scene(k){ return ls('ayuBgD_'+k) || uri(DEF[k]); }
+  var cur='', wrap=null;
+  function keyNow(){
+    var b=document.body; if(b.classList.contains('ayu-brk')) return 'vitals';
+    for(var c in MAP) if(b.classList.contains(c)) return MAP[c];
+    return 'body';
+  }
+  function build(){
+    if(!wrap) return;
+    var vw=window.innerWidth||360, vh=window.innerHeight||700, wide=vw/vh>0.75;
+    var h=Math.round(wide?vh*.92:vh), w=Math.round(h*200/360), n=wide?Math.max(1,Math.ceil(vw/w/2)*2+1):1;
+    if(!wide) w=Math.max(w,vw);
+    var u="url('"+scene(cur).replace(/'/g,'%27')+"')", mid=(n-1)/2, html='';
+    for(var i=0;i<n;i++){ var f=Math.abs(i-mid)%2===1; html+='<div class="t'+(f?' f':'')+'" style="width:'+w+'px;height:'+h+'px;background-image:'+u+'"></div>'; }
+    wrap.innerHTML=html;
+  }
+  function apply(){ var k=keyNow(); if(k!==cur){ cur=k; build(); } }
+  // Newer pictures from GitHub: only those whose version changed are downloaded; the built-in ones count as version 1
+  function refresh(){
+    try{
+      fetch(BASE+'backgrounds.json?t='+Math.floor(Date.now()/300000),{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; }).then(function(j){
+        if(!j||!j.tabs) return;
+        KEYS.forEach(function(k){
+          var t=j.tabs[k]; if(!t||!t.file) return; var v=String(t.v||1), have=ls('ayuBgV_'+k)||'1';
+          if(v===have) return;
+          fetch(BASE+t.file+'?v='+encodeURIComponent(v),{cache:'no-store'}).then(function(r){ return r.ok?r.text():null; }).then(function(txt){
+            if(!txt||txt.indexOf('<svg')<0||txt.length>400000) return;
+            ls('ayuBgD_'+k,uri(txt)); ls('ayuBgV_'+k,v); if(k===cur) build();
+          }).catch(function(){});
+        });
+      }).catch(function(){});
+    }catch(e){}
+  }
   function go(){
     if(document.getElementById('ayu-bgc')) return;
-    var b=document.createElement('div'); b.id='ayu-bgc'; b.setAttribute('aria-hidden','true'); b.innerHTML='<i class="c1"></i><i class="c2"></i><i class="c3"></i>';
-    document.body.insertBefore(b,document.body.firstChild);
-    var f=document.createElement('div'); f.id='ayu-bgf'; f.setAttribute('aria-hidden','true'); document.body.appendChild(f);
-    function size(){ var h=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight)-720; f.style.top='720px'; f.style.height=(h>0?h:0)+'px'; }
-    size(); try{ new ResizeObserver(size).observe(document.body); }catch(e){ setInterval(size,1500); }
-    window.addEventListener('resize',size);
-    document.documentElement.setAttribute('data-ayu-bg','circles');
+    var b=document.createElement('div'); b.id='ayu-bgc'; b.setAttribute('aria-hidden','true'); b.innerHTML='<div class="row"></div>';
+    document.body.insertBefore(b,document.body.firstChild); wrap=b.firstChild;
+    document.documentElement.setAttribute('data-ayu-bg','scenes');
+    apply();
+    try{ new MutationObserver(apply).observe(document.body,{attributes:true,attributeFilter:['class']}); }catch(e){ setInterval(apply,500); }
+    var rt=null; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(build,150); });
+    setTimeout(refresh,2500);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
 })();
