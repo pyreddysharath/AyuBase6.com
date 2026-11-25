@@ -19505,7 +19505,7 @@ html body #rem-alarm-card.alert-card{background-color:var(--tl-5eead4,#bee068) !
     $('rem-al-ibtn').addEventListener('click',function(){ var i=$('rem-al-info'); i.hidden=!i.hidden; this.setAttribute('aria-expanded',String(!i.hidden)); });
     $('rem-alarm-add').addEventListener('click',function(){
       closeForms(); var nid=newId();
-      put(nid,{on:false,draft:true,once:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:1,snoozeMin:10,snoozeMax:3,keys:'stop',lock:'snooze',name:'',vibrate:true});
+      put(nid,{on:false,draft:true,once:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:1,snoozeMin:10,snoozeMax:3,keys:'stop',lock:'snooze',name:'',vibrate:false});
       paintList(); openForm(nid);
       if('Notification' in window && Notification.permission==='default' && !APP){ try{ Notification.requestPermission().catch(function(){}); }catch(e){} }
     });
@@ -19582,7 +19582,7 @@ html body #rem-alarm-card.alert-card{background-color:var(--tl-5eead4,#bee068) !
   function openForm(id){
     closeForms();
     var list=$('rem-alarm-list'); if(!list) return;
-    var isNew=!id, base=isNew ? {on:true,once:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:1,snoozeMin:10,snoozeMax:3,keys:'stop',lock:'snooze',name:'',vibrate:true} : get(id);
+    var isNew=!id, base=isNew ? {on:true,once:true,at:((new Date().getHours()+1)%24)*60,days:[0,1,2,3,4,5,6],tone:'rise',ring:1,snoozeMin:10,snoozeMax:3,keys:'stop',lock:'snooze',name:'',vibrate:false} : get(id);
     var c=JSON.parse(JSON.stringify(base)); if(!c.name) c.name=''; c.vibrate=('vibrate' in c) ? c.vibrate!==false : !!c.on;
     var f=document.createElement('div'); f.className='ayu-alarm-form ayu-al-body';
     f.innerHTML='<div class="ayu-al-row"><span class="ayu-al-lbl">Name</span><input type="text" class="ayu-al-name" maxlength="40" placeholder="Optional, e.g. Gym" aria-label="Alarm name"></div>'
@@ -20722,7 +20722,7 @@ html body .ayu-rem-tabs, html body .ayu-vit-tabs{background:none !important;padd
     l.innerHTML='<input type="checkbox"'+(id?' id="'+id+'"':'')+' aria-label="'+label+'">';
     var i=l.querySelector('input'); i.checked=checked; i.addEventListener('change',function(){ onChange(i.checked); }); return l;
   }
-  function mainVib(){ var o=load(); return ('hbm' in o) ? o.hbm!==false : masterOn(); }
+  function mainVib(){ var o=load(); return ('hbm' in o) ? o.hbm!==false : false; }   // Vibrate is off until it is turned on
   function paintHB(){
     var m=document.querySelector('#rh-vibrate input'); if(m) m.checked=mainVib();   // its own switch: a section's Vibrate does not change it
     HB.forEach(function(k){ var e=document.querySelector('[data-vib-key="'+k+'"] input'); if(e) e.checked=on(k); });
