@@ -25210,7 +25210,7 @@ html body #mind-panel .mt-note{font-size:.8rem;margin:10px 0 0;color:var(--fi-4a
 (function(){
   var K='ayuBase6-mind', PEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>';
   function $(i){ return document.getElementById(i); }
-  function load(){ var o=null; try{ o=JSON.parse(localStorage.getItem(K)||'null'); }catch(e){} o=(o && typeof o==='object') ? o : {}; if(!Array.isArray(o.del)) o.del=[]; if(!o.txt||typeof o.txt!=='object') o.txt={}; if(!Array.isArray(o.add)) o.add=[]; if(typeof o.on!=='boolean') o.on=false; if(!(o.at>=0&&o.at<1440)) o.at=450; if(!o.sound) o.sound='xylophone'; if(typeof o.vibrate!=='boolean') o.vibrate=true; return o; }
+  function load(){ var o=null; try{ o=JSON.parse(localStorage.getItem(K)||'null'); }catch(e){} o=(o && typeof o==='object') ? o : {}; if(!Array.isArray(o.del)) o.del=[]; if(!o.txt||typeof o.txt!=='object') o.txt={}; if(!Array.isArray(o.add)) o.add=[]; if(typeof o.on!=='boolean') o.on=false; if(!(o.at>=0&&o.at<1440)) o.at=600; if(!o.sound) o.sound='xylophone'; if(typeof o.vibrate!=='boolean') o.vibrate=true; return o; }
   function save(o){ try{ localStorage.setItem(K,JSON.stringify(o)); }catch(e){} sync(); }
   function sync(){ try{ if(window.ayuNative && typeof window.ayuNative.sync==='function') setTimeout(window.ayuNative.sync,200); }catch(e){} }
   function hm(m){ return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
