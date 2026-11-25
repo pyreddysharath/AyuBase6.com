@@ -26614,6 +26614,7 @@ body.ayu-sb-nutrition-panel{--ayu-c:#658849}body.ayu-sb-mind-panel{--ayu-c:#6366
 #ayu-bgc{position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;overflow:hidden;z-index:-1;background:linear-gradient(170deg,color-mix(in srgb,var(--ayu-c) 10%,#fff),#F6F8FB 60%)}
 #ayu-bgc .row{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;justify-content:center;align-items:flex-end}
 #ayu-bgc .t{flex:0 0 auto;background-repeat:no-repeat;background-position:center bottom;background-size:100% 100%;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14%);mask-image:linear-gradient(to bottom,transparent 0,#000 14%)}
+#ayu-bgc .t.full{-webkit-mask-image:none;mask-image:none}
 #ayu-bgc .t.sf{-webkit-mask-image:linear-gradient(to right,transparent 0,#000 12%,#000 88%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 14%);mask-image:linear-gradient(to right,transparent 0,#000 12%,#000 88%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 14%);-webkit-mask-composite:source-in;mask-composite:intersect}
 #ayu-bgc .t.f{transform:scaleX(-1)}
 </style>
@@ -26637,10 +26638,10 @@ body.ayu-sb-nutrition-panel{--ayu-c:#658849}body.ayu-sb-mind-panel{--ayu-c:#6366
     // The whole picture is shown, once (never cropped or repeated): as large as fits the screen. A phone is sized from the full screen height so it does not change while the system bars settle at launch.
     var vw=window.innerWidth||360, vh=window.innerHeight||700, H=(vw/vh>0.75)?vh:Math.max(screen.height||0,vh);
     var W0=Math.round(H*200/360), w=W0, h=H;
-    if(vw<W0){ w=vw; h=Math.round(vw*1.8); }
+    var full=vw<W0;   // narrower than the picture (phones): fill the whole screen, trimming a little off the sides
     wrap.className='row';
     var u="url('"+scene(cur).replace(/'/g,'%27')+"')";
-    wrap.innerHTML='<div class="t'+(vw>w+2?' sf':'')+'" style="width:'+w+'px;height:'+h+'px;background-image:'+u+'"></div>';
+    wrap.innerHTML='<div class="t'+(full?' full':(vw>w+2?' sf':''))+'" style="width:'+w+'px;height:'+h+'px;background-image:'+u+'"></div>';
   }
   function apply(){ var k=keyNow(); if(k!==cur){ cur=k; build(); } }
   // Newer pictures from GitHub: only those whose version changed are downloaded; the built-in ones count as version 1
