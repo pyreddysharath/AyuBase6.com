@@ -26613,9 +26613,8 @@ body{--ayu-c:#2563eb}
 body.ayu-sb-nutrition-panel{--ayu-c:#658849}body.ayu-sb-mind-panel{--ayu-c:#6366f1}body.ayu-sb-calculator-panel{--ayu-c:#0891b2}body.ayu-sb-routines-panel{--ayu-c:#1a86b5}body.ayu-sb-alerts-panel{--ayu-c:#799e1b}body.ayu-brk.ayu-brk{--ayu-c:#0891b2}
 #ayu-bgc{position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;overflow:hidden;z-index:-1;background:linear-gradient(170deg,color-mix(in srgb,var(--ayu-c) 10%,#fff),#F6F8FB 60%)}
 #ayu-bgc .row{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;justify-content:center;align-items:flex-end}
-#ayu-bgc .t{flex:0 0 auto;height:100%;aspect-ratio:200/360;background-repeat:no-repeat;background-position:center bottom;background-size:cover}
-#ayu-bgc .row.m .t{min-width:100%;height:var(--bh,100%)}
-#ayu-bgc .row.w .t{height:100%;width:100%;aspect-ratio:auto}
+#ayu-bgc .t{flex:0 0 auto;background-repeat:no-repeat;background-position:center bottom;background-size:100% 100%;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14%);mask-image:linear-gradient(to bottom,transparent 0,#000 14%)}
+#ayu-bgc .t.sf{-webkit-mask-image:linear-gradient(to right,transparent 0,#000 12%,#000 88%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 14%);mask-image:linear-gradient(to right,transparent 0,#000 12%,#000 88%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 14%);-webkit-mask-composite:source-in;mask-composite:intersect}
 #ayu-bgc .t.f{transform:scaleX(-1)}
 </style>
 <script id="bg-scenes-20261125-js">
@@ -26635,13 +26634,13 @@ body.ayu-sb-nutrition-panel{--ayu-c:#658849}body.ayu-sb-mind-panel{--ayu-c:#6366
   }
   function build(){
     if(!wrap) return;
-    var vw=window.innerWidth||360, vh=window.innerHeight||700, wide=vw/vh>0.75;
-    var w=Math.round(vh*.92*200/360), n=1;
-    wrap.className='row '+(wide?'w':'m');
-    if(!wide) wrap.style.setProperty('--bh',Math.round(Math.max(screen.height||0,vh))+'px');   // phone: size from the whole screen, so it does not change while the system bars settle at launch
-    var u="url('"+scene(cur).replace(/'/g,'%27')+"')", mid=(n-1)/2, html='';
-    for(var i=0;i<n;i++){ var f=Math.abs(i-mid)%2===1; html+='<div class="t'+(f?' f':'')+'" style="background-image:'+u+'"></div>'; }
-    wrap.innerHTML=html;
+    // The whole picture is shown, once (never cropped or repeated): as large as fits the screen. A phone is sized from the full screen height so it does not change while the system bars settle at launch.
+    var vw=window.innerWidth||360, vh=window.innerHeight||700, H=(vw/vh>0.75)?vh:Math.max(screen.height||0,vh);
+    var W0=Math.round(H*200/360), w=W0, h=H;
+    if(vw<W0){ w=vw; h=Math.round(vw*1.8); }
+    wrap.className='row';
+    var u="url('"+scene(cur).replace(/'/g,'%27')+"')";
+    wrap.innerHTML='<div class="t'+(vw>w+2?' sf':'')+'" style="width:'+w+'px;height:'+h+'px;background-image:'+u+'"></div>';
   }
   function apply(){ var k=keyNow(); if(k!==cur){ cur=k; build(); } }
   // Newer pictures from GitHub: only those whose version changed are downloaded; the built-in ones count as version 1
