@@ -15474,8 +15474,8 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
 </style>
 <script id="per-reminder-schedule-logic">
 (function(){
-  const defaults={start:'10:00',end:'20:00'};
-  const OWN={posture:['10:00','17:30'],stretch:['10:00','18:00'],breathe:['08:00','17:00']};   // each of these has its own first hours
+  const defaults={start:'10:00',end:'18:00'};
+  const OWN={};   // every Health Break section starts at 10:00 AM to 6:00 PM (office hours)
   const specs=[
     {id:'alert-card-drink',key:'drink',title:'Water'},
     {id:'alert-card-posture',key:'posture',title:'Posture'},
@@ -15485,19 +15485,20 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
     {id:'alert-card-break',key:'break',title:'Eyes (20-20-20)'},
     {id:'alert-card-break-ex',key:'break-ex',title:'Eyes (Exercise)'}
   ];
-  const cards={};
+  const cards={}, manual={};   // manual[key]=true: that section's From/To was set by hand, so a Wake-up Alarm change leaves it alone
   // The chosen From/To hours (all sections, and each section's own) are kept on this device.
   const HOURS_KEY='ayuBase6-reminder-hours';
   const validTime=t=>/^\d{1,2}:\d{2}$/.test(String(t||''));
   function saveHours(){
     try{
       const sections={};Object.keys(cards).forEach(k=>{sections[k]={start:cards[k].start,end:cards[k].end}});
-      localStorage.setItem(HOURS_KEY,JSON.stringify({top:{start:topState.start,end:topState.end},sections,days:(window.ayuDays?window.ayuDays.get('rem'):undefined),hbDays:(window.ayuDays&&window.ayuDays.all?window.ayuDays.all():undefined)}));
+      localStorage.setItem(HOURS_KEY,JSON.stringify({top:{start:topState.start,end:topState.end},sections,manual:manual,days:(window.ayuDays?window.ayuDays.get('rem'):undefined),hbDays:(window.ayuDays&&window.ayuDays.all?window.ayuDays.all():undefined)}));
     }catch(e){}
   }
   function restoreHours(){
     let saved=null;try{saved=JSON.parse(localStorage.getItem(HOURS_KEY)||'null')}catch(e){}
     if(!saved)return;
+    if(saved.manual&&typeof saved.manual==='object')Object.keys(saved.manual).forEach(k=>{if(saved.manual[k])manual[k]=true});
     if(saved.top&&validTime(saved.top.start)&&validTime(saved.top.end)){topState.start=saved.top.start;topState.end=saved.top.end;wireTopSchedule()}
     specs.forEach(spec=>{
       const st=cards[spec.key],sv=saved.sections&&saved.sections[spec.key],card=document.getElementById(spec.id);
@@ -15545,7 +15546,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   function setAllSchedules(){
     specs.forEach(spec=>{
       const st=cards[spec.key],card=document.getElementById(spec.id);if(!st||!card)return;
-      st.start=topState.start;st.end=topState.end;
+      st.start=topState.start;st.end=topState.end;manual[spec.key]=true;
       ['start','end'].forEach(w=>{const b=card.querySelector('.per-reminder-schedule [data-time="'+w+'"]');if(b)drawButton(b,st[w])});
     });
     updateExerciseTimes(true);
@@ -15584,7 +15585,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
         const picker=window.openTimePicker;
         if(typeof picker!=='function')return;
         picker('custom',state[which],value=>{
-          state[which]=value;drawButton(btn,value);
+          state[which]=value;manual[spec.key]=true;drawButton(btn,value);
           if(spec.key==='break-ex')updateExerciseTimes(true);
           if(spec.key!=='break-ex'&&typeof window.scheduleAlertTimer==='function')window.scheduleAlertTimer(spec.key);
           saveHours();
@@ -15639,6 +15640,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   }
   window.ayuReminderSlots={next:nextSlot,latest:latestSlot};
   window.ayuSaveHours=saveHours;
+  window.ayuHbManual=manual; window.ayuExerciseTimes=updateExerciseTimes;
   window.ayuReminderWindows=function(){return cards};   // read by the reminder rules (Android app)
   const lastSlot={},GRACE=5*60000;
   function tick(key){
@@ -15671,7 +15673,7 @@ html[data-petal-card="e"] #alerts-panel .per-reminder-schedule .eye-ex-time-item
   const oldEyeCountChange=window.onEyeExCountChange;
   window.onEyeExCountChange=function(){if(typeof oldEyeCountChange==='function')oldEyeCountChange();updateExerciseTimes(true)};
   const oldReset=window.resetRemindersToDefault;
-  window.resetRemindersToDefault=function(){try{localStorage.removeItem(HOURS_KEY)}catch(e){}if(window.ayuDays)window.ayuDays.reset('rem');if(typeof oldReset==='function')oldReset();topState.start=defaults.start;topState.end=defaults.end;wireTopSchedule();Object.keys(cards).forEach(k=>{const o=OWN[k];cards[k].start=o?o[0]:defaults.start;cards[k].end=o?o[1]:defaults.end});document.querySelectorAll('#alerts-panel .per-reminder-schedule').forEach(row=>{const spec=specs.find(x=>row.closest('#'+x.id));if(!spec)return;['start','end'].forEach(w=>drawButton(row.querySelector('[data-time="'+w+'"]'),cards[spec.key][w]))});['break','walk','drink'].forEach(k=>window.scheduleAlertTimer(k));updateExerciseTimes()};
+  window.resetRemindersToDefault=function(){try{localStorage.removeItem(HOURS_KEY)}catch(e){}Object.keys(manual).forEach(k=>{delete manual[k]});if(window.ayuDays)window.ayuDays.reset('rem');if(typeof oldReset==='function')oldReset();topState.start=defaults.start;topState.end=defaults.end;wireTopSchedule();Object.keys(cards).forEach(k=>{const o=OWN[k];cards[k].start=o?o[0]:defaults.start;cards[k].end=o?o[1]:defaults.end});document.querySelectorAll('#alerts-panel .per-reminder-schedule').forEach(row=>{const spec=specs.find(x=>row.closest('#'+x.id));if(!spec)return;['start','end'].forEach(w=>drawButton(row.querySelector('[data-time="'+w+'"]'),cards[spec.key][w]))});['break','walk','drink'].forEach(k=>window.scheduleAlertTimer(k));updateExerciseTimes()};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })();
 </script>
@@ -24126,9 +24128,9 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
   var lastDay=ymd(); setInterval(function(){ if(ymd()!==lastDay){ lastDay=ymd(); shiftChanged(); } else shiftNote(); },60000);
   shiftNote();
 
-  // ── 41. Health Breaks (Eyes, Walk, Water): with a Wake-up Alarm, From = 2.5 hours after it and To = 10 hours after From; without one, 10 AM to 8 PM.
-  //        Applied when the alarm is set, switched off or on, or its time changes. Each section's From/To can still be changed by hand. ──
-  var HB={'break':'alert-card-break','walk':'alert-card-walk','drink':'alert-card-drink','posture':'alert-card-posture','stretch':'alert-card-stretch','breathe':'alert-card-breathe'}, hbLast=null, hbT=0;
+  // ── 41. Health Breaks (all sections): with a Wake-up Alarm, From = 2.5 hours after it and To = 8 hours after From (7:30 AM → 10 AM to 6 PM); without one, 10 AM to 6 PM.
+  //        Applied when the alarm is set, switched off or on, or its time changes. A section whose From/To was set by hand is left alone (until Reset). ──
+  var HB={'break':'alert-card-break','walk':'alert-card-walk','drink':'alert-card-drink','posture':'alert-card-posture','stretch':'alert-card-stretch','breathe':'alert-card-breathe','break-ex':'alert-card-break-ex'}, hbLast=null, hbT=0;
   function hhmm(m){ m=((m%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
   function wakeAlarmOn(){ var w=J('ayuBase6-routine-alarm'); return !!(w && w.on); }
   function draw(btn,v){ if(btn) btn.textContent=(typeof window.fmt12==='function') ? window.fmt12(v) : v; }
@@ -24137,12 +24139,12 @@ html body #ayu-checklist .ayu-user-row .rout-check{flex:1 1 auto}
     var k0=hbKey(); if(hbLast===null){ return; } if(k0===hbLast) return; hbLast=k0;
     var W=null; try{ W=(typeof window.ayuReminderWindows==='function') ? window.ayuReminderWindows() : null; }catch(e){}
     if(!W) return;
-    var f=wakeMin()+150, t=wakeAlarmOn() ? [hhmm(f),hhmm(f+600)] : ['10:00','20:00'], ch=false;
+    var f=wakeMin()+150, t=wakeAlarmOn() ? [hhmm(f),hhmm(f+480)] : ['10:00','18:00'], ch=false, M=window.ayuHbManual||{};
     Object.keys(HB).forEach(function(k){
-      var st=W[k], card=$(HB[k]); if(!st || !card) return;
+      var st=W[k], card=$(HB[k]); if(!st || !card || M[k]) return;
       if(st.start!==t[0] || st.end!==t[1]){ st.start=t[0]; st.end=t[1]; ch=true; }
       ['start','end'].forEach(function(w){ draw(card.querySelector('.per-reminder-schedule [data-time="'+w+'"]'),st[w]); });
-      try{ if(typeof window.scheduleAlertTimer==='function') window.scheduleAlertTimer(k); }catch(e){}
+      try{ if(k==='break-ex'){ if(typeof window.ayuExerciseTimes==='function') window.ayuExerciseTimes(false); } else if(typeof window.scheduleAlertTimer==='function') window.scheduleAlertTimer(k); }catch(e){}
     });
     if(ch){ try{ if(window.ayuSaveHours) window.ayuSaveHours(); }catch(e){} try{ if(window.ayuNative && window.ayuNative.sync) window.ayuNative.sync(); }catch(e){} }
   }
