@@ -26642,8 +26642,9 @@ body.ayu-sb-nutrition-panel{--ayu-c:#4f8a22}body.ayu-sb-mind-panel{--ayu-c:#7d46
   }
   function apply(){ var k=keyNow(); if(k!==cur){ cur=k; build(); } }
   // Newer pictures from GitHub: only those whose version changed are downloaded; the built-in ones count as version 1
-  function refresh(){
+  function refresh(quiet){
     try{
+      ls('ayuBgChk',String(Date.now()));
       fetch(BASE+'backgrounds.json?t='+Math.floor(Date.now()/300000),{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; }).then(function(j){
         if(!j||!j.tabs) return;
         KEYS.forEach(function(k){
@@ -26651,7 +26652,7 @@ body.ayu-sb-nutrition-panel{--ayu-c:#4f8a22}body.ayu-sb-mind-panel{--ayu-c:#7d46
           if(v===have) return;
           fetch(BASE+t.file+'?v='+encodeURIComponent(v),{cache:'no-store'}).then(function(r){ return r.ok?r.text():null; }).then(function(txt){
             if(!txt||txt.indexOf('<svg')<0||txt.length>400000) return;
-            ls('ayuBgD_'+k,uri(txt)); ls('ayuBgV_'+k,v); if(k===cur||k===cur+'_w') build();
+            ls('ayuBgD_'+k,uri(txt)); ls('ayuBgV_'+k,v); if(!quiet && (k===cur||k===cur+'_w')) build();   // when the app was only brought back to the front, the new picture shows on the next tab change (nothing flickers)
           }).catch(function(){});
         });
       }).catch(function(){});
@@ -26665,7 +26666,9 @@ body.ayu-sb-nutrition-panel{--ayu-c:#4f8a22}body.ayu-sb-mind-panel{--ayu-c:#7d46
     apply();
     try{ new MutationObserver(apply).observe(document.body,{attributes:true,attributeFilter:['class']}); }catch(e){ setInterval(apply,500); }
     var rt=null; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(build,150); });
-    setTimeout(refresh,2500);
+    setTimeout(function(){ refresh(); },2500);
+    // the app left open for days: look again when it comes back to the front, at most once every 6 hours
+    document.addEventListener('visibilitychange',function(){ if(document.hidden) return; var last=+(ls('ayuBgChk')||0); if(Date.now()-last>6*3600000) setTimeout(function(){ refresh(true); },1500); });
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
 })();
