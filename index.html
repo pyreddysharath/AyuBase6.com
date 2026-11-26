@@ -21881,16 +21881,6 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
       (document.body).appendChild(sec);
       $('au-btn').addEventListener('click',act);
       $('au-x').addEventListener('click',function(){ var n=window.ayuNative; if(n && n.updateCancel) n.updateCancel(); });
-      // background checks (every 2 hours, 10 AM to 8 PM), only in app versions that have them
-      var N=window.ayuNative;
-      if(N && typeof N.updateChecksGet==='function'){
-        N.updateChecksGet().then(function(n){
-          var card=sec.querySelector('.au-card'); if(!card || $('au-auto')) return;
-          card.insertAdjacentHTML('afterend','<div class="au-auto-row"><span class="au-auto-l">Check automatically</span><label class="master-switch" title="Check automatically"><input type="checkbox" id="au-auto" aria-label="Check for updates automatically"></label></div><div class="au-note au-auto-note">Every 2 hours, 10 AM to 8 PM.</div>');
-          var sw=$('au-auto'); sw.checked=(isNaN(n)?2:n)>0;
-          sw.addEventListener('change',function(){ N.updateChecksSet(sw.checked?2:0).catch(function(){}); });
-        }).catch(function(){});
-      }
     }
     var t=$('subtab-app');
     if(t && t.firstChild && t.firstChild.nodeType===3 && t.firstChild.textContent!=='App Updates') t.firstChild.textContent='App Updates';
@@ -21927,7 +21917,6 @@ html body #sec-app .au-bar i{display:block;height:100%;width:0;background:var(--
     else { cls='busy'; txt='Checking for a new version…'; b='Checking…'; dis=true; }
     if(L && (u.error==='download'||u.error==='install')){ b='Download'; alt=false; }
     if(bg && !L && u.store!=='play'){ b='Checking…'; dis=true; }
-    document.querySelectorAll('#sec-app .au-auto-row').forEach(function(ar){ ar.hidden=u.store==='play'; });   // Google Play checks by itself
     line.className='au-line '+cls; line.textContent=txt; note.textContent=nt;
     if(ic){ line.textContent=''; var si=document.createElement('span'); si.className='au-ic'; si.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 20h14"/></svg>'; var tx=document.createElement('span'); tx.className='au-tx'; tx.appendChild(document.createTextNode(txt)); if(sub){ var sm=document.createElement('small'); sm.textContent=sub; tx.appendChild(sm); } line.appendChild(si); line.appendChild(tx); }
     btn.textContent=b; btn.disabled=dis; btn.classList.toggle('alt',alt);
