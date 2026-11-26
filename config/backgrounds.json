@@ -3,7 +3,7 @@
   "tabs": {
     "body": {
       "file": "bg/body.svg",
-      "v": 10
+      "v": 11
     },
     "food": {
       "file": "bg/food.svg",
@@ -27,7 +27,7 @@
     },
     "body_w": {
       "file": "bg/body_w.svg",
-      "v": 9
+      "v": 10
     },
     "food_w": {
       "file": "bg/food_w.svg",
