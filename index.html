@@ -26810,7 +26810,7 @@ html body #mind-panel :is(.alert-preview-btn,.ayu-prev-btn):not(#ayu-x1):not(#ay
 <style id="hb-all-20261126">
 /* Health Breaks: one icon collapses or opens every section that is switched on */
 html body #alerts-panel .ayu-rem-group > .ayu-hb-allbar:not(#ayu-x1){display:flex;justify-content:flex-end;align-items:center;margin:0 2px 8px}
-html body #alerts-panel .ayu-hb-allbtn:not(#ayu-x1){display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 9px;border-radius:16px;border:1.5px solid var(--alert-2,#799e1b);background:rgba(255,255,255,.7);color:var(--alert-2,#799e1b);font:inherit;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+html body #alerts-panel .ayu-hb-allbtn:not(#ayu-x1){display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border-radius:50%;border:1.5px solid var(--alert-2,#799e1b);background:rgba(255,255,255,.7);color:var(--alert-2,#799e1b);font:inherit;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
 html body #alerts-panel .ayu-hb-allbtn:not(#ayu-x1) svg{width:16px;height:16px;flex:0 0 16px}
 html body #alerts-panel .ayu-hb-allbtn:not(#ayu-x1):disabled{opacity:.45;filter:grayscale(1);cursor:default}
 </style>
@@ -26824,7 +26824,7 @@ html body #alerts-panel .ayu-hb-allbtn:not(#ayu-x1):disabled{opacity:.45;filter:
     var b=document.getElementById('ayu-hb-all'); if(!b) return;
     var en=cards().filter(on), open=en.some(function(c){ return !c.classList.contains('collapsed'); });
     b.disabled=!en.length; b.dataset.mode=open?'collapse':'expand';
-    var txt=open?'Collapse all':'Expand all'; b.innerHTML=(open?UP:DOWN)+'<span>'+txt+'</span>'; b.setAttribute('aria-label',txt+' sections that are on');
+    var txt=open?'Collapse all':'Expand all'; b.innerHTML=open?UP:DOWN; b.setAttribute('aria-label',txt+' sections that are on'); b.title=txt;
   }
   function install(){
     var g=document.querySelector('#alerts-panel .ayu-rem-group'); if(!g||document.getElementById('ayu-hb-all')) { paint(); return; }
