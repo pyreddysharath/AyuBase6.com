@@ -17319,17 +17319,20 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
 <script id="on-these-days-js-20261103">
 (function(){
   var KEYS={rem:'ayuBase6-reminder-hours',chk:'ayuBase6-routine-days'};
-  var ALL=[0,1,2,3,4,5,6],ORDER=[1,2,3,4,5,6,0],L={1:'M',2:'T',3:'W',4:'T',5:'F',6:'S',0:'S'},F={1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday',6:'Saturday',0:'Sunday'};
+  var ALL=[0,1,2,3,4,5,6],WK=[1,2,3,4,5],ORDER=[1,2,3,4,5,6,0],L={1:'M',2:'T',3:'W',4:'T',5:'F',6:'S',0:'S'},F={1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday',6:'Saturday',0:'Sunday'};
   var cache={};
   function clean(a){ if(!Array.isArray(a))return ALL.slice(); a=a.filter(function(n){return n>=0&&n<=6}); return a.length?a:ALL.slice(); }
   // Health Breaks sections each have their own days ("rem-break", "rem-walk", "rem-drink", "rem-eyeex"), kept with the hours
   var EX_DEF=[1,2,4,5];   // Eyes (Exercise): Mon, Tue, Thu, Fri (recommended)
   function load(k){
     try{
-      if(/^rem-/.test(k)){ var h=JSON.parse(localStorage.getItem(KEYS.rem)||'null')||{}, s=k.slice(4);
+      if(/^rem-/.test(k)){ var raw=localStorage.getItem(KEYS.rem), h=JSON.parse(raw||'null')||{}, s=k.slice(4);
         if(h.hbDays && Array.isArray(h.hbDays[s]) && h.hbDays[s].length) return clean(h.hbDays[s]);
-        var g=clean(h.days); if(s==='eyeex'){ var x=EX_DEF.filter(function(d){ return g.indexOf(d)>=0; }); return x.length?x:EX_DEF.slice(); } return g; }
-      var v=JSON.parse(localStorage.getItem(KEYS[k])||'null'); return clean(k==='rem'?(v&&v.days):v);
+        var g=(Array.isArray(h.days)&&h.days.length)?clean(h.days):(raw?ALL.slice():WK.slice());   // new installs start on Mon-Fri; saved choices are kept
+        if(s==='eyeex'){ var x=EX_DEF.filter(function(d){ return g.indexOf(d)>=0; }); return x.length?x:EX_DEF.slice(); } return g; }
+      var rawV=localStorage.getItem(KEYS[k]), v=JSON.parse(rawV||'null');
+      if(k==='rem') return (v&&Array.isArray(v.days)&&v.days.length)?clean(v.days):(rawV?ALL.slice():WK.slice());
+      return clean(v);
     }catch(e){ return /eyeex$/.test(k) ? EX_DEF.slice() : ALL.slice(); }
   }
   function hbAll(){ var o={}; ['break','walk','drink','posture','stretch','breathe','eyeex'].forEach(function(s){ o[s]=get('rem-'+s).slice(); }); return o; }
@@ -17359,7 +17362,7 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
   window.ayuDays={
     get:function(k){return get(k)},
     ok:function(k,d){return get(k).indexOf((d||new Date()).getDay())>=0},
-    reset:function(k){cache[k]=ALL.slice();if(draws[k])draws[k]();if(k==='rem')['break','walk','drink','posture','stretch','breathe','eyeex'].forEach(function(s){cache['rem-'+s]=s==='eyeex'?EX_DEF.slice():ALL.slice();if(draws['rem-'+s])draws['rem-'+s]()});},
+    reset:function(k){cache[k]=(k==='rem'?WK:ALL).slice();if(draws[k])draws[k]();if(k==='rem')['break','walk','drink','posture','stretch','breathe','eyeex'].forEach(function(s){cache['rem-'+s]=s==='eyeex'?EX_DEF.slice():WK.slice();if(draws['rem-'+s])draws['rem-'+s]()});},
     all:function(){return hbAll()},
     refresh:function(){cache={};Object.keys(draws).forEach(function(k){draws[k]()})}
   };
@@ -19969,7 +19972,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-f
     try{
       var h=JSON.parse(localStorage.getItem('ayuBase6-reminder-hours')||'null');
       if(h && ((h.start&&h.start!=='08:00') || (h.end&&h.end!=='20:00'))) return true;
-      if(window.ayuDays && window.ayuDays.get('rem').length!==7) return true;
+      if(window.ayuDays && window.ayuDays.get('rem').slice().sort().join()!=='1,2,3,4,5') return true;
       if(typeof alertState!=='undefined' && typeof ALERT_DEFAULTS!=='undefined'){
         for(var k in ALERT_DEFAULTS){ var s=alertState[k]; if(!s) continue; if(s.sound!==ALERT_DEFAULTS[k].sound || s.muted || (s.minutes&&+s.minutes!==ALERT_DEFAULTS[k].minutes)) return true; }
       }
@@ -26803,6 +26806,43 @@ html body #mind-panel :is(.alert-preview-btn,.ayu-prev-btn):not(#ayu-x1):not(#ay
 </style>
 <style id="au-colors-20261126">html body #sec-app .au-line.ok:not(#ayu-x1):not(#ayu-x2){color:var(--footer-accent,#2563eb) !important}html body #sec-app .au-ver:not(#ayu-x1):not(#ayu-x2){color:color-mix(in srgb,var(--footer-accent,#2563eb) 62%,#0b1b2b) !important}</style>
 <style id="glass-c-20261126">html[data-ayu-bg] .tab-panel :is(.card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section):not(#ayu-x1):not(#ayu-x2){background-color:rgba(255,255,255,.46) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}html[data-petal-card="e"] #mind-panel .mind-card:not(#ayu-x1){background:rgba(255,255,255,.46) !important}html body #lab-insights-card .lab-top-box:not(#ayu-x1), html body #lab-insights-card .lab-rep-box:not(#ayu-x1){background-color:rgba(255,255,255,.46) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}html body #calculator-panel .calc-card.ayu-vit-on:not(#ayu-x1):not(#ayu-x2){background-color:rgba(255,255,255,.46) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}#ayu-bgc .t{filter:saturate(1.3) brightness(.97)}</style>
+
+<style id="hb-all-20261126">
+/* Health Breaks: one icon collapses or opens every section that is switched on */
+html body #alerts-panel .ayu-rem-group > .ayu-hb-allbar:not(#ayu-x1){display:flex;justify-content:flex-end;align-items:center;margin:0 2px 8px}
+html body #alerts-panel .ayu-hb-allbtn:not(#ayu-x1){display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 9px;border-radius:16px;border:1.5px solid var(--alert-2,#799e1b);background:rgba(255,255,255,.7);color:var(--alert-2,#799e1b);font:inherit;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+html body #alerts-panel .ayu-hb-allbtn:not(#ayu-x1) svg{width:16px;height:16px;flex:0 0 16px}
+html body #alerts-panel .ayu-hb-allbtn:not(#ayu-x1):disabled{opacity:.45;filter:grayscale(1);cursor:default}
+</style>
+<script id="hb-all-js-20261126">
+(function(){
+  var UP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11l6-6 6 6"/><path d="M6 19l6-6 6 6"/></svg>';
+  var DOWN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5l6 6 6-6"/><path d="M6 13l6 6 6-6"/></svg>';
+  function on(c){ var t=c.querySelector('.alert-enabled-toggle input'); return !!(t&&t.checked); }
+  function cards(){ return [].slice.call(document.querySelectorAll('#alerts-panel .ayu-rem-group .alert-card:not(#reminder-hours-card)')).filter(function(c){ return c.querySelector('.alert-enabled-toggle input'); }); }
+  function paint(){
+    var b=document.getElementById('ayu-hb-all'); if(!b) return;
+    var en=cards().filter(on), open=en.some(function(c){ return !c.classList.contains('collapsed'); });
+    b.disabled=!en.length; b.dataset.mode=open?'collapse':'expand';
+    var txt=open?'Collapse all':'Expand all'; b.innerHTML=(open?UP:DOWN)+'<span>'+txt+'</span>'; b.setAttribute('aria-label',txt+' sections that are on');
+  }
+  function install(){
+    var g=document.querySelector('#alerts-panel .ayu-rem-group'); if(!g||document.getElementById('ayu-hb-all')) { paint(); return; }
+    var bar=document.createElement('div'); bar.className='ayu-hb-allbar';
+    var b=document.createElement('button'); b.type='button'; b.id='ayu-hb-all'; b.className='ayu-hb-allbtn';
+    b.addEventListener('click',function(){
+      var collapse=b.dataset.mode==='collapse';
+      cards().filter(on).forEach(function(c){ if(c.classList.contains('collapsed')===collapse) return; var h=c.querySelector('.alert-card-hdr'); if(h) h.click(); });
+      setTimeout(paint,0);
+    });
+    bar.appendChild(b); g.insertBefore(bar,g.firstChild); paint();
+  }
+  install(); var n=0,iv=setInterval(function(){ install(); if(++n>40) clearInterval(iv); },500);
+  setInterval(paint,700);
+  document.addEventListener('change',function(){ setTimeout(paint,0); setTimeout(paint,350); },true);
+  document.addEventListener('click',function(){ setTimeout(paint,0); },true);
+})();
+</script>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
