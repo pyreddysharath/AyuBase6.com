@@ -19500,7 +19500,7 @@ html body #rem-alarm-card.alert-card{background-color:var(--tl-5eead4,#bee068) !
     var mr=$('custom-reminders-card'); if(!mr || $('rem-alarm-card')) return;
     var wrap=document.createElement('div'); wrap.id='rem-alarm-card'; wrap.className='alert-card';
     wrap.innerHTML='<div class="alert-card-hdr"><h2><span class="section-title-text">Alarm</span></h2></div>'
-      +(APP?'<div class="ayu-tap-row" id="rem-tap-row"><span class="ayu-tap-l">Phone’s time opens</span><span class="ayu-seg" role="radiogroup" aria-label="Tapping the phone’s time opens"><button type="button" role="radio" data-v="clock">Phone’s Clock</button><button type="button" role="radio" data-v="app">AyuBase6</button></span></div>':'')
+      +(APP?'<div class="ayu-tap-row" id="rem-tap-row"><span class="ayu-tap-l">Phone time tap opens</span><span class="ayu-seg" role="radiogroup" aria-label="Tapping the phone’s time opens"><button type="button" role="radio" data-v="clock">Phone clock</button><button type="button" role="radio" data-v="app">AyuBase6</button></span></div>':'')
       +'<div id="rem-alarm-list" class="ayu-list"></div>'
       +'<div class="ayu-add-row"><button type="button" class="ayu-add-btn" id="rem-alarm-add"><span class="ayu-add-plus" aria-hidden="true">+</span><span>Add an alarm</span></button>'
       +'<button type="button" class="calc-info-btn rout-info-btn ayu-al-ibtn" id="rem-al-ibtn" title="About alarms" aria-label="About alarms" aria-expanded="false">i</button></div>'
@@ -26764,6 +26764,19 @@ html body #routines-panel #routines-remind-panel #chk-sound-row:not(#ayu-x1):not
 html body #routines-panel #routines-remind-panel #chk-sound-row > .chk-lbl:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto !important;min-width:0 !important;margin:0 !important;white-space:nowrap !important}
 html body #routines-panel #routines-remind-panel #chk-sound-row > select:not(#ayu-x1):not(#ayu-x2){flex:1 1 0 !important;min-width:0 !important;max-width:none !important;width:auto !important}
 html body #routines-panel #routines-remind-panel #chk-sound-row > button:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto !important}
+</style>
+<style id="tap-pill-20261126">
+/* Alarm: "Phone time tap opens" with a pill, on one line */
+html body #alerts-panel #rem-alarm-card .ayu-tap-row:not(#ayu-x1):not(#ayu-x2){flex-wrap:nowrap !important;white-space:nowrap !important;gap:8px !important;font-size:.8rem !important;font-weight:600}
+html body #alerts-panel #rem-alarm-card .ayu-tap-row .ayu-tap-l:not(#ayu-x1):not(#ayu-x2){flex:0 1 auto;min-width:0;white-space:nowrap !important}
+html body #alerts-panel #rem-alarm-card .ayu-seg:not(#ayu-x1):not(#ayu-x2){border:2.5px solid color-mix(in srgb,var(--tl-0f766e,#73961b) 55%,#fff) !important;border-radius:999px !important;background:#fff;margin-left:auto;flex:0 0 auto}
+html body #alerts-panel #rem-alarm-card .ayu-seg button:not(#ayu-x1):not(#ayu-x2){border-radius:999px !important;font-size:.74rem !important;padding:5px 9px !important;white-space:nowrap;color:color-mix(in srgb,var(--tl-0f766e,#73961b) 85%,#000) !important;background:#fff !important}
+html body #alerts-panel #rem-alarm-card .ayu-seg button.on:not(#ayu-x1):not(#ayu-x2){background:color-mix(in srgb,var(--tl-0f766e,#73961b) 70%,#fff) !important;color:var(--tl-134e4a,#2f4a0a) !important}
+@media (max-width:370px){
+html body #alerts-panel #rem-alarm-card .ayu-tap-row:not(#ayu-x1):not(#ayu-x2){font-size:.7rem !important;gap:6px !important}
+html body #alerts-panel #rem-alarm-card .ayu-seg:not(#ayu-x1):not(#ayu-x2){border-width:2px !important}
+html body #alerts-panel #rem-alarm-card .ayu-seg button:not(#ayu-x1):not(#ayu-x2){font-size:.64rem !important;padding:4px 6px !important}
+}
 </style>
 </body>
 
