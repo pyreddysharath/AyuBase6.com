@@ -7,7 +7,7 @@
     },
     "food": {
       "file": "bg/food.svg",
-      "v": 7
+      "v": 8
     },
     "mind": {
       "file": "bg/mind.svg",
@@ -15,15 +15,15 @@
     },
     "vitals": {
       "file": "bg/vitals.svg",
-      "v": 6
+      "v": 7
     },
     "care": {
       "file": "bg/care.svg",
-      "v": 7
+      "v": 8
     },
     "alerts": {
       "file": "bg/alerts.svg",
-      "v": 7
+      "v": 8
     },
     "body_w": {
       "file": "bg/body_w.svg",
@@ -31,7 +31,7 @@
     },
     "food_w": {
       "file": "bg/food_w.svg",
-      "v": 5
+      "v": 6
     },
     "mind_w": {
       "file": "bg/mind_w.svg",
@@ -39,15 +39,15 @@
     },
     "vitals_w": {
       "file": "bg/vitals_w.svg",
-      "v": 3
+      "v": 4
     },
     "care_w": {
       "file": "bg/care_w.svg",
-      "v": 4
+      "v": 5
     },
     "alerts_w": {
       "file": "bg/alerts_w.svg",
-      "v": 4
+      "v": 5
     }
   }
 }
