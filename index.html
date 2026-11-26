@@ -2835,7 +2835,7 @@ html[data-petal-card="e"] #mind-panel .mind-topic-list li {
   -webkit-backdrop-filter:none !important;
 }
 html[data-petal-card="e"] #mind-panel .mind-card {
-  background:rgba(255,255,255,.5) !important;
+  background:rgba(255,255,255,.4) !important;
 }
 </style>
 
@@ -3030,7 +3030,7 @@ body #app-nav { border-bottom:6px solid var(--hdr-band) !important; }
   .tab-panel > .ayu-content-page-title::after {content:none !important;display:none !important;}
   /* Consistent, gently translucent content surfaces reveal lotus art. */
   .tab-panel :is(.card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section) {
-    background-color:rgba(255,255,255,.5) !important;
+    background-color:rgba(255,255,255,.4) !important;
     border-color:color-mix(in srgb,var(--accent,var(--fb-2563eb,#2563eb)) 16%,#e3e8ee) !important;
     box-shadow:0 3px 16px rgba(var(--fbr-27-46-70,27,46,70),.055) !important;
     backdrop-filter:blur(1px);
@@ -26597,7 +26597,7 @@ html body #app-logo-wrap #app-logo #logo-thee:not(#ayu-x1):not(#ayu-x2){font-sty
 /* Section backgrounds: one nature scene per tab, fixed to the screen (it never moves when sections open or close). The pictures live in
    config/bg/ on GitHub (list and versions in config/backgrounds.json) and are kept on the phone; the copies built in below are the first look and the fallback.
    Roll back: delete this block and the script after it (the old lotus pictures come back). */
-@media (max-width:899px){html[data-ayu-bg] .tab-panel :is(.card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section){background-color:rgba(255,255,255,.5) !important;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px)}}
+@media (max-width:899px){html[data-ayu-bg] .tab-panel :is(.card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section){background-color:rgba(255,255,255,.4) !important;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px)}}
 html[data-ayu-bg] .sec-bg-layer,html[data-ayu-bg] .sec-lotus-layer,html[data-ayu-bg] .lotus-extra-motif{display:none !important}
 html[data-ayu-bg] body #nav-lotus:not(#ayu-x1):not(#ayu-x2){display:none !important}
 html[data-ayu-bg][data-petal-card="e"] :is(#activity-panel,#nutrition-panel,#routines-panel,#alerts-panel,#mind-panel,#calculator-panel) :is(.card,.body-age-section,.activity-type-section,.rout-card,.mind-card,.alert-card,.calc-card)::after{content:none !important;display:none !important}
@@ -26684,7 +26684,7 @@ html body :is(.ayu-i,.calc-info-btn,.reminder-hours-info-btn,.alert-info-btn,.no
 <style id="clock-personal-20261125">
 /* Lab Insights: two boxes (the tool, then My Reports), no extra space inside either */
 html body #calculator-panel #lab-insights-card.calc-card.ayu-vit-on:not(#ayu-x1){background:transparent !important;border:0 !important;box-shadow:none !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;padding:0 !important}
-html body #lab-insights-card .lab-top-box, html body #lab-insights-card .lab-rep-box{background-color:rgba(255,255,255,.5);border:1px solid color-mix(in srgb,var(--accent,#13806c) 22%,#dfe8e6);box-shadow:0 3px 14px rgba(27,46,70,.045);border-radius:15px;padding:14px;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px)}
+html body #lab-insights-card .lab-top-box, html body #lab-insights-card .lab-rep-box{background-color:rgba(255,255,255,.4);border:1px solid color-mix(in srgb,var(--accent,#13806c) 22%,#dfe8e6);box-shadow:0 3px 14px rgba(27,46,70,.045);border-radius:15px;padding:14px;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px)}
 html body #lab-insights-card .lab-top-box{margin-bottom:12px}
 html body #lab-insights-card .lab-top-box .lab-actions-row:not(#ayu-x1){margin-bottom:0 !important}
 html body #lab-insights-card .lab-top-box #lab-pane-manual{margin-top:12px}
@@ -26694,7 +26694,7 @@ html body #lab-insights-card .lab-rep-box:not(:has(#lab-results > *)){display:no
 html body #lab-insights-card .lab-rep-box > :last-child:not(#ayu-x1){margin-bottom:0 !important}
 html body #mind-panel h1.ayu-content-page-title:not(#ayu-x1){color:#3b8460 !important}
 /* Vitals: BMI, Lab Insights and Tracker get the same box as the sections of the other tabs */
-html body #calculator-panel .calc-card.ayu-vit-on:not(#ayu-x1){background-color:rgba(255,255,255,.5) !important;border:1px solid color-mix(in srgb,var(--accent,#13806c) 22%,#dfe8e6) !important;box-shadow:0 3px 14px rgba(27,46,70,.045) !important;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);padding-top:14px !important;padding-left:14px !important;padding-right:14px !important}
+html body #calculator-panel .calc-card.ayu-vit-on:not(#ayu-x1){background-color:rgba(255,255,255,.4) !important;border:1px solid color-mix(in srgb,var(--accent,#13806c) 22%,#dfe8e6) !important;box-shadow:0 3px 14px rgba(27,46,70,.045) !important;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);padding-top:14px !important;padding-left:14px !important;padding-right:14px !important}
 /* Clock: time on the left, date and year on the right, the (i) at the end; no bell, no "Clock" word */
 html body #alerts-panel #rem-alarm-card > .ayu-part-title > svg:not(#ayu-x1), html body #alerts-panel #rem-alarm-card > .ayu-part-title > span:not(.clk-now):not(#ayu-x1){display:none !important}
 html body #alerts-panel #rem-alarm-card > .ayu-part-title .clk-now{flex:1 1 auto;margin-left:0 !important;font-size:1.12rem;font-weight:800}
@@ -26737,6 +26737,10 @@ html body #alerts-panel :is(.ayu-i,#rem-al-ibtn,.reminder-hours-info-btn):not(#a
   try{ new MutationObserver(function(){ var r=document.querySelector('#alerts-panel .med-addrow'), i=document.getElementById('custom-rem-info-btn'); if(r&&i&&i.parentNode!==r) go(); }).observe(document.getElementById('alerts-panel')||document.body,{childList:true,subtree:true}); }catch(e){}
 })();
 </script>
+<style id="i-white-20261126">
+/* every i: white while closed (also while pressed or focused on a touch screen); the section colour fills it only while its text is open */
+html body :is(#activity-panel,#nutrition-panel,#mind-panel,#calculator-panel,#routines-panel) :is(.ayu-i,.ayu-sec-i,.calc-info-btn,.ayu-desc-btn,.rout-info-btn):not([aria-expanded="true"]):not(.active):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){background:#fff !important;filter:none !important;color:color-mix(in srgb,var(--ii-c,var(--rout-2,#41aad4)) 80%,#000) !important}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
