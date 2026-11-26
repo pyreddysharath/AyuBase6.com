@@ -17906,11 +17906,11 @@ body.ayu-sb-calculator-panel:not(#ayu-x1) #app-nav::before{left:46%;top:-6%}
         return bad(p.length===1 ? p[0][0].replace(/<[^>]+>/g,'') : p.length+' things keep reminders quiet','<ul style="margin:0;padding-left:18px">'+p.map(function(x){ return '<li>'+x[0]+'. '+x[1]+'</li>'; }).join('')+'</ul>'); }},
       {k:'alm',label:'Alarms ring with the app closed',fn:async function(){
         var r=await soundCheck(); if(!r) return skip('Could not read the phone\'s settings');
-        var p=[], tip='';
+        var p=[], tip='', forceNote='';
         if(r.alarmMax && !r.alarmVol) p.push(['<b>Alarm volume</b> is at 0','Phone <b>Settings → Sound</b>: turn up Alarm volume. Alarms and the timer use it.']);
         if(r.exact===false) p.push(['<b>Alarms &amp; reminders</b> is not allowed','<b>Settings → Apps → AyuBase6 → Alarms &amp; reminders</b>: allow it, so alarms ring on time.']);
         if(r.bgRestricted) p.push(['<b>Background use</b> is restricted','<b>Settings → Apps → AyuBase6 → Battery</b>: choose <b>Unrestricted</b>.']);
-        if(r.forceStoppedAt && Date.now()-r.forceStoppedAt<86400000) p.push(['Earlier, the phone <b>closed AyuBase6 completely</b> ('+new Date(r.forceStoppedAt).toLocaleString([], {day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})+')','Some phones stop an app\'s alarms when it is swiped away. AyuBase6 sets them again each time you open it, so nothing is lost now; reminders that fell due in between were missed. To avoid it: set <b>Battery</b> to <b>Unrestricted</b> and lock AyuBase6 in the recent apps (long-press its card → Lock).'+(/xiaomi|redmi|poco/i.test(r.manufacturer||'')?' Also turn on <b>Autostart</b> for AyuBase6.':'')]);
+        if(r.forceStoppedAt && Date.now()-r.forceStoppedAt<86400000) forceNote='The phone closed AyuBase6 completely ('+new Date(r.forceStoppedAt).toLocaleString([], {day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})+'). That cancels alarms until the app is opened again, so do not swipe it away from the recent apps.';
         if(r.dnd==='none') p.push(['<b>Do Not Disturb</b> silences alarms too','Turn it off, or allow alarms in its settings.']);
         // What happened to the last alarm (the phone keeps a short record)
         var log=(r.alarmLog||[]).slice(), lastSet=null, after=[];
@@ -17929,7 +17929,7 @@ body.ayu-sb-calculator-panel:not(#ayu-x1) #app-nav::before{left:46%;top:-6%}
         if(typeof r.nextAlarmMs==='number'){ var nm=r.nextAlarmMs; tapTxt = !nm ? 'Phone time tap opens: nothing (the phone holds no next alarm)' : r.nextAlarmOurs ? tapTxt : 'Phone time tap opens: another app\'s alarm is the phone\'s next one'; }
         if(r.fullScreen===false) tip='Full-screen alarms are off, so alarms show as a notification';
         else if(!r.batteryUnrestricted) tip='Tip: Battery “Unrestricted” makes alarms most reliable';
-        if(!p.length) return ok((tip||'Alarm volume up, on time, not restricted')+(tapTxt?'\n'+tapTxt.replace('Phone time tap opens: ','Time tap → '):''));
+        if(!p.length) return ok((tip||'Alarm volume up, on time, not restricted')+(forceNote?'\n'+forceNote:'')+(tapTxt?'\n'+tapTxt.replace('Phone time tap opens: ','Time tap → '):''));
         var EVN={set:'alarm scheduled',ringing:'alarm rang',late:'started late',blocked:'blocked by Android',startfail:'could not start',refused:'refused by Android',stopped:'stopped',snoozed:'snoozed'};
         var det=('<p style="margin:8px 0 0;font-size:.8em;opacity:.75">Your phone: '+String(r.manufacturer||'Phone').replace(/[<>&]/g,'')+', Android '+(r.android||'?')+(tapTxt?'.<br>'+tapTxt:'')+(r.alarmLog&&r.alarmLog.length?'.<br>What AyuBase6 did last (oldest first): '+r.alarmLog.slice(-4).map(function(x){ var k=x.m.split(':')[0]; return (EVN[k]||k)+' at '+new Date(x.t).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); }).join('; ')+'.':'.')+'</p>');
         // One tap to the phone's battery page for AyuBase6 (where "Unrestricted" is chosen)
@@ -17949,6 +17949,15 @@ body.ayu-sb-calculator-panel:not(#ayu-x1) #app-nav::before{left:46%;top:-6%}
       li.querySelector('.chk-i').addEventListener('click',function(){ var d=INFO[s.k]; if(d) showPop(d[0],d[1]); });
       list.appendChild(li);
     });
+    // After Test again: scroll down so every check shows, but never past the Test again button reaching the top
+    function keepChecksInView(){
+      try{ var rows=list.querySelectorAll('.chk-row'); if(!btn||!rows.length) return;
+        var last=rows[rows.length-1].getBoundingClientRect(), br=btn.getBoundingClientRect();
+        var delta=Math.min(last.bottom-(window.innerHeight-16), br.top-8);
+        if(delta>1) window.scrollBy({top:delta,behavior:'smooth'});
+      }catch(e){}
+    }
+    setTimeout(keepChecksInView,120);
     var allOk=true;
     for(var i=0;i<steps.length;i++){
       var s=steps[i], li=$('chk-'+s.k); li.classList.add('run'); await sleep(350);
@@ -17959,7 +17968,7 @@ body.ayu-sb-calculator-panel:not(#ayu-x1) #app-nav::before{left:46%;top:-6%}
       else { allOk=false; li.classList.add('bad'); INFO[s.k]=[r.title,r.msg]; li.querySelector('.chk-note').textContent=r.title; }
     }
     sum.innerHTML= allOk ? '<span class="nt-ok">✓</span> All checks passed.' : 'Tap the <b>i</b> next to a ✕ step to see how to fix it, then tap Test again.';
-    if(btn){ btn.disabled=false; btn.textContent='Test again'; } running=false; update();
+    if(btn){ btn.disabled=false; btn.textContent='Test again'; } running=false; update(); setTimeout(keepChecksInView,150);
   }
   // The test notification's picture uses the colour of the section you are in.
   function sectionTheme(){
@@ -19438,9 +19447,8 @@ html body #rem-alarm-card.alert-card{background-color:var(--tl-5eead4,#bee068) !
   window.ayuShowAlarm=function(id,plain){
     try{
       if(plain){   // the phone's time / an alarm note was tapped: just go to the alarm section, nothing expands
-        if(id==='wake'){ if(typeof switchTab==='function') switchTab('routines'); setTimeout(function(){ var sec=$('chk-alarm'); if(sec) try{ sec.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },200); return; }
+        if(id==='wake'){ if(typeof switchTab==='function') switchTab('routines'); return; }
         if(typeof switchTab==='function') switchTab('alerts'); if(window.ayuRemTab) window.ayuRemTab('alarm'); if(window.ayuClockTab) window.ayuClockTab('alarm');
-        setTimeout(function(){ var c=$('rem-alarm-card'); if(c) try{ c.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },200);
         return;
       }
       if(id==='wake'){ if(typeof switchTab==='function') switchTab('routines'); var sec=$('chk-alarm'); if(sec){ setOpen(sec,'wake-alarm',true,true); setTimeout(function(){ try{ sec.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },150); } return; }
