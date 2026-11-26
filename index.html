@@ -26749,6 +26749,17 @@ html body #alerts-panel:has(.alert-page[data-remtab="breaks"]) :is(.alert-previe
 html body #alerts-panel:has(.alert-page[data-remtab="breaks"]) .alert-card :is(.alert-row-lbl,.dotted-lbl,.ayu-speak-lbl,.otd-title,.per-reminder-from,.alert-fixed-frequency):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){color:var(--tl-134e4a,#336374) !important}
 html body #mind-panel :is(.alert-preview-btn,.ayu-prev-btn):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){background:color-mix(in srgb,#359b62 30%,#fff) !important;border:1.5px solid color-mix(in srgb,#359b62 80%,#fff) !important;color:color-mix(in srgb,#359b62 55%,#000) !important;font-weight:700 !important}
 </style>
+<style id="sound-one-line-20261126">
+/* Sound: the label and the drop-down (with play and speaker) share one line on phones too */
+html body #alerts-panel .alert-row.alert-sound-line:not(#ayu-x1):not(#ayu-x2){flex-direction:row !important;align-items:center !important;flex-wrap:nowrap !important;gap:8px !important}
+html body #alerts-panel .alert-row.alert-sound-line > .alert-row-lbl:not(#ayu-x1):not(#ayu-x2){align-self:center !important;margin:0 !important;flex:0 0 auto !important;white-space:nowrap !important}
+html body #alerts-panel .alert-row.alert-sound-line > .alert-sound-row:not(#ayu-x1):not(#ayu-x2){width:auto !important;flex:1 1 0 !important;min-width:0 !important}
+html body #alerts-panel .alert-sound-line .reminder-custom-select-wrap:not(#ayu-x1):not(#ayu-x2){width:auto !important;min-width:0 !important;flex:1 1 0 !important}
+html body #routines-panel #routines-remind-panel #chk-sound-row:not(#ayu-x1):not(#ayu-x2){flex-wrap:nowrap !important;align-items:center !important;gap:8px !important}
+html body #routines-panel #routines-remind-panel #chk-sound-row > .chk-lbl:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto !important;min-width:0 !important;margin:0 !important;white-space:nowrap !important}
+html body #routines-panel #routines-remind-panel #chk-sound-row > select:not(#ayu-x1):not(#ayu-x2){flex:1 1 0 !important;min-width:0 !important;max-width:none !important;width:auto !important}
+html body #routines-panel #routines-remind-panel #chk-sound-row > button:not(#ayu-x1):not(#ayu-x2){flex:0 0 auto !important}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
