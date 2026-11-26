@@ -26738,8 +26738,10 @@ html body #alerts-panel :is(.ayu-i,#rem-al-ibtn,.reminder-hours-info-btn):not(#a
 })();
 </script>
 <style id="i-white-20261126">
-/* every i: white while closed (also while pressed or focused on a touch screen); the section colour fills it only while its text is open */
-html body :is(#activity-panel,#nutrition-panel,#mind-panel,#calculator-panel,#routines-panel) :is(.ayu-i,.ayu-sec-i,.calc-info-btn,.ayu-desc-btn,.rout-info-btn):not([aria-expanded="true"]):not(.active):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){background:#fff !important;filter:none !important;color:color-mix(in srgb,var(--ii-c,var(--rout-2,#41aad4)) 80%,#000) !important}
+/* every i: white while closed with the section colour as its outline and letter; filled with the section colour while its text is open */
+html body #routines-panel :is(.ayu-i,.ayu-sec-i,.calc-info-btn,.ayu-desc-btn,.rout-info-btn):not([aria-expanded="true"]):not(.active):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){background:#fff !important;filter:none !important;color:var(--ii-c,var(--rout-2,#41aad4)) !important;border-color:var(--ii-c,var(--rout-2,#41aad4)) !important}
+html body #routines-panel :is(.ayu-i,.ayu-sec-i,.calc-info-btn,.ayu-desc-btn,.rout-info-btn):is([aria-expanded="true"],.active):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){background:var(--ii-c,var(--rout-2,#41aad4)) !important;border-color:var(--ii-c,var(--rout-2,#41aad4)) !important;color:#fff !important;filter:none !important}
+html body :is(#activity-panel,#nutrition-panel,#mind-panel,#calculator-panel) :is(.ayu-i,.ayu-sec-i,.calc-info-btn,.ayu-desc-btn,.rout-info-btn):not([aria-expanded="true"]):not(.active):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){background:#fff !important;filter:none !important;color:color-mix(in srgb,var(--ii-c,var(--rout-2,#41aad4)) 80%,#000) !important}
 </style>
 <style id="preview-btn-20261126">
 /* Preview notification: a 30% tint of the section colour, a clear outline and bold dark text, so it stays readable on the background picture */
