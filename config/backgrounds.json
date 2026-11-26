@@ -11,7 +11,7 @@
     },
     "mind": {
       "file": "bg/mind.svg",
-      "v": 8
+      "v": 9
     },
     "vitals": {
       "file": "bg/vitals.svg",
@@ -19,7 +19,7 @@
     },
     "care": {
       "file": "bg/care.svg",
-      "v": 8
+      "v": 9
     },
     "alerts": {
       "file": "bg/alerts.svg",
@@ -35,7 +35,7 @@
     },
     "mind_w": {
       "file": "bg/mind_w.svg",
-      "v": 6
+      "v": 7
     },
     "vitals_w": {
       "file": "bg/vitals_w.svg",
@@ -43,7 +43,7 @@
     },
     "care_w": {
       "file": "bg/care_w.svg",
-      "v": 5
+      "v": 6
     },
     "alerts_w": {
       "file": "bg/alerts_w.svg",
