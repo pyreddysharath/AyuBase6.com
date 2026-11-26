@@ -11,7 +11,7 @@
     },
     "mind": {
       "file": "bg/mind.svg",
-      "v": 12
+      "v": 13
     },
     "vitals": {
       "file": "bg/vitals.svg",
@@ -35,7 +35,7 @@
     },
     "mind_w": {
       "file": "bg/mind_w.svg",
-      "v": 10
+      "v": 11
     },
     "vitals_w": {
       "file": "bg/vitals_w.svg",
