@@ -17915,6 +17915,7 @@ body.ayu-sb-calculator-panel:not(#ayu-x1) #app-nav::before{left:46%;top:-6%}
         // What happened to the last alarm (the phone keeps a short record)
         var log=(r.alarmLog||[]).slice(), lastSet=null, after=[];
         for(var i=log.length-1;i>=0;i--){ if(/^set:/.test(log[i].m)){ lastSet=log[i]; after=log.slice(i+1); break; } }
+        if(lastSet && after.some(function(x){ return /^cleared:/.test(x.m); })) lastSet=null;   // deleted or turned off before its time: nothing was missed
         var fmt=function(t){ return new Date(t).toLocaleString([], {day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}); };
         if(lastSet){
           var at=+lastSet.m.split(':')[1], gone=Date.now()>at+3*60000, ev=after.map(function(x){ return x.m.split(':')[0]; });
