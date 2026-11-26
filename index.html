@@ -23311,12 +23311,6 @@ html body #ayu-checklist #ayu-cl-prev{margin:12px 0 0 16px}
 })();
 </script>
 <style id="update-auto-20261110">
-html body #sec-app .au-auto-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid color-mix(in srgb,var(--footer-accent,var(--tl-0d9488,#799e1b)) 20%,#fff)}
-html body #sec-app .au-auto-row{justify-content:space-between;flex-wrap:nowrap;border-top:0 !important;margin:14px 2px 0 !important;padding-top:0 !important}
-html body #sec-app .au-auto-note{margin:4px 2px 0}
-html body #sec-app .au-auto-l{font-weight:700;font-size:.9rem;color:var(--fb-1e293b,#1e293b)}
-html body #sec-app .au-auto-row .master-switch{flex:0 0 auto}
-html body #sec-app .au-auto-row .master-switch input:checked:not(#ayu-x1){background:var(--footer-accent,var(--fb-255cc0,#255cc0)) !important}
 </style>
 <style id="au-layout-20261110">
 /* App Updates: text first (full width), the button at the bottom, full width; "New version … is ready" in the section colour */
@@ -23326,10 +23320,8 @@ html body #sec-app .au-row > div{order:1}
 html body #sec-app .au-barrow{order:2}
 html body #sec-app .au-note{order:3}
 html body #sec-app #au-btn{order:4;margin-top:12px;width:100%;padding:10px 16px}
-html body #sec-app .au-auto-row{order:5}
-html body #sec-app .au-auto-note{order:6}
 html body #sec-app .au-line.new{color:var(--footer-accent,var(--fb-2563eb,#2563eb)) !important}
-@media (max-width:340px){html body #sec-app .au-card{padding:12px}html body #sec-app #au-note,html body #sec-app .au-auto-note{font-size:11px}}
+@media (max-width:340px){html body #sec-app .au-card{padding:12px}html body #sec-app #au-note{font-size:11px}}
 </style>
 <style id="au-center-20261122">
 /* App Updates: text centred like the update popup (icon on the left, small line under the title), a soft fading line under the version */
@@ -23341,7 +23333,6 @@ html body #sec-app .au-line .au-ic{display:inline-flex;align-items:center;justif
 html body #sec-app .au-line .au-tx{text-align:left;line-height:1.25}
 html body #sec-app .au-line .au-tx small{display:block;font-weight:500;font-size:.72rem;color:#64748b}
 html body #sec-app .au-note:not(#ayu-x1){text-align:center}
-html body #sec-app .au-auto-note:not(#ayu-x1){text-align:left;margin-left:2px;margin-right:0}
 </style>
 <style id="app-request-20261110">
 /* Download App: request the Android app (name + email); sent like Feedback, marked "App install request" */
@@ -23447,7 +23438,6 @@ html body #sec-app .au-x[hidden]{display:none}
   if(document.body) upd(); else document.addEventListener('DOMContentLoaded',upd);
 })();
 </script>
-<style id="au-play-20261110">html body #sec-app .au-auto-row[hidden]{display:none !important}</style>
 <style id="kb-time-20261110">
 /* Time pickers: a keyboard icon types the time instead of using the clock or wheels */
 .ayu-kb-btn{margin-right:auto !important;width:40px;height:38px;padding:0 !important;border-radius:10px !important;border:0 !important;background:transparent !important;box-shadow:none !important;color:var(--ayu-kb-c,var(--tl-0d9488,#799e1b)) !important;display:inline-flex !important;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
