@@ -19435,8 +19435,14 @@ html body #rem-alarm-card.alert-card{background-color:var(--tl-5eead4,#bee068) !
         actions:acts, data:{ key:'alarm:'+id, section:id==='wake'?'routines':'alerts', url:'./' } });
     }).catch(function(){});
   }
-  window.ayuShowAlarm=function(id){
+  window.ayuShowAlarm=function(id,plain){
     try{
+      if(plain){   // the phone's time / an alarm note was tapped: just go to the alarm section, nothing expands
+        if(id==='wake'){ if(typeof switchTab==='function') switchTab('routines'); setTimeout(function(){ var sec=$('chk-alarm'); if(sec) try{ sec.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },200); return; }
+        if(typeof switchTab==='function') switchTab('alerts'); if(window.ayuRemTab) window.ayuRemTab('alarm'); if(window.ayuClockTab) window.ayuClockTab('alarm');
+        setTimeout(function(){ var c=$('rem-alarm-card'); if(c) try{ c.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },200);
+        return;
+      }
       if(id==='wake'){ if(typeof switchTab==='function') switchTab('routines'); var sec=$('chk-alarm'); if(sec){ setOpen(sec,'wake-alarm',true,true); setTimeout(function(){ try{ sec.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },150); } return; }
       if(typeof switchTab==='function') switchTab('alerts'); if(window.ayuRemTab) window.ayuRemTab('alarm'); if(window.ayuClockTab) window.ayuClockTab('alarm');
       setTimeout(function(){ var it=document.querySelector('#rem-alarm-list [data-id="'+id+'"]'); if(!it) return; if(!it.classList.contains('open')) openForm(id); try{ it.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} },200);
@@ -19680,7 +19686,7 @@ html body #rem-alarm-card.alert-card{background-color:var(--tl-5eead4,#bee068) !
     // Two closed sections, like Download App: Notifications (the test) and Common problems
     function part(id,title){ var d=document.createElement('details'); d.className='app-part'; d.dataset.part=id; d.id='hlp-'+id;
       d.innerHTML='<summary>'+title+'</summary><div class="app-part-b"></div>'; return d; }
-    var pN=part('notifications','Test Notifications'), pP=part('problems','Common problems'), sep=document.createElement('hr'); sep.className='app-sep';
+    var pN=part('notifications','Test Notifications'), pP=part('problems','Common problems'), sep=document.createElement('hr'); sep.className='app-sep'; pN.open=true;
     var bP=pP.querySelector('.app-part-b'), bN=pN.querySelector('.app-part-b');
     [].slice.call(tr.childNodes).forEach(function(n){ bP.appendChild(n); });
     [].slice.call(ck.childNodes).forEach(function(n){ bN.appendChild(n); });
@@ -26781,6 +26787,13 @@ html body #alerts-panel #rem-alarm-card .ayu-tap-row:not(#ayu-x1):not(#ayu-x2){f
 html body #alerts-panel #rem-alarm-card .ayu-seg:not(#ayu-x1):not(#ayu-x2){border-width:2px !important}
 html body #alerts-panel #rem-alarm-card .ayu-seg button:not(#ayu-x1):not(#ayu-x2){font-size:.64rem !important;padding:4px 6px !important}
 }
+</style>
+<style id="alarm-clear-20261126">
+/* Alarm cards: see-through like the other cards (40%), so the background picture shows */
+html body #alerts-panel #rem-alarm-list .custom-reminder-item.ayu-alarm-item:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){background:rgba(246,250,235,.4) !important}
+html body #alerts-panel #rem-alarm-list .custom-reminder-item.ayu-alarm-item.alt:not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){background:rgba(237,244,217,.4) !important}
+/* Help: the notification test is shown directly (no 'Test Notifications' heading); Common problems stays below it */
+html body #hlp-notifications > summary:not(#ayu-x1):not(#ayu-x2){display:none !important}
 </style>
 </body>
 
