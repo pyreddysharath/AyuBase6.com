@@ -17925,6 +17925,7 @@ body.ayu-sb-calculator-panel:not(#ayu-x1) #app-nav::before{left:46%;top:-6%}
         }
         var tapTo=''; for(var q=log.length-1;q>=0;q--){ var f=String(log[q].m).split(':'); if(f[0]==='set' && f[3]){ tapTo=f[3]; break; } }
         var tapTxt=tapTo==='app' ? 'Phone time tap opens: AyuBase6' : tapTo==='clock' ? 'Phone time tap opens: Phone clock' : '';
+        if(typeof r.nextAlarmMs==='number'){ var nm=r.nextAlarmMs; tapTxt = !nm ? 'Phone time tap opens: nothing (the phone holds no next alarm)' : r.nextAlarmOurs ? tapTxt : 'Phone time tap opens: another app\'s alarm is the phone\'s next one'; }
         if(r.fullScreen===false) tip='Full-screen alarms are off, so alarms show as a notification';
         else if(!r.batteryUnrestricted) tip='Tip: Battery “Unrestricted” makes alarms most reliable';
         if(!p.length) return ok((tip||'Alarm volume up, on time, not restricted')+(tapTxt?' · '+tapTxt.replace('Phone time tap opens: ','Time tap → '):''));
