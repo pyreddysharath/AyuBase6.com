@@ -26741,6 +26741,12 @@ html body #alerts-panel :is(.ayu-i,#rem-al-ibtn,.reminder-hours-info-btn):not(#a
 /* every i: white while closed (also while pressed or focused on a touch screen); the section colour fills it only while its text is open */
 html body :is(#activity-panel,#nutrition-panel,#mind-panel,#calculator-panel,#routines-panel) :is(.ayu-i,.ayu-sec-i,.calc-info-btn,.ayu-desc-btn,.rout-info-btn):not([aria-expanded="true"]):not(.active):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3):not(#ayu-x4){background:#fff !important;filter:none !important;color:color-mix(in srgb,var(--ii-c,var(--rout-2,#41aad4)) 80%,#000) !important}
 </style>
+<style id="preview-btn-20261126">
+/* Preview notification: a 30% tint of the section colour, a clear outline and bold dark text, so it stays readable on the background picture */
+html body #routines-panel :is(.alert-preview-btn,.ayu-prev-btn):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){background:color-mix(in srgb,#41aad4 30%,#fff) !important;border:1.5px solid color-mix(in srgb,#41aad4 80%,#fff) !important;color:color-mix(in srgb,#41aad4 55%,#000) !important;font-weight:700 !important}
+html body #alerts-panel :is(.alert-preview-btn,.ayu-prev-btn):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){background:color-mix(in srgb,#6f8a3a 30%,#fff) !important;border:1.5px solid color-mix(in srgb,#6f8a3a 80%,#fff) !important;color:color-mix(in srgb,#6f8a3a 55%,#000) !important;font-weight:700 !important}
+html body #mind-panel :is(.alert-preview-btn,.ayu-prev-btn):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){background:color-mix(in srgb,#359b62 30%,#fff) !important;border:1.5px solid color-mix(in srgb,#359b62 80%,#fff) !important;color:color-mix(in srgb,#359b62 55%,#000) !important;font-weight:700 !important}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
