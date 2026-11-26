@@ -17928,7 +17928,10 @@ body.ayu-sb-calculator-panel:not(#ayu-x1) #app-nav::before{left:46%;top:-6%}
         if(!p.length) return ok(tip||'Alarm volume up, on time, not restricted');
         var EVN={set:'alarm scheduled',ringing:'alarm rang',late:'started late',blocked:'blocked by Android',startfail:'could not start',refused:'refused by Android',stopped:'stopped',snoozed:'snoozed'};
         var det=('<p style="margin:8px 0 0;font-size:.8em;opacity:.75">Your phone: '+String(r.manufacturer||'Phone').replace(/[<>&]/g,'')+', Android '+(r.android||'?')+(r.alarmLog&&r.alarmLog.length?'.<br>What AyuBase6 did last (oldest first): '+r.alarmLog.slice(-4).map(function(x){ var k=x.m.split(':')[0]; return (EVN[k]||k)+' at '+new Date(x.t).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); }).join('; ')+'.':'.')+'</p>');
-        return bad(p.length===1 ? p[0][0].replace(/<[^>]+>/g,'').replace(/ \(.*\)$/,'') : p.length+' things can stop alarms','<ul style="margin:0;padding-left:18px">'+p.map(function(x){ return '<li>'+x[0]+'. '+x[1]+'</li>'; }).join('')+'</ul>'+det); }}
+        // One tap to the phone's battery page for AyuBase6 (where "Unrestricted" is chosen)
+        var batBtn=(window.ayuNative && typeof window.ayuNative.openBattery==='function' && (r.bgRestricted || !r.batteryUnrestricted || (r.forceStoppedAt && Date.now()-r.forceStoppedAt<86400000)))
+          ? '<p style="margin:10px 0 0"><button type="button" class="chk-bat-btn" onclick="try{ayuNative.openBattery()}catch(e){}" style="font:inherit;font-weight:700;font-size:.9em;padding:7px 14px;border-radius:10px;border:1.5px solid var(--footer-accent,#3272ab);background:color-mix(in srgb,var(--footer-accent,#3272ab) 14%,#fff);color:var(--footer-accent,#3272ab);cursor:pointer">Open battery settings</button></p>' : '';
+        return bad(p.length===1 ? p[0][0].replace(/<[^>]+>/g,'').replace(/ \(.*\)$/,'') : p.length+' things can stop alarms','<ul style="margin:0;padding-left:18px">'+p.map(function(x){ return '<li>'+x[0]+'. '+x[1]+'</li>'; }).join('')+'</ul>'+batBtn+det); }}
     );
     steps.push({k:'test',label:'Test notification and sound',human:true,fn:async function(){
       if(!granted()) return skip('Needs notifications allowed');
