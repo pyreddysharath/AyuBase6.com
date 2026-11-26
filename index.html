@@ -17795,8 +17795,8 @@ body.ayu-sb-calculator-panel:not(#ayu-x1) #app-nav::before{left:46%;top:-6%}
 .chk-row.skip .chk-lab{opacity:.55}
 .chk-lab{flex:1 1 auto}
 .chk-note{display:block;font-size:.78rem;opacity:.65}
-.chk-i{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--footer-accent,var(--act-2));background:#fff;color:var(--footer-accent,var(--act-2));font:italic 700 13px/1 Georgia,serif;cursor:pointer;padding:0;display:none}
-.chk-row.bad .chk-i,.chk-row.hasinfo .chk-i{display:inline-block}
+.chk-i{flex:0 0 13px;width:13px;height:13px;min-width:13px;border-radius:50%;border:1px solid var(--footer-accent,var(--act-2));background:#fff;color:var(--footer-accent,var(--act-2));font:italic 700 9.5px/1 Georgia,serif;cursor:pointer;padding:0;margin:0 0 0 6px;display:none;vertical-align:middle;text-align:center;box-sizing:border-box}
+.chk-row.bad .chk-i,.chk-row.hasinfo .chk-i{display:inline-flex;align-items:center;justify-content:center}
 .chk-sum{font-weight:700;margin:6px 0 8px;text-align:center}
 .chk-sum:empty{display:none}
 .chk-top{display:flex;justify-content:center;margin:6px 0 10px}
@@ -17944,7 +17944,7 @@ body.ayu-sb-calculator-panel:not(#ayu-x1) #app-nav::before{left:46%;top:-6%}
       info:['Didn\'t arrive?','You should see a notification and hear the reminder sound. If not, open your phone <b>Settings → Apps → AyuBase6 (or Chrome) → Notifications</b>: allowed, sound on, not silent. Also check Do Not Disturb and battery saver.']});
     steps.forEach(function(s){
       var li=document.createElement('li'); li.className='chk-row'; li.id='chk-'+s.k;
-      li.innerHTML='<span class="chk-cb"></span><span class="chk-lab">'+s.label+'<span class="chk-note"></span></span><button type="button" class="chk-i" aria-label="More information">i</button>';
+      li.innerHTML='<span class="chk-cb"></span><span class="chk-lab">'+s.label+'<button type="button" class="chk-i" aria-label="More information">i</button><span class="chk-note"></span></span>';
       li.querySelector('.chk-i').addEventListener('click',function(){ var d=INFO[s.k]; if(d) showPop(d[0],d[1]); });
       list.appendChild(li);
     });
