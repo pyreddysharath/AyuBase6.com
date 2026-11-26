@@ -3,51 +3,51 @@
   "tabs": {
     "body": {
       "file": "bg/body.svg",
-      "v": 12
+      "v": 13
     },
     "food": {
       "file": "bg/food.svg",
-      "v": 9
+      "v": 10
     },
     "mind": {
       "file": "bg/mind.svg",
-      "v": 10
+      "v": 11
     },
     "vitals": {
       "file": "bg/vitals.svg",
-      "v": 8
+      "v": 9
     },
     "care": {
       "file": "bg/care.svg",
-      "v": 10
+      "v": 11
     },
     "alerts": {
       "file": "bg/alerts.svg",
-      "v": 9
+      "v": 10
     },
     "body_w": {
       "file": "bg/body_w.svg",
-      "v": 11
+      "v": 12
     },
     "food_w": {
       "file": "bg/food_w.svg",
-      "v": 7
+      "v": 8
     },
     "mind_w": {
       "file": "bg/mind_w.svg",
-      "v": 8
+      "v": 9
     },
     "vitals_w": {
       "file": "bg/vitals_w.svg",
-      "v": 5
+      "v": 6
     },
     "care_w": {
       "file": "bg/care_w.svg",
-      "v": 7
+      "v": 8
     },
     "alerts_w": {
       "file": "bg/alerts_w.svg",
-      "v": 6
+      "v": 7
     }
   }
 }
