@@ -17794,7 +17794,7 @@ body.ayu-sb-calculator-panel:not(#ayu-x1) #app-nav::before{left:46%;top:-6%}
 .chk-row.skip .chk-cb{opacity:.35}
 .chk-row.skip .chk-lab{opacity:.55}
 .chk-lab{flex:1 1 auto}
-.chk-note{display:block;font-size:.78rem;opacity:.65}
+.chk-note{display:block;font-size:.78rem;opacity:.65;white-space:pre-line}
 .chk-i{flex:0 0 13px;width:13px;height:13px;min-width:13px;border-radius:50%;border:1px solid var(--footer-accent,var(--act-2));background:#fff;color:var(--footer-accent,var(--act-2));font:italic 700 9.5px/1 Georgia,serif;cursor:pointer;padding:0;margin:0 0 0 6px;display:none;vertical-align:middle;text-align:center;box-sizing:border-box}
 .chk-row.bad .chk-i,.chk-row.hasinfo .chk-i{display:inline-flex;align-items:center;justify-content:center}
 .chk-sum{font-weight:700;margin:6px 0 8px;text-align:center}
@@ -17928,7 +17928,7 @@ body.ayu-sb-calculator-panel:not(#ayu-x1) #app-nav::before{left:46%;top:-6%}
         if(typeof r.nextAlarmMs==='number'){ var nm=r.nextAlarmMs; tapTxt = !nm ? 'Phone time tap opens: nothing (the phone holds no next alarm)' : r.nextAlarmOurs ? tapTxt : 'Phone time tap opens: another app\'s alarm is the phone\'s next one'; }
         if(r.fullScreen===false) tip='Full-screen alarms are off, so alarms show as a notification';
         else if(!r.batteryUnrestricted) tip='Tip: Battery “Unrestricted” makes alarms most reliable';
-        if(!p.length) return ok((tip||'Alarm volume up, on time, not restricted')+(tapTxt?' · '+tapTxt.replace('Phone time tap opens: ','Time tap → '):''));
+        if(!p.length) return ok((tip||'Alarm volume up, on time, not restricted')+(tapTxt?'\n'+tapTxt.replace('Phone time tap opens: ','Time tap → '):''));
         var EVN={set:'alarm scheduled',ringing:'alarm rang',late:'started late',blocked:'blocked by Android',startfail:'could not start',refused:'refused by Android',stopped:'stopped',snoozed:'snoozed'};
         var det=('<p style="margin:8px 0 0;font-size:.8em;opacity:.75">Your phone: '+String(r.manufacturer||'Phone').replace(/[<>&]/g,'')+', Android '+(r.android||'?')+(tapTxt?'.<br>'+tapTxt:'')+(r.alarmLog&&r.alarmLog.length?'.<br>What AyuBase6 did last (oldest first): '+r.alarmLog.slice(-4).map(function(x){ var k=x.m.split(':')[0]; return (EVN[k]||k)+' at '+new Date(x.t).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); }).join('; ')+'.':'.')+'</p>');
         // One tap to the phone's battery page for AyuBase6 (where "Unrestricted" is chosen)
