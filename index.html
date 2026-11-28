@@ -16640,7 +16640,7 @@ html body #nutrition-panel #sec-gender{min-height:0 !important}
   sec('routines','#alert-card-break-ex',0,C.rem,'<b>Eye Exercise</b>: guided eye exercises on the days you choose.',{care:'hb'});
   // Reminders
   tab('alerts','.tab-btn.alerts',C.rem,'Gentle nudges, alarms and timers through the day.');
-  sec('alerts','#alerts-panel .ayu-sub-tabs.rem5',0,C.rem,'<b>Five parts</b>: Alarm, Timer, Stopwatch, World Clock and Personal. Tap one to open it.');
+  sec('alerts','#alerts-panel .ayu-sub-tabs.rem5',0,C.rem,'<b>Five parts</b>: Alarm, Timer, Stopwatch, World Clock and Reminders. Tap one to open it.');
   sec('alerts','#custom-reminders-card',0,C.rem,'<b>Personal Reminders</b>: tap <b>Add treatment</b> (a name, its medicines with times, food and days; Taken, Snooze and Skip on the notification; a history table) or <b>Add reminder</b> with a Frequency of Only Once, Daily, Weekly, Monthly or Yearly.');
   sec('alerts','#rem-alarm-card .clk-now',0,C.rem,'<b>Clock</b>: the time and date now, above Alarm, Timer, Stopwatch and World Clock.');
   sec('alerts','#rem-tap-row',0,C.rem,'<b>Phone’s time opens</b>: your phone’s Clock app or AyuBase6, while an AyuBase6 alarm is next.');
@@ -17332,7 +17332,7 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
         if(s==='eyeex'){ var x=EX_DEF.filter(function(d){ return g.indexOf(d)>=0; }); return x.length?x:EX_DEF.slice(); } return g; }
       var rawV=localStorage.getItem(KEYS[k]), v=JSON.parse(rawV||'null');
       if(k==='rem') return (v&&Array.isArray(v.days)&&v.days.length)?clean(v.days):(rawV?ALL.slice():WK.slice());
-      return clean(v);
+      return rawV ? clean(v) : WK.slice();   // chk (Notify Me and the Wake-up days): new installs start on Mon-Fri
     }catch(e){ return /eyeex$/.test(k) ? EX_DEF.slice() : ALL.slice(); }
   }
   function hbAll(){ var o={}; ['break','walk','drink','posture','stretch','breathe','eyeex'].forEach(function(s){ o[s]=get('rem-'+s).slice(); }); return o; }
@@ -17362,7 +17362,7 @@ html body #alerts-panel .alert-card.collapsed > .sec-lotus-layer{display:block !
   window.ayuDays={
     get:function(k){return get(k)},
     ok:function(k,d){return get(k).indexOf((d||new Date()).getDay())>=0},
-    reset:function(k){cache[k]=(k==='rem'?WK:ALL).slice();if(draws[k])draws[k]();if(k==='rem')['break','walk','drink','posture','stretch','breathe','eyeex'].forEach(function(s){cache['rem-'+s]=s==='eyeex'?EX_DEF.slice():WK.slice();if(draws['rem-'+s])draws['rem-'+s]()});},
+    reset:function(k){cache[k]=WK.slice();if(draws[k])draws[k]();if(k==='rem')['break','walk','drink','posture','stretch','breathe','eyeex'].forEach(function(s){cache['rem-'+s]=s==='eyeex'?EX_DEF.slice():WK.slice();if(draws['rem-'+s])draws['rem-'+s]()});},
     all:function(){return hbAll()},
     refresh:function(){cache={};Object.keys(draws).forEach(function(k){draws[k]()})}
   };
@@ -19964,7 +19964,7 @@ html body #alerts-panel #custom-reminders-card .custom-reminder-form .reminder-f
       if(a && (a.on || (a.tone&&a.tone!=='rise') || (a.ring!=null&&+a.ring!==1) || (a.snoozeMin!=null&&+a.snoozeMin!==10) || (a.snoozeMax!=null&&+a.snoozeMax!==3) || (a.keys&&a.keys!=='stop') || (a.lock&&a.lock!=='snooze') || a.once || (Array.isArray(a.days)&&a.days.length&&a.days.length!==7))) return true;
       if(typeof routineNotificationsEnabled==='function' && routineNotificationsEnabled()) return true;
       if(typeof routineRemindMode==='function' && routineRemindMode()!=='start') return true;
-      if(window.ayuDays && window.ayuDays.get('chk').length!==7) return true;
+      if(window.ayuDays && window.ayuDays.get('chk').slice().sort().join()!=='1,2,3,4,5') return true;
     }catch(e){}
     return false;
   }
@@ -20360,7 +20360,7 @@ body.ayu-tour:not(#ayu-x1) #alerts-panel .alert-page[data-remtab="breaks"] :is(#
           ['timer','Timer','M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42A8.962 8.962 0 0012 4c-4.97 0-9 4.03-9 9s4.02 9 9 9a8.994 8.994 0 007.03-14.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z'],
           ['stopwatch','Stopwatch','M9 1h6v2H9V1zm3 5a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm-.9-9.5v4.2l3.1 1.8.75-1.25-2.45-1.45V10.5h-1.4zM19.03 7.39l1.42-1.42-1.41-1.41-1.42 1.42 1.41 1.41z'],
           ['world','World Clock','M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'],
-          ['personal','Personal','M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z']];
+          ['personal','Reminders','M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z']];
   var CLOCK=/^(alarm|timer|stopwatch|world)$/, REM=/^(personal|alarm|timer|stopwatch|world)$/;
   var care=(function(){ try{ return localStorage.getItem(CK)==='hb'?'hb':'checks'; }catch(e){ return 'checks'; } })();
   var rsub=(function(){ try{ var v=localStorage.getItem(RK); return REM.test(v||'')?v:'alarm'; }catch(e){ return 'alarm'; } })();
@@ -21309,7 +21309,7 @@ html body .ayu-rem-tabs button[aria-selected=true]>span:not(#ayu-x1):not(#ayu-x2
 </style>
 <script id="tab-labels-20261105-js">
 (function(){
-  var M={breaks:'Health Breaks',personal:'Personal',alarm:'Clock',bmi:'BMI',lab:'Lab Insights',tracker:'Tracker'};
+  var M={breaks:'Health Breaks',personal:'Reminders',alarm:'Clock',bmi:'BMI',lab:'Lab Insights',tracker:'Tracker'};
   function go(){ var b=document.querySelectorAll('.ayu-rem-tabs button[data-t],.ayu-vit-tabs button[data-t]'); [].forEach.call(b,function(x){ var s=x.querySelector('span'); if(s && M[x.dataset.t] && s.textContent!==M[x.dataset.t]) s.textContent=M[x.dataset.t]; }); return b.length>=6; }
   var n=0, iv=setInterval(function(){ if(go() || ++n>40) clearInterval(iv); },250);
 })();
@@ -26212,7 +26212,8 @@ function repBody(p,r){
   }
   if(r.type==='lab'){
     h+=labItems(r).map(labSectionHtml).join('');
-    if(r.manual) h+=(labManualOpen?'<div id="lab-form-slot" class="lab-form-slot"></div>':'<div class="lab-plus-row"><button type="button" class="lab-plus" onclick="labOpenManual()" aria-label="Add a value">+</button><span id="lab-plus-note" class="lab-plus-note"></span></div>');
+    if(labManualOpen && manualTarget===r.id) h+='<div id="lab-form-slot" class="lab-form-slot"></div>';
+    else if(r.manual) h+='<div class="lab-plus-row"><button type="button" class="lab-plus" onclick="labOpenManual(true,\''+r.id+'\')" aria-label="Add a value">+</button><span id="lab-plus-note" class="lab-plus-note"></span></div>';
     if(!r.rows.length && !r.other.length && !r.manual) h+='<div class="lab-card-note">No test values were found.</div>';
     return h;
   }
@@ -26368,7 +26369,9 @@ function delEntry(key){
 
 /* old entry points used by other parts of the page */
 window.labDeleteEntry=function(k){ delEntry(k); };
+var manualTarget=null;   // the report the typed-in values go to (chosen when Manual is tapped)
 function manualReport(){
+  if(manualTarget){ var tf=findRep(manualTarget); if(tf){ openRep[tf.r.id]=true; openP[tf.p.id]=true; repOpen=true; closed[tf.p.id+'|'+tf.r.date.slice(0,4)]=false; closed[tf.p.id+'|'+tf.r.date.slice(0,4)+'|'+tf.r.date.slice(5,7)]=false; return tf.r; } manualTarget=null; }
   var p=lastPid&&person(lastPid)||store.people[0];
   if(!p){ p={id:uid('p'),name:'Me',aliases:[],reports:[]}; store.people.push(p); }
   var r=p.reports.filter(function(x){ return x.manual; })[0];
@@ -26381,12 +26384,44 @@ window.addLabRow=function(refId,value){
   if(ex) ex.value=value; else r.rows.push({refId:refId,value:value});
   save(); render();
 };
-window.labOpenManual=function(){
-  manualReport(); labManualOpen=true; var m=$('lab-form-msg'); if(m) m.textContent=''; save(); render();
-  var slot=$('lab-form-slot'), sel=$('lab-test-select'); if(slot) slot.scrollIntoView({block:'nearest',behavior:'smooth'}); if(sel) try{ sel.focus({preventScroll:true}); }catch(e){}
+function manualAsk(go){
+  var list=[]; store.people.forEach(function(p){ p.reports.forEach(function(r){ if(r.type==='lab') list.push({p:p,r:r}); }); });
+  list.sort(function(a,b){ return a.r.date<b.r.date?1:a.r.date>b.r.date?-1:0; });
+  var many=store.people.length>1;
+  var h='<div class="lb-card"><div class="lb-q"><b>'+(list.length?'Add values to':'Name this report')+'</b></div><div class="lb-pl">'
+    +'<label class="lb-pk"><input type="radio" name="lbm" value="" checked> <b>'+(list.length?'A new report':'Report name')+'</b></label><input type="text" class="lb-newname" maxlength="60" value="Values typed in" aria-label="Report name">';
+  list.forEach(function(x){ h+='<label class="lb-pk"><input type="radio" name="lbm" value="'+x.r.id+'"> '+esc(x.r.title)+' <small>'+esc(shortDate(x.r.date))+(many?' · '+esc(x.p.name):'')+'</small></label>'; });
+  h+='</div><div class="lb-btns"><button type="button" class="pri" data-go="1">Continue</button><button type="button" data-go="0">Cancel</button></div></div>';
+  var ov=document.createElement('div'); ov.className='lb-modal'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.innerHTML=h; document.body.appendChild(ov);
+  var nm=ov.querySelector('.lb-newname'); try{ nm.focus(); nm.select(); }catch(e){}
+  nm.addEventListener('focus',function(){ var r=ov.querySelector('input[name="lbm"][value=""]'); if(r) r.checked=true; });
+  ov.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-go]'); if(!b){ if(e.target===ov) ov.remove(); return; }
+    if(b.getAttribute('data-go')!=='1'){ ov.remove(); return; }
+    var pick=ov.querySelector('input[name="lbm"]:checked'), v=pick?pick.value:'';
+    if(v){ manualTarget=v; }
+    else {
+      var p=lastPid&&person(lastPid)||store.people[0];
+      if(!p){ p={id:uid('p'),name:'Me',aliases:[],reports:[]}; store.people.push(p); }
+      var r={id:uid('r'),type:'lab',manual:true,title:(nm.value||'').trim()||'Values typed in',date:todayStr(),file:'',rows:[],other:[],items:[],lines:[],st:'na',added:Date.now()};
+      p.reports.push(r); manualTarget=r.id;
+    }
+    ov.remove(); go();
+  });
+  ov.addEventListener('keydown',function(e){ if(e.key==='Enter'&&e.target===nm){ e.preventDefault(); ov.querySelector('button[data-go="1"]').click(); } else if(e.key==='Escape'){ ov.remove(); } });
+}
+window.labOpenManual=function(again,rid){
+  function open(){
+    manualReport(); labManualOpen=true; var m=$('lab-form-msg'); if(m) m.textContent=''; save(); render();
+    var slot=$('lab-form-slot'), sel=$('lab-test-select'); if(slot) slot.scrollIntoView({block:'nearest',behavior:'smooth'}); if(sel) try{ sel.focus({preventScroll:true}); }catch(e){}
+  }
+  if(again===true && rid && findRep(rid)){ manualTarget=rid; open(); return; }   // the + inside a report keeps adding to it
+  manualAsk(open);
 };
+var labSave0=window.labManualSave;
+window.labManualSave=function(){ var r=labSave0.apply(this,arguments); if(!labManualOpen) manualTarget=null; return r; };
 window.labCloseManual=function(){
-  labManualOpen=false; var v=$('lab-test-value'); if(v) v.value=''; if(window.labSelectShowPlaceholder) window.labSelectShowPlaceholder();
+  labManualOpen=false; manualTarget=null; var v=$('lab-test-value'); if(v) v.value=''; if(window.labSelectShowPlaceholder) window.labSelectShowPlaceholder();
   store.people.forEach(function(p){ p.reports=p.reports.filter(function(r){ return !(r.manual && !r.rows.length); }); });
   save(); render();
 };
@@ -26717,7 +26752,7 @@ html body #alerts-panel #custom-reminders-card > .ayu-part-title .clk-now .cn-ap
 html body #alerts-panel #custom-reminders-card > .ayu-part-title .clk-now .cn-s{font-size:.82em;font-weight:700;opacity:.8;margin-left:-2px}
 html body #alerts-panel #custom-reminders-card > .ayu-part-title .clk-now .cn-d{margin-left:auto;font-size:.9rem;font-weight:700;opacity:.85}
 html body #alerts-panel .med-addrow{align-items:center}
-html body #alerts-panel .med-addrow > .ayu-i:not(#ayu-x1){position:static !important;transform:none !important;margin:0 0 0 2px !important;flex:0 0 auto}
+html body #alerts-panel .med-addrow > .ayu-i:not(#ayu-x1){position:relative !important;transform:none !important;margin:0 0 0 2px !important;flex:0 0 auto}
 html body #alerts-panel .med-addrow .ma-btn{padding:4px 6px !important;font-size:.82rem !important;border-radius:10px !important;gap:6px !important;min-height:0 !important;line-height:1.2}
 html body #alerts-panel .med-addrow .ma-btn svg{width:15px !important;height:15px !important}
 /* the info text under an (i): the same small size in every Alerts part, on the section's light sage */
@@ -26805,7 +26840,7 @@ html body #alerts-panel:has(.alert-page[data-remtab="breaks"]) :is(.alert-previe
 html body #mind-panel :is(.alert-preview-btn,.ayu-prev-btn):not(#ayu-x1):not(#ayu-x2):not(#ayu-x3){min-height:30px !important;height:auto !important;padding:4px 16px !important;line-height:1.3 !important;background:color-mix(in srgb,#5d69c6 18%,#fff) !important;border:2px solid #5d69c6 !important;color:color-mix(in srgb,#5d69c6 55%,#000) !important;font-weight:700 !important}
 </style>
 <style id="au-colors-20261126">html body #sec-app .au-line.ok:not(#ayu-x1):not(#ayu-x2){color:var(--footer-accent,#2563eb) !important}html body #sec-app .au-ver:not(#ayu-x1):not(#ayu-x2){color:color-mix(in srgb,var(--footer-accent,#2563eb) 62%,#0b1b2b) !important}</style>
-<style id="glass-c-20261126">html[data-ayu-bg] .tab-panel :is(.card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section):not(#ayu-x1):not(#ayu-x2){background-color:rgba(255,255,255,.46) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}html[data-petal-card="e"] #mind-panel .mind-card:not(#ayu-x1){background:rgba(255,255,255,.46) !important}html body #lab-insights-card .lab-top-box:not(#ayu-x1), html body #lab-insights-card .lab-rep-box:not(#ayu-x1){background-color:rgba(255,255,255,.46) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}html body #calculator-panel .calc-card.ayu-vit-on:not(#ayu-x1):not(#ayu-x2){background-color:rgba(255,255,255,.46) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}#ayu-bgc .t{filter:saturate(1.3) brightness(.97)}</style>
+<style id="glass-c-20261126">html[data-ayu-bg] .tab-panel :is(.card,.calc-card,.alert-card,.rout-card,.mind-card,.body-age-section,.activity-type-section):not(#ayu-x1):not(#ayu-x2){background-color:rgba(255,255,255,.46) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}html[data-petal-card="e"] #mind-panel .mind-card:not(#ayu-x1){background:rgba(255,255,255,.46) !important}html body #lab-insights-card .lab-top-box:not(#ayu-x1), html body #lab-insights-card .lab-rep-box:not(#ayu-x1){background-color:rgba(255,255,255,.46) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}html body #calculator-panel .calc-card.ayu-vit-on:not(#ayu-x1):not(#ayu-x2){background-color:rgba(255,255,255,.46) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}#ayu-bgc .t{filter:saturate(1.3) brightness(.97)}html[data-ayu-bg] .tab-panel .ayu-rem-group .alert-card:not(#reminder-hours-card):not(#ayu-x1):not(#ayu-x2){background-color:rgba(255,255,255,.62) !important}</style>
 
 <style id="hb-all-20261126">
 /* Health Breaks: one icon collapses or opens every section that is switched on */
@@ -26843,6 +26878,19 @@ html body #alerts-panel .ayu-hb-allbtn:not(#ayu-x1):disabled{opacity:.45;filter:
   document.addEventListener('click',function(){ setTimeout(paint,0); },true);
 })();
 </script>
+
+<style id="lab-ask-20261128">
+html body .lb-pl{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow:auto;margin-bottom:12px}
+html body .lb-pk{display:block;font-size:.95rem;line-height:1.35;color:#0b4254;cursor:pointer}
+html body .lb-pk small{opacity:.75}
+html body .lb-newname{font:inherit;padding:9px 10px;border-radius:10px;border:1px solid #a5dcea;background:#fff;color:#0b4254;margin:-2px 0 4px 22px;width:calc(100% - 22px);box-sizing:border-box}
+</style>
+
+<style id="alerts-nobox-20261128">
+/* Alerts: Alarm, Timer, Stopwatch, World Clock and Reminders sit straight on the picture, no box behind them */
+html body #alerts-panel :is(#rem-alarm-card,#custom-reminders-card):not(#ayu-x1):not(#ayu-x2){background:transparent !important;background-color:transparent !important;border-color:transparent !important;box-shadow:none !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+html body #alerts-panel :is(#rem-alarm-card,#custom-reminders-card):not(#ayu-x1):not(#ayu-x2)::before,html body #alerts-panel :is(#rem-alarm-card,#custom-reminders-card):not(#ayu-x1):not(#ayu-x2)::after{display:none !important}
+</style>
 </body>
 
 <style id="reminders-time-arrows-and-fit-width-20261027">
